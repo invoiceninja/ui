@@ -10,6 +10,7 @@
 
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 import { AuthenticationTypes } from "../dtos/authentication";
 import { endpoint } from "../helpers";
 import { authenticate } from "../stores/slices/user";
@@ -18,6 +19,8 @@ import { RootState } from "../stores/store";
 export function useAuthenticated(): Boolean {
   const user = useSelector((state: RootState) => state.user);
   const token = localStorage.getItem("X-NINJA-TOKEN");
+
+  const navigate = useNavigate();
   const dispatch = useDispatch();
 
   if (token === null) return false;
@@ -46,7 +49,8 @@ export function useAuthenticated(): Boolean {
       }
     })
     .catch((error: AxiosError) => {
-      // Clear storage item..
+      localStorage.removeItem("X-NINJA-TOKEN");
+      navigate("/login");
     });
 
   return true;
