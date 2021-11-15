@@ -8,11 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useSelector } from "react-redux";
-import { RootState } from "../common/stores/store";
+import { generatePath } from "react-router";
 
-export function Index() {
-  const user = useSelector((state: RootState) => state.user.user);
-
-  return <div>Hello, {user.first_name}</div>;
+export function endpoint(endpoint: string, params = {}): string {
+  return process.env.REACT_APP_API_URL + generatePath(endpoint, params);
 }

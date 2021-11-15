@@ -22,4 +22,5 @@ export enum AuthenticationTypes {
 
 export interface Authenticated {
   type: AuthenticationTypes;
+  user: {};
 }

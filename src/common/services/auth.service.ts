@@ -8,8 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import axios from "axios";
 import { LoginForm } from "../dtos/authentication";
+import { endpoint } from "../helpers";
 
 export class AuthService {
-  login(values: LoginForm) {}
+  login(values: LoginForm) {
+    return axios.post(
+      endpoint("/api/v1/login"),
+      {
+        email: values.emailAddress,
+        password: values.password,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      }
+    );
+  }
 }
