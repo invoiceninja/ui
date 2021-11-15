@@ -15,6 +15,7 @@ import reportWebVitals from "./reportWebVitals";
 import { HashRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./common/stores/store";
+import "./resources/css/app.css";
 
 ReactDOM.render(
   <React.StrictMode>
