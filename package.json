@@ -27,7 +27,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "format": "prettier --write src/**/*.{tsx,ts}"
+    "format": "prettier --write src/**/*.{tsx,ts}",
+    "serve": "react-scripts build && serve -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -48,6 +49,7 @@
     ]
   },
   "devDependencies": {
-    "prettier": "2.4.1"
+    "prettier": "2.4.1",
+    "serve": "^13.0.2"
   }
 }
