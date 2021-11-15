@@ -1,33 +1,34 @@
 import { useFormik } from "formik";
 import { useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import {
   AuthenticationTypes,
   LoginForm,
 } from "../../common/dtos/authentication";
-import { AuthService } from "../../common/services/auth.service";
+import { endpoint } from "../../common/helpers";
 import { authenticate } from "../../common/stores/slices/user";
+import axios, { AxiosError, AxiosResponse } from "axios";
 
 export function Login() {
-  const authService = new AuthService();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
 
   const form = useFormik({
     initialValues: {
-      emailAddress: "",
+      email: "",
       password: "",
-      oneTimePassword: "",
-      secret: "",
     },
     onSubmit: (values: LoginForm) => {
-      setMessage("");
-
-      authService
-        .login(values)
-        .then((response) => {
+      axios
+        .post(endpoint("/api/v1/login"), values, {
+          headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest",
+          },
+        })
+        .then((response: AxiosResponse) => {
           dispatch(
             authenticate({
               type: AuthenticationTypes.TOKEN,
@@ -35,11 +36,16 @@ export function Login() {
             })
           );
 
+          localStorage.setItem(
+            "X-NINJA-TOKEN",
+            response.data.data[0].token.token
+          );
+
           navigate("/");
         })
-        .catch((error) =>
-          setMessage("These credentials do not match our records.")
-        );
+        .catch((error: AxiosError) => {
+          setMessage("These credentials do not match our records.");
+        });
     },
   });
 
@@ -49,7 +55,7 @@ export function Login() {
       <form onSubmit={form.handleSubmit}>
         <input
           type="email"
-          id="emailAddress"
+          id="email"
           placeholder="E-mail address"
           onChange={form.handleChange}
         />
@@ -59,18 +65,7 @@ export function Login() {
           placeholder="Password"
           onChange={form.handleChange}
         />
-        <input
-          type="password"
-          id="oneTimePassword"
-          placeholder="One Time Password (Optional)"
-          onChange={form.handleChange}
-        />
-        <input
-          type="password"
-          id="secret"
-          placeholder="Secret (Optional)"
-          onChange={form.handleChange}
-        />
+        <br />
         <button type="submit">Log in with e-mail</button>
       </form>
     </>

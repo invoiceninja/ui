@@ -9,10 +9,8 @@
  */
 
 export interface LoginForm {
-  emailAddress: string;
+  email: string;
   password: string;
-  oneTimePassword: string | null;
-  secret: string | null;
 }
 
 export enum AuthenticationTypes {

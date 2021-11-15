@@ -8,14 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
-import { RootState } from "../common/stores/store";
+import { useAuthenticated } from "../common/hooks/useAuthenticated";
 
 export function PrivateRoute() {
-  const authenticated = useSelector(
-    (state: RootState) => state.user.authenticated
-  );
+  const authenticated = useAuthenticated();
 
   return authenticated ? <Outlet /> : <Navigate to="/login" />;
 }
