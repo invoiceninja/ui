@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { routes } from "./common/routes";
+import { LoginForm } from "../dtos/authentication";
 
-export function App() {
-  return <div className="App">{routes}</div>;
+export class AuthService {
+  login(values: LoginForm) {}
 }

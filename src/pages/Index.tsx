@@ -1,11 +1,13 @@
-import { Link } from "react-router-dom";
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
 
 export function Index() {
-  return (
-    <div>
-      <h1>Invoice Ninja</h1>
-
-      <Link to="/login">Login</Link>
-    </div>
-  );
+  return <div></div>;
 }
