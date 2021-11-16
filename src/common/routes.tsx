@@ -13,6 +13,7 @@ import { PrivateRoute } from "../components/PrivateRoute";
 import { PublicRoute } from "../components/PublicRoute";
 import { Login } from "../pages/authentication/Login";
 import { Logout } from "../pages/authentication/Logout";
+import { Register } from "../pages/authentication/Register";
 import { Dashboard } from "../pages/Dashboard";
 import { Index } from "../pages/Index";
 
@@ -21,6 +22,7 @@ export const routes = (
     <Route path="/" element={<Index />} />
     <Route path="/" element={<PublicRoute />}>
       <Route path="login" element={<Login />} />
+      <Route path="register" element={<Register />} />
     </Route>
     <Route path="/app" element={<PrivateRoute />}>
       <Route path="dashboard" element={<Dashboard />} />
