@@ -14,7 +14,5 @@ import { useNavigate } from "react-router";
 export function Dashboard() {
   const navigate = useNavigate();
 
-  useEffect(() => navigate("/dashboard"));
-
-  return <></>;
+  return <>dashboard</>;
 }

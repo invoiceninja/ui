@@ -10,16 +10,19 @@
 
 import { Route, Routes } from "react-router";
 import { PrivateRoute } from "../components/PrivateRoute";
+import { PublicRoute } from "../components/PublicRoute";
 import { Login } from "../pages/authentication/Login";
 import { Dashboard } from "../pages/Dashboard";
 import { Index } from "../pages/Index";
 
 export const routes = (
   <Routes>
-    <Route path="/" element={<PrivateRoute />}>
-      <Route path="/" element={<Index />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+    <Route path="/" element={<Index />} />
+    <Route path="/" element={<PublicRoute />}>
+      <Route path="login" element={<Login />} />
     </Route>
-    <Route path="/login" element={<Login />} />
+    <Route path="/app" element={<PrivateRoute />}>
+      <Route path="dashboard" element={<Dashboard />} />
+    </Route>
   </Routes>
 );

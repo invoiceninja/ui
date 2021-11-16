@@ -8,15 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Navigate } from "react-router";
+import { Navigate, Outlet } from "react-router";
 import { useAuthenticated } from "../common/hooks/useAuthenticated";
 
-export function Index() {
+export function PublicRoute() {
   const authenticated = useAuthenticated();
 
-  return authenticated ? (
-    <Navigate to="/app/dashboard" />
-  ) : (
-    <Navigate to="/login" />
-  );
+  return authenticated ? <Navigate to="/app/dashboard" /> : <Outlet />;
 }
