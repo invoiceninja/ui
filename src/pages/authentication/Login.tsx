@@ -6,9 +6,9 @@ import {
   AuthenticationTypes,
   LoginForm,
 } from "../../common/dtos/authentication";
-import { endpoint } from "../../common/helpers";
+import { request } from "../../common/helpers";
 import { authenticate } from "../../common/stores/slices/user";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { Link } from "react-router-dom";
 import { LinkStyled } from "../../components/forms/Link";
 import { Input } from "../../components/forms/Input";
@@ -34,13 +34,7 @@ export function Login() {
       setErrors(undefined);
       setIsFormBusy(true);
 
-      axios
-        .post(endpoint("/api/v1/login"), values, {
-          headers: {
-            "Content-Type": "application/json",
-            "X-Requested-With": "XMLHttpRequest",
-          },
-        })
+      request("POST", "/api/v1/login", values)
         .then((response: AxiosResponse) => {
           dispatch(
             authenticate({
