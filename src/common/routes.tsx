@@ -12,6 +12,7 @@ import { Route, Routes } from "react-router";
 import { PrivateRoute } from "../components/PrivateRoute";
 import { PublicRoute } from "../components/PublicRoute";
 import { Login } from "../pages/authentication/Login";
+import { Logout } from "../pages/authentication/Logout";
 import { Dashboard } from "../pages/Dashboard";
 import { Index } from "../pages/Index";
 
@@ -23,6 +24,7 @@ export const routes = (
     </Route>
     <Route path="/app" element={<PrivateRoute />}>
       <Route path="dashboard" element={<Dashboard />} />
+      <Route path="logout" element={<Logout />} />
     </Route>
   </Routes>
 );
