@@ -12,6 +12,8 @@ interface Props {
   label: string;
   id?: string;
   name?: string;
+  required?: boolean;
+  onChange?: any;
 }
 
 export function Checkbox(props: Props) {
@@ -22,8 +24,10 @@ export function Checkbox(props: Props) {
         name={props.name}
         type="checkbox"
         className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
+        required={props.required}
+        onChange={props.onChange}
       />
-      <label htmlFor={props.id} className="ml-2 block text-sm text-gray-900">
+      <label htmlFor={props.id} className="ml-2 block text-sm text-gray-900 cursor-pointer">
         {props.label}
       </label>
     </div>
