@@ -8,10 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isSelfHosted } from "../../../common/helpers";
 import { ShieldCheck } from "../../../components/icons/ShieldCheck";
 import { Smartphone } from "../../../components/icons/Smartphone";
 
 export function BelowForm() {
+  if (isSelfHosted()) {
+    return <></>;
+  }
+
   return (
     <div className="mt-6">
       <div className="relative">
