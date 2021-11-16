@@ -15,7 +15,24 @@ import reportWebVitals from "./reportWebVitals";
 import { HashRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./common/stores/store";
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
 import "./resources/css/app.css";
+
+import en from "./resources/lang/en/en.json";
+
+i18n.use(initReactI18next).init({
+  resources: {
+    en: {
+      translation: en,
+    },
+  },
+  lng: "en",
+  fallbackLng: "en",
+  interpolation: {
+    escapeValue: false,
+  },
+});
 
 ReactDOM.render(
   <React.StrictMode>
