@@ -6,7 +6,7 @@ import {
   AuthenticationTypes,
   LoginForm,
 } from "../../common/dtos/authentication";
-import { request } from "../../common/helpers";
+import { isHosted, request } from "../../common/helpers";
 import { authenticate } from "../../common/stores/slices/user";
 import { AxiosError, AxiosResponse } from "axios";
 import { Link } from "react-router-dom";
@@ -136,9 +136,11 @@ export function Login() {
           <div className="flex flex-col items-center mt-4">
             {message && <Message type="red">{message}</Message>}
 
-            <LinkStyled className="mt-2" to="/register">
-              {t("register_label")}
-            </LinkStyled>
+            {isHosted() && (
+              <LinkStyled className="mt-2" to="/register">
+                {t("register_label")}
+              </LinkStyled>
+            )}
           </div>
         </div>
       </div>

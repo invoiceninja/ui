@@ -9,6 +9,7 @@
  */
 
 import { Route, Routes } from "react-router";
+import { HostedRoute } from "../components/HostedRoute";
 import { PrivateRoute } from "../components/PrivateRoute";
 import { PublicRoute } from "../components/PublicRoute";
 import { Login } from "../pages/authentication/Login";
@@ -22,7 +23,9 @@ export const routes = (
     <Route path="/" element={<Index />} />
     <Route path="/" element={<PublicRoute />}>
       <Route path="login" element={<Login />} />
-      <Route path="register" element={<Register />} />
+      <Route path="" element={<HostedRoute />}>
+        <Route path="register" element={<Register />} />
+      </Route>
     </Route>
     <Route path="/app" element={<PrivateRoute />}>
       <Route path="dashboard" element={<Dashboard />} />
