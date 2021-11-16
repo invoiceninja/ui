@@ -17,6 +17,7 @@ interface Props {
   placeholder?: string;
   onChange?: any;
   disabled?: boolean | false;
+  required?: boolean;
 }
 
 export function Input(props: Props) {
@@ -37,6 +38,7 @@ export function Input(props: Props) {
           placeholder={props.placeholder}
           onChange={props.onChange}
           disabled={props.disabled}
+          required={props.required}
         />
       </div>
     </div>
