@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from "react-i18next";
 import { ShieldCheck } from "../../../components/icons/ShieldCheck";
 import { Smartphone } from "../../../components/icons/Smartphone";
 
@@ -29,6 +28,7 @@ export function BelowForm() {
           <a
             href="https://status.invoiceninja.com/"
             target="_blank"
+            rel="noreferrer"
             className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
           >
             <span className="sr-only">Check Status</span>
@@ -43,6 +43,7 @@ export function BelowForm() {
           <a
             href="https://www.invoiceninja.com/mobile/"
             target="_blank"
+            rel="noreferrer"
             className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
           >
             <span className="sr-only">Applications</span>
