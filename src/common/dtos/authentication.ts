@@ -13,6 +13,14 @@ export interface LoginForm {
   password: string;
 }
 
+export interface RegisterForm {
+  email: string;
+  password: string;
+  password_confirmation: string;
+  terms_of_service: boolean;
+  privacy_policy: boolean;
+}
+
 export enum AuthenticationTypes {
   TOKEN = "invoiceninja_token",
   GOOGLE_SSO = "google_sso",
