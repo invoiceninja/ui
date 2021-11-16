@@ -8,12 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useNavigate } from "react-router";
 import { Link } from "react-router-dom";
 
 export function Dashboard() {
-  const navigate = useNavigate();
-
   return (
     <div>
       <h1>Dashboard</h1>

@@ -9,10 +9,8 @@
  */
 
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { request } from "../../common/helpers";
-import { RootState } from "../../common/stores/store";
 
 export function Logout() {
   const navigate = useNavigate();
