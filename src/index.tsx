@@ -12,7 +12,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { App } from "./App";
 import reportWebVitals from "./reportWebVitals";
-import { HashRouter } from "react-router-dom";
+import { BrowserRouter, HashRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import { store } from "./common/stores/store";
 import i18n from "i18next";
@@ -34,12 +34,15 @@ i18n.use(initReactI18next).init({
   },
 });
 
+const Router =
+  process.env.REACT_APP_ROUTER === "hash" ? HashRouter : BrowserRouter;
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
-      <HashRouter>
+      <Router>
         <App />
-      </HashRouter>
+      </Router>
     </Provider>
   </React.StrictMode>,
   document.getElementById("root")
