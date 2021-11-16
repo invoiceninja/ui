@@ -9,16 +9,19 @@
  */
 
 import classNames from "classnames";
+import Loading from "../icons/Loading";
 
 interface Props {
   block?: boolean;
   children?: any;
   type?: string | "button";
+  busy?: boolean;
 }
 
 export function Button(props: any) {
   return (
     <button
+      disabled={props.busy}
       type={props.type}
       className={
         "flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 " +
@@ -27,7 +30,7 @@ export function Button(props: any) {
         })
       }
     >
-      {props.children}
+      {props.busy ? <Loading /> : props.children}
     </button>
   );
 }
