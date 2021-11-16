@@ -29,5 +29,5 @@ export function Logout() {
     });
   });
 
-  return <div>Logging out</div>;
+  return <></>;
 }
