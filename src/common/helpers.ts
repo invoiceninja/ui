@@ -18,7 +18,7 @@ export function endpoint(endpoint: string, params = {}): string {
 export function request(
   method: Method = "GET",
   route: string,
-  body?: {},
+  data?: {},
   headers?: {}
 ) {
   return axios.request({
@@ -29,5 +29,6 @@ export function request(
       "Content-Type": "application/json",
       ...headers,
     },
+    data,
   });
 }

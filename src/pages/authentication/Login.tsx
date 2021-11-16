@@ -57,7 +57,7 @@ export function Login() {
             return setErrors(error.response.data.errors);
           }
 
-          setMessage("These credentials do not match our records.");
+          setMessage(t("invalid_credentials"));
         })
         .finally(() => setIsFormBusy(false));
     },
