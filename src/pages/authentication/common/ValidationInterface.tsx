@@ -9,6 +9,12 @@
  */
 
 export interface LoginValidation {
-  email: string[];
-  password: string[];
+  email?: string[];
+  password?: string[];
+}
+
+export interface RegisterValidation {
+  email?: string[];
+  password?: string[];
+  password_confirmation?: string[];
 }
