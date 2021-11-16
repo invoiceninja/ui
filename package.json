@@ -3,6 +3,8 @@
   "version": "alpha",
   "private": true,
   "dependencies": {
+    "@headlessui/react": "^1.4.2",
+    "@heroicons/react": "^1.0.5",
     "@reduxjs/toolkit": "^1.6.2",
     "@tailwindcss/forms": "^0.3.4",
     "@testing-library/jest-dom": "^5.15.0",
