@@ -17,6 +17,7 @@ import { Logout } from "../pages/authentication/Logout";
 import { Register } from "../pages/authentication/Register";
 import { Dashboard } from "../pages/Dashboard";
 import { Index } from "../pages/Index";
+import { Projects } from "../pages/Projects";
 
 export const routes = (
   <Routes>
@@ -28,8 +29,9 @@ export const routes = (
       </Route>
     </Route>
     <Route path="/app" element={<PrivateRoute />}>
-      <Route path="dashboard" element={<Dashboard />} />
       <Route path="logout" element={<Logout />} />
+      <Route path="dashboard" element={<Dashboard />} />
+      <Route path="projects" element={<Projects />} />
     </Route>
   </Routes>
 );
