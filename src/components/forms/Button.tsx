@@ -14,11 +14,11 @@ import Loading from "../icons/Loading";
 interface Props {
   block?: boolean;
   children?: any;
-  type?: string | "button";
+  type?: "submit" | "button";
   busy?: boolean;
 }
 
-export function Button(props: any) {
+export function Button(props: Props) {
   return (
     <button
       disabled={props.busy}
