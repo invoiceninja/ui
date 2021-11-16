@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router";
 import {
@@ -17,6 +17,7 @@ import { Button } from "../../components/forms/Button";
 import { Message } from "../../components/forms/Message";
 import { LoginValidation } from "./common/ValidationInterface";
 import { useTranslation } from "react-i18next";
+import { BelowForm } from "./components/BelowForm";
 
 export function Login() {
   const dispatch = useDispatch();
@@ -25,6 +26,10 @@ export function Login() {
   const [errors, setErrors] = useState<LoginValidation | undefined>(undefined);
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [t] = useTranslation();
+
+  useEffect(() => {
+    document.title = t("login");
+  });
 
   const form = useFormik({
     initialValues: {
@@ -125,9 +130,15 @@ export function Login() {
                 {t("email_sign_in")}
               </Button>
             </form>
+
+            <BelowForm />
           </div>
-          <div className="flex justify-center mt-4">
+          <div className="flex flex-col items-center mt-4">
             {message && <Message type="red">{message}</Message>}
+
+            <LinkStyled className="mt-2" to="/register">
+              {t("register_label")}
+            </LinkStyled>
           </div>
         </div>
       </div>
