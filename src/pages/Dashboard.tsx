@@ -8,13 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from "react-router-dom";
-
-export function Dashboard() {
-  return (
-    <div>
-      <h1>Dashboard</h1>
-      <Link to="/app/logout">Log out</Link>
-    </div>
-  );
-}
+ import { useEffect } from "react";
+ import { useTranslation } from "react-i18next";
+ import { Default } from "../components/layouts/Default";
+ 
+ export function Dashboard() {
+   const [t] = useTranslation();
+ 
+   useEffect(() => {
+     document.title = t("dashboard");
+   });
+ 
+   return <Default title={t("dashboard")}>Lorem, ipsum dolor.</Default>;
+ }
+ 
