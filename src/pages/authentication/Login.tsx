@@ -16,6 +16,7 @@ import { Checkbox } from "../../components/forms/Checkbox";
 import { Button } from "../../components/forms/Button";
 import { Message } from "../../components/forms/Message";
 import { LoginValidation } from "./common/ValidationInterface";
+import { useTranslation } from "react-i18next";
 
 export function Login() {
   const dispatch = useDispatch();
@@ -23,6 +24,7 @@ export function Login() {
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<LoginValidation | undefined>(undefined);
   const [isFormBusy, setIsFormBusy] = useState(false);
+  const [t] = useTranslation();
 
   const form = useFormik({
     initialValues: {
@@ -79,7 +81,7 @@ export function Login() {
             <form className="space-y-6" onSubmit={form.handleSubmit}>
               <div>
                 <Input
-                  label="E-mail address"
+                  label={t("email_address")}
                   type="email"
                   id="email"
                   placeholder="you@example.com"
@@ -95,7 +97,7 @@ export function Login() {
 
               <div>
                 <Input
-                  label="Password"
+                  label={t("password")}
                   type="password"
                   id="password"
                   disabled={isFormBusy}
@@ -110,17 +112,17 @@ export function Login() {
               </div>
 
               <div className="flex items-center justify-between">
-                <Checkbox label="Keep me signed in" />
+                <Checkbox label={t("stay_logged_in")} />
 
                 <div className="text-sm">
                   <LinkStyled to="/forgot-password">
-                    Forgot your password?
+                    {t("forgot_password")}
                   </LinkStyled>
                 </div>
               </div>
 
               <Button busy={isFormBusy} block>
-                Sign in
+                {t("email_sign_in")}
               </Button>
             </form>
           </div>
