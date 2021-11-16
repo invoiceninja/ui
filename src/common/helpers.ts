@@ -32,3 +32,11 @@ export function request(
     data,
   });
 }
+
+export function isHosted(): boolean {
+  return process.env.REACT_APP_IS_HOSTED === "true";
+}
+
+export function isSelfHosted(): boolean {
+  return !isHosted();
+}
