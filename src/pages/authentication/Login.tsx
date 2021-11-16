@@ -81,7 +81,7 @@ export function Login() {
         </div>
 
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+          <div className="bg-white mx-4 lg:mx-0 py-8 px-4 shadow rounded-lg sm:px-10">
             <form className="space-y-6" onSubmit={form.handleSubmit}>
               <div>
                 <Input
