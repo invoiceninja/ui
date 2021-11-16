@@ -50,7 +50,7 @@ export function Login() {
             response.data.data[0].token.token
           );
 
-          navigate("/");
+          navigate("/app/dashboard");
         })
         .catch((error: AxiosError) => {
           if (error.response?.status === 422) {
