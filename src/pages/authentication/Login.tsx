@@ -14,11 +14,15 @@ import { LinkStyled } from "../../components/forms/Link";
 import { Input } from "../../components/forms/Input";
 import { Checkbox } from "../../components/forms/Checkbox";
 import { Button } from "../../components/forms/Button";
+import { Message } from "../../components/forms/Message";
+import { LoginValidation } from "./common/ValidationInterface";
 
 export function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [message, setMessage] = useState("");
+  const [errors, setErrors] = useState<LoginValidation | undefined>(undefined);
+  const [isFormBusy, setIsFormBusy] = useState(false);
 
   const form = useFormik({
     initialValues: {
@@ -26,6 +30,10 @@ export function Login() {
       password: "",
     },
     onSubmit: (values: LoginForm) => {
+      setMessage("");
+      setErrors(undefined);
+      setIsFormBusy(true);
+
       axios
         .post(endpoint("/api/v1/login"), values, {
           headers: {
@@ -49,8 +57,13 @@ export function Login() {
           navigate("/");
         })
         .catch((error: AxiosError) => {
+          if (error.response?.status === 422) {
+            return setErrors(error.response.data.errors);
+          }
+
           setMessage("These credentials do not match our records.");
-        });
+        })
+        .finally(() => setIsFormBusy(false));
     },
   });
 
@@ -70,20 +83,37 @@ export function Login() {
         <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
           <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
             <form className="space-y-6" onSubmit={form.handleSubmit}>
-              <Input
-                label="E-mail address"
-                type="email"
-                id="email"
-                placeholder="you@example.com"
-                onChange={form.handleChange}
-              />
+              <div>
+                <Input
+                  label="E-mail address"
+                  type="email"
+                  id="email"
+                  placeholder="you@example.com"
+                  onChange={form.handleChange}
+                />
 
-              <Input
-                label="Password"
-                type="password"
-                id="password"
-                onChange={form.handleChange}
-              />
+                {errors?.email && (
+                  <Message classNames="mt-2" type="red">
+                    {errors.email}
+                  </Message>
+                )}
+              </div>
+
+              <div>
+                <Input
+                  label="Password"
+                  type="password"
+                  id="password"
+                  disabled={isFormBusy}
+                  onChange={form.handleChange}
+                />
+
+                {errors?.password && (
+                  <Message classNames="mt-2" type="red">
+                    {errors.password}
+                  </Message>
+                )}
+              </div>
 
               <div className="flex items-center justify-between">
                 <Checkbox label="Keep me signed in" />
@@ -95,10 +125,13 @@ export function Login() {
                 </div>
               </div>
 
-              <Button block>Sign in</Button>
-
-              {message}
+              <Button busy={isFormBusy} block>
+                Sign in
+              </Button>
             </form>
+          </div>
+          <div className="flex justify-center mt-4">
+            {message && <Message type="red">{message}</Message>}
           </div>
         </div>
       </div>
