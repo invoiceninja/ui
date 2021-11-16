@@ -8,11 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
 import { useAuthenticated } from "../common/hooks/useAuthenticated";
+import { RootState } from "../common/stores/store";
+import { LoadingScreen } from "./LoadingScreen";
 
 export function PrivateRoute() {
   const authenticated = useAuthenticated();
+  const user = useSelector((state: RootState) => state.user);
 
-  return authenticated ? <Outlet /> : <Navigate to="/login" />;
+  return authenticated ? (
+    user.user.id ? (
+      <Outlet />
+    ) : (
+      <LoadingScreen />
+    )
+  ) : (
+    <Navigate to="/login" />
+  );
 }

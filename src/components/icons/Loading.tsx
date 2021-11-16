@@ -8,12 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export default function Loading() {
+import classNames from "classnames";
+
+interface Props {
+  variant?: "light" | "dark";
+}
+
+export default function Loading(props: Props) {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
-      className="w-5 h-5 mr-2 -ml-1 text-white animate-spin"
+      className={classNames("w-5 h-5 mr-2 -ml-1 animate-spin", {
+        "text-white":
+          props.variant === "light" || typeof props.variant === "undefined",
+        "text-black": props.variant === "dark",
+      })}
       viewBox="0 0 24 24"
     >
       <circle
