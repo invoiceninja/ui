@@ -86,7 +86,7 @@ export function Login() {
                 />
 
                 {errors?.email && (
-                  <Message classNames="mt-2" type="red">
+                  <Message className="mt-2" type="red">
                     {errors.email}
                   </Message>
                 )}
@@ -102,7 +102,7 @@ export function Login() {
                 />
 
                 {errors?.password && (
-                  <Message classNames="mt-2" type="red">
+                  <Message className="mt-2" type="red">
                     {errors.password}
                   </Message>
                 )}
@@ -126,7 +126,7 @@ export function Login() {
             <BelowForm />
           </div>
           <div className="flex flex-col items-center mt-4">
-            {message && <Message type="red">{message}</Message>}
+            {message && <Message className="bg-white" type="red">{message}</Message>}
 
             {isHosted() && (
               <LinkStyled className="mt-2" to="/register">

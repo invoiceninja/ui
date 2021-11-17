@@ -86,7 +86,7 @@ export function ForgotPassword() {
                 />
 
                 {errors?.email && (
-                  <Message classNames="mt-2" type="red">
+                  <Message className="mt-2" type="red">
                     {errors.email}
                   </Message>
                 )}

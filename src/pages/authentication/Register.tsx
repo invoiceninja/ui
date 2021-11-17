@@ -110,7 +110,7 @@ export function Register() {
                 />
 
                 {errors?.email && (
-                  <Message classNames="mt-2" type="red">
+                  <Message className="mt-2" type="red">
                     {errors.email}
                   </Message>
                 )}
@@ -126,7 +126,7 @@ export function Register() {
                 />
 
                 {errors?.password && (
-                  <Message classNames="mt-2" type="red">
+                  <Message className="mt-2" type="red">
                     {errors.password}
                   </Message>
                 )}
@@ -142,7 +142,7 @@ export function Register() {
                 />
 
                 {errors?.password_confirmation && (
-                  <Message classNames="mt-2" type="red">
+                  <Message className="mt-2" type="red">
                     {errors.password_confirmation}
                   </Message>
                 )}
@@ -190,7 +190,7 @@ export function Register() {
             <BelowForm />
           </div>
           <div className="flex flex-col items-center mt-4">
-            {message && <Message type="red">{message}</Message>}
+            {message && <Message className="bg-white" type="red">{message}</Message>}
 
             <LinkStyled className="mt-2" to="/login">
               {t("login")}
