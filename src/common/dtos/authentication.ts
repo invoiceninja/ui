@@ -21,6 +21,10 @@ export interface RegisterForm {
   privacy_policy: boolean;
 }
 
+export interface ForgotPasswordForm {
+  email: string;
+}
+
 export enum AuthenticationTypes {
   TOKEN = "invoiceninja_token",
   GOOGLE_SSO = "google_sso",
@@ -31,7 +35,6 @@ export interface Authenticated {
   user: {};
   token: string;
 }
-
 export interface Registered {
   user: any;
   token: string;
