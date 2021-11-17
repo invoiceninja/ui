@@ -111,7 +111,7 @@ export function Login() {
               </div>
 
               <div className="flex items-center justify-between">
-                <Checkbox label={t("stay_logged_in")} />
+                <Checkbox id="stayLoggedIn" label={t("stay_logged_in")} />
 
                 <div className="text-sm">
                   <LinkStyled to="/forgot-password">
