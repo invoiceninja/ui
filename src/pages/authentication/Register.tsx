@@ -12,9 +12,11 @@ import { AxiosError, AxiosResponse } from "axios";
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { RegisterForm } from "../../common/dtos/authentication";
 import { request } from "../../common/helpers";
+import { register } from "../../common/stores/slices/user";
 import { Button } from "../../components/forms/Button";
 import { Checkbox } from "../../components/forms/Checkbox";
 import { Input } from "../../components/forms/Input";
@@ -36,6 +38,7 @@ export function Register() {
 
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [message, setMessage] = useState("");
+  const dispatch = useDispatch();
 
   const form = useFormik({
     initialValues: {
@@ -60,8 +63,15 @@ export function Register() {
         return;
       }
 
-      request("POST", "/api/v1/signup", values)
-        .then((response: AxiosResponse) => console.log(response))
+      request("POST", "/api/v1/signup?include=token,user", values)
+        .then((response: AxiosResponse) => {
+          dispatch(
+            register({
+              token: response.data.data[0].token.token,
+              user: response.data.data[0].user,
+            })
+          );
+        })
         .catch((error: AxiosError) => {
           if (error.response?.status === 422) {
             setErrors(error.response.data.errors);

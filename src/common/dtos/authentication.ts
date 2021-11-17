@@ -30,3 +30,8 @@ export interface Authenticated {
   type: AuthenticationTypes;
   user: {};
 }
+
+export interface Registered {
+  user: any;
+  token: string;
+}

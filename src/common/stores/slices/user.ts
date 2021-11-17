@@ -9,7 +9,7 @@
  */
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Authenticated } from "../../dtos/authentication";
+import { Authenticated, Registered } from "../../dtos/authentication";
 
 interface UserState {
   authenticated: boolean;
@@ -29,7 +29,13 @@ export const userSlice = createSlice({
       state.authenticated = true;
       state.user = action.payload.user;
     },
+    register: (state, action: PayloadAction<Registered>) => {
+      state.authenticated = true;
+      state.user = action.payload.user;
+
+      localStorage.setItem("X-NINJA-TOKEN", action.payload.token);
+    },
   },
 });
 
-export const { authenticate } = userSlice.actions;
+export const { authenticate, register } = userSlice.actions;
