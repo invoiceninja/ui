@@ -19,6 +19,7 @@ import { Default } from "../components/layouts/Default";
 import Loading from "../components/icons/Loading";
 import useSWR from "swr";
 import classNames from "classnames";
+import { Link } from "react-router-dom";
 
 export function Products() {
   useEffect(() => {
@@ -133,12 +134,12 @@ export function Products() {
                       {product.quantity}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <a
-                        href="#"
+                      <Link
+                        to="#"
                         className="text-indigo-600 hover:text-indigo-900"
                       >
                         Edit
-                      </a>
+                      </Link>
                     </td>
                   </tr>
                 ))}
