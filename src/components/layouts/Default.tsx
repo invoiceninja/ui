@@ -17,7 +17,6 @@ import {
   MenuAlt2Icon,
   XIcon,
 } from "@heroicons/react/outline";
-import { SearchIcon } from "@heroicons/react/solid";
 import classNames from "classnames";
 import { Link, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -105,8 +104,8 @@ export function Default(props: Props) {
                 <div className="flex-shrink-0 flex items-center px-4">
                   <Link to="/app/dashboard">
                     <img
-                      className="h-8 w-auto"
-                      src="https://invoiceninja.github.io/assets/images/logo-rounded.png"
+                      className="h-7 w-auto"
+                      src="https://raw.githubusercontent.com/invoiceninja/invoiceninja/v5-develop/public/images/invoiceninja-white-logo.png"
                       alt="Invoice Ninja"
                     />
                   </Link>
@@ -148,8 +147,8 @@ export function Default(props: Props) {
             <div className="flex items-center flex-shrink-0 px-4">
               <Link to="/app/dashboard">
                 <img
-                  className="h-8 w-auto"
-                  src="https://invoiceninja.github.io/assets/images/logo-rounded.png"
+                  className="h-7 w-auto"
+                  src="https://raw.githubusercontent.com/invoiceninja/invoiceninja/v5-develop/public/images/invoiceninja-white-logo.png"
                   alt="Invoice Ninja"
                 />
               </Link>
@@ -179,7 +178,7 @@ export function Default(props: Props) {
           </div>
         </div>
         <div className="md:pl-64 flex flex-col flex-1">
-          <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow">
+          <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white border-b border-gray-300">
             <button
               type="button"
               className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
