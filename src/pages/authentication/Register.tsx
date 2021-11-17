@@ -15,7 +15,7 @@ import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
 import { RegisterForm } from "../../common/dtos/authentication";
-import { request } from "../../common/helpers";
+import { endpoint, request } from "../../common/helpers";
 import { register } from "../../common/stores/slices/user";
 import { Button } from "../../components/forms/Button";
 import { Checkbox } from "../../components/forms/Checkbox";
@@ -63,7 +63,7 @@ export function Register() {
         return;
       }
 
-      request("POST", "/api/v1/signup?include=token,user", values)
+      request("POST", endpoint("/api/v1/signup?include=token,user"), values)
         .then((response: AxiosResponse) => {
           dispatch(
             register({
@@ -190,7 +190,11 @@ export function Register() {
             <BelowForm />
           </div>
           <div className="flex flex-col items-center mt-4">
-            {message && <Message className="bg-white" type="red">{message}</Message>}
+            {message && (
+              <Message className="bg-white" type="red">
+                {message}
+              </Message>
+            )}
 
             <LinkStyled className="mt-2" to="/login">
               {t("login")}

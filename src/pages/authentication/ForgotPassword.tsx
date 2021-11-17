@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ForgotPasswordForm } from "../../common/dtos/authentication";
-import { isHosted, request } from "../../common/helpers";
+import { endpoint, isHosted, request } from "../../common/helpers";
 import { Button } from "../../components/forms/Button";
 import { Input } from "../../components/forms/Input";
 import { LinkStyled } from "../../components/forms/Link";
@@ -48,7 +48,7 @@ export function ForgotPassword() {
       setErrors(undefined);
       setMessage(undefined);
 
-      request("POST", "/api/v1/reset_password", values)
+      request("POST", endpoint("/api/v1/reset_password"), values)
         .then((response: AxiosResponse) => setMessage(response.data))
         .catch((error: AxiosError) => {
           return error.response?.status === 422

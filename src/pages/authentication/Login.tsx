@@ -5,7 +5,7 @@ import {
   AuthenticationTypes,
   LoginForm,
 } from "../../common/dtos/authentication";
-import { isHosted, request } from "../../common/helpers";
+import { endpoint, isHosted, request } from "../../common/helpers";
 import { authenticate } from "../../common/stores/slices/user";
 import { AxiosError, AxiosResponse } from "axios";
 import { Link } from "react-router-dom";
@@ -39,7 +39,7 @@ export function Login() {
       setErrors(undefined);
       setIsFormBusy(true);
 
-      request("POST", "/api/v1/login", values)
+      request("POST", endpoint("/api/v1/login"), values)
         .then((response: AxiosResponse) => {
           dispatch(
             authenticate({
@@ -126,7 +126,11 @@ export function Login() {
             <BelowForm />
           </div>
           <div className="flex flex-col items-center mt-4">
-            {message && <Message className="bg-white" type="red">{message}</Message>}
+            {message && (
+              <Message className="bg-white" type="red">
+                {message}
+              </Message>
+            )}
 
             {isHosted() && (
               <LinkStyled className="mt-2" to="/register">

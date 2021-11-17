@@ -10,7 +10,7 @@
 
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
-import { request } from "../../common/helpers";
+import { endpoint, request } from "../../common/helpers";
 
 export function Logout() {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export function Logout() {
   useEffect(() => {
     request(
       "POST",
-      "/api/v1/logout",
+      endpoint("/api/v1/logout"),
       {},
       {
         "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN"),
