@@ -19,7 +19,7 @@ export default function Loading(props: Props) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
-      className={classNames("w-5 h-5 mr-2 -ml-1 animate-spin", {
+      className={classNames("w-4 h-4 animate-spin", {
         "text-white":
           props.variant === "light" || typeof props.variant === "undefined",
         "text-black": props.variant === "dark",
