@@ -8,28 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError, AxiosResponse } from "axios";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { request } from "../common/helpers";
 import { Button } from "../components/forms/Button";
 import { Checkbox } from "../components/forms/Checkbox";
 import { Input } from "../components/forms/Input";
 import { Default } from "../components/layouts/Default";
+import Loading from "../components/icons/Loading";
+import useSWR from "swr";
 
 export function Products() {
-  const [t] = useTranslation();
-
-  const people = [
-    {
-      name: "Jane Cooper",
-      title: "Regional Paradigm Technician",
-      role: "Admin",
-      email: "jane.cooper@example.com",
-    },
-    // More people...
-  ];
-
   useEffect(() => {
     document.title = t("products");
+  });
+
+  const [t] = useTranslation();
+
+  const { data, error } = useSWR("/api/v1/products", (url: string) => {
+    return request(
+      "GET",
+      url,
+      {},
+      { "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN") }
+    )
+      .then((response: AxiosResponse) => response.data)
+      .catch((error: AxiosError) => error.response?.data);
   });
 
   return (
@@ -63,59 +68,65 @@ export function Products() {
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Name
+                  {t("product")}
                 </th>
                 <th
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Title
+                  {t("description")}
                 </th>
                 <th
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Email
+                  {t("price")}
                 </th>
                 <th
                   scope="col"
                   className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                 >
-                  Role
+                  {t("quantity")}
                 </th>
                 <th scope="col" className="relative px-6 py-3">
-                  <span className="sr-only">Edit</span>
+                  <span className="sr-only">{t("view")}</span>
                 </th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {people.map((person) => (
-                <tr key={person.email}>
+              {!data && !error && (
+                <tr>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    <Checkbox />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {person.name}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {person.title}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {person.email}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {person.role}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <a
-                      href="#"
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      Edit
-                    </a>
+                    <Loading variant="dark" />
                   </td>
                 </tr>
-              ))}
+              )}
+
+              {data &&
+                data.data.map((product: any) => (
+                  <tr key={product.product_key}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <Checkbox />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      {product.notes}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {product.price}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      {product.quantity}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <a
+                        href="#"
+                        className="text-indigo-600 hover:text-indigo-900"
+                      >
+                        Edit
+                      </a>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
