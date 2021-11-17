@@ -188,7 +188,7 @@ export function Default(props: Props) {
               <span className="sr-only">Open sidebar</span>
               <MenuAlt2Icon className="h-6 w-6" aria-hidden="true" />
             </button>
-            <div className="flex flex-1 max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <div className="flex flex-1 mx-auto px-4 sm:px-6 md:px-8">
               <div className="flex-1 flex flex-col justify-center">
                 <h1 className="text-2xl font-semibold text-gray-900">
                   {props.title}
@@ -249,7 +249,7 @@ export function Default(props: Props) {
 
           <main>
             <div className="py-6">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+              <div className="mx-auto px-4 sm:px-6 md:px-8">
                 <div className="py-4">{props.children}</div>
               </div>
             </div>
