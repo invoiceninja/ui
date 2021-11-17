@@ -19,7 +19,7 @@ export function request(
   method: Method = "GET",
   route: string,
   data?: {},
-  headers?: {},
+  headers?: {}
 ) {
   return axios.request({
     url: route,
