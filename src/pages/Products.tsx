@@ -9,15 +9,16 @@
  */
 
 import { AxiosError, AxiosResponse } from "axios";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { request } from "../common/helpers";
+import { endpoint, request } from "../common/helpers";
 import { Button } from "../components/forms/Button";
 import { Checkbox } from "../components/forms/Checkbox";
 import { Input } from "../components/forms/Input";
 import { Default } from "../components/layouts/Default";
 import Loading from "../components/icons/Loading";
 import useSWR from "swr";
+import classNames from "classnames";
 
 export function Products() {
   useEffect(() => {
@@ -25,17 +26,22 @@ export function Products() {
   });
 
   const [t] = useTranslation();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pages, setPages] = useState([1, 2, 3, 4]);
 
-  const { data, error } = useSWR("/api/v1/products", (url: string) => {
-    return request(
-      "GET",
-      url,
-      {},
-      { "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN") }
-    )
-      .then((response: AxiosResponse) => response.data)
-      .catch((error: AxiosError) => error.response?.data);
-  });
+  const { data, error } = useSWR(
+    endpoint("/api/v1/products?page=:currentPage", { currentPage }),
+    (url: string) => {
+      return request(
+        "GET",
+        url,
+        {},
+        { "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN") }
+      )
+        .then((response: AxiosResponse) => response.data)
+        .catch((error: AxiosError) => error.response?.data);
+    }
+  );
 
   return (
     <Default title={t("products")}>
@@ -129,6 +135,37 @@ export function Products() {
                 ))}
             </tbody>
           </table>
+          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+            <div className="flex-1 flex sm:justify-end">
+              <div>
+                {data?.meta?.pagination && (
+                  <nav
+                    className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
+                    aria-label="Pagination"
+                  >
+                    {pages.map((i) => (
+                      <button
+                        key={i}
+                        onClick={() => setCurrentPage(i)}
+                        aria-current="page"
+                        className={classNames(
+                          "relative inline-flex items-center px-4 py-2 border text-sm font-medium ",
+                          {
+                            "z-10 bg-indigo-50 border-indigo-500 text-indigo-600":
+                              currentPage === i,
+                            "bg-white border-gray-300 text-gray-500 hover:bg-gray-50":
+                              currentPage !== i,
+                          }
+                        )}
+                      >
+                        {i}
+                      </button>
+                    ))}
+                  </nav>
+                )}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </Default>
