@@ -1,7 +1,6 @@
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router";
 import {
   AuthenticationTypes,
   LoginForm,
@@ -21,7 +20,6 @@ import { BelowForm } from "./components/BelowForm";
 
 export function Login() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<LoginValidation | undefined>(undefined);
   const [isFormBusy, setIsFormBusy] = useState(false);
