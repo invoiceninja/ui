@@ -19,10 +19,10 @@ export function request(
   method: Method = "GET",
   route: string,
   data?: {},
-  headers?: {}
+  headers?: {},
 ) {
   return axios.request({
-    url: endpoint(route),
+    url: route,
     method,
     headers: {
       "X-Requested-With": "XMLHttpRequest",
