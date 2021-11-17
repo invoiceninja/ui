@@ -16,21 +16,36 @@ interface Props {
   children?: any;
   type?: "submit" | "button";
   busy?: boolean;
+  variant?: "primary" | "secondary";
 }
 
+const defaultProps: Props = {
+  variant: "primary",
+};
+
 export function Button(props: Props) {
+  props = { ...defaultProps, ...props };
+
   return (
     <button
       disabled={props.busy}
       type={props.type}
       className={
-        "flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 " +
+        "inline-flex justify-center items-center py-2.5 px-4 border border-gray-300 text-sm leading-4 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ffocus:ring-indigo-500 " +
         classNames({
           "w-full": props.block,
+          "text-white bg-indigo-600 hover:bg-indigo-700":
+            props.variant === "primary",
+          "text-gray-700 bg-white hover:bg-gray-50":
+            props.variant === "secondary",
         })
       }
     >
-      {props.busy ? <Loading /> : props.children}
+      {props.busy ? (
+        <Loading variant={props.variant === "primary" ? "light" : "dark"} />
+      ) : (
+        props.children
+      )}
     </button>
   );
 }
