@@ -27,10 +27,10 @@ export function Products() {
 
   const [t] = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const [pages, setPages] = useState([1, 2, 3, 4]);
+  const [pages, setPages] = useState([1]);
 
   const { data, error } = useSWR(
-    endpoint("/api/v1/products?page=:currentPage", { currentPage }),
+    endpoint("/api/v1/products?page=:currentPage&per_page=10", { currentPage }),
     (url: string) => {
       return request(
         "GET",
@@ -38,7 +38,16 @@ export function Products() {
         {},
         { "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN") }
       )
-        .then((response: AxiosResponse) => response.data)
+        .then((response: AxiosResponse) => {
+          setPages(
+            Array.from(
+              Array(response.data.meta.pagination.total_pages),
+              (_, idx) => idx + 1
+            )
+          );
+
+          return response.data;
+        })
         .catch((error: AxiosError) => error.response?.data);
     }
   );
