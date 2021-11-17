@@ -47,15 +47,9 @@ export function Login() {
             authenticate({
               type: AuthenticationTypes.TOKEN,
               user: response.data.data[0].user,
+              token: response.data.data[0].token.token,
             })
           );
-
-          localStorage.setItem(
-            "X-NINJA-TOKEN",
-            response.data.data[0].token.token
-          );
-
-          navigate("/app/dashboard");
         })
         .catch((error: AxiosError) => {
           if (error.response?.status === 422) {

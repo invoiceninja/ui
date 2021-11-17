@@ -28,6 +28,8 @@ export const userSlice = createSlice({
     authenticate: (state, action: PayloadAction<Authenticated>) => {
       state.authenticated = true;
       state.user = action.payload.user;
+
+      localStorage.setItem("X-NINJA-TOKEN", action.payload.token);
     },
     register: (state, action: PayloadAction<Registered>) => {
       state.authenticated = true;

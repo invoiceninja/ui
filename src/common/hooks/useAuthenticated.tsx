@@ -44,6 +44,7 @@ export function useAuthenticated(): Boolean {
           authenticate({
             type: AuthenticationTypes.TOKEN,
             user: response.data.data[0].user,
+            token: localStorage.getItem("X-NINJA-TOKEN") as string,
           })
         );
       }

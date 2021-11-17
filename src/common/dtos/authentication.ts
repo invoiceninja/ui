@@ -29,6 +29,7 @@ export enum AuthenticationTypes {
 export interface Authenticated {
   type: AuthenticationTypes;
   user: {};
+  token: string;
 }
 
 export interface Registered {
