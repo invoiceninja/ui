@@ -12,7 +12,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Default } from "../components/layouts/Default";
 
-export function Projects() {
+export function Products() {
   const [t] = useTranslation();
 
   useEffect(() => {
