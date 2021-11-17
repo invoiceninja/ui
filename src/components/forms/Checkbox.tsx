@@ -9,7 +9,7 @@
  */
 
 interface Props {
-  label: string;
+  label?: string;
   id?: string;
   name?: string;
   required?: boolean;
