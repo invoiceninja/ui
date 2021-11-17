@@ -16,8 +16,8 @@ export function Products() {
   const [t] = useTranslation();
 
   useEffect(() => {
-    document.title = t("projects");
+    document.title = t("products");
   });
 
-  return <Default title={t("projects")}>Lorem, ipsum dolor.</Default>;
+  return <Default title={t("products")}>Lorem, ipsum dolor.</Default>;
 }
