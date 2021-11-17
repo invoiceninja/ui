@@ -81,6 +81,7 @@ export function ForgotPassword() {
                   type="email"
                   id="email"
                   placeholder="you@example.com"
+                  required={true}
                   onChange={form.handleChange}
                 />
 
