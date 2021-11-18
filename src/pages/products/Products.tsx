@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { Product } from "../../common/dtos/product";
@@ -35,6 +35,16 @@ export function Products() {
   );
 
   const filter = useSelector((state: RootState) => state.products.filter);
+
+  const [selected, setSelected] = useState<string[]>([]);
+
+  function checkboxHandler(event: ChangeEvent<HTMLInputElement>): void {
+    selected.includes(event.target.value)
+      ? setSelected(
+          selected.filter((value, index, array) => value !== event.target.value)
+        )
+      : setSelected([...selected, event.target.value]);
+  }
 
   const { data, isLoading } = useProductsQuery({
     perPage: 10,
@@ -69,7 +79,7 @@ export function Products() {
               data.data.map((product: Product) => (
                 <Tr key={product.id}>
                   <Td>
-                    <Checkbox />
+                    <Checkbox value={product.id} onChange={checkboxHandler} />
                   </Td>
                   <Td>{product.product_key}</Td>
                   <Td>{product.notes}</Td>
