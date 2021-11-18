@@ -27,7 +27,7 @@ export function Products() {
   const [t] = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
 
-  const { data, error, isLoading } = useProductsQuery({
+  const { data, isLoading } = useProductsQuery({
     perPage: 10,
     currentPage,
   });
