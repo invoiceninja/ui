@@ -26,10 +26,10 @@ export function Products() {
 
   const [t] = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
-  const [pages, setPages] = useState([1]);
 
   const { data, error, isLoading } = useProductsQuery({
-    perPage: "1",
+    perPage: 10,
+    currentPage,
   });
 
   return (
@@ -99,7 +99,7 @@ export function Products() {
 
               {data &&
                 data.data.map((product: any) => (
-                  <tr key={product.product_key}>
+                  <tr key={product.id}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <Checkbox />
                     </td>
@@ -124,37 +124,39 @@ export function Products() {
                 ))}
             </tbody>
           </table>
-          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-            <div className="flex-1 flex sm:justify-end">
-              <div>
-                {data?.meta?.pagination && (
+          {data?.meta?.pagination && data?.meta?.pagination.total_pages > 1 && (
+            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
+              <div className="flex-1 flex sm:justify-end">
+                <div>
                   <nav
                     className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px"
                     aria-label="Pagination"
                   >
-                    {pages.map((i) => (
-                      <button
-                        key={i}
-                        onClick={() => setCurrentPage(i)}
-                        aria-current="page"
-                        className={classNames(
-                          "relative inline-flex items-center px-4 py-2 border text-sm font-medium ",
-                          {
-                            "z-10 bg-indigo-50 border-indigo-500 text-indigo-600":
-                              currentPage === i,
-                            "bg-white border-gray-300 text-gray-500 hover:bg-gray-50":
-                              currentPage !== i,
-                          }
-                        )}
-                      >
-                        {i}
-                      </button>
-                    ))}
+                    {[...Array(data.meta.pagination.total_pages).keys()].map(
+                      (i) => (
+                        <button
+                          key={i + 1}
+                          onClick={() => setCurrentPage(i + 1)}
+                          aria-current="page"
+                          className={classNames(
+                            "relative inline-flex items-center px-4 py-2 border text-sm font-medium ",
+                            {
+                              "z-10 bg-indigo-50 border-indigo-500 text-indigo-600":
+                                currentPage === i + 1,
+                              "bg-white border-gray-300 text-gray-500 hover:bg-gray-50":
+                                currentPage !== i + 1,
+                            }
+                          )}
+                        >
+                          {i + 1}
+                        </button>
+                      )
+                    )}
                   </nav>
-                )}
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
       </div>
     </Default>
