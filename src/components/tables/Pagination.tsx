@@ -9,9 +9,8 @@
  */
 
 import classNames from "classnames";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { updateCurrentPage } from "../../common/stores/slices/products";
-import { RootState } from "../../common/stores/store";
 
 interface Props {
   currentPage: number;
@@ -19,10 +18,6 @@ interface Props {
 }
 
 export function Pagination(props: Props) {
-  const currentPage = useSelector(
-    (state: RootState) => state.products.currentPage
-  );
-
   const dispatch = useDispatch();
 
   return (

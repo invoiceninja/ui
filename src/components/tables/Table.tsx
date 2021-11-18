@@ -8,11 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from "react-i18next";
-
 export function Table(props: { children?: any }) {
-  const [t] = useTranslation();
-
   return (
     <table className="w-full divide-y divide-gray-200">{props.children}</table>
   );
