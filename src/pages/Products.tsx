@@ -8,18 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from "axios";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { endpoint, request } from "../common/helpers";
 import { Button } from "../components/forms/Button";
 import { Checkbox } from "../components/forms/Checkbox";
 import { Input } from "../components/forms/Input";
 import { Default } from "../components/layouts/Default";
-import Loading from "../components/icons/Loading";
-import useSWR from "swr";
+import { useProductsQuery } from "../common/queries/products";
 import classNames from "classnames";
 import { Link } from "react-router-dom";
+import Loading from "../components/icons/Loading";
 
 export function Products() {
   useEffect(() => {
@@ -30,28 +28,9 @@ export function Products() {
   const [currentPage, setCurrentPage] = useState(1);
   const [pages, setPages] = useState([1]);
 
-  const { data, error } = useSWR(
-    endpoint("/api/v1/products?page=:currentPage&per_page=10", { currentPage }),
-    (url: string) => {
-      return request(
-        "GET",
-        url,
-        {},
-        { "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN") }
-      )
-        .then((response: AxiosResponse) => {
-          setPages(
-            Array.from(
-              Array(response.data.meta.pagination.total_pages),
-              (_, idx) => idx + 1
-            )
-          );
-
-          return response.data;
-        })
-        .catch((error: AxiosError) => error.response?.data);
-    }
-  );
+  const { data, error, isLoading } = useProductsQuery({
+    perPage: "1",
+  });
 
   return (
     <Default title={t("products")}>
@@ -110,7 +89,7 @@ export function Products() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {!data && !error && (
+              {isLoading && (
                 <tr>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     <Loading variant="dark" />
