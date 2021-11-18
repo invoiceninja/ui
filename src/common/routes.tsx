@@ -18,7 +18,7 @@ import { Logout } from "../pages/authentication/Logout";
 import { Register } from "../pages/authentication/Register";
 import { Dashboard } from "../pages/Dashboard";
 import { Index } from "../pages/Index";
-import { Products } from "../pages/Products";
+import { Products } from "../pages/products/Products";
 
 export const routes = (
   <Routes>
@@ -34,7 +34,9 @@ export const routes = (
       <Route path="" element={<Index />} />
       <Route path="logout" element={<Logout />} />
       <Route path="dashboard" element={<Dashboard />} />
-      <Route path="products" element={<Products />} />
+      <Route path="products">
+        <Route path="" element={<Products />} />
+      </Route>
     </Route>
   </Routes>
 );

@@ -10,18 +10,18 @@
 
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Checkbox } from "../components/forms/Checkbox";
-import { Default } from "../components/layouts/Default";
-import { useProductsQuery } from "../common/queries/products";
-import { Actions } from "./products/Actions";
-import { Table, Tbody, Td, Th, Thead, Tr } from "../components/tables/Table";
-import { Button } from "../components/forms/Button";
-import { TableWrapper } from "../components/tables/TableWrapper";
-import { Pagination } from "../components/tables/Pagination";
 import { useSelector } from "react-redux";
-import { RootState } from "../common/stores/store";
-import { Product } from "../common/dtos/product";
-import Loading from "../components/icons/Loading";
+import { Product } from "../../common/dtos/product";
+import { useProductsQuery } from "../../common/queries/products";
+import { RootState } from "../../common/stores/store";
+import { Button } from "../../components/forms/Button";
+import { Checkbox } from "../../components/forms/Checkbox";
+import Loading from "../../components/icons/Loading";
+import { Default } from "../../components/layouts/Default";
+import { Pagination } from "../../components/tables/Pagination";
+import { Table, Tbody, Td, Th, Thead, Tr } from "../../components/tables/Table";
+import { TableWrapper } from "../../components/tables/TableWrapper";
+import { Actions } from "./Actions";
 
 export function Products() {
   useEffect(() => {
