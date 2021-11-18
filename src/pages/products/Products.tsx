@@ -35,7 +35,6 @@ export function Products() {
   );
 
   const filter = useSelector((state: RootState) => state.products.filter);
-
   const [selected, setSelected] = useState<string[]>([]);
 
   function checkboxHandler(event: ChangeEvent<HTMLInputElement>): void {
@@ -58,9 +57,7 @@ export function Products() {
       <TableWrapper>
         <Table>
           <Thead>
-            <Th>
-              <Checkbox />
-            </Th>
+            <Th></Th>
             <Th>{t("product")}</Th>
             <Th>{t("notes")}</Th>
             <Th>{t("cost")}</Th>
