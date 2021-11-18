@@ -64,7 +64,7 @@ export function Products() {
 
             {data &&
               data.data.map((product: Product) => (
-                <Tr>
+                <Tr key={product.id}>
                   <Td>
                     <Checkbox />
                   </Td>
