@@ -41,8 +41,8 @@ export function Tbody(props: { children?: any }) {
   );
 }
 
-export function Tr(props: { key?: string; children?: any }) {
-  return <tr key={props.key}>{props.children}</tr>;
+export function Tr(props: { children?: any }) {
+  return <tr>{props.children}</tr>;
 }
 
 export function Td(props: { children?: any }) {
