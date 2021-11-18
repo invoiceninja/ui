@@ -21,7 +21,7 @@ import { Default } from "../../components/layouts/Default";
 import { Pagination } from "../../components/tables/Pagination";
 import { Table, Tbody, Td, Th, Thead, Tr } from "../../components/tables/Table";
 import { TableWrapper } from "../../components/tables/TableWrapper";
-import { Actions } from "./Actions";
+import { Actions } from "./components/Actions";
 
 export function Products() {
   useEffect(() => {

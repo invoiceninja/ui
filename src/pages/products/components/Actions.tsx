@@ -9,9 +9,9 @@
  */
 
 import { useTranslation } from "react-i18next";
-import { Button } from "../../components/forms/Button";
-import { Checkbox } from "../../components/forms/Checkbox";
-import { Input } from "../../components/forms/Input";
+import { Button } from "../../../components/forms/Button";
+import { Checkbox } from "../../../components/forms/Checkbox";
+import { Input } from "../../../components/forms/Input";
 
 export function Actions() {
   const [t] = useTranslation();
