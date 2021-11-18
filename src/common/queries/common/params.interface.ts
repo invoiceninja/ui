@@ -9,5 +9,6 @@
  */
 
 export interface Params {
-  perPage?: string;
+  perPage?: number | string | undefined;
+  currentPage?: number | string | undefined;
 }
