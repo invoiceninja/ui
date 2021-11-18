@@ -34,9 +34,12 @@ export function Products() {
     (state: RootState) => state.products.currentPage
   );
 
+  const filter = useSelector((state: RootState) => state.products.filter);
+
   const { data, isLoading } = useProductsQuery({
     perPage: 10,
     currentPage,
+    filter,
   });
 
   return (

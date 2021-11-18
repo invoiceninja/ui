@@ -30,10 +30,14 @@ export const productsApi = createApi({
   endpoints: (builder) => ({
     products: builder.query({
       query: (args: Params) =>
-        generatePath("/products?per_page=:perPage&page=:currentPage", {
-          perPage: args.perPage as unknown as string,
-          currentPage: args.currentPage as unknown as string,
-        }),
+        generatePath(
+          "/products?per_page=:perPage&page=:currentPage&filter=:filter",
+          {
+            perPage: (args.perPage as unknown as string) ?? 1,
+            currentPage: (args.currentPage as unknown as string) ?? 1,
+            filter: args.filter ?? "",
+          }
+        ),
     }),
   }),
 });
