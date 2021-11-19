@@ -1,3 +1,13 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
 import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
@@ -8,15 +18,20 @@ import {
 import { endpoint, isHosted, request } from "../../common/helpers";
 import { authenticate } from "../../common/stores/slices/user";
 import { AxiosError, AxiosResponse } from "axios";
-import { Link } from "react-router-dom";
-import { LinkStyled } from "../../components/forms/Link";
-import { Input } from "../../components/forms/Input";
-import { Checkbox } from "../../components/forms/Checkbox";
-import { Button } from "../../components/forms/Button";
-import { Message } from "../../components/forms/Message";
 import { LoginValidation } from "./common/ValidationInterface";
 import { useTranslation } from "react-i18next";
-import { BelowForm } from "./components/BelowForm";
+import { Link as RouterLink } from "react-router-dom";
+import Logo from "../../resources/images/invoiceninja-logox53.png";
+
+import {
+  Grid,
+  Typography,
+  Stack,
+  TextField,
+  Button,
+  Alert,
+} from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
 export function Login() {
   const dispatch = useDispatch();
@@ -50,11 +65,11 @@ export function Login() {
           );
         })
         .catch((error: AxiosError) => {
-          if (error.response?.status === 422) {
-            return setErrors(error.response.data.errors);
-          }
-
-          setMessage(t("invalid_credentials"));
+          error.response?.status === 422
+            ? setErrors(error.response.data.errors)
+            : setMessage(
+                error.response?.data.message ?? t("invalid_credentials")
+              );
         })
         .finally(() => setIsFormBusy(false));
     },
@@ -62,84 +77,99 @@ export function Login() {
 
   return (
     <>
-      <div className="h-screen min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <Link to="/">
-            <img
-              className="mx-auto h-12 w-auto"
-              src="https://invoiceninja.github.io/assets/images/logo-rounded.png"
-              alt="Invoice Ninja"
-            />
-          </Link>
-        </div>
+      <div
+        style={{
+          backgroundColor: "#3c3b3b",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          padding: "28px 55px",
+        }}
+      >
+        <RouterLink to="/">
+          <img width="231" src={Logo} alt="Invoice Ninja Logo" />
+        </RouterLink>
+      </div>
 
-        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white mx-4 lg:mx-0 py-8 px-4 border border-gray-300 rounded-lg sm:px-10">
-            <form className="space-y-6" onSubmit={form.handleSubmit}>
-              <div>
-                <Input
-                  label={t("email_address")}
-                  type="email"
-                  id="email"
-                  placeholder="you@example.com"
-                  onChange={form.handleChange}
-                />
+      <Grid
+        container
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Grid item xs={10} sm={7} md={5} lg={4}>
+          <Typography
+            sx={{ marginTop: 10, mx: "auto", textAlign: "center" }}
+            variant="h4"
+          >
+            {t("account_login")}
+          </Typography>
 
-                {errors?.email && (
-                  <Message className="mt-2" type="red">
-                    {errors.email}
-                  </Message>
-                )}
-              </div>
+          <form onSubmit={form.handleSubmit}>
+            <Stack sx={{ mt: 4 }}>
+              <TextField
+                error={Boolean(errors?.email)}
+                helperText={errors?.email}
+                id="email"
+                label={t("email_address")}
+                variant="outlined"
+                type="email"
+                onChange={form.handleChange}
+              />
 
-              <div>
-                <Input
-                  label={t("password")}
-                  type="password"
-                  id="password"
-                  disabled={isFormBusy}
-                  onChange={form.handleChange}
-                />
+              <TextField
+                error={Boolean(errors?.password)}
+                helperText={errors?.password}
+                sx={{ mt: 2 }}
+                id="password"
+                label={t("password")}
+                variant="outlined"
+                type="password"
+                onChange={form.handleChange}
+              />
 
-                {errors?.password && (
-                  <Message className="mt-2" type="red">
-                    {errors.password}
-                  </Message>
-                )}
-              </div>
+              <LoadingButton
+                type="submit"
+                loading={isFormBusy}
+                sx={{ mt: 2 }}
+                disableElevation
+                size="large"
+                variant="contained"
+              >
+                {t("login")}
+              </LoadingButton>
+            </Stack>
+          </form>
 
-              <div className="flex items-center justify-between">
-                <Checkbox id="stayLoggedIn" label={t("stay_logged_in")} />
+          {message && (
+            <Alert sx={{ marginTop: 2 }} severity="error">
+              {message}
+            </Alert>
+          )}
 
-                <div className="text-sm">
-                  <LinkStyled to="/forgot-password">
-                    {t("forgot_password")}
-                  </LinkStyled>
-                </div>
-              </div>
-
-              <Button busy={isFormBusy} block>
-                {t("email_sign_in")}
-              </Button>
-            </form>
-
-            <BelowForm />
-          </div>
-          <div className="flex flex-col items-center mt-4">
-            {message && (
-              <Message className="bg-white" type="red">
-                {message}
-              </Message>
-            )}
+          <Stack
+            direction="column"
+            justifyContent="space-evenly"
+            alignItems="center"
+            sx={{ marginTop: 2 }}
+          >
+            <Button component={RouterLink} to="/forgot-password">
+              {t("forgot_password")}
+            </Button>
 
             {isHosted() && (
-              <LinkStyled className="mt-2" to="/register">
+              <Button
+                variant="outlined"
+                component={RouterLink}
+                to="/register"
+                sx={{ marginTop: 2 }}
+              >
                 {t("register_label")}
-              </LinkStyled>
+              </Button>
             )}
-          </div>
-        </div>
-      </div>
+          </Stack>
+        </Grid>
+      </Grid>
     </>
   );
 }
