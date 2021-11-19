@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import React from "react";
 import { Route, Routes } from "react-router";
 import { HostedRoute } from "../components/HostedRoute";
 import { PrivateRoute } from "../components/PrivateRoute";

@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import React from "react";
 import { Navigate } from "react-router";
 import { useAuthenticated } from "../common/hooks/useAuthenticated";
 
