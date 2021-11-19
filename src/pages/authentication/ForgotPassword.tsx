@@ -8,17 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import React, { useEffect, useState } from "react";
 import { AxiosError, AxiosResponse } from "axios";
 import { useFormik } from "formik";
-import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
 import { ForgotPasswordForm } from "../../common/dtos/authentication";
 import { endpoint, request } from "../../common/helpers";
 import { ForgotPasswordValidation } from "./common/ValidationInterface";
-import Logo from "../../resources/images/invoiceninja-logox53.png";
-import { Alert, Grid, Stack, TextField, Typography } from "@mui/material";
-import { LoadingButton } from "@mui/lab";
 
 interface Response {
   message: string;
@@ -59,69 +55,26 @@ export function ForgotPassword() {
 
   return (
     <>
-      <div
-        style={{
-          backgroundColor: "#3c3b3b",
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-          padding: "28px 55px",
-        }}
-      >
-        <Link to="/">
-          <img width="231" src={Logo} alt="Invoice Ninja Logo" />
-        </Link>
-      </div>
+      <form onSubmit={form.handleSubmit}>
+        <input
+          // error={Boolean(errors?.email)}
+          // helperText={errors?.email}
+          id="email"
+          // label={t("email_address")}
+          type="email"
+          onChange={form.handleChange}
+        />
 
-      <Grid
-        container
-        direction="row"
-        justifyContent="center"
-        alignItems="center"
-      >
-        <Grid item xs={10} sm={7} md={5} lg={4} xl={2}>
-          <Typography
-            sx={{ marginTop: 10, mx: "auto", textAlign: "center" }}
-            variant="h4"
-          >
-            {t("password_recovery")}
-          </Typography>
+        <button type="submit">{t("send_email")}</button>
+      </form>
 
-          <form onSubmit={form.handleSubmit}>
-            <Stack sx={{ mt: 4 }}>
-              <TextField
-                error={Boolean(errors?.email)}
-                helperText={errors?.email}
-                id="email"
-                label={t("email_address")}
-                variant="outlined"
-                type="email"
-                onChange={form.handleChange}
-              />
-
-              <LoadingButton
-                type="submit"
-                loading={isFormBusy}
-                sx={{ mt: 2 }}
-                disableElevation
-                size="large"
-                variant="contained"
-              >
-                {t("send_email")}
-              </LoadingButton>
-            </Stack>
-          </form>
-
-          {message && (
-            <Alert
-              sx={{ marginTop: 2 }}
-              severity={message.status ? "success" : "error"}
-            >
-              {message.message}
-            </Alert>
-          )}
-        </Grid>
-      </Grid>
+      {message && (
+        <div
+        // severity={message.status ? "success" : "error"}
+        >
+          {message.message}
+        </div>
+      )}
     </>
   );
 }
