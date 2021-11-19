@@ -8,12 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AppBar as MaterialAppBar, IconButton, Toolbar } from "@mui/material";
+import {
+  AppBar as MaterialAppBar,
+  Avatar,
+  Button,
+  IconButton,
+  Menu,
+  MenuItem,
+  Toolbar,
+} from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import Logo from "../../resources/images/invoiceninja-logox53.png";
 import { Box } from "@mui/system";
+import { useTranslation } from "react-i18next";
+import { green } from "@mui/material/colors";
+import { CompanySelector } from "./CompanySelector";
+import { Link } from "react-router-dom";
 
 export function AppBar() {
+  const [t] = useTranslation();
+
   return (
     <MaterialAppBar
       position="fixed"
@@ -37,10 +51,32 @@ export function AppBar() {
               <MenuIcon style={{ color: "white" }} />
             </IconButton>
 
-            <img src={Logo} alt="Invoice Ninja logo" height={30} />
+            <Link
+              to="/dashboard"
+              style={{ display: "inline-flex", justifyItems: "center" }}
+            >
+              <img src={Logo} alt="Invoice Ninja logo" height={27} />
+            </Link>
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center" }}>
+            <Box
+              sx={{ display: { xs: "none", md: "flex" } }}
+              style={{ display: "flex" }}
+            >
+              <Button
+                sx={{
+                  bgcolor: green[700],
+                  display: { xs: "none", md: "block" },
+                }}
+                disableElevation
+                variant="contained"
+              >
+                {t("upgrade")}
+              </Button>
+              <CompanySelector />
+            </Box>
+
             <IconButton
               size="small"
               sx={{ display: { xs: "block", md: "none" } }}
