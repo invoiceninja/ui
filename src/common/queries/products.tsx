@@ -15,7 +15,7 @@ import { Params } from "./common/params.interface";
 export const productsApi = createApi({
   reducerPath: "productsApi",
   baseQuery: fetchBaseQuery({
-    baseUrl: `${process.env.REACT_APP_API_URL}/api/v1`,
+    baseUrl: `${import.meta.env.VITE_API_URL}/api/v1`,
     prepareHeaders: (headers) => {
       headers.set("Content-Type", "application/json");
       headers.set("X-Requested-With", "XMLHttpRequest");
