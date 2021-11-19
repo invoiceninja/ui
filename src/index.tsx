@@ -35,7 +35,7 @@ i18n.use(initReactI18next).init({
 });
 
 const Router =
-  process.env.REACT_APP_ROUTER === "hash" ? HashRouter : BrowserRouter;
+  import.meta.env.VITE_ROUTER === "hash" ? HashRouter : BrowserRouter;
 
 ReactDOM.render(
   <React.StrictMode>

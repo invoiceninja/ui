@@ -12,7 +12,7 @@ import axios, { Method } from "axios";
 import { generatePath } from "react-router";
 
 export function endpoint(endpoint: string, params = {}): string {
-  return process.env.REACT_APP_API_URL + generatePath(endpoint, params);
+  return import.meta.env.VITE_API_URL + generatePath(endpoint, params);
 }
 
 export function request(
@@ -34,7 +34,7 @@ export function request(
 }
 
 export function isHosted(): boolean {
-  return process.env.REACT_APP_IS_HOSTED === "true";
+  return import.meta.env.VITE_ROUTER === "true";
 }
 
 export function isSelfHosted(): boolean {
