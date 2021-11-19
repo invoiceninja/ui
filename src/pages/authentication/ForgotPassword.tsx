@@ -14,13 +14,11 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { ForgotPasswordForm } from "../../common/dtos/authentication";
-import { endpoint, isHosted, request } from "../../common/helpers";
-import { Button } from "../../components/forms/Button";
-import { Input } from "../../components/forms/Input";
-import { LinkStyled } from "../../components/forms/Link";
-import { Message } from "../../components/forms/Message";
+import { endpoint, request } from "../../common/helpers";
 import { ForgotPasswordValidation } from "./common/ValidationInterface";
-import { BelowForm } from "./components/BelowForm";
+import Logo from "../../resources/images/invoiceninja-logox53.png";
+import { Alert, Grid, Stack, TextField, Typography } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
 interface Response {
   message: string;
@@ -61,59 +59,69 @@ export function ForgotPassword() {
 
   return (
     <>
-      <div className="h-screen min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <Link to="/">
-            <img
-              className="mx-auto h-12 w-auto"
-              src="https://invoiceninja.github.io/assets/images/logo-rounded.png"
-              alt="Invoice Ninja"
-            />
-          </Link>
-        </div>
-
-        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white mx-4 lg:mx-0 py-8 px-4 border border-gray-300 rounded-lg sm:px-10">
-            <form className="space-y-6" onSubmit={form.handleSubmit}>
-              <div>
-                <Input
-                  label={t("email_address")}
-                  type="email"
-                  id="email"
-                  placeholder="you@example.com"
-                  required={true}
-                  onChange={form.handleChange}
-                />
-
-                {errors?.email && (
-                  <Message className="mt-2" type="red">
-                    {errors.email}
-                  </Message>
-                )}
-              </div>
-
-              <Button type="submit" busy={isFormBusy} block>
-                {t("recover_password")}
-              </Button>
-            </form>
-
-            <BelowForm />
-          </div>
-          <div className="flex flex-col items-center mt-4">
-            {message && (
-              <Message type={message.status ? "green" : "red"}>
-                {message.message}
-              </Message>
-            )}
-
-            {isHosted() && (
-              <LinkStyled className="mt-2" to="/login">
-                {t("login")}
-              </LinkStyled>
-            )}
-          </div>
-        </div>
+      <div
+        style={{
+          backgroundColor: "#3c3b3b",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          padding: "28px 55px",
+        }}
+      >
+        <Link to="/">
+          <img width="231" src={Logo} alt="Invoice Ninja Logo" />
+        </Link>
       </div>
+
+      <Grid
+        container
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Grid item xs={10} sm={7} md={5} lg={4}>
+          <Typography
+            sx={{ marginTop: 10, mx: "auto", textAlign: "center" }}
+            variant="h4"
+          >
+            {t("password_recovery")}
+          </Typography>
+
+          <form onSubmit={form.handleSubmit}>
+            <Stack sx={{ mt: 4 }}>
+              <TextField
+                error={Boolean(errors?.email)}
+                helperText={errors?.email}
+                id="email"
+                label={t("email_address")}
+                variant="outlined"
+                type="email"
+                onChange={form.handleChange}
+              />
+
+              <LoadingButton
+                type="submit"
+                loading={isFormBusy}
+                sx={{ mt: 2 }}
+                disableElevation
+                size="large"
+                variant="contained"
+              >
+                {t("send_email")}
+              </LoadingButton>
+            </Stack>
+          </form>
+
+          {message && (
+            <Alert
+              sx={{ marginTop: 2 }}
+              severity={message.status ? "success" : "error"}
+            >
+              {message.message}
+            </Alert>
+          )}
+        </Grid>
+      </Grid>
     </>
   );
 }

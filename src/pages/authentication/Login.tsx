@@ -65,7 +65,7 @@ export function Login() {
           );
         })
         .catch((error: AxiosError) => {
-          error.response?.status === 422
+          return error.response?.status === 422
             ? setErrors(error.response.data.errors)
             : setMessage(
                 error.response?.data.message ?? t("invalid_credentials")
