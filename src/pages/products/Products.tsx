@@ -51,50 +51,5 @@ export function Products() {
     filter,
   });
 
-  return (
-    <Default title={t("products")}>
-      <Actions />
-      <TableWrapper>
-        <Table>
-          <Thead>
-            <Th></Th>
-            <Th>{t("product")}</Th>
-            <Th>{t("notes")}</Th>
-            <Th>{t("cost")}</Th>
-            <Th></Th>
-          </Thead>
-          <Tbody>
-            {isLoading && (
-              <Tr>
-                <Td>
-                  <Loading />
-                </Td>
-              </Tr>
-            )}
-
-            {data &&
-              data.data.map((product: Product) => (
-                <Tr key={product.id}>
-                  <Td>
-                    <Checkbox value={product.id} onChange={checkboxHandler} />
-                  </Td>
-                  <Td>{product.product_key}</Td>
-                  <Td>{product.notes}</Td>
-                  <Td>{product.price}</Td>
-                  <Td>
-                    <Button variant="secondary">Actions</Button>
-                  </Td>
-                </Tr>
-              ))}
-          </Tbody>
-        </Table>
-        {data?.meta.pagination && data?.meta.pagination.total_pages > 1 && (
-          <Pagination
-            currentPage={currentPage}
-            totalPages={data.meta.pagination.total_pages}
-          />
-        )}
-      </TableWrapper>
-    </Default>
-  );
+  return <div></div>;
 }
