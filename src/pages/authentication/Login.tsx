@@ -10,7 +10,7 @@
 
 import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   AuthenticationTypes,
   LoginForm,
@@ -20,10 +20,16 @@ import { authenticate } from "../../common/stores/slices/user";
 import { AxiosError, AxiosResponse } from "axios";
 import { LoginValidation } from "./common/ValidationInterface";
 import { useTranslation } from "react-i18next";
-import { Link, Link as RouterLink } from "react-router-dom";
-import Logo from "../../resources/images/invoiceninja-logox53.png";
+import Logo from "../../resources/images/invoiceninja-logo@dark.png";
+import { InputField } from "../../components/forms/InputField";
+import { Button } from "../../components/forms/Button";
+import { Link } from "../../components/forms/Link";
+import { InputLabel } from "../../components/forms/InputLabel";
+import { Alert } from "../../components/Alert";
+import { RootState } from "../../common/stores/store";
 
 export function Login() {
+  const colors = useSelector((state: RootState) => state.settings.colors);
   const dispatch = useDispatch();
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<LoginValidation | undefined>(undefined);
@@ -66,8 +72,42 @@ export function Login() {
   });
 
   return (
-    <>
-      <form onSubmit={form.handleSubmit}>
+    <div className="h-screen bg-gray-100">
+      <div className={`bg-${colors.primary} py-1`}></div>
+      <div className="flex justify-center py-8">
+        <img src={Logo} alt="Invoice Ninja Logo" className="h-12" />
+      </div>
+
+      <div className="flex flex-col items-center">
+        <div className="bg-white mx-4 max-w-md w-full p-8 rounded shadow-lg">
+          <h2 className="text-2xl">{t("login")}</h2>
+
+          <form className="my-6">
+            <InputField type="email" label={t("email_address")} id="email" />
+
+            <Alert className="mt-2" type="danger">
+              Field is required.
+            </Alert>
+
+            <div className="flex items-center justify-between mt-4">
+              <InputLabel>{t("password")}</InputLabel>
+              <Link to="/forgot-password">{t("forgot_password")}</Link>
+            </div>
+
+            <InputField type="password" className="mt-2" id="password" />
+
+            <Alert className="mt-2" type="danger">
+              Field is required.
+            </Alert>
+
+            <Button className="mt-4" variant="block">
+              {t("login")}
+            </Button>
+          </form>
+        </div>
+      </div>
+
+      {/* <form onSubmit={form.handleSubmit}>
         <input
           // error={Boolean(errors?.email)}
           // helperText={errors?.email}
@@ -80,13 +120,13 @@ export function Login() {
         <input id="password" type="password" onChange={form.handleChange} />
 
         <button type="submit">{t("login")}</button>
-      </form>
+      </form> */}
 
       {message && <div>{message}</div>}
 
-      <Link to="/forgot-password">{t("forgot_password")}</Link>
+      {/* <Link to="/forgot-password">{t("forgot_password")}</Link> */}
 
       {isHosted() && <Link to="/register">{t("register_label")}</Link>}
-    </>
+    </div>
   );
 }
