@@ -13,17 +13,24 @@ import { useFormik } from "formik";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
 import { RegisterForm } from "../../common/dtos/authentication";
 import { endpoint, request } from "../../common/helpers";
 import { register } from "../../common/stores/slices/user";
-import { Button } from "../../components/forms/Button";
-import { Checkbox } from "../../components/forms/Checkbox";
-import { Input } from "../../components/forms/Input";
-import { LinkExternal, LinkStyled } from "../../components/forms/Link";
-import { Message } from "../../components/forms/Message";
 import { RegisterValidation } from "./common/ValidationInterface";
-import { BelowForm } from "./components/BelowForm";
+import Logo from "../../resources/images/invoiceninja-logox53.png";
+import { Link } from "react-router-dom";
+import {
+  Checkbox,
+  FormControlLabel,
+  FormGroup,
+  Grid,
+  Stack,
+  TextField,
+  Typography,
+  Link as LinkComponent,
+  Alert,
+} from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
 export function Register() {
   const [t] = useTranslation();
@@ -85,123 +92,134 @@ export function Register() {
 
   return (
     <>
-      <div className="h-screen min-h-full flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-        <div className="sm:mx-auto sm:w-full sm:max-w-md">
-          <Link to="/">
-            <img
-              className="mx-auto h-12 w-auto"
-              src="https://invoiceninja.github.io/assets/images/logo-rounded.png"
-              alt="Invoice Ninja"
-            />
-          </Link>
-        </div>
-
-        <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <div className="bg-white mx-4 lg:mx-0 py-8 px-4 border border-gray-300 rounded-lg sm:px-10">
-            <form className="space-y-6" onSubmit={form.handleSubmit}>
-              <div>
-                <Input
-                  label={t("email_address")}
-                  type="email"
-                  id="email"
-                  placeholder="you@example.com"
-                  onChange={form.handleChange}
-                  disabled={isFormBusy}
-                />
-
-                {errors?.email && (
-                  <Message className="mt-2" type="red">
-                    {errors.email}
-                  </Message>
-                )}
-              </div>
-              <div>
-                <Input
-                  label={t("password")}
-                  type="password"
-                  id="password"
-                  disabled={isFormBusy}
-                  onChange={form.handleChange}
-                  required={true}
-                />
-
-                {errors?.password && (
-                  <Message className="mt-2" type="red">
-                    {errors.password}
-                  </Message>
-                )}
-              </div>
-
-              <div>
-                <Input
-                  label={t("confirm_password")}
-                  type="password"
-                  id="password_confirmation"
-                  disabled={isFormBusy}
-                  onChange={form.handleChange}
-                />
-
-                {errors?.password_confirmation && (
-                  <Message className="mt-2" type="red">
-                    {errors.password_confirmation}
-                  </Message>
-                )}
-              </div>
-
-              <div className="flex items-center">
-                <Checkbox
-                  id="terms_of_service"
-                  required={true}
-                  onChange={form.handleChange}
-                  label={t("i_agree_to_the")}
-                />
-
-                <LinkExternal
-                  target="_blank"
-                  className="ml-1 text-sm"
-                  to="https://www.invoiceninja.com/terms"
-                >
-                  {t("terms_of_service_link")}
-                </LinkExternal>
-              </div>
-
-              <div className="flex items-center">
-                <Checkbox
-                  id="privacy_policy"
-                  required={true}
-                  onChange={form.handleChange}
-                  label={`${t("i_agree_to_the")} ${t("privacy_policy_link")}`}
-                />
-
-                <LinkExternal
-                  target="_blank"
-                  className="ml-1 text-sm"
-                  to="https://www.invoiceninja.com/privacy-policy"
-                >
-                  {t("privacy_policy_link")}
-                </LinkExternal>
-              </div>
-
-              <Button busy={isFormBusy} block>
-                {t("sign_up")}
-              </Button>
-            </form>
-
-            <BelowForm />
-          </div>
-          <div className="flex flex-col items-center mt-4">
-            {message && (
-              <Message className="bg-white" type="red">
-                {message}
-              </Message>
-            )}
-
-            <LinkStyled className="mt-2" to="/login">
-              {t("login")}
-            </LinkStyled>
-          </div>
-        </div>
+      <div
+        style={{
+          backgroundColor: "#3c3b3b",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "center",
+          padding: "28px 55px",
+        }}
+      >
+        <Link to="/">
+          <img width="231" src={Logo} alt="Invoice Ninja Logo" />
+        </Link>
       </div>
+
+      <Grid
+        container
+        direction="row"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Grid item xs={10} sm={7} md={5} lg={4}>
+          <Typography
+            sx={{ marginTop: 10, mx: "auto", textAlign: "center" }}
+            variant="h5"
+          >
+            {t("register_label")}
+          </Typography>
+
+          <form onSubmit={form.handleSubmit}>
+            <Stack sx={{ mt: 4 }}>
+              <TextField
+                error={Boolean(errors?.email)}
+                helperText={errors?.email}
+                id="email"
+                label={t("email_address")}
+                variant="outlined"
+                type="email"
+                onChange={form.handleChange}
+              />
+
+              <TextField
+                sx={{ mt: 2 }}
+                error={Boolean(errors?.password)}
+                helperText={errors?.password}
+                id="password"
+                label={t("password")}
+                variant="outlined"
+                type="password"
+                onChange={form.handleChange}
+              />
+
+              <TextField
+                sx={{ mt: 2 }}
+                error={Boolean(errors?.password_confirmation)}
+                helperText={errors?.password_confirmation}
+                id="password_confirmation"
+                label={t("confirm_password")}
+                variant="outlined"
+                type="password"
+                onChange={form.handleChange}
+              />
+
+              <FormGroup sx={{ mt: 2 }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      required
+                      id="terms_of_service"
+                      onChange={form.handleChange}
+                    />
+                  }
+                  label={
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <span>{t("i_agree_to_the")}</span>
+                      <LinkComponent
+                        target="_blank"
+                        href="https://www.invoiceninja.com/terms"
+                        style={{ marginLeft: 5 }}
+                      >
+                        {t("terms_of_service_link")}
+                      </LinkComponent>
+                    </div>
+                  }
+                />
+
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      required
+                      id="privacy_policy"
+                      onChange={form.handleChange}
+                    />
+                  }
+                  label={
+                    <div style={{ display: "flex", alignItems: "center" }}>
+                      <span>{t("i_agree_to_the")}</span>
+                      <LinkComponent
+                        target="_blank"
+                        href="https://www.invoiceninja.com/privacy-policy"
+                        style={{ marginLeft: 5 }}
+                      >
+                        {t("privacy_policy_link")}
+                      </LinkComponent>
+                    </div>
+                  }
+                />
+              </FormGroup>
+
+              <LoadingButton
+                type="submit"
+                loading={isFormBusy}
+                sx={{ mt: 2 }}
+                disableElevation
+                size="large"
+                variant="contained"
+              >
+                {t("register")}
+              </LoadingButton>
+            </Stack>
+          </form>
+
+          {message && (
+            <Alert sx={{ marginTop: 2 }} severity="error">
+              {message}
+            </Alert>
+          )}
+        </Grid>
+      </Grid>
     </>
   );
 }
