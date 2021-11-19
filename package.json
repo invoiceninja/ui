@@ -32,9 +32,9 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "vite",
-    "build": "vite build",
-    "serve": "vite build && serve -d build",
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview",
     "format": "prettier --write src/**/*.{tsx,ts}"
   },
   "eslintConfig": {
