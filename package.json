@@ -32,13 +32,10 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "format": "prettier --write src/**/*.{tsx,ts}",
-    "serve": "react-scripts build && serve -d build",
-    "start-legacy": "react-scripts --openssl-legacy-provider start"
+    "start": "vite",
+    "build": "vite build",
+    "serve": "vite build && serve -d build",
+    "format": "prettier --write src/**/*.{tsx,ts}"
   },
   "eslintConfig": {
     "extends": [
