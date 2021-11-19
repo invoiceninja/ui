@@ -11,6 +11,9 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import { Box } from "@mui/system";
+import { CssBaseline } from "@mui/material";
+import { AppBar } from "../appbar/AppBar";
 
 interface Props {
   title?: string;
@@ -18,7 +21,6 @@ interface Props {
 }
 
 export function Default(props: Props) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const [t] = useTranslation();
 
@@ -37,5 +39,10 @@ export function Default(props: Props) {
 
   const userNavigation = [{ name: t("logout"), href: "/app/logout" }];
 
-  return <></>;
+  return (
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
+      <AppBar />
+    </Box>
+  );
 }
