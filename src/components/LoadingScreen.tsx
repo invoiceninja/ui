@@ -7,12 +7,9 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { CircularProgress } from "@mui/material";
 
 export function LoadingScreen() {
   return (
-    <div style={{ position: "fixed", top: "50%", left: "50%" }}>
-      <CircularProgress />
-    </div>
+    <div style={{ position: "fixed", top: "50%", left: "50%" }}>Loading...</div>
   );
 }
