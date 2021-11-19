@@ -29,13 +29,13 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
-    "start": "craco start",
-    "build": "craco build",
-    "test": "craco test",
-    "eject": "craco eject",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
     "format": "prettier --write src/**/*.{tsx,ts}",
-    "serve": "craco build && serve -d build",
-    "start-legacy": "craco --openssl-legacy-provider start"
+    "serve": "react-scripts build && serve -d build",
+    "start-legacy": "react-scripts --openssl-legacy-provider start"
   },
   "eslintConfig": {
     "extends": [
@@ -56,7 +56,6 @@
     ]
   },
   "devDependencies": {
-    "@craco/craco": "^6.4.0",
     "autoprefixer": "^9.8.8",
     "postcss": "^7.0.39",
     "prettier": "2.4.1",
