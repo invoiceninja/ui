@@ -47,7 +47,10 @@
     ]
   },
   "devDependencies": {
+    "autoprefixer": "^10.4.0",
+    "postcss": "^8.3.11",
     "prettier": "2.4.1",
-    "serve": "^13.0.2"
+    "serve": "^13.0.2",
+    "tailwindcss": "^2.2.19"
   }
 }
