@@ -29,6 +29,7 @@ import {
   Typography,
   Link as LinkComponent,
   Alert,
+  Button
 } from "@mui/material";
 import { LoadingButton } from "@mui/lab";
 
@@ -218,6 +219,17 @@ export function Register() {
               {message}
             </Alert>
           )}
+
+          <Stack
+            direction="column"
+            justifyContent="space-evenly"
+            alignItems="center"
+            sx={{ marginTop: 2 }}
+          >
+            <Button component={Link} to="/login">
+              {t("login")}
+            </Button>
+          </Stack>
         </Grid>
       </Grid>
     </>
