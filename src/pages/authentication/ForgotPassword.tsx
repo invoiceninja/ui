@@ -79,7 +79,7 @@ export function ForgotPassword() {
         justifyContent="center"
         alignItems="center"
       >
-        <Grid item xs={10} sm={7} md={5} lg={4}>
+        <Grid item xs={10} sm={7} md={5} lg={4} xl={2}>
           <Typography
             sx={{ marginTop: 10, mx: "auto", textAlign: "center" }}
             variant="h4"
