@@ -19,11 +19,7 @@ export default function Loading(props: Props) {
     <svg
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
-      className={classNames("w-4 h-4 animate-spin", {
-        "text-white":
-          props.variant === "light" || typeof props.variant === "undefined",
-        "text-black": props.variant === "dark",
-      })}
+      style={{ width: "1.5rem", height: "1.5rem", color: "black" }}
       viewBox="0 0 24 24"
     >
       <circle

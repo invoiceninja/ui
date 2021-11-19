@@ -14,5 +14,5 @@ import { useAuthenticated } from "../common/hooks/useAuthenticated";
 export function PublicRoute() {
   const authenticated = useAuthenticated();
 
-  return authenticated ? <Navigate to="/app/dashboard" /> : <Outlet />;
+  return authenticated ? <Navigate to="/dashboard" /> : <Outlet />;
 }

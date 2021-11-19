@@ -7,15 +7,12 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-
-import Loading from "./icons/Loading";
+import { CircularProgress } from "@mui/material";
 
 export function LoadingScreen() {
   return (
-    <div className="grid place-items-center h-screen">
-      <div className="text-gray-900">
-        <Loading variant="dark" />
-      </div>
+    <div style={{ position: "fixed", top: "50%", left: "50%" }}>
+      <CircularProgress />
     </div>
   );
 }

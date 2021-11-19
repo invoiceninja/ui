@@ -15,7 +15,7 @@ export function Index() {
   const authenticated = useAuthenticated();
 
   return authenticated ? (
-    <Navigate to="/app/dashboard" />
+    <Navigate to="/dashboard" />
   ) : (
     <Navigate to="/login" />
   );

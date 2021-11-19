@@ -23,20 +23,19 @@ import { Products } from "../pages/products/Products";
 export const routes = (
   <Routes>
     <Route path="/" element={<Index />} />
-    <Route path="/" element={<PublicRoute />}>
-      <Route path="login" element={<Login />} />
-      <Route path="forgot-password" element={<ForgotPassword />} />
-      <Route path="" element={<HostedRoute />}>
-        <Route path="register" element={<Register />} />
+    <Route element={<PublicRoute />}>
+      <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route element={<HostedRoute />}>
+        <Route path="/register" element={<Register />} />
       </Route>
     </Route>
-    <Route path="/app" element={<PrivateRoute />}>
-      <Route path="" element={<Index />} />
-      <Route path="logout" element={<Logout />} />
-      <Route path="dashboard" element={<Dashboard />} />
-      <Route path="products">
-        <Route path="" element={<Products />} />
+    <Route element={<PrivateRoute />}>
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/products">
+        <Route element={<Products />} />
       </Route>
+      <Route path="/logout" element={<Logout />} />
     </Route>
   </Routes>
 );
