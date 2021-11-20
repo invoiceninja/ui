@@ -43,6 +43,7 @@ export function InputField(props: Props) {
           }
         )}
         placeholder={props.placeholder}
+        onChange={props.onChange}
       />
     </section>
   );

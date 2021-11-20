@@ -9,7 +9,7 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { useFormik } from "formik";
+import { Formik, useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 import {
   AuthenticationTypes,
@@ -27,6 +27,7 @@ import { Link } from "../../components/forms/Link";
 import { InputLabel } from "../../components/forms/InputLabel";
 import { Alert } from "../../components/Alert";
 import { RootState } from "../../common/stores/store";
+import { HostedLinks } from "./components/HostedLinks";
 
 export function Login() {
   const colors = useSelector((state: RootState) => state.settings.colors);
@@ -37,7 +38,7 @@ export function Login() {
   const [t] = useTranslation();
 
   useEffect(() => {
-    document.title = t("login");
+    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t("login")}`;
   });
 
   const form = useFormik({
@@ -72,61 +73,72 @@ export function Login() {
   });
 
   return (
-    <div className="h-screen bg-gray-100">
+    <div className="h-screen md:bg-gray-100">
       <div className={`bg-${colors.primary} py-1`}></div>
       <div className="flex justify-center py-8">
-        <img src={Logo} alt="Invoice Ninja Logo" className="h-12" />
+        <Link to="/">
+          <img src={Logo} alt="Invoice Ninja Logo" className="h-12" />
+        </Link>
       </div>
 
       <div className="flex flex-col items-center">
-        <div className="bg-white mx-4 max-w-md w-full p-8 rounded shadow-lg">
+        <div className="bg-white mx-4 max-w-md w-full p-8 rounded md:shadow-lg">
           <h2 className="text-2xl">{t("login")}</h2>
 
-          <form className="my-6">
-            <InputField type="email" label={t("email_address")} id="email" />
+          <form onSubmit={form.handleSubmit} className="my-6">
+            <InputField
+              type="email"
+              label={t("email_address")}
+              id="email"
+              onChange={form.handleChange}
+            />
 
-            <Alert className="mt-2" type="danger">
-              Field is required.
-            </Alert>
+            {errors?.email && (
+              <Alert className="mt-2" type="danger">
+                {errors.email}
+              </Alert>
+            )}
 
             <div className="flex items-center justify-between mt-4">
               <InputLabel>{t("password")}</InputLabel>
               <Link to="/forgot-password">{t("forgot_password")}</Link>
             </div>
 
-            <InputField type="password" className="mt-2" id="password" />
+            <InputField
+              type="password"
+              className="mt-2"
+              id="password"
+              onChange={form.handleChange}
+            />
 
-            <Alert className="mt-2" type="danger">
-              Field is required.
-            </Alert>
+            {errors?.password && (
+              <Alert className="mt-2" type="danger">
+                {errors.password}
+              </Alert>
+            )}
 
-            <Button className="mt-4" variant="block">
+            {message && (
+              <Alert className="mt-4" type="danger">
+                {message}
+              </Alert>
+            )}
+
+            <Button disabled={isFormBusy} className="mt-4" variant="block">
               {t("login")}
             </Button>
           </form>
+
+          <div className="flex justify-center">
+            {isHosted() && <Link to="/register">{t("register_label")}</Link>}
+          </div>
         </div>
+
+        {isHosted() && (
+          <div className="bg-white mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
+            <HostedLinks />
+          </div>
+        )}
       </div>
-
-      {/* <form onSubmit={form.handleSubmit}>
-        <input
-          // error={Boolean(errors?.email)}
-          // helperText={errors?.email}
-          id="email"
-          // label={t("email_address")}
-          type="email"
-          onChange={form.handleChange}
-        />
-
-        <input id="password" type="password" onChange={form.handleChange} />
-
-        <button type="submit">{t("login")}</button>
-      </form> */}
-
-      {message && <div>{message}</div>}
-
-      {/* <Link to="/forgot-password">{t("forgot_password")}</Link> */}
-
-      {isHosted() && <Link to="/register">{t("register_label")}</Link>}
     </div>
   );
 }
