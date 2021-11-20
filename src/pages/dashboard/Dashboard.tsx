@@ -8,15 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import React from "react";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
-import { Default } from "../components/layouts/Default";
+import { Default } from "../../components/layouts/Default";
 
 export function Dashboard() {
   const [t] = useTranslation();
 
   useEffect(() => {
-    document.title = t("dashboard");
+    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t("dashboard")}`;
   });
 
   return <Default title={t("dashboard")}>Lorem, ipsum dolor.</Default>;

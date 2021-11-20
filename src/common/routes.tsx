@@ -17,9 +17,9 @@ import { RecoverPassword } from "../pages/authentication/RecoverPassword";
 import { Login } from "../pages/authentication/Login";
 import { Logout } from "../pages/authentication/Logout";
 import { Register } from "../pages/authentication/Register";
-import { Dashboard } from "../pages/Dashboard";
 import { Index } from "../pages/Index";
 import { Products } from "../pages/products/Products";
+import { Dashboard } from "../pages/dashboard/Dashboard";
 
 export const routes = (
   <Routes>

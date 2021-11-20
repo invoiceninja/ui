@@ -11,15 +11,17 @@
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
+import CommonProps from "../../common/interfaces/common-props.interface";
 
-interface Props {
+interface Props extends CommonProps {
   title?: string;
-  children: any;
 }
 
 export function Default(props: Props) {
   const location = useLocation();
   const [t] = useTranslation();
 
-  return <div></div>;
+  return <div>
+    {props.children}
+  </div>;
 }
