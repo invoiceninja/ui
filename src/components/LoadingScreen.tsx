@@ -8,8 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import React from "react";
+import { Spinner } from "./Spinner";
+
 export function LoadingScreen() {
   return (
-    <div style={{ position: "fixed", top: "50%", left: "50%" }}>Loading...</div>
+    <div className="flex items-center justify-center h-screen">
+      <Spinner variant="dark" />
+    </div>
   );
 }
