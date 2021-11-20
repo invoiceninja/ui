@@ -13,10 +13,12 @@ import React, { ReactNode } from "react";
 import { useSelector } from "react-redux";
 import CommonProps from "../../common/interfaces/common-props.interface";
 import { RootState } from "../../common/stores/store";
+import { Spinner } from "../Spinner";
 
 interface Props extends CommonProps {
   children?: ReactNode;
   variant?: "block";
+  disabled?: boolean;
 }
 
 export function Button(props: Props) {
@@ -24,12 +26,16 @@ export function Button(props: Props) {
 
   return (
     <button
-      className={classNames(`py-2 px-3 text-white rounded ${props.className}`, {
-        "w-full": props.variant === "block",
-        [`bg-${colors.primary}`]: colors.isClass,
-      })}
+      disabled={props.disabled}
+      className={classNames(
+        `inline-flex justify-center py-2 px-3 text-white rounded ${props.className}`,
+        {
+          "w-full": props.variant === "block",
+          [`bg-${colors.primary}`]: colors.isClass,
+        }
+      )}
     >
-      {props.children}
+      {props.disabled ? <Spinner variant="light" /> : props.children}
     </button>
   );
 }
