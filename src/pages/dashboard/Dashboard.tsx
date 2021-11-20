@@ -20,5 +20,9 @@ export function Dashboard() {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t("dashboard")}`;
   });
 
-  return <Default title={t("dashboard")}>Lorem, ipsum dolor.</Default>;
+  return (
+    <Default title={t("dashboard")}>
+      <p>Lorem, ipsum dolor.</p>
+    </Default>
+  );
 }
