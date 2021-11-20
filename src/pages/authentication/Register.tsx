@@ -12,19 +12,26 @@ import React, { useEffect, useState } from "react";
 import { AxiosError, AxiosResponse } from "axios";
 import { useFormik } from "formik";
 import { useTranslation } from "react-i18next";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RegisterForm } from "../../common/dtos/authentication";
-import { endpoint, request } from "../../common/helpers";
+import { endpoint, isHosted, request } from "../../common/helpers";
 import { register } from "../../common/stores/slices/user";
 import { RegisterValidation } from "./common/ValidationInterface";
-import Logo from "../../resources/images/invoiceninja-logox53.png";
-import { Link } from "react-router-dom";
+import { RootState } from "../../common/stores/store";
+import { Header } from "./components/Header";
+import { InputField } from "../../components/forms/InputField";
+import { Alert } from "../../components/Alert";
+import { InputLabel } from "../../components/forms/InputLabel";
+import { Button } from "../../components/forms/Button";
+import { HostedLinks } from "./components/HostedLinks";
+import { Link } from "../../components/forms/Link";
 
 export function Register() {
+  const colors = useSelector((state: RootState) => state.settings.colors);
   const [t] = useTranslation();
 
   useEffect(() => {
-    document.title = t("register");
+    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t("register")}`;
   });
 
   const [errors, setErrors] = useState<RegisterValidation | undefined>(
@@ -79,28 +86,80 @@ export function Register() {
   });
 
   return (
-    <>
-      <Link to="/">
-        <img width="231" src={Logo} alt="Invoice Ninja Logo" />
-      </Link>
+    <div className="h-screen md:bg-gray-100">
+      <Header />
+      <div className="flex flex-col items-center">
+        <div className="bg-white mx-4 max-w-md w-full p-8 rounded md:shadow-lg">
+          <h2 className="text-2xl">{t("register_label")}</h2>
 
-      <form onSubmit={form.handleSubmit}>
-        <input id="email" type="email" onChange={form.handleChange} />
+          <form onSubmit={form.handleSubmit} className="my-6">
+            <section>
+              <InputField
+                type="email"
+                label={t("email_address")}
+                id="email"
+                onChange={form.handleChange}
+              />
 
-        <input id="password" type="password" onChange={form.handleChange} />
+              {errors?.email && (
+                <Alert className="mt-2" type="danger">
+                  {errors.email}
+                </Alert>
+              )}
+            </section>
 
-        <input
-          id="password_confirmation"
-          type="password"
-          onChange={form.handleChange}
-        />
+            <section className="mt-4">
+              <InputField
+                type="password"
+                label={t("password")}
+                id="password"
+                onChange={form.handleChange}
+              />
 
-        <button type="submit">{t("register")}</button>
-      </form>
+              {errors?.password && (
+                <Alert className="mt-2" type="danger">
+                  {errors.password}
+                </Alert>
+              )}
+            </section>
 
-      {message && <div>{message}</div>}
+            <section className="mt-4">
+              <InputField
+                type="password"
+                label={t("password_confirmation")}
+                id="password_confirmation"
+                onChange={form.handleChange}
+              />
 
-      <Link to="/login">{t("login")}</Link>
-    </>
+              {errors?.password_confirmation && (
+                <Alert className="mt-2" type="danger">
+                  {errors.password_confirmation}
+                </Alert>
+              )}
+            </section>
+
+            {message && (
+              <Alert className="mt-4" type="danger">
+                {message}
+              </Alert>
+            )}
+
+            <Button disabled={isFormBusy} className="mt-4" variant="block">
+              {t("register")}
+            </Button>
+          </form>
+
+          <div className="flex justify-center">
+            {isHosted() && <Link to="/login">{t("login")}</Link>}
+          </div>
+        </div>
+
+        {isHosted() && (
+          <div className="bg-white mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
+            <HostedLinks />
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
