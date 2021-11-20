@@ -17,12 +17,10 @@ import { endpoint, isHosted, request } from "../../common/helpers";
 import { ForgotPasswordValidation } from "./common/ValidationInterface";
 import { InputField } from "../../components/forms/InputField";
 import { Alert } from "../../components/Alert";
-import { useSelector } from "react-redux";
-import { RootState } from "../../common/stores/store";
 import { Button } from "../../components/forms/Button";
 import { HostedLinks } from "./components/HostedLinks";
 import { Link } from "../../components/forms/Link";
-import Logo from "../../resources/images/invoiceninja-logo@dark.png";
+import { Header } from "./components/Header";
 
 interface Response {
   message: string;
@@ -30,7 +28,6 @@ interface Response {
 }
 
 export function RecoverPassword() {
-  const colors = useSelector((state: RootState) => state.settings.colors);
   const [t] = useTranslation();
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [message, setMessage] = useState<Response | undefined>(undefined);
@@ -66,12 +63,7 @@ export function RecoverPassword() {
 
   return (
     <div className="h-screen md:bg-gray-100">
-      <div className={`bg-${colors.primary} py-1`}></div>
-      <div className="flex justify-center py-8">
-        <Link to="/">
-          <img src={Logo} alt="Invoice Ninja Logo" className="h-12" />
-        </Link>
-      </div>
+      <Header />
 
       <div className="flex flex-col items-center">
         <div className="bg-white mx-4 max-w-md w-full p-8 rounded md:shadow-lg">

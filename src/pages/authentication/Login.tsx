@@ -9,8 +9,8 @@
  */
 
 import React, { useEffect, useState } from "react";
-import { Formik, useFormik } from "formik";
-import { useDispatch, useSelector } from "react-redux";
+import { useFormik } from "formik";
+import { useDispatch } from "react-redux";
 import {
   AuthenticationTypes,
   LoginForm,
@@ -20,17 +20,15 @@ import { authenticate } from "../../common/stores/slices/user";
 import { AxiosError, AxiosResponse } from "axios";
 import { LoginValidation } from "./common/ValidationInterface";
 import { useTranslation } from "react-i18next";
-import Logo from "../../resources/images/invoiceninja-logo@dark.png";
 import { InputField } from "../../components/forms/InputField";
 import { Button } from "../../components/forms/Button";
 import { Link } from "../../components/forms/Link";
 import { InputLabel } from "../../components/forms/InputLabel";
 import { Alert } from "../../components/Alert";
-import { RootState } from "../../common/stores/store";
 import { HostedLinks } from "./components/HostedLinks";
+import { Header } from "./components/Header";
 
 export function Login() {
-  const colors = useSelector((state: RootState) => state.settings.colors);
   const dispatch = useDispatch();
   const [message, setMessage] = useState("");
   const [errors, setErrors] = useState<LoginValidation | undefined>(undefined);
@@ -74,13 +72,7 @@ export function Login() {
 
   return (
     <div className="h-screen md:bg-gray-100">
-      <div className={`bg-${colors.primary} py-1`}></div>
-      <div className="flex justify-center py-8">
-        <Link to="/">
-          <img src={Logo} alt="Invoice Ninja Logo" className="h-12" />
-        </Link>
-      </div>
-
+      <Header />
       <div className="flex flex-col items-center">
         <div className="bg-white mx-4 max-w-md w-full p-8 rounded md:shadow-lg">
           <h2 className="text-2xl">{t("login")}</h2>
