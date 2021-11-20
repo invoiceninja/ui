@@ -13,7 +13,7 @@ import { Route, Routes } from "react-router";
 import { HostedRoute } from "../components/HostedRoute";
 import { PrivateRoute } from "../components/PrivateRoute";
 import { PublicRoute } from "../components/PublicRoute";
-import { ForgotPassword } from "../pages/authentication/ForgotPassword";
+import { RecoverPassword } from "../pages/authentication/RecoverPassword";
 import { Login } from "../pages/authentication/Login";
 import { Logout } from "../pages/authentication/Logout";
 import { Register } from "../pages/authentication/Register";
@@ -26,7 +26,7 @@ export const routes = (
     <Route path="/" element={<Index />} />
     <Route element={<PublicRoute />}>
       <Route path="/login" element={<Login />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/recover_password" element={<RecoverPassword />} />
       <Route element={<HostedRoute />}>
         <Route path="/register" element={<Register />} />
       </Route>

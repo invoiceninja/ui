@@ -101,7 +101,7 @@ export function Login() {
 
             <div className="flex items-center justify-between mt-4">
               <InputLabel>{t("password")}</InputLabel>
-              <Link to="/forgot-password">{t("forgot_password")}</Link>
+              <Link to="/recover_password">{t("forgot_password")}</Link>
             </div>
 
             <InputField
