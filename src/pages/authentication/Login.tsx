@@ -30,7 +30,7 @@ import { Header } from "./components/Header";
 
 export function Login() {
   const dispatch = useDispatch();
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState<string | undefined>(undefined);
   const [errors, setErrors] = useState<LoginValidation | undefined>(undefined);
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [t] = useTranslation();
@@ -45,7 +45,7 @@ export function Login() {
       password: "",
     },
     onSubmit: (values: LoginForm) => {
-      setMessage("");
+      setMessage(undefined);
       setErrors(undefined);
       setIsFormBusy(true);
 
