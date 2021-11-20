@@ -23,6 +23,9 @@ interface Props extends CommonProps {
 
 export function Button(props: Props) {
   const colors = useSelector((state: RootState) => state.settings.colors);
+  const css: React.CSSProperties = {
+    backgroundColor: colors.primary,
+  };
 
   return (
     <button
@@ -31,9 +34,9 @@ export function Button(props: Props) {
         `inline-flex justify-center py-2 px-3 text-white rounded ${props.className}`,
         {
           "w-full": props.variant === "block",
-          [`bg-${colors.primary}`]: colors.isClass,
         }
       )}
+      style={css}
     >
       {props.disabled ? <Spinner variant="light" /> : props.children}
     </button>

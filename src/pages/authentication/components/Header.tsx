@@ -16,10 +16,13 @@ import Logo from "../../../resources/images/invoiceninja-logo@dark.png";
 
 export function Header() {
   const colors = useSelector((state: RootState) => state.settings.colors);
+  const css: React.CSSProperties = {
+    backgroundColor: colors.primary,
+  };
 
   return (
     <>
-      <div className={`bg-${colors.primary} py-1`}></div>
+      <div className="py-1" style={css}></div>
       <div className="flex justify-center py-8">
         <Link to="/">
           <img src={Logo} alt="Invoice Ninja Logo" className="h-12" />

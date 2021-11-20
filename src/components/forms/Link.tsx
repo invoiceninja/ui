@@ -22,12 +22,14 @@ interface Props extends CommonProps {
 
 export function Link(props: Props) {
   const colors = useSelector((state: RootState) => state.settings.colors);
+  const css: React.CSSProperties = {
+    color: colors.primary,
+  };
 
   return (
     <RouterLink
-      className={classNames(`text-sm hover:underline ${props.className}`, {
-        [`text-${colors.primary}`]: colors.isClass,
-      })}
+      className={`text-sm hover:underline ${props.className}`}
+      style={css}
       to={props.to}
     >
       {props.children}

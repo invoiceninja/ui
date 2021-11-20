@@ -36,12 +36,7 @@ export function InputField(props: Props) {
       <input
         id={props.id}
         type={props.type}
-        className={classNames(
-          `w-full py-2 px-3 rounded border border-gray-300 focus:outline-none text-sm ${props.className}`,
-          {
-            [`focus:border-${colors.primary}`]: colors.isClass,
-          }
-        )}
+        className={`w-full py-2 px-3 rounded border border-gray-300 text-sm ${props.className}`}
         placeholder={props.placeholder}
         onChange={props.onChange}
       />
