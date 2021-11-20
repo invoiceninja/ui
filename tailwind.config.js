@@ -11,6 +11,12 @@ module.exports = {
       fontFamily: {
         sans: ["Inter var", ...defaultTheme.fontFamily.sans],
       },
+      colors: {
+        ninja: {
+          gray: "#454544",
+          "gray-darker": "#2F2E2E",
+        },
+      },
     },
   },
   variants: {
