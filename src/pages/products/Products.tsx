@@ -11,17 +11,8 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
-import { Product } from "../../common/dtos/product";
 import { useProductsQuery } from "../../common/queries/products";
 import { RootState } from "../../common/stores/store";
-import { Button } from "../../components/forms/Button";
-import { Checkbox } from "../../components/forms/Checkbox";
-import Loading from "../../components/icons/Loading";
-import { Default } from "../../components/layouts/Default";
-import { Pagination } from "../../components/tables/Pagination";
-import { Table, Tbody, Td, Th, Thead, Tr } from "../../components/tables/Table";
-import { TableWrapper } from "../../components/tables/TableWrapper";
-import { Actions } from "./components/Actions";
 
 export function Products() {
   useEffect(() => {

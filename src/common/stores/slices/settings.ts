@@ -21,7 +21,7 @@ interface SettingsState {
 const initialState: SettingsState = {
   colors: {
     isClass: true,
-    primary: "green-800",
+    primary: "green-800", 
   },
 };
 
