@@ -34,7 +34,7 @@ export function request(
 }
 
 export function isHosted(): boolean {
-  return import.meta.env.VITE_ROUTER === "true";
+  return import.meta.env.VITE_IS_HOSTED === "true";
 }
 
 export function isSelfHosted(): boolean {
