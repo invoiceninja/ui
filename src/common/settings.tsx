@@ -13,15 +13,15 @@ import React from "react";
 import { RootState } from "../common/stores/store";
 import Client from "../common/dtos/client";
 
-export function GetSetting(Client: client setting: string) {
+export function getSetting(Client: client setting: string) {
 
   const settings = useSelector((state: RootState) => state.settings);
 
-  if(typeof client.settings === 'object' && hasOwnProperty(client.settings, setting)) {
+  if(typeof client.settings === 'object' && client.settings.hasOwnProperty(setting)) {
     return client.settings[setting];
   }
 
-  if(typeof client.group_settings === 'object' && hasOwnProperty(client.group_settings, setting)) {
+  if(typeof client.group_settings === 'object' && client.group_settings.hasOwnProperty(setting)) {
     return client.group_settings[setting];
   }
 

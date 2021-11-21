@@ -9,7 +9,7 @@
  */
 
 export interface Client {
-  id?: string;
+  id: string;
   name?: string;
   settings?: object;
   group_settings?: object;
