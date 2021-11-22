@@ -33,11 +33,7 @@ export function Default(props: Props) {
     { name: t("products"), href: "/products", icon: Box, current: false },
   ];
 
-  const userNavigation = [
-    { name: "Your Profile", href: "#" },
-    { name: "Settings", href: "#" },
-    { name: "Sign out", href: "#" },
-  ];
+  const userNavigation = [{ name: "Sign out", href: "/logout" }];
 
   return (
     <>
@@ -90,16 +86,13 @@ export function Default(props: Props) {
                   </div>
                 </Transition.Child>
                 <div className="flex-shrink-0 flex items-center px-4">
-                  <img
-                    className="h-8 w-auto"
-                    src={Logo}
-                    alt="Company logo"
-                  />
+                  <img className="h-8 w-auto" src={Logo} alt="Company logo" />
                 </div>
                 <div className="mt-5 flex-1 h-0 overflow-y-auto">
                   <nav className="space-y-1">
                     {navigation.map((item) => (
-                      <Link to={item.href}
+                      <Link
+                        to={item.href}
                         key={item.name}
                         className={classNames(
                           item.current
@@ -145,8 +138,8 @@ export function Default(props: Props) {
                     to={item.href}
                     className={classNames(
                       item.current
-                        ? "bg-gray-100 text-gray-900"
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
+                        ? "border-l-4 border-transparent bg-gray-100 text-gray-900"
+                        : "border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900",
                       "group flex items-center px-4 py-2 text-sm font-medium"
                     )}
                   >
@@ -211,15 +204,15 @@ export function Default(props: Props) {
                       {userNavigation.map((item) => (
                         <Menu.Item key={item.name}>
                           {({ active }) => (
-                            <a
-                              href={item.href}
+                            <Link
+                              to={item.href}
                               className={classNames(
                                 active ? "bg-gray-100" : "",
                                 "block px-4 py-2 text-sm text-gray-700"
                               )}
                             >
                               {item.name}
-                            </a>
+                            </Link>
                           )}
                         </Menu.Item>
                       ))}
