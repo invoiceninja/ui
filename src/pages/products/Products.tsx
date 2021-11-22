@@ -24,6 +24,13 @@ import {
   PlusCircle,
 } from "react-feather";
 import { Link } from "../../components/forms/Link";
+import { Table } from "../../components/tables/Table";
+import { Thead } from "../../components/tables/Thead";
+import { Th } from "../../components/tables/Th";
+import { Tbody } from "../../components/tables/Tbody";
+import { Tr } from "../../components/tables/Tr";
+import { Td } from "../../components/tables/Td";
+import { Pagination } from "../../components/tables/Pagination";
 
 export function Products() {
   useEffect(() => {
@@ -76,122 +83,31 @@ export function Products() {
         </div>
       </div>
 
-      <div className="flex flex-col mt-2">
-        <div className="overflow-x-auto">
-          <div className="py-2 align-middle inline-block min-w-full">
-            <div className="overflow-hidden border border-gray-200 rounded border-b border-t">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead style={{ backgroundColor: colors.primary }}>
-                  <tr>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
-                    >
-                      <input type="checkbox" />
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
-                    >
-                      {t("product")}
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
-                    >
-                      {t("notes")}
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
-                    >
-                      {t("cost")}
-                    </th>
-                    <th
-                      scope="col"
-                      className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
-                    ></th>
-                    <th scope="col" className="relative px-6 py-3">
-                      <span className="sr-only">Edit</span>
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr className="bg-white hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      <input type="checkbox" />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"></td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      {/* <Link to="/edit">{t("edit")}</Link> */}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col md:flex-row md:items-center justify-between space-x-2 my-3">
-          <div className="flex justify-center md:justify-start items-center space-x-4">
-            <span className="text-sm">Showing 1 to 1 of 1 entires</span>
-            <div className="flex items-center space-x-2">
-              <select
-                id="location"
-                name="location"
-                className="block pl-3 pr-10 py-2 text-base border-gray-300 sm:text-sm rounded-md"
-                defaultValue="10"
-              >
-                <option>10</option>
-                <option>50</option>
-                <option>100</option>
-              </select>
-              <label
-                htmlFor="location"
-                className="block text-sm font-medium text-gray-700"
-              >
-                {t("rows")}
-              </label>
-            </div>
-          </div>
-          <nav className="flex justify-center md:justify-end my-4 md:my-0 items-center">
-            <a
-              className="py-1.5 px-2 bg-white border-b border-t rounded-l hover:bg-gray-50 border"
-              href="#"
-            >
-              <ChevronLeft />
-            </a>
-            <a
-              className="py-1.5 px-4 bg-white border-b border-t hover:bg-gray-50"
-              href="#"
-            >
-              1
-            </a>
-            <a
-              className="py-1.5 px-4 bg-white border-b border-t text-white"
-              href="#"
-              style={{ backgroundColor: colors.primary }}
-            >
-              2
-            </a>
-            <a
-              className="py-1.5 px-4 bg-white border-b border-t hover:bg-gray-50"
-              href="#"
-            >
-              3
-            </a>
-            <a
-              className="py-1.5 px-2 bg-white border-b border-t border-r rounded-r hover:bg-gray-50"
-              href="#"
-            >
-              <ChevronRight />
-            </a>
-          </nav>
-        </div>
-      </div>
+      <Table>
+        <Thead>
+          <Th>
+            <input type="checkbox" />
+          </Th>
+          <Th>{t("product")}</Th>
+          <Th>{t("notes")}</Th>
+          <Th>{t("cost")}</Th>
+          <Th></Th>
+        </Thead>
+        <Tbody>
+          <Tr>
+            <Td>
+              <input type="checkbox" />
+            </Td>
+            <Td>Lorem</Td>
+            <Td>ipsum</Td>
+            <Td>$300</Td>
+            <Td>
+              <Link to="/product/1">{t("edit")}</Link>
+            </Td>
+          </Tr>
+        </Tbody>
+      </Table>
+      <Pagination />
     </Default>
   );
 }
