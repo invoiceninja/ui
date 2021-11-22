@@ -14,6 +14,7 @@ import { Home, Menu as MenuIcon, X, Box } from "react-feather";
 import CommonProps from "../../common/interfaces/common-props.interface";
 import { useTranslation } from "react-i18next";
 import Logo from "../../resources/images/invoiceninja-logo@dark.png";
+import { Link } from "react-router-dom";
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
@@ -29,7 +30,7 @@ export function Default(props: Props) {
 
   const navigation = [
     { name: t("dashboard"), href: "/dashboard", icon: Home, current: true },
-    { name: t("projects"), href: "/projects", icon: Box, current: false },
+    { name: t("products"), href: "/products", icon: Box, current: false },
   ];
 
   const userNavigation = [
@@ -98,9 +99,8 @@ export function Default(props: Props) {
                 <div className="mt-5 flex-1 h-0 overflow-y-auto">
                   <nav className="space-y-1">
                     {navigation.map((item) => (
-                      <a
+                      <Link to={item.href}
                         key={item.name}
-                        href={item.href}
                         className={classNames(
                           item.current
                             ? "bg-gray-100 text-gray-900"
@@ -118,7 +118,7 @@ export function Default(props: Props) {
                           aria-hidden="true"
                         />
                         {item.name}
-                      </a>
+                      </Link>
                     ))}
                   </nav>
                 </div>
@@ -140,9 +140,9 @@ export function Default(props: Props) {
             <div className="mt-5 flex-grow flex flex-col">
               <nav className="flex-1 pb-4 space-y-1">
                 {navigation.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
-                    href={item.href}
+                    to={item.href}
                     className={classNames(
                       item.current
                         ? "bg-gray-100 text-gray-900"
@@ -160,7 +160,7 @@ export function Default(props: Props) {
                       aria-hidden="true"
                     />
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
               </nav>
             </div>
