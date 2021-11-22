@@ -188,8 +188,9 @@ export function Products() {
               1
             </a>
             <a
-              className="py-1.5 px-4 bg-white border-b border-t bg-green-700 text-white"
+              className="py-1.5 px-4 bg-white border-b border-t text-white"
               href="#"
+              style={{ backgroundColor: colors.primary }}
             >
               2
             </a>

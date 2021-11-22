@@ -19,7 +19,7 @@ interface SettingsState {
 
 const initialState: SettingsState = {
   colors: {
-    primary: "#047857",
+    primary: "#117DC0",
   },
 };
 
