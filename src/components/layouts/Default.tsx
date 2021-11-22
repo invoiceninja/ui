@@ -224,7 +224,7 @@ export function Default(props: Props) {
           </div>
 
           <main className="flex-1">
-            <div className="p-6">{props.children}</div>
+            <div className="p-4 md:p-8">{props.children}</div>
           </main>
         </div>
       </div>
