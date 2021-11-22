@@ -39,26 +39,17 @@ export function Products() {
   const filter = useSelector((state: RootState) => state.products.filter);
   const colors = useSelector((state: RootState) => state.settings.colors);
 
-  const people = [
-    {
-      name: "Jane Cooper",
-      title: "Regional Paradigm Technician",
-      role: "Admin",
-      email: "jane.cooper@example.com",
-    },
-  ];
-
   const options = [
     { value: "archive", label: "Active" },
     { value: "archived", label: "Archived" },
     { value: "deleted", label: "Deleted" },
   ];
 
-  // const { data, isLoading } = useProductsQuery({
-  //   perPage: 10,
-  //   currentPage,
-  //   filter,
-  // });
+  const { data, isLoading } = useProductsQuery({
+    perPage: 10,
+    currentPage,
+    filter,
+  });
 
   return (
     <Default title={t("products")}>
@@ -96,56 +87,48 @@ export function Products() {
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
                     >
-                      Name
+                      <input type="checkbox" />
                     </th>
                     <th
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
                     >
-                      Title
+                      {t("product")}
                     </th>
                     <th
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
                     >
-                      Email
+                      {t("notes")}
                     </th>
                     <th
                       scope="col"
                       className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
                     >
-                      Role
+                      {t("cost")}
                     </th>
+                    <th
+                      scope="col"
+                      className="px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider"
+                    ></th>
                     <th scope="col" className="relative px-6 py-3">
                       <span className="sr-only">Edit</span>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
-                  {people.map((person, personIdx) => (
-                    <tr
-                      key={person.email}
-                      className={
-                        personIdx % 2 === 0 ? "bg-white" : "bg-gray-50"
-                      }
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {person.name}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {person.title}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {person.email}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {person.role}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <Link to="/edit">{t("edit")}</Link>
-                      </td>
-                    </tr>
-                  ))}
+                  <tr className="bg-white hover:bg-gray-50">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                      <input type="checkbox" />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"></td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900"></td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      {/* <Link to="/edit">{t("edit")}</Link> */}
+                    </td>
+                  </tr>
                 </tbody>
               </table>
             </div>
