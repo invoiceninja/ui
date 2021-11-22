@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import React from "react";
 import { ChangeEvent, useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
@@ -16,7 +17,7 @@ import { RootState } from "../../common/stores/store";
 
 export function Products() {
   useEffect(() => {
-    document.title = t("products");
+    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t("products")}`;
   });
 
   const [t] = useTranslation();
@@ -41,6 +42,10 @@ export function Products() {
     currentPage,
     filter,
   });
+  
+  console.log(data, isLoading);
 
-  return <div></div>;
+  return <div>
+    Products page
+  </div>;
 }

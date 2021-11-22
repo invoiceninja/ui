@@ -33,9 +33,7 @@ export const routes = (
     </Route>
     <Route element={<PrivateRoute />}>
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/products">
-        <Route element={<Products />} />
-      </Route>
+      <Route path="/products" element={<Products />} />
       <Route path="/logout" element={<Logout />} />
     </Route>
   </Routes>
