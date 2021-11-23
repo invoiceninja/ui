@@ -31,6 +31,7 @@ import { Tbody } from "../../components/tables/Tbody";
 import { Tr } from "../../components/tables/Tr";
 import { Td } from "../../components/tables/Td";
 import { Pagination } from "../../components/tables/Pagination";
+import { Checkbox } from "../../components/forms/Checkbox";
 
 export function Products() {
   useEffect(() => {
@@ -86,7 +87,7 @@ export function Products() {
       <Table>
         <Thead>
           <Th>
-            <input type="checkbox" />
+            <Checkbox />
           </Th>
           <Th>{t("product")}</Th>
           <Th>{t("notes")}</Th>
@@ -96,7 +97,7 @@ export function Products() {
         <Tbody>
           <Tr>
             <Td>
-              <input type="checkbox" />
+              <Checkbox />
             </Td>
             <Td>Lorem</Td>
             <Td>ipsum</Td>

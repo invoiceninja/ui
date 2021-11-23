@@ -11,6 +11,7 @@
 import { ReactNode } from "react";
 
 export default interface CommonProps {
+  id?: any;
   className?: string;
   children?: ReactNode;
   onChange?: any;
