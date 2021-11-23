@@ -59,6 +59,8 @@ export function Products() {
     filter,
   });
 
+  console.log(data, isLoading);
+
   return (
     <Default title={t("products")}>
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -95,7 +97,7 @@ export function Products() {
           <Th></Th>
         </Thead>
         <Tbody>
-          <Tr>
+          <Tr isLoading={isLoading}>
             <Td>
               <Checkbox />
             </Td>

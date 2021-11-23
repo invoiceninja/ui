@@ -10,9 +10,23 @@
 
 import React from "react";
 import CommonProps from "../../common/interfaces/common-props.interface";
+import { Spinner } from "../Spinner";
+import { Td } from "./Td";
 
-interface Props extends CommonProps {}
+interface Props extends CommonProps {
+  isLoading?: boolean;
+}
 
 export function Tr(props: Props) {
-  return <tr className="bg-white hover:bg-gray-50">{props.children}</tr>;
+  return (
+    <tr className="bg-white hover:bg-gray-50">
+      {props.isLoading ? (
+        <Td colSpan={100}>
+          <Spinner />
+        </Td>
+      ) : (
+        props.children
+      )}
+    </tr>
+  );
 }

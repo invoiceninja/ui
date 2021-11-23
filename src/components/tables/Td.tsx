@@ -11,11 +11,13 @@
 import React from "react";
 import CommonProps from "../../common/interfaces/common-props.interface";
 
-interface Props extends CommonProps {}
+interface Props extends CommonProps {
+  colSpan?: number;
+}
 
 export function Td(props: Props) {
   return (
-    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+    <td colSpan={props.colSpan} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
       {props.children}
     </td>
   );
