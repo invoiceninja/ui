@@ -16,14 +16,17 @@ import CommonProps from "../../common/interfaces/common-props.interface";
 import { RootState } from "../../common/stores/store";
 
 interface Props extends CommonProps {
-  totalPages?: number;
+  totalPages: number;
   currentPage: number;
-  onPageChange?: any;
+  onPageChange: any;
+  onRowsChange: any;
 }
 
 const defaultProps: Props = {
   totalPages: 1,
   currentPage: 1,
+  onPageChange: (page: number) => {},
+  onRowsChange: (rows: string) => {},
 };
 
 export function Pagination(props: Props) {
@@ -54,6 +57,7 @@ export function Pagination(props: Props) {
             name="location"
             className="block pl-3 pr-10 py-2 text-base border-gray-300 sm:text-sm rounded-md"
             defaultValue="10"
+            onChange={(element) => props.onRowsChange(element.target.value)}
           >
             <option>10</option>
             <option>50</option>

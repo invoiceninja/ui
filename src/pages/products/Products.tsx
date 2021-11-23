@@ -37,6 +37,7 @@ export function Products() {
   const [t] = useTranslation();
   const filter = useSelector((state: RootState) => state.products.filter);
   const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState("1");
 
   const options = [
     { value: "archive", label: "Active" },
@@ -45,7 +46,7 @@ export function Products() {
   ];
 
   const { data, isLoading } = useProductsQuery({
-    perPage: 1,
+    perPage,
     currentPage,
     filter,
   });
@@ -106,6 +107,7 @@ export function Products() {
         </Tbody>
       </Table>
       <Pagination
+        onRowsChange={setPerPage}
         onPageChange={setCurrentPage}
         currentPage={currentPage}
         totalPages={data?.meta.pagination.total_pages}
