@@ -32,6 +32,8 @@ import { Tr } from "../../components/tables/Tr";
 import { Td } from "../../components/tables/Td";
 import { Pagination } from "../../components/tables/Pagination";
 import { Checkbox } from "../../components/forms/Checkbox";
+import { generatePath } from "react-router";
+import { produceWithPatches } from "immer";
 
 export function Products() {
   useEffect(() => {
@@ -94,20 +96,26 @@ export function Products() {
           <Th>{t("product")}</Th>
           <Th>{t("notes")}</Th>
           <Th>{t("cost")}</Th>
-          <Th></Th>
         </Thead>
         <Tbody>
-          <Tr isLoading={isLoading}>
-            <Td>
-              <Checkbox />
-            </Td>
-            <Td>Lorem</Td>
-            <Td>ipsum</Td>
-            <Td>$300</Td>
-            <Td>
-              <Link to="/product/1">{t("edit")}</Link>
-            </Td>
-          </Tr>
+          {data.data.map((product: any) => {
+            return (
+              <Tr key={product.id} isLoading={isLoading}>
+                <Td>
+                  <Checkbox id={product.id} />
+                </Td>
+                <Td>
+                  <Link
+                    to={generatePath("/products/:id/edit", { id: product.id })}
+                  >
+                    {product.product_key}
+                  </Link>
+                </Td>
+                <Td>{product.notes}</Td>
+                <Td>{product.cost}</Td>
+              </Tr>
+            );
+          })}
         </Tbody>
       </Table>
       <Pagination />
