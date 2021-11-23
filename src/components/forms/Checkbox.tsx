@@ -24,11 +24,13 @@ export function Checkbox(props: Props) {
     <div className="relative flex items-start">
       <div className="flex items-center h-5">
         <input
+          value={props.value}
           id={props.id}
           aria-describedby="comments-description"
           type="checkbox"
           className="focus:ring-gray-300 h-4 w-4 border-gray-300 rounded"
           style={{ color: colors.primary }}
+          onChange={props.onChange}
         />
       </div>
       <div className="ml-3 text-sm">
