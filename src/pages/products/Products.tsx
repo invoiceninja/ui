@@ -33,7 +33,6 @@ import { Td } from "../../components/tables/Td";
 import { Pagination } from "../../components/tables/Pagination";
 import { Checkbox } from "../../components/forms/Checkbox";
 import { generatePath } from "react-router";
-import { produceWithPatches } from "immer";
 
 export function Products() {
   useEffect(() => {
