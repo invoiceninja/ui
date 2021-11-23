@@ -45,7 +45,7 @@ export function Products() {
   ];
 
   const { data, isLoading } = useProductsQuery({
-    perPage: 10,
+    perPage: 1,
     currentPage,
     filter,
   });
@@ -106,7 +106,7 @@ export function Products() {
         </Tbody>
       </Table>
       <Pagination
-        onChangeHandler={setCurrentPage}
+        onPageChange={setCurrentPage}
         currentPage={currentPage}
         totalPages={data?.meta.pagination.total_pages}
       />

@@ -18,7 +18,7 @@ import { RootState } from "../../common/stores/store";
 interface Props extends CommonProps {
   totalPages?: number;
   currentPage: number;
-  onChangeHandler?: any;
+  onPageChange?: any;
 }
 
 const defaultProps: Props = {
@@ -34,13 +34,13 @@ export function Pagination(props: Props) {
 
   function next() {
     if (props.currentPage + 1 <= props.totalPages) {
-      props.onChangeHandler(props.currentPage + 1);
+      props.onPageChange(props.currentPage + 1);
     }
   }
 
   function previous() {
     if (props.currentPage - 1 >= 1) {
-      props.onChangeHandler(props.currentPage - 1);
+      props.onPageChange(props.currentPage - 1);
     }
   }
 
@@ -79,7 +79,7 @@ export function Pagination(props: Props) {
           return (
             <button
               key={number + 1}
-              onClick={() => props.onChangeHandler(number + 1)}
+              onClick={() => props.onPageChange(number + 1)}
               style={{
                 backgroundColor:
                   props.currentPage === number + 1 ? colors.primary : "",
