@@ -35,9 +35,10 @@ export function Products() {
   const [filter, setFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState("10");
+  const [status, setStatus] = useState(["active"]);
 
   const options = [
-    { value: "archive", label: "Active" },
+    { value: "active", label: "Active" },
     { value: "archived", label: "Archived" },
     { value: "deleted", label: "Deleted" },
   ];
@@ -46,11 +47,13 @@ export function Products() {
     perPage,
     currentPage,
     filter,
+    status,
   });
 
   return (
     <Default title={t("products")}>
       <Actions
+        onStatusChange={setStatus}
         onFilterChange={setFilter}
         optionsMultiSelect={true}
         options={options}
