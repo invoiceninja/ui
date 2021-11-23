@@ -40,3 +40,9 @@ export function isHosted(): boolean {
 export function isSelfHosted(): boolean {
   return !isHosted();
 }
+
+export function handleCheckboxChange(id: string, set: any) {
+  set.has(id) ? set.delete(id) : set.add(id);
+
+  return set;
+}
