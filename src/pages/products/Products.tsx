@@ -51,6 +51,7 @@ export function Products() {
   return (
     <Default title={t("products")}>
       <Actions
+        onFilterChange={setFilter}
         optionsMultiSelect={true}
         options={options}
         defaultOption={options[0]}

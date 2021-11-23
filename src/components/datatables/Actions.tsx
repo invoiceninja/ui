@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { ReactNode } from "react";
+import React, { ChangeEvent, ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import CommonProps from "../../common/interfaces/common-props.interface";
 import { InputField } from "../forms/InputField";
@@ -20,6 +20,8 @@ interface Props extends CommonProps {
   optionsPlaceholder?: string;
   optionsMultiSelect?: boolean;
   rightSide?: ReactNode;
+
+  onFilterChange?: any;
 }
 
 export function Actions(props: Props) {
@@ -39,7 +41,13 @@ export function Actions(props: Props) {
         )}
       </div>
       <div className="mt-2 md:mt-0 flex items-center space-x-4">
-        <InputField id="filter" placeholder={t("filter")} />
+        <InputField
+          id="filter"
+          placeholder={t("filter")}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            props.onFilterChange(event.target.value)
+          }
+        />
         {props.rightSide}
       </div>
     </div>
