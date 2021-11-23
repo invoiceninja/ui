@@ -31,11 +31,12 @@ export const productsApi = createApi({
     products: builder.query({
       query: (args: Params) =>
         generatePath(
-          "/products?per_page=:perPage&page=:currentPage&filter=:filter",
+          "/products?per_page=:perPage&page=:currentPage&filter=:filter&status=:status",
           {
             perPage: (args.perPage as unknown as string) ?? 1,
             currentPage: (args.currentPage as unknown as string) ?? 1,
             filter: args.filter ?? "",
+            status: args.status.join(),
           }
         ),
     }),
