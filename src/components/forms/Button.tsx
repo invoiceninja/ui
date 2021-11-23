@@ -21,6 +21,7 @@ interface Props extends CommonProps {
   variant?: "block";
   disabled?: boolean;
   type?: "primary" | "secondary";
+  onClick?: any;
 }
 
 const defaultProps: Props = {
@@ -40,7 +41,7 @@ export function Button(props: Props) {
     <button
       disabled={props.disabled}
       className={classNames(
-        `inline-flex items-center space-x-2 justify-center py-2 tracking-wide px-4 rounded text-sm ${props.className}`,
+        `inline-flex items-center space-x-2 justify-center py-2 px-4 rounded text-sm ${props.className}`,
         {
           "w-full": props.variant === "block",
           "text-white": props.type == "primary",
@@ -48,6 +49,7 @@ export function Button(props: Props) {
         }
       )}
       style={css}
+      onClick={props.onClick}
     >
       {props.disabled ? <Spinner variant="light" /> : props.children}
     </button>
