@@ -15,11 +15,34 @@ import { useSelector } from "react-redux";
 import CommonProps from "../../common/interfaces/common-props.interface";
 import { RootState } from "../../common/stores/store";
 
-interface Props extends CommonProps {}
+interface Props extends CommonProps {
+  totalPages?: number;
+  currentPage: number;
+  onChangeHandler?: any;
+}
+
+const defaultProps: Props = {
+  totalPages: 1,
+  currentPage: 1,
+};
 
 export function Pagination(props: Props) {
+  props = { ...defaultProps, ...props };
+
   const [t] = useTranslation();
   const colors = useSelector((state: RootState) => state.settings.colors);
+
+  function next() {
+    if (props.currentPage + 1 <= props.totalPages) {
+      props.onChangeHandler(props.currentPage + 1);
+    }
+  }
+
+  function previous() {
+    if (props.currentPage - 1 >= 1) {
+      props.onChangeHandler(props.currentPage - 1);
+    }
+  }
 
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between space-x-2 my-3">
@@ -45,37 +68,36 @@ export function Pagination(props: Props) {
         </div>
       </div>
       <nav className="flex justify-center md:justify-end my-4 md:my-0 items-center">
-        <a
+        <button
+          onClick={previous}
           className="py-1.5 px-2 bg-white border-b border-t rounded-l hover:bg-gray-50 border"
-          href="#"
         >
           <ChevronLeft />
-        </a>
-        <a
-          className="py-1.5 px-4 bg-white border-b border-t hover:bg-gray-50"
-          href="#"
-        >
-          1
-        </a>
-        <a
-          className="py-1.5 px-4 bg-white border-b border-t text-white"
-          href="#"
-          style={{ backgroundColor: colors.primary }}
-        >
-          2
-        </a>
-        <a
-          className="py-1.5 px-4 bg-white border-b border-t hover:bg-gray-50"
-          href="#"
-        >
-          3
-        </a>
-        <a
+        </button>
+
+        {[...Array(props.totalPages).keys()].map((number: number) => {
+          return (
+            <button
+              key={number + 1}
+              onClick={() => props.onChangeHandler(number + 1)}
+              style={{
+                backgroundColor:
+                  props.currentPage === number + 1 ? colors.primary : "",
+                color: props.currentPage === number + 1 ? "white" : "",
+              }}
+              className="py-1.5 px-4 bg-white border-b border-t hover:bg-gray-50"
+            >
+              {number + 1}
+            </button>
+          );
+        })}
+
+        <button
+          onClick={next}
           className="py-1.5 px-2 bg-white border-b border-t border-r rounded-r hover:bg-gray-50"
-          href="#"
         >
           <ChevronRight />
-        </a>
+        </button>
       </nav>
     </div>
   );
