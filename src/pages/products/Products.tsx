@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
 import { useProductsQuery } from "../../common/queries/products";
@@ -17,12 +17,7 @@ import { Button } from "../../components/forms/Button";
 import { Default } from "../../components/layouts/Default";
 import Select from "react-select";
 import { InputField } from "../../components/forms/InputField";
-import {
-  CheckSquare,
-  ChevronLeft,
-  ChevronRight,
-  PlusCircle,
-} from "react-feather";
+import { CheckSquare, PlusCircle } from "react-feather";
 import { Link } from "../../components/forms/Link";
 import { Table } from "../../components/tables/Table";
 import { Thead } from "../../components/tables/Thead";
@@ -40,13 +35,8 @@ export function Products() {
   });
 
   const [t] = useTranslation();
-
-  const currentPage = useSelector(
-    (state: RootState) => state.products.currentPage
-  );
-
   const filter = useSelector((state: RootState) => state.products.filter);
-  const colors = useSelector((state: RootState) => state.settings.colors);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const options = [
     { value: "archive", label: "Active" },
@@ -59,8 +49,6 @@ export function Products() {
     currentPage,
     filter,
   });
-
-  console.log(data, isLoading);
 
   return (
     <Default title={t("products")}>
@@ -97,7 +85,7 @@ export function Products() {
           <Th>{t("cost")}</Th>
         </Thead>
         <Tbody>
-          {data.data.map((product: any) => {
+          {data?.data.map((product: any) => {
             return (
               <Tr key={product.id} isLoading={isLoading}>
                 <Td>
@@ -117,7 +105,11 @@ export function Products() {
           })}
         </Tbody>
       </Table>
-      <Pagination />
+      <Pagination
+        onChangeHandler={setCurrentPage}
+        currentPage={currentPage}
+        totalPages={data?.meta.pagination.total_pages}
+      />
     </Default>
   );
 }
