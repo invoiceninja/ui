@@ -37,7 +37,7 @@ export function Products() {
   const [t] = useTranslation();
   const filter = useSelector((state: RootState) => state.products.filter);
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState("1");
+  const [perPage, setPerPage] = useState("10");
 
   const options = [
     { value: "archive", label: "Active" },
