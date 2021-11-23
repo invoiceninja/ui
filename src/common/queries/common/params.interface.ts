@@ -12,4 +12,5 @@ export interface Params {
   perPage?: number | string;
   currentPage?: number | string;
   filter?: string;
+  status: string[];
 }
