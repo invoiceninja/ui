@@ -8,19 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import { CheckSquare, PlusCircle } from "react-feather";
+import React, { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import CommonProps from "../../common/interfaces/common-props.interface";
-import { Button } from "../forms/Button";
 import { InputField } from "../forms/InputField";
 import Select from "react-select";
 
 interface Props extends CommonProps {
-  options?: [];
-  defaultOption?: any;
+  options?: { value: string; label: string }[];
+  defaultOption?: { value: string; label: string };
   optionsPlaceholder?: string;
   optionsMultiSelect?: boolean;
+  rightSide?: ReactNode;
 }
 
 export function Actions(props: Props) {
@@ -29,11 +28,7 @@ export function Actions(props: Props) {
   return (
     <div className="flex flex-col md:flex-row md:items-center md:justify-between">
       <div className="flex items-center space-x-2">
-        <Button>
-          <span>{t("invoice")}</span>
-          <CheckSquare size="20" />
-        </Button>
-        <Button type="secondary">{t("archive")}</Button>
+        {props.children}
         {props.options && (
           <Select
             defaultValue={props.defaultOption}
@@ -45,10 +40,7 @@ export function Actions(props: Props) {
       </div>
       <div className="mt-2 md:mt-0 flex items-center space-x-4">
         <InputField id="filter" placeholder={t("filter")} />
-        <Button>
-          <span>{t("new_product")}</span>
-          <PlusCircle size="20" />
-        </Button>
+        {props.rightSide}
       </div>
     </div>
   );

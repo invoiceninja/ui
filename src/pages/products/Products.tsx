@@ -23,6 +23,8 @@ import { Pagination } from "../../components/tables/Pagination";
 import { Checkbox } from "../../components/forms/Checkbox";
 import { generatePath } from "react-router";
 import { Actions } from "../../components/datatables/Actions";
+import { Button } from "../../components/forms/Button";
+import { CheckSquare, PlusCircle } from "react-feather";
 
 export function Products() {
   useEffect(() => {
@@ -48,7 +50,23 @@ export function Products() {
 
   return (
     <Default title={t("products")}>
-      <Actions />
+      <Actions
+        optionsMultiSelect={true}
+        options={options}
+        defaultOption={options[0]}
+        rightSide={
+          <Button>
+            <span>{t("new_product")}</span>
+            <PlusCircle size="20" />
+          </Button>
+        }
+      >
+        <Button>
+          <span>{t("invoice")}</span>
+          <CheckSquare size="20" />
+        </Button>
+        <Button type="secondary">{t("archive")}</Button>
+      </Actions>
       <Table>
         <Thead>
           <Th>
