@@ -27,6 +27,7 @@ import { InputLabel } from "../../components/forms/InputLabel";
 import { Alert } from "../../components/Alert";
 import { HostedLinks } from "./components/HostedLinks";
 import { Header } from "./components/Header";
+import { updateCompany } from "../../common/stores/slices/company";
 
 export function Login() {
   const dispatch = useDispatch();
@@ -58,6 +59,8 @@ export function Login() {
               token: response.data.data[0].token.token,
             })
           );
+
+          dispatch(updateCompany(response.data.data[0].company));
         })
         .catch((error: AxiosError) => {
           return error.response?.status === 422
