@@ -58,8 +58,6 @@ export function Products() {
     sort,
   });
 
-  console.log(data);
-
   return (
     <Default title={t("products")}>
       <Actions
