@@ -8,21 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
+import React, { useState } from "react";
 import classNames from "classnames";
 import CommonProps from "../common/interfaces/common-props.interface";
+import { X } from "react-feather";
 
 interface Props extends CommonProps {
   type?: "success" | "warning" | "danger";
 }
 
 export function Alert(props: Props) {
+  const [visible, setVisible] = useState<boolean>(true);
+
   return (
     <div
       className={classNames(`border-l-4 py-2 ${props.className}`, {
         "bg-red-50 border-red-500": props.type === "danger",
         "bg-yellow-50 border-yellow-500": props.type === "warning",
         "bg-green-50 border-green-500": props.type === "success",
+        block: visible,
+        hidden: !visible,
       })}
     >
       <div className="ml-3">
@@ -33,7 +38,12 @@ export function Alert(props: Props) {
             "text-green-700": props.type === "success",
           })}
         >
-          {props.children}
+          <div className="flex items-center justify-between">
+            <span>{props.children}</span>
+            <button type="button" className="px-4">
+              <X onClick={() => setVisible(false)} />
+            </button>
+          </div>
         </p>
       </div>
     </div>
