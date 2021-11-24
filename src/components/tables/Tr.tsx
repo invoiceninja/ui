@@ -10,8 +10,6 @@
 
 import React from "react";
 import CommonProps from "../../common/interfaces/common-props.interface";
-import { Spinner } from "../Spinner";
-import { Td } from "./Td";
 
 interface Props extends CommonProps {
   isLoading?: boolean;
