@@ -15,7 +15,7 @@ import { Default } from "../../components/layouts/Default";
 import { Link } from "../../components/forms/Link";
 import { Table } from "../../components/tables/Table";
 import { Thead } from "../../components/tables/Thead";
-import { Th } from "../../components/tables/Th";
+import { ColumnSortPayload, Th } from "../../components/tables/Th";
 import { Tbody } from "../../components/tables/Tbody";
 import { Tr } from "../../components/tables/Tr";
 import { Td } from "../../components/tables/Td";
@@ -39,6 +39,8 @@ export function Products() {
   const [perPage, setPerPage] = useState("10");
   const [status, setStatus] = useState(["active"]);
   const [selected, setSelected] = useState(new Set());
+  const [sort, setSort] = useState<string | undefined>(undefined);
+  const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
 
   const options = [
     { value: "active", label: "Active" },
@@ -51,6 +53,7 @@ export function Products() {
     currentPage,
     filter,
     status,
+    sort,
   });
 
   return (
@@ -77,9 +80,36 @@ export function Products() {
       <Table>
         <Thead>
           <Th></Th>
-          <Th>{t("product")}</Th>
-          <Th>{t("notes")}</Th>
-          <Th>{t("cost")}</Th>
+          <Th
+            id="product_key"
+            isCurrentlyUsed={sortedBy === "product_key"}
+            onColumnClick={(data: ColumnSortPayload) => {
+              setSortedBy(data.field);
+              setSort(data.sort);
+            }}
+          >
+            {t("product")}
+          </Th>
+          <Th
+            id="notes"
+            isCurrentlyUsed={sortedBy === "notes"}
+            onColumnClick={(data: ColumnSortPayload) => {
+              setSortedBy(data.field);
+              setSort(data.sort);
+            }}
+          >
+            {t("notes")}
+          </Th>
+          <Th
+            id="cost"
+            isCurrentlyUsed={sortedBy === "cost"}
+            onColumnClick={(data: ColumnSortPayload) => {
+              setSortedBy(data.field);
+              setSort(data.sort);
+            }}
+          >
+            {t("cost")}
+          </Th>
         </Thead>
         <Tbody>
           {isLoading && (
