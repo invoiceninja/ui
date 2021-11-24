@@ -47,17 +47,11 @@ export function handleCheckboxChange(id: string, set: any) {
   return set;
 }
 
-export function fetcher(
-  method: Method,
-  url: string,
-  body?: {},
-  headers?: {}
-): Promise<AxiosResponse> {
+export function fetcher(url: string, headers?: {}): Promise<AxiosResponse> {
   return axios
     .request({
-      method,
+      method: "GET",
       url,
-      data: body,
       headers: {
         "X-Requested-With": "XMLHttpRequest",
         "Content-Type": "application/json",
