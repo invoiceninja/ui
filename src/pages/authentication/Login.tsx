@@ -28,6 +28,7 @@ import { Alert } from "../../components/Alert";
 import { HostedLinks } from "./components/HostedLinks";
 import { Header } from "./components/Header";
 import { updateCompany } from "../../common/stores/slices/company";
+import { updateToken } from "../../common/stores/slices/token";
 
 export function Login() {
   const dispatch = useDispatch();
@@ -61,6 +62,7 @@ export function Login() {
           );
 
           dispatch(updateCompany(response.data.data[0].company));
+          dispatch(updateToken(response.data.data[0].token));
         })
         .catch((error: AxiosError) => {
           return error.response?.status === 422

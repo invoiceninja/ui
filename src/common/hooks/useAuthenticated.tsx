@@ -14,6 +14,7 @@ import { useNavigate } from "react-router";
 import { AuthenticationTypes } from "../dtos/authentication";
 import { endpoint } from "../helpers";
 import { updateCompany } from "../stores/slices/company";
+import { updateToken } from "../stores/slices/token";
 import { authenticate } from "../stores/slices/user";
 import { RootState } from "../stores/store";
 
@@ -50,6 +51,7 @@ export function useAuthenticated(): Boolean {
         );
 
         dispatch(updateCompany(response.data.data[0].company));
+        dispatch(updateToken(response.data.data[0].token));
       }
     })
     .catch((error: AxiosError) => {
