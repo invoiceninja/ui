@@ -8,40 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { generatePath } from "react-router";
+import useSWR from "swr";
+import { endpoint, fetcher } from "../helpers";
 import { Params } from "./common/params.interface";
 
-export const productsApi = createApi({
-  reducerPath: "productsApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: `${import.meta.env.VITE_API_URL}/api/v1`,
-    prepareHeaders: (headers) => {
-      headers.set("Content-Type", "application/json");
-      headers.set("X-Requested-With", "XMLHttpRequest");
-      headers.set(
-        "X-Api-Token",
-        localStorage.getItem("X-NINJA-TOKEN") as unknown as string
-      );
-
-      return headers;
-    },
-  }),
-  endpoints: (builder) => ({
-    products: builder.query({
-      query: (args: Params) =>
-        generatePath(
-          "/products?per_page=:perPage&page=:currentPage&filter=:filter&status=:status&sort=:sort",
-          {
-            perPage: (args.perPage as unknown as string) ?? 1,
-            currentPage: (args.currentPage as unknown as string) ?? 1,
-            filter: args.filter ?? "",
-            status: args.status.join(),
-            sort: args.sort ?? "id|asc",
-          }
-        ),
-    }),
-  }),
-});
-
-export const { useProductsQuery } = productsApi;
+export function useProductsQuery(params: Params) {
+  return useSWR(
+    [
+      "GET",
+      endpoint(
+        "/api/v1/products?per_page=:perPage&page=:currentPage&filter=:filter&status=:status&sort=:sort",
+        {
+          perPage: params.perPage,
+          currentPage: params.currentPage,
+          filter: params.filter,
+          status: params.status,
+          sort: params.sort ?? "id|asc",
+        }
+      ),
+    ],
+    fetcher
+  );
+}

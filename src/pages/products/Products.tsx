@@ -25,8 +25,10 @@ import { generatePath } from "react-router";
 import { Actions } from "../../components/datatables/Actions";
 import { Button } from "../../components/forms/Button";
 import { CheckSquare, PlusCircle } from "react-feather";
-import { handleCheckboxChange } from "../../common/helpers";
+import { endpoint, fetcher, handleCheckboxChange } from "../../common/helpers";
 import { Spinner } from "../../components/Spinner";
+import axios, { Method } from "axios";
+import useSWR from "swr";
 
 export function Products() {
   useEffect(() => {
@@ -48,13 +50,15 @@ export function Products() {
     { value: "deleted", label: "Deleted" },
   ];
 
-  const { data, isLoading } = useProductsQuery({
+  const { data, error } = useProductsQuery({
     perPage,
     currentPage,
     filter,
     status,
     sort,
   });
+
+  console.log(data);
 
   return (
     <Default title={t("products")}>
@@ -112,7 +116,7 @@ export function Products() {
           </Th>
         </Thead>
         <Tbody>
-          {isLoading && (
+          {!data && (
             <Tr>
               <Td colSpan={100}>
                 <Spinner />
@@ -122,7 +126,7 @@ export function Products() {
 
           {data?.data.map((product: any) => {
             return (
-              <Tr key={product.id} isLoading={isLoading}>
+              <Tr key={product.id} isLoading={!data}>
                 <Td>
                   <Checkbox
                     value={product.id}
@@ -148,12 +152,14 @@ export function Products() {
           })}
         </Tbody>
       </Table>
-      <Pagination
-        onRowsChange={setPerPage}
-        onPageChange={setCurrentPage}
-        currentPage={currentPage}
-        totalPages={data?.meta.pagination.total_pages}
-      />
+      {data && (
+        <Pagination
+          onRowsChange={setPerPage}
+          onPageChange={setCurrentPage}
+          currentPage={currentPage}
+          totalPages={data?.meta.pagination.total_pages}
+        />
+      )}
     </Default>
   );
 }

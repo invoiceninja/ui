@@ -10,7 +10,6 @@
 
 import { configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/dist/query";
-import { productsApi } from "../queries/products";
 import { accountSlice } from "./slices/account";
 import { companySlice } from "./slices/company";
 import { productsSlice } from "./slices/products";
@@ -26,10 +25,7 @@ export const store = configureStore({
     settings: settingsSlice.reducer,
     token: tokenSlice.reducer,
     account: accountSlice.reducer,
-    [productsApi.reducerPath]: productsApi.reducer,
   },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(productsApi.middleware),
 });
 
 setupListeners(store.dispatch);
