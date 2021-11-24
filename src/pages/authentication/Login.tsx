@@ -29,6 +29,7 @@ import { HostedLinks } from "./components/HostedLinks";
 import { Header } from "./components/Header";
 import { updateCompany } from "../../common/stores/slices/company";
 import { updateToken } from "../../common/stores/slices/token";
+import { updateAccount } from "../../common/stores/slices/account";
 
 export function Login() {
   const dispatch = useDispatch();
@@ -63,6 +64,7 @@ export function Login() {
 
           dispatch(updateCompany(response.data.data[0].company));
           dispatch(updateToken(response.data.data[0].token));
+          dispatch(updateAccount(response.data.data[0].account));
         })
         .catch((error: AxiosError) => {
           return error.response?.status === 422

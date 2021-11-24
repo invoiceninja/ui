@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { AuthenticationTypes } from "../dtos/authentication";
 import { endpoint } from "../helpers";
+import { updateAccount } from "../stores/slices/account";
 import { updateCompany } from "../stores/slices/company";
 import { updateToken } from "../stores/slices/token";
 import { authenticate } from "../stores/slices/user";
@@ -52,6 +53,7 @@ export function useAuthenticated(): Boolean {
 
         dispatch(updateCompany(response.data.data[0].company));
         dispatch(updateToken(response.data.data[0].token));
+        dispatch(updateAccount(response.data.data[0].account));
       }
     })
     .catch((error: AxiosError) => {

@@ -22,10 +22,10 @@ export const accountSlice = createSlice({
   name: "token",
   initialState,
   reducers: {
-    updateToken: (state, action: any) => {
+    updateAccount: (state, action: any) => {
       state.api = action.payload;
     },
   },
 });
 
-export const { updateToken } = accountSlice.actions;
+export const { updateAccount } = accountSlice.actions;
