@@ -31,7 +31,7 @@ export function Alert(props: Props) {
       })}
     >
       <div className="ml-3">
-        <p
+        <div
           className={classNames("text-sm", {
             "text-red-700": props.type === "danger",
             "text-yellow-700": props.type === "warning",
@@ -44,7 +44,7 @@ export function Alert(props: Props) {
               <X onClick={() => setVisible(false)} />
             </button>
           </div>
-        </p>
+        </div>
       </div>
     </div>
   );
