@@ -26,6 +26,7 @@ import { Actions } from "../../components/datatables/Actions";
 import { Button } from "../../components/forms/Button";
 import { CheckSquare, PlusCircle } from "react-feather";
 import { handleCheckboxChange } from "../../common/helpers";
+import { Spinner } from "../../components/Spinner";
 
 export function Products() {
   useEffect(() => {
@@ -81,6 +82,14 @@ export function Products() {
           <Th>{t("cost")}</Th>
         </Thead>
         <Tbody>
+          {isLoading && (
+            <Tr>
+              <Td colSpan={100}>
+                <Spinner />
+              </Td>
+            </Tr>
+          )}
+
           {data?.data.map((product: any) => {
             return (
               <Tr key={product.id} isLoading={isLoading}>
