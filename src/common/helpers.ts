@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { Method } from "axios";
+import axios, { AxiosResponse, Method } from "axios";
 import { generatePath } from "react-router";
 
 export function endpoint(endpoint: string, params = {}): string {
@@ -45,4 +45,27 @@ export function handleCheckboxChange(id: string, set: any) {
   set.has(id) ? set.delete(id) : set.add(id);
 
   return set;
+}
+
+export function fetcher(
+  method: Method,
+  url: string,
+  body?: {},
+  headers?: {}
+): Promise<AxiosResponse> {
+  return axios
+    .request({
+      method,
+      url,
+      data: body,
+      headers: {
+        "X-Requested-With": "XMLHttpRequest",
+        "Content-Type": "application/json",
+        "X-Api-Token": localStorage.getItem(
+          "X-NINJA-TOKEN"
+        ) as unknown as string,
+        ...headers,
+      },
+    })
+    .then((response) => response.data);
 }
