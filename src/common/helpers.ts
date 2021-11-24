@@ -67,5 +67,5 @@ export function fetcher(
         ...headers,
       },
     })
-    .then((response) => response.data);
+    .then((response) => response);
 }
