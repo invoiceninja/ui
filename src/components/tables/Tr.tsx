@@ -18,15 +18,5 @@ interface Props extends CommonProps {
 }
 
 export function Tr(props: Props) {
-  return (
-    <tr className="bg-white hover:bg-gray-50">
-      {props.isLoading ? (
-        <Td colSpan={100}>
-          <Spinner />
-        </Td>
-      ) : (
-        props.children
-      )}
-    </tr>
-  );
+  return <tr className="bg-white hover:bg-gray-50">{props.children}</tr>;
 }
