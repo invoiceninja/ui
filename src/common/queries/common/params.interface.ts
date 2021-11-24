@@ -13,4 +13,5 @@ export interface Params {
   currentPage?: number | string;
   filter?: string;
   status: string[];
+  sort?: string;
 }
