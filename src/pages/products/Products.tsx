@@ -24,11 +24,12 @@ import { Checkbox } from "../../components/forms/Checkbox";
 import { generatePath } from "react-router";
 import { Actions } from "../../components/datatables/Actions";
 import { Button } from "../../components/forms/Button";
-import { CheckSquare, PlusCircle } from "react-feather";
-import { endpoint, fetcher, handleCheckboxChange } from "../../common/helpers";
+import { CheckSquare, Divide, PlusCircle } from "react-feather";
+import { endpoint, handleCheckboxChange, request } from "../../common/helpers";
 import { Spinner } from "../../components/Spinner";
-import axios, { Method } from "axios";
-import useSWR from "swr";
+import axios, { AxiosError, AxiosResponse, Method } from "axios";
+import useSWR, { useSWRConfig } from "swr";
+import { Alert } from "../../components/Alert";
 
 export function Products() {
   useEffect(() => {
@@ -43,6 +44,14 @@ export function Products() {
   const [selected, setSelected] = useState(new Set());
   const [sort, setSort] = useState<string | undefined>(undefined);
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
+  const { mutate, cache } = useSWRConfig();
+  const [alert, setAlert] = useState<
+    | {
+        type?: "success" | "danger";
+        message?: string;
+      }
+    | undefined
+  >(undefined);
 
   const options = [
     { value: "active", label: "Active" },
@@ -58,8 +67,39 @@ export function Products() {
     sort,
   });
 
+  function archive() {
+    request(
+      "POST",
+      endpoint("/api/v1/products/bulk"),
+      {
+        action: "archive",
+        ids: Array.from(selected),
+      },
+      { "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN") }
+    )
+      .then((response: AxiosResponse) => {
+        mutate(data?.request.responseURL);
+
+        setAlert({
+          message: generatePath(t("archived_invoices"), {
+            count: response.data.data.length.toString(),
+          }),
+          type: "success",
+        });
+
+        selected.clear();
+      })
+      .catch((error: AxiosError) => console.error(error.response?.data));
+  }
+
   return (
     <Default title={t("products")}>
+      {alert && (
+        <Alert className="mb-4" type={alert.type}>
+          {alert.message}.
+        </Alert>
+      )}
+
       <Actions
         onStatusChange={setStatus}
         onFilterChange={setFilter}
@@ -77,7 +117,9 @@ export function Products() {
           <span>{t("invoice")}</span>
           <CheckSquare size="20" />
         </Button>
-        <Button type="secondary">{t("archive")}</Button>
+        <Button onClick={archive} type="secondary">
+          {t("archive")}
+        </Button>
       </Actions>
       <Table>
         <Thead>
@@ -122,7 +164,13 @@ export function Products() {
             </Tr>
           )}
 
-          {data?.data.map((product: any) => {
+          {data?.data.data.length === 0 && (
+            <Tr>
+              <Td colSpan={100}>{t("no_results")}</Td>
+            </Tr>
+          )}
+
+          {data?.data.data.map((product: any) => {
             return (
               <Tr key={product.id} isLoading={!data}>
                 <Td>
@@ -155,7 +203,7 @@ export function Products() {
           onRowsChange={setPerPage}
           onPageChange={setCurrentPage}
           currentPage={currentPage}
-          totalPages={data?.meta.pagination.total_pages}
+          totalPages={data?.data.meta.pagination.total_pages}
         />
       )}
     </Default>
