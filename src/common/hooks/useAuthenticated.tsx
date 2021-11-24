@@ -13,6 +13,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
 import { AuthenticationTypes } from "../dtos/authentication";
 import { endpoint } from "../helpers";
+import { updateCompany } from "../stores/slices/company";
 import { authenticate } from "../stores/slices/user";
 import { RootState } from "../stores/store";
 
@@ -47,9 +48,13 @@ export function useAuthenticated(): Boolean {
             token: localStorage.getItem("X-NINJA-TOKEN") as string,
           })
         );
+
+        dispatch(updateCompany(response.data.data[0].company));
       }
     })
     .catch((error: AxiosError) => {
+      console.log(error);
+
       localStorage.removeItem("X-NINJA-TOKEN");
       navigate("/login");
     });
