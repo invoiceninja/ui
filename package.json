@@ -7,6 +7,7 @@
     "@headlessui/react": "^1.4.2",
     "@reduxjs/toolkit": "^1.6.2",
     "@tailwindcss/forms": "^0.3.4",
+    "@tippyjs/react": "^4.2.6",
     "@types/node": "^12.20.37",
     "@types/react": "^17.0.34",
     "@types/react-dom": "^17.0.11",
