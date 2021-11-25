@@ -14,7 +14,7 @@ import { Home, Menu as MenuIcon, X, Box } from "react-feather";
 import CommonProps from "../../common/interfaces/common-props.interface";
 import { useTranslation } from "react-i18next";
 import Logo from "../../resources/images/invoiceninja-logo@dark.png";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(" ");
@@ -27,10 +27,21 @@ interface Props extends CommonProps {
 export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [t] = useTranslation();
+  const location = useLocation();
 
   const navigation = [
-    { name: t("dashboard"), href: "/dashboard", icon: Home, current: true },
-    { name: t("products"), href: "/products", icon: Box, current: false },
+    {
+      name: t("dashboard"),
+      href: "/dashboard",
+      icon: Home,
+      current: location.pathname === "/dashboard",
+    },
+    {
+      name: t("products"),
+      href: "/products",
+      icon: Box,
+      current: location.pathname === "/products",
+    },
   ];
 
   const userNavigation = [{ name: "Sign out", href: "/logout" }];
@@ -108,7 +119,7 @@ export function Default(props: Props) {
                               : "text-gray-400 group-hover:text-gray-500",
                             "mr-4 flex-shrink-0 h-6 w-6"
                           )}
-                          aria-hidden="true"
+                          aria-hidden="location === '/dashboard'"
                         />
                         {item.name}
                       </Link>
