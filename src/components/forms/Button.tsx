@@ -24,10 +24,12 @@ interface Props extends CommonProps {
   type?: "primary" | "secondary";
   onClick?: any;
   to?: string;
+  behaviour?: "button" | "submit";
 }
 
 const defaultProps: Props = {
   type: "primary",
+  behaviour: "submit",
 };
 
 export function Button(props: Props) {
@@ -60,6 +62,7 @@ export function Button(props: Props) {
 
   return (
     <button
+      type={props.behaviour}
       disabled={props.disabled}
       className={classNames(
         `inline-flex items-center space-x-2 justify-center py-2 px-4 rounded text-sm ${props.className}`,
