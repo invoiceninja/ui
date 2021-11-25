@@ -16,4 +16,5 @@ export default interface CommonProps {
   children?: ReactNode;
   onChange?: any;
   value?: any;
+  onClick?: any;
 }
