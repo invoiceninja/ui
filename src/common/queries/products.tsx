@@ -27,3 +27,7 @@ export function useProductsQuery(params: Params) {
     fetcher
   );
 }
+
+export function useProductQuery(params: { id: string | undefined }) {
+  return useSWR(endpoint("/api/v1/products/:id", params), fetcher);
+}
