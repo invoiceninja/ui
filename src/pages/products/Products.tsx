@@ -24,12 +24,13 @@ import { Checkbox } from "../../components/forms/Checkbox";
 import { generatePath } from "react-router";
 import { Actions } from "../../components/datatables/Actions";
 import { Button } from "../../components/forms/Button";
-import { CheckSquare, Divide, PlusCircle } from "react-feather";
+import { CheckSquare, ChevronDown, Divide, PlusCircle } from "react-feather";
 import { endpoint, handleCheckboxChange, request } from "../../common/helpers";
 import { Spinner } from "../../components/Spinner";
-import axios, { AxiosError, AxiosResponse, Method } from "axios";
-import useSWR, { useSWRConfig } from "swr";
+import { AxiosError, AxiosResponse, Method } from "axios";
+import { useSWRConfig } from "swr";
 import { Alert } from "../../components/Alert";
+import Tippy from "@tippyjs/react/headless";
 
 export function Products() {
   useEffect(() => {
@@ -168,6 +169,7 @@ export function Products() {
           >
             {t("cost")}
           </Th>
+          <Th />
         </Thead>
         <Tbody>
           {!data && (
@@ -208,6 +210,49 @@ export function Products() {
                 </Td>
                 <Td>{product.notes}</Td>
                 <Td>{product.cost}</Td>
+                <Td>
+                  <Tippy
+                    placement="bottom"
+                    trigger="click"
+                    interactive={true}
+                    render={(attrs) => (
+                      <div
+                        className="divide-y box mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                        tabIndex={-1}
+                        {...attrs}
+                      >
+                        <div>
+                          <button className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700">
+                            {t("edit_product")}
+                          </button>
+
+                          <button className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700">
+                            {t("clone_product")}
+                          </button>
+
+                          <button className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700">
+                            {t("invoice_product")}
+                          </button>
+                        </div>
+
+                        <div>
+                          <button className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700">
+                            {t("archive_product")}
+                          </button>
+
+                          <button className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700">
+                            {t("delete_product")}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  >
+                    <button className="inline-flex  items-center space-x-2 bg-white border border-gray-300 rounded px-4 py-2">
+                      <span>{t("select")}</span>
+                      <ChevronDown size={14} />
+                    </button>
+                  </Tippy>
+                </Td>
               </Tr>
             );
           })}
