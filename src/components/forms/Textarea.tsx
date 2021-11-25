@@ -33,6 +33,7 @@ export function Textarea(props: Props) {
         className={`form-textarea w-full py-2 px-3 rounded border border-gray-300 text-sm ${props.className}`}
         placeholder={props.placeholder}
         onChange={props.onChange}
+        value={props.value}
       >
         {props.children}
       </textarea>
