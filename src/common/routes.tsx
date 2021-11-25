@@ -20,6 +20,7 @@ import { Register } from "../pages/authentication/Register";
 import { Index } from "../pages/Index";
 import { Products } from "../pages/products/Products";
 import { Dashboard } from "../pages/dashboard/Dashboard";
+import { Create as ProductCreate } from "../pages/products/Create";
 
 export const routes = (
   <Routes>
@@ -34,6 +35,7 @@ export const routes = (
     <Route element={<PrivateRoute />}>
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/products" element={<Products />} />
+      <Route path="/products/create" element={<ProductCreate />} />
       <Route path="/logout" element={<Logout />} />
     </Route>
   </Routes>
