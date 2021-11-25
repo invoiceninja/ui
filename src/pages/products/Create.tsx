@@ -51,7 +51,9 @@ export function Create() {
         "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN"),
       })
         .then((response: AxiosResponse) =>
-          navigate(generatePath("/products/:id", { id: response.data.data.id }))
+          navigate(
+            generatePath("/products/:id/edit", { id: response.data.data.id })
+          )
         )
         .catch((error: AxiosError) => {
           if (error.response?.status === 403) {
@@ -102,7 +104,11 @@ export function Create() {
             {errors?.cost && <Alert type="danger">{errors.cost}</Alert>}
 
             <div className="flex justify-end items-center space-x-2">
-              {!isFormBusy && <Button to="/products" type="secondary">{t("cancel")}</Button>}
+              {!isFormBusy && (
+                <Button to="/products" type="secondary">
+                  {t("cancel")}
+                </Button>
+              )}
 
               <Button disabled={isFormBusy}>{t("save")}</Button>
             </div>

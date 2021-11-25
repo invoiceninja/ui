@@ -21,6 +21,7 @@ import { Index } from "../pages/Index";
 import { Products } from "../pages/products/Products";
 import { Dashboard } from "../pages/dashboard/Dashboard";
 import { Create as ProductCreate } from "../pages/products/Create";
+import { Edit as ProductEdit } from "../pages/products/Edit";
 
 export const routes = (
   <Routes>
@@ -34,8 +35,11 @@ export const routes = (
     </Route>
     <Route element={<PrivateRoute />}>
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/products" element={<Products />} />
-      <Route path="/products/create" element={<ProductCreate />} />
+      <Route path="/products">
+        <Route path="" element={<Products />} />
+        <Route path="create" element={<ProductCreate />} />
+        <Route path=":id/edit" element={<ProductEdit />} />
+      </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>
   </Routes>
