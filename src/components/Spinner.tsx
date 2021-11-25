@@ -17,7 +17,7 @@ interface Props {
 export function Spinner(props: Props) {
   return (
     <svg
-      className={`animate-spin h-6 w-6 ${props.variant ?? "text-black"}`}
+      className={`animate-spin h-5 w-5 ${props.variant ?? "text-black"}`}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"
