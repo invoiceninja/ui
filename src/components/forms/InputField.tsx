@@ -42,6 +42,7 @@ export function InputField(props: Props) {
         className={`w-full py-2 px-3 rounded border border-gray-300 text-sm ${props.className}`}
         placeholder={props.placeholder}
         onChange={props.onChange}
+        value={props.value}
       />
     </section>
   );
