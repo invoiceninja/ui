@@ -28,7 +28,7 @@ export function Checkbox(props: Props) {
           id={props.id}
           aria-describedby="comments-description"
           type="checkbox"
-          className="focus:ring-gray-300 h-4 w-4 border-gray-300 rounded"
+          className={`focus:ring-gray-300 h-4 w-4 border-gray-300 rounded ${props.className}`}
           style={{ color: colors.primary }}
           onChange={props.onChange}
         />
