@@ -123,7 +123,21 @@ export function Products() {
       </Actions>
       <Table>
         <Thead>
-          <Th></Th>
+          <Th>
+            <Checkbox
+              onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                Array.from(
+                  document.querySelectorAll(".child-checkbox")
+                ).forEach((checkbox) => {
+                  checkbox.checked = event.target.checked;
+
+                  event.target.checked
+                    ? selected.add(checkbox.id)
+                    : selected.delete(checkbox.id);
+                });
+              }}
+            />
+          </Th>
           <Th
             id="product_key"
             isCurrentlyUsed={sortedBy === "product_key"}
@@ -175,6 +189,7 @@ export function Products() {
               <Tr key={product.id} isLoading={!data}>
                 <Td>
                   <Checkbox
+                    className="child-checkbox"
                     value={product.id}
                     id={product.id}
                     onChange={(event: ChangeEvent<HTMLInputElement>) =>
