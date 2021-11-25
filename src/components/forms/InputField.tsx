@@ -20,6 +20,7 @@ interface Props extends CommonProps {
   id: string;
   type?: string;
   placeholder?: string;
+  required?: boolean;
 }
 
 export function InputField(props: Props) {
@@ -30,10 +31,12 @@ export function InputField(props: Props) {
       {props.label && (
         <InputLabel className="mb-2" for={props.id}>
           {props.label}
+          {props.required && <span className="ml-1 text-red-600">*</span>}
         </InputLabel>
       )}
 
       <input
+        required={props.required}
         id={props.id}
         type={props.type}
         className={`w-full py-2 px-3 rounded border border-gray-300 text-sm ${props.className}`}
