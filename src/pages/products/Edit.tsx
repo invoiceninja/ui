@@ -13,7 +13,7 @@ import { useFormik } from "formik";
 import { produceWithPatches } from "immer";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 import { endpoint, request } from "../../common/helpers";
 import { useProductQuery } from "../../common/queries/products";
 import { Alert } from "../../components/Alert";
@@ -23,6 +23,7 @@ import { InputField } from "../../components/forms/InputField";
 import { Textarea } from "../../components/forms/Textarea";
 import { Default } from "../../components/layouts/Default";
 import { LoadingScreen } from "../../components/LoadingScreen";
+import { Spinner } from "../../components/Spinner";
 
 interface UpdateProductDto {
   product_key: string;
@@ -33,6 +34,8 @@ interface UpdateProductDto {
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
+  const location = useLocation();
+
   const { data, error } = useProductQuery({ id });
   const [errors, setErrors] = useState<any>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -57,7 +60,11 @@ export function Edit() {
       notes: data?.data.data.notes,
       cost: data?.data.data.cost,
     });
-  }, [data]);
+
+    if (location?.state?.message) {
+      setAlert({ type: "success", message: location?.state?.message });
+    }
+  }, [data, location]);
 
   const form = useFormik({
     enableReinitialize: true,
@@ -95,13 +102,21 @@ export function Edit() {
   });
 
   if (!data) {
-    return <LoadingScreen />;
+    return (
+      <Default>
+        <Container>
+          <div className="flex justify-center">
+            <Spinner />
+          </div>
+        </Container>
+      </Default>
+    );
   }
 
   return (
     <Default>
       <Container>
-        <h2 className="text-2xl">{t("new_product")}</h2>
+        <h2 className="text-2xl">{data.data.data.product_key}</h2>
         <div className="bg-white w-full p-8 rounded shadow my-4">
           <form onSubmit={form.handleSubmit} className="space-y-6">
             <InputField

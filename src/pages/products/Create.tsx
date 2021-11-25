@@ -52,7 +52,8 @@ export function Create() {
       })
         .then((response: AxiosResponse) =>
           navigate(
-            generatePath("/products/:id/edit", { id: response.data.data.id })
+            generatePath("/products/:id/edit", { id: response.data.data.id }),
+            { state: { message: t("created_product") } }
           )
         )
         .catch((error: AxiosError) => {
