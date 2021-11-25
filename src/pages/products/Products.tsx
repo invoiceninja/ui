@@ -108,7 +108,7 @@ export function Products() {
         options={options}
         defaultOption={options[0]}
         rightSide={
-          <Button>
+          <Button to="/products/create">
             <span>{t("new_product")}</span>
             <PlusCircle size="20" />
           </Button>
