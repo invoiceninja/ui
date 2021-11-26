@@ -13,7 +13,12 @@ import { useFormik } from "formik";
 import { produceWithPatches } from "immer";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useLocation, useNavigate, useParams } from "react-router";
+import {
+  generatePath,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router";
 import { endpoint, request } from "../../common/helpers";
 import { useProductQuery } from "../../common/queries/products";
 import { Alert } from "../../components/Alert";
@@ -35,7 +40,7 @@ export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
   const location = useLocation();
-
+  const [product, setProduct] = useState<any>();
   const { data, error } = useProductQuery({ id });
   const [errors, setErrors] = useState<any>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -55,15 +60,19 @@ export function Edit() {
       data?.data.data.product_key
     }`;
 
+    let product = data?.data.data;
+
     setInitialValues({
-      product_key: data?.data.data.product_key,
-      notes: data?.data.data.notes,
-      cost: data?.data.data.cost,
+      product_key: product?.product_key,
+      notes: product?.notes,
+      cost: product?.cost,
     });
 
     if (location?.state?.message) {
       setAlert({ type: "success", message: location?.state?.message });
     }
+
+    setProduct(product);
   }, [data, location]);
 
   const form = useFormik({
@@ -101,7 +110,7 @@ export function Edit() {
     },
   });
 
-  if (!data) {
+  if (!data || !product) {
     return (
       <Default>
         <Container>
@@ -161,6 +170,25 @@ export function Edit() {
           </form>
         </div>
         {alert && <Alert type={alert?.type}>{alert?.message}.</Alert>}
+
+        {/* Cloning product */}
+        <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
+          <div className="flex items-start justify-between">
+            <section>
+              <h2>{t("clone_product")}</h2>
+              <span className="text-xs text-gray-600">
+                Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
+              </span>
+            </section>
+            <Button
+              to={generatePath("/products/:id/clone", {
+                id: product?.id,
+              })}
+            >
+              {t("clone")}
+            </Button>
+          </div>
+        </div>
       </Container>
     </Default>
   );
