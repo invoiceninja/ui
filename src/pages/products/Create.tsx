@@ -21,7 +21,7 @@ import { InputField } from "../../components/forms/InputField";
 import { Textarea } from "../../components/forms/Textarea";
 import { Default } from "../../components/layouts/Default";
 
-interface CreateProductDto {
+export interface CreateProductDto {
   product_key: string;
   notes: string;
   cost: string;
