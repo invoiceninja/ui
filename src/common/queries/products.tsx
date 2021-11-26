@@ -8,8 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosResponse } from "axios";
 import useSWR from "swr";
-import { endpoint, fetcher } from "../helpers";
+import { endpoint, fetcher, request } from "../helpers";
 import { Params } from "./common/params.interface";
 
 export function useProductsQuery(params: Params) {
@@ -30,4 +31,19 @@ export function useProductsQuery(params: Params) {
 
 export function useProductQuery(params: { id: string | undefined }) {
   return useSWR(endpoint("/api/v1/products/:id", params), fetcher);
+}
+
+export function bulk(
+  id: string[],
+  action: "archive" | "restore"
+): Promise<AxiosResponse> {
+  return request(
+    "POST",
+    endpoint("/api/v1/products/bulk"),
+    {
+      action,
+      ids: Array.from(id),
+    },
+    { "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN") }
+  );
 }

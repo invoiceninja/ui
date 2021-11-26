@@ -10,7 +10,7 @@
 
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useProductsQuery } from "../../common/queries/products";
+import { bulk, useProductsQuery } from "../../common/queries/products";
 import { Default } from "../../components/layouts/Default";
 import { Link } from "../../components/forms/Link";
 import { Table } from "../../components/tables/Table";
@@ -25,7 +25,7 @@ import { generatePath } from "react-router";
 import { Actions } from "../../components/datatables/Actions";
 import { Button } from "../../components/forms/Button";
 import { CheckSquare, ChevronDown, Divide, PlusCircle } from "react-feather";
-import { endpoint, handleCheckboxChange, request } from "../../common/helpers";
+import { handleCheckboxChange } from "../../common/helpers";
 import { Spinner } from "../../components/Spinner";
 import { AxiosError, AxiosResponse, Method } from "axios";
 import { useSWRConfig } from "swr";
@@ -43,7 +43,7 @@ export function Products() {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState("10");
   const [status, setStatus] = useState(["active"]);
-  const [selected, setSelected] = useState(new Set());
+  const [selected, setSelected] = useState(new Set<string>());
   const [sort, setSort] = useState<string | undefined>(undefined);
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const { mutate, cache } = useSWRConfig();
@@ -70,19 +70,12 @@ export function Products() {
     sort,
   });
 
-  function archive() {
-    request(
-      "POST",
-      endpoint("/api/v1/products/bulk"),
-      {
-        action: "archive",
-        ids: Array.from(selected),
-      },
-      { "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN") }
-    )
+  function archive(id?: string) {
+    bulk(Array.from(selected), "archive")
       .then((response: AxiosResponse) => {
         mutate(data?.request.responseURL);
 
+        setAlert(undefined);
         setAlert({
           message: generatePath(t("archived_products"), {
             count: response.data.data.length.toString(),
@@ -93,6 +86,27 @@ export function Products() {
         selected.clear();
 
         /** @ts-ignore: Unreachable, if element is null/undefined. */
+        mainCheckbox.current.checked = false;
+      })
+      .catch((error: AxiosError) => console.error(error.response?.data));
+  }
+
+  function restore() {
+    bulk(Array.from(selected), "restore")
+      .then((response: AxiosResponse) => {
+        mutate(data?.request.responseURL);
+
+        setAlert(undefined);
+        setAlert({
+          message: generatePath(t("restored_products"), {
+            value: response.data.data.length.toString(),
+          }),
+          type: "success",
+        });
+
+        selected.clear();
+
+        // @ts-ignore: Unreachable when element is undefined.
         mainCheckbox.current.checked = false;
       })
       .catch((error: AxiosError) => console.error(error.response?.data));
@@ -252,15 +266,29 @@ export function Products() {
                         </div>
 
                         <div>
-                          <button
-                            onClick={() => {
-                              setSelected(selected.add(product.id));
-                              archive();
-                            }}
-                            className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
-                          >
-                            {t("archive_product")}
-                          </button>
+                          {product.archived_at === 0 && (
+                            <button
+                              onClick={() => {
+                                archive();
+                              }}
+                              className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
+                            >
+                              {t("archive_product")}
+                            </button>
+                          )}
+
+                          {product.archived_at > 0 && (
+                            <button
+                              onClick={() => {
+                                setSelected(new Set());
+                                setSelected(selected.add(product.id));
+                                restore();
+                              }}
+                              className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
+                            >
+                              {t("restore_product")}
+                            </button>
+                          )}
 
                           <button className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700">
                             {t("delete_product")}
