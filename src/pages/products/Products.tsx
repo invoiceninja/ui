@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useProductsQuery } from "../../common/queries/products";
 import { Default } from "../../components/layouts/Default";
@@ -53,6 +53,7 @@ export function Products() {
       }
     | undefined
   >(undefined);
+  const mainCheckbox = useRef<HTMLInputElement>(null);
 
   const options = [
     { value: "active", label: "Active" },
@@ -89,6 +90,9 @@ export function Products() {
         });
 
         selected.clear();
+
+        /** @ts-ignore: Unreachable, if element is null/undefined. */
+        mainCheckbox.current.checked = false;
       })
       .catch((error: AxiosError) => console.error(error.response?.data));
   }
@@ -126,6 +130,7 @@ export function Products() {
         <Thead>
           <Th>
             <Checkbox
+              innerRef={mainCheckbox}
               onChange={(event: ChangeEvent<HTMLInputElement>) => {
                 Array.from(
                   document.querySelectorAll(".child-checkbox")
