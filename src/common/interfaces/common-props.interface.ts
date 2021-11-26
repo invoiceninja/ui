@@ -17,4 +17,5 @@ export default interface CommonProps {
   onChange?: any;
   value?: any;
   onClick?: any;
+  innerRef?: any;
 }
