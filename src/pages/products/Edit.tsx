@@ -87,12 +87,14 @@ export function Edit() {
       request("PUT", endpoint("/api/v1/products/:id", { id }), values, {
         "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN"),
       })
-        .then((response: AxiosResponse) =>
+        .then((response: AxiosResponse) => {
           setAlert({
             type: "success",
             message: t("updated_product"),
-          })
-        )
+          });
+
+          mutate(data?.request.responseURL);
+        })
         .catch((error: AxiosError) => {
           if (error.response?.status === 403) {
             return navigate("/logout");
@@ -121,6 +123,18 @@ export function Edit() {
 
   function restore() {
     bulk([product.id], "restore")
+      .then((response: AxiosResponse) => mutate(data?.request.responseURL))
+      .catch((error: AxiosError) =>
+        setAlert({ type: "danger", message: error.request?.data.message })
+      );
+  }
+
+  function _delete() {
+    if (!confirm(t("are_you_sure"))) {
+      return;
+    }
+
+    bulk([product.id], "delete")
       .then((response: AxiosResponse) => mutate(data?.request.responseURL))
       .catch((error: AxiosError) =>
         setAlert({ type: "danger", message: error.request?.data.message })
@@ -204,7 +218,6 @@ export function Edit() {
             </div>
           </form>
         </div>
-        {alert && <Alert type={alert?.type}>{alert?.message}.</Alert>}
 
         {/* Cloning product */}
         <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
@@ -241,7 +254,7 @@ export function Edit() {
         ) : null}
 
         {/* Restoring product */}
-        {!product.is_deleted && product.archived_at ? (
+        {product.archived_at ? (
           <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
             <div className="flex items-start justify-between">
               <section>
@@ -251,6 +264,21 @@ export function Edit() {
                 </span>
               </section>
               <Button onClick={restore}>{t("restore")}</Button>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Deleting product */}
+        {!product.is_deleted ? (
+          <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
+            <div className="flex items-start justify-between">
+              <section>
+                <h2>{t("delete_product")}</h2>
+                <span className="text-xs text-gray-600">
+                  Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
+                </span>
+              </section>
+              <Button onClick={_delete}>{t("delete")}</Button>
             </div>
           </div>
         ) : null}
