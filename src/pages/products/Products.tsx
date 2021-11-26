@@ -134,7 +134,7 @@ export function Products() {
               onChange={(event: ChangeEvent<HTMLInputElement>) => {
                 Array.from(
                   document.querySelectorAll(".child-checkbox")
-                ).forEach((checkbox) => {
+                ).forEach((checkbox: HTMLInputElement | any) => {
                   checkbox.checked = event.target.checked;
 
                   event.target.checked
