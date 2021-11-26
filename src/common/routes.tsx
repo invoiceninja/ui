@@ -22,6 +22,7 @@ import { Products } from "../pages/products/Products";
 import { Dashboard } from "../pages/dashboard/Dashboard";
 import { Create as ProductCreate } from "../pages/products/Create";
 import { Edit as ProductEdit } from "../pages/products/Edit";
+import { Clone as ProductClone } from "../pages/products/Clone";
 
 export const routes = (
   <Routes>
@@ -39,6 +40,7 @@ export const routes = (
         <Route path="" element={<Products />} />
         <Route path="create" element={<ProductCreate />} />
         <Route path=":id/edit" element={<ProductEdit />} />
+        <Route path=":id/clone" element={<ProductClone />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>
