@@ -24,6 +24,7 @@ export function Checkbox(props: Props) {
     <div className="relative flex items-start">
       <div className="flex items-center h-5">
         <input
+          ref={props.innerRef}
           value={props.value}
           id={props.id}
           aria-describedby="comments-description"
