@@ -28,6 +28,7 @@ import { Textarea } from "../../components/forms/Textarea";
 import { Default } from "../../components/layouts/Default";
 import { Spinner } from "../../components/Spinner";
 import { Badge } from "../../components/Badge";
+import { useSWRConfig } from "swr";
 
 interface UpdateProductDto {
   product_key: string;
@@ -47,6 +48,7 @@ export function Edit() {
   const [alert, setAlert] = useState<
     { type: string; message: string } | undefined
   >(undefined);
+  const { mutate } = useSWRConfig();
 
   const [initialValues, setInitialValues] = useState<UpdateProductDto>({
     product_key: "",
@@ -111,8 +113,10 @@ export function Edit() {
 
   function archive() {
     bulk([product.id], "archive")
-      .then((response: AxiosResponse) => console.log(response.data))
-      .catch((error: AxiosError) => console.log(error.response?.data));
+      .then((response: AxiosResponse) => mutate(data?.request.responseURL))
+      .catch((error: AxiosError) =>
+        setAlert({ type: "danger", message: error.request?.data.message })
+      );
   }
 
   if (!data || !product) {
@@ -130,6 +134,12 @@ export function Edit() {
   return (
     <Default>
       <Container>
+        {alert && (
+          <Alert className="mb-4" type={alert.type}>
+            {alert.message}.
+          </Alert>
+        )}
+
         <h2 className="inline-flex items-end text-2xl space-x-2">
           <span>{data.data.data.product_key}</span>
 
@@ -208,17 +218,19 @@ export function Edit() {
         </div>
 
         {/* Archiving product */}
-        <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
-          <div className="flex items-start justify-between">
-            <section>
-              <h2>{t("archive_product")}</h2>
-              <span className="text-xs text-gray-600">
-                Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
-              </span>
-            </section>
-            <Button onClick={archive}>{t("archive")}</Button>
+        {!product.is_deleted && !product.archived_at && (
+          <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
+            <div className="flex items-start justify-between">
+              <section>
+                <h2>{t("archive_product")}</h2>
+                <span className="text-xs text-gray-600">
+                  Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
+                </span>
+              </section>
+              <Button onClick={archive}>{t("archive")}</Button>
+            </div>
           </div>
-        </div>
+        )}
       </Container>
     </Default>
   );
