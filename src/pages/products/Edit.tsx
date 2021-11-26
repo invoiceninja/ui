@@ -8,10 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import React, { useEffect, useState } from "react";
 import { AxiosError, AxiosResponse } from "axios";
 import { useFormik } from "formik";
-import { produceWithPatches } from "immer";
-import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   generatePath,
@@ -20,15 +19,15 @@ import {
   useParams,
 } from "react-router";
 import { endpoint, request } from "../../common/helpers";
-import { useProductQuery } from "../../common/queries/products";
+import { bulk, useProductQuery } from "../../common/queries/products";
 import { Alert } from "../../components/Alert";
 import { Container } from "../../components/Container";
 import { Button } from "../../components/forms/Button";
 import { InputField } from "../../components/forms/InputField";
 import { Textarea } from "../../components/forms/Textarea";
 import { Default } from "../../components/layouts/Default";
-import { LoadingScreen } from "../../components/LoadingScreen";
 import { Spinner } from "../../components/Spinner";
+import { Badge } from "../../components/Badge";
 
 interface UpdateProductDto {
   product_key: string;
@@ -110,6 +109,12 @@ export function Edit() {
     },
   });
 
+  function archive() {
+    bulk([product.id], "archive")
+      .then((response: AxiosResponse) => console.log(response.data))
+      .catch((error: AxiosError) => console.log(error.response?.data));
+  }
+
   if (!data || !product) {
     return (
       <Default>
@@ -125,7 +130,19 @@ export function Edit() {
   return (
     <Default>
       <Container>
-        <h2 className="text-2xl">{data.data.data.product_key}</h2>
+        <h2 className="inline-flex items-end text-2xl space-x-2">
+          <span>{data.data.data.product_key}</span>
+
+          {!product.is_deleted && !product.archived_at && (
+            <Badge variant="white">{t("active")}</Badge>
+          )}
+
+          {product.archived_at && !product.is_deleted && (
+            <Badge variant="yellow">{t("archived")}</Badge>
+          )}
+
+          {product.is_deleted && <Badge variant="red">{t("deleted")}</Badge>}
+        </h2>
         <div className="bg-white w-full p-8 rounded shadow my-4">
           <form onSubmit={form.handleSubmit} className="space-y-6">
             <InputField
@@ -187,6 +204,19 @@ export function Edit() {
             >
               {t("clone")}
             </Button>
+          </div>
+        </div>
+
+        {/* Archiving product */}
+        <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
+          <div className="flex items-start justify-between">
+            <section>
+              <h2>{t("archive_product")}</h2>
+              <span className="text-xs text-gray-600">
+                Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
+              </span>
+            </section>
+            <Button onClick={archive}>{t("archive")}</Button>
           </div>
         </div>
       </Container>
