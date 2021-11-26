@@ -113,6 +113,10 @@ export function Products() {
   }
 
   function _delete() {
+    if (!confirm(t("are_you_sure"))) {
+      return;
+    }
+
     bulk(Array.from(selected), "delete")
       .then((response: AxiosResponse) => {
         mutate(data?.request.responseURL);
