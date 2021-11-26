@@ -35,7 +35,7 @@ export function useProductQuery(params: { id: string | undefined }) {
 
 export function bulk(
   id: string[],
-  action: "archive" | "restore"
+  action: "archive" | "restore" | "delete"
 ): Promise<AxiosResponse> {
   return request(
     "POST",

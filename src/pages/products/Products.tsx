@@ -70,7 +70,7 @@ export function Products() {
     sort,
   });
 
-  function archive(id?: string) {
+  function archive() {
     bulk(Array.from(selected), "archive")
       .then((response: AxiosResponse) => {
         mutate(data?.request.responseURL);
@@ -101,6 +101,25 @@ export function Products() {
           message: generatePath(t("restored_products"), {
             value: response.data.data.length.toString(),
           }),
+          type: "success",
+        });
+
+        selected.clear();
+
+        // @ts-ignore: Unreachable when element is undefined.
+        mainCheckbox.current.checked = false;
+      })
+      .catch((error: AxiosError) => console.error(error.response?.data));
+  }
+
+  function _delete() {
+    bulk(Array.from(selected), "delete")
+      .then((response: AxiosResponse) => {
+        mutate(data?.request.responseURL);
+
+        setAlert(undefined);
+        setAlert({
+          message: t("deleted_product"),
           type: "success",
         });
 
@@ -241,34 +260,38 @@ export function Products() {
                         tabIndex={-1}
                         {...attrs}
                       >
-                        <div>
-                          <RouterLink
-                            to={generatePath("/products/:id/edit", {
-                              id: product.id,
-                            })}
-                            className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
-                          >
-                            {t("edit_product")}
-                          </RouterLink>
+                        {!product.is_deleted && (
+                          <div>
+                            <RouterLink
+                              to={generatePath("/products/:id/edit", {
+                                id: product.id,
+                              })}
+                              className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
+                            >
+                              {t("edit_product")}
+                            </RouterLink>
 
-                          <RouterLink
-                            to={generatePath("/products/:id/clone", {
-                              id: product.id,
-                            })}
-                            className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
-                          >
-                            {t("clone_product")}
-                          </RouterLink>
+                            <RouterLink
+                              to={generatePath("/products/:id/clone", {
+                                id: product.id,
+                              })}
+                              className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
+                            >
+                              {t("clone_product")}
+                            </RouterLink>
 
-                          <button className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700">
-                            {t("invoice_product")}
-                          </button>
-                        </div>
+                            <button className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700">
+                              {t("invoice_product")}
+                            </button>
+                          </div>
+                        )}
 
                         <div>
                           {product.archived_at === 0 && (
                             <button
                               onClick={() => {
+                                setSelected(new Set());
+                                setSelected(selected.add(product.id));
                                 archive();
                               }}
                               className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
@@ -290,9 +313,18 @@ export function Products() {
                             </button>
                           )}
 
-                          <button className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700">
-                            {t("delete_product")}
-                          </button>
+                          {!product.is_deleted && (
+                            <button
+                              onClick={() => {
+                                setSelected(new Set());
+                                setSelected(selected.add(product.id));
+                                _delete();
+                              }}
+                              className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
+                            >
+                              {t("delete_product")}
+                            </button>
+                          )}
                         </div>
                       </div>
                     )}
