@@ -84,7 +84,7 @@ export function Products() {
         mutate(data?.request.responseURL);
 
         setAlert({
-          message: generatePath(t("archived_invoices"), {
+          message: generatePath(t("archived_products"), {
             count: response.data.data.length.toString(),
           }),
           type: "success",
@@ -252,7 +252,13 @@ export function Products() {
                         </div>
 
                         <div>
-                          <button className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700">
+                          <button
+                            onClick={() => {
+                              setSelected(selected.add(product.id));
+                              archive();
+                            }}
+                            className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
+                          >
                             {t("archive_product")}
                           </button>
 
