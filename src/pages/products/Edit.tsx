@@ -137,9 +137,9 @@ export function Edit() {
             <Badge variant="white">{t("active")}</Badge>
           )}
 
-          {product.archived_at && !product.is_deleted && (
+          {product.archived_at && !product.is_deleted ? (
             <Badge variant="yellow">{t("archived")}</Badge>
-          )}
+          ) : null}
 
           {product.is_deleted && <Badge variant="red">{t("deleted")}</Badge>}
         </h2>
