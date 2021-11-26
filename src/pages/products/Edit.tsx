@@ -119,6 +119,14 @@ export function Edit() {
       );
   }
 
+  function restore() {
+    bulk([product.id], "restore")
+      .then((response: AxiosResponse) => mutate(data?.request.responseURL))
+      .catch((error: AxiosError) =>
+        setAlert({ type: "danger", message: error.request?.data.message })
+      );
+  }
+
   if (!data || !product) {
     return (
       <Default>
@@ -218,7 +226,7 @@ export function Edit() {
         </div>
 
         {/* Archiving product */}
-        {!product.is_deleted && !product.archived_at && (
+        {!product.is_deleted && !product.archived_at ? (
           <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
             <div className="flex items-start justify-between">
               <section>
@@ -230,7 +238,22 @@ export function Edit() {
               <Button onClick={archive}>{t("archive")}</Button>
             </div>
           </div>
-        )}
+        ) : null}
+
+        {/* Restoring product */}
+        {!product.is_deleted && product.archived_at ? (
+          <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
+            <div className="flex items-start justify-between">
+              <section>
+                <h2>{t("restore_product")}</h2>
+                <span className="text-xs text-gray-600">
+                  Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
+                </span>
+              </section>
+              <Button onClick={restore}>{t("restore")}</Button>
+            </div>
+          </div>
+        ) : null}
       </Container>
     </Default>
   );
