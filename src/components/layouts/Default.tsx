@@ -10,7 +10,7 @@
 
 import React, { Fragment, useState } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
-import { Home, Menu as MenuIcon, X, Box } from "react-feather";
+import { Home, Menu as MenuIcon, X, Box, FileText } from "react-feather";
 import CommonProps from "../../common/interfaces/common-props.interface";
 import { useTranslation } from "react-i18next";
 import Logo from "../../resources/images/invoiceninja-logo@dark.png";
@@ -42,9 +42,15 @@ export function Default(props: Props) {
       icon: Box,
       current: location.pathname === "/products",
     },
+    {
+      name: t("invoices"),
+      href: "/invoices",
+      icon: FileText,
+      current: location.pathname === "/invoices",
+    },
   ];
 
-  const userNavigation = [{ name: "Sign out", href: "/logout" }];
+  const userNavigation = [{ name: t('logout'), href: "/logout" }];
 
   return (
     <>
