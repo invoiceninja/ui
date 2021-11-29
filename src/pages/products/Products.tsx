@@ -24,7 +24,7 @@ import { Checkbox } from "../../components/forms/Checkbox";
 import { generatePath } from "react-router";
 import { Actions } from "../../components/datatables/Actions";
 import { Button } from "../../components/forms/Button";
-import { CheckSquare, ChevronDown, Divide, PlusCircle } from "react-feather";
+import { CheckSquare, PlusCircle } from "react-feather";
 import { handleCheckboxChange } from "../../common/helpers";
 import { Spinner } from "../../components/Spinner";
 import { AxiosError, AxiosResponse, Method } from "axios";
