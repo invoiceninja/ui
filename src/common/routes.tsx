@@ -13,17 +13,21 @@ import { Route, Routes } from 'react-router';
 import { HostedRoute } from '../components/HostedRoute';
 import { PrivateRoute } from '../components/PrivateRoute';
 import { PublicRoute } from '../components/PublicRoute';
-import { RecoverPassword } from '../pages/authentication/RecoverPassword';
-import { Login } from '../pages/authentication/Login';
-import { Logout } from '../pages/authentication/Logout';
-import { Register } from '../pages/authentication/Register';
 import { Index } from '../pages/Index';
-import { Products } from '../pages/products/Products';
 import { Dashboard } from '../pages/dashboard/Dashboard';
-import { Create as ProductCreate } from '../pages/products/Create';
-import { Edit as ProductEdit } from '../pages/products/Edit';
-import { Clone as ProductClone } from '../pages/products/Clone';
-import { Invoices } from '../pages/invoices/Invoices';
+import {
+  Login,
+  Logout,
+  RecoverPassword,
+  Register,
+} from '../pages/authentication';
+import {
+  ProductClone,
+  ProductCreate,
+  ProductEdit,
+  Products,
+} from '../pages/products';
+import { Invoices, InvoiceCreate } from '../pages/invoices/index';
 
 export const routes = (
   <Routes>
@@ -45,6 +49,7 @@ export const routes = (
       </Route>
       <Route path="/invoices">
         <Route path="" element={<Invoices />} />
+        <Route path="create" element={<InvoiceCreate />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>
