@@ -30,8 +30,8 @@ import { Spinner } from "../../components/Spinner";
 import { AxiosError, AxiosResponse, Method } from "axios";
 import { useSWRConfig } from "swr";
 import { Alert } from "../../components/Alert";
-import Tippy from "@tippyjs/react/headless";
-import { Link as RouterLink } from "react-router-dom";
+import { Dropdown } from "../../components/dropdown/Dropdown";
+import { DropdownElement } from "../../components/dropdown/DropdownElement";
 
 export function Products() {
   useEffect(() => {
@@ -160,9 +160,20 @@ export function Products() {
           <span>{t("invoice")}</span>
           <CheckSquare size="20" />
         </Button>
-        <Button onClick={archive} type="secondary">
-          {t("archive")}
-        </Button>
+
+        <Dropdown label={t("actions")}>
+          <DropdownElement onClick={archive}>
+            {t("archive_product")}
+          </DropdownElement>
+
+          <DropdownElement onClick={restore}>
+            {t("restore_product")}
+          </DropdownElement>
+
+          <DropdownElement onClick={_delete}>
+            {t("delete_product")}
+          </DropdownElement>
+        </Dropdown>
       </Actions>
       <Table>
         <Thead>
@@ -254,90 +265,69 @@ export function Products() {
                 <Td>{product.notes}</Td>
                 <Td>{product.cost}</Td>
                 <Td>
-                  <Tippy
-                    placement="bottom"
-                    trigger="click"
-                    interactive={true}
-                    render={(attrs) => (
-                      <div
-                        className="divide-y box mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                        tabIndex={-1}
-                        {...attrs}
-                      >
-                        {!product.is_deleted && (
-                          <div>
-                            <RouterLink
-                              to={generatePath("/products/:id/edit", {
-                                id: product.id,
-                              })}
-                              className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
-                            >
-                              {t("edit_product")}
-                            </RouterLink>
+                  <Dropdown className="divide-y" label={t("select")}>
+                    {!product.is_deleted && (
+                      <div>
+                        <DropdownElement
+                          to={generatePath("/products/:id/edit", {
+                            id: product.id,
+                          })}
+                        >
+                          {t("edit_product")}
+                        </DropdownElement>
 
-                            <RouterLink
-                              to={generatePath("/products/:id/clone", {
-                                id: product.id,
-                              })}
-                              className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
-                            >
-                              {t("clone_product")}
-                            </RouterLink>
+                        <DropdownElement
+                          to={generatePath("/products/:id/clone", {
+                            id: product.id,
+                          })}
+                        >
+                          {t("clone_product")}
+                        </DropdownElement>
 
-                            <button className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700">
-                              {t("invoice_product")}
-                            </button>
-                          </div>
-                        )}
-
-                        <div>
-                          {product.archived_at === 0 && (
-                            <button
-                              onClick={() => {
-                                setSelected(new Set());
-                                setSelected(selected.add(product.id));
-                                archive();
-                              }}
-                              className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
-                            >
-                              {t("archive_product")}
-                            </button>
-                          )}
-
-                          {product.archived_at > 0 && (
-                            <button
-                              onClick={() => {
-                                setSelected(new Set());
-                                setSelected(selected.add(product.id));
-                                restore();
-                              }}
-                              className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
-                            >
-                              {t("restore_product")}
-                            </button>
-                          )}
-
-                          {!product.is_deleted && (
-                            <button
-                              onClick={() => {
-                                setSelected(new Set());
-                                setSelected(selected.add(product.id));
-                                _delete();
-                              }}
-                              className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700"
-                            >
-                              {t("delete_product")}
-                            </button>
-                          )}
-                        </div>
+                        <DropdownElement>
+                          {t("invoice_product")}
+                        </DropdownElement>
                       </div>
                     )}
-                  >
-                    <button className="inline-flex  items-center space-x-2 bg-white border border-gray-300 rounded px-4 py-2">
-                      <span>{t("select")}</span>
-                      <ChevronDown size={14} />
-                    </button>
-                  </Tippy>
+
+                    <div>
+                      {product.archived_at === 0 && (
+                        <DropdownElement
+                          onClick={() => {
+                            setSelected(new Set());
+                            setSelected(selected.add(product.id));
+                            archive();
+                          }}
+                        >
+                          {t("archive_product")}
+                        </DropdownElement>
+                      )}
+
+                      {product.archived_at > 0 && (
+                        <DropdownElement
+                          onClick={() => {
+                            setSelected(new Set());
+                            setSelected(selected.add(product.id));
+                            restore();
+                          }}
+                        >
+                          {t("restore_product")}
+                        </DropdownElement>
+                      )}
+
+                      {!product.is_deleted && (
+                        <DropdownElement
+                          onClick={() => {
+                            setSelected(new Set());
+                            setSelected(selected.add(product.id));
+                            _delete();
+                          }}
+                        >
+                          {t("delete_product")}
+                        </DropdownElement>
+                      )}
+                    </div>
+                  </Dropdown>
                 </Td>
               </Tr>
             );
