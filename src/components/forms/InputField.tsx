@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import classNames from "classnames";
-import React from "react";
-import { useSelector } from "react-redux";
-import CommonProps from "../../common/interfaces/common-props.interface";
-import { RootState } from "../../common/stores/store";
-import { InputLabel } from "./InputLabel";
+import classNames from 'classnames';
+import React from 'react';
+import { useSelector } from 'react-redux';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { RootState } from '../../common/stores/store';
+import { InputLabel } from './InputLabel';
 
 interface Props extends CommonProps {
   label?: string;
@@ -21,6 +21,7 @@ interface Props extends CommonProps {
   type?: string;
   placeholder?: string;
   required?: boolean;
+  border?: boolean;
 }
 
 export function InputField(props: Props) {
@@ -39,7 +40,12 @@ export function InputField(props: Props) {
         required={props.required}
         id={props.id}
         type={props.type}
-        className={`w-full py-2 px-3 rounded border border-gray-300 text-sm ${props.className}`}
+        className={classNames(
+          `w-full py-2 px-3 rounded text-sm ${props.className}`,
+          {
+            'border border-gray-300': props.border !== false,
+          }
+        )}
         placeholder={props.placeholder}
         onChange={props.onChange}
         value={props.value}
