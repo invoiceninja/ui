@@ -17,7 +17,7 @@ export function Invoices() {
   const [t] = useTranslation();
 
   useEffect(() => {
-    document.title = t("invoices");
+    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t("invoices")}`;
   });
 
   return (
