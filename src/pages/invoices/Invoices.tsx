@@ -8,8 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
+import React, { useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import { Link as RouterLink } from "react-router-dom";
+import { Default } from "../../components/layouts/Default";
 
 export function Invoices() {
-  return <></>;
+  const [t] = useTranslation();
+
+  useEffect(() => {
+    document.title = t("invoices");
+  });
+
+  return (
+    <Default title={t("invoices")}>
+      <RouterLink to="/invoices/create">Create an invoice</RouterLink>
+    </Default>
+  );
 }

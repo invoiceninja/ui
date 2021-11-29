@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import { Route, Routes } from "react-router";
-import { HostedRoute } from "../components/HostedRoute";
-import { PrivateRoute } from "../components/PrivateRoute";
-import { PublicRoute } from "../components/PublicRoute";
-import { RecoverPassword } from "../pages/authentication/RecoverPassword";
-import { Login } from "../pages/authentication/Login";
-import { Logout } from "../pages/authentication/Logout";
-import { Register } from "../pages/authentication/Register";
-import { Index } from "../pages/Index";
-import { Products } from "../pages/products/Products";
-import { Dashboard } from "../pages/dashboard/Dashboard";
-import { Create as ProductCreate } from "../pages/products/Create";
-import { Edit as ProductEdit } from "../pages/products/Edit";
-import { Clone as ProductClone } from "../pages/products/Clone";
-import { Invoices } from "../pages/invoices/Invoices";
+import React from 'react';
+import { Route, Routes } from 'react-router';
+import { HostedRoute } from '../components/HostedRoute';
+import { PrivateRoute } from '../components/PrivateRoute';
+import { PublicRoute } from '../components/PublicRoute';
+import { RecoverPassword } from '../pages/authentication/RecoverPassword';
+import { Login } from '../pages/authentication/Login';
+import { Logout } from '../pages/authentication/Logout';
+import { Register } from '../pages/authentication/Register';
+import { Index } from '../pages/Index';
+import { Products } from '../pages/products/Products';
+import { Dashboard } from '../pages/dashboard/Dashboard';
+import { Create as ProductCreate } from '../pages/products/Create';
+import { Edit as ProductEdit } from '../pages/products/Edit';
+import { Clone as ProductClone } from '../pages/products/Clone';
+import { Invoices } from '../pages/invoices/Invoices';
 
 export const routes = (
   <Routes>

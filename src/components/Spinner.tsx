@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
+import React from 'react';
 
 interface Props {
-  variant?: "light" | "dark";
+  variant?: 'light' | 'dark';
 }
 
 export function Spinner(props: Props) {
   return (
     <svg
-      className={`animate-spin h-5 w-5 ${props.variant ?? "text-black"}`}
+      className={`animate-spin h-5 w-5 ${props.variant ?? 'text-black'}`}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosResponse, Method } from "axios";
-import { generatePath } from "react-router";
+import axios, { AxiosResponse, Method } from 'axios';
+import { generatePath } from 'react-router';
 
 export function endpoint(endpoint: string, params = {}): string {
   return import.meta.env.VITE_API_URL + generatePath(endpoint, params);
 }
 
 export function request(
-  method: Method = "GET",
+  method: Method = 'GET',
   route: string,
   data?: {},
   headers?: {}
@@ -25,8 +25,8 @@ export function request(
     url: route,
     method,
     headers: {
-      "X-Requested-With": "XMLHttpRequest",
-      "Content-Type": "application/json",
+      'X-Requested-With': 'XMLHttpRequest',
+      'Content-Type': 'application/json',
       ...headers,
     },
     data,
@@ -34,7 +34,7 @@ export function request(
 }
 
 export function isHosted(): boolean {
-  return import.meta.env.VITE_IS_HOSTED === "true";
+  return import.meta.env.VITE_IS_HOSTED === 'true';
 }
 
 export function isSelfHosted(): boolean {
@@ -50,13 +50,13 @@ export function handleCheckboxChange(id: string, set: any) {
 export function fetcher(url: string, headers?: {}): Promise<AxiosResponse> {
   return axios
     .request({
-      method: "GET",
+      method: 'GET',
       url,
       headers: {
-        "X-Requested-With": "XMLHttpRequest",
-        "Content-Type": "application/json",
-        "X-Api-Token": localStorage.getItem(
-          "X-NINJA-TOKEN"
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/json',
+        'X-Api-Token': localStorage.getItem(
+          'X-NINJA-TOKEN'
         ) as unknown as string,
         ...headers,
       },

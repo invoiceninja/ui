@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import { useSelector } from "react-redux";
-import { Navigate, Outlet } from "react-router-dom";
-import { useAuthenticated } from "../common/hooks/useAuthenticated";
-import { RootState } from "../common/stores/store";
-import { LoadingScreen } from "./LoadingScreen";
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useAuthenticated } from '../common/hooks/useAuthenticated';
+import { RootState } from '../common/stores/store';
+import { LoadingScreen } from './LoadingScreen';
 
 export function PrivateRoute() {
   const authenticated = useAuthenticated();

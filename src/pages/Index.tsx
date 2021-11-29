@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import { Navigate } from "react-router";
-import { useAuthenticated } from "../common/hooks/useAuthenticated";
+import React from 'react';
+import { Navigate } from 'react-router';
+import { useAuthenticated } from '../common/hooks/useAuthenticated';
 
 export function Index() {
   const authenticated = useAuthenticated();
