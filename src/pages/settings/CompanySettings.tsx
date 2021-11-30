@@ -10,7 +10,7 @@
 
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Default } from '../../components/layouts/Default';
+import { Settings } from '../../components/layouts/Settings';
 
 export function CompanySettings() {
   const [t] = useTranslation();
@@ -21,5 +21,5 @@ export function CompanySettings() {
     )}`;
   });
 
-  return <Default>Company settings</Default>;
+  return <Settings title={t('company_details')}>Company settings</Settings>;
 }
