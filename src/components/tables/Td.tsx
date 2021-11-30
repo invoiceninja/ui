@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import CommonProps from "../../common/interfaces/common-props.interface";
+import React from 'react';
+import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   colSpan?: number;
@@ -17,7 +17,10 @@ interface Props extends CommonProps {
 
 export function Td(props: Props) {
   return (
-    <td colSpan={props.colSpan} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+    <td
+      colSpan={props.colSpan}
+      className={`px-6 py-4 whitespace-nowrap text-sm text-gray-900 ${props.className}`}
+    >
       {props.children}
     </td>
   );
