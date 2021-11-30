@@ -63,3 +63,7 @@ export function fetcher(url: string, headers?: {}): Promise<AxiosResponse> {
     })
     .then((response) => response);
 }
+
+export function classNames(...classes: any) {
+  return classes.filter(Boolean).join(' ');
+}
