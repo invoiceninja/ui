@@ -15,6 +15,7 @@ import Select from 'react-select';
 import { Calendar, X } from 'react-feather';
 import { Table, Tbody, Td, Th, Thead, Tr } from '../../components/tables';
 import {
+  Button,
   Datepicker,
   InputField,
   InputLabel,
@@ -239,6 +240,57 @@ export function Create() {
             </Tbody>
           </Table>
         </div>
+
+        {/* Public & private notes, terms, footer & totals */}
+        <div className="flex flex-col lg:flex-row lg:justify-between p-6 space-y-6 lg:space-y-0 lg:p-8 lg:items-start lg:ml-6 lg:mr-10">
+          <div className="flex flex-col">
+            <div className="flex flex-row items-center space-x-4">
+              <nav className="flex space-x-4" aria-label="Tabs">
+                <button className="bg-gray-100 text-gray-700 px-3 py-2 font-medium text-sm rounded">
+                  Public notes
+                </button>
+
+                <button className="text-gray-500 hover:text-gray-700 px-3 py-2 font-medium text-sm rounded">
+                  Private notes
+                </button>
+
+                <button className="text-gray-500 hover:text-gray-700 px-3 py-2 font-medium text-sm rounded">
+                  Terms
+                </button>
+
+                <button className="text-gray-500 hover:text-gray-700 px-3 py-2 font-medium text-sm rounded">
+                  Footer
+                </button>
+              </nav>
+            </div>
+            <div className="mt-2">
+              <Textarea />
+            </div>
+          </div>
+          <div className="w-full lg:w-64">
+            <div className="flex justify-between items-center py-4 border-b">
+              <p>{t('subtotal')}</p>
+              <p>$0</p>
+            </div>
+
+            <div className="flex justify-between items-center py-4 border-b">
+              <p>{t('paid_to_date')}</p>
+              <p>$0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="flex space-x-2 justify-center my-10">
+        <Button type="secondary">{t('save_draft')}</Button>
+        <Button type="secondary">{t('email_invoice')}</Button>
+        <Button>{t('mark_sent')}</Button>
+      </div>
+
+      <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-32 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        <span className="mt-2 block text-sm font-medium text-gray-900">
+          Placeholder for invoice
+        </span>
       </div>
     </Default>
   );
