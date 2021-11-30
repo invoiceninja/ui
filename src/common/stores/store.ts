@@ -8,14 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { configureStore } from "@reduxjs/toolkit";
-import { setupListeners } from "@reduxjs/toolkit/dist/query";
-import { accountSlice } from "./slices/account";
-import { companySlice } from "./slices/company";
-import { productsSlice } from "./slices/products";
-import { settingsSlice } from "./slices/settings";
-import { tokenSlice } from "./slices/token";
-import { userSlice } from "./slices/user";
+import { configureStore } from '@reduxjs/toolkit';
+import { setupListeners } from '@reduxjs/toolkit/dist/query';
+import { accountSlice } from './slices/account';
+import { companySlice } from './slices/company';
+import { invoiceSlice } from './slices/invoices';
+import { productsSlice } from './slices/products';
+import { settingsSlice } from './slices/settings';
+import { tokenSlice } from './slices/token';
+import { userSlice } from './slices/user';
 
 export const store = configureStore({
   reducer: {
@@ -25,6 +26,7 @@ export const store = configureStore({
     settings: settingsSlice.reducer,
     token: tokenSlice.reducer,
     account: accountSlice.reducer,
+    invoices: invoiceSlice.reducer,
   },
 });
 
