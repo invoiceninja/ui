@@ -33,7 +33,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "serve": "npm run build && serve -d dist/",
-    "format": "prettier --write src/**/*.{tsx,ts}"
+    "format": "prettier --write src/"
   },
   "eslintConfig": {
     "extends": [

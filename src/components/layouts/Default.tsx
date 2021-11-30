@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { Fragment, useState } from "react";
-import { Dialog, Menu, Transition } from "@headlessui/react";
-import { Home, Menu as MenuIcon, X, Box, FileText } from "react-feather";
-import CommonProps from "../../common/interfaces/common-props.interface";
-import { useTranslation } from "react-i18next";
-import Logo from "../../resources/images/invoiceninja-logo@dark.png";
-import { Link, useLocation } from "react-router-dom";
+import React, { Fragment, useState } from 'react';
+import { Dialog, Menu, Transition } from '@headlessui/react';
+import { Home, Menu as MenuIcon, X, Box, FileText } from 'react-feather';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { useTranslation } from 'react-i18next';
+import Logo from '../../resources/images/invoiceninja-logo@dark.png';
+import { Link, useLocation } from 'react-router-dom';
 
 function classNames(...classes: any) {
-  return classes.filter(Boolean).join(" ");
+  return classes.filter(Boolean).join(' ');
 }
 
 interface Props extends CommonProps {
@@ -31,26 +31,26 @@ export function Default(props: Props) {
 
   const navigation = [
     {
-      name: t("dashboard"),
-      href: "/dashboard",
+      name: t('dashboard'),
+      href: '/dashboard',
       icon: Home,
-      current: location.pathname === "/dashboard",
+      current: location.pathname === '/dashboard',
     },
     {
-      name: t("products"),
-      href: "/products",
+      name: t('products'),
+      href: '/products',
       icon: Box,
-      current: location.pathname === "/products",
+      current: location.pathname === '/products',
     },
     {
-      name: t("invoices"),
-      href: "/invoices",
+      name: t('invoices'),
+      href: '/invoices',
       icon: FileText,
-      current: location.pathname === "/invoices",
+      current: location.pathname === '/invoices',
     },
   ];
 
-  const userNavigation = [{ name: t('logout'), href: "/logout" }];
+  const userNavigation = [{ name: t('logout'), href: '/logout' }];
 
   return (
     <>
@@ -113,17 +113,17 @@ export function Default(props: Props) {
                         key={item.name}
                         className={classNames(
                           item.current
-                            ? "bg-gray-100 text-gray-900"
-                            : "text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                          "group flex items-center px-4 py-2 text-base font-medium"
+                            ? 'bg-gray-100 text-gray-900'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                          'group flex items-center px-4 py-2 text-base font-medium'
                         )}
                       >
                         <item.icon
                           className={classNames(
                             item.current
-                              ? "text-gray-500"
-                              : "text-gray-400 group-hover:text-gray-500",
-                            "mr-4 flex-shrink-0 h-6 w-6"
+                              ? 'text-gray-500'
+                              : 'text-gray-400 group-hover:text-gray-500',
+                            'mr-4 flex-shrink-0 h-6 w-6'
                           )}
                           aria-hidden="location === '/dashboard'"
                         />
@@ -155,17 +155,17 @@ export function Default(props: Props) {
                     to={item.href}
                     className={classNames(
                       item.current
-                        ? "border-l-4 border-transparent bg-gray-100 text-gray-900"
-                        : "border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900",
-                      "group flex items-center px-4 py-2 text-sm font-medium"
+                        ? 'border-l-4 border-transparent bg-gray-100 text-gray-900'
+                        : 'border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                      'group flex items-center px-4 py-2 text-sm font-medium'
                     )}
                   >
                     <item.icon
                       className={classNames(
                         item.current
-                          ? "text-gray-500"
-                          : "text-gray-400 group-hover:text-gray-500",
-                        "mr-3 flex-shrink-0 h-6 w-6"
+                          ? 'text-gray-500'
+                          : 'text-gray-400 group-hover:text-gray-500',
+                        'mr-3 flex-shrink-0 h-6 w-6'
                       )}
                       aria-hidden="true"
                     />
@@ -224,8 +224,8 @@ export function Default(props: Props) {
                             <Link
                               to={item.href}
                               className={classNames(
-                                active ? "bg-gray-100" : "",
-                                "block px-4 py-2 text-sm text-gray-700"
+                                active ? 'bg-gray-100' : '',
+                                'block px-4 py-2 text-sm text-gray-700'
                               )}
                             >
                               {item.name}

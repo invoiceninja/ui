@@ -8,25 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import { useEffect } from "react";
-import { useNavigate } from "react-router";
-import { endpoint, request } from "../../common/helpers";
+import React from 'react';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router';
+import { endpoint, request } from '../../common/helpers';
 
 export function Logout() {
   const navigate = useNavigate();
 
   useEffect(() => {
     request(
-      "POST",
-      endpoint("/api/v1/logout"),
+      'POST',
+      endpoint('/api/v1/logout'),
       {},
       {
-        "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN"),
+        'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN'),
       }
     ).then(() => {
-      localStorage.removeItem("X-NINJA-TOKEN");
-      navigate("/");
+      localStorage.removeItem('X-NINJA-TOKEN');
+      navigate('/');
     });
   });
 

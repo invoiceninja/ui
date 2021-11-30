@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Authenticated, Registered } from "../../dtos/authentication";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Authenticated, Registered } from '../../dtos/authentication';
 
 interface UserState {
   authenticated: boolean;
@@ -22,20 +22,20 @@ const initialState: UserState = {
 };
 
 export const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState,
   reducers: {
     authenticate: (state, action: PayloadAction<Authenticated>) => {
       state.authenticated = true;
       state.user = action.payload.user;
 
-      localStorage.setItem("X-NINJA-TOKEN", action.payload.token);
+      localStorage.setItem('X-NINJA-TOKEN', action.payload.token);
     },
     register: (state, action: PayloadAction<Registered>) => {
       state.authenticated = true;
       state.user = action.payload.user;
 
-      localStorage.setItem("X-NINJA-TOKEN", action.payload.token);
+      localStorage.setItem('X-NINJA-TOKEN', action.payload.token);
     },
   },
 });

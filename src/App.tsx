@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import { routes } from "./common/routes";
+import React from 'react';
+import { routes } from './common/routes';
 
 export function App() {
   return <div className="App">{routes}</div>;

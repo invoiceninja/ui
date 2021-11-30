@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { ChangeEvent, ReactNode } from "react";
-import { useTranslation } from "react-i18next";
-import CommonProps from "../../common/interfaces/common-props.interface";
-import { InputField } from "../forms/InputField";
-import Select, { MultiValue, SingleValue } from "react-select";
+import React, { ChangeEvent, ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { InputField } from '../forms/InputField';
+import Select, { MultiValue, SingleValue } from 'react-select';
 
 interface Props extends CommonProps {
   options?: { value: string; label: string }[];
@@ -50,7 +50,7 @@ export function Actions(props: Props) {
           <Select
             onChange={(options) => onStatusChange(options)}
             defaultValue={props.defaultOption}
-            placeholder={t("status")}
+            placeholder={t('status')}
             options={props.options}
             isMulti={props.optionsMultiSelect}
           />
@@ -59,7 +59,7 @@ export function Actions(props: Props) {
       <div className="mt-2 md:mt-0 flex items-center space-x-4">
         <InputField
           id="filter"
-          placeholder={t("filter")}
+          placeholder={t('filter')}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             props.onFilterChange(event.target.value)
           }

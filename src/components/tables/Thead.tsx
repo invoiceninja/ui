@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import { useSelector } from "react-redux";
-import CommonProps from "../../common/interfaces/common-props.interface";
-import { RootState } from "../../common/stores/store";
+import React from 'react';
+import { useSelector } from 'react-redux';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { RootState } from '../../common/stores/store';
 
 interface Props extends CommonProps {}
 

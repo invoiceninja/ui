@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface SettingsState {
   colors: {
@@ -19,12 +19,12 @@ interface SettingsState {
 
 const initialState: SettingsState = {
   colors: {
-    primary: "#117DC0",
+    primary: '#117DC0',
   },
 };
 
 export const settingsSlice = createSlice({
-  name: "settings",
+  name: 'settings',
   initialState,
   reducers: {
     updatePrimaryColor: (state, action: PayloadAction<{ color: string }>) => {

@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import Tippy from "@tippyjs/react/headless";
-import CommonProps from "../../common/interfaces/common-props.interface";
-import { ChevronDown, Divide } from "react-feather";
+import React from 'react';
+import Tippy from '@tippyjs/react/headless';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { ChevronDown, Divide } from 'react-feather';
 
 interface Props extends CommonProps {
   label?: string;

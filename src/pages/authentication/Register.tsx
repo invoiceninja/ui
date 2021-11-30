@@ -8,30 +8,30 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useEffect, useState } from "react";
-import { AxiosError, AxiosResponse } from "axios";
-import { useFormik } from "formik";
-import { useTranslation } from "react-i18next";
-import { useDispatch, useSelector } from "react-redux";
-import { RegisterForm } from "../../common/dtos/authentication";
-import { endpoint, isHosted, request } from "../../common/helpers";
-import { register } from "../../common/stores/slices/user";
-import { RegisterValidation } from "./common/ValidationInterface";
-import { RootState } from "../../common/stores/store";
-import { Header } from "./components/Header";
-import { InputField } from "../../components/forms/InputField";
-import { Alert } from "../../components/Alert";
-import { InputLabel } from "../../components/forms/InputLabel";
-import { Button } from "../../components/forms/Button";
-import { HostedLinks } from "./components/HostedLinks";
-import { Link } from "../../components/forms/Link";
+import React, { useEffect, useState } from 'react';
+import { AxiosError, AxiosResponse } from 'axios';
+import { useFormik } from 'formik';
+import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
+import { RegisterForm } from '../../common/dtos/authentication';
+import { endpoint, isHosted, request } from '../../common/helpers';
+import { register } from '../../common/stores/slices/user';
+import { RegisterValidation } from './common/ValidationInterface';
+import { RootState } from '../../common/stores/store';
+import { Header } from './components/Header';
+import { InputField } from '../../components/forms/InputField';
+import { Alert } from '../../components/Alert';
+import { InputLabel } from '../../components/forms/InputLabel';
+import { Button } from '../../components/forms/Button';
+import { HostedLinks } from './components/HostedLinks';
+import { Link } from '../../components/forms/Link';
 
 export function Register() {
   const colors = useSelector((state: RootState) => state.settings.colors);
   const [t] = useTranslation();
 
   useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t("register")}`;
+    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('register')}`;
   });
 
   const [errors, setErrors] = useState<RegisterValidation | undefined>(
@@ -39,19 +39,19 @@ export function Register() {
   );
 
   const [isFormBusy, setIsFormBusy] = useState(false);
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
   const dispatch = useDispatch();
 
   const form = useFormik({
     initialValues: {
-      email: "",
-      password: "",
-      password_confirmation: "",
+      email: '',
+      password: '',
+      password_confirmation: '',
       terms_of_service: false,
       privacy_policy: false,
     },
     onSubmit(values: RegisterForm) {
-      setMessage("");
+      setMessage('');
       setErrors(undefined);
       setIsFormBusy(true);
 
@@ -59,13 +59,13 @@ export function Register() {
         setIsFormBusy(false);
 
         setErrors({
-          password_confirmation: ["Password confirmation does not match."],
+          password_confirmation: ['Password confirmation does not match.'],
         });
 
         return;
       }
 
-      request("POST", endpoint("/api/v1/signup?include=token,user"), values)
+      request('POST', endpoint('/api/v1/signup?include=token,user'), values)
         .then((response: AxiosResponse) => {
           dispatch(
             register({
@@ -90,13 +90,13 @@ export function Register() {
       <Header />
       <div className="flex flex-col items-center">
         <div className="bg-white mx-4 max-w-md w-full p-8 rounded md:shadow-lg">
-          <h2 className="text-2xl">{t("register_label")}</h2>
+          <h2 className="text-2xl">{t('register_label')}</h2>
 
           <form onSubmit={form.handleSubmit} className="my-6">
             <section>
               <InputField
                 type="email"
-                label={t("email_address")}
+                label={t('email_address')}
                 id="email"
                 onChange={form.handleChange}
               />
@@ -111,7 +111,7 @@ export function Register() {
             <section className="mt-4">
               <InputField
                 type="password"
-                label={t("password")}
+                label={t('password')}
                 id="password"
                 onChange={form.handleChange}
               />
@@ -126,7 +126,7 @@ export function Register() {
             <section className="mt-4">
               <InputField
                 type="password"
-                label={t("password_confirmation")}
+                label={t('password_confirmation')}
                 id="password_confirmation"
                 onChange={form.handleChange}
               />
@@ -145,12 +145,12 @@ export function Register() {
             )}
 
             <Button disabled={isFormBusy} className="mt-4" variant="block">
-              {t("register")}
+              {t('register')}
             </Button>
           </form>
 
           <div className="flex justify-center">
-            {isHosted() && <Link to="/login">{t("login")}</Link>}
+            {isHosted() && <Link to="/login">{t('login')}</Link>}
           </div>
         </div>
 

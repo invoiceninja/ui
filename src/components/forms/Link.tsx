@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import classNames from "classnames";
-import React, { ReactNode } from "react";
-import { useSelector } from "react-redux";
-import { Link as RouterLink } from "react-router-dom";
-import CommonProps from "../../common/interfaces/common-props.interface";
-import { RootState } from "../../common/stores/store";
+import classNames from 'classnames';
+import React, { ReactNode } from 'react';
+import { useSelector } from 'react-redux';
+import { Link as RouterLink } from 'react-router-dom';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { RootState } from '../../common/stores/store';
 
 interface Props extends CommonProps {
   to: string;

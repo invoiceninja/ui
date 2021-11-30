@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError, AxiosResponse } from "axios";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router";
-import { AuthenticationTypes } from "../dtos/authentication";
-import { endpoint } from "../helpers";
-import { updateAccount } from "../stores/slices/account";
-import { updateCompany } from "../stores/slices/company";
-import { updateToken } from "../stores/slices/token";
-import { authenticate } from "../stores/slices/user";
-import { RootState } from "../stores/store";
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router';
+import { AuthenticationTypes } from '../dtos/authentication';
+import { endpoint } from '../helpers';
+import { updateAccount } from '../stores/slices/account';
+import { updateCompany } from '../stores/slices/company';
+import { updateToken } from '../stores/slices/token';
+import { authenticate } from '../stores/slices/user';
+import { RootState } from '../stores/store';
 
 export function useAuthenticated(): Boolean {
   const user = useSelector((state: RootState) => state.user);
-  const token = localStorage.getItem("X-NINJA-TOKEN");
+  const token = localStorage.getItem('X-NINJA-TOKEN');
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -31,13 +31,13 @@ export function useAuthenticated(): Boolean {
 
   axios
     .post(
-      endpoint("/api/v1/refresh"),
+      endpoint('/api/v1/refresh'),
       {},
       {
         headers: {
-          "Content-Type": "application/json",
-          "X-Requested-With": "XMLHttpRequest",
-          "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN") as string,
+          'Content-Type': 'application/json',
+          'X-Requested-With': 'XMLHttpRequest',
+          'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
         },
       }
     )
@@ -47,7 +47,7 @@ export function useAuthenticated(): Boolean {
           authenticate({
             type: AuthenticationTypes.TOKEN,
             user: response.data.data[0].user,
-            token: localStorage.getItem("X-NINJA-TOKEN") as string,
+            token: localStorage.getItem('X-NINJA-TOKEN') as string,
           })
         );
 
@@ -59,8 +59,8 @@ export function useAuthenticated(): Boolean {
     .catch((error: AxiosError) => {
       console.log(error);
 
-      localStorage.removeItem("X-NINJA-TOKEN");
-      navigate("/login");
+      localStorage.removeItem('X-NINJA-TOKEN');
+      navigate('/login');
     });
 
   return true;

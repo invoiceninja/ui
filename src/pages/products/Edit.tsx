@@ -8,27 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useEffect, useState } from "react";
-import { AxiosError, AxiosResponse } from "axios";
-import { useFormik } from "formik";
-import { useTranslation } from "react-i18next";
+import React, { useEffect, useState } from 'react';
+import { AxiosError, AxiosResponse } from 'axios';
+import { useFormik } from 'formik';
+import { useTranslation } from 'react-i18next';
 import {
   generatePath,
   useLocation,
   useNavigate,
   useParams,
-} from "react-router";
-import { endpoint, request } from "../../common/helpers";
-import { bulk, useProductQuery } from "../../common/queries/products";
-import { Alert } from "../../components/Alert";
-import { Container } from "../../components/Container";
-import { Button } from "../../components/forms/Button";
-import { InputField } from "../../components/forms/InputField";
-import { Textarea } from "../../components/forms/Textarea";
-import { Default } from "../../components/layouts/Default";
-import { Spinner } from "../../components/Spinner";
-import { Badge } from "../../components/Badge";
-import { useSWRConfig } from "swr";
+} from 'react-router';
+import { endpoint, request } from '../../common/helpers';
+import { bulk, useProductQuery } from '../../common/queries/products';
+import { Alert } from '../../components/Alert';
+import { Container } from '../../components/Container';
+import { Button } from '../../components/forms/Button';
+import { InputField } from '../../components/forms/InputField';
+import { Textarea } from '../../components/forms/Textarea';
+import { Default } from '../../components/layouts/Default';
+import { Spinner } from '../../components/Spinner';
+import { Badge } from '../../components/Badge';
+import { useSWRConfig } from 'swr';
 
 interface UpdateProductDto {
   product_key: string;
@@ -51,9 +51,9 @@ export function Edit() {
   const { mutate } = useSWRConfig();
 
   const [initialValues, setInitialValues] = useState<UpdateProductDto>({
-    product_key: "",
-    notes: "",
-    cost: "",
+    product_key: '',
+    notes: '',
+    cost: '',
   });
 
   useEffect(() => {
@@ -70,7 +70,7 @@ export function Edit() {
     });
 
     if (location?.state?.message) {
-      setAlert({ type: "success", message: location?.state?.message });
+      setAlert({ type: 'success', message: location?.state?.message });
     }
 
     setProduct(product);
@@ -81,23 +81,23 @@ export function Edit() {
     initialValues,
     onSubmit: (values: UpdateProductDto) => {
       setIsFormBusy(true);
-      setErrors("");
+      setErrors('');
       setAlert(undefined);
 
-      request("PUT", endpoint("/api/v1/products/:id", { id }), values, {
-        "X-Api-Token": localStorage.getItem("X-NINJA-TOKEN"),
+      request('PUT', endpoint('/api/v1/products/:id', { id }), values, {
+        'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN'),
       })
         .then((response: AxiosResponse) => {
           setAlert({
-            type: "success",
-            message: t("updated_product"),
+            type: 'success',
+            message: t('updated_product'),
           });
 
           mutate(data?.request.responseURL);
         })
         .catch((error: AxiosError) => {
           if (error.response?.status === 403) {
-            return navigate("/logout");
+            return navigate('/logout');
           }
 
           if (error.response?.status === 422) {
@@ -105,7 +105,7 @@ export function Edit() {
           }
 
           setAlert({
-            type: "error",
+            type: 'error',
             message: error?.response?.data.message,
           });
         })
@@ -114,30 +114,30 @@ export function Edit() {
   });
 
   function archive() {
-    bulk([product.id], "archive")
+    bulk([product.id], 'archive')
       .then((response: AxiosResponse) => mutate(data?.request.responseURL))
       .catch((error: AxiosError) =>
-        setAlert({ type: "danger", message: error.request?.data.message })
+        setAlert({ type: 'danger', message: error.request?.data.message })
       );
   }
 
   function restore() {
-    bulk([product.id], "restore")
+    bulk([product.id], 'restore')
       .then((response: AxiosResponse) => mutate(data?.request.responseURL))
       .catch((error: AxiosError) =>
-        setAlert({ type: "danger", message: error.request?.data.message })
+        setAlert({ type: 'danger', message: error.request?.data.message })
       );
   }
 
   function _delete() {
-    if (!confirm(t("are_you_sure"))) {
+    if (!confirm(t('are_you_sure'))) {
       return;
     }
 
-    bulk([product.id], "delete")
+    bulk([product.id], 'delete')
       .then((response: AxiosResponse) => mutate(data?.request.responseURL))
       .catch((error: AxiosError) =>
-        setAlert({ type: "danger", message: error.request?.data.message })
+        setAlert({ type: 'danger', message: error.request?.data.message })
       );
   }
 
@@ -166,22 +166,22 @@ export function Edit() {
           <span>{data.data.data.product_key}</span>
 
           {!product.is_deleted && !product.archived_at && (
-            <Badge variant="white">{t("active")}</Badge>
+            <Badge variant="white">{t('active')}</Badge>
           )}
 
           {product.archived_at && !product.is_deleted ? (
-            <Badge variant="yellow">{t("archived")}</Badge>
+            <Badge variant="yellow">{t('archived')}</Badge>
           ) : null}
 
-          {product.is_deleted && <Badge variant="red">{t("deleted")}</Badge>}
+          {product.is_deleted && <Badge variant="red">{t('deleted')}</Badge>}
         </h2>
         <div className="bg-white w-full p-8 rounded shadow my-4">
           <form onSubmit={form.handleSubmit} className="space-y-6">
             <InputField
-              label={t("product")}
+              label={t('product')}
               id="product_key"
               required
-              value={form.values.product_key || ""}
+              value={form.values.product_key || ''}
               onChange={form.handleChange}
             />
 
@@ -190,18 +190,18 @@ export function Edit() {
             )}
 
             <Textarea
-              label={t("notes")}
+              label={t('notes')}
               id="notes"
               onChange={form.handleChange}
-              value={form.values.notes || ""}
+              value={form.values.notes || ''}
             />
 
             {errors?.notes && <Alert type="danger">{errors.notes}</Alert>}
 
             <InputField
-              label={t("cost")}
+              label={t('cost')}
               id="cost"
-              value={form.values.cost || ""}
+              value={form.values.cost || ''}
               onChange={form.handleChange}
             />
 
@@ -210,11 +210,11 @@ export function Edit() {
             <div className="flex justify-end items-center space-x-2">
               {!isFormBusy && (
                 <Button to="/products" type="secondary">
-                  {t("cancel")}
+                  {t('cancel')}
                 </Button>
               )}
 
-              <Button disabled={isFormBusy}>{t("save")}</Button>
+              <Button disabled={isFormBusy}>{t('save')}</Button>
             </div>
           </form>
         </div>
@@ -223,17 +223,17 @@ export function Edit() {
         <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
           <div className="flex items-start justify-between">
             <section>
-              <h2>{t("clone_product")}</h2>
+              <h2>{t('clone_product')}</h2>
               <span className="text-xs text-gray-600">
                 Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
               </span>
             </section>
             <Button
-              to={generatePath("/products/:id/clone", {
+              to={generatePath('/products/:id/clone', {
                 id: product?.id,
               })}
             >
-              {t("clone")}
+              {t('clone')}
             </Button>
           </div>
         </div>
@@ -243,12 +243,12 @@ export function Edit() {
           <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
             <div className="flex items-start justify-between">
               <section>
-                <h2>{t("archive_product")}</h2>
+                <h2>{t('archive_product')}</h2>
                 <span className="text-xs text-gray-600">
                   Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
                 </span>
               </section>
-              <Button onClick={archive}>{t("archive")}</Button>
+              <Button onClick={archive}>{t('archive')}</Button>
             </div>
           </div>
         ) : null}
@@ -258,12 +258,12 @@ export function Edit() {
           <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
             <div className="flex items-start justify-between">
               <section>
-                <h2>{t("restore_product")}</h2>
+                <h2>{t('restore_product')}</h2>
                 <span className="text-xs text-gray-600">
                   Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
                 </span>
               </section>
-              <Button onClick={restore}>{t("restore")}</Button>
+              <Button onClick={restore}>{t('restore')}</Button>
             </div>
           </div>
         ) : null}
@@ -273,12 +273,12 @@ export function Edit() {
           <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
             <div className="flex items-start justify-between">
               <section>
-                <h2>{t("delete_product")}</h2>
+                <h2>{t('delete_product')}</h2>
                 <span className="text-xs text-gray-600">
                   Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
                 </span>
               </section>
-              <Button onClick={_delete}>{t("delete")}</Button>
+              <Button onClick={_delete}>{t('delete')}</Button>
             </div>
           </div>
         ) : null}

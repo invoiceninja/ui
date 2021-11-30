@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import CommonProps from "../../common/interfaces/common-props.interface";
-import { InputLabel } from "./InputLabel";
+import React from 'react';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { InputLabel } from './InputLabel';
 
 interface Props extends CommonProps {
   label?: string;

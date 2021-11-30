@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 interface ProductState {
   currentPage: number;
@@ -17,11 +17,11 @@ interface ProductState {
 
 const initialState: ProductState = {
   currentPage: 1,
-  filter: "",
+  filter: '',
 };
 
 export const productsSlice = createSlice({
-  name: "products",
+  name: 'products',
   initialState,
   reducers: {
     updateCurrentPage: (state, action: PayloadAction<{ number: number }>) => {

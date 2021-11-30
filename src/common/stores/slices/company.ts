@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 interface CompanyState {
   api: any;
@@ -19,7 +19,7 @@ const initialState: CompanyState = {
 };
 
 export const companySlice = createSlice({
-  name: "company",
+  name: 'company',
   initialState,
   reducers: {
     updateCompany: (state, action: any) => {

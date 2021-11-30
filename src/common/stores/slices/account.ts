@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice } from '@reduxjs/toolkit';
 
 interface AccountState {
   api: any;
@@ -19,7 +19,7 @@ const initialState: AccountState = {
 };
 
 export const accountSlice = createSlice({
-  name: "token",
+  name: 'token',
   initialState,
   reducers: {
     updateAccount: (state, action: any) => {

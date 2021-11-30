@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import { ChevronLeft, ChevronRight } from "react-feather";
-import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
-import CommonProps from "../../common/interfaces/common-props.interface";
-import { RootState } from "../../common/stores/store";
+import React from 'react';
+import { ChevronLeft, ChevronRight } from 'react-feather';
+import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
+import CommonProps from '../../common/interfaces/common-props.interface';
+import { RootState } from '../../common/stores/store';
 
 interface Props extends CommonProps {
   totalPages: number;
@@ -67,7 +67,7 @@ export function Pagination(props: Props) {
             htmlFor="location"
             className="block text-sm font-medium text-gray-700"
           >
-            {t("rows")}
+            {t('rows')}
           </label>
         </div>
       </div>
@@ -86,8 +86,8 @@ export function Pagination(props: Props) {
               onClick={() => props.onPageChange(number + 1)}
               style={{
                 backgroundColor:
-                  props.currentPage === number + 1 ? colors.primary : "",
-                color: props.currentPage === number + 1 ? "white" : "",
+                  props.currentPage === number + 1 ? colors.primary : '',
+                color: props.currentPage === number + 1 ? 'white' : '',
               }}
               className="py-1.5 px-4 bg-white border-b border-t hover:bg-gray-50"
             >

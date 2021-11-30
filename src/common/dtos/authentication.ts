@@ -26,8 +26,8 @@ export interface ForgotPasswordForm {
 }
 
 export enum AuthenticationTypes {
-  TOKEN = "invoiceninja_token",
-  GOOGLE_SSO = "google_sso",
+  TOKEN = 'invoiceninja_token',
+  GOOGLE_SSO = 'google_sso',
 }
 
 export interface Authenticated {

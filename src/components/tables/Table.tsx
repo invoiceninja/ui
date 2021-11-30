@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import CommonProps from "../../common/interfaces/common-props.interface";
+import React from 'react';
+import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {}
 

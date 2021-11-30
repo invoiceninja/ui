@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../common/stores/store";
-import { Link } from "../../../components/forms/Link";
-import Logo from "../../../resources/images/invoiceninja-logo@dark.png";
+import React from 'react';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../common/stores/store';
+import { Link } from '../../../components/forms/Link';
+import Logo from '../../../resources/images/invoiceninja-logo@dark.png';
 
 export function Header() {
   const colors = useSelector((state: RootState) => state.settings.colors);

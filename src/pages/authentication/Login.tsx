@@ -8,28 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useEffect, useState } from "react";
-import { useFormik } from "formik";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from 'react';
+import { useFormik } from 'formik';
+import { useDispatch } from 'react-redux';
 import {
   AuthenticationTypes,
   LoginForm,
-} from "../../common/dtos/authentication";
-import { endpoint, isHosted, request } from "../../common/helpers";
-import { authenticate } from "../../common/stores/slices/user";
-import { AxiosError, AxiosResponse } from "axios";
-import { LoginValidation } from "./common/ValidationInterface";
-import { useTranslation } from "react-i18next";
-import { InputField } from "../../components/forms/InputField";
-import { Button } from "../../components/forms/Button";
-import { Link } from "../../components/forms/Link";
-import { InputLabel } from "../../components/forms/InputLabel";
-import { Alert } from "../../components/Alert";
-import { HostedLinks } from "./components/HostedLinks";
-import { Header } from "./components/Header";
-import { updateCompany } from "../../common/stores/slices/company";
-import { updateToken } from "../../common/stores/slices/token";
-import { updateAccount } from "../../common/stores/slices/account";
+} from '../../common/dtos/authentication';
+import { endpoint, isHosted, request } from '../../common/helpers';
+import { authenticate } from '../../common/stores/slices/user';
+import { AxiosError, AxiosResponse } from 'axios';
+import { LoginValidation } from './common/ValidationInterface';
+import { useTranslation } from 'react-i18next';
+import { InputField } from '../../components/forms/InputField';
+import { Button } from '../../components/forms/Button';
+import { Link } from '../../components/forms/Link';
+import { InputLabel } from '../../components/forms/InputLabel';
+import { Alert } from '../../components/Alert';
+import { HostedLinks } from './components/HostedLinks';
+import { Header } from './components/Header';
+import { updateCompany } from '../../common/stores/slices/company';
+import { updateToken } from '../../common/stores/slices/token';
+import { updateAccount } from '../../common/stores/slices/account';
 
 export function Login() {
   const dispatch = useDispatch();
@@ -39,20 +39,20 @@ export function Login() {
   const [t] = useTranslation();
 
   useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t("login")}`;
+    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('login')}`;
   });
 
   const form = useFormik({
     initialValues: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
     onSubmit: (values: LoginForm) => {
       setMessage(undefined);
       setErrors(undefined);
       setIsFormBusy(true);
 
-      request("POST", endpoint("/api/v1/login"), values)
+      request('POST', endpoint('/api/v1/login'), values)
         .then((response: AxiosResponse) => {
           dispatch(
             authenticate({
@@ -70,7 +70,7 @@ export function Login() {
           return error.response?.status === 422
             ? setErrors(error.response.data.errors)
             : setMessage(
-                error.response?.data.message ?? t("invalid_credentials")
+                error.response?.data.message ?? t('invalid_credentials')
               );
         })
         .finally(() => setIsFormBusy(false));
@@ -82,12 +82,12 @@ export function Login() {
       <Header />
       <div className="flex flex-col items-center">
         <div className="bg-white mx-4 max-w-md w-full p-8 rounded md:shadow-lg">
-          <h2 className="text-2xl">{t("login")}</h2>
+          <h2 className="text-2xl">{t('login')}</h2>
 
           <form onSubmit={form.handleSubmit} className="my-6">
             <InputField
               type="email"
-              label={t("email_address")}
+              label={t('email_address')}
               id="email"
               onChange={form.handleChange}
             />
@@ -99,8 +99,8 @@ export function Login() {
             )}
 
             <div className="flex items-center justify-between mt-4">
-              <InputLabel>{t("password")}</InputLabel>
-              <Link to="/recover_password">{t("forgot_password")}</Link>
+              <InputLabel>{t('password')}</InputLabel>
+              <Link to="/recover_password">{t('forgot_password')}</Link>
             </div>
 
             <InputField
@@ -123,12 +123,12 @@ export function Login() {
             )}
 
             <Button disabled={isFormBusy} className="mt-4" variant="block">
-              {t("login")}
+              {t('login')}
             </Button>
           </form>
 
           <div className="flex justify-center">
-            {isHosted() && <Link to="/register">{t("register_label")}</Link>}
+            {isHosted() && <Link to="/register">{t('register_label')}</Link>}
           </div>
         </div>
 
