@@ -10,7 +10,14 @@
 
 import React, { Fragment, useState } from 'react';
 import { Dialog, Menu, Transition } from '@headlessui/react';
-import { Home, Menu as MenuIcon, X, Box, FileText } from 'react-feather';
+import {
+  Home,
+  Menu as MenuIcon,
+  X,
+  Box,
+  FileText,
+  Settings,
+} from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import Logo from '../../resources/images/invoiceninja-logo@dark.png';
@@ -47,6 +54,12 @@ export function Default(props: Props) {
       href: '/invoices',
       icon: FileText,
       current: location.pathname === '/invoices',
+    },
+    {
+      name: t('settings'),
+      href: '/settings/company_settings',
+      icon: Settings,
+      current: location.pathname.startsWith('/settings'),
     },
   ];
 
