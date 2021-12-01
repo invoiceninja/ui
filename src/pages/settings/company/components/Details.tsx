@@ -18,7 +18,7 @@ export function Details() {
   const [t] = useTranslation();
 
   return (
-    <Card withSaveButton title={t('details')}>
+    <Card title={t('details')}>
       <Element leftSide={t('name')}>
         <InputField id="name" />
       </Element>
