@@ -95,7 +95,7 @@ export function Default(props: Props) {
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <div className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white">
+              <div className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white dark:bg-gray-900">
                 <Transition.Child
                   as={Fragment}
                   enter="ease-in-out duration-300"
@@ -127,16 +127,16 @@ export function Default(props: Props) {
                         key={item.name}
                         className={classNames(
                           item.current
-                            ? 'bg-gray-100 text-gray-900'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                            ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
+                            : 'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-200 dark:hover:bg-gray-800',
                           'group flex items-center px-4 py-2 text-base font-medium'
                         )}
                       >
                         <item.icon
                           className={classNames(
                             item.current
-                              ? 'text-gray-500'
-                              : 'text-gray-400 group-hover:text-gray-500',
+                              ? 'text-gray-500 dark:text-gray-200'
+                              : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-200',
                             'mr-4 flex-shrink-0 h-6 w-6'
                           )}
                           aria-hidden="location === '/dashboard'"
@@ -157,7 +157,7 @@ export function Default(props: Props) {
         {/* Static sidebar for desktop */}
         <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
           {/* Sidebar component, swap this element with another sidebar if you like */}
-          <div className="flex flex-col flex-grow border-r border-gray-200 pt-5 bg-white overflow-y-auto">
+          <div className="flex flex-col flex-grow border-gray-200 pt-5 bg-white dark:bg-gray-800 dark:border-transparent overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
               <img className="h-8 w-auto" src={Logo} alt="Company logo" />
             </div>
@@ -169,16 +169,16 @@ export function Default(props: Props) {
                     to={item.href}
                     className={classNames(
                       item.current
-                        ? 'border-l-4 border-transparent bg-gray-100 text-gray-900'
-                        : 'border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                        ? 'border-l-4 border-transparent bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100'
+                        : 'border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-gray-100',
                       'group flex items-center px-4 py-2 text-sm font-medium'
                     )}
                   >
                     <item.icon
                       className={classNames(
                         item.current
-                          ? 'text-gray-500'
-                          : 'text-gray-400 group-hover:text-gray-500',
+                          ? 'text-gray-500 dark:text-gray-100'
+                          : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-100',
                         'mr-3 flex-shrink-0 h-6 w-6'
                       )}
                       aria-hidden="true"
@@ -191,17 +191,17 @@ export function Default(props: Props) {
           </div>
         </div>
         <div className="md:pl-64 flex flex-col flex-1">
-          <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white shadow">
+          <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white dark:bg-gray-800 shadow">
             <button
               type="button"
-              className="px-4 border-r border-gray-200 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
+              className="px-4 border-r border-gray-200 dark:border-gray-700 text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
               onClick={() => setSidebarOpen(true)}
             >
               <span className="sr-only">Open sidebar</span>
-              <MenuIcon />
+              <MenuIcon className="dark:text-gray-100" />
             </button>
             <div className="flex-1 px-4 flex items-center justify-between">
-              <h2 className="text-xl">{props.title}</h2>
+              <h2 className="text-xl dark:text-gray-100">{props.title}</h2>
               <div className="ml-4 flex items-center md:ml-6">
                 <LightSwitch />
 
@@ -226,15 +226,15 @@ export function Default(props: Props) {
                     leaveFrom="transform opacity-100 scale-100"
                     leaveTo="transform opacity-0 scale-95"
                   >
-                    <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                    <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700">
                       {userNavigation.map((item) => (
                         <Menu.Item key={item.name}>
                           {({ active }) => (
                             <Link
                               to={item.href}
                               className={classNames(
-                                active ? 'bg-gray-100' : '',
-                                'block px-4 py-2 text-sm text-gray-700'
+                                active ? 'bg-gray-100 dark:bg-gray-800' : '',
+                                'block px-4 py-2 text-sm text-gray-700 dark:text-gray-200'
                               )}
                             >
                               {item.name}
@@ -250,7 +250,7 @@ export function Default(props: Props) {
           </div>
 
           <main className="flex-1">
-            <div className="p-4 md:p-8">{props.children}</div>
+            <div className="p-4 md:p-8 dark:text-gray-100">{props.children}</div>
           </main>
         </div>
       </div>
