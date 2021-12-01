@@ -14,9 +14,10 @@ export function Element(props: {
   leftSide?: ReactNode;
   rightSide?: ReactNode;
   children: ReactNode;
+  className?: any;
 }) {
   return (
-    <div className="py-3 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 flex flex-col lg:flex-row lg:items-center">
+    <div className={`py-3 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 flex flex-col lg:flex-row lg:items-center ${props.className}`}>
       <dt className="text-sm font-medium text-gray-500">{props.leftSide}</dt>
       <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
         {props.children}
