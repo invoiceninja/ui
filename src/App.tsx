@@ -17,7 +17,7 @@ export function App() {
   let darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
   useEffect(() => {
-    document.body.classList.add('bg-gray-50', 'dark:bg-black');
+    document.body.classList.add('bg-gray-50', 'dark:bg-gray-900');
 
     darkMode
       ? document.querySelector('html')?.classList.add('dark')

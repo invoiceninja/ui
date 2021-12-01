@@ -20,7 +20,7 @@ export function LightSwitch() {
 
   return (
     <button onClick={() => dispatch(setDarkMode({ status: !darkMode }))}>
-      {darkMode ? <Sun /> : <Moon />}
+      {darkMode ? <Moon className="text-white" /> : <Sun />}
     </button>
   );
 }
