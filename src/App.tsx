@@ -17,9 +17,11 @@ export function App() {
   let darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
   useEffect(() => {
+    document.body.classList.add('bg-gray-50', 'dark:bg-black');
+
     darkMode
-      ? document.body.classList.add('dark')
-      : document.body.classList.remove('dark');
+      ? document.querySelector('html')?.classList.add('dark')
+      : document.querySelector('html')?.classList.remove('dark');
   }, [darkMode]);
 
   return <div className="App">{routes}</div>;
