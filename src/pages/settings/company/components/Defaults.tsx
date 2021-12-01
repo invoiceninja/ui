@@ -11,7 +11,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
-import { SelectField } from '../../../../components/forms';
+import { Link, SelectField } from '../../../../components/forms';
 
 export function Defaults() {
   const [t] = useTranslation();
@@ -44,6 +44,10 @@ export function Defaults() {
           <option value="60">Net 60</option>
           <option value="90">Net 90</option>
         </SelectField>
+
+        <Link to="/settings/payment_terms" className="block mt-2">
+          {t('configure_payment_terms')}
+        </Link>
       </Element>
       <Element leftSide={t('quote_valid_until')}>
         <SelectField>
