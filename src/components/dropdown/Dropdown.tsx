@@ -26,13 +26,13 @@ export function Dropdown(props: Props) {
         interactive={true}
         render={(attrs) => (
           <div
-            className={`box mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none ${props.className}`}
+            className={`box mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none ${props.className}`}
           >
             {props.children}
           </div>
         )}
       >
-        <button className="inline-flex text-gray-900 border border-gray-300 bg-white items-center space-x-2 justify-center py-2 px-4 rounded text-sm undefined text-white">
+        <button className="inline-flex text-gray-900 border border-gray-300 dark:border-transparent bg-white items-center space-x-2 justify-center py-2 px-4 rounded text-sm undefined text-white dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700">
           <span>{props.label}</span>
           <ChevronDown size={14} />
         </button>

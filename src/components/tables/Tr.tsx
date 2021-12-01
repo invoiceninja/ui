@@ -16,5 +16,5 @@ interface Props extends CommonProps {
 }
 
 export function Tr(props: Props) {
-  return <tr className="bg-white hover:bg-gray-50">{props.children}</tr>;
+  return <tr className="bg-white dark:bg-gray-800 hover:bg-gray-50">{props.children}</tr>;
 }
