@@ -10,7 +10,7 @@
 
 import React, { ReactNode } from 'react';
 
-export default function Element(props: {
+export function Element(props: {
   leftSide?: ReactNode;
   rightSide?: ReactNode;
   children: ReactNode;
