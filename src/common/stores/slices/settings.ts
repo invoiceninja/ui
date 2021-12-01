@@ -15,12 +15,14 @@ interface SettingsState {
     primary: string;
     secondary?: string;
   };
+  darkMode: boolean;
 }
 
 const initialState: SettingsState = {
   colors: {
     primary: '#117DC0',
   },
+  darkMode: false,
 };
 
 export const settingsSlice = createSlice({
@@ -30,7 +32,10 @@ export const settingsSlice = createSlice({
     updatePrimaryColor: (state, action: PayloadAction<{ color: string }>) => {
       state.colors.primary = action.payload.color;
     },
+    setDarkMode: (state, action: PayloadAction<{ status: boolean }>) => {
+      state.darkMode = action.payload.status;
+    },
   },
 });
 
-export const { updatePrimaryColor } = settingsSlice.actions;
+export const { updatePrimaryColor, setDarkMode } = settingsSlice.actions;
