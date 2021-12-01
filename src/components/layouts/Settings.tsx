@@ -11,6 +11,7 @@
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { classNames } from '../../common/helpers';
+import { SelectField } from '../forms';
 import { Default } from './Default';
 
 export function Settings(props: { title: string; children: ReactNode }) {
@@ -120,7 +121,25 @@ export function Settings(props: { title: string; children: ReactNode }) {
             <span className="truncate">{t('basic_settings')}</span>
           </a>
 
-          <nav className="space-y-1" aria-label="Sidebar">
+          <SelectField className="lg:hidden">
+            {basic.map((item) => (
+              <option
+                key={item.name}
+                value={item.href}
+                className={classNames(
+                  item.current
+                    ? 'bg-gray-200 text-gray-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                  'flex items-center px-3 py-2 text-sm font-medium rounded'
+                )}
+                aria-current={item.current ? 'page' : undefined}
+              >
+                {item.name}
+              </option>
+            ))}
+          </SelectField>
+
+          <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
             {basic.map((item) => (
               <a
                 key={item.name}
@@ -142,7 +161,25 @@ export function Settings(props: { title: string; children: ReactNode }) {
             <span className="truncate">{t('advanced_settings')}</span>
           </a>
 
-          <nav className="space-y-1" aria-label="Sidebar">
+          <SelectField className="lg:hidden">
+            {advanced.map((item) => (
+              <option
+                key={item.name}
+                value={item.href}
+                className={classNames(
+                  item.current
+                    ? 'bg-gray-200 text-gray-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                  'flex items-center px-3 py-2 text-sm font-medium rounded'
+                )}
+                aria-current={item.current ? 'page' : undefined}
+              >
+                {item.name}
+              </option>
+            ))}
+          </SelectField>
+
+          <nav className="space-y-1  hidden lg:block" aria-label="Sidebar">
             {advanced.map((item) => (
               <a
                 key={item.name}
@@ -161,12 +198,8 @@ export function Settings(props: { title: string; children: ReactNode }) {
           </nav>
         </div>
 
-        <div className="col-span-12 md:col-span-8 lg:col-start-4 p-4">
-          <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-32 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-            <span className="mt-2 block text-sm font-medium text-gray-900">
-              Placeholder for settings
-            </span>
-          </div>
+        <div className="col-span-12 md:col-span-8 lg:col-start-4">
+          {props.children}
         </div>
       </div>
     </Default>
