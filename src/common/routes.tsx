@@ -29,6 +29,7 @@ import {
 import { Invoices, InvoiceCreate } from '../pages/invoices/index';
 import {
   CompanyDetails,
+  ExpenseSettings,
   Localization,
   OnlinePayments,
   ProductSettings,
@@ -67,6 +68,7 @@ export const routes = (
         <Route path="tax_settings" element={<TaxSettings />} />
         <Route path="product_settings" element={<ProductSettings />} />
         <Route path="task_settings" element={<TaskSettings />} />
+        <Route path="expense_settings" element={<ExpenseSettings />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>

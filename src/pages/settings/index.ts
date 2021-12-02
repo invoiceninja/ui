@@ -15,3 +15,4 @@ export * from './online-payments/OnlinePayments';
 export * from './tax-settings/TaxSettings';
 export * from './products/ProductSettings';
 export * from './task-settings/TaskSettings';
+export * from './expense-settings/ExpenseSettings';

@@ -55,9 +55,9 @@ export function Settings(props: { title: string; children: ReactNode }) {
       current: location.pathname === '/settings/task_settings',
     },
     {
-      name: t('import_export'),
-      href: '/settings/import_export',
-      current: location.pathname === '/settings/import_export',
+      name: t('expense_settings'),
+      href: '/settings/expense_settings',
+      current: location.pathname === '/settings/expense_settings',
     },
     {
       name: t('account_management'),
