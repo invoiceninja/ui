@@ -11,6 +11,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
+import { Invoices, Quotes } from './components';
 
 export function WorkflowSettings() {
   const [t] = useTranslation();
@@ -23,7 +24,10 @@ export function WorkflowSettings() {
 
   return (
     <Settings title={t('workflow_settings')}>
-      <div className="space-y-6 mt-6"></div>
+      <div className="space-y-6 mt-6">
+        <Invoices />
+        <Quotes />
+      </div>
     </Settings>
   );
 }
