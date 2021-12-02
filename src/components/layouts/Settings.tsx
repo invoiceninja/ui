@@ -64,6 +64,11 @@ export function Settings(props: { title: string; children: ReactNode }) {
       href: '/settings/workflow_settings',
       current: location.pathname === '/settings/workflow_settings',
     },
+    {
+      name: t('import_export'),
+      href: '/settings/import_export',
+      current: location.pathname === '/settings/import_export',
+    },
   ];
 
   const advanced = [

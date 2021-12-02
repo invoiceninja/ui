@@ -30,14 +30,15 @@ import { Invoices, InvoiceCreate } from '../pages/invoices/index';
 import {
   CompanyDetails,
   ExpenseSettings,
+  ImportExport,
   Localization,
   OnlinePayments,
   ProductSettings,
   TaskSettings,
   TaxSettings,
+  WorkflowSettings,
 } from '../pages/settings';
 import { UserDetails } from '../pages/settings';
-import { WorkflowSettings } from '../pages/settings/workflow-settings/WorkflowSettings';
 
 export const routes = (
   <Routes>
@@ -71,6 +72,7 @@ export const routes = (
         <Route path="task_settings" element={<TaskSettings />} />
         <Route path="expense_settings" element={<ExpenseSettings />} />
         <Route path="workflow_settings" element={<WorkflowSettings />} />
+        <Route path="import_export" element={<ImportExport />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>
