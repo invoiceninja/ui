@@ -40,9 +40,7 @@ export default function Toggle(props: Props) {
       </Switch>
       {props.label && (
         <Switch.Label as="span" className="ml-3">
-          <span className="text-sm text-gray-900">
-            {props.label}
-          </span>
+          <span className="text-sm text-gray-900">{props.label}</span>
         </Switch.Label>
       )}
     </Switch.Group>

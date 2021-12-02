@@ -83,7 +83,7 @@ export function OnlinePayments() {
           </Tr>
         </Tbody>
       </Table>
-      
+
       <Pagination
         currentPage={1}
         onPageChange={() => {}}
