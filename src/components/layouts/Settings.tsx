@@ -69,6 +69,11 @@ export function Settings(props: { title: string; children: ReactNode }) {
       href: '/settings/import_export',
       current: location.pathname === '/settings/import_export',
     },
+    {
+      name: t('account_management'),
+      href: '/settings/account_management',
+      current: location.pathname === '/settings/account_management',
+    },
   ];
 
   const advanced = [

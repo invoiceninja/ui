@@ -18,3 +18,4 @@ export * from './task-settings/TaskSettings';
 export * from './expense-settings/ExpenseSettings';
 export * from './workflow-settings/WorkflowSettings';
 export * from './import-export/ImportExport';
+export * from './account-management/AccountManagement';

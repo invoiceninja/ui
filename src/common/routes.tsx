@@ -28,6 +28,7 @@ import {
 } from '../pages/products';
 import { Invoices, InvoiceCreate } from '../pages/invoices/index';
 import {
+  AccountManagement,
   CompanyDetails,
   ExpenseSettings,
   ImportExport,
@@ -36,9 +37,9 @@ import {
   ProductSettings,
   TaskSettings,
   TaxSettings,
+  UserDetails,
   WorkflowSettings,
 } from '../pages/settings';
-import { UserDetails } from '../pages/settings';
 
 export const routes = (
   <Routes>
@@ -73,6 +74,7 @@ export const routes = (
         <Route path="expense_settings" element={<ExpenseSettings />} />
         <Route path="workflow_settings" element={<WorkflowSettings />} />
         <Route path="import_export" element={<ImportExport />} />
+        <Route path="account_management" element={<AccountManagement />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>
