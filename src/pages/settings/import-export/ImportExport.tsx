@@ -10,6 +10,8 @@
 
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Card, Element } from '../../../components/cards';
+import { InputField, SelectField } from '../../../components/forms';
 import { Settings } from '../../../components/layouts/Settings';
 
 export function ImportExport() {
@@ -19,5 +21,42 @@ export function ImportExport() {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('import_export')}`;
   });
 
-  return <Settings title={t('import_export')}>{/*  */}</Settings>;
+  return (
+    <Settings title={t('import_export')}>
+      <div className="space-y-6">
+        <Card withSaveButton saveButtonLabel={t('import')} title={t('import')}>
+          <Element leftSide={t('import_type')}>
+            <SelectField>
+              <option value="csv">CSV</option>
+            </SelectField>
+          </Element>
+          <Element leftSide={t('clients')}>
+            <InputField id="clients" type="file" />
+          </Element>
+          <Element leftSide={t('invoices')}>
+            <InputField id="invoices" type="file" />
+          </Element>
+          <Element leftSide={t('payments')}>
+            <InputField id="payments" type="file" />
+          </Element>
+          <Element leftSide={t('products')}>
+            <InputField id="products" type="file" />
+          </Element>
+          <Element leftSide={t('vendors')}>
+            <InputField id="vendors" type="file" />
+          </Element>
+          <Element leftSide={t('expenses')}>
+            <InputField id="expenses" type="file" />
+          </Element>
+        </Card>
+
+        <Card withSaveButton saveButtonLabel={t('export')} title={t('export')}>
+          <Element>
+            Lorem ipsum dolor sit amet consectetur, adipisicing elit. Repellat
+            repudiandae error, assumenda dolore qui id?
+          </Element>
+        </Card>
+      </div>
+    </Settings>
+  );
 }

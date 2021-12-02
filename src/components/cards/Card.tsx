@@ -21,6 +21,7 @@ export function Card(props: {
   description?: string;
   withSaveButton?: boolean;
   onSaveClick?: any;
+  saveButtonLabel?: string;
 }) {
   const colors = useSelector((state: RootState) => state.settings.colors);
   const [t] = useTranslation();
@@ -46,7 +47,7 @@ export function Card(props: {
         <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
           <dl className="sm:divide-y sm:divide-gray-200">
             <div className="sm:py-5 sm:px-6 flex justify-end">
-              <Button>{t('save')}</Button>
+              <Button>{props.saveButtonLabel ?? t('save')}</Button>
             </div>
           </dl>
         </div>
