@@ -40,9 +40,9 @@ export function Settings(props: { title: string; children: ReactNode }) {
       current: location.pathname === '/settings/online_payments',
     },
     {
-      name: t('tax_rates'),
-      href: '/settings/tax_rates',
-      current: location.pathname === '/settings/tax_rates',
+      name: t('tax_settings'),
+      href: '/settings/tax_settings',
+      current: location.pathname === '/settings/tax_settings',
     },
     {
       name: t('products'),

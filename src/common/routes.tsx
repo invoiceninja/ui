@@ -31,6 +31,7 @@ import {
   CompanyDetails,
   Localization,
   OnlinePayments,
+  TaxSettings,
 } from '../pages/settings';
 import { UserDetails } from '../pages/settings';
 
@@ -61,6 +62,7 @@ export const routes = (
         <Route path="user_details" element={<UserDetails />} />
         <Route path="localization" element={<Localization />} />
         <Route path="online_payments" element={<OnlinePayments />} />
+        <Route path="tax_settings" element={<TaxSettings />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>
