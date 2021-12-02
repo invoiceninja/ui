@@ -9,10 +9,19 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Card } from '../../../../components/cards';
+import { Card, Element } from '../../../../components/cards';
+import { Button } from '../../../../components/forms';
 
 export function Plan() {
   const [t] = useTranslation();
 
-  return <Card title={t('plan')}>{/*  */}</Card>;
+  return (
+    <Card title={t('plan')}>
+      <Element leftSide={t('plan')}>Free</Element>
+      <Element leftSide={t('expires_on')}>December 31, 2025</Element>
+      <Element>
+        <Button className="mt-4" type="minimal">{t('plan_change')}</Button>
+      </Element>
+    </Card>
+  );
 }

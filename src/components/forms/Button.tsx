@@ -72,13 +72,13 @@ export function Button(props: Props) {
       type={props.behaviour}
       disabled={props.disabled}
       className={classNames(
-        `inline-flex items-center space-x-2 justify-center py-2 px-4 rounded text-sm ${props.className}`,
+        `inline-flex items-center space-x-2 justify-center rounded text-sm ${props.className}`,
         {
+          'py-2 px-4': props.type !== 'minimal',
           'w-full': props.variant === 'block',
           'text-white': props.type === 'primary',
           'text-gray-900 border border-gray-300': props.type === 'secondary',
-          'border border-transparent hover:border-gray-300':
-            props.type === 'minimal',
+          'p-0 m-0': props.type === 'minimal',
         }
       )}
       style={css}
