@@ -45,9 +45,9 @@ export function Settings(props: { title: string; children: ReactNode }) {
       current: location.pathname === '/settings/tax_settings',
     },
     {
-      name: t('products'),
-      href: '/settings/products',
-      current: location.pathname === '/settings/products',
+      name: t('product_settings'),
+      href: '/settings/product_settings',
+      current: location.pathname === '/settings/product_settings',
     },
     {
       name: t('notifications'),
