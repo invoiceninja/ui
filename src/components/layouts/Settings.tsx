@@ -50,9 +50,9 @@ export function Settings(props: { title: string; children: ReactNode }) {
       current: location.pathname === '/settings/product_settings',
     },
     {
-      name: t('notifications'),
-      href: '/settings/notifications',
-      current: location.pathname === '/settings/notifications',
+      name: t('task_settings'),
+      href: '/settings/task_settings',
+      current: location.pathname === '/settings/task_settings',
     },
     {
       name: t('import_export'),
