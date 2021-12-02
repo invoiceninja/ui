@@ -10,7 +10,13 @@
 
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
-import { AccentColor, Connect, Details, Password } from './components';
+import {
+  AccentColor,
+  Connect,
+  Details,
+  Notifications,
+  Password,
+} from './components';
 
 export function UserDetails() {
   const [t] = useTranslation();
@@ -22,6 +28,7 @@ export function UserDetails() {
         <Password />
         <Connect />
         <AccentColor />
+        <Notifications />
       </div>
     </Settings>
   );
