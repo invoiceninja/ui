@@ -4,5 +4,6 @@ export * from './Datepicker';
 export * from './InputField';
 export * from './InputLabel';
 export * from './Link';
+export * from './Radio';
 export * from './SelectField';
 export * from './Textarea';
