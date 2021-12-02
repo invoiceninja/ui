@@ -11,7 +11,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
-import { Plan } from './component';
+import { Overview, Plan } from './component';
 
 export function AccountManagement() {
   const [t] = useTranslation();
@@ -26,6 +26,7 @@ export function AccountManagement() {
     <Settings title={t('account_management')}>
       <div className="space-y-6">
           <Plan />
+          <Overview />
       </div>
     </Settings>
   );
