@@ -55,10 +55,10 @@ export function ProductSettings() {
           <Toggle />
         </Element>
 
-        <div className="py-4 border-b"></div>
+        <div className="pt-6 border-b"></div>
 
         <Element
-          className="mt-4"
+          className="mt-6"
           leftSide={t('fill_products')}
           leftSideHelp={t('fill_products_help')}
           pushContentToRight

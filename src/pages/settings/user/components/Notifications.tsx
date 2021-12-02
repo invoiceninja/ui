@@ -11,6 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { Checkbox } from '../../../../components/forms';
+import Toggle from '../../../../components/forms/Toggle';
 
 export function Notifications() {
   const [t] = useTranslation();
@@ -43,7 +44,7 @@ export function Notifications() {
       {options.map((notification) => {
         return (
           <Element className="mt-4" leftSide={notification.label}>
-            <Checkbox id={notification.field} />
+            <Toggle />
           </Element>
         );
       })}

@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../components/cards';
 import { Button, Checkbox, SelectField } from '../../../components/forms';
+import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import {
   Pagination,
@@ -49,13 +50,13 @@ export function OnlinePayments() {
           </SelectField>
         </Element>
         <Element leftSide={t('allow_over_payment')}>
-          <Checkbox
+          <Toggle
             label={t('allow_over_payment_help')}
             id="allow_over_payment"
           />
         </Element>
         <Element leftSide={t('allow_under_payment')}>
-          <Checkbox
+          <Toggle
             label={t('allow_under_payment_help')}
             id="allow_under_payment"
           />

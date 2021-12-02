@@ -11,6 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { Checkbox, Radio, SelectField } from '../../../../components/forms';
+import Toggle from '../../../../components/forms/Toggle';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -47,10 +48,10 @@ export function Settings() {
           </SelectField>
         </Element>
         <Element leftSide={t('military_time')}>
-          <Checkbox />
+          <Toggle />
         </Element>
         <Element leftSide={t('decimal_comma')}>
-          <Checkbox />
+          <Toggle />
         </Element>
       </Card>
 

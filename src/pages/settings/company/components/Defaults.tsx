@@ -13,6 +13,7 @@ import ReactQuill from 'react-quill';
 import { Card, Element } from '../../../../components/cards';
 import { Checkbox, Link, SelectField } from '../../../../components/forms';
 import 'react-quill/dist/quill.snow.css';
+import Toggle from '../../../../components/forms/Toggle';
 
 export function Defaults() {
   const [t] = useTranslation();
@@ -80,11 +81,11 @@ export function Defaults() {
 
         <div className="pt-6 border-b"></div>
 
-        <Element className="mt-4" leftSide={t('manual_payment_email')}>
-          <Checkbox id="manual_payment_email" label={t('email_receipt')} />
+        <Element className="mt-6" leftSide={t('manual_payment_email')}>
+          <Toggle />
         </Element>
         <Element leftSide={t('online_payment_email')}>
-          <Checkbox id="online_payment_email" label={t('email_receipt')} />
+          <Toggle />
         </Element>
 
         <div className="pt-6 border-b"></div>
