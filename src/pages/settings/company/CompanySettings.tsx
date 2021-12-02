@@ -11,7 +11,7 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
-import { Address, Defaults, Details } from './components';
+import { Address, Defaults, Details, Documents } from './components';
 
 export function CompanySettings() {
   const [t] = useTranslation();
@@ -28,6 +28,7 @@ export function CompanySettings() {
         <Details />
         <Address />
         <Defaults />
+        <Documents />
       </div>
     </Settings>
   );
