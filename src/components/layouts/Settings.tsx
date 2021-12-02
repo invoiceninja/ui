@@ -20,8 +20,8 @@ export function Settings(props: { title: string; children: ReactNode }) {
   const basic = [
     {
       name: t('company_details'),
-      href: '/settings/company_settings',
-      current: location.pathname === '/settings/company_settings',
+      href: '/settings/company_details',
+      current: location.pathname === '/settings/company_details',
     },
     {
       name: t('user_details'),

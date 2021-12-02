@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { Address, Defaults, Details, Documents } from './components';
 
-export function CompanySettings() {
+export function CompanyDetails() {
   const [t] = useTranslation();
 
   useEffect(() => {

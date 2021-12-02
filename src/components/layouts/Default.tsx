@@ -57,7 +57,7 @@ export function Default(props: Props) {
     },
     {
       name: t('settings'),
-      href: '/settings/company_settings',
+      href: '/settings/company_details',
       icon: Settings,
       current: location.pathname.startsWith('/settings'),
     },
