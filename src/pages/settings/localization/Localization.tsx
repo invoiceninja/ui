@@ -11,7 +11,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
-import { Settings as SettingsComponent } from './components';
+import { CustomLabels, Settings as SettingsComponent } from './components';
 
 export function Localization() {
   const [t] = useTranslation();
@@ -24,6 +24,7 @@ export function Localization() {
     <Settings title={t('localization')}>
       <div className="space-y-6 mt-6">
         <SettingsComponent />
+        <CustomLabels />
       </div>
     </Settings>
   );
