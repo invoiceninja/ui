@@ -10,9 +10,16 @@
 
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
+import { Details } from './components/Details';
 
 export function UserDetails() {
   const [t] = useTranslation();
 
-  return <Settings title={t('user_details')}></Settings>;
+  return (
+    <Settings title={t('user_details')}>
+      <div className="space-y-6 mt-6">
+        <Details />
+      </div>
+    </Settings>
+  );
 }
