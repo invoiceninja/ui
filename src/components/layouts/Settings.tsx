@@ -60,9 +60,9 @@ export function Settings(props: { title: string; children: ReactNode }) {
       current: location.pathname === '/settings/expense_settings',
     },
     {
-      name: t('account_management'),
-      href: '/settings/account_management',
-      current: location.pathname === '/settings/account_management',
+      name: t('workflow_settings'),
+      href: '/settings/workflow_settings',
+      current: location.pathname === '/settings/workflow_settings',
     },
   ];
 
