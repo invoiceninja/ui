@@ -10,31 +10,15 @@
 
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Card } from '../../../components/cards';
 import { Settings } from '../../../components/layouts/Settings';
-import {
-  AccentColor,
-  Connect,
-  Details,
-  Notifications,
-  Password,
-} from './components';
 
-export function UserDetails() {
+export function Localization() {
   const [t] = useTranslation();
 
   useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('user_details')}`;
+    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('localization')}`;
   });
 
-  return (
-    <Settings title={t('user_details')}>
-      <div className="space-y-6 mt-6">
-        <Details />
-        <Password />
-        <Connect />
-        <AccentColor />
-        <Notifications />
-      </div>
-    </Settings>
-  );
+  return <Settings title={t('localization')}>{/*  */}</Settings>;
 }
