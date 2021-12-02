@@ -27,7 +27,11 @@ import {
   Products,
 } from '../pages/products';
 import { Invoices, InvoiceCreate } from '../pages/invoices/index';
-import { CompanyDetails, Localization } from '../pages/settings';
+import {
+  CompanyDetails,
+  Localization,
+  OnlinePayments,
+} from '../pages/settings';
 import { UserDetails } from '../pages/settings';
 
 export const routes = (
@@ -56,6 +60,7 @@ export const routes = (
         <Route path="company_details" element={<CompanyDetails />} />
         <Route path="user_details" element={<UserDetails />} />
         <Route path="localization" element={<Localization />} />
+        <Route path="online_payments" element={<OnlinePayments />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>
