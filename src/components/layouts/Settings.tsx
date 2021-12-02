@@ -10,6 +10,7 @@
 
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import { classNames } from '../../common/helpers';
 import { SelectField } from '../forms';
 import { Default } from './Default';
@@ -141,9 +142,9 @@ export function Settings(props: { title: string; children: ReactNode }) {
 
           <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
             {basic.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
                 className={classNames(
                   item.current
                     ? 'bg-gray-200 text-gray-900'
@@ -153,7 +154,7 @@ export function Settings(props: { title: string; children: ReactNode }) {
                 aria-current={item.current ? 'page' : undefined}
               >
                 <span className="truncate">{item.name}</span>
-              </a>
+              </Link>
             ))}
           </nav>
 

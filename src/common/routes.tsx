@@ -28,6 +28,7 @@ import {
 } from '../pages/products';
 import { Invoices, InvoiceCreate } from '../pages/invoices/index';
 import { CompanyDetails } from '../pages/settings';
+import { UserDetails } from '../pages/settings';
 
 export const routes = (
   <Routes>
@@ -53,6 +54,7 @@ export const routes = (
       </Route>
       <Route path="/settings">
         <Route path="company_details" element={<CompanyDetails />} />
+        <Route path="user_details" element={<UserDetails />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>
