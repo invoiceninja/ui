@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from 'react';
 import { Lock, Smartphone, Book } from 'react-feather';
 
 export function HostedLinks() {

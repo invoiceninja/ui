@@ -9,7 +9,7 @@
  */
 
 import classNames from 'classnames';
-import React from 'react';
+
 import { useSelector } from 'react-redux';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { RootState } from '../../common/stores/store';

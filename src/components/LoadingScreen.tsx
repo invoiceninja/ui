@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from 'react';
 import { Spinner } from './Spinner';
 
 export function LoadingScreen() {

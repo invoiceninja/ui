@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from 'react';
-
 interface Props {
   variant?: 'light' | 'dark';
 }

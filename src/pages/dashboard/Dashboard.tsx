@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from 'react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';

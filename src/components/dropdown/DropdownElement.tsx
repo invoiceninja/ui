@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from 'react';
 import { Link } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
 

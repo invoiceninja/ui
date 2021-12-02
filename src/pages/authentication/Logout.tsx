@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from 'react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import { endpoint, request } from '../../common/helpers';

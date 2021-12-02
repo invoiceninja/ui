@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from 'react';
 import { Moon, Sun } from 'react-feather';
 import { useDispatch, useSelector } from 'react-redux';
 import { setDarkMode } from '../common/stores/slices/settings';

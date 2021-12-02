@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React from 'react';
 import { ChevronLeft, ChevronRight } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
