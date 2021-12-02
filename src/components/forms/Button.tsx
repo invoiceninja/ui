@@ -21,7 +21,7 @@ interface Props extends CommonProps {
   children?: ReactNode;
   variant?: 'block';
   disabled?: boolean;
-  type?: 'primary' | 'secondary';
+  type?: 'primary' | 'secondary' | 'minimal';
   onClick?: any;
   to?: string;
   behaviour?: 'button' | 'submit';
@@ -39,6 +39,12 @@ export function Button(props: Props) {
 
   const css: React.CSSProperties = {
     backgroundColor: props.type === 'primary' ? colors.primary : 'white',
+    color:
+      props.type === 'primary'
+        ? 'white'
+        : props.type === 'secondary'
+        ? 'text-gray-900'
+        : colors.primary,
   };
 
   if (props.to) {
@@ -51,6 +57,7 @@ export function Button(props: Props) {
             'w-full': props.variant === 'block',
             'text-white': props.type == 'primary',
             'text-gray-900 border border-gray-300': props.type == 'secondary',
+            'border-gray-600': props.type == 'minimal',
           }
         )}
         style={css}
@@ -68,8 +75,10 @@ export function Button(props: Props) {
         `inline-flex items-center space-x-2 justify-center py-2 px-4 rounded text-sm ${props.className}`,
         {
           'w-full': props.variant === 'block',
-          'text-white': props.type == 'primary',
-          'text-gray-900 border border-gray-300': props.type == 'secondary',
+          'text-white': props.type === 'primary',
+          'text-gray-900 border border-gray-300': props.type === 'secondary',
+          'border border-transparent hover:border-gray-300':
+            props.type === 'minimal',
         }
       )}
       style={css}

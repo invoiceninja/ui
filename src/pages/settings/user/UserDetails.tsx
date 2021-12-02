@@ -10,8 +10,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
-import { Details } from './components/Details';
-import { Password } from './components/Password';
+import { Connect, Details, Password } from './components';
 
 export function UserDetails() {
   const [t] = useTranslation();
@@ -20,6 +19,7 @@ export function UserDetails() {
     <Settings title={t('user_details')}>
       <div className="space-y-6 mt-6">
         <Details />
+        <Connect />
         <Password />
       </div>
     </Settings>
