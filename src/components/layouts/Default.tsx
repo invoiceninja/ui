@@ -22,7 +22,6 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import Logo from '../../resources/images/invoiceninja-logo@dark.png';
 import { Link, useLocation } from 'react-router-dom';
-import { LightSwitch } from '../LightSwitch';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -203,8 +202,6 @@ export function Default(props: Props) {
             <div className="flex-1 px-4 flex items-center justify-between">
               <h2 className="text-xl dark:text-gray-100">{props.title}</h2>
               <div className="ml-4 flex items-center md:ml-6">
-                <LightSwitch />
-
                 {/* Profile dropdown */}
                 <Menu as="div" className="ml-3 relative">
                   <div>
