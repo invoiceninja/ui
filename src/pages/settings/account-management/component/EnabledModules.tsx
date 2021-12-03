@@ -28,7 +28,7 @@ export function EnabledModules() {
     { label: t('tasks') },
     { label: t('vendor') },
     { label: t('expenses') },
-    { label: t('recurring_invoices') },
+    { label: t('recurring_expenses') },
   ];
 
   return (
