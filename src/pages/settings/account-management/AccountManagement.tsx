@@ -10,8 +10,16 @@
 
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Card, ClickableElement } from '../../../components/cards';
 import { Settings } from '../../../components/layouts/Settings';
-import { EnabledModules, Integrations, Licence, Overview, Plan, SecuritySettings } from './component';
+import {
+  EnabledModules,
+  Integrations,
+  Licence,
+  Overview,
+  Plan,
+  SecuritySettings,
+} from './component';
 
 export function AccountManagement() {
   const [t] = useTranslation();
@@ -31,6 +39,15 @@ export function AccountManagement() {
         <Integrations />
         <EnabledModules />
         <SecuritySettings />
+
+        <Card title="Danger zone">
+          <ClickableElement className="text-red-500 hover:text-red-600">
+            {t('purge_data')}
+          </ClickableElement>
+          <ClickableElement className="text-red-500 hover:text-red-600">
+            {t('cancel_account')}
+          </ClickableElement>
+        </Card>
       </div>
     </Settings>
   );
