@@ -25,10 +25,10 @@ export function AccountManagement() {
   return (
     <Settings title={t('account_management')}>
       <div className="space-y-6">
-          <Plan />
-          <Overview />
-          <Licence />
-          <Integrations />
+        <Plan />
+        <Overview />
+        <Licence />
+        <Integrations />
       </div>
     </Settings>
   );

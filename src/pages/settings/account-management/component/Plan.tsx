@@ -20,7 +20,9 @@ export function Plan() {
       <Element leftSide={t('plan')}>Free</Element>
       <Element leftSide={t('expires_on')}>December 31, 2025</Element>
       <Element>
-        <Button className="mt-4" type="minimal">{t('plan_change')}</Button>
+        <Button className="mt-4" type="minimal">
+          {t('plan_change')}
+        </Button>
       </Element>
     </Card>
   );
