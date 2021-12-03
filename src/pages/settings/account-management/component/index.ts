@@ -1,3 +1,4 @@
+export * from './EnabledModules';
 export * from './Integrations';
 export * from './Licence';
 export * from './Overview';
