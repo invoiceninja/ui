@@ -8,12 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../common/stores/store';
 import { Button } from '../forms';
-import Element from './Element';
 
 export function Card(props: {
   children: ReactNode;
@@ -27,7 +26,7 @@ export function Card(props: {
   const [t] = useTranslation();
 
   return (
-    <div className="bg-white shadow overflow-hidden rounded-md">
+    <div className="bg-white shadow overflow-hidden rounded">
       {props.title && (
         <div className="px-4 py-5 sm:px-6">
           <h3 className="text-lg leading-6 font-medium text-gray-900">
