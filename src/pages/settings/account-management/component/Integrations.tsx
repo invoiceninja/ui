@@ -25,8 +25,14 @@ export function Integrations() {
       <ClickableElement href="https://invoiceninja.github.io">
         {t('api_docs')}
       </ClickableElement>
-      <ClickableElement to="/settings/integrations/zapier">
+
+      <div className="pt-6 border-b"></div>
+
+      <ClickableElement className="mt-4" to="/settings/integrations/zapier">
         Zapier
+      </ClickableElement>
+      <ClickableElement to="/settings/integrations/google_analytics">
+        {t('google_analytics')}
       </ClickableElement>
     </Card>
   );
