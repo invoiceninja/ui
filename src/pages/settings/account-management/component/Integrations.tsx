@@ -9,39 +9,25 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import { Card } from '../../../../components/cards';
+import { Card, ClickableElement } from '../../../../components/cards';
 
 export function Integrations() {
   const [t] = useTranslation();
 
   return (
     <Card title={t('integrations')}>
-      <Link
-        to="/settings/integrations/api_tokens"
-        className="px-4 sm:px-6 block hover:bg-gray-50 py-4"
-      >
+      <ClickableElement to="/settings/integrations/api_token">
         {t('api_tokens')}
-      </Link>
-      <Link
-        to="/settings/integrations/api_webhooks"
-        className="px-4 sm:px-6 block hover:bg-gray-50 py-4"
-      >
+      </ClickableElement>
+      <ClickableElement to="/settings/integrations/api_webhooks">
         {t('api_webhooks')}
-      </Link>
-      <a
-        target="_blank"
-        href="https://invoiceninja.github.io"
-        className="px-4 sm:px-6 block hover:bg-gray-50 py-4"
-      >
+      </ClickableElement>
+      <ClickableElement href="https://invoiceninja.github.io">
         {t('api_docs')}
-      </a>
-      <Link
-        to="/settings/integrations/zapier"
-        className="px-4 sm:px-6 block hover:bg-gray-50 py-4"
-      >
+      </ClickableElement>
+      <ClickableElement to="/settings/integrations/zapier">
         Zapier
-      </Link>
+      </ClickableElement>
     </Card>
   );
 }
