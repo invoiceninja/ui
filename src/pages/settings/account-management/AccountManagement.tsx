@@ -11,7 +11,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
-import { EnabledModules, Integrations, Licence, Overview, Plan } from './component';
+import { EnabledModules, Integrations, Licence, Overview, Plan, SecuritySettings } from './component';
 
 export function AccountManagement() {
   const [t] = useTranslation();
@@ -30,6 +30,7 @@ export function AccountManagement() {
         <Licence />
         <Integrations />
         <EnabledModules />
+        <SecuritySettings />
       </div>
     </Settings>
   );
