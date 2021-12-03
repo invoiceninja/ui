@@ -39,7 +39,7 @@ export function Card(props: {
           )}
         </div>
       )}
-      <div className="border-t border-gray-200 py-5">
+      <div className="border-t border-gray-200 py-0">
         <dl className="py-4">{props.children}</dl>
       </div>
       {props.withSaveButton && (
