@@ -62,5 +62,9 @@
     "serve": "^13.0.2",
     "typescript": "^4.5.2",
     "vite": "^2.6.14"
-  }
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "engineStrict": true
 }
