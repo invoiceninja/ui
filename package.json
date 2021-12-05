@@ -1,6 +1,6 @@
 {
-  "name": "invoiceninja-ui",
-  "version": "alpha",
+  "name": "@invoiceninja/ui",
+  "version": "0.0.0",
   "private": true,
   "dependencies": {
     "@emotion/styled": "^11.6.0",
