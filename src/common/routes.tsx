@@ -40,7 +40,8 @@ import {
   TaxSettings,
   UserDetails,
   WorkflowSettings,
-  Customize as CustomizeInvoiceDesign
+  Customize as CustomizeInvoiceDesign,
+  CustomFields
 } from '../pages/settings';
 
 export const routes = (
@@ -79,6 +80,7 @@ export const routes = (
         <Route path="account_management" element={<AccountManagement />} />
         <Route path="invoice_design" element={<InvoiceDesign />} />
         <Route path="invoice_design/customize" element={<CustomizeInvoiceDesign />} />
+        <Route path="custom_fields" element={<CustomFields />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>

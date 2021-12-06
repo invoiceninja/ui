@@ -82,6 +82,11 @@ export function Settings(props: { title: string; children: ReactNode }) {
       href: '/settings/invoice_design',
       current: location.pathname === '/settings/invoice_design',
     },
+    {
+      name: t('custom_fields'),
+      href: '/settings/custom_fields',
+      current: location.pathname === '/settings/custom_fields',
+    },
   ];
 
   return (
