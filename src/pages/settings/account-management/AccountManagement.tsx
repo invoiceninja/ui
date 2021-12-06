@@ -32,23 +32,21 @@ export function AccountManagement() {
 
   return (
     <Settings title={t('account_management')}>
-      <div className="space-y-6">
-        <Plan />
-        <Overview />
-        <Licence />
-        <Integrations />
-        <EnabledModules />
-        <SecuritySettings />
+      <Plan />
+      <Overview />
+      <Licence />
+      <Integrations />
+      <EnabledModules />
+      <SecuritySettings />
 
-        <Card title="Danger zone">
-          <ClickableElement className="text-red-500 hover:text-red-600">
-            {t('purge_data')}
-          </ClickableElement>
-          <ClickableElement className="text-red-500 hover:text-red-600">
-            {t('cancel_account')}
-          </ClickableElement>
-        </Card>
-      </div>
+      <Card title="Danger zone">
+        <ClickableElement className="text-red-500 hover:text-red-600">
+          {t('purge_data')}
+        </ClickableElement>
+        <ClickableElement className="text-red-500 hover:text-red-600">
+          {t('cancel_account')}
+        </ClickableElement>
+      </Card>
     </Settings>
   );
 }
