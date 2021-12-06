@@ -22,3 +22,5 @@ export * from './account-management/AccountManagement';
 export * from './invoice-design/InvoiceDesign';
 export * from './invoice-design/customize/Customize';
 export * from './custom-fields/CustomFields';
+
+export * from './custom-fields/company/Company';
