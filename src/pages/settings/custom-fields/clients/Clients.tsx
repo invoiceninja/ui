@@ -16,7 +16,6 @@ import { Field } from '../components';
 
 export function Clients() {
   const [t] = useTranslation();
-  const title = `${t('custom_fields')}: ${t('clients')}`;
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('custom_fields')}`;
@@ -24,9 +23,15 @@ export function Clients() {
 
   return (
     <Settings title={t('custom_fields')}>
-      <Card title={title}>
+      <Card title={`${t('custom_fields')}: ${t('clients')}`}>
         {['client1', 'client2', 'client3', 'client4'].map((field) => (
           <Field field={field} placeholder={t('client_field')} />
+        ))}
+      </Card>
+
+      <Card title={`${t('custom_fields')}: ${t('contacts')}`}>
+        {['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (
+          <Field field={field} placeholder={t('contact_field')} />
         ))}
       </Card>
     </Settings>
