@@ -48,6 +48,7 @@ import {
   Invoices as InvoicesCustomFields,
   Payments as PaymentsCustomFields,
   Projects as ProjectsCustomFields,
+  Tasks as TasksCustomFields,
 } from '../pages/settings';
 
 export const routes = (
@@ -97,6 +98,7 @@ export const routes = (
           <Route path="invoices" element={<InvoicesCustomFields />} />
           <Route path="payments" element={<PaymentsCustomFields />} />
           <Route path="projects" element={<ProjectsCustomFields />} />
+          <Route path="tasks" element={<TasksCustomFields />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
