@@ -43,6 +43,7 @@ import {
   Customize as CustomizeInvoiceDesign,
   CustomFields,
   Company as CompanyCustomFields,
+  Clients as ClientsCustomFields,
 } from '../pages/settings';
 
 export const routes = (
@@ -87,6 +88,7 @@ export const routes = (
         <Route path="custom_fields">
           <Route path="" element={<CustomFields />} />
           <Route path="company" element={<CompanyCustomFields />} />
+          <Route path="clients" element={<ClientsCustomFields />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />

@@ -14,9 +14,9 @@ import { Card } from '../../../../components/cards';
 import { Settings } from '../../../../components/layouts/Settings';
 import { Field } from '../components';
 
-export function Company() {
+export function Clients() {
   const [t] = useTranslation();
-  const title = `${t('custom_fields')}: ${t('company')}`;
+  const title = `${t('custom_fields')}: ${t('clients')}`;
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('custom_fields')}`;
@@ -25,8 +25,8 @@ export function Company() {
   return (
     <Settings title={t('custom_fields')}>
       <Card title={title}>
-        {['company1', 'company2', 'company3', 'company4'].map((field) => (
-          <Field field={field} placeholder={t('company_field')} />
+        {['client1', 'client2', 'client3', 'client4'].map((field) => (
+          <Field field={field} placeholder={t('client_field')} />
         ))}
       </Card>
     </Settings>
