@@ -1,2 +1,2 @@
-export * from './ClientDetails';
 export * from './GeneralSettings';
+export * from './Sortable';

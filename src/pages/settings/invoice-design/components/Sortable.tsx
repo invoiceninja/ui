@@ -12,7 +12,11 @@ import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import Select from 'react-select';
 
-export function ClientDetails() {
+interface Props {
+  cardTitle: string;
+}
+
+export function Sortable(props: Props) {
   const [t] = useTranslation();
 
   const options = [
@@ -21,12 +25,8 @@ export function ClientDetails() {
     { value: 'vat_number', label: t('vat_number') },
   ];
 
-  const state = {
-    items: ['Item 1', 'Item 2', 'Item 3', 'Item 4', 'Item 5', 'Item 6'],
-  };
-
   return (
-    <Card title={t('client_details')}>
+    <Card title={props.cardTitle}>
       <Element leftSide={t('fields')}>
         <Select isMulti name="colors" options={options} />
       </Element>
