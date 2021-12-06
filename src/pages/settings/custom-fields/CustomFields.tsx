@@ -10,8 +10,9 @@
 
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Card } from '../../../components/cards';
 import { Settings } from '../../../components/layouts/Settings';
-import { Clients, Company } from './components';
+import { Field } from './components';
 
 export function CustomFields() {
   const [t] = useTranslation();
@@ -22,8 +23,13 @@ export function CustomFields() {
 
   return (
     <Settings title={t('custom_fields')}>
-      <Company />
-      <Clients />
+      <Card title={t('company')}>
+        {['company1', 'company2', 'company3', 'company4'].map((field) => {
+          return (
+            <Field key={field} id={field} placeholder={t('company_field')} />
+          );
+        })}
+      </Card>
     </Settings>
   );
 }
