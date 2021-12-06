@@ -11,7 +11,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
-import { Company } from './components';
+import { Clients, Company } from './components';
 
 export function CustomFields() {
   const [t] = useTranslation();
@@ -23,6 +23,7 @@ export function CustomFields() {
   return (
     <Settings title={t('custom_fields')}>
       <Company />
+      <Clients />
     </Settings>
   );
 }
