@@ -24,3 +24,4 @@ export * from './invoice-design/customize/Customize';
 export * from './custom-fields/CustomFields';
 export * from './custom-fields/company/Company';
 export * from './custom-fields/clients/Clients';
+export * from './custom-fields/products/Products';

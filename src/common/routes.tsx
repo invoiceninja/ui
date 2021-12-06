@@ -44,6 +44,7 @@ import {
   CustomFields,
   Company as CompanyCustomFields,
   Clients as ClientsCustomFields,
+  Products as ProductsCustomFields,
 } from '../pages/settings';
 
 export const routes = (
@@ -89,6 +90,7 @@ export const routes = (
           <Route path="" element={<CustomFields />} />
           <Route path="company" element={<CompanyCustomFields />} />
           <Route path="clients" element={<ClientsCustomFields />} />
+          <Route path="products" element={<ProductsCustomFields />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
