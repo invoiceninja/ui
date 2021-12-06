@@ -11,7 +11,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
-import { GeneralSettings } from './components/GeneralSettings';
+import { ClientDetails, GeneralSettings } from './components';
 
 export function InvoiceDesign() {
   const [t] = useTranslation();
@@ -25,6 +25,7 @@ export function InvoiceDesign() {
   return (
     <Settings title={t('invoice_design')}>
       <GeneralSettings />
+      <ClientDetails />
     </Settings>
   );
 }
