@@ -78,49 +78,9 @@ export function Settings(props: { title: string; children: ReactNode }) {
 
   const advanced = [
     {
-      name: t('invoice_settings'),
-      href: '/settings/invoice_settings',
-      current: location.pathname === '/settings/invoice_settings',
-    },
-    {
       name: t('invoice_design'),
       href: '/settings/invoice_design',
       current: location.pathname === '/settings/invoice_design',
-    },
-    {
-      name: t('client_portal'),
-      href: '/settings/client_portal',
-      current: location.pathname === '/settings/client_portal',
-    },
-    {
-      name: t('email_settings'),
-      href: '/settings/email_settings',
-      current: location.pathname === '/settings/email_settings',
-    },
-    {
-      name: t('templates_and_reminders'),
-      href: '/settings/templates_and_reminders',
-      current: location.pathname === '/settings/templates_and_reminders',
-    },
-    {
-      name: t('credit_cards_and_banks'),
-      href: '/settings/credit_cards_and_banks',
-      current: location.pathname === '/settings/credit_cards_and_banks',
-    },
-    {
-      name: t('data_visualizations'),
-      href: '/settings/data_visualizations',
-      current: location.pathname === '/settings/data_visualizations',
-    },
-    {
-      name: t('api_tokens'),
-      href: '/settings/api_tokens',
-      current: location.pathname === '/settings/api_tokens',
-    },
-    {
-      name: t('user_management'),
-      href: '/settings/user_management',
-      current: location.pathname === '/settings/user_management',
     },
   ];
 
@@ -192,9 +152,9 @@ export function Settings(props: { title: string; children: ReactNode }) {
 
           <nav className="space-y-1  hidden lg:block" aria-label="Sidebar">
             {advanced.map((item) => (
-              <a
+              <Link
                 key={item.name}
-                href={item.href}
+                to={item.href}
                 className={classNames(
                   item.current
                     ? 'bg-gray-200 text-gray-900'
@@ -204,7 +164,7 @@ export function Settings(props: { title: string; children: ReactNode }) {
                 aria-current={item.current ? 'page' : undefined}
               >
                 <span className="truncate">{item.name}</span>
-              </a>
+              </Link>
             ))}
           </nav>
         </div>
