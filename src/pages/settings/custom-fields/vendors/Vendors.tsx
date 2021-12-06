@@ -26,7 +26,7 @@ export function Vendors() {
     <Settings title={t('custom_fields')}>
       <Card title={title}>
         {['vendor1', 'vendor2', 'vendor3', 'vendor4'].map((field) => (
-          <Field field={field} placeholder={t('vendor_field')} />
+          <Field key={field} field={field} placeholder={t('vendor_field')} />
         ))}
       </Card>
     </Settings>

@@ -26,7 +26,7 @@ export function Tasks() {
     <Settings title={t('custom_fields')}>
       <Card title={title}>
         {['tasks1', 'tasks2', 'tasks3', 'tasks4'].map((field) => (
-          <Field field={field} placeholder={t('tasks_field')} />
+          <Field key={field} field={field} placeholder={t('tasks_field')} />
         ))}
       </Card>
     </Settings>

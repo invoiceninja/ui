@@ -26,7 +26,7 @@ export function Products() {
     <Settings title={t('custom_fields')}>
       <Card title={title}>
         {['product1', 'product2', 'product3', 'product4'].map((field) => (
-          <Field field={field} placeholder={t('product_field')} />
+          <Field key={field} field={field} placeholder={t('product_field')} />
         ))}
       </Card>
     </Settings>

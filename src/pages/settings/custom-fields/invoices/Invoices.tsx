@@ -27,7 +27,7 @@ export function Invoices() {
     <Settings title={t('custom_fields')}>
       <Card title={`${t('custom_fields')}: ${t('invoices')}`}>
         {['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
-          <Field field={field} placeholder={t('invoice_field')} />
+          <Field key={field} field={field} placeholder={t('invoice_field')} />
         ))}
       </Card>
 

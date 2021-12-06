@@ -26,7 +26,7 @@ export function Payments() {
     <Settings title={t('custom_fields')}>
       <Card title={title}>
         {['payment1', 'payment2', 'payment3', 'payment4'].map((field) => (
-          <Field field={field} placeholder={t('payment_field')} />
+          <Field key={field} field={field} placeholder={t('payment_field')} />
         ))}
       </Card>
     </Settings>

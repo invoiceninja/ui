@@ -26,7 +26,7 @@ export function Expenses() {
     <Settings title={t('custom_fields')}>
       <Card title={title}>
         {['expense1', 'expense2', 'expense3', 'expense4'].map((field) => (
-          <Field field={field} placeholder={t('expense_field')} />
+          <Field key={field} field={field} placeholder={t('expense_field')} />
         ))}
       </Card>
     </Settings>
