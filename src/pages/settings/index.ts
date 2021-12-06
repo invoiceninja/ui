@@ -31,3 +31,4 @@ export * from './custom-fields/projects/Projects';
 export * from './custom-fields/tasks/Tasks';
 export * from './custom-fields/vendors/Vendors';
 export * from './custom-fields/expenses/Expenses';
+export * from './custom-fields/users/Users';
