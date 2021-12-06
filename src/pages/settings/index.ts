@@ -29,3 +29,4 @@ export * from './custom-fields/invoices/Invoices';
 export * from './custom-fields/payments/Payments';
 export * from './custom-fields/projects/Projects';
 export * from './custom-fields/tasks/Tasks';
+export * from './custom-fields/vendors/Vendors';
