@@ -10,6 +10,8 @@
 
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Settings } from '../../../components/layouts/Settings';
+import { Company } from './components';
 
 export function CustomFields() {
   const [t] = useTranslation();
@@ -18,5 +20,9 @@ export function CustomFields() {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('custom_fields')}`;
   });
 
-  return <></>;
+  return (
+    <Settings title={t('custom_fields')}>
+      <Company />
+    </Settings>
+  );
 }
