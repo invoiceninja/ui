@@ -32,6 +32,7 @@ import {
   CompanyDetails,
   ExpenseSettings,
   ImportExport,
+  InvoiceDesign,
   Localization,
   OnlinePayments,
   ProductSettings,
@@ -39,8 +40,8 @@ import {
   TaxSettings,
   UserDetails,
   WorkflowSettings,
+  Customize as CustomizeInvoiceDesign
 } from '../pages/settings';
-import { InvoiceDesign } from '../pages/settings/invoice-design/InvoiceDesign';
 
 export const routes = (
   <Routes>
@@ -77,6 +78,7 @@ export const routes = (
         <Route path="import_export" element={<ImportExport />} />
         <Route path="account_management" element={<AccountManagement />} />
         <Route path="invoice_design" element={<InvoiceDesign />} />
+        <Route path="invoice_design/customize" element={<CustomizeInvoiceDesign />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>

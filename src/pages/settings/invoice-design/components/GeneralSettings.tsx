@@ -18,7 +18,9 @@ export function GeneralSettings() {
 
   return (
     <Card title={t('general_settings')}>
-      <ClickableElement>{t('customize_and_preview')}</ClickableElement>
+      <ClickableElement to="/settings/invoice_design/customize">
+        {t('customize_and_preview')}
+      </ClickableElement>
 
       <div className="pt-4 border-b"></div>
 

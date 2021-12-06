@@ -19,3 +19,5 @@ export * from './expense-settings/ExpenseSettings';
 export * from './workflow-settings/WorkflowSettings';
 export * from './import-export/ImportExport';
 export * from './account-management/AccountManagement';
+export * from './invoice-design/InvoiceDesign';
+export * from './invoice-design/customize/Customize';
