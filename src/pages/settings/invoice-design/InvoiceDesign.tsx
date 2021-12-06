@@ -8,11 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
+import { GeneralSettings } from './components/GeneralSettings';
 
 export function InvoiceDesign() {
   const [t] = useTranslation();
 
-  return <Settings title={t('invoice_design')}>{/*  */}</Settings>;
+  useEffect(() => {
+    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
+      'invoice_design'
+    )}`;
+  });
+
+  return (
+    <Settings title={t('invoice_design')}>
+      <GeneralSettings />
+    </Settings>
+  );
 }

@@ -169,7 +169,7 @@ export function Settings(props: { title: string; children: ReactNode }) {
           </nav>
         </div>
 
-        <div className="col-span-12 md:col-span-8 lg:col-start-4">
+        <div className="col-span-12 md:col-span-8 lg:col-start-4 space-y-6">
           {props.children}
         </div>
       </div>
