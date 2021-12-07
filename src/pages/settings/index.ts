@@ -35,4 +35,4 @@ export { Expenses as ExpensesCustomFields } from './custom-fields/expenses/Expen
 export { Users as UsersCustomFields } from './custom-fields/users/Users';
 
 export * from './generated-numbers/GeneratedNumbers';
-export { Clients as ClientGeneratedNumbers } from './generated-numbers/clients/Clients';
+export { Clients as ClientsGeneratedNumbers } from './generated-numbers/clients/Clients';

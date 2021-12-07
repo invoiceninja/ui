@@ -43,7 +43,6 @@ import {
   Customize as CustomizeInvoiceDesign,
   CustomFields,
   GeneratedNumbers,
-  ClientGeneratedNumbers,
   CompanyCustomFields,
   ClientsCustomFields,
   ProductsCustomFields,
@@ -54,6 +53,7 @@ import {
   VendorsCustomFields,
   ExpensesCustomFields,
   UsersCustomFields,
+  ClientsGeneratedNumbers,
 } from '../pages/settings';
 
 export const routes = (
@@ -110,7 +110,7 @@ export const routes = (
         </Route>
         <Route path="generated_numbers">
           <Route path="" element={<GeneratedNumbers />} />
-          <Route path="clients" element={<ClientGeneratedNumbers />} />
+          <Route path="clients" element={<ClientsGeneratedNumbers />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />

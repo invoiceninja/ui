@@ -36,7 +36,11 @@ export function ClickableElement(props: Props) {
   }
 
   return (
-    <button onChange={props.onChange} className={classes}>
+    <button
+      onClick={props.onClick}
+      onChange={props.onChange}
+      className={classes}
+    >
       {props.children}
     </button>
   );

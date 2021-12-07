@@ -12,7 +12,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement } from '../../../components/cards';
 import { Settings } from '../../../components/layouts/Settings';
-import { Settings as SettingsComponent } from './components';
+import { Settings as SettingsComponent } from './components/Settings';
 
 export function GeneratedNumbers() {
   const [t] = useTranslation();
