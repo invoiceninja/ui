@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import {
   Authorization,
+  Messages,
   Registration,
   Settings as SettingsComponent,
 } from './components';
@@ -29,6 +30,7 @@ export function ClientPortal() {
       <SettingsComponent />
       <Registration />
       <Authorization />
+      <Messages />
     </Settings>
   );
 }
