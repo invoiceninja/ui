@@ -68,6 +68,7 @@ import {
   ClientPortal,
   TemplatesAndReminders,
   GroupSettings,
+  Subscriptions,
 } from '../pages/settings';
 
 export const routes = (
@@ -148,9 +149,8 @@ export const routes = (
           path="templates_and_reminders"
           element={<TemplatesAndReminders />}
         />
-        <Route path="group_settings">
-          <Route path="" element={<GroupSettings />} />
-        </Route>
+        <Route path="group_settings" element={<GroupSettings />} />
+        <Route path="subscriptions" element={<Subscriptions />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>

@@ -225,6 +225,11 @@ export function Settings(props: { title: string; children: ReactNode }) {
       href: '/settings/group_settings',
       current: location.pathname === '/settings/group_settings',
     },
+    {
+      name: t('subscriptions'),
+      href: '/settings/subscriptions',
+      current: location.pathname === '/settings/subscriptions',
+    },
   ];
 
   return (

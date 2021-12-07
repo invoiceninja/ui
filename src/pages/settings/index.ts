@@ -51,3 +51,4 @@ export * from './email-settings/EmailSettings';
 export * from './client-portal/ClientPortal';
 export * from './templates-and-reminders/TemplatesAndReminders';
 export * from './group-settings/GroupSettings';
+export * from './subscriptions/Subscriptions';
