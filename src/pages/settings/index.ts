@@ -44,3 +44,4 @@ export { Credits as CreditsGeneratedNumbers } from './generated-numbers/credits/
 export { Projects as ProjectsGeneratedNumbers } from './generated-numbers/projects/Projects';
 export { Tasks as TasksGeneratedNumbers } from './generated-numbers/tasks/Tasks';
 export { Vendors as VendorsGeneratedNumbers } from './generated-numbers/vendors/Vendors';
+export { Expenses as ExpensesGeneratedNumbers } from './generated-numbers/expenses/Expenses';

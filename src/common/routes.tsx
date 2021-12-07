@@ -62,6 +62,7 @@ import {
   ProjectsGeneratedNumbers,
   TasksGeneratedNumbers,
   VendorsGeneratedNumbers,
+  ExpensesGeneratedNumbers,
 } from '../pages/settings';
 
 export const routes = (
@@ -130,6 +131,7 @@ export const routes = (
           <Route path="projects" element={<ProjectsGeneratedNumbers />} />
           <Route path="tasks" element={<TasksGeneratedNumbers />} />
           <Route path="vendors" element={<VendorsGeneratedNumbers />} />
+          <Route path="expenses" element={<ExpensesGeneratedNumbers />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
