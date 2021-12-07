@@ -41,13 +41,11 @@ export function Notifications() {
 
       <div className="pt-6 border-b"></div>
 
-      {options.map((notification) => {
-        return (
-          <Element className="mt-4" leftSide={notification.label}>
-            <Toggle />
-          </Element>
-        );
-      })}
+      {options.map((notification, index) => (
+        <Element key={index} className="mt-4" leftSide={notification.label}>
+          <Toggle />
+        </Element>
+      ))}
     </Card>
   );
 }

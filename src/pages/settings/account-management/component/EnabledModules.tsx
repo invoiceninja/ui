@@ -33,13 +33,11 @@ export function EnabledModules() {
 
   return (
     <Card title={t('enabled_modules')}>
-      {modules.map((module) => {
-        return (
-          <Element leftSide={module.label}>
-            <Toggle key={module.label} />
-          </Element>
-        );
-      })}
+      {modules.map((module, index) => (
+        <Element key={index} leftSide={module.label}>
+          <Toggle key={module.label} />
+        </Element>
+      ))}
     </Card>
   );
 }
