@@ -70,6 +70,7 @@ import {
   GroupSettings,
   Subscriptions,
 } from '../pages/settings';
+import { UserManagement } from '../pages/settings/user-management/UserManagement';
 
 export const routes = (
   <Routes>
@@ -151,6 +152,7 @@ export const routes = (
         />
         <Route path="group_settings" element={<GroupSettings />} />
         <Route path="subscriptions" element={<Subscriptions />} />
+        <Route path="user_management" element={<UserManagement />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>

@@ -230,6 +230,11 @@ export function Settings(props: { title: string; children: ReactNode }) {
       href: '/settings/subscriptions',
       current: location.pathname === '/settings/subscriptions',
     },
+    {
+      name: t('user_management'),
+      href: '/settings/user_management',
+      current: location.pathname === '/settings/user_management',
+    },
   ];
 
   return (
