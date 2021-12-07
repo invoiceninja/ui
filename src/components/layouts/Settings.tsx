@@ -215,6 +215,11 @@ export function Settings(props: { title: string; children: ReactNode }) {
       href: '/settings/client_portal',
       current: location.pathname === '/settings/client_portal',
     },
+    {
+      name: t('templates_and_reminders'),
+      href: '/settings/templates_and_reminders',
+      current: location.pathname === '/settings/templates_and_reminders',
+    },
   ];
 
   return (

@@ -65,8 +65,9 @@ import {
   ExpensesGeneratedNumbers,
   RecurringExpensesGeneratedNumbers,
   EmailSettings,
+  ClientPortal,
+  TemplatesAndReminders,
 } from '../pages/settings';
-import { ClientPortal } from '../pages/settings/client-portal/ClientPortal';
 
 export const routes = (
   <Routes>
@@ -135,10 +136,17 @@ export const routes = (
           <Route path="tasks" element={<TasksGeneratedNumbers />} />
           <Route path="vendors" element={<VendorsGeneratedNumbers />} />
           <Route path="expenses" element={<ExpensesGeneratedNumbers />} />
-          <Route path="recurring_expenses" element={<RecurringExpensesGeneratedNumbers />} />
+          <Route
+            path="recurring_expenses"
+            element={<RecurringExpensesGeneratedNumbers />}
+          />
         </Route>
         <Route path="email_settings" element={<EmailSettings />} />
         <Route path="client_portal" element={<ClientPortal />} />
+        <Route
+          path="templates_and_reminders"
+          element={<TemplatesAndReminders />}
+        />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>

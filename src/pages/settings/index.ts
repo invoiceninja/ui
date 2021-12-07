@@ -48,3 +48,5 @@ export { Expenses as ExpensesGeneratedNumbers } from './generated-numbers/expens
 export { RecurringExpenses as RecurringExpensesGeneratedNumbers } from './generated-numbers/recurring-expenses/RecurringExpenses';
 
 export * from './email-settings/EmailSettings';
+export * from './client-portal/ClientPortal';
+export * from './templates-and-reminders/TemplatesAndReminders';
