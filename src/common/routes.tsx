@@ -147,6 +147,9 @@ export const routes = (
           path="templates_and_reminders"
           element={<TemplatesAndReminders />}
         />
+        <Route path="group_settings">
+          <Route path="" element={<GroupSettings />} />
+        </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>

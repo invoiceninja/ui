@@ -220,6 +220,11 @@ export function Settings(props: { title: string; children: ReactNode }) {
       href: '/settings/templates_and_reminders',
       current: location.pathname === '/settings/templates_and_reminders',
     },
+    {
+      name: t('group_settings'),
+      href: '/settings/group_settings',
+      current: location.pathname === '/settings/group_settings',
+    },
   ];
 
   return (
