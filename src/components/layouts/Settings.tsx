@@ -139,6 +139,11 @@ export function Settings(props: { title: string; children: ReactNode }) {
         },
       ],
     },
+    {
+      name: t('generated_numbers'),
+      href: '/settings/generated_numbers',
+      current: location.pathname.startsWith('/settings/generated_numbers'),
+    },
   ];
 
   return (
