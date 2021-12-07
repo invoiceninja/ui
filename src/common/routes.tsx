@@ -67,6 +67,7 @@ import {
   EmailSettings,
   ClientPortal,
   TemplatesAndReminders,
+  GroupSettings,
 } from '../pages/settings';
 
 export const routes = (
