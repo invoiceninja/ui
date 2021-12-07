@@ -56,6 +56,7 @@ import {
   ClientsGeneratedNumbers,
   InvoicesGeneratedNumbers,
   RecurringInvoicesGeneratedNumbers,
+  PaymentsGeneratedNumbers,
 } from '../pages/settings';
 
 export const routes = (
@@ -118,6 +119,7 @@ export const routes = (
             path="recurring_invoices"
             element={<RecurringInvoicesGeneratedNumbers />}
           />
+          <Route path="payments" element={<PaymentsGeneratedNumbers />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
