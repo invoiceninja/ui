@@ -21,15 +21,18 @@ export * from './import-export/ImportExport';
 export * from './account-management/AccountManagement';
 export * from './invoice-design/InvoiceDesign';
 export * from './invoice-design/customize/Customize';
+
 export * from './custom-fields/CustomFields';
-export * from './custom-fields/company/Company';
-export * from './custom-fields/clients/Clients';
-export * from './custom-fields/products/Products';
-export * from './custom-fields/invoices/Invoices';
-export * from './custom-fields/payments/Payments';
-export * from './custom-fields/projects/Projects';
-export * from './custom-fields/tasks/Tasks';
-export * from './custom-fields/vendors/Vendors';
-export * from './custom-fields/expenses/Expenses';
-export * from './custom-fields/users/Users';
+export { Company as CompanyCustomFields } from './custom-fields/company/Company';
+export { Clients as ClientsCustomFields } from './custom-fields/clients/Clients';
+export { Products as ProductsCustomFields } from './custom-fields/products/Products';
+export { Invoices as InvoicesCustomFields } from './custom-fields/invoices/Invoices';
+export { Payments as PaymentsCustomFields } from './custom-fields/payments/Payments';
+export { Projects as ProjectsCustomFields } from './custom-fields/projects/Projects';
+export { Tasks as TasksCustomFields } from './custom-fields/tasks/Tasks';
+export { Vendors as VendorsCustomFields } from './custom-fields/vendors/Vendors';
+export { Expenses as ExpensesCustomFields } from './custom-fields/expenses/Expenses';
+export { Users as UsersCustomFields } from './custom-fields/users/Users';
+
 export * from './generated-numbers/GeneratedNumbers';
+export { Clients as ClientGeneratedNumbers } from './generated-numbers/clients/Clients';

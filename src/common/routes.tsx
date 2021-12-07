@@ -42,17 +42,18 @@ import {
   WorkflowSettings,
   Customize as CustomizeInvoiceDesign,
   CustomFields,
-  Company as CompanyCustomFields,
-  Clients as ClientsCustomFields,
-  Products as ProductsCustomFields,
-  Invoices as InvoicesCustomFields,
-  Payments as PaymentsCustomFields,
-  Projects as ProjectsCustomFields,
-  Tasks as TasksCustomFields,
-  Vendors as VendorsCustomFields,
-  Expenses as ExpensesCustomFields,
-  Users as UsersCustomFields,
   GeneratedNumbers,
+  ClientGeneratedNumbers,
+  CompanyCustomFields,
+  ClientsCustomFields,
+  ProductsCustomFields,
+  InvoicesCustomFields,
+  PaymentsCustomFields,
+  ProjectsCustomFields,
+  TasksCustomFields,
+  VendorsCustomFields,
+  ExpensesCustomFields,
+  UsersCustomFields,
 } from '../pages/settings';
 
 export const routes = (
@@ -109,6 +110,7 @@ export const routes = (
         </Route>
         <Route path="generated_numbers">
           <Route path="" element={<GeneratedNumbers />} />
+          <Route path="clients" element={<ClientGeneratedNumbers />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
