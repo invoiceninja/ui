@@ -210,6 +210,11 @@ export function Settings(props: { title: string; children: ReactNode }) {
       href: '/settings/email_settings',
       current: location.pathname === '/settings/email_settings',
     },
+    {
+      name: t('client_portal'),
+      href: '/settings/client_portal',
+      current: location.pathname === '/settings/client_portal',
+    },
   ];
 
   return (

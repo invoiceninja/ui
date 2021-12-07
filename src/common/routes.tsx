@@ -66,6 +66,7 @@ import {
   RecurringExpensesGeneratedNumbers,
   EmailSettings,
 } from '../pages/settings';
+import { ClientPortal } from '../pages/settings/client-portal/ClientPortal';
 
 export const routes = (
   <Routes>
@@ -137,6 +138,7 @@ export const routes = (
           <Route path="recurring_expenses" element={<RecurringExpensesGeneratedNumbers />} />
         </Route>
         <Route path="email_settings" element={<EmailSettings />} />
+        <Route path="client_portal" element={<ClientPortal />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>
