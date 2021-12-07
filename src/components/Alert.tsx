@@ -14,7 +14,7 @@ import CommonProps from '../common/interfaces/common-props.interface';
 import { X } from 'react-feather';
 
 interface Props extends CommonProps {
-  type?: 'success' | 'warning' | 'danger';
+  type?: string | 'success' | 'warning' | 'danger';
 }
 
 export function Alert(props: Props) {

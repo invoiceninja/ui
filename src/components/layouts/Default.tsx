@@ -138,7 +138,6 @@ export function Default(props: Props) {
                               : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-200',
                             'mr-4 flex-shrink-0 h-6 w-6'
                           )}
-                          aria-hidden="location === '/dashboard'"
                         />
                         {item.name}
                       </Link>
