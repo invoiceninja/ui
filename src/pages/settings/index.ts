@@ -46,3 +46,5 @@ export { Tasks as TasksGeneratedNumbers } from './generated-numbers/tasks/Tasks'
 export { Vendors as VendorsGeneratedNumbers } from './generated-numbers/vendors/Vendors';
 export { Expenses as ExpensesGeneratedNumbers } from './generated-numbers/expenses/Expenses';
 export { RecurringExpenses as RecurringExpensesGeneratedNumbers } from './generated-numbers/recurring-expenses/RecurringExpenses';
+
+export * from './email-settings/EmailSettings';

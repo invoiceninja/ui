@@ -64,6 +64,7 @@ import {
   VendorsGeneratedNumbers,
   ExpensesGeneratedNumbers,
   RecurringExpensesGeneratedNumbers,
+  EmailSettings,
 } from '../pages/settings';
 
 export const routes = (
@@ -135,6 +136,7 @@ export const routes = (
           <Route path="expenses" element={<ExpensesGeneratedNumbers />} />
           <Route path="recurring_expenses" element={<RecurringExpensesGeneratedNumbers />} />
         </Route>
+        <Route path="email_settings" element={<EmailSettings />} />
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>
