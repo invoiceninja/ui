@@ -85,7 +85,59 @@ export function Settings(props: { title: string; children: ReactNode }) {
     {
       name: t('custom_fields'),
       href: '/settings/custom_fields',
-      current: location.pathname === '/settings/custom_fields',
+      current: location.pathname.startsWith('/settings/custom_fields'),
+      children: [
+        {
+          name: t('company'),
+          href: '/settings/custom_fields/company',
+          current: location.pathname === '/settings/custom_fields/company',
+        },
+        {
+          name: t('clients'),
+          href: '/settings/custom_fields/clients',
+          current: location.pathname === '/settings/custom_fields/clients',
+        },
+        {
+          name: t('products'),
+          href: '/settings/custom_fields/products',
+          current: location.pathname === '/settings/custom_fields/products',
+        },
+        {
+          name: t('invoices'),
+          href: '/settings/custom_fields/invoices',
+          current: location.pathname === '/settings/custom_fields/invoices',
+        },
+        {
+          name: t('payments'),
+          href: '/settings/custom_fields/payments',
+          current: location.pathname === '/settings/custom_fields/payments',
+        },
+        {
+          name: t('projects'),
+          href: '/settings/custom_fields/projects',
+          current: location.pathname === '/settings/custom_fields/projects',
+        },
+        {
+          name: t('tasks'),
+          href: '/settings/custom_fields/tasks',
+          current: location.pathname === '/settings/custom_fields/tasks',
+        },
+        {
+          name: t('vendors'),
+          href: '/settings/custom_fields/vendors',
+          current: location.pathname === '/settings/custom_fields/vendors',
+        },
+        {
+          name: t('expenses'),
+          href: '/settings/custom_fields/expenses',
+          current: location.pathname === '/settings/custom_fields/expenses',
+        },
+        {
+          name: t('users'),
+          href: '/settings/custom_fields/users',
+          current: location.pathname === '/settings/custom_fields/users',
+        },
+      ],
     },
   ];
 
@@ -155,21 +207,40 @@ export function Settings(props: { title: string; children: ReactNode }) {
             ))}
           </SelectField>
 
-          <nav className="space-y-1  hidden lg:block" aria-label="Sidebar">
-            {advanced.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={classNames(
-                  item.current
-                    ? 'bg-gray-200 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                  'flex items-center px-3 py-2 text-sm font-medium rounded'
+          <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
+            {advanced.map((item, index) => (
+              <div key={index}>
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={classNames(
+                    item.current
+                      ? 'bg-gray-200 text-gray-900'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                    'flex items-center px-3 py-2 text-sm font-medium rounded'
+                  )}
+                  aria-current={item.current ? 'page' : undefined}
+                >
+                  <span className="truncate">{item.name}</span>
+                </Link>
+
+                {item.children && item.current && (
+                  <div className="bg-gray-100 space-y-4 py-3 rounded-b">
+                    {item.children.map((item, index) => (
+                      <Link
+                        key={index}
+                        to={item.href}
+                        className={classNames(
+                          item.current ? 'text-gray-900 font-semibold' : '',
+                          'px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
+                        )}
+                      >
+                        {item.name}
+                      </Link>
+                    ))}
+                  </div>
                 )}
-                aria-current={item.current ? 'page' : undefined}
-              >
-                <span className="truncate">{item.name}</span>
-              </Link>
+              </div>
             ))}
           </nav>
         </div>

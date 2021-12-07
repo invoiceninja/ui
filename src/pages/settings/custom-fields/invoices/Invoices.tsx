@@ -32,8 +32,9 @@ export function Invoices() {
       </Card>
 
       <Card>
-        {['surchage1', 'surchage2', 'surchage3', 'surchage4'].map((field) => (
+        {['surchage1', 'surchage2', 'surchage3', 'surchage4'].map((field, index) => (
           <Element
+            key={index}
             leftSide={
               <InputField id={field} placeholder={t('surcharge_field')} />
             }
