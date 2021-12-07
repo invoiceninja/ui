@@ -42,3 +42,4 @@ export { Payments as PaymentsGeneratedNumbers } from './generated-numbers/paymen
 export { Quotes as QuotesGeneratedNumbers } from './generated-numbers/quotes/Quotes';
 export { Credits as CreditsGeneratedNumbers } from './generated-numbers/credits/Credits';
 export { Projects as ProjectsGeneratedNumbers } from './generated-numbers/projects/Projects';
+export { Tasks as TasksGeneratedNumbers } from './generated-numbers/tasks/Tasks';

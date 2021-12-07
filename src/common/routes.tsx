@@ -60,6 +60,7 @@ import {
   QuotesGeneratedNumbers,
   CreditsGeneratedNumbers,
   ProjectsGeneratedNumbers,
+  TasksGeneratedNumbers,
 } from '../pages/settings';
 
 export const routes = (
@@ -126,6 +127,7 @@ export const routes = (
           <Route path="quotes" element={<QuotesGeneratedNumbers />} />
           <Route path="credits" element={<CreditsGeneratedNumbers />} />
           <Route path="projects" element={<ProjectsGeneratedNumbers />} />
+          <Route path="tasks" element={<TasksGeneratedNumbers />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
