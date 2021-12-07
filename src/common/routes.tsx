@@ -61,6 +61,7 @@ import {
   CreditsGeneratedNumbers,
   ProjectsGeneratedNumbers,
   TasksGeneratedNumbers,
+  VendorsGeneratedNumbers,
 } from '../pages/settings';
 
 export const routes = (
@@ -128,6 +129,7 @@ export const routes = (
           <Route path="credits" element={<CreditsGeneratedNumbers />} />
           <Route path="projects" element={<ProjectsGeneratedNumbers />} />
           <Route path="tasks" element={<TasksGeneratedNumbers />} />
+          <Route path="vendors" element={<VendorsGeneratedNumbers />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
