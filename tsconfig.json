@@ -15,7 +15,12 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "baseUrl": "src",
+    "paths": {
+      "@invoiceninja/forms": ["components/forms"],
+      "@invoiceninja/cards": ["components/cards"],
+    }
   },
   "include": ["src"]
 }
