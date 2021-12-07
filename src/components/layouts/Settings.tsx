@@ -143,6 +143,67 @@ export function Settings(props: { title: string; children: ReactNode }) {
       name: t('generated_numbers'),
       href: '/settings/generated_numbers',
       current: location.pathname.startsWith('/settings/generated_numbers'),
+      children: [
+        {
+          name: t('clients'),
+          href: '/settings/generated_numbers/clients',
+          current: location.pathname === '/settings/generated_numbers/clients',
+        },
+        {
+          name: t('invoices'),
+          href: '/settings/generated_numbers/invoices',
+          current: location.pathname === '/settings/generated_numbers/invoices',
+        },
+        {
+          name: t('recurring_invoices'),
+          href: '/settings/generated_numbers/recurring_invoices',
+          current:
+            location.pathname ===
+            '/settings/generated_numbers/recurring_invoices',
+        },
+        {
+          name: t('payments'),
+          href: '/settings/generated_numbers/payments',
+          current: location.pathname === '/settings/generated_numbers/payments',
+        },
+        {
+          name: t('quotes'),
+          href: '/settings/generated_numbers/quotes',
+          current: location.pathname === '/settings/generated_numbers/quotes',
+        },
+        {
+          name: t('credits'),
+          href: '/settings/generated_numbers/credits',
+          current: location.pathname === '/settings/generated_numbers/credits',
+        },
+        {
+          name: t('projects'),
+          href: '/settings/generated_numbers/projects',
+          current: location.pathname === '/settings/generated_numbers/projects',
+        },
+        {
+          name: t('tasks'),
+          href: '/settings/generated_numbers/tasks',
+          current: location.pathname === '/settings/generated_numbers/tasks',
+        },
+        {
+          name: t('vendors'),
+          href: '/settings/generated_numbers/vendors',
+          current: location.pathname === '/settings/generated_numbers/vendors',
+        },
+        {
+          name: t('expenses'),
+          href: '/settings/generated_numbers/expenses',
+          current: location.pathname === '/settings/generated_numbers/expenses',
+        },
+        {
+          name: t('recurring_expenses'),
+          href: '/settings/generated_numbers/recurring_expenses',
+          current:
+            location.pathname ===
+            '/settings/generated_numbers/recurring_expenses',
+        },
+      ],
     },
   ];
 
