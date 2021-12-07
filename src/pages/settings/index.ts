@@ -40,3 +40,4 @@ export { Invoices as InvoicesGeneratedNumbers } from './generated-numbers/invoic
 export { RecurringInvoices as RecurringInvoicesGeneratedNumbers } from './generated-numbers/recurring-invoices/RecurringInvoices';
 export { Payments as PaymentsGeneratedNumbers } from './generated-numbers/payments/Payments';
 export { Quotes as QuotesGeneratedNumbers } from './generated-numbers/quotes/Quotes';
+export { Credits as CreditsGeneratedNumbers } from './generated-numbers/credits/Credits';
