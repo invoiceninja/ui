@@ -39,3 +39,4 @@ export { Clients as ClientsGeneratedNumbers } from './generated-numbers/clients/
 export { Invoices as InvoicesGeneratedNumbers } from './generated-numbers/invoices/Invoices';
 export { RecurringInvoices as RecurringInvoicesGeneratedNumbers } from './generated-numbers/recurring-invoices/RecurringInvoices';
 export { Payments as PaymentsGeneratedNumbers } from './generated-numbers/payments/Payments';
+export { Quotes as QuotesGeneratedNumbers } from './generated-numbers/quotes/Quotes';
