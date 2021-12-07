@@ -11,7 +11,11 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
-import { Registration, Settings as SettingsComponent } from './components';
+import {
+  Authorization,
+  Registration,
+  Settings as SettingsComponent,
+} from './components';
 
 export function ClientPortal() {
   const [t] = useTranslation();
@@ -24,6 +28,7 @@ export function ClientPortal() {
     <Settings title={t('client_portal')}>
       <SettingsComponent />
       <Registration />
+      <Authorization />
     </Settings>
   );
 }
