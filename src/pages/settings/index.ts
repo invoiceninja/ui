@@ -37,3 +37,4 @@ export { Users as UsersCustomFields } from './custom-fields/users/Users';
 export * from './generated-numbers/GeneratedNumbers';
 export { Clients as ClientsGeneratedNumbers } from './generated-numbers/clients/Clients';
 export { Invoices as InvoicesGeneratedNumbers } from './generated-numbers/invoices/Invoices';
+export { RecurringInvoices as RecurringInvoicesGeneratedNumbers } from './generated-numbers/recurring-invoices/RecurringInvoices';
