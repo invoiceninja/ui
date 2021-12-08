@@ -9,6 +9,8 @@
  */
 
 export interface Company {
+  size_id: string;
+  industry_id: string;
   settings: {
     name: string;
     id_number: string;
