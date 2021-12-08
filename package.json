@@ -23,9 +23,11 @@
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.0.2",
     "react-select": "^5.2.1",
+    "reflect-metadata": "^0.1.13",
     "remove": "^0.1.5",
     "swr": "^1.0.1",
-    "tailwindcss": "^2.2.19"
+    "tailwindcss": "^2.2.19",
+    "typedi": "^0.10.0"
   },
   "scripts": {
     "dev": "vite",
