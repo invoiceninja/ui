@@ -26,4 +26,19 @@ export class CompanyService {
       }
     );
   }
+
+  updateLogo(
+    companyId: string,
+    data: { company_logo: File | undefined }
+  ): Promise<AxiosResponse> {
+    return axios.put(
+      endpoint('/api/v1/companies/:id', { id: companyId }),
+      data,
+      {
+        headers: {
+          'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
+        },
+      }
+    );
+  }
 }

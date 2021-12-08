@@ -11,7 +11,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
-import { Address, Defaults, Details, Documents } from './components';
+import { Address, Defaults, Details, Documents, Logo } from './components';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
@@ -26,6 +26,7 @@ export function CompanyDetails() {
     <Settings title={t('company_details')}>
       <div className="space-y-6 mt-6">
         <Details />
+        <Logo />
         <Address />
         <Defaults />
         <Documents />

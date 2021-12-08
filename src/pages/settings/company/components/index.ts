@@ -1,4 +1,5 @@
 export * from './Address';
-export * from './Details';
 export * from './Defaults';
+export * from './Details';
 export * from './Documents';
+export * from './Logo';
