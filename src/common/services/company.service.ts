@@ -8,11 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import axios, { AxiosResponse } from 'axios';
+import { endpoint } from 'common/helpers';
+import { Company } from 'common/interfaces/company.interface';
 import { Service } from 'typedi';
 
 @Service()
 export class CompanyService {
-  helloWorld(): string {
-    return 'Hello world';
+  update(companyId: string, data: Partial<Company>): Promise<AxiosResponse> {
+    return axios.put(
+      endpoint('/api/v1/companies/:id', { id: companyId }),
+      data,
+      {
+        headers: {
+          'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
+        },
+      }
+    );
   }
 }
