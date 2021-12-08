@@ -22,6 +22,7 @@ interface Props extends CommonProps {
   placeholder?: string;
   required?: boolean;
   border?: boolean;
+  name?: string;
 }
 
 export function InputField(props: Props) {
