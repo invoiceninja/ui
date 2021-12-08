@@ -8,7 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
+import { Toaster } from 'react-hot-toast';
 import { useSelector } from 'react-redux';
 import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
@@ -24,5 +25,10 @@ export function App() {
       : document.querySelector('html')?.classList.remove('dark');
   }, [darkMode]);
 
-  return <div className="App">{routes}</div>;
+  return (
+    <div className="App">
+      <Toaster position="top-right" />
+      {routes}
+    </div>
+  );
 }

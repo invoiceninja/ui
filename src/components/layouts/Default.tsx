@@ -22,8 +22,6 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import Logo from '../../resources/images/invoiceninja-logo@light.png';
 import { Link, useLocation } from 'react-router-dom';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -69,7 +67,6 @@ export function Default(props: Props) {
 
   return (
     <>
-      <ToastContainer />
       <div>
         <Transition.Root show={sidebarOpen} as={Fragment}>
           <Dialog

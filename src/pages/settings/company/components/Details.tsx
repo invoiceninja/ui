@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { Company } from 'common/interfaces/company.interface';
 import { CompanyService } from 'common/services/company.service';
 import { RootState } from 'common/stores/store';
@@ -19,9 +19,9 @@ import { SelectField } from 'components/forms/SelectField';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { Image } from 'react-feather';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { toast } from 'react-toastify';
 import Container from 'typedi';
 
 export function Details() {
@@ -58,13 +58,11 @@ export function Details() {
     enableReinitialize: true,
     initialValues,
     onSubmit: (values: Partial<Company>) => {
-      companyService
-        .update(company.id, values)
-        .then(() => toast(t('updated_settings'), { type: 'success' }))
-        .catch((error: AxiosError) => {
-          console.log(error);
-          toast(t('error_title'), { type: 'error' });
-        });
+      toast.promise(companyService.update(company.id, values), {
+        success: t('updated_settings'),
+        error: t('error_title'),
+        loading: t('processing'),
+      });
     },
   });
 
