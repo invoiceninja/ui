@@ -20,7 +20,7 @@ import {
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
-import Logo from '../../resources/images/invoiceninja-logo@dark.png';
+import Logo from '../../resources/images/invoiceninja-logo@light.png';
 import { Link, useLocation } from 'react-router-dom';
 
 function classNames(...classes: any) {
@@ -94,7 +94,7 @@ export function Default(props: Props) {
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
-              <div className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white dark:bg-gray-900">
+              <div className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-ninja-gray dark:bg-gray-900">
                 <Transition.Child
                   as={Fragment}
                   enter="ease-in-out duration-300"
@@ -116,7 +116,7 @@ export function Default(props: Props) {
                   </div>
                 </Transition.Child>
                 <div className="flex-shrink-0 flex items-center px-4">
-                  <img className="h-8 w-auto" src={Logo} alt="Company logo" />
+                  <img className="h-7 w-auto" src={Logo} alt="Company logo" />
                 </div>
                 <div className="mt-5 flex-1 h-0 overflow-y-auto">
                   <nav className="space-y-1">
@@ -126,16 +126,16 @@ export function Default(props: Props) {
                         key={item.name}
                         className={classNames(
                           item.current
-                            ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100'
-                            : 'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:text-gray-200 dark:hover:bg-gray-800',
+                            ? 'bg-ninja-gray-darker text-gray-100 dark:bg-gray-800 dark:text-gray-100'
+                            : 'text-gray-100 hover:bg-ninja-gray-darker dark:text-gray-300 dark:hover:text-gray-200 dark:hover:bg-gray-800',
                           'group flex items-center px-4 py-2 text-base font-medium'
                         )}
                       >
                         <item.icon
                           className={classNames(
                             item.current
-                              ? 'text-gray-500 dark:text-gray-200'
-                              : 'text-gray-400 group-hover:text-gray-500 dark:text-gray-400 dark:group-hover:text-gray-200',
+                              ? 'dark:text-gray-200'
+                              : 'dark:text-gray-400 dark:group-hover:text-gray-200',
                             'mr-4 flex-shrink-0 h-6 w-6'
                           )}
                         />
@@ -155,9 +155,9 @@ export function Default(props: Props) {
         {/* Static sidebar for desktop */}
         <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r">
           {/* Sidebar component, swap this element with another sidebar if you like */}
-          <div className="flex flex-col flex-grow border-gray-200 pt-5 bg-white dark:bg-gray-800 dark:border-transparent overflow-y-auto">
+          <div className="flex flex-col flex-grow border-gray-200 pt-5 bg-ninja-gray dark:bg-gray-800 dark:border-transparent overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
-              <img className="h-8 w-auto" src={Logo} alt="Company logo" />
+              <img className="h-7 w-auto" src={Logo} alt="Company logo" />
             </div>
             <div className="mt-5 flex-grow flex flex-col">
               <nav className="flex-1 pb-4 space-y-1">
@@ -167,17 +167,17 @@ export function Default(props: Props) {
                     to={item.href}
                     className={classNames(
                       item.current
-                        ? 'border-l-4 border-transparent bg-gray-100 text-gray-900 dark:bg-gray-700 dark:text-gray-100'
-                        : 'border-l-4 border-transparent text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:hover:bg-gray-700 dark:hover:text-gray-100',
+                        ? 'border-l-4 border-transparent bg-ninja-gray-darker text-gray-100 dark:bg-gray-700 dark:text-gray-100'
+                        : 'border-l-4 border-transparent text-gray-100 hover:bg-ninja-gray-darker dark:hover:bg-gray-700 dark:hover:text-gray-100',
                       'group flex items-center px-4 py-2 text-sm font-medium'
                     )}
                   >
                     <item.icon
                       className={classNames(
                         item.current
-                          ? 'text-gray-500 dark:text-gray-100'
-                          : 'text-gray-400 group-hover:text-gray-500 dark:group-hover:text-gray-100',
-                        'mr-3 flex-shrink-0 h-6 w-6'
+                          ? 'dark:text-gray-100'
+                          : 'dark:group-hover:text-gray-100',
+                        'text-gray-100 mr-3 flex-shrink-0 h-6 w-6'
                       )}
                       aria-hidden="true"
                     />
