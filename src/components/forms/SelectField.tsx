@@ -13,7 +13,7 @@ import { InputLabel } from '.';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
-  defualtValue?: any;
+  defaultValue?: any;
   label?: string;
   required?: boolean;
 }
@@ -29,11 +29,13 @@ export function SelectField(props: Props) {
       )}
 
       <select
+        onChange={props.onChange}
         id={props.id}
         className={classNames(
           `w-full py-2 px-3 rounded text-sm  border border-gray-300 ${props.className}`
         )}
-        defaultValue={props.defualtValue}
+        defaultValue={props.defaultValue}
+        value={props.value}
       >
         {props.children}
       </select>
