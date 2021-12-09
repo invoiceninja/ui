@@ -36,7 +36,7 @@ export function CompanyDetails() {
     toast.loading(t('processing'));
 
     companyService
-      .update(companyState.api.id, companyState.changes)
+      .update(companyState.api.id, companyState.api)
       .then((response: AxiosResponse) => {
         dispatch(updateCompany(response.data.data));
 

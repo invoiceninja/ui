@@ -16,14 +16,12 @@ interface CompanyState {
   api: any;
   logo: string;
   isDirty: boolean;
-  changes: any;
 }
 
 const initialState: CompanyState = {
   api: {},
   logo,
   isDirty: false,
-  changes: {},
 };
 
 export const companySlice = createSlice({
@@ -35,7 +33,7 @@ export const companySlice = createSlice({
       action: PayloadAction<{ property: string; value: any }>
     ) => {
       state.isDirty = true;
-      set(state.changes, action.payload.property, action.payload.value);
+      set(state.api, action.payload.property, action.payload.value);
     },
     updateCompany: (state, action: any) => {
       state.api = action.payload;
