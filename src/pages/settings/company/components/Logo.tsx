@@ -12,13 +12,16 @@ import { Card, Element } from '@invoiceninja/cards';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useStaticsQuery } from 'common/queries/statics';
 import { CompanyService } from 'common/services/company.service';
+import { updateCompany } from 'common/stores/slices/company';
 import { RootState } from 'common/stores/store';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
+import toast from 'react-hot-toast';
+import { dispatch } from 'react-hot-toast/dist/core/store';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Container from 'typedi';
 
 export function Logo() {
@@ -26,6 +29,7 @@ export function Logo() {
   const [logo, setLogo] = useState<File>();
   const company = useSelector((state: RootState) => state.company.api);
   const companyService = Container.get(CompanyService);
+  const dispatch = useDispatch();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -33,10 +37,22 @@ export function Logo() {
       company_logo: logo,
     },
     onSubmit: (values) => {
+      toast.loading(t('processing'));
+
       companyService
         .updateLogo(company.id, values)
-        .then((response: AxiosResponse) => console.log(response.data))
-        .catch((error: AxiosError) => console.log(error.response?.data));
+        .then((response: AxiosResponse) => {
+          dispatch(updateCompany(response.data.data));
+
+          toast.dismiss();
+          toast.success(t('uploaded_logo'));
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+
+          toast.dismiss();
+          toast.error(t('error_title'));
+        });
     },
   });
 

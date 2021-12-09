@@ -37,6 +37,7 @@ export class CompanyService {
       {
         headers: {
           'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
+          'Content-Type': 'multipart/form-data',
         },
       }
     );
