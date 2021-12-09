@@ -8,31 +8,46 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import logo from '../../../resources/images/invoiceninja-logo@light.png';
+import { set } from 'lodash';
 
 interface CompanyState {
   api: any;
   logo: string;
+  isDirty: boolean;
+  changes: any;
 }
 
 const initialState: CompanyState = {
   api: {},
   logo,
+  isDirty: false,
+  changes: {},
 };
 
 export const companySlice = createSlice({
   name: 'company',
   initialState,
   reducers: {
+    updateChanges: (
+      state,
+      action: PayloadAction<{ property: string; value: any }>
+    ) => {
+      state.isDirty = true;
+      set(state.changes, action.payload.property, action.payload.value);
+    },
     updateCompany: (state, action: any) => {
       state.api = action.payload;
+
       state.logo =
         action.payload.settings.company_logo === ''
           ? logo
           : action.payload.settings.company_logo;
+
+      state.isDirty = false;
     },
   },
 });
 
-export const { updateCompany } = companySlice.actions;
+export const { updateChanges, updateCompany } = companySlice.actions;
