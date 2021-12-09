@@ -9,13 +9,16 @@
  */
 
 import { createSlice } from '@reduxjs/toolkit';
+import logo from '../../../resources/images/invoiceninja-logo@light.png';
 
 interface CompanyState {
   api: any;
+  logo: string;
 }
 
 const initialState: CompanyState = {
   api: {},
+  logo,
 };
 
 export const companySlice = createSlice({
@@ -24,6 +27,10 @@ export const companySlice = createSlice({
   reducers: {
     updateCompany: (state, action: any) => {
       state.api = action.payload;
+      state.logo =
+        action.payload.settings.company_logo === ''
+          ? logo
+          : action.payload.settings.company_logo;
     },
   },
 });

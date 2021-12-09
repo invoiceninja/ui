@@ -20,8 +20,9 @@ import {
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
-import Logo from '../../resources/images/invoiceninja-logo@light.png';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { RootState } from 'common/stores/store';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -35,6 +36,7 @@ export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [t] = useTranslation();
   const location = useLocation();
+  const logo = useSelector((state: RootState) => state.company.logo);
 
   const navigation = [
     {
@@ -116,7 +118,7 @@ export function Default(props: Props) {
                   </div>
                 </Transition.Child>
                 <div className="flex-shrink-0 flex items-center px-4">
-                  <img className="h-7 w-auto" src={Logo} alt="Company logo" />
+                  <img className="h-7 w-auto" src={logo} alt="Company logo" />
                 </div>
                 <div className="mt-5 flex-1 h-0 overflow-y-auto">
                   <nav className="space-y-1">
@@ -157,7 +159,7 @@ export function Default(props: Props) {
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-col flex-grow border-gray-200 pt-5 bg-ninja-gray dark:bg-gray-800 dark:border-transparent overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
-              <img className="h-7 w-auto" src={Logo} alt="Company logo" />
+              <img className="h-7 w-auto" src={logo} alt="Company logo" />
             </div>
             <div className="mt-5 flex-grow flex flex-col">
               <nav className="flex-1 pb-4 space-y-1">
