@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from 'common/stores/store';
+import { Button } from '@invoiceninja/forms';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -30,6 +31,8 @@ function classNames(...classes: any) {
 
 interface Props extends CommonProps {
   title?: string;
+  onSaveClick?: any;
+  onCancelClick?: any;
 }
 
 export function Default(props: Props) {
@@ -202,47 +205,16 @@ export function Default(props: Props) {
             </button>
             <div className="flex-1 px-4 flex items-center justify-between">
               <h2 className="text-xl dark:text-gray-100">{props.title}</h2>
-              <div className="ml-4 flex items-center md:ml-6">
-                {/* Profile dropdown */}
-                <Menu as="div" className="ml-3 relative">
-                  <div>
-                    <Menu.Button className="max-w-xs bg-white flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                      <span className="sr-only">Open user menu</span>
-                      <img
-                        className="h-8 w-8 rounded-full"
-                        src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                        alt=""
-                      />
-                    </Menu.Button>
-                  </div>
-                  <Transition
-                    as={Fragment}
-                    enter="transition ease-out duration-100"
-                    enterFrom="transform opacity-0 scale-95"
-                    enterTo="transform opacity-100 scale-100"
-                    leave="transition ease-in duration-75"
-                    leaveFrom="transform opacity-100 scale-100"
-                    leaveTo="transform opacity-0 scale-95"
-                  >
-                    <Menu.Items className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700">
-                      {userNavigation.map((item) => (
-                        <Menu.Item key={item.name}>
-                          {({ active }) => (
-                            <Link
-                              to={item.href}
-                              className={classNames(
-                                active ? 'bg-gray-100 dark:bg-gray-800' : '',
-                                'block px-4 py-2 text-sm text-gray-700 dark:text-gray-200'
-                              )}
-                            >
-                              {item.name}
-                            </Link>
-                          )}
-                        </Menu.Item>
-                      ))}
-                    </Menu.Items>
-                  </Transition>
-                </Menu>
+              <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
+                {props.onCancelClick && (
+                  <Button onClick={props.onCancelClick} type="secondary">
+                    {t('cancel')}
+                  </Button>
+                )}
+                
+                {props.onSaveClick && (
+                  <Button onClick={props.onSaveClick}>{t('save')}</Button>
+                )}
               </div>
             </div>
           </div>

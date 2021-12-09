@@ -22,8 +22,15 @@ export function CompanyDetails() {
     )}`;
   });
 
+  function onSave() {}
+  function onCancel() {}
+
   return (
-    <Settings title={t('company_details')}>
+    <Settings
+      onSaveClick={onSave}
+      onCancelClick={onCancel}
+      title={t('company_details')}
+    >
       <div className="space-y-6 mt-6">
         <Details />
         <Logo />

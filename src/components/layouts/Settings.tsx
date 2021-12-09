@@ -15,7 +15,14 @@ import { classNames } from '../../common/helpers';
 import { SelectField } from '../forms';
 import { Default } from './Default';
 
-export function Settings(props: { title: string; children: ReactNode }) {
+interface Props {
+  title: string;
+  children: ReactNode;
+  onSaveClick?: any;
+  onCancelClick?: any;
+}
+
+export function Settings(props: Props) {
   const [t] = useTranslation();
 
   const basic = [
@@ -238,7 +245,11 @@ export function Settings(props: { title: string; children: ReactNode }) {
   ];
 
   return (
-    <Default title={props.title}>
+    <Default
+      onSaveClick={props.onSaveClick}
+      onCancelClick={props.onCancelClick}
+      title={props.title}
+    >
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 md:col-span-4 lg:col-span-2">
           <a className="flex items-center py-4 px-3 text-xs uppercase font-medium text-gray-600">
