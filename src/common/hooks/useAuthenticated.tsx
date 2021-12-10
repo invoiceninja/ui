@@ -52,7 +52,7 @@ export function useAuthenticated(): Boolean {
         );
 
         dispatch(updateCompanies(response.data.data));
-        dispatch(updateCompany(response.data.data[0].company));
+        dispatch(updateCompany(response.data.data[0]));
         dispatch(updateToken(response.data.data[0].token));
         dispatch(updateAccount(response.data.data[0].account));
       }

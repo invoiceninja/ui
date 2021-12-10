@@ -26,7 +26,7 @@ export function Users() {
     <Settings title={t('custom_fields')}>
       <Card title={title}>
         {['user1', 'user2', 'user3', 'user4'].map((field) => (
-          <Field  key={field} field={field} placeholder={t('user_field')} />
+          <Field key={field} field={field} placeholder={t('user_field')} />
         ))}
       </Card>
     </Settings>

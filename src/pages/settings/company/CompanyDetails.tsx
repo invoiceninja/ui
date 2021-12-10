@@ -10,7 +10,7 @@
 
 import { AxiosError, AxiosResponse } from 'axios';
 import { CompanyService } from 'common/services/company.service';
-import { updateCompany } from 'common/stores/slices/company';
+import { updateCompanyRecord } from 'common/stores/slices/company';
 import { RootState } from 'common/stores/store';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
@@ -36,9 +36,9 @@ export function CompanyDetails() {
     toast.loading(t('processing'));
 
     companyService
-      .update(companyState.current.id, companyState.current)
+      .update(companyState.current.company.id, companyState.current.company)
       .then((response: AxiosResponse) => {
-        dispatch(updateCompany(response.data.data));
+        dispatch(updateCompanyRecord(response.data.data));
 
         toast.dismiss();
         toast.success(t('updated_settings'));

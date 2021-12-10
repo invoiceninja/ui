@@ -211,7 +211,7 @@ export function Default(props: Props) {
                     {t('cancel')}
                   </Button>
                 )}
-                
+
                 {props.onSaveClick && (
                   <Button onClick={props.onSaveClick}>{t('save')}</Button>
                 )}

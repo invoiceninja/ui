@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export * from './Settings'
+export * from './Settings';
 export * from './company/CompanyDetails';
 export * from './user/UserDetails';
 export * from './localization/Localization';

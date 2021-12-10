@@ -35,13 +35,29 @@ export const companySlice = createSlice({
       action: PayloadAction<{ property: string; value: any }>
     ) => {
       state.isDirty = true;
-      set(state.current, action.payload.property, action.payload.value);
+      set(state.current.company, action.payload.property, action.payload.value);
     },
     updateCompanies: (state, action) => {
       state.companies = action.payload;
     },
     updateCompany: (state, action: any) => {
       state.current = action.payload;
+
+      state.logo =
+        action.payload.company.settings.company_logo === ''
+          ? logo
+          : action.payload.company.settings.company_logo;
+
+      state.isDirty = false;
+    },
+    updateCompanyRecord: (state, action: any) => {
+      state.current.company = action.payload;
+
+      let position = state.companies.findIndex(
+        (record: any) => record.company.id === action.payload.id
+      );
+
+      state.companies[position].company = action.payload;
 
       state.logo =
         action.payload.settings.company_logo === ''
@@ -53,5 +69,9 @@ export const companySlice = createSlice({
   },
 });
 
-export const { updateChanges, updateCompanies, updateCompany } =
-  companySlice.actions;
+export const {
+  updateChanges,
+  updateCompanies,
+  updateCompany,
+  updateCompanyRecord,
+} = companySlice.actions;

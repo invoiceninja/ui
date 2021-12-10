@@ -26,7 +26,9 @@ export function UserManagement() {
   const [t] = useTranslation();
 
   useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('user_management')}`;
+    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
+      'user_management'
+    )}`;
   });
 
   return (
