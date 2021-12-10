@@ -10,7 +10,7 @@
 
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { classNames } from '../../common/helpers';
 import { SelectField } from '../forms';
 import { Default } from './Default';
@@ -24,6 +24,7 @@ interface Props {
 
 export function Settings(props: Props) {
   const [t] = useTranslation();
+  const location = useLocation();
 
   const basic = [
     {
