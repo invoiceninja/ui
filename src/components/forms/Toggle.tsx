@@ -15,16 +15,20 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   label?: string;
+  checked?: boolean;
 }
 
 export default function Toggle(props: Props) {
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(props.checked ?? false);
 
   return (
     <Switch.Group as="div" className="flex items-center">
       <Switch
         checked={enabled}
-        onChange={setEnabled}
+        onChange={(value) => {
+          setEnabled(value);
+          return props.onChange(value);
+        }}
         className={classNames(
           enabled ? 'bg-gray-700' : 'bg-gray-200',
           'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500'
