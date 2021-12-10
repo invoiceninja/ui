@@ -92,10 +92,10 @@ export function Default(props: Props) {
             </Transition.Child>
             <Transition.Child
               as={Fragment}
-              enter="transition ease-in-out duration-300 transform"
+              enter="transition ease-in-out duration-300"
               enterFrom="-translate-x-full"
               enterTo="translate-x-0"
-              leave="transition ease-in-out duration-300 transform"
+              leave="transition ease-in-out duration-300"
               leaveFrom="translate-x-0"
               leaveTo="-translate-x-full"
             >
