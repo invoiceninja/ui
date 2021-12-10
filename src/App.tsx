@@ -27,7 +27,7 @@ export function App() {
 
   return (
     <div className="App">
-      <Toaster position="top-right" />
+      <Toaster position="top-center" />
       {routes}
     </div>
   );
