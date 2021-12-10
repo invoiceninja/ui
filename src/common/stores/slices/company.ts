@@ -13,13 +13,15 @@ import logo from '../../../resources/images/invoiceninja-logo@light.png';
 import { set } from 'lodash';
 
 interface CompanyState {
-  api: any;
+  companies: any;
+  current: any;
   logo: string;
   isDirty: boolean;
 }
 
 const initialState: CompanyState = {
-  api: {},
+  companies: [],
+  current: {},
   logo,
   isDirty: false,
 };
@@ -33,10 +35,13 @@ export const companySlice = createSlice({
       action: PayloadAction<{ property: string; value: any }>
     ) => {
       state.isDirty = true;
-      set(state.api, action.payload.property, action.payload.value);
+      set(state.current, action.payload.property, action.payload.value);
+    },
+    updateCompanies: (state, action) => {
+      state.companies = action.payload;
     },
     updateCompany: (state, action: any) => {
-      state.api = action.payload;
+      state.current = action.payload;
 
       state.logo =
         action.payload.settings.company_logo === ''
@@ -48,4 +53,5 @@ export const companySlice = createSlice({
   },
 });
 
-export const { updateChanges, updateCompany } = companySlice.actions;
+export const { updateChanges, updateCompanies, updateCompany } =
+  companySlice.actions;

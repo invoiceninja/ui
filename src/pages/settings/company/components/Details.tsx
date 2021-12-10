@@ -35,53 +35,53 @@ export function Details() {
 
   return (
     <>
-      {company.api?.settings && (
+      {company.current?.settings && (
         <Card title={t('details')}>
           <Element leftSide={t('name')}>
             <InputField
-              value={company.api.settings.name || ''}
+              value={company.current.settings.name || ''}
               onChange={handleChange}
               id="settings.name"
             />
           </Element>
           <Element leftSide={t('id_number')}>
             <InputField
-              value={company.api.settings.id_number || ''}
+              value={company.current.settings.id_number || ''}
               onChange={handleChange}
               id="settings.id_number"
             />
           </Element>
           <Element leftSide={t('vat_number')}>
             <InputField
-              value={company.api.settings.vat_number || ''}
+              value={company.current.settings.vat_number || ''}
               onChange={handleChange}
               id="settings.vat_number"
             />
           </Element>
           <Element leftSide={t('website')}>
             <InputField
-              value={company.api.settings.website || ''}
+              value={company.current.settings.website || ''}
               onChange={handleChange}
               id="settings.website"
             />
           </Element>
           <Element leftSide={t('email')}>
             <InputField
-              value={company.api.settings.email || ''}
+              value={company.current.settings.email || ''}
               onChange={handleChange}
               id="settings.email"
             />
           </Element>
           <Element leftSide={t('phone')}>
             <InputField
-              value={company.api.settings.phone || ''}
+              value={company.current.settings.phone || ''}
               onChange={handleChange}
               id="settings.phone"
             />
           </Element>
           <Element leftSide={t('size_id')}>
             <SelectField
-              value={company.api.size_id || '1'}
+              value={company.current.size_id || '1'}
               onChange={handleChange}
               id="size_id"
             >
@@ -94,7 +94,7 @@ export function Details() {
           </Element>
           <Element leftSide={t('industry_id')}>
             <SelectField
-              value={company.api.industry_id || '1'}
+              value={company.current.industry_id || '1'}
               onChange={handleChange}
               id="industry_id"
             >

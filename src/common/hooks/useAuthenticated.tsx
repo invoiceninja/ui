@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router';
 import { AuthenticationTypes } from '../dtos/authentication';
 import { endpoint } from '../helpers';
 import { updateAccount } from '../stores/slices/account';
-import { updateCompany } from '../stores/slices/company';
+import { updateCompanies, updateCompany } from '../stores/slices/company';
 import { updateToken } from '../stores/slices/token';
 import { authenticate } from '../stores/slices/user';
 import { RootState } from '../stores/store';
@@ -51,6 +51,7 @@ export function useAuthenticated(): Boolean {
           })
         );
 
+        dispatch(updateCompanies(response.data.data));
         dispatch(updateCompany(response.data.data[0].company));
         dispatch(updateToken(response.data.data[0].token));
         dispatch(updateAccount(response.data.data[0].account));

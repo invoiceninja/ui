@@ -27,7 +27,7 @@ import Container from 'typedi';
 export function Logo() {
   const [t] = useTranslation();
   const [logo, setLogo] = useState<File>();
-  const company = useSelector((state: RootState) => state.company.api);
+  const company = useSelector((state: RootState) => state.company.current);
   const companyService = Container.get(CompanyService);
   const dispatch = useDispatch();
 
