@@ -341,7 +341,7 @@ export function Settings(props: Props) {
                         to={item.href}
                         className={classNames(
                           item.current ? 'text-gray-900 font-semibold' : '',
-                          'px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
+                          'ml-4 px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
                         )}
                       >
                         {item.name}
