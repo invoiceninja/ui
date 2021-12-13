@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosResponse, Method } from 'axios';
+import axios, { Axios, AxiosResponse, Method } from 'axios';
 import { generatePath } from 'react-router';
 
 export function endpoint(endpoint: string, params = {}): string {
@@ -47,10 +47,14 @@ export function handleCheckboxChange(id: string, set: any) {
   return set;
 }
 
-export function fetcher(url: string, headers?: {}): Promise<AxiosResponse> {
+export function fetcher(
+  url: string,
+  headers?: {},
+  method: Method = 'GET'
+): Promise<AxiosResponse> {
   return axios
     .request({
-      method: 'GET',
+      method,
       url,
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
