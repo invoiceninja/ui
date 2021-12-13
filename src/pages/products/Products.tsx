@@ -57,9 +57,9 @@ export function Products() {
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
   const options = [
-    { value: 'active', label: 'Active' },
-    { value: 'archived', label: 'Archived' },
-    { value: 'deleted', label: 'Deleted' },
+    { value: 'active', label: t('active') },
+    { value: 'archived', label: t('archived') },
+    { value: 'deleted', label: t('deleted') },
   ];
 
   const { data, error } = useProductsQuery({

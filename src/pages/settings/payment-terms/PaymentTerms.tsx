@@ -22,12 +22,14 @@ import {
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { bulk, usePaymentTermsQuery } from 'common/queries/payment-terms';
+import { Actions } from 'components/datatables/Actions';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import { PlusCircle } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
@@ -43,15 +45,29 @@ export function PaymentTerms() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
   const [sort, setSort] = useState<string | undefined>(undefined);
+  const [status, setStatus] = useState(['active']);
+  const [filter, setFilter] = useState('');
 
   const { mutate } = useSWRConfig();
-  const { data } = usePaymentTermsQuery({ currentPage, perPage, sort });
+  const { data } = usePaymentTermsQuery({
+    currentPage,
+    perPage,
+    sort,
+    filter,
+    status,
+  });
+
+  const options = [
+    { value: 'active', label: t('active') },
+    { value: 'archived', label: t('archived') },
+    { value: 'deleted', label: t('deleted') },
+  ];
 
   const archive = (id: string) => {
     toast.loading(t('processing'));
 
     bulk([id], 'archive')
-      .then((response: AxiosResponse) => {
+      .then(() => {
         toast.dismiss();
         toast.success(t('archived_payment_term'));
 
@@ -67,11 +83,29 @@ export function PaymentTerms() {
 
   return (
     <Settings title={t('payment_terms')}>
-      <div className="flex justify-end mt-8">
-        <Button to="/settings/payment_terms/create">
-          {t('new_payment_term')}
-        </Button>
-      </div>
+      <Actions
+        onStatusChange={setStatus}
+        onFilterChange={setFilter}
+        optionsMultiSelect={true}
+        options={options}
+        defaultOption={options[0]}
+        rightSide={
+          <Button to="/settings/payment_terms/create">
+            <span>{t('new_payment_term')}</span>
+            <PlusCircle size="20" />
+          </Button>
+        }
+      >
+        <Dropdown label={t('actions')}>
+          <DropdownElement onClick={archive}>
+            {t('archive_payment_term')}
+          </DropdownElement>
+
+          <DropdownElement>{t('restore_payment_term')}</DropdownElement>
+
+          <DropdownElement>{t('delete_payment_term')}</DropdownElement>
+        </Dropdown>
+      </Actions>
 
       <Table>
         <Thead>
