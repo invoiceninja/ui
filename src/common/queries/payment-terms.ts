@@ -30,7 +30,10 @@ export function usePaymentTermsQuery(params: Params) {
   );
 }
 
-export function bulk(id: string[], action: 'archive'): Promise<AxiosResponse> {
+export function bulk(
+  id: string[],
+  action: 'archive' | 'restore' | 'delete'
+): Promise<AxiosResponse> {
   return axios.post(
     endpoint('/api/v1/payment_terms/bulk'),
     {

@@ -95,17 +95,7 @@ export function PaymentTerms() {
             <PlusCircle size="20" />
           </Button>
         }
-      >
-        <Dropdown label={t('actions')}>
-          <DropdownElement onClick={archive}>
-            {t('archive_payment_term')}
-          </DropdownElement>
-
-          <DropdownElement>{t('restore_payment_term')}</DropdownElement>
-
-          <DropdownElement>{t('delete_payment_term')}</DropdownElement>
-        </Dropdown>
-      </Actions>
+      ></Actions>
 
       <Table>
         <Thead>
