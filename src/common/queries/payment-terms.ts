@@ -8,17 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import axios, { AxiosResponse } from 'axios';
 import { endpoint, fetcher } from 'common/helpers';
 import useSWR from 'swr';
+import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 
 export function usePaymentTermsQuery(params: Params) {
   return useSWR(
-    endpoint('/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort', {
-      perPage: params.perPage,
-      currentPage: params.currentPage,
-      sort: params.sort ?? 'id|asc',
-    }),
+    endpoint(
+      '/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort',
+      {
+        perPage: params.perPage,
+        currentPage: params.currentPage,
+        sort: params.sort ?? 'id|asc',
+      }
+    ),
     fetcher
+  );
+}
+
+export function bulk(id: string[], action: 'archive'): Promise<AxiosResponse> {
+  return axios.post(
+    endpoint('/api/v1/payment_terms/bulk'),
+    {
+      action,
+      ids: id,
+    },
+    { headers: { ...defaultHeaders } }
   );
 }

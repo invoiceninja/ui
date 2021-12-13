@@ -19,16 +19,19 @@ import {
   Thead,
   Tr,
 } from '@invoiceninja/tables';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { PaymentTerm } from 'common/interfaces/payment-term';
-import { usePaymentTermsQuery } from 'common/queries/payment-terms';
+import { bulk, usePaymentTermsQuery } from 'common/queries/payment-terms';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
 import { useState } from 'react';
 import { useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { useSWRConfig } from 'swr';
 
 export function PaymentTerms() {
   const [t] = useTranslation();
@@ -41,9 +44,26 @@ export function PaymentTerms() {
   const [perPage, setPerPage] = useState<string>('10');
   const [sort, setSort] = useState<string | undefined>(undefined);
 
+  const { mutate } = useSWRConfig();
   const { data } = usePaymentTermsQuery({ currentPage, perPage, sort });
 
-  const archive = () => {};
+  const archive = (id: string) => {
+    toast.loading(t('processing'));
+
+    bulk([id], 'archive')
+      .then((response: AxiosResponse) => {
+        toast.dismiss();
+        toast.success(t('archived_payment_term'));
+
+        mutate(data?.request.responseURL);
+      })
+      .catch((error: AxiosError) => {
+        toast.dismiss();
+        toast.success(t('error_title'));
+
+        console.log(error);
+      });
+  };
 
   return (
     <Settings title={t('payment_terms')}>
@@ -86,7 +106,7 @@ export function PaymentTerms() {
                     >
                       {t('edit_payment_term')}
                     </DropdownElement>
-                    <DropdownElement>
+                    <DropdownElement onClick={() => archive(paymentTerm.id)}>
                       {t('archive_payment_term')}
                     </DropdownElement>
                   </Dropdown>
