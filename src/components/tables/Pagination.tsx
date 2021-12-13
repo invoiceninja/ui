@@ -18,7 +18,7 @@ interface Props extends CommonProps {
   totalPages: number;
   currentPage: number;
   onPageChange: any;
-  onRowsChange: any;
+  onRowsChange: (rows: string) => any;
 }
 
 const defaultProps: Props = {

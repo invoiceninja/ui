@@ -8,10 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export interface Params {
-  perPage?: number | string;
-  currentPage?: number | string;
-  filter?: string;
-  status?: string[];
-  sort?: string;
+export interface PaymentTerm {
+  id: string;
+  num_days: number;
+  name: string;
+  is_deleted: boolean;
+  created_at: number;
+  updated_at: number;
+  archived_at: number;
 }
