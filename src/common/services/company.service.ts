@@ -14,20 +14,4 @@ import { Company } from 'common/interfaces/company.interface';
 import { Service } from 'typedi';
 
 @Service()
-export class CompanyService {
-  updateLogo(
-    companyId: string,
-    data: { company_logo: File | undefined }
-  ): Promise<AxiosResponse> {
-    return axios.put(
-      endpoint('/api/v1/companies/:id', { id: companyId }),
-      data,
-      {
-        headers: {
-          'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
-          'Content-Type': 'multipart/form-data',
-        },
-      }
-    );
-  }
-}
+export class CompanyService {}

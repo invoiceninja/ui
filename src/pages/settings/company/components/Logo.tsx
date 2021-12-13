@@ -9,26 +9,22 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { AxiosError, AxiosResponse } from 'axios';
-import { useStaticsQuery } from 'common/queries/statics';
-import { CompanyService } from 'common/services/company.service';
-import { updateCompany, updateCompanyRecord } from 'common/stores/slices/company';
-import { RootState } from 'common/stores/store';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import { endpoint } from 'common/helpers';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { updateCompanyRecord } from 'common/stores/slices/company';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import toast from 'react-hot-toast';
-import { dispatch } from 'react-hot-toast/dist/core/store';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
-import Container from 'typedi';
+import { useDispatch } from 'react-redux';
 
 export function Logo() {
   const [t] = useTranslation();
   const [logo, setLogo] = useState<File>();
-  const company = useSelector((state: RootState) => state.company.current);
-  const companyService = Container.get(CompanyService);
+  const company = useCurrentCompany();
   const dispatch = useDispatch();
 
   const formik = useFormik({
@@ -39,8 +35,13 @@ export function Logo() {
     onSubmit: (values) => {
       toast.loading(t('processing'));
 
-      companyService
-        .updateLogo(company.company.id, values)
+      axios
+        .put(endpoint('/api/v1/companies/:id', { id: company.id }), values, {
+          headers: {
+            'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
+            'Content-Type': 'multipart/form-data',
+          },
+        })
         .then((response: AxiosResponse) => {
           dispatch(updateCompanyRecord(response.data.data));
 
