@@ -12,34 +12,42 @@ import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { Link, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from 'common/stores/store';
+import { useDispatch } from 'react-redux';
 import { useStaticsQuery } from 'common/queries/statics';
 import { updateChanges } from 'common/stores/slices/company';
 import { ChangeEvent } from 'react';
 import MDEditor from '@uiw/react-md-editor';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import useSWR from 'swr';
+import { endpoint, fetcher } from 'common/helpers';
 
 export function Defaults() {
   const [t] = useTranslation();
-  const company = useSelector((state: RootState) => state.company);
-  const { data } = useStaticsQuery();
   const dispatch = useDispatch();
+  const company = useCurrentCompany();
+  const statics = useStaticsQuery();
 
-  function handleChange(event: ChangeEvent<HTMLInputElement>) {
+  const { data } = useSWR(
+    endpoint('/api/v1/companies/:id?include=payment_terms', {
+      id: company?.id ?? '',
+    }),
+    fetcher
+  );
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
     dispatch(
       updateChanges({ property: event.target.id, value: event.target.value })
     );
-  }
 
   return (
     <>
-      {company.current?.company?.settings && (
+      {company?.settings && (
         <Card title={t('defaults')}>
           <Element leftSide={t('auto_bill')}>
             <SelectField
               onChange={handleChange}
               id="settings.auto_bill"
-              value={company.current.company.settings.auto_bill}
+              value={company.settings.auto_bill}
             >
               <option defaultChecked></option>
               <option value="always">{t('enabled')}</option>
@@ -52,10 +60,10 @@ export function Defaults() {
             <SelectField
               onChange={handleChange}
               id="settings.payment_type_id"
-              value={company.current.company.settings.payment_type_id}
+              value={company.settings.payment_type_id}
             >
               <option value="0"></option>
-              {data?.data.payment_types.map(
+              {statics.data?.data.payment_types.map(
                 (type: { id: string; name: string }) => (
                   <option key={type.id} value={type.id}>
                     {type.name}
@@ -64,53 +72,53 @@ export function Defaults() {
               )}
             </SelectField>
           </Element>
-          <Element leftSide={t('payment_terms')}>
-            <SelectField
-              id="settings.payment_terms"
-              onChange={handleChange}
-              value={company.current.company.settings.payment_terms}
-            >
-              <option value=""></option>
-              <option value="0">Net 0</option>
-              <option value="7">Net 7</option>
-              <option value="10">Net 10</option>
-              <option value="14">Net 14</option>
-              <option value="15">Net 15</option>
-              <option value="30">Net 30</option>
-              <option value="60">Net 60</option>
-              <option value="90">Net 90</option>
-            </SelectField>
+          {data && (
+            <Element leftSide={t('payment_terms')}>
+              <SelectField
+                id="settings.payment_terms"
+                onChange={handleChange}
+                value={company.settings.payment_terms}
+              >
+                <option value=""></option>
+                {data.data.data.payment_terms.map(
+                  (type: { id: string; name: string }) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  )
+                )}
+              </SelectField>
 
-            <Link to="/settings/payment_terms" className="block mt-2">
-              {t('configure_payment_terms')}
-            </Link>
-          </Element>
-          <Element leftSide={t('quote_valid_until')}>
-            <SelectField
-              id="settings.valid_until"
-              onChange={handleChange}
-              value={company.current.company.settings.valid_until}
-            >
-              <option value=""></option>
-              <option value="0">Net 0</option>
-              <option value="7">Net 7</option>
-              <option value="10">Net 10</option>
-              <option value="14">Net 14</option>
-              <option value="15">Net 15</option>
-              <option value="30">Net 30</option>
-              <option value="60">Net 60</option>
-              <option value="90">Net 90</option>
-            </SelectField>
-          </Element>
+              <Link to="/settings/payment_terms" className="block mt-2">
+                {t('configure_payment_terms')}
+              </Link>
+            </Element>
+          )}
+
+          {data && (
+            <Element leftSide={t('quote_valid_until')}>
+              <SelectField
+                id="settings.valid_until"
+                onChange={handleChange}
+                value={company.settings.valid_until}
+              >
+                <option value=""></option>
+                {data.data.data.payment_terms.map(
+                  (type: { id: string; name: string }) => (
+                    <option key={type.id} value={type.id}>
+                      {type.name}
+                    </option>
+                  )
+                )}
+              </SelectField>
+            </Element>
+          )}
 
           <div className="pt-6 border-b"></div>
 
           <Element className="mt-6" leftSide={t('manual_payment_email')}>
             <Toggle
-              checked={
-                company.current.company.settings
-                  .client_manual_payment_notification
-              }
+              checked={company.settings.client_manual_payment_notification}
               onChange={(value: boolean) =>
                 dispatch(
                   updateChanges({
@@ -123,10 +131,7 @@ export function Defaults() {
           </Element>
           <Element leftSide={t('online_payment_email')}>
             <Toggle
-              checked={
-                company.current.company.settings
-                  .client_online_payment_notification
-              }
+              checked={company.settings.client_online_payment_notification}
               onChange={(value: boolean) =>
                 dispatch(
                   updateChanges({
@@ -142,7 +147,7 @@ export function Defaults() {
 
           <Element className="mt-4" leftSide={t('invoice_terms')}>
             <MDEditor
-              value={company.current.company.settings.invoice_terms}
+              value={company.settings.invoice_terms}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -155,7 +160,7 @@ export function Defaults() {
           </Element>
           <Element className="mt-4" leftSide={t('invoice_footer')}>
             <MDEditor
-              value={company.current.company.settings.invoice_footer}
+              value={company.settings.invoice_footer}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -168,7 +173,7 @@ export function Defaults() {
           </Element>
           <Element className="mt-4" leftSide={t('quote_terms')}>
             <MDEditor
-              value={company.current.company.settings.quote_terms}
+              value={company.settings.quote_terms}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -181,7 +186,7 @@ export function Defaults() {
           </Element>
           <Element className="mt-4" leftSide={t('quote_footer')}>
             <MDEditor
-              value={company.current.company.settings.quote_footer}
+              value={company.settings.quote_footer}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -194,7 +199,7 @@ export function Defaults() {
           </Element>
           <Element className="mt-4" leftSide={t('credit_terms')}>
             <MDEditor
-              value={company.current.company.settings.credit_terms}
+              value={company.settings.credit_terms}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -207,7 +212,7 @@ export function Defaults() {
           </Element>
           <Element className="mt-4" leftSide={t('credit_footer')}>
             <MDEditor
-              value={company.current.company.settings.credit_footer}
+              value={company.settings.credit_footer}
               onChange={(value) =>
                 dispatch(
                   updateChanges({
