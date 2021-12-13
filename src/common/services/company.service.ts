@@ -15,18 +15,6 @@ import { Service } from 'typedi';
 
 @Service()
 export class CompanyService {
-  update(companyId: string, data: Partial<Company>): Promise<AxiosResponse> {
-    return axios.put(
-      endpoint('/api/v1/companies/:id', { id: companyId }),
-      data,
-      {
-        headers: {
-          'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
-        },
-      }
-    );
-  }
-
   updateLogo(
     companyId: string,
     data: { company_logo: File | undefined }

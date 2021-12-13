@@ -8,23 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from 'axios';
-import { CompanyService } from 'common/services/company.service';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import { endpoint } from 'common/helpers';
+import { useCompany } from 'common/hooks/useCompany';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { updateCompanyRecord } from 'common/stores/slices/company';
-import { RootState } from 'common/stores/store';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
-import Container from 'typedi';
+import { useDispatch } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
 import { Address, Defaults, Details, Documents, Logo } from './components';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
-  const companyState = useSelector((state: RootState) => state.company);
-  const companyService = Container.get(CompanyService);
-  const dispatch = useDispatch();
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
@@ -32,11 +29,23 @@ export function CompanyDetails() {
     )}`;
   });
 
-  function onSave() {
+  const dispatch = useDispatch();
+  const currentCompany = useCurrentCompany();
+  const company = useCompany(currentCompany?.id);
+
+  const onSave = () => {
     toast.loading(t('processing'));
 
-    companyService
-      .update(companyState.current.company.id, companyState.current.company)
+    axios
+      .put(
+        endpoint('/api/v1/companies/:id', { id: currentCompany.id }),
+        currentCompany,
+        {
+          headers: {
+            'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
+          },
+        }
+      )
       .then((response: AxiosResponse) => {
         dispatch(updateCompanyRecord(response.data.data));
 
@@ -49,9 +58,9 @@ export function CompanyDetails() {
         toast.dismiss();
         toast.success(t('error_title'));
       });
-  }
+  };
 
-  function onCancel() {}
+  const onCancel = () => dispatch(updateCompanyRecord(company));
 
   return (
     <Settings
