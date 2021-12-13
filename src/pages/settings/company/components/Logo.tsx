@@ -12,7 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useStaticsQuery } from 'common/queries/statics';
 import { CompanyService } from 'common/services/company.service';
-import { updateCompany } from 'common/stores/slices/company';
+import { updateCompany, updateCompanyRecord } from 'common/stores/slices/company';
 import { RootState } from 'common/stores/store';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
@@ -40,9 +40,9 @@ export function Logo() {
       toast.loading(t('processing'));
 
       companyService
-        .updateLogo(company.id, values)
+        .updateLogo(company.company.id, values)
         .then((response: AxiosResponse) => {
-          dispatch(updateCompany(response.data.data));
+          dispatch(updateCompanyRecord(response.data.data));
 
           toast.dismiss();
           toast.success(t('uploaded_logo'));
