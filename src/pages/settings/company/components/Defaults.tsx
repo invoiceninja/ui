@@ -9,16 +9,15 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import ReactQuill from 'react-quill';
 import { Card, Element } from '../../../../components/cards';
 import { Link, SelectField } from '../../../../components/forms';
-import 'react-quill/dist/quill.snow.css';
 import Toggle from '../../../../components/forms/Toggle';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'common/stores/store';
 import { useStaticsQuery } from 'common/queries/statics';
 import { updateChanges } from 'common/stores/slices/company';
 import { ChangeEvent } from 'react';
+import MDEditor from '@uiw/react-md-editor';
 
 export function Defaults() {
   const [t] = useTranslation();
@@ -142,10 +141,9 @@ export function Defaults() {
           <div className="pt-6 border-b"></div>
 
           <Element className="mt-4" leftSide={t('invoice_terms')}>
-            <ReactQuill
-              theme="snow"
+            <MDEditor
               value={company.current.company.settings.invoice_terms}
-              onChange={(value: string) =>
+              onChange={(value) =>
                 dispatch(
                   updateChanges({
                     property: 'settings.invoice_terms',
@@ -156,10 +154,9 @@ export function Defaults() {
             />
           </Element>
           <Element className="mt-4" leftSide={t('invoice_footer')}>
-            <ReactQuill
-              theme="snow"
+            <MDEditor
               value={company.current.company.settings.invoice_footer}
-              onChange={(value: string) =>
+              onChange={(value) =>
                 dispatch(
                   updateChanges({
                     property: 'settings.invoice_footer',
@@ -170,10 +167,9 @@ export function Defaults() {
             />
           </Element>
           <Element className="mt-4" leftSide={t('quote_terms')}>
-            <ReactQuill
-              theme="snow"
+            <MDEditor
               value={company.current.company.settings.quote_terms}
-              onChange={(value: string) =>
+              onChange={(value) =>
                 dispatch(
                   updateChanges({
                     property: 'settings.quote_terms',
@@ -184,10 +180,9 @@ export function Defaults() {
             />
           </Element>
           <Element className="mt-4" leftSide={t('quote_footer')}>
-            <ReactQuill
-              theme="snow"
+            <MDEditor
               value={company.current.company.settings.quote_footer}
-              onChange={(value: string) =>
+              onChange={(value) =>
                 dispatch(
                   updateChanges({
                     property: 'settings.quote_footer',
@@ -198,10 +193,9 @@ export function Defaults() {
             />
           </Element>
           <Element className="mt-4" leftSide={t('credit_terms')}>
-            <ReactQuill
-              theme="snow"
+            <MDEditor
               value={company.current.company.settings.credit_terms}
-              onChange={(value: string) =>
+              onChange={(value) =>
                 dispatch(
                   updateChanges({
                     property: 'settings.credit_terms',
@@ -212,10 +206,9 @@ export function Defaults() {
             />
           </Element>
           <Element className="mt-4" leftSide={t('credit_footer')}>
-            <ReactQuill
-              theme="snow"
+            <MDEditor
               value={company.current.company.settings.credit_footer}
-              onChange={(value: string) =>
+              onChange={(value) =>
                 dispatch(
                   updateChanges({
                     property: 'settings.credit_footer',
