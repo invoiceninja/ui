@@ -10,4 +10,5 @@
 
 export const defaultHeaders = {
   'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
+  'X-Requested-With': 'XMLHttpRequest',
 };
