@@ -10,10 +10,12 @@
 
 import React, { ReactNode } from 'react';
 
-export function Container(props: { children: ReactNode }) {
+export function Container(props: { children: ReactNode; className?: string }) {
   return (
     <div className="flex justify-center">
-      <div className="container max-w-2xl">{props.children}</div>
+      <div className={`container max-w-2xl ${props.className}`}>
+        {props.children}
+      </div>
     </div>
   );
 }
