@@ -10,6 +10,7 @@
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
+import { defaultHeaders } from 'common/queries/common/headers';
 import { updateCompanyRecord } from 'common/stores/slices/company';
 import { RootState } from 'common/stores/store';
 import { useFormik } from 'formik';
@@ -23,34 +24,32 @@ import { Card, Element } from '../../../../components/cards';
 
 export function Documents() {
   const [t] = useTranslation();
-  const [files, setFiles] = useState<File[]>();
+  const [formData, setFormData] = useState(new FormData());
   const company = useSelector((state: RootState) => state.company.current);
   const dispatch = useDispatch();
 
   const formik = useFormik({
     enableReinitialize: true,
-    initialValues: {
-      documents: files,
-    },
-    onSubmit: (values) => {
+    initialValues: {},
+    onSubmit: () => {
       toast.loading(t('processing'));
 
       axios
-        .put(
+        .post(
           endpoint('/api/v1/companies/:id/upload', { id: company.company.id }),
-          values,
+          formData,
           {
             headers: {
-              'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
+              ...defaultHeaders,
               'Content-Type': 'multipart/form-data',
             },
           }
         )
         .then((response: AxiosResponse) => {
+          dispatch(updateCompanyRecord(response.data.data));
+
           toast.dismiss();
           toast.success(t('successfully_uploaded_documents'));
-
-          dispatch(updateCompanyRecord(response.data.data));
         })
         .catch((error: AxiosError) => {
           console.error(error);
@@ -63,7 +62,11 @@ export function Documents() {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
-      setFiles(acceptedFiles);
+      formData.append('_method', 'PUT');
+
+      acceptedFiles.forEach((file) => formData.append('documents[]', file));
+
+      setFormData(formData);
 
       formik.submitForm();
     },
