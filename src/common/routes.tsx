@@ -71,6 +71,7 @@ import {
   Subscriptions,
   PaymentTerms,
   Settings,
+  EditPaymentTerm,
 } from '../pages/settings';
 import { UserManagement } from '../pages/settings/user-management/UserManagement';
 
@@ -156,7 +157,10 @@ export const routes = (
         <Route path="group_settings" element={<GroupSettings />} />
         <Route path="subscriptions" element={<Subscriptions />} />
         <Route path="user_management" element={<UserManagement />} />
-        <Route path="payment_terms" element={<PaymentTerms />} />
+        <Route path="payment_terms">
+          <Route path="" element={<PaymentTerms />} />
+          <Route path=":id/edit" element={<EditPaymentTerm />} />
+        </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
     </Route>

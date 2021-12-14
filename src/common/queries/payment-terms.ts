@@ -28,6 +28,10 @@ export function usePaymentTermsQuery(params: Params) {
   );
 }
 
+export function usePaymentTermQuery(params: { id: string | undefined }) {
+  return useSWR(endpoint('/api/v1/payment_terms/:id', params), fetcher);
+}
+
 export function bulk(
   id: string[],
   action: 'archive' | 'restore' | 'delete'

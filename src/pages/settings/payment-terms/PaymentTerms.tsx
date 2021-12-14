@@ -108,7 +108,7 @@ export function PaymentTerms() {
                 <Td>
                   <Dropdown label={t('actions')}>
                     <DropdownElement
-                      to={generatePath('/settings/payment_terms/:id', {
+                      to={generatePath('/settings/payment_terms/:id/edit', {
                         id: paymentTerm.id,
                       })}
                     >
