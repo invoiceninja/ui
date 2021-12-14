@@ -17,13 +17,11 @@ import { Params } from './common/params.interface';
 export function usePaymentTermsQuery(params: Params) {
   return useSWR(
     endpoint(
-      '/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort&filter=:filter&status=:status',
+      '/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort',
       {
         perPage: params.perPage,
         currentPage: params.currentPage,
         sort: params.sort ?? 'id|asc',
-        filter: params.filter,
-        status: params.status,
       }
     ),
     fetcher

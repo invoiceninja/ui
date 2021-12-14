@@ -45,23 +45,14 @@ export function PaymentTerms() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
   const [sort, setSort] = useState<string | undefined>(undefined);
-  const [status, setStatus] = useState(['active']);
-  const [filter, setFilter] = useState('');
 
   const { mutate } = useSWRConfig();
+
   const { data } = usePaymentTermsQuery({
     currentPage,
     perPage,
     sort,
-    filter,
-    status,
   });
-
-  const options = [
-    { value: 'active', label: t('active') },
-    { value: 'archived', label: t('archived') },
-    { value: 'deleted', label: t('deleted') },
-  ];
 
   const archive = (id: string) => {
     toast.loading(t('processing'));
@@ -83,19 +74,12 @@ export function PaymentTerms() {
 
   return (
     <Settings title={t('payment_terms')}>
-      <Actions
-        onStatusChange={setStatus}
-        onFilterChange={setFilter}
-        optionsMultiSelect={true}
-        options={options}
-        defaultOption={options[0]}
-        rightSide={
-          <Button to="/settings/payment_terms/create">
-            <span>{t('new_payment_term')}</span>
-            <PlusCircle size="20" />
-          </Button>
-        }
-      ></Actions>
+      <div className="flex justify-end">
+        <Button to="/settings/payment_terms/create">
+          <span>{t('new_payment_term')}</span>
+          <PlusCircle size="20" />
+        </Button>
+      </div>
 
       <Table>
         <Thead>
