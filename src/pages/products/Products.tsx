@@ -46,7 +46,7 @@ export function Products() {
   const [selected, setSelected] = useState(new Set<string>());
   const [sort, setSort] = useState<string | undefined>(undefined);
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
-  const { mutate, cache } = useSWRConfig();
+  const { mutate } = useSWRConfig();
   const [alert, setAlert] = useState<
     | {
         type?: 'success' | 'danger';
