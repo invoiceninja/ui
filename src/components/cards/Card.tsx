@@ -22,6 +22,7 @@ interface Props {
   onFormSubmit?: any;
   onSaveClick?: any;
   saveButtonLabel?: string;
+  disableSubmitButton?: boolean;
 }
 
 export function Card(props: Props) {
@@ -50,7 +51,9 @@ export function Card(props: Props) {
           <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
             <dl className="sm:divide-y sm:divide-gray-200">
               <div className="sm:py-5 sm:px-6 flex justify-end">
-                <Button>{props.saveButtonLabel ?? t('save')}</Button>
+                <Button disabled={props.disableSubmitButton}>
+                  {props.saveButtonLabel ?? t('save')}
+                </Button>
               </div>
             </dl>
           </div>
