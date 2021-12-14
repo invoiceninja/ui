@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
+import { ActionCard, Card, CardContainer } from '@invoiceninja/cards';
+import { Button, InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { PaymentTerm } from 'common/interfaces/payment-term';
@@ -75,7 +75,7 @@ export function Edit() {
       )}
 
       {data && (
-        <Container>
+        <Container className="space-y-6">
           <Card
             withSaveButton
             disableSubmitButton={formik.isSubmitting}
