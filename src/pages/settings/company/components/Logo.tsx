@@ -20,27 +20,23 @@ import { Image } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { defaultHeaders } from 'common/queries/common/headers';
 
 export function Logo() {
   const [t] = useTranslation();
-  const [logo, setLogo] = useState<File>();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
+  const [formData, setFormData] = useState(new FormData());
 
   const formik = useFormik({
     enableReinitialize: true,
-    initialValues: {
-      company_logo: logo,
-    },
-    onSubmit: (values) => {
+    initialValues: formData,
+    onSubmit: () => {
       toast.loading(t('processing'));
 
       axios
-        .put(endpoint('/api/v1/companies/:id', { id: company.id }), values, {
-          headers: {
-            'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
-            'Content-Type': 'multipart/form-data',
-          },
+        .post(endpoint('/api/v1/companies/:id', { id: company.id }), formData, {
+          headers: { ...defaultHeaders, 'Content-Type': 'multipart/form-data' },
         })
         .then((response: AxiosResponse) => {
           dispatch(updateCompanyRecord(response.data.data));
@@ -53,12 +49,16 @@ export function Logo() {
 
           toast.dismiss();
           toast.error(t('error_title'));
-        });
+        })
+        .finally(() => setFormData(new FormData()));
     },
   });
 
   const onDrop = useCallback((acceptedFiles) => {
-    setLogo(acceptedFiles[0]);
+    formData.append('company_logo', acceptedFiles[0]);
+    formData.append('_method', 'PUT');
+
+    setFormData(formData);
 
     formik.submitForm();
   }, []);
@@ -76,14 +76,20 @@ export function Logo() {
         <div className="grid grid-cols-12 lg:gap-4 space-y-4 lg:space-y-0">
           <div className="bg-gray-200 col-span-12 lg:col-span-5 rounded-lg p-6">
             <img
-              src="http://localhost:3000/src/resources/images/invoiceninja-logo@light.png"
+              src={
+                company?.settings.company_logo ||
+                'http://localhost:3000/src/resources/images/invoiceninja-logo@light.png'
+              }
               alt={t('company_logo')}
             />
           </div>
 
           <div className="col-span-12 lg:col-span-5 bg-gray-900 rounded-lg p-6">
             <img
-              src="http://localhost:3000/src/resources/images/invoiceninja-logo@light.png"
+              src={
+                company?.settings.company_logo ||
+                'http://localhost:3000/src/resources/images/invoiceninja-logo@light.png'
+              }
               alt={t('company_logo')}
             />
           </div>
