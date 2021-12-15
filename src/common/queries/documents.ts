@@ -10,7 +10,14 @@
 
 import { endpoint, fetcher } from 'common/helpers';
 import useSWR from 'swr';
+import { Params } from './common/params.interface';
 
-export function useDocumentsQuery() {
-  return useSWR(endpoint('/api/v1/documents'), fetcher);
+export function useDocumentsQuery(params: Params) {
+  return useSWR(
+    endpoint('/api/v1/documents?per_page=:perPage&page=:currentPage', {
+      perPage: params.perPage,
+      currentPage: params.currentPage,
+    }),
+    fetcher
+  );
 }

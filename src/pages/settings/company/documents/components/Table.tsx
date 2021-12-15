@@ -9,6 +9,7 @@
  */
 
 import {
+  Pagination,
   Table as TableElement,
   Tbody,
   Td,
@@ -19,41 +20,56 @@ import {
 import { Document } from 'common/interfaces/document.interface';
 import { useDocumentsQuery } from 'common/queries/documents';
 import { Spinner } from 'components/Spinner';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export function Table() {
   const [t] = useTranslation();
-  const { data } = useDocumentsQuery();
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [perPage, setPerPage] = useState<string>('10');
+
+  const { data } = useDocumentsQuery({ perPage, currentPage });
 
   return (
-    <TableElement>
-      <Thead>
-        <Th>{t('name')}</Th>
-        <Th>{t('date')}</Th>
-        <Th>{t('type')}</Th>
-        <Th>{t('size')}</Th>
-        <Th></Th>
-      </Thead>
-      <Tbody>
-        {!data && (
-          <Tr>
-            <Td colSpan={5}>
-              <Spinner />
-            </Td>
-          </Tr>
-        )}
-
-        {data &&
-          data.data.data.map((document: Document) => (
+    <>
+      <TableElement>
+        <Thead>
+          <Th>{t('name')}</Th>
+          <Th>{t('date')}</Th>
+          <Th>{t('type')}</Th>
+          <Th>{t('size')}</Th>
+          <Th></Th>
+        </Thead>
+        <Tbody>
+          {!data && (
             <Tr>
-              <Td>{document.name}</Td>
-              <Td>{document.updated_at}</Td>
-              <Td>{document.type}</Td>
-              <Td>{document.size}</Td>
-              <Td></Td>
+              <Td colSpan={5}>
+                <Spinner />
+              </Td>
             </Tr>
-          ))}
-      </Tbody>
-    </TableElement>
+          )}
+
+          {data &&
+            data.data.data.map((document: Document) => (
+              <Tr key={document.id}>
+                <Td className="truncate">{document.name}</Td>
+                <Td>{document.updated_at}</Td>
+                <Td>{document.type}</Td>
+                <Td>{document.size}</Td>
+                <Td></Td>
+              </Tr>
+            ))}
+        </Tbody>
+      </TableElement>
+
+      {data && (
+        <Pagination
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          onRowsChange={setPerPage}
+          totalPages={data.data.meta.pagination.total_pages}
+        />
+      )}
+    </>
   );
 }
