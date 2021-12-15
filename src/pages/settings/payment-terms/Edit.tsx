@@ -67,6 +67,9 @@ export function Edit() {
     },
   });
 
+  const archive = () => {};
+  const restore = () => {};
+
   return (
     <Settings title={t('payment_terms')}>
       {!data && (
@@ -106,6 +109,18 @@ export function Edit() {
               />
             </CardContainer>
           </Card>
+
+          {!data.data.data.archived_at && !data.data.data.is_deleted ? (
+            <ActionCard label={t('archive')} help="Lorem ipsum dolor sit amet.">
+              <Button>{t('archive')}</Button>
+            </ActionCard>
+          ) : null}
+
+          {data.data.data.archived_at && !data.data.data.is_deleted ? (
+            <ActionCard label={t('restore')} help="Lorem ipsum dolor sit amet.">
+              <Button>{t('restore')}</Button>
+            </ActionCard>
+          ) : null}
         </Container>
       )}
     </Settings>

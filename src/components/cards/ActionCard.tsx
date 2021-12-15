@@ -19,7 +19,7 @@ export function ActionCard(props: {
     <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
       <div className={`flex justify-between items-center`}>
         <section>
-          <h2>{props.label}</h2>
+          <h2 className="text-gray-800">{props.label}</h2>
           {props.help && (
             <span className="text-xs text-gray-600">{props.help}</span>
           )}
