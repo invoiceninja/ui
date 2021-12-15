@@ -8,13 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ActionCard, Card, CardContainer } from '@invoiceninja/cards';
+import { ActionCard, Card, CardContainer, Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { usePaymentTermQuery } from 'common/queries/payment-terms';
+import { Badge } from 'components/Badge';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
@@ -82,6 +83,19 @@ export function Edit() {
             onFormSubmit={formik.handleSubmit}
             title={data.data.data.name}
           >
+            <Element leftSide="Status">
+              {!data.data.data.is_deleted && !data.data.data.archived_at && (
+                <Badge variant="primary">{t('active')}</Badge>
+              )}
+
+              {data.data.data.archived_at && !data.data.data.is_deleted ? (
+                <Badge variant="yellow">{t('archived')}</Badge>
+              ) : null}
+
+              {data.data.data.is_deleted && (
+                <Badge variant="red">{t('deleted')}</Badge>
+              )}
+            </Element>
             <CardContainer>
               <InputField
                 value={formik.values.num_days}
