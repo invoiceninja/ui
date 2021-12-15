@@ -73,6 +73,7 @@ import {
   Settings,
   EditPaymentTerm,
   CreatePaymentTerm,
+  CompanyDocuments,
 } from '../pages/settings';
 import { UserManagement } from '../pages/settings/user-management/UserManagement';
 
@@ -100,7 +101,10 @@ export const routes = (
       </Route>
       <Route path="/settings">
         <Route path="" element={<Settings />} />
-        <Route path="company_details" element={<CompanyDetails />} />
+        <Route path="company_details">
+          <Route path="" element={<CompanyDetails />} />
+          <Route path="documents" element={<CompanyDocuments />} />
+        </Route>
         <Route path="user_details" element={<UserDetails />} />
         <Route path="localization" element={<Localization />} />
         <Route path="online_payments" element={<OnlinePayments />} />

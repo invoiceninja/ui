@@ -55,3 +55,5 @@ export * from './group-settings/GroupSettings';
 export * from './subscriptions/Subscriptions';
 export * from './user-management/UserManagement';
 export * from './payment-terms';
+
+export { Documents as CompanyDocuments } from './company/documents/Documents';

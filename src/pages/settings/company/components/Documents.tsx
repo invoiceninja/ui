@@ -20,7 +20,7 @@ import { Image } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { Card, Element } from '../../../../components/cards';
+import { Card, ClickableElement, Element } from '../../../../components/cards';
 
 export function Documents() {
   const [t] = useTranslation();
@@ -74,7 +74,7 @@ export function Documents() {
 
   return (
     <Card title={t('documents')}>
-      <Element leftSide={t('upload')}>
+      {/* <Element leftSide={t('upload')}>
         <div
           {...getRootProps()}
           className="flex flex-col md:flex-row md:items-center"
@@ -89,7 +89,10 @@ export function Documents() {
             </span>
           </div>
         </div>
-      </Element>
+      </Element> */}
+      <ClickableElement to="/settings/company_details/documents">
+        {t('browse_company_documents')}
+      </ClickableElement>
     </Card>
   );
 }
