@@ -14,7 +14,7 @@ import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { usePaymentTermQuery } from 'common/queries/payment-terms';
+import { bulk, usePaymentTermQuery } from 'common/queries/payment-terms';
 import { Badge } from 'components/Badge';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
@@ -67,7 +67,23 @@ export function Edit() {
     },
   });
 
-  const archive = () => {};
+  const archive = () => {
+    toast.loading(t('processing'));
+
+    bulk([data?.data.data.id], 'archive')
+      .then(() => {
+        toast.dismiss();
+        toast.success(t('archived_payment_term'));
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.dismiss();
+        toast.success(t('archived_payment_term'));
+      })
+      .finally(() => mutate(data?.request.responseURL));
+  };
+
   const restore = () => {};
 
   return (
@@ -112,7 +128,7 @@ export function Edit() {
 
           {!data.data.data.archived_at && !data.data.data.is_deleted ? (
             <ActionCard label={t('archive')} help="Lorem ipsum dolor sit amet.">
-              <Button>{t('archive')}</Button>
+              <Button onClick={archive}>{t('archive')}</Button>
             </ActionCard>
           ) : null}
 
