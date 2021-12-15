@@ -72,6 +72,7 @@ import {
   PaymentTerms,
   Settings,
   EditPaymentTerm,
+  CreatePaymentTerm,
 } from '../pages/settings';
 import { UserManagement } from '../pages/settings/user-management/UserManagement';
 
@@ -160,6 +161,7 @@ export const routes = (
         <Route path="payment_terms">
           <Route path="" element={<PaymentTerms />} />
           <Route path=":id/edit" element={<EditPaymentTerm />} />
+          <Route path="create" element={<CreatePaymentTerm />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
