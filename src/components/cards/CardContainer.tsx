@@ -9,5 +9,5 @@
  */
 
 export function CardContainer(props: { children: React.ReactNode }) {
-  return <div className="p-8 space-y-6">{props.children}</div>;
+  return <div className="px-6 py-4 space-y-6">{props.children}</div>;
 }
