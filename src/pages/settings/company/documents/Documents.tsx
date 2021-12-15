@@ -11,7 +11,7 @@
 import { Settings } from 'components/layouts/Settings';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Upload } from './components';
+import { Upload, Table as DocumentsTable } from './components';
 
 export function Documents() {
   const [t] = useTranslation();
@@ -25,6 +25,7 @@ export function Documents() {
   return (
     <Settings title={t('documents')}>
       <Upload />
+      <DocumentsTable />
     </Settings>
   );
 }
