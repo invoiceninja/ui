@@ -76,7 +76,6 @@ export function PaymentTerms() {
       <div className="flex justify-end">
         <Button to="/settings/payment_terms/create">
           <span>{t('new_payment_term')}</span>
-          <PlusCircle size="20" />
         </Button>
       </div>
 
@@ -136,7 +135,7 @@ export function PaymentTerms() {
           currentPage={currentPage}
           onPageChange={setCurrentPage}
           onRowsChange={setPerPage}
-          totalPages={data.data.meta.total_pages}
+          totalPages={data.data.meta.pagination.total_pages}
         />
       )}
     </Settings>
