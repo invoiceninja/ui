@@ -10,19 +10,26 @@
 
 import { Card, CardContainer } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import { endpoint } from 'common/helpers';
 import { PaymentTerm } from 'common/interfaces/payment-term';
+import { defaultHeaders } from 'common/queries/common/headers';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { generatePath, useNavigate } from 'react-router-dom';
 
 export function Create() {
   const [t] = useTranslation();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('payment_terms')}`;
+    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
+      'create_payment_term'
+    )}`;
   });
 
   const formik = useFormik({
@@ -32,17 +39,34 @@ export function Create() {
     },
     onSubmit: (values: Partial<PaymentTerm>) => {
       toast.loading(t('processing'));
+
+      axios
+        .post(endpoint('/api/v1/payment_terms'), values, {
+          headers: defaultHeaders,
+        })
+        .then((response: AxiosResponse) => {
+          toast.dismiss();
+          toast.success(t('created_payment_term'));
+
+          navigate(
+            generatePath('/settings/payment_terms/:id/edit', {
+              id: response.data.data.id,
+            })
+          );
+        })
+        .catch((error: AxiosError) => console.log(error))
+        .finally(() => formik.setSubmitting(false));
     },
   });
 
   return (
-    <Settings title="Create">
+    <Settings title={t('payment_terms')}>
       <Container className="space-y-6">
         <Card
           withSaveButton
           disableSubmitButton={formik.isSubmitting}
           onFormSubmit={formik.handleSubmit}
-          title={t('create_a_product_term')}
+          title={t('create_payment_term')}
         >
           <CardContainer>
             <InputField
