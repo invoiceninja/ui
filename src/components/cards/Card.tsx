@@ -10,8 +10,6 @@
 
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../common/stores/store';
 import { Button } from '../forms';
 
 interface Props {
@@ -26,7 +24,6 @@ interface Props {
 }
 
 export function Card(props: Props) {
-  const colors = useSelector((state: RootState) => state.settings.colors);
   const [t] = useTranslation();
 
   return (
