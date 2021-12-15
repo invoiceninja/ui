@@ -19,6 +19,7 @@ import {
 } from '@invoiceninja/tables';
 import { Document } from 'common/interfaces/document.interface';
 import { useDocumentsQuery } from 'common/queries/documents';
+import { FileIcon } from 'components/FileIcon';
 import { Spinner } from 'components/Spinner';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -52,7 +53,12 @@ export function Table() {
           {data &&
             data.data.data.map((document: Document) => (
               <Tr key={document.id}>
-                <Td className="truncate">{document.name}</Td>
+                <Td className="truncate">
+                  <div className="flex items-center space-x-2">
+                    <FileIcon type={document.type} />
+                    <span>{document.name}</span>
+                  </div>
+                </Td>
                 <Td>{document.updated_at}</Td>
                 <Td>{document.type}</Td>
                 <Td>{document.size}</Td>
