@@ -36,9 +36,9 @@ export function Badge(props: Props) {
   return (
     <span
       style={styles}
-      className={classNames('text-xs px-2 py-1 rounded border', {
+      className={classNames('text-xs px-2 py-1 rounded', {
         'bg-gray-50': props.variant === 'generic',
-        'bg-white': props.variant === 'white',
+        'bg-white border': props.variant === 'white',
         'bg-yellow-600 text-white': props.variant === 'yellow',
         'bg-red-600 text-white': props.variant === 'red',
       })}
