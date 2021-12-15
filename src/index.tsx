@@ -20,6 +20,7 @@ import { initReactI18next } from 'react-i18next';
 import './resources/css/app.css';
 
 import en from './resources/lang/en/en.json';
+import { ScrollToTop } from 'components/ScrollToTop';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -41,7 +42,9 @@ ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
       <Router>
-        <App />
+        <ScrollToTop>
+          <App />
+        </ScrollToTop>
       </Router>
     </Provider>
   </React.StrictMode>,
