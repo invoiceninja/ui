@@ -79,12 +79,27 @@ export function Edit() {
         console.error(error);
 
         toast.dismiss();
-        toast.success(t('archived_payment_term'));
+        toast.success(t('error_title'));
       })
       .finally(() => mutate(data?.request.responseURL));
   };
 
-  const restore = () => {};
+  const restore = () => {
+    toast.loading(t('processing'));
+
+    bulk([data?.data.data.id], 'restore')
+      .then(() => {
+        toast.dismiss();
+        toast.success(t('restored_payment_term'));
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.dismiss();
+        toast.success(t('error_title'));
+      })
+      .finally(() => mutate(data?.request.responseURL));
+  };
 
   return (
     <Settings title={t('payment_terms')}>
@@ -134,7 +149,7 @@ export function Edit() {
 
           {data.data.data.archived_at && !data.data.data.is_deleted ? (
             <ActionCard label={t('restore')} help="Lorem ipsum dolor sit amet.">
-              <Button>{t('restore')}</Button>
+              <Button onClick={restore}>{t('restore')}</Button>
             </ActionCard>
           ) : null}
         </Container>
