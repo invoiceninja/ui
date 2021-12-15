@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
+import { Button, Link } from '@invoiceninja/forms';
 import {
   ColumnSortPayload,
   Pagination,
@@ -19,10 +19,9 @@ import {
   Thead,
   Tr,
 } from '@invoiceninja/tables';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { bulk, usePaymentTermsQuery } from 'common/queries/payment-terms';
-import { Actions } from 'components/datatables/Actions';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Settings } from 'components/layouts/Settings';
@@ -104,7 +103,15 @@ export function PaymentTerms() {
           {data &&
             data.data.data.map((paymentTerm: PaymentTerm) => (
               <Tr key={paymentTerm.id}>
-                <Td>{paymentTerm.name}</Td>
+                <Td>
+                  <Link
+                    to={generatePath('/settings/payment_terms/:id/edit', {
+                      id: paymentTerm.id,
+                    })}
+                  >
+                    {paymentTerm.name}
+                  </Link>
+                </Td>
                 <Td>
                   <Dropdown label={t('actions')}>
                     <DropdownElement
