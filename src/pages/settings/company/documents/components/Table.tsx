@@ -17,8 +17,11 @@ import {
   Thead,
   Tr,
 } from '@invoiceninja/tables';
+import { endpoint } from 'common/helpers';
 import { Document } from 'common/interfaces/document.interface';
 import { useDocumentsQuery } from 'common/queries/documents';
+import { Dropdown } from 'components/dropdown/Dropdown';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { FileIcon } from 'components/FileIcon';
 import { Spinner } from 'components/Spinner';
 import { useState } from 'react';
@@ -62,7 +65,31 @@ export function Table() {
                 <Td>{document.updated_at}</Td>
                 <Td>{document.type}</Td>
                 <Td>{document.size}</Td>
-                <Td></Td>
+                <Td>
+                  <Dropdown>
+                    <DropdownElement>
+                      <a
+                        target="_blank"
+                        className="block w-full"
+                        href={endpoint('/documents/:hash?inline=true', {
+                          hash: document.hash,
+                        })}
+                      >
+                        {t('view')}
+                      </a>
+                    </DropdownElement>
+                    <DropdownElement>
+                      <a
+                        className="block w-full"
+                        href={endpoint('/documents/:hash', {
+                          hash: document.hash,
+                        })}
+                      >
+                        {t('download')}
+                      </a>
+                    </DropdownElement>
+                  </Dropdown>
+                </Td>
               </Tr>
             ))}
         </Tbody>
