@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -34,6 +35,8 @@ export function Pagination(props: Props) {
   const [t] = useTranslation();
   const colors = useSelector((state: RootState) => state.settings.colors);
 
+  const [currentPerPage, setCurrentPerPage] = useState('10');
+
   function next() {
     if (props.currentPage + 1 <= props.totalPages) {
       props.onPageChange(props.currentPage + 1);
@@ -56,9 +59,12 @@ export function Pagination(props: Props) {
             name="location"
             className="block pl-3 pr-10 py-2 text-base border-gray-300 sm:text-sm rounded-md"
             defaultValue="10"
-            onChange={(element) => props.onRowsChange(element.target.value)}
+            onChange={(element) => {
+              setCurrentPerPage(element.target.value);
+              props.onRowsChange(element.target.value);
+            }}
           >
-            <option>10</option>
+            <option value="10">10</option>
             <option>50</option>
             <option>100</option>
           </select>
