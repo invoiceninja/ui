@@ -8,9 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint, fetcher } from 'common/helpers';
-import useSWR from 'swr';
+import axios from 'axios';
+import { endpoint } from 'common/helpers';
+import { useQuery } from 'react-query';
+import { defaultHeaders } from './common/headers';
 
 export function useStaticsQuery() {
-  return useSWR(endpoint('/api/v1/statics'), fetcher);
+  return useQuery('/api/v1/statics', () => {
+    return axios.get(endpoint('/api/v1/statics'), { headers: defaultHeaders });
+  });
 }
