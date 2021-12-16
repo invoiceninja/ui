@@ -39,7 +39,7 @@ export function Table() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
 
-  const { data } = useDocumentsQuery({ perPage, currentPage });
+  const { data, isLoading } = useDocumentsQuery({ perPage, currentPage });
   const { mutate } = useSWRConfig();
 
   const dispatch = useDispatch();
@@ -82,7 +82,7 @@ export function Table() {
           <Th></Th>
         </Thead>
         <Tbody>
-          {!data && (
+          {isLoading && (
             <Tr>
               <Td colSpan={5}>
                 <Spinner />

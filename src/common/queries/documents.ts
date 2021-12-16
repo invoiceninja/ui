@@ -15,7 +15,7 @@ import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 
 export function useDocumentsQuery(params: Params) {
-  return useQuery('/api/v1/documents', () =>
+  return useQuery(['/api/v1/documents', params], () =>
     axios.get(
       endpoint('/api/v1/documents?per_page=:perPage&page=:currentPage', {
         perPage: params.perPage,
