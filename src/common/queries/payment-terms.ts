@@ -11,6 +11,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { endpoint, fetcher } from 'common/helpers';
 import { useQuery } from 'react-query';
+import { generatePath } from 'react-router-dom';
 import useSWR from 'swr';
 import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
@@ -32,7 +33,11 @@ export function usePaymentTermsQuery(params: Params) {
 }
 
 export function usePaymentTermQuery(params: { id: string | undefined }) {
-  return useSWR(endpoint('/api/v1/payment_terms/:id', params), fetcher);
+  return useQuery(generatePath('/api/v1/payment_terms/:id', params), () =>
+    axios.get(endpoint('/api/v1/payment_terms/:id', params), {
+      headers: defaultHeaders,
+    })
+  );
 }
 
 export function bulk(
