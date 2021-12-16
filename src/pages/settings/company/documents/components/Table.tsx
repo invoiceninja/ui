@@ -26,6 +26,7 @@ import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { FileIcon } from 'components/FileIcon';
 import { Spinner } from 'components/Spinner';
+import prettyBytes from 'pretty-bytes';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -89,7 +90,7 @@ export function Table() {
                 </Td>
                 <Td>{document.updated_at}</Td>
                 <Td>{document.type}</Td>
-                <Td>{document.size}</Td>
+                <Td>{prettyBytes(document.size)}</Td>
                 <Td>
                   <Dropdown>
                     <DropdownElement>
