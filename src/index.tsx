@@ -21,6 +21,7 @@ import './resources/css/app.css';
 
 import en from './resources/lang/en/en.json';
 import { ScrollToTop } from 'components/ScrollToTop';
+import { QueryClient, QueryClientProvider } from 'react-query';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -38,15 +39,19 @@ i18n.use(initReactI18next).init({
 const Router =
   import.meta.env.VITE_ROUTER === 'hash' ? HashRouter : BrowserRouter;
 
+const queryClient = new QueryClient();
+
 ReactDOM.render(
   <React.StrictMode>
-    <Provider store={store}>
-      <Router>
-        <ScrollToTop>
-          <App />
-        </ScrollToTop>
-      </Router>
-    </Provider>
+    <QueryClientProvider client={queryClient}>
+      <Provider store={store}>
+        <Router>
+          <ScrollToTop>
+            <App />
+          </ScrollToTop>
+        </Router>
+      </Provider>
+    </QueryClientProvider>
   </React.StrictMode>,
   document.getElementById('root')
 );
