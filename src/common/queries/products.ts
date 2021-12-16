@@ -17,19 +17,21 @@ import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 
 export function useProductsQuery(params: Params) {
-  return useSWR(
-    endpoint(
-      '/api/v1/products?per_page=:perPage&page=:currentPage&filter=:filter&status=:status&sort=:sort',
-      {
-        perPage: params.perPage,
-        currentPage: params.currentPage,
-        filter: params.filter,
-        status: params.status,
-        sort: params.sort ?? 'id|asc',
-      }
-    ),
-    fetcher
-  );
+  return useQuery(['/api/v1/products', params], () => {
+    return axios.get(
+      endpoint(
+        '/api/v1/products?per_page=:perPage&page=:currentPage&filter=:filter&status=:status&sort=:sort',
+        {
+          perPage: params.perPage,
+          currentPage: params.currentPage,
+          filter: params.filter,
+          status: params.status,
+          sort: params.sort ?? 'id|asc',
+        }
+      ),
+      { headers: defaultHeaders }
+    );
+  });
 }
 
 export function useProductQuery(params: { id: string | undefined }) {
@@ -38,8 +40,6 @@ export function useProductQuery(params: { id: string | undefined }) {
       headers: defaultHeaders,
     })
   );
-
-  return useSWR(endpoint('/api/v1/products/:id', params), fetcher);
 }
 
 export function bulk(
