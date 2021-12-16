@@ -11,8 +11,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
-import useSWR from 'swr';
-import { endpoint, fetcher, request } from '../helpers';
+import { endpoint, request } from '../helpers';
 import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 
