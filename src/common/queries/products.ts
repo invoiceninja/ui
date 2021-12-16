@@ -8,9 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
+import { useQuery } from 'react-query';
+import { generatePath } from 'react-router-dom';
 import useSWR from 'swr';
 import { endpoint, fetcher, request } from '../helpers';
+import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 
 export function useProductsQuery(params: Params) {
@@ -30,6 +33,12 @@ export function useProductsQuery(params: Params) {
 }
 
 export function useProductQuery(params: { id: string | undefined }) {
+  return useQuery(generatePath('/api/v1/products/:id', { id: params.id }), () =>
+    axios.get(endpoint('/api/v1/products/:id', { id: params.id }), {
+      headers: defaultHeaders,
+    })
+  );
+
   return useSWR(endpoint('/api/v1/products/:id', params), fetcher);
 }
 
