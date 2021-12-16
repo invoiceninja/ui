@@ -23,6 +23,7 @@
     "react-feather": "^2.0.9",
     "react-hot-toast": "^2.1.1",
     "react-i18next": "^11.14.2",
+    "react-query": "^3.34.4",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.0.2",
     "react-select": "^5.2.1",
