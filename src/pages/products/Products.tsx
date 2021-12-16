@@ -8,30 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { bulk, useProductsQuery } from '../../common/queries/products';
 import { Default } from '../../components/layouts/Default';
-import { Link } from '../../components/forms/Link';
-import { Table } from '../../components/tables/Table';
-import { Thead } from '../../components/tables/Thead';
-import { ColumnSortPayload, Th } from '../../components/tables/Th';
-import { Tbody } from '../../components/tables/Tbody';
-import { Tr } from '../../components/tables/Tr';
-import { Td } from '../../components/tables/Td';
-import { Pagination } from '../../components/tables/Pagination';
-import { Checkbox } from '../../components/forms/Checkbox';
 import { generatePath } from 'react-router';
 import { Actions } from '../../components/datatables/Actions';
-import { Button } from '../../components/forms/Button';
+import {Link, Checkbox, Button} from '@invoiceninja/forms'
 import { CheckSquare, PlusCircle } from 'react-feather';
 import { handleCheckboxChange } from '../../common/helpers';
 import { Spinner } from '../../components/Spinner';
-import { AxiosError, AxiosResponse, Method } from 'axios';
-import { useSWRConfig } from 'swr';
-import { Alert } from '../../components/Alert';
+import { AxiosError, AxiosResponse } from 'axios';
 import { Dropdown } from '../../components/dropdown/Dropdown';
 import { DropdownElement } from '../../components/dropdown/DropdownElement';
+import { useQueryClient } from 'react-query';
+import toast from 'react-hot-toast';
+import {
+  Table,
+  Thead,
+  Th,
+  ColumnSortPayload,
+  Tbody,
+  Tr,
+  Td,
+  Pagination,
+} from '@invoiceninja/tables';
 
 export function Products() {
   useEffect(() => {
@@ -46,15 +47,8 @@ export function Products() {
   const [selected, setSelected] = useState(new Set<string>());
   const [sort, setSort] = useState<string | undefined>(undefined);
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
-  const { mutate } = useSWRConfig();
-  const [alert, setAlert] = useState<
-    | {
-        type?: 'success' | 'danger';
-        message?: string;
-      }
-    | undefined
-  >(undefined);
   const mainCheckbox = useRef<HTMLInputElement>(null);
+  const queryClient = useQueryClient();
 
   const options = [
     { value: 'active', label: t('active') },
@@ -62,7 +56,7 @@ export function Products() {
     { value: 'deleted', label: t('deleted') },
   ];
 
-  const { data, error } = useProductsQuery({
+  const { data } = useProductsQuery({
     perPage,
     currentPage,
     filter,
@@ -70,79 +64,62 @@ export function Products() {
     sort,
   });
 
-  function archive() {
+  const archive = () => {
     bulk(Array.from(selected), 'archive')
       .then((response: AxiosResponse) => {
-        mutate(data?.request.responseURL);
-
-        setAlert(undefined);
-        setAlert({
-          message: generatePath(t('archived_products'), {
+        toast.success(
+          generatePath(t('archived_products'), {
             count: response.data.data.length.toString(),
-          }),
-          type: 'success',
-        });
+          })
+        );
 
         selected.clear();
 
         /** @ts-ignore: Unreachable, if element is null/undefined. */
         mainCheckbox.current.checked = false;
       })
-      .catch((error: AxiosError) => console.error(error.response?.data));
-  }
+      .catch((error: AxiosError) => console.error(error.response?.data))
+      .finally(() => queryClient.invalidateQueries('/api/v1/products'));
+  };
 
-  function restore() {
+  const restore = () => {
     bulk(Array.from(selected), 'restore')
       .then((response: AxiosResponse) => {
-        mutate(data?.request.responseURL);
-
-        setAlert(undefined);
-        setAlert({
-          message: generatePath(t('restored_products'), {
+        toast.success(
+          generatePath(t('restored_products'), {
             value: response.data.data.length.toString(),
-          }),
-          type: 'success',
-        });
+          })
+        );
 
         selected.clear();
 
         // @ts-ignore: Unreachable when element is undefined.
         mainCheckbox.current.checked = false;
       })
-      .catch((error: AxiosError) => console.error(error.response?.data));
-  }
+      .catch((error: AxiosError) => console.error(error.response?.data))
+      .finally(() => queryClient.invalidateQueries('/api/v1/products'));
+  };
 
-  function _delete() {
+  const destroy = () => {
     if (!confirm(t('are_you_sure'))) {
       return;
     }
 
     bulk(Array.from(selected), 'delete')
       .then((response: AxiosResponse) => {
-        mutate(data?.request.responseURL);
-
-        setAlert(undefined);
-        setAlert({
-          message: t('deleted_product'),
-          type: 'success',
-        });
+        toast.success(t('deleted_product'));
 
         selected.clear();
 
         // @ts-ignore: Unreachable when element is undefined.
         mainCheckbox.current.checked = false;
       })
-      .catch((error: AxiosError) => console.error(error.response?.data));
-  }
+      .catch((error: AxiosError) => console.error(error.response?.data))
+      .finally(() => queryClient.invalidateQueries('/api/v1/products'));
+  };
 
   return (
     <Default title={t('products')}>
-      {alert && (
-        <Alert className="mb-4" type={alert.type}>
-          {alert.message}.
-        </Alert>
-      )}
-
       <Actions
         onStatusChange={setStatus}
         onFilterChange={setFilter}
@@ -170,7 +147,7 @@ export function Products() {
             {t('restore_product')}
           </DropdownElement>
 
-          <DropdownElement onClick={_delete}>
+          <DropdownElement onClick={destroy}>
             {t('delete_product')}
           </DropdownElement>
         </Dropdown>
@@ -320,7 +297,7 @@ export function Products() {
                           onClick={() => {
                             setSelected(new Set());
                             setSelected(selected.add(product.id));
-                            _delete();
+                            destroy();
                           }}
                         >
                           {t('delete_product')}
