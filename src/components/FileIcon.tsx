@@ -19,7 +19,7 @@ export function FileIcon(props: { type: string }) {
       {props.type === 'svg' && <Svg height={26} />}
       {props.type === 'png' && <Png height={26} />}
       {props.type === 'pdf' && <Pdf height={26} />}
-      
+
       {!supported.includes(props.type) && <File height={26} />}
     </>
   );
