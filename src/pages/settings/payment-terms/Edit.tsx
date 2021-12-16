@@ -23,8 +23,8 @@ import { useFormik } from 'formik';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import { useSWRConfig } from 'swr';
+import { useQueryClient } from 'react-query';
+import { generatePath, useParams } from 'react-router-dom';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -35,7 +35,13 @@ export function Edit() {
 
   const { id } = useParams();
   const { data } = usePaymentTermQuery({ id });
-  const { mutate } = useSWRConfig();
+  const queryClient = useQueryClient();
+
+  const invalidatePaymentTermCache = () => {
+    queryClient.invalidateQueries(
+      generatePath('/api/v1/payment_terms/:id', { id })
+    );
+  };
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -52,8 +58,6 @@ export function Edit() {
           { headers: defaultHeaders }
         )
         .then(() => {
-          mutate(data?.request.responseURL);
-
           toast.dismiss();
           toast.success(t('updated_payment_term'));
         })
@@ -63,7 +67,10 @@ export function Edit() {
           toast.dismiss();
           toast.error(t('error_title'));
         })
-        .finally(() => formik.setSubmitting(false));
+        .finally(() => {
+          formik.setSubmitting(false);
+          invalidatePaymentTermCache();
+        });
     },
   });
 
@@ -81,7 +88,7 @@ export function Edit() {
         toast.dismiss();
         toast.success(t('error_title'));
       })
-      .finally(() => mutate(data?.request.responseURL));
+      .finally(() => invalidatePaymentTermCache());
   };
 
   const restore = () => {
@@ -98,7 +105,7 @@ export function Edit() {
         toast.dismiss();
         toast.success(t('error_title'));
       })
-      .finally(() => mutate(data?.request.responseURL));
+      .finally(() => invalidatePaymentTermCache());
   };
 
   const _delete = () => {
@@ -115,7 +122,7 @@ export function Edit() {
         toast.dismiss();
         toast.success(t('error_title'));
       })
-      .finally(() => mutate(data?.request.responseURL));
+      .finally(() => invalidatePaymentTermCache());
   };
 
   return (

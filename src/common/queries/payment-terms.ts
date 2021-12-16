@@ -41,7 +41,7 @@ export function usePaymentTermQuery(params: { id: string | undefined }) {
 
 export function bulk(
   id: string[],
-  action: 'archive' | 'restore'
+  action: 'archive' | 'restore' | 'delete'
 ): Promise<AxiosResponse> {
   return axios.post(
     endpoint('/api/v1/payment_terms/bulk'),
