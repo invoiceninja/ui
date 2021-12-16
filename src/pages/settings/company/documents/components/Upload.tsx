@@ -55,7 +55,7 @@ export function Upload() {
           console.error(error);
 
           toast.dismiss();
-          toast.success(t('error_title'));
+          toast.error(t('error_title'));
         });
     },
   });
