@@ -48,7 +48,7 @@ export function Edit() {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${
       data?.data.data.product_key
     }`;
-  }, []);
+  }, [data]);
 
   const invalidateProductCache = () => {
     queryClient.invalidateQueries(generatePath('/api/v1/products/:id', { id }));
