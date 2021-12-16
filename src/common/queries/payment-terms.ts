@@ -10,21 +10,24 @@
 
 import axios, { AxiosResponse } from 'axios';
 import { endpoint, fetcher } from 'common/helpers';
+import { useQuery } from 'react-query';
 import useSWR from 'swr';
 import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 
 export function usePaymentTermsQuery(params: Params) {
-  return useSWR(
-    endpoint(
-      '/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort',
-      {
-        perPage: params.perPage,
-        currentPage: params.currentPage,
-        sort: params.sort ?? 'id|asc',
-      }
-    ),
-    fetcher
+  return useQuery(['/api/v1/payment_terms', params], () =>
+    axios.get(
+      endpoint(
+        '/api/v1/payment_terms?per_page=:perPage&page=:currentPage&sort=:sort',
+        {
+          perPage: params.perPage,
+          currentPage: params.currentPage,
+          sort: params.sort ?? 'id|asc',
+        }
+      ),
+      { headers: defaultHeaders }
+    )
   );
 }
 
