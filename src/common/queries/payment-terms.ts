@@ -9,10 +9,9 @@
  */
 
 import axios, { AxiosResponse } from 'axios';
-import { endpoint, fetcher } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
-import useSWR from 'swr';
 import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 
