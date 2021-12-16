@@ -8,7 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { Axios, AxiosResponse, Method } from 'axios';
+import axios, { AxiosResponse, Method } from 'axios';
+import dayjs from 'dayjs';
 import { generatePath } from 'react-router';
 
 export function endpoint(endpoint: string, params = {}): string {
@@ -70,4 +71,8 @@ export function fetcher(
 
 export function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
+}
+
+export function date(timestamp: number, format: string) {
+  return dayjs.unix(timestamp).format(format);
 }
