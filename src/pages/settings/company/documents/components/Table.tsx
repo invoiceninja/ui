@@ -40,7 +40,7 @@ export function Table() {
   const { data, isLoading } = useDocumentsQuery({ perPage, currentPage });
   const queryClient = useQueryClient();
 
-  const _delete = (id: string) => {
+  const destroy = (id: string) => {
     toast.loading(t('processing'));
 
     axios
@@ -116,7 +116,7 @@ export function Table() {
                       </a>
                     </DropdownElement>
 
-                    <DropdownElement onClick={() => _delete(document.id)}>
+                    <DropdownElement onClick={() => destroy(document.id)}>
                       {t('delete')}
                     </DropdownElement>
                   </Dropdown>
