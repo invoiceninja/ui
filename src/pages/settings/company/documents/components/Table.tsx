@@ -17,15 +17,20 @@ import {
   Thead,
   Tr,
 } from '@invoiceninja/tables';
+import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { Document } from 'common/interfaces/document.interface';
+import { defaultHeaders } from 'common/queries/common/headers';
 import { useDocumentsQuery } from 'common/queries/documents';
+import { bulk } from 'common/queries/payment-terms';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { FileIcon } from 'components/FileIcon';
 import { Spinner } from 'components/Spinner';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useSWRConfig } from 'swr';
 
 export function Table() {
   const [t] = useTranslation();
@@ -33,6 +38,28 @@ export function Table() {
   const [perPage, setPerPage] = useState<string>('10');
 
   const { data } = useDocumentsQuery({ perPage, currentPage });
+  const { mutate } = useSWRConfig();
+
+  const _delete = (id: string) => {
+    toast.loading(t('processing'));
+
+    axios
+      .delete(endpoint('/api/v1/documents/:id', { id }), {
+        headers: defaultHeaders,
+      })
+      .then(() => {
+        toast.dismiss();
+        toast.success(t('deleted_payment_term'));
+
+        mutate(data?.request.responseURL);
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.dismiss();
+        toast.error(t('error_title'));
+      });
+  };
 
   return (
     <>
@@ -78,6 +105,7 @@ export function Table() {
                         {t('view')}
                       </a>
                     </DropdownElement>
+
                     <DropdownElement>
                       <a
                         className="block w-full"
@@ -87,6 +115,10 @@ export function Table() {
                       >
                         {t('download')}
                       </a>
+                    </DropdownElement>
+
+                    <DropdownElement onClick={() => _delete(document.id)}>
+                      {t('delete')}
                     </DropdownElement>
                   </Dropdown>
                 </Td>
