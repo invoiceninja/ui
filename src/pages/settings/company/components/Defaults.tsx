@@ -18,8 +18,10 @@ import { updateChanges } from 'common/stores/slices/company';
 import { ChangeEvent } from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import useSWR from 'swr';
-import { endpoint, fetcher } from 'common/helpers';
+import { endpoint } from 'common/helpers';
+import { useQuery } from 'react-query';
+import axios from 'axios';
+import { defaultHeaders } from 'common/queries/common/headers';
 
 export function Defaults() {
   const [t] = useTranslation();
@@ -27,11 +29,8 @@ export function Defaults() {
   const company = useCurrentCompany();
   const statics = useStaticsQuery();
 
-  const { data } = useSWR(
-    endpoint('/api/v1/companies/:id?include=payment_terms', {
-      id: company?.id ?? '',
-    }),
-    fetcher
+  const { data: terms, isLoading } = useQuery('/api/v1/paymen_terms', () =>
+    axios.get(endpoint('/api/v1/payment_terms'), { headers: defaultHeaders })
   );
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
@@ -72,7 +71,7 @@ export function Defaults() {
               )}
             </SelectField>
           </Element>
-          {data && (
+          {terms && (
             <Element leftSide={t('payment_terms')}>
               <SelectField
                 id="settings.payment_terms"
@@ -80,13 +79,11 @@ export function Defaults() {
                 value={company.settings.payment_terms}
               >
                 <option value=""></option>
-                {data.data.data.payment_terms.map(
-                  (type: { id: string; name: string }) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  )
-                )}
+                {terms.data.data.map((type: { id: string; name: string }) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
               </SelectField>
 
               <Link to="/settings/payment_terms" className="block mt-2">
@@ -95,7 +92,7 @@ export function Defaults() {
             </Element>
           )}
 
-          {data && (
+          {terms && (
             <Element leftSide={t('quote_valid_until')}>
               <SelectField
                 id="settings.valid_until"
@@ -103,7 +100,7 @@ export function Defaults() {
                 value={company.settings.valid_until}
               >
                 <option value=""></option>
-                {data.data.data.payment_terms.map(
+                {terms.data.data.map(
                   (type: { id: string; name: string }) => (
                     <option key={type.id} value={type.id}>
                       {type.name}
