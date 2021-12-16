@@ -28,11 +28,10 @@ import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { PlusCircle } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { generatePath } from 'react-router-dom';
-import { useSWRConfig } from 'swr';
 
 export function PaymentTerms() {
   const [t] = useTranslation();
@@ -44,8 +43,7 @@ export function PaymentTerms() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
   const [sort, setSort] = useState<string | undefined>(undefined);
-
-  const { mutate } = useSWRConfig();
+  const queryClient = useQueryClient();
 
   const { data } = usePaymentTermsQuery({
     currentPage,
@@ -60,15 +58,14 @@ export function PaymentTerms() {
       .then(() => {
         toast.dismiss();
         toast.success(t('archived_payment_term'));
-
-        mutate(data?.request.responseURL);
       })
       .catch((error: AxiosError) => {
         toast.dismiss();
         toast.success(t('error_title'));
 
         console.log(error);
-      });
+      })
+      .finally(() => queryClient.invalidateQueries('/api/v1/payment_terms'));
   };
 
   return (
