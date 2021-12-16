@@ -13,6 +13,7 @@ import { setupListeners } from '@reduxjs/toolkit/dist/query';
 import { accountSlice } from './slices/account';
 import { companySlice } from './slices/company';
 import { invoiceSlice } from './slices/invoices';
+import { companyDocumentSlice } from './slices/company-documents';
 import { productsSlice } from './slices/products';
 import { settingsSlice } from './slices/settings';
 import { tokenSlice } from './slices/token';
@@ -27,6 +28,7 @@ export const store = configureStore({
     token: tokenSlice.reducer,
     account: accountSlice.reducer,
     invoices: invoiceSlice.reducer,
+    companyDocuments: companyDocumentSlice.reducer,
   },
 });
 

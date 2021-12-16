@@ -23,13 +23,15 @@ import { Document } from 'common/interfaces/document.interface';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useDocumentsQuery } from 'common/queries/documents';
 import { bulk } from 'common/queries/payment-terms';
+import { updateLatestQueryUrl } from 'common/stores/slices/company-documents';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { FileIcon } from 'components/FileIcon';
 import { Spinner } from 'components/Spinner';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useSWRConfig } from 'swr';
 
 export function Table() {
@@ -39,6 +41,14 @@ export function Table() {
 
   const { data } = useDocumentsQuery({ perPage, currentPage });
   const { mutate } = useSWRConfig();
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(
+      updateLatestQueryUrl({ url: data?.request.responseURL as string })
+    );
+  }, [data]);
 
   const _delete = (id: string) => {
     toast.loading(t('processing'));

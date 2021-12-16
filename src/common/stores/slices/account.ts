@@ -19,7 +19,7 @@ const initialState: AccountState = {
 };
 
 export const accountSlice = createSlice({
-  name: 'token',
+  name: 'account',
   initialState,
   reducers: {
     updateAccount: (state, action: any) => {
