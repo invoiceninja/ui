@@ -8,17 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useEffect, useState } from 'react';
-import { AxiosError, AxiosResponse } from 'axios';
+import { useEffect, useState } from 'react';
+import axios from 'axios';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import {
-  generatePath,
-  useLocation,
-  useNavigate,
-  useParams,
-} from 'react-router';
-import { endpoint, request } from '../../common/helpers';
+import { generatePath, useParams } from 'react-router';
+import { endpoint } from '../../common/helpers';
 import { bulk, useProductQuery } from '../../common/queries/products';
 import { Alert } from '../../components/Alert';
 import { Container } from '../../components/Container';
@@ -28,7 +23,9 @@ import { Textarea } from '../../components/forms/Textarea';
 import { Default } from '../../components/layouts/Default';
 import { Spinner } from '../../components/Spinner';
 import { Badge } from '../../components/Badge';
-import { useSWRConfig } from 'swr';
+import { useQueryClient } from 'react-query';
+import { defaultHeaders } from 'common/queries/common/headers';
+import toast from 'react-hot-toast';
 
 interface UpdateProductDto {
   product_key: string;
@@ -39,67 +36,41 @@ interface UpdateProductDto {
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
-  const location = useLocation();
-  const [product, setProduct] = useState<any>();
-  const { data, error } = useProductQuery({ id });
+  const { data, isLoading } = useProductQuery({ id });
   const [errors, setErrors] = useState<any>();
-  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-  const navigate = useNavigate();
   const [alert, setAlert] = useState<
     { type: string; message: string } | undefined
   >(undefined);
-  const { mutate } = useSWRConfig();
 
-  const [initialValues, setInitialValues] = useState<UpdateProductDto>({
-    product_key: '',
-    notes: '',
-    cost: '',
-  });
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${
       data?.data.data.product_key
     }`;
+  }, []);
 
-    let product = data?.data.data;
-
-    setInitialValues({
-      product_key: product?.product_key,
-      notes: product?.notes,
-      cost: product?.cost,
-    });
-
-    if (location?.state?.message) {
-      setAlert({ type: 'success', message: location?.state?.message });
-    }
-
-    setProduct(product);
-  }, [data, location]);
+  const invalidateProductCache = () => {
+    queryClient.invalidateQueries(generatePath('/api/v1/products/:id', { id }));
+  };
 
   const form = useFormik({
     enableReinitialize: true,
-    initialValues,
+    initialValues: {
+      product_key: data?.data.data.product_key || '',
+      notes: data?.data.data.notes || '',
+      cost: data?.data.data.cost || 0,
+    },
     onSubmit: (values: UpdateProductDto) => {
-      setIsFormBusy(true);
       setErrors('');
       setAlert(undefined);
 
-      request('PUT', endpoint('/api/v1/products/:id', { id }), values, {
-        'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN'),
-      })
-        .then((response: AxiosResponse) => {
-          setAlert({
-            type: 'success',
-            message: t('updated_product'),
-          });
-
-          mutate(data?.request.responseURL);
+      axios
+        .put(endpoint('/api/v1/products/:id', { id }), values, {
+          headers: defaultHeaders,
         })
-        .catch((error: AxiosError) => {
-          if (error.response?.status === 403) {
-            return navigate('/logout');
-          }
-
+        .then(() => toast.success(t('updated_product')))
+        .catch((error) => {
           if (error.response?.status === 422) {
             setErrors(error.response.data.errors);
           }
@@ -109,22 +80,25 @@ export function Edit() {
             message: error?.response?.data.message,
           });
         })
-        .finally(() => setIsFormBusy(false));
+        .finally(() => {
+          form.setSubmitting(false);
+          invalidateProductCache();
+        });
     },
   });
 
-  function archive() {
-    bulk([product.id], 'archive')
-      .then((response: AxiosResponse) => mutate(data?.request.responseURL))
-      .catch((error: AxiosError) =>
+  const archive = () => {
+    bulk([id as string], 'archive')
+      .then(() => invalidateProductCache())
+      .catch((error) =>
         setAlert({ type: 'danger', message: error.request?.data.message })
       );
-  }
+  };
 
   function restore() {
-    bulk([product.id], 'restore')
-      .then((response: AxiosResponse) => mutate(data?.request.responseURL))
-      .catch((error: AxiosError) =>
+    bulk([id as string], 'restore')
+      .then(() => invalidateProductCache())
+      .catch((error) =>
         setAlert({ type: 'danger', message: error.request?.data.message })
       );
   }
@@ -134,14 +108,14 @@ export function Edit() {
       return;
     }
 
-    bulk([product.id], 'delete')
-      .then((response: AxiosResponse) => mutate(data?.request.responseURL))
-      .catch((error: AxiosError) =>
+    bulk([id as string], 'delete')
+      .then(() => invalidateProductCache())
+      .catch((error) =>
         setAlert({ type: 'danger', message: error.request?.data.message })
       );
   }
 
-  if (!data || !product) {
+  if (isLoading) {
     return (
       <Default>
         <Container>
@@ -163,17 +137,19 @@ export function Edit() {
         )}
 
         <h2 className="inline-flex items-end text-2xl space-x-2">
-          <span>{data.data.data.product_key}</span>
+          <span>{data?.data.data.product_key}</span>
 
-          {!product.is_deleted && !product.archived_at && (
+          {!data?.data.data.is_deleted && !data?.data.data.archived_at && (
             <Badge variant="white">{t('active')}</Badge>
           )}
 
-          {product.archived_at && !product.is_deleted ? (
+          {data?.data.data.archived_at && !data?.data.data.is_deleted ? (
             <Badge variant="yellow">{t('archived')}</Badge>
           ) : null}
 
-          {product.is_deleted && <Badge variant="red">{t('deleted')}</Badge>}
+          {data?.data.data.is_deleted && (
+            <Badge variant="red">{t('deleted')}</Badge>
+          )}
         </h2>
         <div className="bg-white w-full p-8 rounded shadow my-4">
           <form onSubmit={form.handleSubmit} className="space-y-6">
@@ -208,13 +184,13 @@ export function Edit() {
             {errors?.cost && <Alert type="danger">{errors.cost}</Alert>}
 
             <div className="flex justify-end items-center space-x-2">
-              {!isFormBusy && (
+              {!form.isSubmitting && (
                 <Button to="/products" type="secondary">
                   {t('cancel')}
                 </Button>
               )}
 
-              <Button disabled={isFormBusy}>{t('save')}</Button>
+              <Button disabled={form.isSubmitting}>{t('save')}</Button>
             </div>
           </form>
         </div>
@@ -230,7 +206,7 @@ export function Edit() {
             </section>
             <Button
               to={generatePath('/products/:id/clone', {
-                id: product?.id,
+                id,
               })}
             >
               {t('clone')}
@@ -239,7 +215,7 @@ export function Edit() {
         </div>
 
         {/* Archiving product */}
-        {!product.is_deleted && !product.archived_at ? (
+        {!data?.data.data.is_deleted && !data?.data.data.archived_at ? (
           <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
             <div className="flex items-start justify-between">
               <section>
@@ -254,7 +230,7 @@ export function Edit() {
         ) : null}
 
         {/* Restoring product */}
-        {product.archived_at ? (
+        {data?.data.data.archived_at ? (
           <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
             <div className="flex items-start justify-between">
               <section>
@@ -269,7 +245,7 @@ export function Edit() {
         ) : null}
 
         {/* Deleting product */}
-        {!product.is_deleted ? (
+        {!data?.data.data.is_deleted ? (
           <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
             <div className="flex items-start justify-between">
               <section>
