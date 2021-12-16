@@ -11,6 +11,7 @@
     "@uiw/react-md-editor": "^3.8.5",
     "axios": "^0.24.0",
     "classnames": "^2.3.1",
+    "dayjs": "^1.10.7",
     "formik": "^2.2.9",
     "history": "^5.1.0",
     "i18next": "^21.5.1",
