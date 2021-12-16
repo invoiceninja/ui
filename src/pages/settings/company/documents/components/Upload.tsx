@@ -20,16 +20,15 @@ import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSWRConfig } from 'swr';
 
 export function Upload() {
   const [t] = useTranslation();
   const [formData, setFormData] = useState(new FormData());
   const company = useSelector((state: RootState) => state.company.current);
   const dispatch = useDispatch();
-  const documents = useSelector((state: RootState) => state.companyDocuments);
-  const { mutate } = useSWRConfig();
+  const queryClient = useQueryClient();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -54,7 +53,7 @@ export function Upload() {
           toast.dismiss();
           toast.success(t('successfully_uploaded_documents'));
 
-          mutate(documents.latestQueryUrl);
+          queryClient.invalidateQueries('/api/v1/documents');
 
           setFormData(new FormData());
         })
