@@ -8,26 +8,58 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { deletePassword, updateChanges } from 'common/stores/slices/user';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 
 export function Password() {
   const [t] = useTranslation();
+  const dispatch = useDispatch();
+
+  const [password, setPassword] = useState('');
+  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+
+  const handleChange = () => {
+    password === passwordConfirmation
+      ? dispatch(updateChanges({ property: 'password', value: password }))
+      : dispatch(deletePassword());
+  };
+
+  useEffect(() => {
+    window.addEventListener('user.updated', onUserUpdated);
+
+    handleChange();
+  }, [password, passwordConfirmation]);
+
+  const onUserUpdated = () => {
+    setPassword('');
+    setPasswordConfirmation('');
+  };
 
   return (
-    <Card withSaveButton title={t('password')}>
-      <Element leftSide={t('current_password')}>
-        <InputField id="password" type="password" />
-      </Element>
-
-      <div className="my-6"></div>
-
+    <Card title={t('password')}>
       <Element leftSide={t('new_password')}>
-        <InputField id="password" type="password" />
+        <InputField
+          value={password}
+          id="password"
+          type="password"
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            setPassword(event.target.value)
+          }
+        />
       </Element>
       <Element leftSide={t('confirm_password')}>
-        <InputField id="password" type="password" />
+        <InputField
+          value={passwordConfirmation}
+          id="password_confirmation"
+          type="password"
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            setPasswordConfirmation(event.target.value)
+          }
+        />
       </Element>
     </Card>
   );

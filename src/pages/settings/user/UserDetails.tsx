@@ -13,10 +13,12 @@ import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { deletePassword } from 'common/stores/slices/user';
 import { Modal } from 'components/Modal';
 import { ChangeEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
 import {
   AccentColor,
@@ -29,6 +31,8 @@ import {
 export function UserDetails() {
   const [t] = useTranslation();
   const user = useCurrentUser();
+  const dispatch = useDispatch();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
 
@@ -44,9 +48,11 @@ export function UserDetails() {
       .put(endpoint('/api/v1/users/:id', { id: user.id }), user, {
         headers: { 'X-Api-Password': currentPassword, ...defaultHeaders },
       })
-      .then((response) => {
+      .then(() => {
         toast.dismiss();
         toast.success(t('updated_settings'));
+
+        window.dispatchEvent(new CustomEvent('user.updated'));
       })
       .catch((error: AxiosError) => {
         toast.dismiss();
@@ -54,7 +60,8 @@ export function UserDetails() {
         error.response?.status === 412
           ? toast.error(error.response?.data.message)
           : toast.error(t('error_title'));
-      });
+      })
+      .finally(() => dispatch(deletePassword()));
   };
 
   return (
