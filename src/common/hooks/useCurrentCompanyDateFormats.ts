@@ -26,7 +26,7 @@ export function useCurrentCompanyDateFormats() {
         (format: any) => format.id === dateFormatId
       );
 
-      setDateFormat(result?.[0].format_moment);
+      setDateFormat(result?.[0]?.format_moment);
     }
   }, [company, statics]);
 
