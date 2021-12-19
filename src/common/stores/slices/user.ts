@@ -47,7 +47,11 @@ export const userSlice = createSlice({
       state.isDirty = true;
       set(state.user, action.payload.property, action.payload.value);
     },
+    deletePassword: (state) => {
+      delete state.user['password'];
+    },
   },
 });
 
-export const { authenticate, register, updateChanges } = userSlice.actions;
+export const { authenticate, register, updateChanges, deletePassword } =
+  userSlice.actions;
