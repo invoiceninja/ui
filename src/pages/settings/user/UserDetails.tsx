@@ -8,7 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect } from 'react';
+import { Modal } from 'components/Modal';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import {
@@ -26,8 +27,10 @@ export function UserDetails() {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('user_details')}`;
   });
 
+  const onSave = () => {};
+
   return (
-    <Settings title={t('user_details')}>
+    <Settings onSaveClick={onSave} title={t('user_details')}>
       <div className="space-y-6 mt-6">
         <Details />
         <Password />
