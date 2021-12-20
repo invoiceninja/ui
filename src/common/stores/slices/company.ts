@@ -16,14 +16,14 @@ interface CompanyState {
   companies: any;
   current: any;
   logo: string;
-  isDirty: boolean;
+  changes: any;
 }
 
 const initialState: CompanyState = {
   companies: [],
   current: {},
   logo,
-  isDirty: false,
+  changes: {},
 };
 
 export const companySlice = createSlice({
@@ -34,8 +34,10 @@ export const companySlice = createSlice({
       state,
       action: PayloadAction<{ property: string; value: any }>
     ) => {
-      state.isDirty = true;
-      set(state.current.company, action.payload.property, action.payload.value);
+      set(state.changes, action.payload.property, action.payload.value);
+    },
+    resetChanges: (state) => {
+      state.changes = {};
     },
     updateCompanies: (state, action) => {
       state.companies = action.payload;
@@ -47,8 +49,6 @@ export const companySlice = createSlice({
         action.payload.company.settings.company_logo === ''
           ? logo
           : action.payload.company.settings.company_logo;
-
-      state.isDirty = false;
     },
     updateCompanyRecord: (state, action: any) => {
       state.current.company = action.payload;
@@ -63,14 +63,13 @@ export const companySlice = createSlice({
         action.payload.settings.company_logo === ''
           ? logo
           : action.payload.settings.company_logo;
-
-      state.isDirty = false;
     },
   },
 });
 
 export const {
   updateChanges,
+  resetChanges,
   updateCompanies,
   updateCompany,
   updateCompanyRecord,

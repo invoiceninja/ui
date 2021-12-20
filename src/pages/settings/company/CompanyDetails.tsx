@@ -10,13 +10,17 @@
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
-import { useCompany } from 'common/hooks/useCompany';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { updateCompanyRecord } from 'common/stores/slices/company';
+import {
+  resetChanges,
+  updateCompanyRecord,
+} from 'common/stores/slices/company';
+import { RootState } from 'common/stores/store';
+import { merge } from 'lodash';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
 import { Address, Defaults, Details, Documents, Logo } from './components';
 
@@ -31,7 +35,7 @@ export function CompanyDetails() {
 
   const dispatch = useDispatch();
   const currentCompany = useCurrentCompany();
-  const company = useCompany(currentCompany?.id);
+  const companyState = useSelector((state: RootState) => state.company);
 
   const onSave = () => {
     toast.loading(t('processing'));
@@ -39,7 +43,7 @@ export function CompanyDetails() {
     axios
       .put(
         endpoint('/api/v1/companies/:id', { id: currentCompany.id }),
-        currentCompany,
+        merge({}, currentCompany, companyState.changes),
         {
           headers: {
             'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
@@ -60,7 +64,7 @@ export function CompanyDetails() {
       });
   };
 
-  const onCancel = () => dispatch(updateCompanyRecord(company));
+  const onCancel = () => dispatch(resetChanges());
 
   return (
     <Settings
