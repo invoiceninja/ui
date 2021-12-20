@@ -28,6 +28,9 @@ export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    updateUser: (state, action) => {
+      state.user = action.payload;
+    },
     authenticate: (state, action: PayloadAction<Authenticated>) => {
       state.authenticated = true;
       state.user = action.payload.user;
@@ -57,6 +60,7 @@ export const userSlice = createSlice({
 });
 
 export const {
+  updateUser,
   authenticate,
   register,
   updateChanges,
