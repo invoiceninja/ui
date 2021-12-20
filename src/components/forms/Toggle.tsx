@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { Switch } from '@headlessui/react';
 import { classNames } from '../../common/helpers';
 import CommonProps from '../../common/interfaces/common-props.interface';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 
 interface Props extends CommonProps {
   label?: string;
@@ -20,6 +21,15 @@ interface Props extends CommonProps {
 
 export default function Toggle(props: Props) {
   const [enabled, setEnabled] = useState(props.checked ?? false);
+  const accentColor = useAccentColor();
+
+  const styles: React.CSSProperties = {
+    backgroundColor: 'rgb(229 231 235)',
+  };
+
+  if (enabled) {
+    styles.backgroundColor = accentColor;
+  }
 
   return (
     <Switch.Group as="div" className="flex items-center">
@@ -29,10 +39,8 @@ export default function Toggle(props: Props) {
           setEnabled(value);
           return props.onChange(value);
         }}
-        className={classNames(
-          enabled ? 'bg-gray-700' : 'bg-gray-200',
-          'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500'
-        )}
+        style={styles}
+        className="relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
       >
         <span
           aria-hidden="true"
