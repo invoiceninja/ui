@@ -8,11 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAccentColor } from 'common/hooks/useAccentColor';
 import React, { ReactNode } from 'react';
-import { useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
-import { RootState } from '../../common/stores/store';
 
 interface Props extends CommonProps {
   to: string;
@@ -21,9 +20,10 @@ interface Props extends CommonProps {
 }
 
 export function Link(props: Props) {
-  const colors = useSelector((state: RootState) => state.settings.colors);
+  const accentColor = useAccentColor();
+
   const css: React.CSSProperties = {
-    color: colors.primary,
+    color: accentColor,
   };
 
   if (props.external) {
