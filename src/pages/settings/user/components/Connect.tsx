@@ -16,21 +16,13 @@ export function Connect() {
   const [t] = useTranslation();
 
   return (
-    <>
-      <Card title={t('oneclick_login')}>
-        <Element leftSide="Google">
-          <Button type="minimal">{t('connect_google')}</Button>
-        </Element>
-        <Element leftSide="Gmail">
-          <Button type="minimal">{t('connect_gmail')}</Button>
-        </Element>
-      </Card>
-
-      <Card>
-        <Element leftSide="2FA">
-          <Button type="minimal">{t('enable_two_factor')}</Button>
-        </Element>
-      </Card>
-    </>
+    <Card title={t('oneclick_login')}>
+      <Element leftSide="Google">
+        <Button type="minimal">{t('connect_google')}</Button>
+      </Element>
+      <Element leftSide="Gmail">
+        <Button type="minimal">{t('connect_gmail')}</Button>
+      </Element>
+    </Card>
   );
 }

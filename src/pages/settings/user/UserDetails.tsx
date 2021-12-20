@@ -29,6 +29,7 @@ import {
   Notifications,
   Password,
 } from './components';
+import { TwoFactorAuthentication } from './components/TwoFactorAuthentication';
 
 export function UserDetails() {
   const [t] = useTranslation();
@@ -99,6 +100,7 @@ export function UserDetails() {
         <Details />
         <Password />
         <Connect />
+        <TwoFactorAuthentication />
         <AccentColor />
         <Notifications />
       </div>
