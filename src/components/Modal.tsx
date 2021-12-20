@@ -9,6 +9,7 @@
  */
 
 import { Dialog, Transition } from '@headlessui/react';
+import classNames from 'classnames';
 import { Fragment, useState, useEffect, ReactNode } from 'react';
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
   title: string;
   text?: string;
   children?: ReactNode;
+  centerContent?: boolean;
 }
 
 export function Modal(props: Props) {
@@ -82,7 +84,14 @@ export function Modal(props: Props) {
                 </div>
               </div>
               {props.children && (
-                <div className="mt-5 sm:mt-6 text-sm text-gray-500 flex flex-col space-y-4">{props.children}</div>
+                <div
+                  className={classNames(
+                    'mt-5 sm:mt-6 text-sm text-gray-500 flex flex-col space-y-4',
+                    { 'justify-center items-center': props.centerContent }
+                  )}
+                >
+                  {props.children}
+                </div>
               )}
             </div>
           </Transition.Child>

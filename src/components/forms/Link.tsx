@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import { useSelector } from 'react-redux';
 import { Link as RouterLink } from 'react-router-dom';
@@ -18,6 +17,7 @@ import { RootState } from '../../common/stores/store';
 interface Props extends CommonProps {
   to: string;
   children: ReactNode;
+  external?: boolean;
 }
 
 export function Link(props: Props) {
@@ -25,6 +25,19 @@ export function Link(props: Props) {
   const css: React.CSSProperties = {
     color: colors.primary,
   };
+
+  if (props.external) {
+    return (
+      <a
+        target="_blank"
+        href={props.to}
+        className={`text-sm hover:underline ${props.className}`}
+        style={css}
+      >
+        {props.children}
+      </a>
+    );
+  }
 
   return (
     <RouterLink
