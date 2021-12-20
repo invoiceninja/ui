@@ -11,22 +11,36 @@
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { useDispatch, useSelector } from 'react-redux';
+import { updateChanges } from 'common/stores/slices/user';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { RootState } from '../../../../common/stores/store';
-import { updatePrimaryColor } from '../../../../common/stores/slices/settings';
 
 export function AccentColor() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
-  const colors = useSelector((state: RootState) => state.settings.colors);
+
+  const user = useCurrentUser();
+  const userState = useSelector((state: RootState) => state.user);
 
   return (
     <Card>
       <Element leftSide={t('accent_color')}>
         <input
+          value={
+            userState.changes?.company_user?.settings?.hasOwnProperty(
+              'accent_color'
+            )
+              ? userState.changes?.company_user?.settings?.accent_color
+              : user?.company_user?.settings?.accent_color || ''
+          }
           type="color"
-          value={colors.primary}
           onChange={(event) =>
-            dispatch(updatePrimaryColor({ color: event.target.value }))
+            dispatch(
+              updateChanges({
+                property: 'company_user.settings.accent_color',
+                value: event.target.value,
+              })
+            )
           }
         />
       </Element>
