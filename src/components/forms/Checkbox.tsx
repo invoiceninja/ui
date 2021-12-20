@@ -8,16 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useSelector } from 'react-redux';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 import CommonProps from '../../common/interfaces/common-props.interface';
-import { RootState } from '../../common/stores/store';
 
 interface Props extends CommonProps {
   label?: string;
 }
 
 export function Checkbox(props: Props) {
-  const colors = useSelector((state: RootState) => state.settings.colors);
+  const accentColor = useAccentColor();
 
   return (
     <div className="relative flex items-start">
@@ -29,7 +28,7 @@ export function Checkbox(props: Props) {
           aria-describedby="comments-description"
           type="checkbox"
           className={`focus:ring-gray-300 h-4 w-4 border-gray-300 rounded dark:bg-gray-700 dark:border-transparent ${props.className}`}
-          style={{ color: colors.primary }}
+          style={{ color: accentColor }}
           onChange={props.onChange}
         />
       </div>
