@@ -23,7 +23,7 @@ export function Password() {
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
 
   const handleChange = () => {
-    password === passwordConfirmation
+    password === passwordConfirmation && password.length > 1
       ? dispatch(updateChanges({ property: 'password', value: password }))
       : dispatch(deletePassword());
   };

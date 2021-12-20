@@ -50,6 +50,7 @@ export const userSlice = createSlice({
       state.changes = {};
     },
     deletePassword: (state) => {
+      delete state.changes['password'];
       delete state.user['password'];
     },
   },
