@@ -13,12 +13,13 @@ import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { deletePassword } from 'common/stores/slices/user';
+import { deletePassword, resetChanges } from 'common/stores/slices/user';
+import { RootState } from 'common/stores/store';
 import { Modal } from 'components/Modal';
 import { ChangeEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
 import {
   AccentColor,
@@ -33,6 +34,8 @@ export function UserDetails() {
   const user = useCurrentUser();
   const dispatch = useDispatch();
 
+  const userState = useSelector((state: RootState) => state.user);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentPassword, setCurrentPassword] = useState('');
 
@@ -45,9 +48,13 @@ export function UserDetails() {
     toast.loading(t('processing'));
 
     axios
-      .put(endpoint('/api/v1/users/:id', { id: user.id }), user, {
-        headers: { 'X-Api-Password': currentPassword, ...defaultHeaders },
-      })
+      .put(
+        endpoint('/api/v1/users/:id', { id: user.id }),
+        { ...user, ...userState.changes },
+        {
+          headers: { 'X-Api-Password': currentPassword, ...defaultHeaders },
+        }
+      )
       .then(() => {
         toast.dismiss();
         toast.success(t('updated_settings'));
@@ -67,6 +74,7 @@ export function UserDetails() {
   return (
     <Settings
       onSaveClick={() => setIsModalOpen(true)}
+      onCancelClick={() => dispatch(resetChanges())}
       title={t('user_details')}
     >
       <Modal

@@ -15,13 +15,13 @@ import { Authenticated, Registered } from '../../dtos/authentication';
 interface UserState {
   authenticated: boolean;
   user: any;
-  isDirty: boolean;
+  changes: any;
 }
 
 const initialState: UserState = {
   authenticated: false,
   user: {},
-  isDirty: false,
+  changes: {},
 };
 
 export const userSlice = createSlice({
@@ -44,8 +44,10 @@ export const userSlice = createSlice({
       state,
       action: PayloadAction<{ property: string; value: any }>
     ) => {
-      state.isDirty = true;
-      set(state.user, action.payload.property, action.payload.value);
+      set(state.changes, action.payload.property, action.payload.value);
+    },
+    resetChanges: (state) => {
+      state.changes = {};
     },
     deletePassword: (state) => {
       delete state.user['password'];
@@ -53,5 +55,10 @@ export const userSlice = createSlice({
   },
 });
 
-export const { authenticate, register, updateChanges, deletePassword } =
-  userSlice.actions;
+export const {
+  authenticate,
+  register,
+  updateChanges,
+  resetChanges,
+  deletePassword,
+} = userSlice.actions;
