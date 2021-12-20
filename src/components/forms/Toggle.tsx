@@ -13,30 +13,40 @@ import { Switch } from '@headlessui/react';
 import { classNames } from '../../common/helpers';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useAccentColor } from 'common/hooks/useAccentColor';
+import { useEffect } from 'react';
 
 interface Props extends CommonProps {
   label?: string;
   checked?: boolean;
+  disabled?: boolean;
 }
 
 export default function Toggle(props: Props) {
-  const [enabled, setEnabled] = useState(props.checked ?? false);
+  const [checked, setChecked] = useState(false);
+  const [disabled, setDisabled] = useState(false);
+
+  useEffect(() => {
+    setChecked(props.checked as boolean);
+    setDisabled(props.disabled as boolean);
+  }, [props.checked, props.disabled]);
+
   const accentColor = useAccentColor();
 
   const styles: React.CSSProperties = {
     backgroundColor: 'rgb(229 231 235)',
   };
 
-  if (enabled) {
+  if (checked) {
     styles.backgroundColor = accentColor;
   }
 
   return (
     <Switch.Group as="div" className="flex items-center">
       <Switch
-        checked={enabled}
+        disabled={disabled}
+        checked={checked}
         onChange={(value) => {
-          setEnabled(value);
+          setChecked(value);
           return props.onChange(value);
         }}
         style={styles}
@@ -45,7 +55,7 @@ export default function Toggle(props: Props) {
         <span
           aria-hidden="true"
           className={classNames(
-            enabled ? 'translate-x-5' : 'translate-x-0',
+            checked ? 'translate-x-5' : 'translate-x-0',
             'pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow ring-0 transition ease-in-out duration-200'
           )}
         />
