@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { Link, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useStaticsQuery } from 'common/queries/statics';
 import { updateChanges } from 'common/stores/slices/company';
 import { ChangeEvent } from 'react';
@@ -22,6 +22,7 @@ import { endpoint } from 'common/helpers';
 import { useQuery } from 'react-query';
 import axios from 'axios';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { RootState } from 'common/stores/store';
 
 export function Defaults() {
   const [t] = useTranslation();
@@ -29,9 +30,11 @@ export function Defaults() {
   const company = useCurrentCompany();
   const statics = useStaticsQuery();
 
-  const { data: terms, isLoading } = useQuery('/api/v1/paymen_terms', () =>
+  const { data: terms, isLoading } = useQuery('/api/v1/payment_terms', () =>
     axios.get(endpoint('/api/v1/payment_terms'), { headers: defaultHeaders })
   );
+
+  const companyState = useSelector((state: RootState) => state.company);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
     dispatch(
@@ -46,7 +49,11 @@ export function Defaults() {
             <SelectField
               onChange={handleChange}
               id="settings.auto_bill"
-              value={company.settings.auto_bill}
+              value={
+                companyState.changes?.settings?.hasOwnProperty('auto_bill')
+                  ? companyState.changes?.settings?.auto_bill
+                  : company.settings.auto_bill || ''
+              }
             >
               <option defaultChecked></option>
               <option value="always">{t('enabled')}</option>
@@ -59,7 +66,13 @@ export function Defaults() {
             <SelectField
               onChange={handleChange}
               id="settings.payment_type_id"
-              value={company.settings.payment_type_id}
+              value={
+                companyState.changes?.settings?.hasOwnProperty(
+                  'payment_type_id'
+                )
+                  ? companyState.changes?.settings?.payment_type_id
+                  : company.settings.payment_type_id || ''
+              }
             >
               <option value="0"></option>
               {statics.data?.data.payment_types.map(
@@ -76,7 +89,13 @@ export function Defaults() {
               <SelectField
                 id="settings.payment_terms"
                 onChange={handleChange}
-                value={company.settings.payment_terms}
+                value={
+                  companyState.changes?.settings?.hasOwnProperty(
+                    'payment_terms'
+                  )
+                    ? companyState.changes?.settings?.payment_terms
+                    : company.settings.payment_terms || ''
+                }
               >
                 <option value=""></option>
                 {terms.data.data.map((type: { id: string; name: string }) => (
@@ -97,16 +116,18 @@ export function Defaults() {
               <SelectField
                 id="settings.valid_until"
                 onChange={handleChange}
-                value={company.settings.valid_until}
+                value={
+                  companyState.changes?.settings?.hasOwnProperty('valid_until')
+                    ? companyState.changes?.settings?.valid_until
+                    : company.settings.valid_until || ''
+                }
               >
                 <option value=""></option>
-                {terms.data.data.map(
-                  (type: { id: string; name: string }) => (
-                    <option key={type.id} value={type.id}>
-                      {type.name}
-                    </option>
-                  )
-                )}
+                {terms.data.data.map((type: { id: string; name: string }) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))}
               </SelectField>
             </Element>
           )}
@@ -115,7 +136,14 @@ export function Defaults() {
 
           <Element className="mt-6" leftSide={t('manual_payment_email')}>
             <Toggle
-              checked={company.settings.client_manual_payment_notification}
+              checked={
+                companyState.changes?.settings?.hasOwnProperty(
+                  'client_manual_payment_notification'
+                )
+                  ? companyState.changes?.settings
+                      ?.client_manual_payment_notification
+                  : company.settings.client_manual_payment_notification || false
+              }
               onChange={(value: boolean) =>
                 dispatch(
                   updateChanges({
@@ -128,7 +156,14 @@ export function Defaults() {
           </Element>
           <Element leftSide={t('online_payment_email')}>
             <Toggle
-              checked={company.settings.client_online_payment_notification}
+              checked={
+                companyState.changes?.settings?.hasOwnProperty(
+                  'client_online_payment_notification'
+                )
+                  ? companyState.changes?.settings
+                      ?.client_online_payment_notification
+                  : company.settings.client_online_payment_notification || false
+              }
               onChange={(value: boolean) =>
                 dispatch(
                   updateChanges({
@@ -144,7 +179,11 @@ export function Defaults() {
 
           <Element className="mt-4" leftSide={t('invoice_terms')}>
             <MDEditor
-              value={company.settings.invoice_terms}
+              value={
+                companyState.changes?.settings?.hasOwnProperty('invoice_terms')
+                  ? companyState.changes?.settings?.invoice_terms
+                  : company.settings.invoice_terms || ''
+              }
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -157,7 +196,11 @@ export function Defaults() {
           </Element>
           <Element className="mt-4" leftSide={t('invoice_footer')}>
             <MDEditor
-              value={company.settings.invoice_footer}
+              value={
+                companyState.changes?.settings?.hasOwnProperty('invoice_footer')
+                  ? companyState.changes?.settings?.invoice_footer
+                  : company.settings.invoice_footer || ''
+              }
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -170,7 +213,11 @@ export function Defaults() {
           </Element>
           <Element className="mt-4" leftSide={t('quote_terms')}>
             <MDEditor
-              value={company.settings.quote_terms}
+              value={
+                companyState.changes?.settings?.hasOwnProperty('quote_terms')
+                  ? companyState.changes?.settings?.quote_terms
+                  : company.settings.quote_terms || ''
+              }
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -183,7 +230,11 @@ export function Defaults() {
           </Element>
           <Element className="mt-4" leftSide={t('quote_footer')}>
             <MDEditor
-              value={company.settings.quote_footer}
+              value={
+                companyState.changes?.settings?.hasOwnProperty('quote_footer')
+                  ? companyState.changes?.settings?.quote_footer
+                  : company.settings.quote_footer || ''
+              }
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -196,7 +247,11 @@ export function Defaults() {
           </Element>
           <Element className="mt-4" leftSide={t('credit_terms')}>
             <MDEditor
-              value={company.settings.credit_terms}
+              value={
+                companyState.changes?.settings?.hasOwnProperty('credit_terms')
+                  ? companyState.changes?.settings?.credit_terms
+                  : company.settings.credit_terms || ''
+              }
               onChange={(value) =>
                 dispatch(
                   updateChanges({
@@ -209,7 +264,11 @@ export function Defaults() {
           </Element>
           <Element className="mt-4" leftSide={t('credit_footer')}>
             <MDEditor
-              value={company.settings.credit_footer}
+              value={
+                companyState.changes?.settings?.hasOwnProperty('credit_footer')
+                  ? companyState.changes?.settings?.credit_footer
+                  : company.settings.credit_footer || ''
+              }
               onChange={(value) =>
                 dispatch(
                   updateChanges({
