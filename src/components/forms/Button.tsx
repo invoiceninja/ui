@@ -9,12 +9,10 @@
  */
 
 import classNames from 'classnames';
-import { produceWithPatches } from 'immer';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 import React, { ReactNode } from 'react';
-import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
-import { RootState } from '../../common/stores/store';
 import { Spinner } from '../Spinner';
 
 interface Props extends CommonProps {
@@ -35,16 +33,16 @@ const defaultProps: Props = {
 export function Button(props: Props) {
   props = { ...defaultProps, ...props };
 
-  const colors = useSelector((state: RootState) => state.settings.colors);
+  const accentColor = useAccentColor();
 
   const css: React.CSSProperties = {
-    backgroundColor: props.type === 'primary' ? colors.primary : 'white',
+    backgroundColor: props.type === 'primary' ? accentColor : 'white',
     color:
       props.type === 'primary'
         ? 'white'
         : props.type === 'secondary'
         ? 'text-gray-900'
-        : colors.primary,
+        : accentColor,
   };
 
   if (props.to) {
