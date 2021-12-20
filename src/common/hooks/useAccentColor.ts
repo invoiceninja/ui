@@ -20,6 +20,6 @@ export function useAccentColor() {
   return (
     userState.changes?.company_user?.settings?.accent_color ||
     user?.company_user?.settings?.accent_color ||
-    colors.primary
+    colors.accent
   );
 }

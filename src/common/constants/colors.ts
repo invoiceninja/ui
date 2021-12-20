@@ -9,5 +9,5 @@
  */
 
 export default {
-  primary: '#117DC0',
+  accent: '#117DC0',
 };
