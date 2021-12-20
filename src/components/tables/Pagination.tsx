@@ -8,12 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useAccentColor } from 'common/hooks/useAccentColor';
 import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import CommonProps from '../../common/interfaces/common-props.interface';
-import { RootState } from '../../common/stores/store';
 
 interface Props extends CommonProps {
   totalPages: number;
@@ -33,7 +32,7 @@ export function Pagination(props: Props) {
   props = { ...defaultProps, ...props };
 
   const [t] = useTranslation();
-  const colors = useSelector((state: RootState) => state.settings.colors);
+  const accentColor = useAccentColor();
 
   const [currentPerPage, setCurrentPerPage] = useState('10');
 
@@ -91,7 +90,7 @@ export function Pagination(props: Props) {
               onClick={() => props.onPageChange(number + 1)}
               style={{
                 backgroundColor:
-                  props.currentPage === number + 1 ? colors.primary : '',
+                  props.currentPage === number + 1 ? accentColor : '',
                 color: props.currentPage === number + 1 ? 'white' : '',
               }}
               className="py-1.5 px-4 bg-white border-b border-t hover:bg-gray-50"
