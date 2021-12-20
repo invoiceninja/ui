@@ -16,6 +16,7 @@ import { defaultHeaders } from 'common/queries/common/headers';
 import { deletePassword, resetChanges } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { Modal } from 'components/Modal';
+import { merge } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -50,7 +51,7 @@ export function UserDetails() {
     axios
       .put(
         endpoint('/api/v1/users/:id', { id: user.id }),
-        { ...user, ...userState.changes },
+        merge({}, user, userState.changes),
         {
           headers: { 'X-Api-Password': currentPassword, ...defaultHeaders },
         }
