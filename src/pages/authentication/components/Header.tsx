@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../common/stores/store';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 import { Link } from '../../../components/forms/Link';
 import Logo from '../../../resources/images/invoiceninja-logo@dark.png';
 
 export function Header() {
-  const colors = useSelector((state: RootState) => state.settings.colors);
+  const accentColor = useAccentColor();
+
   const css: React.CSSProperties = {
-    backgroundColor: colors.primary,
+    backgroundColor: accentColor,
   };
 
   return (
