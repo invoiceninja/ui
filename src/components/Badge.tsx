@@ -9,10 +9,8 @@
  */
 
 import classNames from 'classnames';
-
-import { useSelector } from 'react-redux';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 import CommonProps from '../common/interfaces/common-props.interface';
-import { RootState } from '../common/stores/store';
 
 interface Props extends CommonProps {
   variant?: 'primary' | 'white' | 'yellow' | 'red' | 'generic';
@@ -24,12 +22,13 @@ const defaultProps: Props = {
 
 export function Badge(props: Props) {
   props = { ...defaultProps, ...props };
-  const colors = useSelector((state: RootState) => state.settings.colors);
+
+  const accentColor = useAccentColor();
 
   const styles: React.CSSProperties = {};
 
   if (props.variant === 'primary') {
-    styles.backgroundColor = colors.primary;
+    styles.backgroundColor = accentColor;
     styles.color = 'white';
   }
 
