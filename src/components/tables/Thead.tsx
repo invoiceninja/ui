@@ -8,17 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useSelector } from 'react-redux';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 import CommonProps from '../../common/interfaces/common-props.interface';
-import { RootState } from '../../common/stores/store';
 
 interface Props extends CommonProps {}
 
 export function Thead(props: Props) {
-  const colors = useSelector((state: RootState) => state.settings.colors);
+  const accentColor = useAccentColor();
 
   return (
-    <thead style={{ backgroundColor: colors.primary }}>
+    <thead style={{ backgroundColor: accentColor }}>
       <tr>{props.children}</tr>
     </thead>
   );
