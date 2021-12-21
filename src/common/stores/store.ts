@@ -10,25 +10,21 @@
 
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/dist/query';
-import { accountSlice } from './slices/account';
-import { companySlice } from './slices/company';
 import { invoiceSlice } from './slices/invoices';
 import { companyDocumentSlice } from './slices/company-documents';
 import { productsSlice } from './slices/products';
 import { settingsSlice } from './slices/settings';
-import { tokenSlice } from './slices/token';
 import { userSlice } from './slices/user';
+import { companyUserSlice } from './slices/company-users';
 
 export const store = configureStore({
   reducer: {
-    company: companySlice.reducer,
+    companyUsers: companyUserSlice.reducer,
+    companyDocuments: companyDocumentSlice.reducer,
     user: userSlice.reducer,
     products: productsSlice.reducer,
     settings: settingsSlice.reducer,
-    token: tokenSlice.reducer,
-    account: accountSlice.reducer,
     invoices: invoiceSlice.reducer,
-    companyDocuments: companyDocumentSlice.reducer,
   },
 });
 
