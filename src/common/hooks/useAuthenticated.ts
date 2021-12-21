@@ -9,13 +9,11 @@
  */
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { updateCompanyUsers } from 'common/stores/slices/company-users';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { AuthenticationTypes } from '../dtos/authentication';
 import { endpoint } from '../helpers';
-import { updateAccount } from '../stores/slices/account';
-import { updateCompanies, updateCompany } from '../stores/slices/company';
-import { updateToken } from '../stores/slices/token';
 import { authenticate } from '../stores/slices/user';
 import { RootState } from '../stores/store';
 
@@ -51,10 +49,7 @@ export function useAuthenticated(): Boolean {
           })
         );
 
-        dispatch(updateCompanies(response.data.data));
-        dispatch(updateCompany(response.data.data[0]));
-        dispatch(updateToken(response.data.data[0].token));
-        dispatch(updateAccount(response.data.data[0].account));
+        dispatch(updateCompanyUsers(response.data.data));
       }
     })
     .catch((error: AxiosError) => {
