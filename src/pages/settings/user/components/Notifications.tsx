@@ -8,13 +8,66 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { injectInChangesWithData } from 'common/stores/slices/user';
+import { RootState } from 'common/stores/store';
+import { cloneDeep, set } from 'lodash';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch, useSelector } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
-import { Checkbox } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 
 export function Notifications() {
   const [t] = useTranslation();
+  const userChanges = useSelector((state: RootState) => state.user.changes);
+  const dispatch = useDispatch();
+
+  const [isGlobalChecked, setIsGlobalChecked] = useState({
+    initial: true,
+    value: false,
+  });
+
+  useEffect(() => {
+    userChanges?.company_user?.notifications?.email?.includes(
+      'all_notifications'
+    )
+      ? setIsGlobalChecked({ initial: true, value: true })
+      : setIsGlobalChecked({ initial: true, value: false });
+  }, [userChanges]);
+
+  useEffect(() => {
+    if (!isGlobalChecked.initial) {
+      handleGlobalToggleChange();
+    }
+  }, [isGlobalChecked]);
+
+  const handleGlobalToggleChange = () => {
+    let user = cloneDeep(userChanges);
+
+    let notifications: string[] = [];
+
+    isGlobalChecked.value ? (notifications = ['all_notifications']) : [];
+
+    set(user, 'company_user.notifications.email', notifications);
+
+    dispatch(injectInChangesWithData(user));
+  };
+
+  const handleToggleChange = (field: string, value: boolean) => {
+    let user = cloneDeep(userChanges);
+
+    let notifications: string[] = user.company_user.notifications.email ?? [];
+
+    value
+      ? notifications.push(field)
+      : (notifications = notifications.filter(
+          (element: string) => element !== field
+        ));
+
+    set(user, 'company_user.notifications.email', notifications);
+
+    dispatch(injectInChangesWithData(user));
+  };
 
   const options: { label: string; field: string }[] = [
     { label: t('invoice_created'), field: 'invoice_created_all' },
@@ -39,14 +92,29 @@ export function Notifications() {
   return (
     <Card title={t('notifications')}>
       <Element leftSide={t('all_events')}>
-        <Checkbox />
+        <Toggle
+          checked={isGlobalChecked.value}
+          onChange={(value: boolean) =>
+            setIsGlobalChecked({ initial: false, value })
+          }
+        />
       </Element>
 
       <div className="pt-6 border-b"></div>
 
       {options.map((notification, index) => (
         <Element key={index} className="mt-4" leftSide={notification.label}>
-          <Toggle />
+          <Toggle
+            checked={
+              userChanges?.company_user?.notifications?.email?.includes(
+                notification.field
+              ) || isGlobalChecked.value
+            }
+            onChange={(value: boolean) =>
+              handleToggleChange(notification.field, value)
+            }
+            disabled={isGlobalChecked.value}
+          />
         </Element>
       ))}
     </Card>

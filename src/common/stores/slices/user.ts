@@ -34,6 +34,9 @@ export const userSlice = createSlice({
     injectInChanges: (state) => {
       state.changes = state.user;
     },
+    injectInChangesWithData: (state, action) => {
+      state.changes = action.payload;
+    },
     resetChanges: (state) => {
       state.changes = state.user;
     },
@@ -65,6 +68,7 @@ export const userSlice = createSlice({
 export const {
   updateUser,
   injectInChanges,
+  injectInChangesWithData,
   resetChanges,
   authenticate,
   register,
