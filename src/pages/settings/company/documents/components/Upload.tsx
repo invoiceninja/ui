@@ -8,25 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
 import axios from 'axios';
+import toast from 'react-hot-toast';
+import { Card, Element } from '@invoiceninja/cards';
 import { endpoint } from 'common/helpers';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { updateCompanyRecord } from 'common/stores/slices/company';
-import { RootState } from 'common/stores/store';
+import { updateRecord } from 'common/stores/slices/company-users';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 
 export function Upload() {
   const [t] = useTranslation();
   const [formData, setFormData] = useState(new FormData());
-  const company = useSelector((state: RootState) => state.company.current);
+  const company = useCurrentCompany();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
 
@@ -38,7 +38,7 @@ export function Upload() {
 
       axios
         .post(
-          endpoint('/api/v1/companies/:id/upload', { id: company.company.id }),
+          endpoint('/api/v1/companies/:id/upload', { id: company.id }),
           formData,
           {
             headers: {
@@ -48,7 +48,9 @@ export function Upload() {
           }
         )
         .then((response) => {
-          dispatch(updateCompanyRecord(response.data.data));
+          dispatch(
+            updateRecord({ object: 'company', data: response.data.data })
+          );
 
           toast.dismiss();
           toast.success(t('successfully_uploaded_documents'));

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import { useDispatch } from 'react-redux';
 import {
@@ -27,12 +27,7 @@ import { InputLabel } from '../../components/forms/InputLabel';
 import { Alert } from '../../components/Alert';
 import { HostedLinks } from './components/HostedLinks';
 import { Header } from './components/Header';
-import {
-  updateCompanies,
-  updateCompany,
-} from '../../common/stores/slices/company';
-import { updateToken } from '../../common/stores/slices/token';
-import { updateAccount } from '../../common/stores/slices/account';
+import { updateCompanyUsers } from 'common/stores/slices/company-users';
 
 export function Login() {
   const dispatch = useDispatch();
@@ -65,10 +60,7 @@ export function Login() {
             })
           );
 
-          dispatch(updateCompanies(response.data.data));
-          dispatch(updateCompany(response.data.data[0]));
-          dispatch(updateToken(response.data.data[0].token));
-          dispatch(updateAccount(response.data.data[0].account));
+          dispatch(updateCompanyUsers(response.data.data))
         })
         .catch((error: AxiosError) => {
           return error.response?.status === 422

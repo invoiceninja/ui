@@ -12,7 +12,6 @@ import { Card, Element } from '@invoiceninja/cards';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { updateCompanyRecord } from 'common/stores/slices/company';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -21,12 +20,15 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { useLogo } from 'common/hooks/useLogo';
+import { updateRecord } from 'common/stores/slices/company-users';
 
 export function Logo() {
   const [t] = useTranslation();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
   const [formData, setFormData] = useState(new FormData());
+  const logo = useLogo();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -39,7 +41,9 @@ export function Logo() {
           headers: { ...defaultHeaders, 'Content-Type': 'multipart/form-data' },
         })
         .then((response: AxiosResponse) => {
-          dispatch(updateCompanyRecord(response.data.data));
+          dispatch(
+            updateRecord({ object: 'company', data: response.data.data })
+          );
 
           toast.dismiss();
           toast.success(t('uploaded_logo'));
@@ -75,23 +79,11 @@ export function Logo() {
       <Element leftSide={t('logo')}>
         <div className="grid grid-cols-12 lg:gap-4 space-y-4 lg:space-y-0">
           <div className="bg-gray-200 col-span-12 lg:col-span-5 rounded-lg p-6">
-            <img
-              src={
-                company?.settings.company_logo ||
-                'http://localhost:3000/src/resources/images/invoiceninja-logo@light.png'
-              }
-              alt={t('company_logo')}
-            />
+            <img src={logo} alt={t('company_logo')} />
           </div>
 
           <div className="col-span-12 lg:col-span-5 bg-gray-900 rounded-lg p-6">
-            <img
-              src={
-                company?.settings.company_logo ||
-                'http://localhost:3000/src/resources/images/invoiceninja-logo@light.png'
-              }
-              alt={t('company_logo')}
-            />
+            <img src={logo} alt={t('company_logo')} />
           </div>
         </div>
       </Element>

@@ -24,6 +24,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from 'common/stores/store';
 import { Button } from '@invoiceninja/forms';
+import { useLogo } from 'common/hooks/useLogo';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -39,7 +40,7 @@ export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [t] = useTranslation();
   const location = useLocation();
-  const logo = useSelector((state: RootState) => state.company.logo);
+  const logo = useLogo();
 
   const navigation = [
     {

@@ -11,12 +11,13 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { defaultHeaders } from 'common/queries/common/headers';
 import {
+  injectInChanges,
   resetChanges,
-  updateCompanyRecord,
-} from 'common/stores/slices/company';
+  updateRecord,
+} from 'common/stores/slices/company-users';
 import { RootState } from 'common/stores/store';
-import { merge } from 'lodash';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -26,32 +27,32 @@ import { Address, Defaults, Details, Documents, Logo } from './components';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
+  const dispatch = useDispatch();
+  const company = useCurrentCompany();
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
       'company_details'
     )}`;
-  });
 
-  const dispatch = useDispatch();
-  const currentCompany = useCurrentCompany();
-  const companyState = useSelector((state: RootState) => state.company);
+    dispatch(injectInChanges({ object: 'company', data: company }));
+  }, [company]);
+
+  const companyChanges = useSelector(
+    (state: RootState) => state.companyUsers.changes.company
+  );
 
   const onSave = () => {
     toast.loading(t('processing'));
 
     axios
       .put(
-        endpoint('/api/v1/companies/:id', { id: currentCompany.id }),
-        merge({}, currentCompany, companyState.changes),
-        {
-          headers: {
-            'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
-          },
-        }
+        endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
+        companyChanges,
+        { headers: defaultHeaders }
       )
       .then((response: AxiosResponse) => {
-        dispatch(updateCompanyRecord(response.data.data));
+        dispatch(updateRecord({ object: 'company', data: response.data.data }));
 
         toast.dismiss();
         toast.success(t('updated_settings'));
@@ -64,7 +65,9 @@ export function CompanyDetails() {
       });
   };
 
-  const onCancel = () => dispatch(resetChanges());
+  const onCancel = () => {
+    dispatch(resetChanges('company'));
+  };
 
   return (
     <Settings

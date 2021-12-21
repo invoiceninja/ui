@@ -9,11 +9,13 @@
  */
 
 import { useEffect } from 'react';
+import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router';
 import { endpoint, request } from '../../common/helpers';
 
 export function Logout() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     request(
@@ -25,6 +27,8 @@ export function Logout() {
       }
     ).then(() => {
       localStorage.removeItem('X-NINJA-TOKEN');
+      queryClient.invalidateQueries();
+
       navigate('/');
     });
   });
