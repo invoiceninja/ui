@@ -17,20 +17,23 @@ export function Notifications() {
   const [t] = useTranslation();
 
   const options: { label: string; field: string }[] = [
-    { label: t('invoice_created'), field: 'invoice_created' },
-    { label: t('invoice_sent'), field: 'invoice_sent' },
-    { label: t('invoice_viewed'), field: 'invoice_viewed' },
-    { label: t('invoice_late'), field: 'invoice_late' },
-    { label: t('payment_success'), field: 'payment_success' },
-    { label: t('payment_failure'), field: 'payment_failure' },
-    { label: t('quote_created'), field: 'quote_created' },
-    { label: t('quote_sent'), field: 'quote_sent' },
-    { label: t('quote_viewed'), field: 'quote_viewed' },
-    { label: t('quote_approved'), field: 'quote_approved' },
-    { label: t('quote_expired'), field: 'quote_expired' },
-    { label: t('credit_created'), field: 'credit_created' },
-    { label: t('credit_sent'), field: 'credit_sent' },
-    { label: t('credit_viewed'), field: 'credit_viewed' },
+    { label: t('invoice_created'), field: 'invoice_created_all' },
+    { label: t('invoice_sent'), field: 'invoice_sent_all' },
+    { label: t('invoice_viewed'), field: 'invoice_viewed_all' },
+    { label: t('invoice_late'), field: 'invoice_late_all' },
+
+    { label: t('payment_success'), field: 'payment_success_all' },
+    { label: t('payment_failure'), field: 'payment_failure_all' },
+
+    { label: t('quote_created'), field: 'quote_created_all' },
+    { label: t('quote_sent'), field: 'quote_sent_all' },
+    { label: t('quote_viewed'), field: 'quote_viewed_all' },
+    { label: t('quote_approved'), field: 'quote_approved_all' },
+    { label: t('quote_expired'), field: 'quote_expired_all' },
+
+    { label: t('credit_created'), field: 'credit_created_all' },
+    { label: t('credit_sent'), field: 'credit_sent_all' },
+    { label: t('credit_viewed'), field: 'credit_viewed_all' },
   ];
 
   return (
