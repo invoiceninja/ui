@@ -12,7 +12,9 @@ import { RootState } from 'common/stores/store';
 import { useSelector } from 'react-redux';
 
 export function useCurrentCompany() {
-  const companyState = useSelector((state: RootState) => state.company.current);
+  const companyUserState = useSelector(
+    (state: RootState) => state.companyUsers
+  );
 
-  return companyState?.company;
+  return companyUserState.api[companyUserState.currentIndex]?.company;
 }
