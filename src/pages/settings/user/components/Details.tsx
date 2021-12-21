@@ -36,7 +36,7 @@ export function Details() {
           <Element leftSide={t('first_name')}>
             <InputField
               id="first_name"
-              value={userChanges?.first_name}
+              value={userChanges?.first_name || ''}
               onChange={handleChange}
             />
           </Element>
@@ -44,7 +44,7 @@ export function Details() {
           <Element leftSide={t('last_name')}>
             <InputField
               id="last_name"
-              value={userChanges?.last_name}
+              value={userChanges?.last_name || ''}
               onChange={handleChange}
             />
           </Element>
@@ -52,7 +52,7 @@ export function Details() {
           <Element leftSide={t('email')}>
             <InputField
               id="email"
-              value={userChanges?.email}
+              value={userChanges?.email || ''}
               type="email"
               onChange={handleChange}
             />
@@ -61,7 +61,7 @@ export function Details() {
           <Element leftSide={t('phone')}>
             <InputField
               id="phone"
-              value={userChanges?.phone}
+              value={userChanges?.phone || ''}
               onChange={handleChange}
             />
           </Element>
