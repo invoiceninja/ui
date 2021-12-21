@@ -13,10 +13,14 @@ import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { deletePassword, resetChanges } from 'common/stores/slices/user';
+import {
+  deletePassword,
+  injectInChanges,
+  resetChanges,
+  updateUser,
+} from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { Modal } from 'components/Modal';
-import { merge } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -43,7 +47,9 @@ export function UserDetails() {
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('user_details')}`;
-  });
+
+    dispatch(injectInChanges());
+  }, [user]);
 
   const onSave = () => {
     setIsModalOpen(false);
@@ -51,15 +57,17 @@ export function UserDetails() {
 
     axios
       .put(
-        endpoint('/api/v1/users/:id', { id: user.id }),
-        merge({}, user, userState.changes),
+        endpoint('/api/v1/users/:id?include=company_user', { id: user.id }),
+        userState.changes,
         {
           headers: { 'X-Api-Password': currentPassword, ...defaultHeaders },
         }
       )
-      .then(() => {
+      .then((response) => {
         toast.dismiss();
         toast.success(t('updated_settings'));
+
+        dispatch(updateUser(response.data.data));
 
         window.dispatchEvent(new CustomEvent('user.updated'));
       })

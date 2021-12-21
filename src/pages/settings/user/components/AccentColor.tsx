@@ -20,19 +20,13 @@ export function AccentColor() {
   const dispatch = useDispatch();
 
   const user = useCurrentUser();
-  const userState = useSelector((state: RootState) => state.user);
+  const userChanges = useSelector((state: RootState) => state.user.changes);
 
   return (
     <Card>
       <Element leftSide={t('accent_color')}>
         <input
-          value={
-            userState.changes?.company_user?.settings?.hasOwnProperty(
-              'accent_color'
-            )
-              ? userState.changes?.company_user?.settings?.accent_color
-              : user?.company_user?.settings?.accent_color || ''
-          }
+          value={userChanges?.company_user?.settings?.accent_color || ''}
           type="color"
           onChange={(event) =>
             dispatch(

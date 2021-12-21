@@ -21,6 +21,7 @@ export function Details() {
   const [t] = useTranslation();
   const user = useCurrentUser();
   const dispatch = useDispatch();
+  const userChanges = useSelector((state: RootState) => state.user.changes);
   const userState = useSelector((state: RootState) => state.user);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
@@ -29,55 +30,43 @@ export function Details() {
     );
 
   return (
-    <Card title={t('details')}>
-      <Element leftSide={t('first_name')}>
-        <InputField
-          id="first_name"
-          value={
-            userState.changes.hasOwnProperty('first_name')
-              ? userState.changes?.first_name
-              : user.first_name || ''
-          }
-          onChange={handleChange}
-        />
-      </Element>
+    <>
+      {userChanges && (
+        <Card title={t('details')}>
+          <Element leftSide={t('first_name')}>
+            <InputField
+              id="first_name"
+              value={userChanges?.first_name}
+              onChange={handleChange}
+            />
+          </Element>
 
-      <Element leftSide={t('last_name')}>
-        <InputField
-          id="last_name"
-          value={
-            userState.changes.hasOwnProperty('last_name')
-              ? userState.changes?.last_name
-              : user.last_name || ''
-          }
-          onChange={handleChange}
-        />
-      </Element>
+          <Element leftSide={t('last_name')}>
+            <InputField
+              id="last_name"
+              value={userChanges?.last_name}
+              onChange={handleChange}
+            />
+          </Element>
 
-      <Element leftSide={t('email')}>
-        <InputField
-          id="email"
-          type="email"
-          value={
-            userState.changes.hasOwnProperty('email')
-              ? userState.changes?.email
-              : user.email || ''
-          }
-          onChange={handleChange}
-        />
-      </Element>
+          <Element leftSide={t('email')}>
+            <InputField
+              id="email"
+              value={userChanges?.email}
+              type="email"
+              onChange={handleChange}
+            />
+          </Element>
 
-      <Element leftSide={t('phone')}>
-        <InputField
-          id="phone"
-          value={
-            userState.changes.hasOwnProperty('phone')
-              ? userState.changes?.phone
-              : user.phone || ''
-          }
-          onChange={handleChange}
-        />
-      </Element>
-    </Card>
+          <Element leftSide={t('phone')}>
+            <InputField
+              id="phone"
+              value={userChanges?.phone}
+              onChange={handleChange}
+            />
+          </Element>
+        </Card>
+      )}
+    </>
   );
 }

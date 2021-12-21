@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { set } from 'lodash';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Authenticated, Registered } from '../../dtos/authentication';
 
 interface UserState {
@@ -31,6 +31,12 @@ export const userSlice = createSlice({
     updateUser: (state, action) => {
       state.user = action.payload;
     },
+    injectInChanges: (state) => {
+      state.changes = state.user;
+    },
+    resetChanges: (state) => {
+      state.changes = state.user;
+    },
     authenticate: (state, action: PayloadAction<Authenticated>) => {
       state.authenticated = true;
       state.user = action.payload.user;
@@ -49,9 +55,6 @@ export const userSlice = createSlice({
     ) => {
       set(state.changes, action.payload.property, action.payload.value);
     },
-    resetChanges: (state) => {
-      state.changes = {};
-    },
     deletePassword: (state) => {
       delete state.changes['password'];
       delete state.user['password'];
@@ -61,9 +64,10 @@ export const userSlice = createSlice({
 
 export const {
   updateUser,
+  injectInChanges,
+  resetChanges,
   authenticate,
   register,
   updateChanges,
-  resetChanges,
   deletePassword,
 } = userSlice.actions;

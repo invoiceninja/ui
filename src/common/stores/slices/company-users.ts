@@ -9,7 +9,7 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { property, set } from 'lodash';
+import { set } from 'lodash';
 
 interface CompanyUser {
   currentIndex: number;

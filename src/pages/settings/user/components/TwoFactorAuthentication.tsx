@@ -153,7 +153,7 @@ export function TwoFactorAuthentication() {
         onClose={setIsDisableModalOpen}
       >
         <Button disabled={isSumbitDisabled} onClick={() => disableTwoFactor()}>
-          {t('continue')}
+          {t('confirm')}
         </Button>
       </Modal>
 
