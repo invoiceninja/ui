@@ -8,11 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { DetailedHTMLProps, InputHTMLAttributes } from 'react';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
-  options: { id: string; title: string }[];
+  options: {
+    id: string;
+    title: string;
+    value: string | number | readonly string[] | undefined;
+  }[];
   defaultSelected?: string;
+  name: string;
 }
 
 export function Radio(props: Props) {
@@ -23,15 +29,18 @@ export function Radio(props: Props) {
         {props.options.map((option) => (
           <div key={option.id} className="flex items-center">
             <input
+              value={option.value}
+              onClick={props.onClick}
+              onChange={() => {}}
               id={option.id}
-              name="notification-method"
+              name={props.name}
               type="radio"
-              defaultChecked={option.id === props.defaultSelected}
+              checked={option.value === props.defaultSelected}
               className="focus:ring-gray-500 h-4 w-4 text-gray-800 border-gray-300"
             />
             <label
               htmlFor={option.id}
-              className="ml-3 block text-sm font-medium text-gray-700"
+              className="ml-3 block text-sm font-medium text-gray-700 cursor-pointer"
             >
               {option.title}
             </label>
