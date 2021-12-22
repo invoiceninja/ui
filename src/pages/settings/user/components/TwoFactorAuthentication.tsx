@@ -161,7 +161,7 @@ export function TwoFactorAuthentication() {
         <Element leftSide="2FA">
           {!user.google_2fa_secret && (
             <Button
-              behaviour="button"
+              behavior="button"
               type="minimal"
               onClick={() => requestQrCode()}
             >
@@ -171,7 +171,7 @@ export function TwoFactorAuthentication() {
 
           {user.google_2fa_secret && (
             <Button
-              behaviour="button"
+              behavior="button"
               type="minimal"
               onClick={() => setIsDisableModalOpen(true)}
             >

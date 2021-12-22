@@ -24,7 +24,9 @@ export function CustomLabels() {
           </SelectField>
         }
       >
-        <Button type="minimal">{t('add_custom')}</Button>
+        <Button behavior="button" type="minimal">
+          {t('add_custom')}
+        </Button>
       </Element>
     </Card>
   );

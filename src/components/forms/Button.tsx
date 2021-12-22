@@ -22,12 +22,12 @@ interface Props extends CommonProps {
   type?: 'primary' | 'secondary' | 'minimal';
   onClick?: any;
   to?: string;
-  behaviour?: 'button' | 'submit';
+  behavior?: 'button' | 'submit';
 }
 
 const defaultProps: Props = {
   type: 'primary',
-  behaviour: 'submit',
+  behavior: 'submit',
 };
 
 export function Button(props: Props) {
@@ -67,7 +67,7 @@ export function Button(props: Props) {
 
   return (
     <button
-      type={props.behaviour}
+      type={props.behavior}
       disabled={props.disabled}
       className={classNames(
         `inline-flex items-center space-x-2 justify-center rounded text-sm ${props.className}`,
