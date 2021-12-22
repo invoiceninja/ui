@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { DetailedHTMLProps, InputHTMLAttributes } from 'react';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
@@ -22,6 +22,8 @@ interface Props extends CommonProps {
 }
 
 export function Radio(props: Props) {
+  const accentColor = useAccentColor();
+
   return (
     <fieldset className="mt-4">
       <legend className="sr-only">Notification method</legend>
@@ -36,7 +38,8 @@ export function Radio(props: Props) {
               name={props.name}
               type="radio"
               checked={option.value === props.defaultSelected}
-              className="focus:ring-gray-500 h-4 w-4 text-gray-800 border-gray-300"
+              className="focus:ring-gray-500 h-4 w-4 border-gray-300"
+              style={{ color: accentColor }}
             />
             <label
               htmlFor={option.id}
