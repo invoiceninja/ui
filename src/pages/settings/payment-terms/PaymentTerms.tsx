@@ -63,7 +63,7 @@ export function PaymentTerms() {
         toast.dismiss();
         toast.success(t('error_title'));
 
-        console.log(error);
+        console.error(error);
       })
       .finally(() => queryClient.invalidateQueries('/api/v1/payment_terms'));
   };

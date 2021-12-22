@@ -53,7 +53,7 @@ export function useAuthenticated(): Boolean {
       }
     })
     .catch((error: AxiosError) => {
-      console.log(error);
+      console.error(error);
 
       localStorage.removeItem('X-NINJA-TOKEN');
       navigate('/login');

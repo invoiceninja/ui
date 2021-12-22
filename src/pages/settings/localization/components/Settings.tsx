@@ -51,8 +51,6 @@ export function Settings() {
     { id: 'code', title: `${t('currency_code')}: 1,000.00 USD`, value: 'true' },
   ];
 
-  console.log(statics);
-
   return (
     <>
       <Card title={t('settings')}>

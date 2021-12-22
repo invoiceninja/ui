@@ -54,7 +54,7 @@ export function TwoFactorAuthentication() {
       })
       .catch((error: AxiosError) => {
         toast.dismiss();
-        console.log(error);
+        console.error(error);
 
         if (error.response?.data?.message) {
           toast.error(error.response.data.message);
@@ -109,7 +109,7 @@ export function TwoFactorAuthentication() {
 
         setIsDisableModalOpen(false);
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   };
 
   return (
