@@ -31,7 +31,7 @@ export function Link(props: Props) {
       <a
         target="_blank"
         href={props.to}
-        className={`text-sm hover:underline ${props.className}`}
+        className={`text-center text-sm hover:underline ${props.className}`}
         style={css}
       >
         {props.children}
