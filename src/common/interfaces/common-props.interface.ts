@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ReactNode } from 'react';
+import { ChangeEvent, ReactNode } from 'react';
 
 export default interface CommonProps {
   id?: any;
   className?: string;
   children?: ReactNode;
-  onChange?: any;
+  onChange?: (event: ChangeEvent<HTMLInputElement>) => unknown;
   value?: any;
   onClick?: any;
   innerRef?: any;
