@@ -14,7 +14,7 @@ export default interface CommonProps {
   id?: any;
   className?: string;
   children?: ReactNode;
-  onChange?: (event: ChangeEvent<HTMLInputElement>) => unknown;
+  onChange?: any;
   value?: any;
   onClick?: any;
   innerRef?: any;
