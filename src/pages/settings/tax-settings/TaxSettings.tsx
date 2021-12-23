@@ -27,7 +27,7 @@ import { Card, Element } from '../../../components/cards';
 import { SelectField } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
-import { Table } from './components/index';
+import { Table, Selector } from './components/index';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -136,6 +136,7 @@ export function TaxSettings() {
         </Element>
       </Card>
 
+      <Selector />
       <Table />
     </Settings>
   );
