@@ -15,7 +15,7 @@ import {
 } from 'common/stores/slices/company-users';
 import { Divider } from 'components/cards/Divider';
 import { Modal } from 'components/Modal';
-import { cloneDeep, set } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -105,7 +105,11 @@ export function CustomLabels() {
   const handleSelectChange = (property: string): void => {
     let company = cloneDeep(companyChanges);
 
-    set(company, `settings.translations.${property}`, '');
+    if (company.settings.translations.length <= 1) {
+      company.settings.translations = {};
+    }
+
+    company.settings.translations[property] = '';
 
     dispatch(injectInChanges({ object: 'company', data: company }));
   };
