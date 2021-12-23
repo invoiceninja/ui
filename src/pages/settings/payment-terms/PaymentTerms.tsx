@@ -40,10 +40,11 @@ export function PaymentTerms() {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('payment_terms')}`;
   });
 
+  const queryClient = useQueryClient();
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
   const [sort, setSort] = useState<string | undefined>(undefined);
-  const queryClient = useQueryClient();
 
   const { data } = usePaymentTermsQuery({
     currentPage,
@@ -87,23 +88,7 @@ export function PaymentTerms() {
           </Th>
           <Th></Th>
         </Thead>
-        <Tbody>
-          {!data && (
-            <Tr>
-              <Td colSpan={2}>
-                <Spinner />
-              </Td>
-            </Tr>
-          )}
-
-          {data && data.data.meta.pagination.total === 0 && (
-            <Tr>
-              <Td colSpan={2}>
-                <p>{t('empty_table')}</p>
-              </Td>
-            </Tr>
-          )}
-
+        <Tbody data={data} showHelperPlaceholders>
           {data &&
             data.data.data.map((paymentTerm: PaymentTerm) => (
               <Tr key={paymentTerm.id}>
