@@ -8,14 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import {
+  injectInChanges,
+  updateChanges,
+} from 'common/stores/slices/company-users';
+import { Divider } from 'components/cards/Divider';
+import { cloneDeep, set } from 'lodash';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
-import { Button, SelectField } from '../../../../components/forms';
+import { Button, InputField, SelectField } from '../../../../components/forms';
 
 export function CustomLabels() {
   const [t] = useTranslation();
+  const companyChanges = useCompanyChanges();
+  const dispatch = useDispatch();
 
-  let defaultLabels = [
+  const defaultLabels = [
     { property: 'amount', translation: t('amount') },
     { property: 'address2', translation: t('address2') },
     { property: 'balance', translation: t('balance') },
@@ -58,12 +69,56 @@ export function CustomLabels() {
     { property: 'website', translation: t('website') },
   ];
 
+  const [defaultLabelsFiltered, setDefaultLabelsFiltered] =
+    useState<{ property: string; translation: string }[]>(defaultLabels);
+
+  useEffect(() => {
+    let translations = Object.keys(
+      companyChanges?.settings?.translations ?? []
+    );
+
+    setDefaultLabelsFiltered(
+      defaultLabelsFiltered.filter(
+        (label) => !translations.includes(label.property)
+      )
+    );
+  }, [companyChanges]);
+
+  const labelLeftSide = (property: string): string => {
+    let possibleDefault = defaultLabels.find(
+      (label) => label.property === property
+    );
+
+    return possibleDefault ? possibleDefault.translation : property;
+  };
+
+  const handleSelectChange = (property: string): void => {
+    let company = cloneDeep(companyChanges);
+
+    set(company, `settings.translations.${property}`, '');
+
+    dispatch(injectInChanges({ object: 'company', data: company }));
+  };
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: event.target.id,
+        value: event.target.value,
+      })
+    );
+
   return (
     <Card title={t('custom_labels')}>
       <Element
         leftSide={
-          <SelectField>
-            {defaultLabels.map((label) => (
+          <SelectField
+            onChange={(event) => handleSelectChange(event.target.value)}
+            defaultValue=""
+          >
+            <option value=""></option>
+            {defaultLabelsFiltered.map((label) => (
               <option key={label.property} value={label.property}>
                 {label.translation}
               </option>
@@ -75,6 +130,20 @@ export function CustomLabels() {
           {t('add_custom')}
         </Button>
       </Element>
+
+      <Divider />
+
+      {Object.keys(companyChanges?.settings?.translations ?? []).map(
+        (translation) => (
+          <Element leftSide={labelLeftSide(translation)} key={translation}>
+            <InputField
+              value={companyChanges?.settings?.translations[translation] || ''}
+              onChange={handleChange}
+              id={`settings.translations.${translation}`}
+            />
+          </Element>
+        )
+      )}
     </Card>
   );
 }
