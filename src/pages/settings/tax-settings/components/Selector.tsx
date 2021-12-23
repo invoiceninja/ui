@@ -8,10 +8,40 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
+import { Card, Element } from '@invoiceninja/cards';
+import { SelectField } from '@invoiceninja/forms';
+import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import Select from 'react-select/dist/declarations/src/Select';
 
 export function Selector() {
-  return <Card>
-      {/*  */}
-  </Card>;
+  const [t] = useTranslation();
+  const companyChanges = useCompanyChanges();
+
+  return (
+    <>
+      {companyChanges?.enabled_tax_rates > 0 && (
+        <Card>
+          {companyChanges?.enabled_tax_rates > 0 && (
+            <Element leftSide={t('tax_rate1')}>
+              <SelectField></SelectField>
+            </Element>
+          )}
+
+          {companyChanges?.enabled_tax_rates > 1 && (
+            <Element leftSide={t('tax_rate2')}>
+              <SelectField></SelectField>
+            </Element>
+          )}
+
+          {companyChanges?.enabled_tax_rates > 2 && (
+            <Element leftSide={t('tax_rate3')}>
+              <SelectField></SelectField>
+            </Element>
+          )}
+        </Card>
+      )}
+    </>
+  );
 }
