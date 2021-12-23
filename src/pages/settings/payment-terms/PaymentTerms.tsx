@@ -96,6 +96,14 @@ export function PaymentTerms() {
             </Tr>
           )}
 
+          {data && data.data.meta.pagination.total === 0 && (
+            <Tr>
+              <Td colSpan={2}>
+                <p>{t('empty_table')}</p>
+              </Td>
+            </Tr>
+          )}
+
           {data &&
             data.data.data.map((paymentTerm: PaymentTerm) => (
               <Tr key={paymentTerm.id}>
