@@ -16,6 +16,7 @@ import {
 import { Divider } from 'components/cards/Divider';
 import { cloneDeep, set } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
+import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
@@ -109,6 +110,14 @@ export function CustomLabels() {
       })
     );
 
+  const handleDelete = (translation: string) => {
+    let company = cloneDeep(companyChanges);
+
+    delete company?.settings?.translations[translation];
+
+    dispatch(injectInChanges({ object: 'company', data: company }));
+  };
+
   return (
     <Card title={t('custom_labels')}>
       <Element
@@ -131,16 +140,27 @@ export function CustomLabels() {
         </Button>
       </Element>
 
-      <Divider />
+      {Object.keys(companyChanges?.settings?.translations ?? []).length > 0 && (
+        <Divider />
+      )}
 
       {Object.keys(companyChanges?.settings?.translations ?? []).map(
         (translation) => (
           <Element leftSide={labelLeftSide(translation)} key={translation}>
-            <InputField
-              value={companyChanges?.settings?.translations[translation] || ''}
-              onChange={handleChange}
-              id={`settings.translations.${translation}`}
-            />
+            <div className="flex items-center space-x-4">
+              <InputField
+                value={
+                  companyChanges?.settings?.translations[translation] || ''
+                }
+                onChange={handleChange}
+                id={`settings.translations.${translation}`}
+              />
+
+              <X
+                className="cursor-pointer"
+                onClick={() => handleDelete(translation)}
+              />
+            </div>
           </Element>
         )
       )}
