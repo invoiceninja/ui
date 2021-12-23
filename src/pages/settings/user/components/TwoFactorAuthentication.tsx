@@ -137,14 +137,12 @@ export function TwoFactorAuthentication() {
           {t('continue')}
         </Button>
 
-        <div className="flex justify-center">
-          <Link
-            external
-            to="https://github.com/antonioribeiro/google2fa#google-authenticator-apps"
-          >
-            {t('learn_more')}
-          </Link>
-        </div>
+        <Link
+          external
+          to="https://github.com/antonioribeiro/google2fa#google-authenticator-apps"
+        >
+          {t('learn_more')}
+        </Link>
       </Modal>
 
       <Modal
