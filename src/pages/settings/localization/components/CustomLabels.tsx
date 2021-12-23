@@ -139,7 +139,9 @@ export function CustomLabels() {
         onClose={setIsCustomModalOpen}
       >
         <InputField
-          onChange={(event) => setCustomLabel(event.target.value)}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            setCustomLabel(event.target.value)
+          }
           id="custom_field"
           label={t('custom_field')}
         ></InputField>
@@ -166,7 +168,9 @@ export function CustomLabels() {
         <Element
           leftSide={
             <SelectField
-              onChange={(event) => handleSelectChange(event.target.value)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                handleSelectChange(event.target.value)
+              }
               defaultValue=""
             >
               <option value=""></option>
