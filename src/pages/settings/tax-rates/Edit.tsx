@@ -94,6 +94,23 @@ export function Edit() {
       .finally(() => invalidatePaymentTermCache());
   };
 
+  const restore = () => {
+    toast.loading(t('processing'));
+
+    bulk([data?.data.data.id], 'restore')
+      .then(() => {
+        toast.dismiss();
+        toast.success(t('restored_tax_rate'));
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.dismiss();
+        toast.success(t('error_title'));
+      })
+      .finally(() => invalidatePaymentTermCache());
+  };
+
   return (
     <Settings title={t('tax_rates')}>
       {!data && (
@@ -148,6 +165,12 @@ export function Edit() {
           {!data.data.data.archived_at && !data.data.data.is_deleted ? (
             <ActionCard label={t('archive')} help="Lorem ipsum dolor sit amet.">
               <Button onClick={archive}>{t('archive')}</Button>
+            </ActionCard>
+          ) : null}
+
+          {data.data.data.archived_at || data.data.data.is_deleted ? (
+            <ActionCard label={t('restore')} help="Lorem ipsum dolor sit amet.">
+              <Button onClick={restore}>{t('restore')}</Button>
             </ActionCard>
           ) : null}
         </Container>
