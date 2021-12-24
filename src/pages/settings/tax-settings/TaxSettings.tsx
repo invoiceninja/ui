@@ -23,7 +23,7 @@ import { ChangeEvent, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, Element } from '../../../components/cards';
+import { Card, ClickableElement, Element } from '../../../components/cards';
 import { SelectField } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
@@ -137,7 +137,14 @@ export function TaxSettings() {
       </Card>
 
       <Selector />
-      <Table />
+
+      {/* <Table /> */}
+
+      <Card>
+        <ClickableElement to="/settings/tax_rates">
+          {t('tax_rates')}
+        </ClickableElement>
+      </Card>
     </Settings>
   );
 }

@@ -77,6 +77,7 @@ import {
   CreateTaxRate,
 } from '../pages/settings';
 import { UserManagement } from '../pages/settings/user-management/UserManagement';
+import { TaxRates } from 'pages/settings/tax-rates';
 
 export const routes = (
   <Routes>
@@ -169,6 +170,7 @@ export const routes = (
           <Route path="create" element={<CreatePaymentTerm />} />
         </Route>
         <Route path="tax_rates">
+          <Route path="" element={<TaxRates />} />
           <Route path="create" element={<CreateTaxRate />} />
         </Route>
       </Route>
