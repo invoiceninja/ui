@@ -94,10 +94,10 @@ export function TaxRates() {
                         id: taxRate.id,
                       })}
                     >
-                      {t('edit_payment_term')}
+                      {t('edit_tax_rate')}
                     </DropdownElement>
                     <DropdownElement onClick={() => archive(taxRate.id)}>
-                      {t('archive_payment_term')}
+                      {t('archive_tax_rate')}
                     </DropdownElement>
                   </Dropdown>
                 </Td>

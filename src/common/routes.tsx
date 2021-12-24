@@ -75,9 +75,10 @@ import {
   CreatePaymentTerm,
   CompanyDocuments,
   CreateTaxRate,
+  TaxRates,
+  EditTaxRate,
+  UserManagement,
 } from '../pages/settings';
-import { UserManagement } from '../pages/settings/user-management/UserManagement';
-import { TaxRates } from 'pages/settings/tax-rates';
 
 export const routes = (
   <Routes>
@@ -172,6 +173,7 @@ export const routes = (
         <Route path="tax_rates">
           <Route path="" element={<TaxRates />} />
           <Route path="create" element={<CreateTaxRate />} />
+          <Route path=":id/edit" element={<EditTaxRate />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
