@@ -9,6 +9,7 @@
  */
 
 import classNames from 'classnames';
+import { Alert } from 'components/Alert';
 
 import { useSelector } from 'react-redux';
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -23,6 +24,7 @@ interface Props extends CommonProps {
   required?: boolean;
   border?: boolean;
   name?: string;
+  errorMessage?: string;
 }
 
 export function InputField(props: Props) {
@@ -51,6 +53,12 @@ export function InputField(props: Props) {
         onChange={props.onChange}
         value={props.value}
       />
+
+      {props.errorMessage && (
+        <Alert className="mt-2" type="danger">
+          {props.errorMessage}
+        </Alert>
+      )}
     </section>
   );
 }
