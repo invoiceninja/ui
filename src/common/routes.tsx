@@ -74,6 +74,7 @@ import {
   EditPaymentTerm,
   CreatePaymentTerm,
   CompanyDocuments,
+  CreateTaxRate,
 } from '../pages/settings';
 import { UserManagement } from '../pages/settings/user-management/UserManagement';
 
@@ -166,6 +167,9 @@ export const routes = (
           <Route path="" element={<PaymentTerms />} />
           <Route path=":id/edit" element={<EditPaymentTerm />} />
           <Route path="create" element={<CreatePaymentTerm />} />
+        </Route>
+        <Route path="tax_rates">
+          <Route path="create" element={<CreateTaxRate />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />

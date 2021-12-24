@@ -57,3 +57,5 @@ export * from './user-management/UserManagement';
 export * from './payment-terms';
 
 export { Documents as CompanyDocuments } from './company/documents/Documents';
+
+export { Create as CreateTaxRate } from './tax-rates';
