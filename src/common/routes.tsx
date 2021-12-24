@@ -78,6 +78,7 @@ import {
   TaxRates,
   EditTaxRate,
   UserManagement,
+  TaskStatuses,
 } from '../pages/settings';
 
 export const routes = (
@@ -174,6 +175,9 @@ export const routes = (
           <Route path="" element={<TaxRates />} />
           <Route path="create" element={<CreateTaxRate />} />
           <Route path=":id/edit" element={<EditTaxRate />} />
+        </Route>
+        <Route path="task_statuses">
+          <Route path="" element={<TaskStatuses />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
