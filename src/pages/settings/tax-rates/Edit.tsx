@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
+import { ActionCard, Card, CardContainer, Element } from '@invoiceninja/cards';
+import { Button, InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { useTaxRateQuery } from 'common/queries/tax-rates';
+import { bulk, useTaxRateQuery } from 'common/queries/tax-rates';
 import { Badge } from 'components/Badge';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -38,7 +38,14 @@ export function Edit() {
     }`;
   }, [data]);
 
+  const invalidatePaymentTermCache = () => {
+    queryClient.invalidateQueries(
+      generatePath('/api/v1/tax_rates/:id', { id })
+    );
+  };
+
   const formik = useFormik({
+    enableReinitialize: true,
     initialValues: {
       name: data?.data.data.name || '',
       rate: data?.data.data.rate || 0,
@@ -52,10 +59,6 @@ export function Edit() {
           headers: defaultHeaders,
         })
         .then(() => {
-          queryClient.invalidateQueries(
-            generatePath('/api/v1/tax_rates/:id', { id })
-          );
-
           toast.dismiss();
           toast.success(t('updated_tax_rate'));
         })
@@ -67,9 +70,29 @@ export function Edit() {
             ? setErrors(error.response.data)
             : toast.error(t('error_title'));
         })
-        .finally(() => formik.setSubmitting(false));
+        .finally(() => {
+          formik.setSubmitting(false);
+          invalidatePaymentTermCache();
+        });
     },
   });
+
+  const archive = () => {
+    toast.loading(t('processing'));
+
+    bulk([data?.data.data.id], 'archive')
+      .then(() => {
+        toast.dismiss();
+        toast.success(t('archived_tax_rate'));
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.dismiss();
+        toast.success(t('error_title'));
+      })
+      .finally(() => invalidatePaymentTermCache());
+  };
 
   return (
     <Settings title={t('tax_rates')}>
@@ -108,6 +131,7 @@ export function Edit() {
                 label={t('name')}
                 onChange={formik.handleChange}
                 errorMessage={errors?.errors.name}
+                value={formik.values.name}
               />
 
               <InputField
@@ -116,9 +140,16 @@ export function Edit() {
                 label={t('rate')}
                 onChange={formik.handleChange}
                 errorMessage={errors?.errors.rate}
+                value={formik.values.rate}
               />
             </CardContainer>
           </Card>
+
+          {!data.data.data.archived_at && !data.data.data.is_deleted ? (
+            <ActionCard label={t('archive')} help="Lorem ipsum dolor sit amet.">
+              <Button onClick={archive}>{t('archive')}</Button>
+            </ActionCard>
+          ) : null}
         </Container>
       )}
     </Settings>
