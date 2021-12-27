@@ -31,7 +31,7 @@ export function Dropdown(props: Props) {
           </div>
         )}
       >
-        <button className="inline-flex text-gray-900 border border-gray-300 dark:border-transparent bg-white items-center space-x-2 justify-center py-2 px-4 rounded text-sm undefined text-white dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700">
+        <button className="inline-flex text-gray-900 border border-gray-300 dark:border-transparent bg-white items-center space-x-2 justify-center py-2 px-4 rounded text-sm  dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700">
           <span>{props.label}</span>
           <ChevronDown size={14} />
         </button>

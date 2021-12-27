@@ -67,9 +67,9 @@ export function Create() {
           {/* Invoice section #1 */}
           <div className="col-span-12 lg:col-start-5 lg:col-span-3 space-y-4 mt-10 lg:mt-0">
             {/* Invoice date */}
-            <div className="grid grid-cols-12 flex items-center space-y-2 lg:space-y-0">
+            <div className="grid grid-cols-12 items-center space-y-2 lg:space-y-0">
               <div className="col-span-12 lg:col-span-4">
-                <p className="w-full text-sm text-gray-800 w-1/3">
+                <p className="w-full text-sm text-gray-800">
                   {t('invoice_date')}
                 </p>
               </div>
@@ -82,11 +82,9 @@ export function Create() {
             </div>
 
             {/* Due date */}
-            <div className="grid grid-cols-12 flex items-center space-y-2 lg:space-y-0">
+            <div className="grid grid-cols-12 items-center space-y-2 lg:space-y-0">
               <div className="col-span-4">
-                <p className="w-full text-sm text-gray-800 w-1/3">
-                  {t('due_date')}
-                </p>
+                <p className="w-full text-sm text-gray-800">{t('due_date')}</p>
               </div>
               <div className="col-span-12 lg:col-span-8">
                 <div className="inline-flex items-center space-x-2 w-full">
@@ -97,9 +95,9 @@ export function Create() {
             </div>
 
             {/* Due date */}
-            <div className="grid grid-cols-12 flex items-center space-y-2 lg:space-y-0">
+            <div className="grid grid-cols-12 items-center space-y-2 lg:space-y-0">
               <div className="col-span-4">
-                <p className="w-full text-sm text-gray-800 w-1/3">
+                <p className="w-full text-sm text-gray-800">
                   {t('partial_deposit')}
                 </p>
               </div>
@@ -112,11 +110,9 @@ export function Create() {
           {/* Invoice section #2 */}
           <div className="col-span-12 lg:col-start-9 lg:col-span-3 space-y-4 mt-10 lg:mt-0">
             {/* Invoice number */}
-            <div className="grid grid-cols-12 flex items-center space-y-2 lg:space-y-0">
+            <div className="grid grid-cols-12 items-center space-y-2 lg:space-y-0">
               <div className="col-span-12 lg:col-span-4">
-                <p className="w-full text-sm text-gray-800 w-1/3">
-                  {t('invoice')} #
-                </p>
+                <p className="w-full text-sm text-gray-800">{t('invoice')} #</p>
               </div>
               <div className="col-span-12 lg:col-span-8">
                 <InputField id="invoice_number" />
@@ -124,9 +120,9 @@ export function Create() {
             </div>
 
             {/* PO number */}
-            <div className="grid grid-cols-12 flex items-center space-y-2 lg:space-y-0">
+            <div className="grid grid-cols-12 items-center space-y-2 lg:space-y-0">
               <div className="col-span-4">
-                <p className="w-full text-sm text-gray-800 w-1/3 uppercase">
+                <p className="w-full text-sm text-gray-800 uppercase">
                   {t('po')} #
                 </p>
               </div>
@@ -136,11 +132,9 @@ export function Create() {
             </div>
 
             {/* Due date */}
-            <div className="grid grid-cols-12 flex items-center space-y-2 lg:space-y-0">
+            <div className="grid grid-cols-12 items-center space-y-2 lg:space-y-0">
               <div className="col-span-4">
-                <p className="w-full text-sm text-gray-800 w-1/3">
-                  {t('discount')}
-                </p>
+                <p className="w-full text-sm text-gray-800">{t('discount')}</p>
               </div>
               <div className="col-span-12 lg:col-span-8">
                 <div className="grid grid-cols-2 gap-2">
