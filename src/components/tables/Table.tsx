@@ -10,7 +10,7 @@
 
 import CommonProps from '../../common/interfaces/common-props.interface';
 
-interface Props extends CommonProps {}
+type Props = CommonProps
 
 export function Table(props: Props) {
   return (

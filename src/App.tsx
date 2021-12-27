@@ -15,7 +15,7 @@ import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 
 export function App() {
-  let darkMode = useSelector((state: RootState) => state.settings.darkMode);
+  const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
   useEffect(() => {
     document.body.classList.add('bg-gray-50', 'dark:bg-gray-900');

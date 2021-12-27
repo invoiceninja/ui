@@ -33,7 +33,7 @@ export function Actions(props: Props) {
       | MultiValue<{ value: string; label: string }>
       | SingleValue<{ value: string; label: string }>
   ) {
-    let values: string[] = [];
+    const values: string[] = [];
 
     (options as any).map((option: { value: string; label: string }) =>
       values.push(option.value)

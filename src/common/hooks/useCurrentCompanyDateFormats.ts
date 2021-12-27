@@ -22,7 +22,7 @@ export function useCurrentCompanyDateFormats() {
     setDateFormatId(company?.settings?.date_format_id);
 
     if (statics?.data?.date_formats) {
-      let result = statics.data.date_formats.filter(
+      const result = statics.data.date_formats.filter(
         (format: any) => format.id === dateFormatId
       );
 

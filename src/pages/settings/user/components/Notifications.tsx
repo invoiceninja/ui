@@ -42,7 +42,7 @@ export function Notifications() {
   }, [isGlobalChecked]);
 
   const handleGlobalToggleChange = () => {
-    let user = cloneDeep(userChanges);
+    const user = cloneDeep(userChanges);
 
     let notifications: string[] = [];
 
@@ -54,7 +54,7 @@ export function Notifications() {
   };
 
   const handleToggleChange = (field: string, value: boolean) => {
-    let user = cloneDeep(userChanges);
+    const user = cloneDeep(userChanges);
 
     let notifications: string[] = user.company_user.notifications.email ?? [];
 

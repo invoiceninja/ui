@@ -83,7 +83,7 @@ export function CustomLabels() {
     useState<{ property: string; translation: string }[]>(defaultLabels);
 
   useEffect(() => {
-    let translations = Object.keys(
+    const translations = Object.keys(
       companyChanges?.settings?.translations ?? []
     );
 
@@ -95,7 +95,7 @@ export function CustomLabels() {
   }, [companyChanges]);
 
   const labelLeftSide = (property: string): string => {
-    let possibleDefault = defaultLabels.find(
+    const possibleDefault = defaultLabels.find(
       (label) => label.property === property
     );
 
@@ -103,7 +103,7 @@ export function CustomLabels() {
   };
 
   const handleSelectChange = (property: string): void => {
-    let company = cloneDeep(companyChanges);
+    const company = cloneDeep(companyChanges);
 
     if (company.settings.translations.length <= 1) {
       company.settings.translations = {};
@@ -124,7 +124,7 @@ export function CustomLabels() {
     );
 
   const handleDelete = (translation: string) => {
-    let company = cloneDeep(companyChanges);
+    const company = cloneDeep(companyChanges);
 
     delete company?.settings?.translations[translation];
 

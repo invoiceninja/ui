@@ -29,7 +29,7 @@ export function ClickableElement(props: Props) {
 
   if (props.href) {
     return (
-      <a target="_blank" href={props.href} className={classes}>
+      <a target="_blank" href={props.href} className={classes} rel="noreferrer">
         {props.children}
       </a>
     );

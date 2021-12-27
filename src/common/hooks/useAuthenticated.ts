@@ -17,7 +17,7 @@ import { endpoint } from '../helpers';
 import { authenticate } from '../stores/slices/user';
 import { RootState } from '../stores/store';
 
-export function useAuthenticated(): Boolean {
+export function useAuthenticated(): boolean {
   const user = useSelector((state: RootState) => state.user);
   const token = localStorage.getItem('X-NINJA-TOKEN');
 
