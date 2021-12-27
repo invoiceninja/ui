@@ -19,6 +19,7 @@
     "pretty-bytes": "^5.6.0",
     "react": "^17.0.2",
     "react-datepicker": "^4.4.0",
+    "react-debounce-input": "^3.2.5",
     "react-dom": "^17.0.2",
     "react-dropzone": "^11.4.2",
     "react-feather": "^2.0.9",

@@ -10,6 +10,7 @@
 
 import classNames from 'classnames';
 import { Alert } from 'components/Alert';
+import { DebounceInput } from 'react-debounce-input';
 
 import { useSelector } from 'react-redux';
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -39,7 +40,8 @@ export function InputField(props: Props) {
         </InputLabel>
       )}
 
-      <input
+      <DebounceInput
+        debounceTimeout={300}
         required={props.required}
         id={props.id}
         type={props.type}
