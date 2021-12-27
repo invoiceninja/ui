@@ -25,7 +25,7 @@ export function PasswordConfirmation(props: Props) {
   const [isModalOpen, setIsModalOpen] = useState(props.show ?? false);
   const [currentPassword, setCurrentPassword] = useState('');
 
-  const [isPasswordRequired, setIsPasswordRequired] = useState(true);
+  const isPasswordRequired = true;
 
   useEffect(() => {
     setIsModalOpen(props.show as boolean);

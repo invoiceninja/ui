@@ -8,9 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { Company } from 'common/interfaces/company.interface';
 import { Service } from 'typedi';
 
 @Service()

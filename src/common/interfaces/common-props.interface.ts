@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ChangeEvent, ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 export default interface CommonProps {
   id?: any;

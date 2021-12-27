@@ -9,7 +9,6 @@
  */
 
 import { useAccentColor } from 'common/hooks/useAccentColor';
-import { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -34,8 +33,6 @@ export function Pagination(props: Props) {
   const [t] = useTranslation();
   const accentColor = useAccentColor();
 
-  const [currentPerPage, setCurrentPerPage] = useState('10');
-
   function next() {
     if (props.currentPage + 1 <= props.totalPages) {
       props.onPageChange(props.currentPage + 1);
@@ -58,10 +55,7 @@ export function Pagination(props: Props) {
             name="location"
             className="block pl-3 pr-10 py-2 text-base border-gray-300 sm:text-sm rounded-md"
             defaultValue="10"
-            onChange={(element) => {
-              setCurrentPerPage(element.target.value);
-              props.onRowsChange(element.target.value);
-            }}
+            onChange={(element) => props.onRowsChange(element.target.value)}
           >
             <option value="10">10</option>
             <option>50</option>

@@ -10,7 +10,7 @@
 
 import Tippy from '@tippyjs/react/headless';
 import CommonProps from '../../common/interfaces/common-props.interface';
-import { ChevronDown, Divide } from 'react-feather';
+import { ChevronDown } from 'react-feather';
 
 interface Props extends CommonProps {
   label?: string;
@@ -23,7 +23,7 @@ export function Dropdown(props: Props) {
         placement="bottom"
         trigger="click"
         interactive={true}
-        render={(attrs) => (
+        render={() => (
           <div
             className={`box mt-2 w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none ${props.className}`}
           >

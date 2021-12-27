@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { forwardRef, useState } from 'react';
+import { useState } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import 'react-datepicker/dist/react-datepicker.css';

@@ -9,7 +9,7 @@
  */
 
 import { Fragment, useState } from 'react';
-import { Dialog, Menu, Transition } from '@headlessui/react';
+import { Dialog, Transition } from '@headlessui/react';
 import {
   Home,
   Menu as MenuIcon,
@@ -21,8 +21,6 @@ import {
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { RootState } from 'common/stores/store';
 import { Button } from '@invoiceninja/forms';
 import { useLogo } from 'common/hooks/useLogo';
 
@@ -68,8 +66,6 @@ export function Default(props: Props) {
       current: location.pathname.startsWith('/settings'),
     },
   ];
-
-  const userNavigation = [{ name: t('logout'), href: '/logout' }];
 
   return (
     <>

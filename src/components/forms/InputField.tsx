@@ -12,9 +12,7 @@ import classNames from 'classnames';
 import { Alert } from 'components/Alert';
 import { DebounceInput } from 'react-debounce-input';
 
-import { useSelector } from 'react-redux';
 import CommonProps from '../../common/interfaces/common-props.interface';
-import { RootState } from '../../common/stores/store';
 import { InputLabel } from './InputLabel';
 
 interface Props extends CommonProps {
@@ -29,8 +27,6 @@ interface Props extends CommonProps {
 }
 
 export function InputField(props: Props) {
-  const colors = useSelector((state: RootState) => state.settings.colors);
-
   return (
     <section>
       {props.label && (
