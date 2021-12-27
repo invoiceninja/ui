@@ -36,7 +36,8 @@ export function TaxRates() {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
-  const [sort, setSort] = useState<string | undefined>(undefined);
+  
+  const sort = 'id|asc';
 
   const { data } = useTaxRatesQuery({
     currentPage,

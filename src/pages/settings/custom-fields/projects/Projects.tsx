@@ -25,8 +25,8 @@ export function Projects() {
   return (
     <Settings title={t('custom_fields')}>
       <Card title={title}>
-        {['project1', 'project2', 'project3', 'project4'].map((field) => (
-          <Field field={field} placeholder={t('project_field')} />
+        {['project1', 'project2', 'project3', 'project4'].map((field, index) => (
+          <Field key={index} field={field} placeholder={t('project_field')} />
         ))}
       </Card>
     </Settings>

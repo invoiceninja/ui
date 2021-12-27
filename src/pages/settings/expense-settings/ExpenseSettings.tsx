@@ -11,7 +11,7 @@
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../components/cards';
-import { Button, InputField } from '../../../components/forms';
+import { Button } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import {

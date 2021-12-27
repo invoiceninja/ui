@@ -8,10 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
-
 export function TaskStatuses() {
-  const [t] = useTranslation();
-
   return <div></div>;
 }

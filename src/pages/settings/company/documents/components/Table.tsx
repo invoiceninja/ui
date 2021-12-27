@@ -17,15 +17,12 @@ import {
   Thead,
   Tr,
 } from '@invoiceninja/tables';
-import { current } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { date, endpoint } from 'common/helpers';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { Document } from 'common/interfaces/document.interface';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useDocumentsQuery } from 'common/queries/documents';
-import { useStaticsQuery } from 'common/queries/statics';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { FileIcon } from 'components/FileIcon';

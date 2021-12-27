@@ -12,14 +12,12 @@ import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateChanges } from 'common/stores/slices/user';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { RootState } from '../../../../common/stores/store';
 
 export function AccentColor() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
-  const user = useCurrentUser();
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
   return (

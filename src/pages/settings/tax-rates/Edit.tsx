@@ -29,7 +29,7 @@ export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
   const { data } = useTaxRateQuery({ id });
-  const [errors, setErrors] = useState<any>(undefined);
+  const [errors, setErrors] = useState<unknown>(undefined);
   const queryClient = useQueryClient();
 
   useEffect(() => {

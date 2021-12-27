@@ -24,7 +24,7 @@ import { generatePath, useNavigate } from 'react-router-dom';
 
 export function Create() {
   const [t] = useTranslation();
-  const [errors, setErrors] = useState<any>(undefined);
+  const [errors, setErrors] = useState<unknown>(undefined);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 

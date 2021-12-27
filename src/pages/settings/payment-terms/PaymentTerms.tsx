@@ -25,7 +25,6 @@ import { bulk, usePaymentTermsQuery } from 'common/queries/payment-terms';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Settings } from 'components/layouts/Settings';
-import { Spinner } from 'components/Spinner';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';

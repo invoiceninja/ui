@@ -24,8 +24,8 @@ interface Props extends CommonProps {
 const defaultProps: Props = {
   totalPages: 1,
   currentPage: 1,
-  onPageChange: (page: number) => {},
-  onRowsChange: (rows: string) => {},
+  onPageChange: (page: number) => page,
+  onRowsChange: (rows: string) => rows,
 };
 
 export function Pagination(props: Props) {

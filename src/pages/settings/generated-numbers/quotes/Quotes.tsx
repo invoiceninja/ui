@@ -17,7 +17,6 @@ import { Settings } from '../../../../components/layouts/Settings';
 export function Quotes() {
   const [t] = useTranslation();
   const [pattern, setPattern] = useState<string>('');
-  const [numberCounter, setNumberCounter] = useState<number>(1);
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(

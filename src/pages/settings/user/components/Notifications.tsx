@@ -27,20 +27,6 @@ export function Notifications() {
     value: false,
   });
 
-  useEffect(() => {
-    userChanges?.company_user?.notifications?.email?.includes(
-      'all_notifications'
-    )
-      ? setIsGlobalChecked({ initial: true, value: true })
-      : setIsGlobalChecked({ initial: true, value: false });
-  }, [userChanges]);
-
-  useEffect(() => {
-    if (!isGlobalChecked.initial) {
-      handleGlobalToggleChange();
-    }
-  }, [isGlobalChecked]);
-
   const handleGlobalToggleChange = () => {
     const user = cloneDeep(userChanges);
 
@@ -68,6 +54,20 @@ export function Notifications() {
 
     dispatch(injectInChangesWithData(user));
   };
+
+  useEffect(() => {
+    userChanges?.company_user?.notifications?.email?.includes(
+      'all_notifications'
+    )
+      ? setIsGlobalChecked({ initial: true, value: true })
+      : setIsGlobalChecked({ initial: true, value: false });
+  }, [userChanges]);
+
+  useEffect(() => {
+    if (!isGlobalChecked.initial) {
+      handleGlobalToggleChange();
+    }
+  }, [isGlobalChecked]);
 
   const options: { label: string; field: string }[] = [
     { label: t('invoice_created'), field: 'invoice_created_all' },

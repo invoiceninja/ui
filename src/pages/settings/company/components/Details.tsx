@@ -8,10 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useStaticsQuery } from 'common/queries/statics';
 import {
-  injectInChanges,
   updateChanges,
 } from 'common/stores/slices/company-users';
 import { RootState } from 'common/stores/store';
@@ -19,7 +17,7 @@ import { Card } from 'components/cards/Card';
 import { Element } from 'components/cards/Element';
 import { InputField } from 'components/forms/InputField';
 import { SelectField } from 'components/forms/SelectField';
-import { ChangeEvent, useEffect } from 'react';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -27,7 +25,6 @@ export function Details() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
-  const company = useCurrentCompany();
   const { data } = useStaticsQuery();
 
   const companyChanges = useSelector(

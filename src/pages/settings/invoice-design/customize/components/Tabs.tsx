@@ -30,9 +30,10 @@ export function Tabs() {
       className="flex space-x-4 overflow-y-auto pb-2 lg:pb-0"
       aria-label="Tabs"
     >
-      {tabs.map((tab) => {
+      {tabs.map((tab, index) => {
         return (
           <button
+            key={index}
             onClick={() => setActiveTab(tab.value)}
             className={classNames(
               'hover:bg-gray-200 text-gray-700 px-3 py-2 font-medium text-sm rounded',

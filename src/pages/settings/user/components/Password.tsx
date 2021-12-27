@@ -28,16 +28,16 @@ export function Password() {
       : dispatch(deletePassword());
   };
 
+  const onUserUpdated = () => {
+    setPassword('');
+    setPasswordConfirmation('');
+  };
+
   useEffect(() => {
     window.addEventListener('user.updated', onUserUpdated);
 
     handleChange();
   }, [password, passwordConfirmation]);
-
-  const onUserUpdated = () => {
-    setPassword('');
-    setPasswordConfirmation('');
-  };
 
   return (
     <Card title={t('password')}>

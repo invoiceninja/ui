@@ -28,11 +28,12 @@ export interface CreateProductDto {
 }
 
 export function Create() {
+  const [t] = useTranslation();
+
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('new_product')}`;
   });
 
-  const [t] = useTranslation();
   const navigate = useNavigate();
   const [errors, setErrors] = useState<any>();
 

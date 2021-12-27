@@ -11,9 +11,7 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { SelectField } from '@invoiceninja/forms';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import Select from 'react-select/dist/declarations/src/Select';
 
 export function Selector() {
   const [t] = useTranslation();

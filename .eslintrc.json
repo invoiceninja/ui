@@ -16,11 +16,13 @@
     "ecmaVersion": 2015,
     "sourceType": "module"
   },
-  "plugins": ["react", "@typescript-eslint"],
+  "plugins": ["unused-imports", "react", "@typescript-eslint"],
   "rules": {
     "no-use-before-define": "off",
+    "react/react-in-jsx-scope": "off",
     "@typescript-eslint/no-use-before-define": ["error"],
-    "react/react-in-jsx-scope": "off"
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-explicit-any": "off"
   },
   "settings": {
     "react": {

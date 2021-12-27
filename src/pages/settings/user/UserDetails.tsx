@@ -50,6 +50,7 @@ export function UserDetails() {
     dispatch(injectInChanges());
   }, [user]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {
     toast.loading(t('processing'));
 
@@ -69,7 +70,7 @@ export function UserDetails() {
 
         window.dispatchEvent(new CustomEvent('user.updated'));
       })
-      .catch((error: AxiosError | any) => {
+      .catch((error: AxiosError | unknown) => {
         console.error(error);
 
         toast.dismiss();

@@ -16,7 +16,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useStaticsQuery } from 'common/queries/statics';
 import { ChangeEvent } from 'react';
 import MDEditor from '@uiw/react-md-editor';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { endpoint } from 'common/helpers';
 import { useQuery } from 'react-query';
 import axios from 'axios';
@@ -27,7 +26,6 @@ import { updateChanges } from 'common/stores/slices/company-users';
 export function Defaults() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
-  const company = useCurrentCompany();
   const statics = useStaticsQuery();
 
   const { data: terms } = useQuery('/api/v1/payment_terms', () =>

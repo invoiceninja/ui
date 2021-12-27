@@ -10,14 +10,9 @@
 
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  generatePath,
-  useLocation,
-  useNavigate,
-  useParams,
-} from 'react-router';
+import { generatePath, useNavigate, useParams } from 'react-router';
 import { endpoint, request } from '../../common/helpers';
 import { useProductQuery } from '../../common/queries/products';
 import { Alert } from '../../components/Alert';
@@ -32,7 +27,7 @@ import { CreateProductDto } from './Create';
 export function Clone() {
   const [t] = useTranslation();
   const { id } = useParams();
-  const { data, error } = useProductQuery({ id });
+  const { data } = useProductQuery({ id });
   const [errors, setErrors] = useState<any>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const navigate = useNavigate();

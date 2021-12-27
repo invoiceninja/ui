@@ -10,11 +10,6 @@
 
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
-import {
-  InputField,
-  SelectField,
-  Textarea,
-} from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 
 export function Registration() {

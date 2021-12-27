@@ -35,11 +35,12 @@ import {
 } from '@invoiceninja/tables';
 
 export function Products() {
+  const [t] = useTranslation();
+
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('products')}`;
   });
 
-  const [t] = useTranslation();
   const [filter, setFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState('10');
@@ -75,6 +76,7 @@ export function Products() {
 
         selected.clear();
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         /** @ts-ignore: Unreachable, if element is null/undefined. */
         mainCheckbox.current.checked = false;
       })
@@ -93,6 +95,7 @@ export function Products() {
 
         selected.clear();
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore: Unreachable when element is undefined.
         mainCheckbox.current.checked = false;
       })
@@ -106,11 +109,12 @@ export function Products() {
     }
 
     bulk(Array.from(selected), 'delete')
-      .then((response: AxiosResponse) => {
+      .then(() => {
         toast.success(t('deleted_product'));
 
         selected.clear();
 
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore: Unreachable when element is undefined.
         mainCheckbox.current.checked = false;
       })

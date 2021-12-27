@@ -97,8 +97,8 @@ export function TaskSettings() {
     >
       {errors?.errors?.settings && (
         <Alert type="danger">
-          {errors?.errors?.settings.map((element: string) => (
-            <p>{element}</p>
+          {errors?.errors?.settings.map((element: string, index: number) => (
+            <p key={index}>{element}</p>
           ))}
         </Alert>
       )}

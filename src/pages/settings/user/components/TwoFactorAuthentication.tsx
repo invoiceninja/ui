@@ -101,7 +101,7 @@ export function TwoFactorAuthentication() {
         {},
         { headers: defaultHeaders }
       )
-      .then((response) => {
+      .then(() => {
         toast.dismiss();
         toast.success(t('disabled_two_factor'));
 

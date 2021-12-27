@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useStaticsQuery } from 'common/queries/statics';
 import { updateChanges } from 'common/stores/slices/company-users';
 import { RootState } from 'common/stores/store';
@@ -20,7 +19,6 @@ import { InputField, SelectField } from '../../../../components/forms';
 
 export function Address() {
   const [t] = useTranslation();
-  const company = useCurrentCompany();
   const { data } = useStaticsQuery();
   const dispatch = useDispatch();
 

@@ -8,26 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { RegisterForm } from '../../common/dtos/authentication';
 import { endpoint, isHosted, request } from '../../common/helpers';
 import { register } from '../../common/stores/slices/user';
 import { RegisterValidation } from './common/ValidationInterface';
-import { RootState } from '../../common/stores/store';
 import { Header } from './components/Header';
 import { InputField } from '../../components/forms/InputField';
 import { Alert } from '../../components/Alert';
-import { InputLabel } from '../../components/forms/InputLabel';
 import { Button } from '../../components/forms/Button';
 import { HostedLinks } from './components/HostedLinks';
 import { Link } from '../../components/forms/Link';
 
 export function Register() {
-  const colors = useSelector((state: RootState) => state.settings.colors);
   const [t] = useTranslation();
 
   useEffect(() => {

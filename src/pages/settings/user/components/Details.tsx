@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { updateChanges } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { ChangeEvent } from 'react';
@@ -19,10 +18,8 @@ import { InputField } from '../../../../components/forms';
 
 export function Details() {
   const [t] = useTranslation();
-  const user = useCurrentUser();
   const dispatch = useDispatch();
   const userChanges = useSelector((state: RootState) => state.user.changes);
-  const userState = useSelector((state: RootState) => state.user);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
     dispatch(
