@@ -75,7 +75,6 @@ import {
   CreatePaymentTerm,
   CompanyDocuments,
   CreateTaxRate,
-  TaxRates,
   EditTaxRate,
   UserManagement,
   TaskStatuses,
@@ -172,7 +171,6 @@ export const routes = (
           <Route path="create" element={<CreatePaymentTerm />} />
         </Route>
         <Route path="tax_rates">
-          <Route path="" element={<TaxRates />} />
           <Route path="create" element={<CreateTaxRate />} />
           <Route path=":id/edit" element={<EditTaxRate />} />
         </Route>

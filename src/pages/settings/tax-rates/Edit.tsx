@@ -164,7 +164,7 @@ export function Edit() {
                 id="name"
                 label={t('name')}
                 onChange={formik.handleChange}
-                errorMessage={errors?.errors.name}
+                errorMessage={errors?.errors?.name}
                 value={formik.values.name}
               />
 
@@ -173,7 +173,7 @@ export function Edit() {
                 id="rate"
                 label={t('rate')}
                 onChange={formik.handleChange}
-                errorMessage={errors?.errors.rate}
+                errorMessage={errors?.errors?.rate}
                 value={formik.values.rate}
               />
             </CardContainer>

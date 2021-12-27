@@ -36,7 +36,7 @@ export function TaxRates() {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
-  
+
   const sort = 'id|asc';
 
   const { data } = useTaxRatesQuery({
@@ -63,7 +63,7 @@ export function TaxRates() {
   };
 
   return (
-    <Settings title={t('tax_rates')}>
+    <>
       <div className="flex justify-end mt-8">
         <Button to="/settings/tax_rates/create">{t('create_tax_rate')}</Button>
       </div>
@@ -115,6 +115,6 @@ export function TaxRates() {
           totalPages={data.data.meta.pagination.total_pages}
         />
       )}
-    </Settings>
+    </>
   );
 }
