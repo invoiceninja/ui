@@ -82,7 +82,7 @@ export function Create() {
               type="text"
               id="name"
               label={t('name')}
-              errorMessage={errors?.errors.name}
+              errorMessage={errors?.errors?.name}
               onChange={formik.handleChange}
               required
             />
@@ -91,7 +91,7 @@ export function Create() {
               type="text"
               id="rate"
               label={t('rate')}
-              errorMessage={errors?.errors.rate}
+              errorMessage={errors?.errors?.rate}
               onChange={formik.handleChange}
               required
             />
