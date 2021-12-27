@@ -23,7 +23,6 @@ import { TaxRate } from 'common/interfaces/tax-rate';
 import { bulk, useTaxRatesQuery } from 'common/queries/tax-rates';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Settings } from 'components/layouts/Settings';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
