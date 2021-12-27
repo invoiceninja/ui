@@ -17,7 +17,7 @@ export function HostedLinks() {
         <a
           href="https://status.invoiceninja.com/"
           target="_blank"
-          className="py-3 w-full hover:bg-gray-100 px-2 py-1 inline-flex justify-center items-center" rel="noreferrer"
+          className="py-3 w-full hover:bg-gray-100 px-2 inline-flex justify-center items-center" rel="noreferrer"
         >
           <Lock size={15} />
           <span className="m-1">Check status</span>
@@ -27,7 +27,7 @@ export function HostedLinks() {
         <a
           href="https://www.invoiceninja.com/mobile/"
           target="_blank"
-          className="py-3 w-full hover:bg-gray-100 px-2 py-1 inline-flex justify-center items-center" rel="noreferrer"
+          className="py-3 w-full hover:bg-gray-100 px-2 inline-flex justify-center items-center" rel="noreferrer"
         >
           <Smartphone size={15} />
           <span className="m-1">Applications</span>
@@ -37,7 +37,7 @@ export function HostedLinks() {
         <a
           href="https://invoiceninja5.github.io"
           target="_blank"
-          className="py-3 w-full hover:bg-gray-100 px-2 py-1 inline-flex justify-center items-center" rel="noreferrer"
+          className="py-3 w-full hover:bg-gray-100 px-2 inline-flex justify-center items-center" rel="noreferrer"
         >
           <Book size={15} />
           <span className="m-1">Documentation</span>
