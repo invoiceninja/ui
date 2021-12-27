@@ -24,7 +24,7 @@ import { generatePath, useNavigate } from 'react-router-dom';
 
 export function Create() {
   const [t] = useTranslation();
-  const [errors, setErrors] = useState<unknown>(undefined);
+  const [errors, setErrors] = useState<Record<string, any>>({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
@@ -40,7 +40,7 @@ export function Create() {
       rate: '',
     },
     onSubmit: (values) => {
-      setErrors(undefined);
+      setErrors({});
 
       axios
         .post(endpoint('/api/v1/tax_rates'), values, {

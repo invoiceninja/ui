@@ -19,8 +19,8 @@ export function endpoint(endpoint: string, params = {}): string {
 export function request(
   method: Method = 'GET',
   route: string,
-  data?: Record<string, unknown>,
-  headers?: Record<string, unknown>
+  data?: object,
+  headers?: object
 ) {
   return axios.request({
     url: route,
@@ -50,7 +50,7 @@ export function handleCheckboxChange(id: string, set: any) {
 
 export function fetcher(
   url: string,
-  headers?: Record<string, unknown>,
+  headers?: object,
   method: Method = 'GET'
 ): Promise<AxiosResponse> {
   return axios

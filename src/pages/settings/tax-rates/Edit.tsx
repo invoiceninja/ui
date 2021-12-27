@@ -29,7 +29,7 @@ export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
   const { data } = useTaxRateQuery({ id });
-  const [errors, setErrors] = useState<unknown>(undefined);
+  const [errors, setErrors] = useState<Record<string, any>>({});
   const queryClient = useQueryClient();
 
   useEffect(() => {
@@ -51,7 +51,7 @@ export function Edit() {
       rate: data?.data.data.rate || 0,
     },
     onSubmit: (value) => {
-      setErrors(undefined);
+      setErrors({});
       toast.loading(t('processing'));
 
       axios
