@@ -18,16 +18,20 @@ import {
   Thead,
   Tr,
 } from '@invoiceninja/tables';
+import { AxiosError } from 'axios';
 import { TaskStatus } from 'common/interfaces/task-status';
-import { useTaskStatusesQuery } from 'common/queries/task-statuses';
+import { bulk, useTaskStatusesQuery } from 'common/queries/task-statuses';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
 export function TaskStatuses() {
   const [t] = useTranslation();
+  const queryClient = useQueryClient();
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
@@ -40,8 +44,22 @@ export function TaskStatuses() {
     sort,
   });
 
-  console.log(data);
+  const archive = (id: string) => {
+    toast.loading(t('processing'));
 
+    bulk([id], 'archive')
+      .then(() => {
+        toast.dismiss();
+        toast.success(t('archived_task_status'));
+      })
+      .catch((error: AxiosError) => {
+        toast.dismiss();
+        toast.success(t('error_title'));
+
+        console.error(error);
+      })
+      .finally(() => queryClient.invalidateQueries('/api/v1/task_statuses'));
+  };
   return (
     <>
       <div className="flex justify-end mt-8">
@@ -84,7 +102,7 @@ export function TaskStatuses() {
                     >
                       {t('edit_task_status')}
                     </DropdownElement>
-                    <DropdownElement onClick={() => {}}>
+                    <DropdownElement onClick={() => archive(taskStatus.id)}>
                       {t('archive_status')}
                     </DropdownElement>
                   </Dropdown>
