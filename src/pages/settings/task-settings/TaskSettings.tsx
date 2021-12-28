@@ -25,7 +25,8 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, ClickableElement, Element } from '../../../components/cards';
+import { TaskStatuses } from '..';
+import { Card, Element } from '../../../components/cards';
 import { InputField } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
@@ -187,11 +188,7 @@ export function TaskSettings() {
         </Element>
       </Card>
 
-      <Card>
-        <ClickableElement to="/settings/task_statuses">
-          {t('configure_statuses')}
-        </ClickableElement>
-      </Card>
+      <TaskStatuses />
     </Settings>
   );
 }
