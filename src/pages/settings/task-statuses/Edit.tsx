@@ -24,9 +24,9 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
-import { Archive } from '../tax-rates/components/edit/Archive';
-import { Delete } from '../tax-rates/components/edit/Delete';
-import { Restore } from '../tax-rates/components/edit/Restore';
+import { Archive } from './components/edit/Archive';
+import { Delete } from './components/edit/Delete';
+import { Restore } from './components/edit/Restore';
 
 export function Edit() {
   const [t] = useTranslation();

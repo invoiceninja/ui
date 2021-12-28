@@ -24,6 +24,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
+import { Archive } from './components/edit/Archive';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -83,7 +84,7 @@ export function Edit() {
       )}
 
       {data && (
-        <Container>
+        <Container className="space-y-6">
           <Card
             withSaveButton
             disableSubmitButton={formik.isSubmitting}
@@ -123,6 +124,8 @@ export function Edit() {
               />
             </CardContainer>
           </Card>
+
+          <Archive />
         </Container>
       )}
     </Settings>
