@@ -25,7 +25,7 @@ export function Radio(props: Props) {
   const accentColor = useAccentColor();
 
   return (
-    <fieldset className="mt-4">
+    <fieldset>
       <legend className="sr-only">Notification method</legend>
       <div className="space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10">
         {props.options.map((option) => (
