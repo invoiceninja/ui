@@ -77,10 +77,10 @@ import {
   CreateTaxRate,
   EditTaxRate,
   UserManagement,
-  TaskStatuses,
   CreateTaskStatus,
   EditTaskStatus,
 } from '../pages/settings';
+import { CreateExpenseCategory } from 'pages/settings/expense-categories';
 
 export const routes = (
   <Routes>
@@ -177,9 +177,11 @@ export const routes = (
           <Route path=":id/edit" element={<EditTaxRate />} />
         </Route>
         <Route path="task_statuses">
-          <Route path="" element={<TaskStatuses />} />
           <Route path="create" element={<CreateTaskStatus />} />
           <Route path=":id/edit" element={<EditTaskStatus />} />
+        </Route>
+        <Route path="expense_categories">
+          <Route path="create" element={<CreateExpenseCategory />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
