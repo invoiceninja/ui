@@ -45,8 +45,8 @@ export function TaskStatuses() {
   return (
     <>
       <div className="flex justify-end mt-8">
-        <Button to="/settings/tax_rates/create">
-          {t('configure_statuses')}
+        <Button to="/settings/task_statuses/create">
+          {t('new_task_status')}
         </Button>
       </div>
 

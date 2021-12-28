@@ -78,6 +78,7 @@ import {
   EditTaxRate,
   UserManagement,
   TaskStatuses,
+  CreateTaskStatus,
 } from '../pages/settings';
 
 export const routes = (
@@ -176,6 +177,7 @@ export const routes = (
         </Route>
         <Route path="task_statuses">
           <Route path="" element={<TaskStatuses />} />
+          <Route path="create" element={<CreateTaskStatus />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
