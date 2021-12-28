@@ -8,12 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer } from '@invoiceninja/cards';
+import { Card, CardContainer, Element } from '@invoiceninja/cards';
 import { InputField, InputLabel } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useTaskStatusQuery } from 'common/queries/task-statuses';
+import { Badge } from 'components/Badge';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
@@ -92,6 +93,20 @@ export function Edit() {
             onFormSubmit={formik.handleSubmit}
             title={data?.data.data.name}
           >
+            <Element leftSide={t('status')}>
+              {!data.data.data.is_deleted && !data.data.data.archived_at && (
+                <Badge variant="primary">{t('active')}</Badge>
+              )}
+
+              {data.data.data.archived_at && !data.data.data.is_deleted ? (
+                <Badge variant="yellow">{t('archived')}</Badge>
+              ) : null}
+
+              {data.data.data.is_deleted && (
+                <Badge variant="red">{t('deleted')}</Badge>
+              )}
+            </Element>
+
             <CardContainer>
               <InputField
                 type="text"
