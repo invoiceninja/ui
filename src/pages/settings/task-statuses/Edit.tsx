@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 import { Archive } from '../tax-rates/components/edit/Archive';
+import { Restore } from '../tax-rates/components/edit/Restore';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -130,6 +131,7 @@ export function Edit() {
           </Card>
 
           <Archive />
+          <Restore />
         </Container>
       )}
     </Settings>
