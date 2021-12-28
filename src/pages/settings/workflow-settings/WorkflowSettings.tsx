@@ -8,22 +8,71 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import axios, { AxiosError } from 'axios';
+import { endpoint } from 'common/helpers';
+import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { defaultHeaders } from 'common/queries/common/headers';
+import {
+  injectInChanges,
+  resetChanges,
+  updateRecord,
+} from 'common/stores/slices/company-users';
 import { useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
 import { Invoices, Quotes } from './components';
 
 export function WorkflowSettings() {
   const [t] = useTranslation();
 
+  const dispatch = useDispatch();
+  const company = useCurrentCompany();
+  const companyChanges = useCompanyChanges();
+
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
       'workflow_settings'
     )}`;
-  });
+
+    dispatch(injectInChanges({ object: 'company', data: company }));
+  }, [company]);
+
+  const onSave = () => {
+    toast.loading(t('processing'));
+
+    axios
+      .put(
+        endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
+        companyChanges,
+        { headers: defaultHeaders }
+      )
+      .then((response) => {
+        dispatch(updateRecord({ object: 'company', data: response.data.data }));
+
+        toast.dismiss();
+        toast.success(t('updated_settings'));
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+
+        toast.dismiss();
+        toast.success(t('error_title'));
+      });
+  };
+
+  const onCancel = () => {
+    dispatch(resetChanges('company'));
+  };
 
   return (
-    <Settings title={t('workflow_settings')}>
+    <Settings
+      onSaveClick={onSave}
+      onCancelClick={onCancel}
+      title={t('workflow_settings')}
+    >
       <div className="space-y-6 mt-6">
         <Invoices />
         <Quotes />
