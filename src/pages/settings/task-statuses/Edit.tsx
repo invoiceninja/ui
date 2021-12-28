@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ActionCard, Card, CardContainer, Element } from '@invoiceninja/cards';
-import { Button, InputField, InputLabel } from '@invoiceninja/forms';
+import { Card, CardContainer, Element } from '@invoiceninja/cards';
+import { InputField, InputLabel } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { bulk, useTaskStatusQuery } from 'common/queries/task-statuses';
+import { useTaskStatusQuery } from 'common/queries/task-statuses';
 import { Badge } from 'components/Badge';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
@@ -24,6 +24,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
+import { Archive } from '../tax-rates/components/edit/Archive';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -77,23 +78,6 @@ export function Edit() {
     },
   });
 
-  const archive = () => {
-    toast.loading(t('processing'));
-
-    bulk([data?.data.data.id], 'archive')
-      .then(() => {
-        toast.dismiss();
-        toast.success(t('archived_task_status'));
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      })
-      .finally(() => invalidateTaskStatusCache());
-  };
-
   return (
     <Settings title={t('task_statuses')}>
       {!data && (
@@ -145,11 +129,7 @@ export function Edit() {
             </CardContainer>
           </Card>
 
-          {!data.data.data.archived_at && !data.data.data.is_deleted ? (
-            <ActionCard label={t('archive')} help="Lorem ipsum dolor sit amet.">
-              <Button onClick={archive}>{t('archive')}</Button>
-            </ActionCard>
-          ) : null}
+          <Archive />
         </Container>
       )}
     </Settings>
