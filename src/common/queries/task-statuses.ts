@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
@@ -38,5 +38,19 @@ export function useTaskStatusQuery(params: { id: string | undefined }) {
       axios.get(endpoint('/api/v1/task_statuses/:id', { id: params.id }), {
         headers: defaultHeaders,
       })
+  );
+}
+
+export function bulk(
+  id: string[],
+  action: 'archive' | 'restore' | 'delete'
+): Promise<AxiosResponse> {
+  return axios.post(
+    endpoint('/api/v1/task_statuses/bulk'),
+    {
+      action,
+      ids: id,
+    },
+    { headers: { ...defaultHeaders } }
   );
 }

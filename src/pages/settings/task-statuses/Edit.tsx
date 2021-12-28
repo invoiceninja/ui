@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer, Element } from '@invoiceninja/cards';
-import { InputField, InputLabel } from '@invoiceninja/forms';
+import { ActionCard, Card, CardContainer, Element } from '@invoiceninja/cards';
+import { Button, InputField, InputLabel } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { useTaskStatusQuery } from 'common/queries/task-statuses';
+import { bulk, useTaskStatusQuery } from 'common/queries/task-statuses';
 import { Badge } from 'components/Badge';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
@@ -77,6 +77,23 @@ export function Edit() {
     },
   });
 
+  const archive = () => {
+    toast.loading(t('processing'));
+
+    bulk([data?.data.data.id], 'archive')
+      .then(() => {
+        toast.dismiss();
+        toast.success(t('archived_task_status'));
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.dismiss();
+        toast.success(t('error_title'));
+      })
+      .finally(() => invalidateTaskStatusCache());
+  };
+
   return (
     <Settings title={t('task_statuses')}>
       {!data && (
@@ -127,6 +144,12 @@ export function Edit() {
               />
             </CardContainer>
           </Card>
+
+          {!data.data.data.archived_at && !data.data.data.is_deleted ? (
+            <ActionCard label={t('archive')} help="Lorem ipsum dolor sit amet.">
+              <Button onClick={archive}>{t('archive')}</Button>
+            </ActionCard>
+          ) : null}
         </Container>
       )}
     </Settings>
