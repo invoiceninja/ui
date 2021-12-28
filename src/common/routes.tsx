@@ -79,6 +79,7 @@ import {
   UserManagement,
   TaskStatuses,
   CreateTaskStatus,
+  EditTaskStatus,
 } from '../pages/settings';
 
 export const routes = (
@@ -178,6 +179,7 @@ export const routes = (
         <Route path="task_statuses">
           <Route path="" element={<TaskStatuses />} />
           <Route path="create" element={<CreateTaskStatus />} />
+          <Route path=":id/edit" element={<EditTaskStatus />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
