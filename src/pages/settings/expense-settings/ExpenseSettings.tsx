@@ -25,18 +25,10 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../components/cards';
-import { Button, Radio } from '../../../components/forms';
+import { Radio } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
-import {
-  Pagination,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from '../../../components/tables';
+import { ExpenseCategories } from '../expense-categories';
 
 export function ExpenseSettings() {
   const [t] = useTranslation();
@@ -170,29 +162,7 @@ export function ExpenseSettings() {
         </Element>
       </Card>
 
-      <div className="flex justify-end mt-8">
-        <Button to="/expenses/categories/create">Create category</Button>
-      </div>
-
-      <Table>
-        <Thead>
-          <Th>{t('category')}</Th>
-          <Th>{t('total')}</Th>
-          <Th>{t('action')}</Th>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td colSpan={3}>{t('empty_table')}</Td>
-          </Tr>
-        </Tbody>
-      </Table>
-
-      <Pagination
-        currentPage={1}
-        onPageChange={() => {}}
-        onRowsChange={() => {}}
-        totalPages={1}
-      />
+      <ExpenseCategories />
     </Settings>
   );
 }
