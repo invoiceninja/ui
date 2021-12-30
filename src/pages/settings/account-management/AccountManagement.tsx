@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement } from '../../../components/cards';
@@ -24,6 +25,11 @@ import {
 export function AccountManagement() {
   const [t] = useTranslation();
 
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('account_management'), href: '/settings/account_management' },
+  ];
+
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
       'account_management'
@@ -32,6 +38,8 @@ export function AccountManagement() {
 
   return (
     <Settings title={t('account_management')}>
+      <Breadcrumbs pages={pages} />
+
       <Plan />
       <Overview />
       <Licence />
