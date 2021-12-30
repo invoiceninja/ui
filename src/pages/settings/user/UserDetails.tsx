@@ -19,6 +19,7 @@ import {
   updateUser,
 } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -36,6 +37,12 @@ import { TwoFactorAuthentication } from './components/TwoFactorAuthentication';
 
 export function UserDetails() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('user_details'), href: '/settings/user_details' },
+  ];
+
   const user = useCurrentUser();
   const dispatch = useDispatch();
 
@@ -92,6 +99,8 @@ export function UserDetails() {
       />
 
       <div className="space-y-6 mt-6">
+        <Breadcrumbs pages={pages} />
+
         <Details />
         <Password />
         <Connect />
