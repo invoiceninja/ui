@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../components/cards';
@@ -27,6 +28,11 @@ import {
 export function OnlinePayments() {
   const [t] = useTranslation();
 
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('online_payments'), href: '/settings/online_payments' },
+  ];
+
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
       'online_payments'
@@ -35,6 +41,8 @@ export function OnlinePayments() {
 
   return (
     <Settings title={t('online_payments')}>
+      <Breadcrumbs pages={pages} />
+
       <Card withSaveButton title={t('settings')}>
         <Element leftSide={t('auto_bill_on')}>
           <SelectField>
