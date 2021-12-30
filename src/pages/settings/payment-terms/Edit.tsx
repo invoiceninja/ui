@@ -16,6 +16,7 @@ import { PaymentTerm } from 'common/interfaces/payment-term';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { bulk, usePaymentTermQuery } from 'common/queries/payment-terms';
 import { Badge } from 'components/Badge';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
@@ -28,12 +29,21 @@ import { generatePath, useParams } from 'react-router-dom';
 
 export function Edit() {
   const [t] = useTranslation();
+  const { id } = useParams();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('payment_terms'), href: '/settings/payment_terms' },
+    {
+      name: t('edit_payment_term'),
+      href: generatePath('/settings/payment_terms/:id/edit', { id }),
+    },
+  ];
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('payment_terms')}`;
   });
 
-  const { id } = useParams();
   const { data } = usePaymentTermQuery({ id });
   const queryClient = useQueryClient();
 
@@ -135,6 +145,8 @@ export function Edit() {
 
       {data && (
         <Container className="space-y-6">
+          <Breadcrumbs pages={pages} />
+          
           <Card
             withSaveButton
             disableSubmitButton={formik.isSubmitting}

@@ -22,6 +22,7 @@ import {
 import { AxiosError } from 'axios';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { bulk, usePaymentTermsQuery } from 'common/queries/payment-terms';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Settings } from 'components/layouts/Settings';
@@ -34,6 +35,11 @@ import { generatePath } from 'react-router-dom';
 
 export function PaymentTerms() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('payment_terms'), href: '/settings/payment_terms' },
+  ];
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('payment_terms')}`;
@@ -70,6 +76,8 @@ export function PaymentTerms() {
 
   return (
     <Settings title={t('payment_terms')}>
+      <Breadcrumbs pages={pages} />
+
       <div className="flex justify-end">
         <Button to="/settings/payment_terms/create">
           <span>{t('new_payment_term')}</span>

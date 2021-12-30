@@ -14,6 +14,7 @@ import axios, { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { useFormik } from 'formik';
@@ -24,6 +25,13 @@ import { generatePath, useNavigate } from 'react-router-dom';
 
 export function Create() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('payment_terms'), href: '/settings/payment_terms' },
+    { name: t('create_payment_term'), href: '/settings/payment_terms/create' },
+  ];
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -62,6 +70,8 @@ export function Create() {
   return (
     <Settings title={t('payment_terms')}>
       <Container className="space-y-6">
+        <Breadcrumbs pages={pages} />
+        
         <Card
           withSaveButton
           disableSubmitButton={formik.isSubmitting}
