@@ -25,9 +25,16 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../common/stores/store';
 import { updateBuilderProperty } from '../../common/stores/slices/invoices';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 
 export function Create() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('invoices'), href: '/invoices' },
+    { name: t('create_invoice'), href: '/invoices/create' },
+  ];
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -43,6 +50,8 @@ export function Create() {
 
   return (
     <Default title={t('new_invoice')}>
+      <Breadcrumbs pages={pages} />
+
       <div className="bg-white shadow rounded">
         {/* Client, invoice date & invoice properties */}
         <div className="grid grid-cols-12 p-6 lg:p-8">
