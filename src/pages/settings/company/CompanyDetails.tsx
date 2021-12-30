@@ -82,15 +82,13 @@ export function CompanyDetails() {
       onCancelClick={onCancel}
       title={t('company_details')}
     >
-      <div className="space-y-6 mt-6">
-        <Breadcrumbs pages={pages} />
+      <Breadcrumbs pages={pages} />
 
-        <Details />
-        <Logo />
-        <Address />
-        <Defaults />
-        <Documents />
-      </div>
+      <Details />
+      <Logo />
+      <Address />
+      <Defaults />
+      <Documents />
     </Settings>
   );
 }

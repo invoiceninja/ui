@@ -354,7 +354,7 @@ export function Settings(props: Props) {
           </nav>
         </div>
 
-        <div className="col-span-12 md:col-span-8 lg:col-start-4 space-y-6">
+        <div className="col-span-12 md:col-span-8 lg:col-start-4 space-y-6 mt-5">
           {props.children}
         </div>
       </div>

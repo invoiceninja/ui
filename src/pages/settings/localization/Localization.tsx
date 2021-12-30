@@ -77,12 +77,10 @@ export function Localization() {
       onCancelClick={onCancel}
       title={t('localization')}
     >
-      <div className="space-y-6 mt-6">
-        <Breadcrumbs pages={pages} />
+      <Breadcrumbs pages={pages} />
 
-        <SettingsComponent />
-        <CustomLabels />
-      </div>
+      <SettingsComponent />
+      <CustomLabels />
     </Settings>
   );
 }

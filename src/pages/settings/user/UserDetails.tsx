@@ -98,16 +98,14 @@ export function UserDetails() {
         onSave={onSave}
       />
 
-      <div className="space-y-6 mt-6">
-        <Breadcrumbs pages={pages} />
+      <Breadcrumbs pages={pages} />
 
-        <Details />
-        <Password />
-        <Connect />
-        <TwoFactorAuthentication />
-        <AccentColor />
-        <Notifications />
-      </div>
+      <Details />
+      <Password />
+      <Connect />
+      <TwoFactorAuthentication />
+      <AccentColor />
+      <Notifications />
     </Settings>
   );
 }
