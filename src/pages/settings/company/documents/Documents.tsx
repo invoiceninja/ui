@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Settings } from 'components/layouts/Settings';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,6 +16,12 @@ import { Upload, Table as DocumentsTable } from './components';
 
 export function Documents() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('company_details'), href: '/settings/company_details' },
+    { name: t('documents'), href: '/settings/company_details/documents' },
+  ];
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('company')}: ${t(
@@ -24,6 +31,8 @@ export function Documents() {
 
   return (
     <Settings title={t('documents')}>
+      <Breadcrumbs pages={pages} />
+
       <Upload />
       <DocumentsTable />
     </Settings>

@@ -18,6 +18,7 @@ import {
   updateRecord,
 } from 'common/stores/slices/company-users';
 import { RootState } from 'common/stores/store';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +28,12 @@ import { Address, Defaults, Details, Documents, Logo } from './components';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('company_details'), href: '/settings/company_details' },
+  ];
+
   const dispatch = useDispatch();
   const company = useCurrentCompany();
 
@@ -76,6 +83,8 @@ export function CompanyDetails() {
       title={t('company_details')}
     >
       <div className="space-y-6 mt-6">
+        <Breadcrumbs pages={pages} />
+
         <Details />
         <Logo />
         <Address />
