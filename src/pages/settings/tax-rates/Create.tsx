@@ -13,6 +13,7 @@ import { InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { useFormik } from 'formik';
@@ -24,6 +25,13 @@ import { generatePath, useNavigate } from 'react-router-dom';
 
 export function Create() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('tax_settings'), href: '/settings/tax_settings' },
+    { name: t('create_tax_rate'), href: '/settings/tax_rates/create' },
+  ];
+
   const [errors, setErrors] = useState<Record<string, any>>({});
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -71,6 +79,8 @@ export function Create() {
   return (
     <Settings title={t('tax_rates')}>
       <Container className="space-y-6">
+        <Breadcrumbs pages={pages} />
+
         <Card
           withSaveButton
           disableSubmitButton={formik.isSubmitting}

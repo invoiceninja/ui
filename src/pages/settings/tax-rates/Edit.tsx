@@ -24,10 +24,21 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('tax_settings'), href: '/settings/tax_settings' },
+    {
+      name: t('edit_tax_rate'),
+      href: generatePath('/settings/tax_rates/:id/edit', { id }),
+    },
+  ];
+
   const { data } = useTaxRateQuery({ id });
   const [errors, setErrors] = useState<Record<string, any>>({});
   const queryClient = useQueryClient();
@@ -138,6 +149,8 @@ export function Edit() {
 
       {data && (
         <Container className="space-y-6">
+          <Breadcrumbs pages={pages} />
+          
           <Card
             withSaveButton
             onFormSubmit={formik.handleSubmit}
