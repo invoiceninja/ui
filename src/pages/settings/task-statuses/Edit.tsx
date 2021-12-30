@@ -15,6 +15,7 @@ import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useTaskStatusQuery } from 'common/queries/task-statuses';
 import { Badge } from 'components/Badge';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
@@ -31,6 +32,16 @@ import { Restore } from './components/edit/Restore';
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('task_settings'), href: '/settings/task_settings' },
+    {
+      name: t('edit_task_status'),
+      href: generatePath('/settings/task_statuses/:id/edit', { id }),
+    },
+  ];
+
   const { data } = useTaskStatusQuery({ id });
 
   const [errors, setErrors] = useState<Record<string, any>>({});
@@ -90,6 +101,8 @@ export function Edit() {
 
       {data && (
         <Container className="space-y-6">
+          <Breadcrumbs pages={pages} />
+
           <Card
             withSaveButton
             disableSubmitButton={formik.isSubmitting}
