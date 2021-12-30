@@ -18,6 +18,7 @@ import {
   resetChanges,
   updateRecord,
 } from 'common/stores/slices/company-users';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +28,12 @@ import { CustomLabels, Settings as SettingsComponent } from './components';
 
 export function Localization() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('localization'), href: '/settings/localization' },
+  ];
+
   const company = useCurrentCompany();
   const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
@@ -71,6 +78,8 @@ export function Localization() {
       title={t('localization')}
     >
       <div className="space-y-6 mt-6">
+        <Breadcrumbs pages={pages} />
+
         <SettingsComponent />
         <CustomLabels />
       </div>
