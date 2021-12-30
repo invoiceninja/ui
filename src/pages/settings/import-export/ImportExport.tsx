@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../components/cards';
@@ -17,12 +18,19 @@ import { Settings } from '../../../components/layouts/Settings';
 export function ImportExport() {
   const [t] = useTranslation();
 
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('import_export'), href: '/settings/import_export' },
+  ];
+
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('import_export')}`;
   });
 
   return (
     <Settings title={t('import_export')}>
+      <Breadcrumbs pages={pages} />
+
       <Card withSaveButton saveButtonLabel={t('import')} title={t('import')}>
         <Element leftSide={t('import_type')}>
           <SelectField>
