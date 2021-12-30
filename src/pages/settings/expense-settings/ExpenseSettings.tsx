@@ -19,6 +19,7 @@ import {
   updateChanges,
   updateRecord,
 } from 'common/stores/slices/company-users';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Divider } from 'components/cards/Divider';
 import { ChangeEvent, useEffect } from 'react';
 import toast from 'react-hot-toast';
@@ -32,6 +33,11 @@ import { ExpenseCategories } from '../expense-categories';
 
 export function ExpenseSettings() {
   const [t] = useTranslation();
+  
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('expense_settings'), href: '/settings/expense_settings' },
+  ];
 
   const dispatch = useDispatch();
   const company = useCurrentCompany();
@@ -88,6 +94,8 @@ export function ExpenseSettings() {
       onCancelClick={onCancel}
       title={t('expense_settings')}
     >
+      <Breadcrumbs pages={pages} />
+      
       <Card title={t('settings')}>
         <Element
           leftSide={t('should_be_invoiced')}
