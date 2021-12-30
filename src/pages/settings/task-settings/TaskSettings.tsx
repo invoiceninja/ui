@@ -20,6 +20,7 @@ import {
   updateRecord,
 } from 'common/stores/slices/company-users';
 import { Alert } from 'components/Alert';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Divider } from 'components/cards/Divider';
 import { ChangeEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -33,6 +34,12 @@ import { Settings } from '../../../components/layouts/Settings';
 
 export function TaskSettings() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('task_settings'), href: '/settings/task_settings' },
+  ];
+
   const dispatch = useDispatch();
 
   const [errors, setErrors] = useState<any>(undefined);
@@ -96,6 +103,8 @@ export function TaskSettings() {
       onCancelClick={() => dispatch(resetChanges('company'))}
       title={t('task_settings')}
     >
+      <Breadcrumbs pages={pages} />
+
       {errors?.errors?.settings && (
         <Alert type="danger">
           {errors?.errors?.settings.map((element: string, index: number) => (
