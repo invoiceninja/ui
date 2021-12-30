@@ -28,6 +28,7 @@ export function Create() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
+    { name: t('company_details'), href: '/settings/company_details' },
     { name: t('payment_terms'), href: '/settings/payment_terms' },
     { name: t('create_payment_term'), href: '/settings/payment_terms/create' },
   ];

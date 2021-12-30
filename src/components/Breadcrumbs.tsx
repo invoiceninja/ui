@@ -15,7 +15,7 @@ export function Breadcrumbs(props: {
   pages: { name: string; href: string }[];
 }) {
   return (
-    <nav className="flex mb-6" aria-label="Breadcrumb">
+    <nav className="hidden lg:flex lg:mb-6" aria-label="Breadcrumb">
       <ol role="list" className="flex items-center space-x-4">
         <li>
           <div>
