@@ -19,6 +19,7 @@ import {
   updateChanges,
   updateRecord,
 } from 'common/stores/slices/company-users';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { ChangeEvent, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -32,6 +33,12 @@ import { Selector } from './components';
 
 export function TaxSettings() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('tax_settings'), href: '/settings/tax_settings' },
+  ];
+
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
@@ -92,6 +99,7 @@ export function TaxSettings() {
       onCancelClick={() => dispatch(resetChanges('company'))}
       title={t('tax_settings')}
     >
+      <Breadcrumbs pages={pages} />
       <Card title={t('tax_settings')}>
         <Element leftSide={t('invoice_tax_rates')}>
           <SelectField
