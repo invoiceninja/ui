@@ -18,6 +18,7 @@ import {
   resetChanges,
   updateRecord,
 } from 'common/stores/slices/company-users';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +28,11 @@ import { Invoices, Quotes } from './components';
 
 export function WorkflowSettings() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('workflow_settings'), href: '/settings/workflow_settings' },
+  ];
 
   const dispatch = useDispatch();
   const company = useCurrentCompany();
@@ -73,10 +79,9 @@ export function WorkflowSettings() {
       onCancelClick={onCancel}
       title={t('workflow_settings')}
     >
-      <div className="space-y-6 mt-6">
-        <Invoices />
-        <Quotes />
-      </div>
+      <Breadcrumbs pages={pages} />
+      <Invoices />
+      <Quotes />
     </Settings>
   );
 }
