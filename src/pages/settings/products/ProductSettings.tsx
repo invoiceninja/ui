@@ -19,6 +19,7 @@ import {
   updateChanges,
   updateRecord,
 } from 'common/stores/slices/company-users';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Divider } from 'components/cards/Divider';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
@@ -30,6 +31,12 @@ import { Settings } from '../../../components/layouts/Settings';
 
 export function ProductSettings() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('product_settings'), href: '/settings/product_settings' },
+  ];
+  
   const dispatch = useDispatch();
 
   const company = useCurrentCompany();
@@ -82,6 +89,8 @@ export function ProductSettings() {
       onCancelClick={() => dispatch(resetChanges('company'))}
       title={t('product_settings')}
     >
+      <Breadcrumbs pages={pages} />
+      
       <Card title={t('Settings')}>
         <Element
           leftSide={t('show_product_discount')}
