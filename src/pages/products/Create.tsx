@@ -20,6 +20,7 @@ import { Alert } from '../../components/Alert';
 import { Container } from '../../components/Container';
 import { Default } from '../../components/layouts/Default';
 import { Button, InputField, Textarea } from '@invoiceninja/forms';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 
 export interface CreateProductDto {
   product_key: string;
@@ -29,6 +30,11 @@ export interface CreateProductDto {
 
 export function Create() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('products'), href: '/products' },
+    { name: t('new_product'), href: '/products/create' },
+  ];
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('new_product')}`;
@@ -66,6 +72,8 @@ export function Create() {
   return (
     <Default>
       <Container>
+        <Breadcrumbs pages={pages} />
+
         <h2 className="text-2xl">{t('new_product')}</h2>
         <div className="bg-white w-full p-8 rounded shadow my-4">
           <form onSubmit={form.handleSubmit} className="space-y-6">

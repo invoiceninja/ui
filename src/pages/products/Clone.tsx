@@ -9,6 +9,7 @@
  */
 
 import { AxiosError, AxiosResponse } from 'axios';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +28,15 @@ import { CreateProductDto } from './Create';
 export function Clone() {
   const [t] = useTranslation();
   const { id } = useParams();
+
+  const pages = [
+    { name: t('products'), href: '/products' },
+    {
+      name: t('clone_product'),
+      href: generatePath('/products/:id/clone', { id }),
+    },
+  ];
+
   const { data } = useProductQuery({ id });
   const [errors, setErrors] = useState<any>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -98,6 +108,8 @@ export function Clone() {
   return (
     <Default>
       <Container>
+        <Breadcrumbs pages={pages} />
+
         <h2 className="text-2xl">
           {t('clone')}: {data.data.data.product_key}
         </h2>

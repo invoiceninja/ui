@@ -26,6 +26,7 @@ import { Badge } from '../../components/Badge';
 import { useQueryClient } from 'react-query';
 import { defaultHeaders } from 'common/queries/common/headers';
 import toast from 'react-hot-toast';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 
 interface UpdateProductDto {
   product_key: string;
@@ -36,6 +37,15 @@ interface UpdateProductDto {
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
+
+  const pages = [
+    { name: t('products'), href: '/products' },
+    {
+      name: t('edit_product'),
+      href: generatePath('/products/:id/edit', { id }),
+    },
+  ];
+
   const { data, isLoading } = useProductQuery({ id });
   const [errors, setErrors] = useState<any>();
   const [alert, setAlert] = useState<
@@ -130,6 +140,8 @@ export function Edit() {
   return (
     <Default>
       <Container>
+        <Breadcrumbs pages={pages} />
+
         {alert && (
           <Alert className="mb-4" type={alert.type}>
             {alert.message}.

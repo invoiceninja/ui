@@ -33,9 +33,14 @@ import {
   Td,
   Pagination,
 } from '@invoiceninja/tables';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 
 export function Products() {
   const [t] = useTranslation();
+
+  const pages = [
+    { name: t('products'), href: '/products' }
+  ];
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('products')}`;
@@ -124,6 +129,8 @@ export function Products() {
 
   return (
     <Default title={t('products')}>
+      <Breadcrumbs pages={pages} />
+
       <Actions
         onStatusChange={setStatus}
         onFilterChange={setFilter}
