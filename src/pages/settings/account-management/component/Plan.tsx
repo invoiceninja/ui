@@ -24,7 +24,7 @@ export function Plan() {
 
   return (
     <Card title={t('plan')}>
-      <Element leftSide={t('plan')}>{account.plan || t('free')}</Element>
+      <Element leftSide={t('plan')}>{account?.plan || t('free')}</Element>
 
       {account.plan_expires !== '' && (
         <Element leftSide={t('expires_on')}>
