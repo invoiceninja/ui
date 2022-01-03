@@ -79,8 +79,12 @@ import {
   UserManagement,
   CreateTaskStatus,
   EditTaskStatus,
+  ApiTokens,
 } from '../pages/settings';
-import { CreateExpenseCategory, EditExpenseCategory } from 'pages/settings/expense-categories';
+import {
+  CreateExpenseCategory,
+  EditExpenseCategory,
+} from 'pages/settings/expense-categories';
 
 export const routes = (
   <Routes>
@@ -183,6 +187,11 @@ export const routes = (
         <Route path="expense_categories">
           <Route path="create" element={<CreateExpenseCategory />} />
           <Route path=":id/edit" element={<EditExpenseCategory />} />
+        </Route>
+        <Route path="integrations">
+          <Route path="api_tokens">
+            <Route path="" element={<ApiTokens />} />
+          </Route>
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />

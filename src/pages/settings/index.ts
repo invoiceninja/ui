@@ -34,3 +34,4 @@ export * from './payment-terms';
 export * from './tax-rates';
 export * from './company';
 export * from './task-statuses';
+export * from './integrations/api-tokens';
