@@ -8,12 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { updateChanges } from 'common/stores/slices/company-users';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
 
 export function Overview() {
   const [t] = useTranslation();
+  const dispatch = useDispatch();
+  const company = useCompanyChanges();
+
+  const handleToggleChange = (id: string, value: boolean) =>
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: id,
+        value,
+      })
+    );
 
   return (
     <Card title={t('overview')}>
@@ -21,19 +35,36 @@ export function Overview() {
         leftSide={t('activate_company')}
         leftSideHelp={t('activate_company_help')}
       >
-        <Toggle />
+        <Toggle
+          checked={company?.is_disabled}
+          onChange={(value: boolean) =>
+            handleToggleChange('is_disabled', value)
+          }
+        />
       </Element>
+
       <Element
         leftSide={t('enable_markdown')}
         leftSideHelp={t('enable_markdown_help')}
       >
-        <Toggle />
+        <Toggle
+          checked={company?.markdown_enabled}
+          onChange={(value: boolean) =>
+            handleToggleChange('markdown_enabled', value)
+          }
+        />
       </Element>
+
       <Element
         leftSide={t('include_drafts')}
         leftSideHelp={t('include_drafts_help')}
       >
-        <Toggle />
+        <Toggle
+          checked={company?.report_include_drafts}
+          onChange={(value: boolean) =>
+            handleToggleChange('report_include_drafts', value)
+          }
+        />
       </Element>
     </Card>
   );
