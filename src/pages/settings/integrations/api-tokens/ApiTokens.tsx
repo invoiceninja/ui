@@ -18,18 +18,22 @@ import {
   Thead,
   Tr,
 } from '@invoiceninja/tables';
+import { AxiosError } from 'axios';
 import { ApiToken } from 'common/interfaces/api-token';
-import { useApiTokensQuery } from 'common/queries/api-tokens';
+import { bulk, useApiTokensQuery } from 'common/queries/api-tokens';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Settings } from 'components/layouts/Settings';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
 export function ApiTokens() {
   const [t] = useTranslation();
+  const queryClient = useQueryClient();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -55,7 +59,22 @@ export function ApiTokens() {
     sort,
   });
 
-  console.log(data);
+  const archive = (id: string) => {
+    toast.loading(t('processing'));
+
+    bulk([id], 'archive')
+      .then(() => {
+        toast.dismiss();
+        toast.success(t('archived_token'));
+      })
+      .catch((error: AxiosError) => {
+        toast.dismiss();
+        toast.success(t('error_title'));
+
+        console.error(error);
+      })
+      .finally(() => queryClient.invalidateQueries('/api/v1/tokens'));
+  };
 
   return (
     <Settings title={t('api_tokens')}>
@@ -74,36 +93,40 @@ export function ApiTokens() {
         </Thead>
         <Tbody data={data} showHelperPlaceholders>
           {data &&
-            data.data.data.map((token: ApiToken) => (
-              <Tr key={token.id}>
-                <Td>
-                  <Link
-                    to={generatePath(
-                      '/settings/integrations/api_tokens/:id/edit',
-                      { id: token.id }
-                    )}
-                  >
-                    {token.name}
-                  </Link>
-                </Td>
-                <Td>
-                  <Dropdown label={t('actions')}>
-                    <DropdownElement
-                      to={generatePath(
-                        '/settings/integrations/api_tokens/:id/edit',
-                        { id: token.id }
-                      )}
-                    >
-                      {t('edit_token')}
-                    </DropdownElement>
-                    
-                    <DropdownElement onClick={() => {}}>
-                      {t('archive_token')}
-                    </DropdownElement>
-                  </Dropdown>
-                </Td>
-              </Tr>
-            ))}
+            data.data.data.map(
+              (token: ApiToken) =>
+                !token.is_system &&
+                !token.archived_at && (
+                  <Tr key={token.id}>
+                    <Td>
+                      <Link
+                        to={generatePath(
+                          '/settings/integrations/api_tokens/:id/edit',
+                          { id: token.id }
+                        )}
+                      >
+                        {token.name}
+                      </Link>
+                    </Td>
+                    <Td>
+                      <Dropdown label={t('actions')}>
+                        <DropdownElement
+                          to={generatePath(
+                            '/settings/integrations/api_tokens/:id/edit',
+                            { id: token.id }
+                          )}
+                        >
+                          {t('edit_token')}
+                        </DropdownElement>
+
+                        <DropdownElement onClick={() => archive(token.id)}>
+                          {t('archive_token')}
+                        </DropdownElement>
+                      </Dropdown>
+                    </Td>
+                  </Tr>
+                )
+            )}
         </Tbody>
       </Table>
 

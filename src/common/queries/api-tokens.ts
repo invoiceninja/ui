@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useQuery } from 'react-query';
 import { defaultHeaders } from './common/headers';
@@ -23,5 +23,19 @@ export function useApiTokensQuery(params: Params) {
       }),
       { headers: defaultHeaders }
     )
+  );
+}
+
+export function bulk(
+  id: string[],
+  action: 'archive' | 'restore' | 'delete'
+): Promise<AxiosResponse> {
+  return axios.post(
+    endpoint('/api/v1/tokens/bulk'),
+    {
+      action,
+      ids: id,
+    },
+    { headers: { ...defaultHeaders } }
   );
 }
