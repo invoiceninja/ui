@@ -8,22 +8,41 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { date, isHosted } from 'common/helpers';
+import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
+import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
-import { Button } from '../../../../components/forms';
+import { Link } from '../../../../components/forms';
 
 export function Plan() {
   const [t] = useTranslation();
+  const user = useCurrentUser();
+  const account = useCurrentAccount();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
     <Card title={t('plan')}>
-      <Element leftSide={t('plan')}>Free</Element>
-      <Element leftSide={t('expires_on')}>December 31, 2025</Element>
-      <Element>
-        <Button className="mt-4" type="minimal">
-          {t('plan_change')}
-        </Button>
-      </Element>
+      <Element leftSide={t('plan')}>{account.plan || t('free')}</Element>
+
+      {account.plan_expires !== '' && (
+        <Element leftSide={t('expires_on')}>
+          {date(account.plan_expires, dateFormat)}
+        </Element>
+      )}
+
+      {isHosted() && (
+        <Element>
+          <Link
+            className="mt-4"
+            external
+            to={user?.company_user?.ninja_portal_url}
+          >
+            {t('plan_change')}
+          </Link>
+        </Element>
+      )}
     </Card>
   );
 }
