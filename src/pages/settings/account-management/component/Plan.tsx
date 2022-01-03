@@ -26,13 +26,13 @@ export function Plan() {
     <Card title={t('plan')}>
       <Element leftSide={t('plan')}>{account?.plan || t('free')}</Element>
 
-      {account.plan_expires !== '' && (
+      {account?.plan_expires !== '' && (
         <Element leftSide={t('expires_on')}>
-          {date(account.plan_expires, dateFormat)}
+          {date(account?.plan_expires, dateFormat)}
         </Element>
       )}
 
-      {isHosted() && (
+      {isHosted() && user?.company_user?.is_owner && (
         <Element>
           <Link
             className="mt-4"
