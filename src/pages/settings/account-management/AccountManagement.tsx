@@ -9,7 +9,7 @@
  */
 
 import axios, { AxiosError } from 'axios';
-import { endpoint, isSelfHosted } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -28,7 +28,6 @@ import { Settings } from '../../../components/layouts/Settings';
 import {
   EnabledModules,
   Integrations,
-  License,
   Overview,
   Plan,
   SecuritySettings,
@@ -87,7 +86,6 @@ export function AccountManagement() {
 
       <Plan />
       <Overview />
-      {isSelfHosted() && <License />}
       <Integrations />
       <EnabledModules />
       <SecuritySettings />

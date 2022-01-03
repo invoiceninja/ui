@@ -12,12 +12,13 @@ import { Button, InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { Divider } from 'components/cards/Divider';
 import { Modal } from 'components/Modal';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Card, ClickableElement } from '../../../../components/cards';
+import { ClickableElement } from '../../../../components/cards';
 
 export function License() {
   const [t] = useTranslation();
@@ -78,13 +79,13 @@ export function License() {
         </form>
       </Modal>
 
-      <Card title={t('license')}>
-        <ClickableElement href={link}>{t('purchase_license')}</ClickableElement>
+      <Divider />
 
-        <ClickableElement onClick={() => setIsModalVisible(true)}>
-          {t('apply_license')}
-        </ClickableElement>
-      </Card>
+      <ClickableElement href={link}>{t('purchase_license')}</ClickableElement>
+
+      <ClickableElement onClick={() => setIsModalVisible(true)}>
+        {t('apply_license')}
+      </ClickableElement>
     </>
   );
 }
