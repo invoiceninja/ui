@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isSelfHosted } from 'common/helpers';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +17,7 @@ import { Settings } from '../../../components/layouts/Settings';
 import {
   EnabledModules,
   Integrations,
-  Licence,
+  License,
   Overview,
   Plan,
   SecuritySettings,
@@ -42,7 +43,7 @@ export function AccountManagement() {
 
       <Plan />
       <Overview />
-      <Licence />
+      {isSelfHosted() && <License />}
       <Integrations />
       <EnabledModules />
       <SecuritySettings />
