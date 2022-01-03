@@ -86,8 +86,8 @@ export function AccountManagement() {
 
       <Plan />
       <Overview />
-      <Integrations />
       <EnabledModules />
+      <Integrations />
       <SecuritySettings />
 
       <Card title="Danger zone">
