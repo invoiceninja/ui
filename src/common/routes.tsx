@@ -81,6 +81,7 @@ import {
   EditTaskStatus,
   ApiTokens,
   CreateApiToken,
+  EditApiToken,
 } from '../pages/settings';
 import {
   CreateExpenseCategory,
@@ -193,6 +194,7 @@ export const routes = (
           <Route path="api_tokens">
             <Route path="" element={<ApiTokens />} />
             <Route path="create" element={<CreateApiToken />} />
+            <Route path=":id/edit" element={<EditApiToken />} />
           </Route>
         </Route>
       </Route>
