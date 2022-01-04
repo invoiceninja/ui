@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../forms';
 
@@ -17,7 +17,7 @@ interface Props {
   title?: string;
   description?: string;
   withSaveButton?: boolean;
-  onFormSubmit?: any;
+  onFormSubmit?: (event: React.FormEvent) => any;
   onSaveClick?: any;
   saveButtonLabel?: string;
   disableSubmitButton?: boolean;
