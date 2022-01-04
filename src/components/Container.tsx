@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 export function Container(props: { children: ReactNode; className?: string }) {
   return (
