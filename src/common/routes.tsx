@@ -80,6 +80,7 @@ import {
   CreateTaskStatus,
   EditTaskStatus,
   ApiTokens,
+  CreateApiToken,
 } from '../pages/settings';
 import {
   CreateExpenseCategory,
@@ -191,6 +192,7 @@ export const routes = (
         <Route path="integrations">
           <Route path="api_tokens">
             <Route path="" element={<ApiTokens />} />
+            <Route path="create" element={<CreateApiToken />} />
           </Route>
         </Route>
       </Route>
