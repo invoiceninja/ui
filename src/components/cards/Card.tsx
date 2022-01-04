@@ -17,7 +17,7 @@ interface Props {
   title?: string;
   description?: string;
   withSaveButton?: boolean;
-  onFormSubmit?: (event: React.FormEvent) => any;
+  onFormSubmit?: (event: React.FormEvent<HTMLFormElement>) => any;
   onSaveClick?: any;
   saveButtonLabel?: string;
   disableSubmitButton?: boolean;
