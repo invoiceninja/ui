@@ -25,6 +25,8 @@ import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useApiTokenQuery } from 'common/queries/api-tokens';
 import { useQueryClient } from 'react-query';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { Archive } from './components/Archive';
+import { Badge } from 'components/Badge';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -106,34 +108,52 @@ export function Edit() {
         <Container className="space-y-6">
           <Breadcrumbs pages={pages} />
 
-          <Card
-            disableSubmitButton={formik.isSubmitting}
-            onFormSubmit={(event) => {
-              event.preventDefault();
-              setIsPasswordConfirmModalOpen(true);
-            }}
-            withSaveButton
-            title={data?.data?.data.name}
-          >
-            <CardContainer>
-              <InputField
-                required
-                label={t('name')}
-                id="name"
-                onChange={formik.handleChange}
-                errorMessage={errors?.errors?.name}
-                value={formik.values.name}
-              />
-            </CardContainer>
+          {data && (
+            <Card
+              disableSubmitButton={formik.isSubmitting}
+              onFormSubmit={(event) => {
+                event.preventDefault();
+                setIsPasswordConfirmModalOpen(true);
+              }}
+              withSaveButton
+              title={data?.data?.data.name}
+            >
+              <Element leftSide="Status">
+                {!data.data.data.is_deleted && !data.data.data.archived_at && (
+                  <Badge variant="primary">{t('active')}</Badge>
+                )}
 
-            <Element leftSide={t('token')}>
-              <p className="break-words">{data?.data?.data.token}</p>
-            </Element>
+                {data.data.data.archived_at && !data.data.data.is_deleted ? (
+                  <Badge variant="yellow">{t('archived')}</Badge>
+                ) : null}
 
-            <Element leftSide={t('created_on')}>
-              {date(data?.data?.data.created_at, dateFormat)}
-            </Element>
-          </Card>
+                {data.data.data.is_deleted && (
+                  <Badge variant="red">{t('deleted')}</Badge>
+                )}
+              </Element>
+
+              <CardContainer>
+                <InputField
+                  required
+                  label={t('name')}
+                  id="name"
+                  onChange={formik.handleChange}
+                  errorMessage={errors?.errors?.name}
+                  value={formik.values.name}
+                />
+              </CardContainer>
+
+              <Element leftSide={t('token')}>
+                <p className="break-words">{data?.data?.data.token}</p>
+              </Element>
+
+              <Element leftSide={t('created_on')}>
+                {date(data?.data?.data.created_at, dateFormat)}
+              </Element>
+            </Card>
+          )}
+
+          <Archive />
         </Container>
       </Settings>
     </>
