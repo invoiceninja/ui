@@ -28,6 +28,7 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import { Archive } from './components/Archive';
 import { Badge } from 'components/Badge';
 import { Restore } from './components/Restore';
+import { Delete } from './components/Delete';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -156,6 +157,7 @@ export function Edit() {
 
           <Archive />
           <Restore />
+          <Delete />
         </Container>
       </Settings>
     </>
