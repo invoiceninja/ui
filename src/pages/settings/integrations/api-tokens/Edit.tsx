@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer } from '@invoiceninja/cards';
+import { Card, CardContainer, Element } from '@invoiceninja/cards';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useTranslation } from 'react-i18next';
 import { Container } from 'components/Container';
@@ -18,12 +18,13 @@ import { useEffect, useState } from 'react';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import axios, { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
+import { date, endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { generatePath, useParams } from 'react-router-dom';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useApiTokenQuery } from 'common/queries/api-tokens';
 import { useQueryClient } from 'react-query';
+import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -49,6 +50,7 @@ export function Edit() {
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, any>>({});
   const queryClient = useQueryClient();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -81,7 +83,7 @@ export function Edit() {
         })
         .finally(() => {
           formik.setSubmitting(false);
-          
+
           queryClient.invalidateQueries(
             generatePath('/api/v1/tokens/:id', { id })
           );
@@ -123,6 +125,14 @@ export function Edit() {
                 value={formik.values.name}
               />
             </CardContainer>
+
+            <Element leftSide={t('token')}>
+              <p className="break-words">{data?.data?.data.token}</p>
+            </Element>
+
+            <Element leftSide={t('created_on')}>
+              {date(data?.data?.data.created_at, dateFormat)}
+            </Element>
           </Card>
         </Container>
       </Settings>
