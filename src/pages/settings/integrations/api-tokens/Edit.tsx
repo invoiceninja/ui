@@ -27,6 +27,7 @@ import { useQueryClient } from 'react-query';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { Archive } from './components/Archive';
 import { Badge } from 'components/Badge';
+import { Restore } from './components/Restore';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -154,6 +155,7 @@ export function Edit() {
           )}
 
           <Archive />
+          <Restore />
         </Container>
       </Settings>
     </>
