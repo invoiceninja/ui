@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -20,6 +21,7 @@ interface Props {
   children: ReactNode;
   onSaveClick?: any;
   onCancelClick?: any;
+  breadcrumbs?: { name: string; href: string }[];
 }
 
 export function Settings(props: Props) {
@@ -355,6 +357,8 @@ export function Settings(props: Props) {
         </div>
 
         <div className="col-span-12 md:col-span-8 lg:col-start-4 space-y-6 mt-5">
+          {props.breadcrumbs && <Breadcrumbs pages={props.breadcrumbs} />}
+
           {props.children}
         </div>
       </div>
