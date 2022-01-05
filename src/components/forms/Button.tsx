@@ -50,7 +50,7 @@ export function Button(props: Props) {
       <Link
         to={props.to}
         className={classNames(
-          `inline-flex items-center space-x-2 justify-center py-2 px-4 rounded text-sm ${props.className}`,
+          `inline-flex items-center space-x-2 justify-center py-2 px-4 rounded text-sm text-gray-900 ${props.className}`,
           {
             'w-full': props.variant === 'block',
             'text-white': props.type == 'primary',
