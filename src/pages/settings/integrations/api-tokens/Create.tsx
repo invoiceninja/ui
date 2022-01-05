@@ -8,13 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer } from '@invoiceninja/cards';
-import { Breadcrumbs } from 'components/Breadcrumbs';
+import { Card, Element } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
-import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { InputField } from '@invoiceninja/forms';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import axios, { AxiosError } from 'axios';
@@ -22,6 +20,7 @@ import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
+import { useTitle } from 'common/hooks/useTitle';
 
 export function Create() {
   const [t] = useTranslation();
@@ -36,9 +35,7 @@ export function Create() {
     },
   ];
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('new_token')}`;
-  });
+  useTitle('new_token');
 
   const navigate = useNavigate();
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
@@ -96,30 +93,25 @@ export function Create() {
         }}
       />
 
-      <Settings title={t('new_token')}>
-        <Container className="space-y-6">
-          <Breadcrumbs pages={pages} />
-
-          <Card
-            disableSubmitButton={formik.isSubmitting}
-            onFormSubmit={(event) => {
-              event.preventDefault();
-              setIsPasswordConfirmModalOpen(true);
-            }}
-            withSaveButton
-            title={t('new_token')}
-          >
-            <CardContainer>
-              <InputField
-                required
-                label={t('name')}
-                id="name"
-                onChange={formik.handleChange}
-                errorMessage={errors?.errors?.name}
-              />
-            </CardContainer>
-          </Card>
-        </Container>
+      <Settings title={t('new_token')} breadcrumbs={pages}>
+        <Card
+          disableSubmitButton={formik.isSubmitting}
+          onFormSubmit={(event) => {
+            event.preventDefault();
+            setIsPasswordConfirmModalOpen(true);
+          }}
+          withSaveButton
+          title={t('new_token')}
+        >
+          <Element leftSide={t('name')}>
+            <InputField
+              required
+              id="name"
+              onChange={formik.handleChange}
+              errorMessage={errors?.errors?.name}
+            />
+          </Element>
+        </Card>
       </Settings>
     </>
   );
