@@ -85,6 +85,7 @@ import {
   ApiWebhooks,
   CreateApiWebhook,
   EditApiWebhook,
+  GoogleAnalytics,
 } from '../pages/settings';
 import {
   CreateExpenseCategory,
@@ -201,9 +202,10 @@ export const routes = (
           </Route>
           <Route path="api_webhooks">
             <Route path="" element={<ApiWebhooks />} />
-            <Route path="create" element={<CreateApiWebhook /> } />
-            <Route path=":id/edit" element={<EditApiWebhook /> } />
+            <Route path="create" element={<CreateApiWebhook />} />
+            <Route path=":id/edit" element={<EditApiWebhook />} />
           </Route>
+          <Route path="google_analytics" element={<GoogleAnalytics />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Logout />} />
