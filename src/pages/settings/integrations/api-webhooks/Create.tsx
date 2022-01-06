@@ -10,13 +10,18 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
+import axios, { AxiosError } from 'axios';
+import { endpoint } from 'common/helpers';
 import { useTitle } from 'common/hooks/useTitle';
+import { defaultHeaders } from 'common/queries/common/headers';
 import { Divider } from 'components/cards/Divider';
 import { Settings } from 'components/layouts/Settings';
 import { useFormik } from 'formik';
 import { ChangeEvent, useState } from 'react';
 import { PlusCircle, X } from 'react-feather';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { generatePath, useNavigate } from 'react-router-dom';
 
 export function Create() {
   const [t] = useTranslation();
@@ -93,6 +98,9 @@ export function Create() {
 
   const [headers, setHeaders] = useState<Record<string, string>[]>([]);
   const [header, setHeader] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Record<string, any>>({});
+
+  const navigate = useNavigate();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -100,10 +108,30 @@ export function Create() {
       target_url: '',
       event_id: EVENT_CREATE_CLIENT,
       rest_method: 'post',
-      headers,
     },
     onSubmit: (values) => {
-      console.log(values);
+      const toastId = toast.loading(t('processing'));
+
+      formik.setFieldValue('headers', headers);
+
+      axios
+        .post(endpoint('/api/v1/webhooks'), values, { headers: defaultHeaders })
+        .then((response) => {
+          toast.success(t('created_webhook'), { id: toastId });
+
+          navigate(
+            generatePath('/settings/integrations/api_webhooks/:id/edit', {
+              id: response.data.data.id,
+            })
+          );
+        })
+        .catch((error: AxiosError) => {
+          toast.dismiss();
+
+          error.response?.status === 422
+            ? setErrors(error.response.data)
+            : toast.error(t('error_title'));
+        });
     },
   });
 
@@ -115,7 +143,11 @@ export function Create() {
         onFormSubmit={formik.handleSubmit}
       >
         <Element leftSide={t('target_url')}>
-          <InputField id="target_url" onChange={formik.handleChange} />
+          <InputField
+            id="target_url"
+            onChange={formik.handleChange}
+            errorMessage={errors?.errors?.target_url}
+          />
         </Element>
 
         <Element leftSide={t('event_type')}>
@@ -144,6 +176,7 @@ export function Create() {
         <Element
           leftSide={
             <InputField
+              debounceTimeout={0}
               id="header_key"
               placeholder={t('header_key')}
               value={header.key || ''}
@@ -155,6 +188,7 @@ export function Create() {
         >
           <div className="inline-flex items-center space-x-4">
             <InputField
+              debounceTimeout={0}
               id="header_value"
               value={header.value || ''}
               placeholder={t('header_value')}
