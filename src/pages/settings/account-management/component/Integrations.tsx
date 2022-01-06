@@ -31,7 +31,7 @@ export function Integrations() {
 
       <Divider />
 
-      <ClickableElement className="mt-4" to="/settings/integrations/zapier">
+      <ClickableElement className="mt-4" href="https://zapier.com/apps/invoice-ninja/integrations">
         Zapier
       </ClickableElement>
 
