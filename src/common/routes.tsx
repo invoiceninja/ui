@@ -84,6 +84,7 @@ import {
   EditApiToken,
   ApiWebhooks,
   CreateApiWebhook,
+  EditApiWebhook,
 } from '../pages/settings';
 import {
   CreateExpenseCategory,
@@ -201,6 +202,7 @@ export const routes = (
           <Route path="api_webhooks">
             <Route path="" element={<ApiWebhooks />} />
             <Route path="create" element={<CreateApiWebhook /> } />
+            <Route path=":id/edit" element={<EditApiWebhook /> } />
           </Route>
         </Route>
       </Route>
