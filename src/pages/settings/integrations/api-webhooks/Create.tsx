@@ -148,7 +148,7 @@ export function Create() {
               placeholder={t('header_key')}
               value={header.key || ''}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setHeader({ ...header, [header.key]: event.target.value })
+                setHeader({ ...header, key: event.target.value })
               }
             />
           }
@@ -159,7 +159,7 @@ export function Create() {
               value={header.value || ''}
               placeholder={t('header_value')}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setHeader({ ...header, [header.key]: event.target.value })
+                setHeader({ ...header, value: event.target.value })
               }
             />
 
@@ -190,16 +190,19 @@ export function Create() {
           </Element>
         )}
 
-        {headers.map((header) => (
-          <Element key={header.key} leftSide={header.key}>
+        {headers.map((header, index) => (
+          <Element key={index} leftSide={Object.keys(header)[0]}>
             <div className="flex items-center space-x-4">
-              <span>{header.value}</span>
+              <span>{header[Object.keys(header)[0]]}</span>
               <Button
                 behavior="button"
                 type="minimal"
                 onClick={() => {
                   setHeaders((headers) =>
-                    headers.filter((entry) => entry.key !== header.key)
+                    headers.filter(
+                      (entry) =>
+                        Object.keys(entry)[0] !== Object.keys(header)[0]
+                    )
                   );
                 }}
               >
