@@ -110,7 +110,11 @@ export function Edit() {
 
   useEffect(() => {
     if (data?.data?.data?.headers) {
-      setHeaders(data.data.data.headers);
+      if (data.data.data.headers instanceof Array) {
+        setHeaders(data.data.data.headers);
+      } else {
+        setHeaders([data.data.data.headers]);
+      }
     }
   }, [data]);
 

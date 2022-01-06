@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
+import { Button, Link } from '@invoiceninja/forms';
 import {
   Pagination,
   Table,
@@ -80,6 +80,7 @@ export function ApiWebhooks() {
       <Table>
         <Thead>
           <Th>{t('endpoint')}</Th>
+          <Th>{t('method')}</Th>
           <Th></Th>
         </Thead>
         <Tbody data={data} showHelperPlaceholders>
@@ -88,7 +89,17 @@ export function ApiWebhooks() {
               !webhook.is_deleted &&
               !webhook.archived_at && (
                 <Tr key={webhook.id}>
-                  <Td>{webhook.target_url}</Td>
+                  <Td>
+                    <Link
+                      to={generatePath(
+                        '/settings/integrations/api_webhooks/:id/edit',
+                        { id: webhook.id }
+                      )}
+                    >
+                      {webhook.target_url}
+                    </Link>
+                  </Td>
+                  <Td>{webhook.rest_method.toUpperCase()}</Td>
                   <Td>
                     <Dropdown label={t('actions')}>
                       <DropdownElement onClick={() => archive(webhook.id)}>
