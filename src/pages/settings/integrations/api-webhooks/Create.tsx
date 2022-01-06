@@ -108,11 +108,12 @@ export function Create() {
       target_url: '',
       event_id: EVENT_CREATE_CLIENT,
       rest_method: 'post',
+      headers: {},
     },
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
 
-      formik.setFieldValue('headers', headers);
+      values.headers = headers;
 
       axios
         .post(endpoint('/api/v1/webhooks'), values, { headers: defaultHeaders })

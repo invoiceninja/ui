@@ -29,7 +29,7 @@ export function useApiTokensQuery(params: Params) {
 
 export function useApiTokenQuery(params: { id: string | undefined }) {
   return useQuery(generatePath('/api/v1/tokens/:id', { id: params.id }), () =>
-    axios.get(endpoint('/api/v1/tokens/:id?include=company_user', { id: params.id }), {
+    axios.get(endpoint('/api/v1/tokens/:id', { id: params.id }), {
       headers: defaultHeaders,
     })
   );
