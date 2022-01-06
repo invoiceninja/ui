@@ -23,7 +23,6 @@ import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, ClickableElement } from '../../../components/cards';
 import { Settings } from '../../../components/layouts/Settings';
 import {
   EnabledModules,
@@ -32,6 +31,7 @@ import {
   Plan,
   SecuritySettings,
 } from './component';
+import { DangerZone } from './component/DangerZone';
 
 export function AccountManagement() {
   const [t] = useTranslation();
@@ -89,15 +89,7 @@ export function AccountManagement() {
       <EnabledModules />
       <Integrations />
       <SecuritySettings />
-
-      <Card title="Danger zone">
-        <ClickableElement className="text-red-500 hover:text-red-600">
-          {t('purge_data')}
-        </ClickableElement>
-        <ClickableElement className="text-red-500 hover:text-red-600">
-          {t('cancel_account')}
-        </ClickableElement>
-      </Card>
+      <DangerZone />
     </Settings>
   );
 }
