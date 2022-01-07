@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
@@ -22,6 +23,7 @@ export function InvoiceDesign() {
   ];
 
   useTitle('invoice_design');
+  useInjectCompanyChanges();
 
   return (
     <Settings title={t('invoice_design')} breadcrumbs={pages}>
