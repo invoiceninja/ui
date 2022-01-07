@@ -11,13 +11,17 @@
 import { injectInChanges } from 'common/stores/slices/company-users';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import { useCompanyChanges } from './useCompanyChanges';
 import { useCurrentCompany } from './useCurrentCompany';
 
-export function useInjectCompanyChanges(): void {
+export function useInjectCompanyChanges() {
   const company = useCurrentCompany();
+  const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
 
   useEffect(() => {
     dispatch(injectInChanges({ object: 'company', data: company }));
   }, [company]);
+
+  return companyChanges;
 }
