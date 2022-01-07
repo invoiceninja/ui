@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect } from 'react';
+import { useTitle } from 'common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { Sortable, GeneralSettings } from './components';
@@ -16,14 +16,15 @@ import { Sortable, GeneralSettings } from './components';
 export function InvoiceDesign() {
   const [t] = useTranslation();
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'invoice_design'
-    )}`;
-  });
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('invoice_design'), href: '/settings/invoice_design' },
+  ];
+
+  useTitle('invoice_design');
 
   return (
-    <Settings title={t('invoice_design')}>
+    <Settings title={t('invoice_design')} breadcrumbs={pages}>
       <GeneralSettings />
 
       <Sortable cardTitle={t('client_details')} />
