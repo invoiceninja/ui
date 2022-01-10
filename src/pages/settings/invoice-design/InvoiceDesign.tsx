@@ -18,7 +18,18 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
-import { GeneralSettings, ClientDetails, CompanyDetails, CompanyAddress, InvoiceDetails, CreditDetails, QuoteDetails, ProductColumns, TaskColumns } from './components';
+import {
+  GeneralSettings,
+  ClientDetails,
+  CompanyDetails,
+  CompanyAddress,
+  InvoiceDetails,
+  CreditDetails,
+  QuoteDetails,
+  ProductColumns,
+  TaskColumns,
+  TotalFields,
+} from './components';
 
 export function InvoiceDesign() {
   useTitle('invoice_design');
@@ -72,6 +83,7 @@ export function InvoiceDesign() {
       <CreditDetails />
       <ProductColumns />
       <TaskColumns />
+      <TotalFields />
     </Settings>
   );
 }

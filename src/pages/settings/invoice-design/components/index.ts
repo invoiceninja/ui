@@ -7,3 +7,4 @@ export * from './InvoiceDetails';
 export * from './ProductColumns';
 export * from './QuoteDetails';
 export * from './TaskColumns';
+export * from './TotalFields';
