@@ -4,4 +4,5 @@ export * from './CompanyDetails';
 export * from './CreditDetails';
 export * from './GeneralSettings';
 export * from './InvoiceDetails';
+export * from './ProductColumns';
 export * from './QuoteDetails';
