@@ -22,27 +22,25 @@ import { Card, Element } from '@invoiceninja/cards';
 import { SelectField } from '@invoiceninja/forms';
 import { useTranslation } from 'react-i18next';
 
-export function InvoiceDetails() {
+export function QuoteDetails() {
   const [t] = useTranslation();
 
   const options = [
-    { value: '$invoice.number', label: t('invoice_number') },
-    { value: '$invoice.po_number', label: t('po_number') },
-    { value: '$invoice.date', label: t('invoice_date') },
-    { value: '$invoice.due_date', label: t('invoice_due_date') },
-    { value: '$invoice.amount', label: t('invoice_amount') },
-    { value: '$invoice.balance', label: t('invoice_balance') },
-    { value: '$invoice.balance_due', label: t('balance_due') },
-    { value: '$invoice.custom1', label: t('custom1') },
-    { value: '$invoice.custom2', label: t('custom2') },
-    { value: '$invoice.custom3', label: t('custom3') },
-    { value: '$invoice.custom4', label: t('custom4') },
-    { value: '$invoice.project', label: t('project') },
+    { value: '$quote.number', label: t('quote_number') },
+    { value: '$quote.po_number', label: t('po_number') },
+    { value: '$quote.po_number', label: t('po_number') },
+    { value: '$quote.date', label: t('quote_date') },
+    { value: '$quote.valid_until', label: t('valid_until') },
+    { value: '$quote.total', label: t('quote_total') },
+    { value: '$quote.custom1', label: t('custom1') },
+    { value: '$quote.custom2', label: t('custom2') },
+    { value: '$quote.custom3', label: t('custom3') },
+    { value: '$quote.custom4', label: t('custom4') },
     { value: '$client.balance', label: t('client_balance') },
   ];
 
   return (
-    <Card title={t('invoice_details')}>
+    <Card title={t('quote_details')}>
       <Element leftSide={t('fields')}>
         <SelectField>
           <option></option>

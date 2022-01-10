@@ -19,6 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
 import { GeneralSettings, ClientDetails, CompanyDetails, CompanyAddress, InvoiceDetails } from './components';
+import { QuoteDetails } from './components/QuoteDetails';
 
 export function InvoiceDesign() {
   useTitle('invoice_design');
@@ -68,6 +69,7 @@ export function InvoiceDesign() {
       <CompanyDetails />
       <CompanyAddress />
       <InvoiceDetails />
+      <QuoteDetails />
     </Settings>
   );
 }
