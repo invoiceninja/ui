@@ -18,7 +18,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
-import { GeneralSettings, ClientDetails, CompanyDetails, CompanyAddress, InvoiceDetails } from './components';
+import { GeneralSettings, ClientDetails, CompanyDetails, CompanyAddress, InvoiceDetails, CreditDetails } from './components';
 import { QuoteDetails } from './components/QuoteDetails';
 
 export function InvoiceDesign() {
@@ -70,6 +70,7 @@ export function InvoiceDesign() {
       <CompanyAddress />
       <InvoiceDetails />
       <QuoteDetails />
+      <CreditDetails />
     </Settings>
   );
 }
