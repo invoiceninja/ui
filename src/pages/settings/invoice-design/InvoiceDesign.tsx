@@ -18,7 +18,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
-import { Sortable, GeneralSettings } from './components';
+import { GeneralSettings, ClientDetails } from './components';
 
 export function InvoiceDesign() {
   useTitle('invoice_design');
@@ -64,15 +64,7 @@ export function InvoiceDesign() {
     >
       <GeneralSettings />
 
-      <Sortable cardTitle={t('client_details')} />
-      <Sortable cardTitle={t('company_details')} />
-      <Sortable cardTitle={t('company_address')} />
-      <Sortable cardTitle={t('invoice_details')} />
-      <Sortable cardTitle={t('quote_details')} />
-      <Sortable cardTitle={t('credit_details')} />
-      <Sortable cardTitle={t('product_columns')} />
-      <Sortable cardTitle={t('task_column')} />
-      <Sortable cardTitle={t('total_fields')} />
+      <ClientDetails />
     </Settings>
   );
 }
