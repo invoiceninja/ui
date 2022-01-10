@@ -6,3 +6,4 @@ export * from './GeneralSettings';
 export * from './InvoiceDetails';
 export * from './ProductColumns';
 export * from './QuoteDetails';
+export * from './TaskColumns';

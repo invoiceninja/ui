@@ -22,26 +22,26 @@ import { Card, Element } from '@invoiceninja/cards';
 import { SelectField } from '@invoiceninja/forms';
 import { useTranslation } from 'react-i18next';
 
-export function ProductColumns() {
+export function TaskColumns() {
   const [t] = useTranslation();
 
   const options = [
-    { value: '$product.item', label: t('item') },
-    { value: '$product.description', label: t('description') },
-    { value: '$product.quantity', label: t('quantity') },
-    { value: '$product.unit_cost', label: t('unit_cost') },
-    { value: '$product.tax', label: t('tax') },
-    { value: '$product.discount', label: t('discount') },
-    { value: '$product.line_total', label: t('line_total') },
-    { value: '$product.custom1', label: t('custom1') },
-    { value: '$product.custom2', label: t('custom2') },
-    { value: '$product.custom3', label: t('custom3') },
-    { value: '$product.custom4', label: t('custom4') },
-    { value: '$product.gross_line_total', label: t('gross_line_total') },
+    { value: '$task.service', label: t('service') },
+    { value: '$task.description', label: t('description') },
+    { value: '$task.hours', label: t('hours') },
+    { value: '$task.rate', label: t('rate') },
+    { value: '$task.tax', label: t('tax') },
+    { value: '$task.discount', label: t('discount') },
+    { value: '$task.line_total', label: t('line_total') },
+    { value: '$task.custom1', label: t('custom1') },
+    { value: '$task.custom2', label: t('custom2') },
+    { value: '$task.custom3', label: t('custom3') },
+    { value: '$task.custom4', label: t('custom4') },
+    { value: '$task.gross_line_total', label: t('gross_line_total') },
   ];
 
   return (
-    <Card title={t('product_columns')}>
+    <Card title={t('task_columns')}>
       <Element leftSide={t('fields')}>
         <SelectField>
           <option></option>
