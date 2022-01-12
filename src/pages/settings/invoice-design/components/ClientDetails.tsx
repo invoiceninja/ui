@@ -20,10 +20,17 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, SelectField } from '@invoiceninja/forms';
+import { arrayMoveImmutable } from 'array-move';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { injectInChanges } from 'common/stores/slices/company-users';
 import { cloneDeep, set } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from 'react-beautiful-dnd';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -102,6 +109,20 @@ export function ClientDetails() {
     dispatch(injectInChanges({ object: 'company', data: companyClone }));
   };
 
+  const onDragEnd = (result: DropResult) => {
+    const companyClone = cloneDeep(company);
+
+    const filtered = arrayMoveImmutable(
+      companyClone.settings.pdf_variables.client_details,
+      result.source.index,
+      result.destination?.index as unknown as number
+    );
+
+    set(companyClone, 'settings.pdf_variables.client_details', filtered);
+
+    dispatch(injectInChanges({ object: 'company', data: companyClone }));
+  };
+
   return (
     <Card title={t('client_details')}>
       <Element leftSide={t('fields')}>
@@ -117,21 +138,41 @@ export function ClientDetails() {
       </Element>
 
       <Element leftSide={t('variables')}>
-        {company?.settings?.pdf_variables?.client_details?.map(
-          (label: string) => (
-            <div className="flex items-center space-x-2 py-2 " key={label}>
-              <Button
-                type="minimal"
-                onClick={() => remove(label)}
-                behavior="button"
-              >
-                <X />
-              </Button>
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="client_details">
+            {(provided) => (
+              <div {...provided.droppableProps} ref={provided.innerRef}>
+                {company?.settings?.pdf_variables?.client_details?.map(
+                  (label: string, index: number) => (
+                    <Draggable key={label} draggableId={label} index={index}>
+                      {(provided) => (
+                        <div
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          ref={provided.innerRef}
+                          className="flex items-center space-x-2 py-2 "
+                          key={label}
+                        >
+                          <Button
+                            type="minimal"
+                            onClick={() => remove(label)}
+                            behavior="button"
+                          >
+                            <X />
+                          </Button>
 
-              <span>{resolveTranslation(label)?.label}</span>
-            </div>
-          )
-        )}
+                          <span>{resolveTranslation(label)?.label}</span>
+                        </div>
+                      )}
+                    </Draggable>
+                  )
+                )}
+
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
       </Element>
     </Card>
   );
