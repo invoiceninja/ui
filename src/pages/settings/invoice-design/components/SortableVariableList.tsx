@@ -84,6 +84,8 @@ export function SortableVariableList(props: Props) {
     companyClone.settings.pdf_variables?.[props.for].push(selectedOption.value);
 
     dispatch(injectInChanges({ object: 'company', data: companyClone }));
+
+    event.target.value = '';
   };
 
   const remove = (property: string) => {
