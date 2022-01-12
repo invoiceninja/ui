@@ -18,27 +18,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { Button, SelectField } from '@invoiceninja/forms';
-import { arrayMoveImmutable } from 'array-move';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { injectInChanges } from 'common/stores/slices/company-users';
-import { cloneDeep, set } from 'lodash';
-import { ChangeEvent, useEffect, useState } from 'react';
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from 'react-beautiful-dnd';
-import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { SortableVariableList } from './SortableVariableList';
 
 export function ClientDetails() {
   const [t] = useTranslation();
-  const company = useCompanyChanges();
-  const dispatch = useDispatch();
 
   const defaultVariables = [
     { value: '$client.name', label: t('client_name') },
@@ -66,114 +50,10 @@ export function ClientDetails() {
     { value: '$contact.custom4', label: t('contact_custom_value4') },
   ];
 
-  const [defaultVariablesFiltered, setDefaultVariablesFiltered] =
-    useState(defaultVariables);
-
-  useEffect(() => {
-    const variables = company?.settings?.pdf_variables?.client_details ?? [];
-
-    setDefaultVariablesFiltered(
-      defaultVariables.filter((label) => !variables.includes(label.value))
-    );
-  }, [company]);
-
-  const resolveTranslation = (key: string) => {
-    return defaultVariables.find((field) => field.value === key);
-  };
-
-  const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>): void => {
-    const selectedOption = event.target.options[event.target.selectedIndex];
-
-    if (selectedOption.value === '') {
-      return;
-    }
-
-    const companyClone = cloneDeep(company);
-
-    companyClone.settings.pdf_variables.client_details.push(
-      selectedOption.value
-    );
-
-    dispatch(injectInChanges({ object: 'company', data: companyClone }));
-  };
-
-  const remove = (property: string) => {
-    const companyClone = cloneDeep(company);
-
-    const filtered = companyClone.settings.pdf_variables.client_details.filter(
-      (variable: string) => variable !== property
-    );
-
-    set(companyClone, 'settings.pdf_variables.client_details', filtered);
-
-    dispatch(injectInChanges({ object: 'company', data: companyClone }));
-  };
-
-  const onDragEnd = (result: DropResult) => {
-    const companyClone = cloneDeep(company);
-
-    const filtered = arrayMoveImmutable(
-      companyClone.settings.pdf_variables.client_details,
-      result.source.index,
-      result.destination?.index as unknown as number
-    );
-
-    set(companyClone, 'settings.pdf_variables.client_details', filtered);
-
-    dispatch(injectInChanges({ object: 'company', data: companyClone }));
-  };
-
   return (
-    <Card title={t('client_details')}>
-      <Element leftSide={t('fields')}>
-        <SelectField onChange={handleSelectChange}>
-          <option></option>
-
-          {defaultVariablesFiltered.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </SelectField>
-      </Element>
-
-      <Element leftSide={t('variables')}>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="client_details">
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
-                {company?.settings?.pdf_variables?.client_details?.map(
-                  (label: string, index: number) => (
-                    <Draggable key={label} draggableId={label} index={index}>
-                      {(provided) => (
-                        <div
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          ref={provided.innerRef}
-                          className="flex items-center space-x-2 py-2 "
-                          key={label}
-                        >
-                          <Button
-                            type="minimal"
-                            onClick={() => remove(label)}
-                            behavior="button"
-                          >
-                            <X />
-                          </Button>
-
-                          <span>{resolveTranslation(label)?.label}</span>
-                        </div>
-                      )}
-                    </Draggable>
-                  )
-                )}
-
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-      </Element>
-    </Card>
+    <SortableVariableList
+      for="client_details"
+      defaultVariables={defaultVariables}
+    />
   );
 }
