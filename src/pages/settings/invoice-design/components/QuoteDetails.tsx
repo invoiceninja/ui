@@ -18,14 +18,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { SelectField } from '@invoiceninja/forms';
 import { useTranslation } from 'react-i18next';
+import { SortableVariableList } from './SortableVariableList';
 
 export function QuoteDetails() {
   const [t] = useTranslation();
 
-  const options = [
+  const defaultVariables = [
     { value: '$quote.number', label: t('quote_number') },
     { value: '$quote.po_number', label: t('po_number') },
     { value: '$quote.po_number', label: t('po_number') },
@@ -40,18 +39,9 @@ export function QuoteDetails() {
   ];
 
   return (
-    <Card title={t('quote_details')}>
-      <Element leftSide={t('fields')}>
-        <SelectField>
-          <option></option>
-
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </SelectField>
-      </Element>
-    </Card>
+    <SortableVariableList
+      for="quote_details"
+      defaultVariables={defaultVariables}
+    />
   );
 }
