@@ -18,14 +18,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { SelectField } from '@invoiceninja/forms';
 import { useTranslation } from 'react-i18next';
+import { SortableVariableList } from './SortableVariableList';
 
 export function TotalFields() {
   const [t] = useTranslation();
 
-  const options = [
+  const defaultVariables = [
     { value: '$subtotal', label: t('subtotal') },
     { value: '$net_subtotal', label: t('net_subtotal') },
     { value: '$discount', label: t('discount') },
@@ -41,18 +40,9 @@ export function TotalFields() {
   ];
 
   return (
-    <Card title={t('total_fields')}>
-      <Element leftSide={t('fields')}>
-        <SelectField>
-          <option></option>
-
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </SelectField>
-      </Element>
-    </Card>
+    <SortableVariableList
+      for="total_columns"
+      defaultVariables={defaultVariables}
+    />
   );
 }
