@@ -63,8 +63,6 @@ export function SortableVariableList(props: Props) {
   useEffect(() => {
     const variables = company?.settings?.pdf_variables?.[props.for] ?? [];
 
-    console.log(variables, props.for);
-
     setDefaultVariablesFiltered(
       defaultVariables.filter((label) => !variables.includes(label.value))
     );
