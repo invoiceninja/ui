@@ -18,14 +18,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { SelectField } from '@invoiceninja/forms';
 import { useTranslation } from 'react-i18next';
+import { SortableVariableList } from './SortableVariableList';
 
 export function TaskColumns() {
   const [t] = useTranslation();
 
-  const options = [
+  const defaultVariables = [
     { value: '$task.service', label: t('service') },
     { value: '$task.description', label: t('description') },
     { value: '$task.hours', label: t('hours') },
@@ -41,18 +40,9 @@ export function TaskColumns() {
   ];
 
   return (
-    <Card title={t('task_columns')}>
-      <Element leftSide={t('fields')}>
-        <SelectField>
-          <option></option>
-
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </SelectField>
-      </Element>
-    </Card>
+    <SortableVariableList
+      for="task_columns"
+      defaultVariables={defaultVariables}
+    />
   );
 }
