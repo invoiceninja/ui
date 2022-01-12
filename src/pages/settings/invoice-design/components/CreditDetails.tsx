@@ -18,14 +18,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { SelectField } from '@invoiceninja/forms';
 import { useTranslation } from 'react-i18next';
+import { SortableVariableList } from './SortableVariableList';
 
 export function CreditDetails() {
   const [t] = useTranslation();
 
-  const options = [
+  const defaultVariables = [
     { value: '$credit.number', label: t('credit_number') },
     { value: '$credit.po_number', label: t('po_number') },
     { value: '$credit.date', label: t('credit_date') },
@@ -39,18 +38,9 @@ export function CreditDetails() {
   ];
 
   return (
-    <Card title={t('credit_details')}>
-      <Element leftSide={t('fields')}>
-        <SelectField>
-          <option></option>
-
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </SelectField>
-      </Element>
-    </Card>
+    <SortableVariableList
+      for="credit_details"
+      defaultVariables={defaultVariables}
+    />
   );
 }
