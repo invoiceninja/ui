@@ -41,6 +41,8 @@ export function CompanySwitcher() {
     dispatch(changeCurrentIndex(index));
 
     queryClient.invalidateQueries();
+
+    location.reload();
   };
 
   return (
