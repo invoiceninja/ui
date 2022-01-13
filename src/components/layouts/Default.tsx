@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@invoiceninja/forms';
 import { useLogo } from 'common/hooks/useLogo';
+import { CompanySwitcher } from 'components/CompanySwitcher';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -203,6 +204,8 @@ export function Default(props: Props) {
             <div className="flex-1 px-4 flex items-center justify-between">
               <h2 className="text-xl dark:text-gray-100">{props.title}</h2>
               <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
+                <CompanySwitcher />
+
                 {props.onCancelClick && (
                   <Button onClick={props.onCancelClick} type="secondary">
                     {t('cancel')}
