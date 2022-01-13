@@ -33,6 +33,14 @@ export const companyUserSlice = createSlice({
   name: 'companyUser',
   initialState,
   reducers: {
+    changeCurrentIndex: (state, payload: PayloadAction<number>) => {
+      state.currentIndex = payload.payload;
+
+      localStorage.setItem(
+        'X-CURRENT-INDEX',
+        payload.payload as unknown as string
+      );
+    },
     updateCompanyUsers: (state, action) => {
       state.api = action.payload;
     },
@@ -74,6 +82,7 @@ export const companyUserSlice = createSlice({
 });
 
 export const {
+  changeCurrentIndex,
   updateCompanyUsers,
   injectInChanges,
   resetChanges,
