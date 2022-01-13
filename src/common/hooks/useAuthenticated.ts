@@ -9,7 +9,10 @@
  */
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { updateCompanyUsers } from 'common/stores/slices/company-users';
+import {
+  changeCurrentIndex,
+  updateCompanyUsers,
+} from 'common/stores/slices/company-users';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';
 import { AuthenticationTypes } from '../dtos/authentication';
@@ -41,15 +44,20 @@ export function useAuthenticated(): boolean {
     )
     .then((response: AxiosResponse) => {
       if (response.status === 200) {
+        const currentIndex = parseInt(
+          localStorage.getItem('X-CURRENT-INDEX') ?? '0'
+        );
+
         dispatch(
           authenticate({
             type: AuthenticationTypes.TOKEN,
-            user: response.data.data[0].user,
+            user: response.data.data[currentIndex].user,
             token: localStorage.getItem('X-NINJA-TOKEN') as string,
           })
         );
 
         dispatch(updateCompanyUsers(response.data.data));
+        dispatch(changeCurrentIndex(currentIndex));
       }
     })
     .catch((error: AxiosError) => {
