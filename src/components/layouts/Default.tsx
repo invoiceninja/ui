@@ -17,6 +17,7 @@ import {
   Box,
   FileText,
   Settings,
+  Users,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -45,6 +46,12 @@ export function Default(props: Props) {
       href: '/dashboard',
       icon: Home,
       current: location.pathname === '/dashboard',
+    },
+    {
+      name: t('clients'),
+      href: '/clients',
+      icon: Users,
+      current: location.pathname === '/clients',
     },
     {
       name: t('products'),
