@@ -15,12 +15,13 @@ import { changeCurrentIndex } from 'common/stores/slices/company-users';
 import { authenticate } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { Fragment } from 'react';
-import { Check, ChevronDown, User } from 'react-feather';
+import { Check, ChevronDown } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import { generatePath } from 'react-router-dom';
 import { DropdownElement } from './dropdown/DropdownElement';
+import { useLogo } from 'common/hooks/useLogo';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -28,6 +29,7 @@ export function CompanySwitcher() {
   const state = useSelector((state: RootState) => state.companyUsers);
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
+  const logo = useLogo();
 
   const switchCompany = (index: number) => {
     dispatch(
@@ -48,9 +50,9 @@ export function CompanySwitcher() {
   return (
     <Menu as="div" className="relative inline-block text-left">
       <div>
-        <Menu.Button className="inline-flex justify-center w-full rounded px-4 py-1.5 bg-white text-sm font-medium text-gray-700 border border-transparent hover:border-gray-300 focus:outline-none focus:ring-q focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-gray-500">
-          <User />
-          <ChevronDown className="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
+        <Menu.Button className="flex items-center space-x-3 justify-center w-full rounded text-sm font-medium text-gray-700 border border-transparent">
+          <img className="max-h-6 w-auto" src={logo} alt="Company logo" />
+          <ChevronDown size={18} color="white" />
         </Menu.Button>
       </div>
 
@@ -63,13 +65,18 @@ export function CompanySwitcher() {
         leaveFrom="transform opacity-100 scale-100"
         leaveTo="transform opacity-0 scale-95"
       >
-        <Menu.Items className="origin-top-right absolute right-0 mt-2 w-56 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none">
-          <div className="px-4 py-3">
-            <p className="text-sm">{t('signed_as')}</p>
-            <p className="text-sm font-medium text-gray-900 truncate">
-              {user.email}
-            </p>
+        <Menu.Items className="origin-top-right absolute left-0 mt-2 w-56 rounded shadow-lg bg-white ring-1 ring-black ring-opacity-5 divide-y divide-gray-100 focus:outline-none">
+          <div className="py-1">
+            <Menu.Item>
+              <DropdownElement>
+                <p className="text-sm">{t('signed_in_as')}</p>
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {user?.email}
+                </p>
+              </DropdownElement>
+            </Menu.Item>
           </div>
+
           <div className="py-1">
             {state?.api?.length >= 1 &&
               state?.api?.map((record: any, index: number) => (
