@@ -11,9 +11,10 @@
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
+import { Checkbox } from './forms';
 import { Spinner } from './Spinner';
 import { Pagination, Table, Tbody, Td, Th, Thead, Tr } from './tables';
 
@@ -32,15 +33,23 @@ export function DataTable(props: Props) {
   const [t] = useTranslation();
 
   const [apiEndpoint, setApiEndpoint] = useState(props.endpoint);
-
-  const { data, isLoading, isError } = useQuery(apiEndpoint, () =>
-    axios.get(endpoint(props.endpoint), { headers: defaultHeaders })
-  );
-
   const [filter, setFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState('10');
-  const [sort, setSort] = useState<string | undefined>(undefined);
+  const [sort, setSort] = useState<string>('id|asc');
+
+  useEffect(() => {
+    setApiEndpoint(
+      endpoint(
+        `${props.endpoint}?per_page=:perPage&page=:currentPage&filter=:filter&sort=:sort`,
+        { perPage, currentPage, filter, sort }
+      )
+    );
+  }, [perPage, currentPage, filter, sort]);
+
+  const { data, isLoading, isError } = useQuery(apiEndpoint, () =>
+    axios.get(apiEndpoint, { headers: defaultHeaders })
+  );
 
   console.log(data);
 
@@ -48,6 +57,9 @@ export function DataTable(props: Props) {
     <>
       <Table>
         <Thead>
+          <Th>
+            <Checkbox />
+          </Th>
           {props.columns.map((column, index) => (
             <Th key={index}>{column.label}</Th>
           ))}
@@ -72,6 +84,10 @@ export function DataTable(props: Props) {
           {data &&
             data?.data?.data?.map((resource: any, index: number) => (
               <Tr key={index}>
+                <Td>
+                  <Checkbox />
+                </Td>
+
                 {props.columns.map((column, index) => (
                   <Td key={index}>
                     {column.format
