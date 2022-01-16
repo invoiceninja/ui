@@ -14,7 +14,10 @@ import { defaultHeaders } from 'common/queries/common/headers';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
-import { Checkbox } from './forms';
+import { Actions } from './datatables/Actions';
+import { Dropdown } from './dropdown/Dropdown';
+import { DropdownElement } from './dropdown/DropdownElement';
+import { Button, Checkbox } from './forms';
 import { Spinner } from './Spinner';
 import { Pagination, Table, Tbody, Td, Th, Thead, Tr } from './tables';
 
@@ -25,8 +28,10 @@ export type DataTableColumns = {
 }[];
 
 interface Props {
+  resource: string;
   columns: DataTableColumns;
   endpoint: string;
+  linkToCreate?: string;
 }
 
 export function DataTable(props: Props) {
@@ -55,6 +60,34 @@ export function DataTable(props: Props) {
 
   return (
     <>
+      <Actions
+        onFilterChange={setFilter}
+        optionsMultiSelect={true}
+        rightSide={
+          props.linkToCreate && (
+            <Button to={props.linkToCreate}>
+              <span>{t(`new_${props.resource}`)}</span>
+            </Button>
+          )
+        }
+      >
+        <span className="text-sm">{t('with_selected')}</span>
+
+        <Dropdown label={t('actions')}>
+          <DropdownElement onClick={() => {}}>
+            {t(`archive_${props.resource}`)}
+          </DropdownElement>
+
+          <DropdownElement onClick={() => {}}>
+            {t(`restore_${props.resource}`)}
+          </DropdownElement>
+
+          <DropdownElement onClick={() => {}}>
+            {t(`delete_${props.resource}`)}
+          </DropdownElement>
+        </Dropdown>
+      </Actions>
+
       <Table>
         <Thead>
           <Th>

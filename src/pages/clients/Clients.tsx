@@ -50,7 +50,12 @@ export function Clients() {
 
   return (
     <Default title={t('clients')}>
-      <DataTable columns={columns} endpoint="/api/v1/clients" />
+      <DataTable
+        resource="client"
+        endpoint="/api/v1/clients"
+        columns={columns}
+        linkToCreate="/clients/create"
+      />
     </Default>
   );
 }
