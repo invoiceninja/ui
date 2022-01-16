@@ -9,10 +9,10 @@
  */
 
 import axios from 'axios';
-import { endpoint } from 'common/helpers';
+import { endpoint, handleCheckboxChange } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { settingsSlice } from 'common/stores/slices/settings';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { Actions } from './datatables/Actions';
@@ -44,6 +44,9 @@ export function DataTable(props: Props) {
   const [perPage, setPerPage] = useState('10');
   const [sort, setSort] = useState<string>('id|asc');
   const [status, setStatus] = useState(['active']);
+  const [selected, setSelected] = useState(new Set<string>());
+
+  const mainCheckbox = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setApiEndpoint(
@@ -100,7 +103,20 @@ export function DataTable(props: Props) {
       <Table>
         <Thead>
           <Th>
-            <Checkbox />
+            <Checkbox
+              innerRef={mainCheckbox}
+              onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                Array.from(
+                  document.querySelectorAll('.child-checkbox')
+                ).forEach((checkbox: HTMLInputElement | any) => {
+                  checkbox.checked = event.target.checked;
+
+                  event.target.checked
+                    ? selected.add(checkbox.id)
+                    : selected.delete(checkbox.id);
+                });
+              }}
+            />
           </Th>
           {props.columns.map((column, index) => (
             <Th key={index}>{column.label}</Th>
@@ -127,7 +143,16 @@ export function DataTable(props: Props) {
             data?.data?.data?.map((resource: any, index: number) => (
               <Tr key={index}>
                 <Td>
-                  <Checkbox />
+                  <Checkbox
+                    className="child-checkbox"
+                    value={resource.id}
+                    id={resource.id}
+                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                      setSelected(
+                        handleCheckboxChange(event.target.id, selected)
+                      )
+                    }
+                  />
                 </Td>
 
                 {props.columns.map((column, index) => (
