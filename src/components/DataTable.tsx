@@ -11,6 +11,7 @@
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { settingsSlice } from 'common/stores/slices/settings';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -42,27 +43,35 @@ export function DataTable(props: Props) {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState('10');
   const [sort, setSort] = useState<string>('id|asc');
+  const [status, setStatus] = useState(['active']);
 
   useEffect(() => {
     setApiEndpoint(
       endpoint(
-        `${props.endpoint}?per_page=:perPage&page=:currentPage&filter=:filter&sort=:sort`,
-        { perPage, currentPage, filter, sort }
+        `${props.endpoint}?per_page=:perPage&page=:currentPage&filter=:filter&sort=:sort&status=:status`,
+        { perPage, currentPage, filter, sort, status }
       )
     );
-  }, [perPage, currentPage, filter, sort]);
+  }, [perPage, currentPage, filter, sort, status]);
 
   const { data, isLoading, isError } = useQuery(apiEndpoint, () =>
     axios.get(apiEndpoint, { headers: defaultHeaders })
   );
 
-  console.log(data);
+  const options = [
+    { value: 'active', label: t('active') },
+    { value: 'archived', label: t('archived') },
+    { value: 'deleted', label: t('deleted') },
+  ];
 
   return (
     <>
       <Actions
         onFilterChange={setFilter}
         optionsMultiSelect={true}
+        options={options}
+        defaultOption={options[0]}
+        onStatusChange={setStatus}
         rightSide={
           props.linkToCreate && (
             <Button to={props.linkToCreate}>
