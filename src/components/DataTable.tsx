@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
-import { endpoint, handleCheckboxChange } from 'common/helpers';
+import axios, { AxiosError } from 'axios';
+import { endpoint, handleCheckboxChange, request } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { settingsSlice } from 'common/stores/slices/settings';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { Actions } from './datatables/Actions';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
@@ -55,6 +55,7 @@ export function DataTable(props: Props) {
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState(['active']);
   const [selected, setSelected] = useState(new Set<string>());
+  const queryClient = useQueryClient();
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
@@ -77,6 +78,39 @@ export function DataTable(props: Props) {
     { value: 'deleted', label: t('deleted') },
   ];
 
+  const bulk = (action: 'archive' | 'restore' | 'delete') => {
+    const toastId = toast.loading(t('processing'));
+
+    request(
+      'POST',
+      endpoint(`${props.endpoint}/bulk`),
+      {
+        action,
+        ids: Array.from(selected),
+      },
+      defaultHeaders
+    )
+      .then(() => {
+        toast.success(t(`successfully_${action}_${props.resource}`), {
+          id: toastId,
+        });
+
+        selected.clear();
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        /** @ts-ignore: Unreachable, if element is null/undefined. */
+        mainCheckbox.current.checked = false;
+      })
+      .catch((error: AxiosError) => {
+        console.error(error.response?.data);
+
+        toast.error(t('error_title'), {
+          id: toastId,
+        });
+      })
+      .finally(() => queryClient.invalidateQueries(apiEndpoint));
+  };
+
   return (
     <>
       <Actions
@@ -96,15 +130,15 @@ export function DataTable(props: Props) {
         <span className="text-sm">{t('with_selected')}</span>
 
         <Dropdown label={t('actions')}>
-          <DropdownElement onClick={() => {}}>
+          <DropdownElement onClick={() => bulk('archive')}>
             {t(`archive_${props.resource}`)}
           </DropdownElement>
 
-          <DropdownElement onClick={() => {}}>
+          <DropdownElement onClick={() => bulk('restore')}>
             {t(`restore_${props.resource}`)}
           </DropdownElement>
 
-          <DropdownElement onClick={() => {}}>
+          <DropdownElement onClick={() => bulk('delete')}>
             {t(`delete_${props.resource}`)}
           </DropdownElement>
         </Dropdown>
