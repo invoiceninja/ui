@@ -20,7 +20,16 @@ import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { Button, Checkbox } from './forms';
 import { Spinner } from './Spinner';
-import { Pagination, Table, Tbody, Td, Th, Thead, Tr } from './tables';
+import {
+  ColumnSortPayload,
+  Pagination,
+  Table,
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+} from './tables';
 
 export type DataTableColumns = {
   id: string;
@@ -42,7 +51,8 @@ export function DataTable(props: Props) {
   const [filter, setFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState('10');
-  const [sort, setSort] = useState<string>('id|asc');
+  const [sort, setSort] = useState('id|asc');
+  const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState(['active']);
   const [selected, setSelected] = useState(new Set<string>());
 
@@ -119,7 +129,17 @@ export function DataTable(props: Props) {
             />
           </Th>
           {props.columns.map((column, index) => (
-            <Th key={index}>{column.label}</Th>
+            <Th
+              id={column.id}
+              key={index}
+              isCurrentlyUsed={sortedBy === column.id}
+              onColumnClick={(data: ColumnSortPayload) => {
+                setSortedBy(data.field);
+                setSort(data.sort);
+              }}
+            >
+              {column.label}
+            </Th>
           ))}
         </Thead>
         <Tbody>
