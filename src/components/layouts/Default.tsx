@@ -24,6 +24,7 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@invoiceninja/forms';
 import { CompanySwitcher } from 'components/CompanySwitcher';
+import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -33,6 +34,7 @@ interface Props extends CommonProps {
   title?: string;
   onSaveClick?: any;
   onCancelClick?: any;
+  breadcrumbs?: BreadcrumRecord[];
 }
 
 export function Default(props: Props) {
@@ -224,6 +226,8 @@ export function Default(props: Props) {
 
           <main className="flex-1">
             <div className="p-4 md:p-8 dark:text-gray-100">
+              {props.breadcrumbs && <Breadcrumbs pages={props.breadcrumbs} />}
+
               {props.children}
             </div>
           </main>

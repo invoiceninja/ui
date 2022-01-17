@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Breadcrumbs } from 'components/Breadcrumbs';
+import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -21,7 +21,7 @@ interface Props {
   children: ReactNode;
   onSaveClick?: any;
   onCancelClick?: any;
-  breadcrumbs?: { name: string; href: string }[];
+  breadcrumbs?: BreadcrumRecord[];
 }
 
 export function Settings(props: Props) {

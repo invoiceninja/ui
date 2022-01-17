@@ -12,6 +12,7 @@ import { Link } from '@invoiceninja/forms';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
+import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +24,8 @@ export function Clients() {
   useTitle('clients');
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const pages: BreadcrumRecord[] = [{ name: t('clients'), href: '/clients' }];
 
   const columns: DataTableColumns = [
     {
@@ -43,13 +46,13 @@ export function Clients() {
     },
     {
       id: 'last_login',
-      label: t('last_login_at'),
+      label: t('last_login'),
       format: (value) => date(value, dateFormat),
     },
   ];
 
   return (
-    <Default title={t('clients')}>
+    <Default breadcrumbs={pages} title={t('clients')}>
       <DataTable
         resource="client"
         endpoint="/api/v1/clients"
