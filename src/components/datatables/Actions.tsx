@@ -43,7 +43,7 @@ export function Actions(props: Props) {
   }
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
       <div className="flex items-center space-x-2">
         {props.children}
         {props.options && (
@@ -56,7 +56,7 @@ export function Actions(props: Props) {
           />
         )}
       </div>
-      <div className="mt-2 md:mt-0 flex items-center space-x-4">
+      <div className="mt-2 lg:mt-0 flex items-center space-x-4">
         <InputField
           id="filter"
           placeholder={t('filter')}
