@@ -55,6 +55,8 @@ export function Clients() {
         endpoint="/api/v1/clients"
         columns={columns}
         linkToCreate="/clients/create"
+        linkToEdit="/clients/:id/edit"
+        withResourcefulActions
       />
     </Default>
   );
