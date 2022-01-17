@@ -15,9 +15,11 @@ import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { Statistic } from 'components/Statistic';
+import { Tabs } from 'components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, Outlet, useParams } from 'react-router-dom';
+import { Tab } from 'components/Tabs';
 
 export function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -25,6 +27,10 @@ export function Client() {
   const [t] = useTranslation();
   const { id } = useParams();
   const { data: client, isLoading } = useClientQuery({ id });
+
+  useEffect(() => {
+    setDocumentTitle(client?.data?.data?.display_name || 'view_client');
+  }, [client]);
 
   const pages: BreadcrumRecord[] = [
     { name: t('clients'), href: '/clients' },
@@ -34,9 +40,23 @@ export function Client() {
     },
   ];
 
-  useEffect(() => {
-    setDocumentTitle(client?.data?.data?.display_name || 'view_client');
-  }, [client]);
+  const tabs: Tab[] = [
+    { name: t('overview'), href: generatePath('/clients/:id', { id }) },
+    { name: t('details'), href: generatePath('/clients/:id/details', { id }) },
+    {
+      name: t('documents'),
+      href: generatePath('/clients/:id/documents', { id }),
+    },
+    { name: t('ledger'), href: generatePath('/clients/:id/ledger', { id }) },
+    {
+      name: t('activity'),
+      href: generatePath('/clients/:id/activity', { id }),
+    },
+    {
+      name: t('system_logs'),
+      href: generatePath('/clients/:id/system_logs', { id }),
+    },
+  ];
 
   return (
     <Default
@@ -66,6 +86,12 @@ export function Client() {
                 value={client.data.data.balance}
               />
             </div>
+          </div>
+
+          <Tabs tabs={tabs} className="mt-6" />
+
+          <div className="my-4">
+            <Outlet />
           </div>
         </>
       )}
