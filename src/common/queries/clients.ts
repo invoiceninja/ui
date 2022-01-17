@@ -11,6 +11,7 @@
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { useQuery } from 'react-query';
+import { generatePath } from 'react-router-dom';
 import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 
@@ -23,5 +24,13 @@ export function useClientsQuery(params: Params) {
       }),
       { headers: defaultHeaders }
     )
+  );
+}
+
+export function useClientQuery(params: { id: string | undefined }) {
+  return useQuery(generatePath('/api/v1/clients/:id', { id: params.id }), () =>
+    axios.get(endpoint('/api/v1/clients/:id', { id: params.id }), {
+      headers: defaultHeaders,
+    })
   );
 }
