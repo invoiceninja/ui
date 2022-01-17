@@ -8,18 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
+import { Button, Link } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { useClientQuery } from 'common/queries/clients';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
-import { Statistic } from 'components/Statistic';
+import { InfoCard } from 'components/InfoCard';
 import { Tabs } from 'components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Outlet, useParams } from 'react-router-dom';
 import { Tab } from 'components/Tabs';
+import { useAccentColor } from 'common/hooks/useAccentColor';
+import { ClientContact } from 'common/interfaces/client-contact';
 
 export function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -27,6 +29,7 @@ export function Client() {
   const [t] = useTranslation();
   const { id } = useParams();
   const { data: client, isLoading } = useClientQuery({ id });
+  const accentColor = useAccentColor();
 
   useEffect(() => {
     setDocumentTitle(client?.data?.data?.display_name || 'view_client');
@@ -58,6 +61,8 @@ export function Client() {
     },
   ];
 
+  console.log(client);
+
   return (
     <Default
       title={documentTitle}
@@ -74,16 +79,77 @@ export function Client() {
         <>
           <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
             <div className="col-span-12 lg:col-span-3">
-              <Statistic
-                title={t('paid_to_date')}
-                value={client.data.data.paid_to_date}
+              <InfoCard
+                title={t('details')}
+                value={
+                  <>
+                    <Link to={client.data.data.website} external>
+                      {client.data.data.website}
+                    </Link>
+                  </>
+                }
+                className="h-full"
               />
             </div>
 
             <div className="col-span-12 lg:col-span-3">
-              <Statistic
-                title={t('balance_due')}
-                value={client.data.data.balance}
+              <InfoCard
+                title={t('address')}
+                value={
+                  <>
+                    <p>
+                      {client.data.data.address1}, {client.data.data.address2}
+                    </p>
+
+                    <p>
+                      {client.data.data.city}, {client.data.data.state}
+                    </p>
+                  </>
+                }
+                className="h-full"
+              />
+            </div>
+
+            <div className="col-span-12 lg:col-span-3">
+              <InfoCard
+                title={t('contacts')}
+                value={
+                  <div className="space-y-2">
+                    {client.data.data.contacts.map((contact: ClientContact) => (
+                      <div key={contact.id}>
+                        <p
+                          className="font-semibold"
+                          style={{ color: accentColor }}
+                        >
+                          {contact.first_name} {contact.last_name}
+                        </p>
+
+                        <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                      </div>
+                    ))}
+                  </div>
+                }
+                className="h-full"
+              />
+            </div>
+
+            <div className="col-span-12 lg:col-span-3">
+              <InfoCard
+                title={t('standing')}
+                value={
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold">{t('paid_to_date')}</p>
+                      <span>{client.data.data.paid_to_date}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <p className="font-semibold">{t('balance')}</p>
+                      <span>{client.data.data.balance}</span>
+                    </div>
+                  </div>
+                }
+                className="h-full"
               />
             </div>
           </div>
