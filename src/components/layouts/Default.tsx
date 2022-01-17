@@ -226,7 +226,7 @@ export function Default(props: Props) {
           </div>
 
           <main className="flex-1">
-            {props.topRight && (
+            {(props.breadcrumbs || props.topRight) && (
               <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
                 <div className="">
                   {props.breadcrumbs && (
