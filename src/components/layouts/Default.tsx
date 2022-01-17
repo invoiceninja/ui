@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Fragment, useState } from 'react';
+import { Fragment, ReactNode, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import {
   Home,
@@ -35,6 +35,7 @@ interface Props extends CommonProps {
   onSaveClick?: any;
   onCancelClick?: any;
   breadcrumbs?: BreadcrumRecord[];
+  topRight?: ReactNode;
 }
 
 export function Default(props: Props) {
@@ -225,9 +226,19 @@ export function Default(props: Props) {
           </div>
 
           <main className="flex-1">
-            <div className="p-4 md:p-8 dark:text-gray-100">
-              {props.breadcrumbs && <Breadcrumbs pages={props.breadcrumbs} />}
+            {props.topRight && (
+              <div className="pt-4 px-4 md:px-8 md:pt-8 dark:text-gray-100 flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
+                <div className="">
+                  {props.breadcrumbs && (
+                    <Breadcrumbs pages={props.breadcrumbs} />
+                  )}
+                </div>
 
+                {props.topRight && <div className="">{props.topRight}</div>}
+              </div>
+            )}
+
+            <div className="pt-4 px-4 md:pt-8 md:px-8 dark:text-gray-100">
               {props.children}
             </div>
           </main>

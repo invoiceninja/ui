@@ -15,7 +15,7 @@ export type BreadcrumRecord = { name: string; href: string };
 
 export function Breadcrumbs(props: { pages: BreadcrumRecord[] }) {
   return (
-    <nav className="hidden lg:flex lg:mb-6" aria-label="Breadcrumb">
+    <nav className="flex" aria-label="Breadcrumb">
       <ol role="list" className="flex items-center space-x-4">
         <li>
           <div>

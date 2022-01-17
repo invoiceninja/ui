@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Button } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { useClientQuery } from 'common/queries/clients';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
@@ -25,8 +26,6 @@ export function Client() {
   const { id } = useParams();
   const { data: client, isLoading } = useClientQuery({ id });
 
-  console.log(client);
-
   const pages: BreadcrumRecord[] = [
     { name: t('clients'), href: '/clients' },
     {
@@ -40,7 +39,15 @@ export function Client() {
   }, [client]);
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      topRight={
+        <Button to={generatePath('/clients/:id/edit', { id })}>
+          {t('edit_client')}
+        </Button>
+      }
+    >
       {isLoading && <Spinner />}
 
       {client && (
