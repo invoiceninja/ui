@@ -32,7 +32,7 @@ export function Clients() {
       id: 'number',
       label: t('number'),
       format: (value, resource) => (
-        <Link to={generatePath('/clients/:id/edit', { id: resource.id })}>
+        <Link to={generatePath('/clients/:id', { id: resource.id })}>
           {value}
         </Link>
       ),
