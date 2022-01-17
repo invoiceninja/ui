@@ -9,6 +9,7 @@
  */
 
 import { useAccentColor } from 'common/hooks/useAccentColor';
+import { Link, useLocation } from 'react-router-dom';
 
 interface Props {
   className?: string;
@@ -19,9 +20,10 @@ export type Tab = { name: string; href: string };
 
 export function Tabs(props: Props) {
   const accentColor = useAccentColor();
+  const location = useLocation();
 
   const isActive = (link: string) => {
-    return location.pathname.endsWith(link);
+    return location.pathname === link;
   };
 
   return (
@@ -48,9 +50,9 @@ export function Tabs(props: Props) {
         <div className="border-b border-gray-200">
           <nav className="-mb-px flex space-x-8" aria-label="Tabs">
             {props.tabs.map((tab) => (
-              <a
+              <Link
                 key={tab.name}
-                href={tab.href}
+                to={tab.href}
                 style={{
                   borderColor: isActive(tab.href) ? accentColor : 'transparent',
                   color: isActive(tab.href) ? accentColor : '#6B7280',
@@ -59,7 +61,7 @@ export function Tabs(props: Props) {
                 aria-current={isActive(tab.href) ? 'page' : undefined}
               >
                 {tab.name}
-              </a>
+              </Link>
             ))}
           </nav>
         </div>
