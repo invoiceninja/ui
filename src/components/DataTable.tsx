@@ -45,6 +45,7 @@ interface Props {
   linkToCreate?: string;
   linkToEdit?: string;
   withResourcefulActions?: ReactNode[] | boolean;
+  bulkRoute?: string;
 }
 
 export function DataTable(props: Props) {
@@ -90,7 +91,7 @@ export function DataTable(props: Props) {
 
     request(
       'POST',
-      endpoint(`${props.endpoint}/bulk`),
+      endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`),
       {
         action,
         ids: Array.from(selected),
@@ -115,7 +116,7 @@ export function DataTable(props: Props) {
           id: toastId,
         });
       })
-      .finally(() => queryClient.invalidateQueries(apiEndpoint));
+      .finally(() => queryClient.invalidateQueries(apiEndpoint.href));
   };
 
   return (
