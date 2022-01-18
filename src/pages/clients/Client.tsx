@@ -46,7 +46,14 @@ export function Client() {
   const tabs: Tab[] = [
     { name: t('invoices'), href: generatePath('/clients/:id', { id }) },
     { name: t('quotes'), href: generatePath('/clients/:id/quotes', { id }) },
-    { name: t('payments'), href: generatePath('/clients/:id/payments', { id }) },
+    {
+      name: t('payments'),
+      href: generatePath('/clients/:id/payments', { id }),
+    },
+    {
+      name: t('recurring_invoices'),
+      href: generatePath('/clients/:id/recurring_invoices', { id }),
+    },
   ];
 
   console.log(client);

@@ -81,6 +81,8 @@ export function DataTable(props: Props) {
     () => axios.get(apiEndpoint.href, { headers: defaultHeaders })
   );
 
+  console.log(data);
+
   const options = [
     { value: 'active', label: t('active') },
     { value: 'archived', label: t('archived') },

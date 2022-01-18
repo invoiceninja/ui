@@ -96,6 +96,7 @@ import {
   ClientInvoices,
   ClientPayments,
   ClientQuotes,
+  ClientRecurringInvoices,
   Clients,
 } from 'pages/clients';
 
@@ -117,6 +118,10 @@ export const routes = (
           <Route path="" element={<ClientInvoices />} />
           <Route path="quotes" element={<ClientQuotes />} />
           <Route path="payments" element={<ClientPayments />} />
+          <Route
+            path="recurring_invoices"
+            element={<ClientRecurringInvoices />}
+          />
         </Route>
       </Route>
       <Route path="/products">
