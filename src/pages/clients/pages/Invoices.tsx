@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
- export function Details() {
-    return <div>Details tab</div>;
-  }
-  
+export function Invoices() {
+  return <div>Show client invoices</div>;
+}

@@ -91,7 +91,7 @@ import {
   CreateExpenseCategory,
   EditExpenseCategory,
 } from 'pages/settings/expense-categories';
-import { Client, ClientDetails, ClientOverview, Clients } from 'pages/clients';
+import { Client, ClientInvoices, Clients } from 'pages/clients';
 
 export const routes = (
   <Routes>
@@ -108,8 +108,7 @@ export const routes = (
       <Route path="clients">
         <Route path="" element={<Clients />} />
         <Route path=":id" element={<Client />}>
-          <Route path="" element={<ClientOverview />} />
-          <Route path="details" element={<ClientDetails />} />
+          <Route path="" element={<ClientInvoices />} />
         </Route>
       </Route>
       <Route path="/products">

@@ -44,21 +44,7 @@ export function Client() {
   ];
 
   const tabs: Tab[] = [
-    { name: t('overview'), href: generatePath('/clients/:id', { id }) },
-    { name: t('details'), href: generatePath('/clients/:id/details', { id }) },
-    {
-      name: t('documents'),
-      href: generatePath('/clients/:id/documents', { id }),
-    },
-    { name: t('ledger'), href: generatePath('/clients/:id/ledger', { id }) },
-    {
-      name: t('activity'),
-      href: generatePath('/clients/:id/activity', { id }),
-    },
-    {
-      name: t('system_logs'),
-      href: generatePath('/clients/:id/system_logs', { id }),
-    },
+    { name: t('invoices'), href: generatePath('/clients/:id', { id }) },
   ];
 
   console.log(client);
