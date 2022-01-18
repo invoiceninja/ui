@@ -76,8 +76,9 @@ export function DataTable(props: Props) {
     setApiEndpoint(apiEndpoint);
   }, [perPage, currentPage, filter, sort, status]);
 
-  const { data, isLoading, isError } = useQuery(apiEndpoint.href, () =>
-    axios.get(apiEndpoint.href, { headers: defaultHeaders })
+  const { data, isLoading, isError } = useQuery(
+    [apiEndpoint.href, perPage, currentPage, filter, sort, status],
+    () => axios.get(apiEndpoint.href, { headers: defaultHeaders })
   );
 
   const options = [
