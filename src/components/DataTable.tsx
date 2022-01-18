@@ -50,7 +50,10 @@ interface Props {
 export function DataTable(props: Props) {
   const [t] = useTranslation();
 
-  const [apiEndpoint, setApiEndpoint] = useState(props.endpoint);
+  const [apiEndpoint, setApiEndpoint] = useState(
+    new URL(endpoint(props.endpoint))
+  );
+
   const [filter, setFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState('10');
@@ -63,16 +66,17 @@ export function DataTable(props: Props) {
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setApiEndpoint(
-      endpoint(
-        `${props.endpoint}?per_page=:perPage&page=:currentPage&filter=:filter&sort=:sort&status=:status`,
-        { perPage, currentPage, filter, sort, status }
-      )
-    );
+    apiEndpoint.searchParams.append('per_page', perPage);
+    apiEndpoint.searchParams.append('page', currentPage.toString());
+    apiEndpoint.searchParams.append('filter', filter);
+    apiEndpoint.searchParams.append('sort', sort);
+    apiEndpoint.searchParams.append('status', status as unknown as string);
+
+    setApiEndpoint(apiEndpoint);
   }, [perPage, currentPage, filter, sort, status]);
 
-  const { data, isLoading, isError } = useQuery(apiEndpoint, () =>
-    axios.get(apiEndpoint, { headers: defaultHeaders })
+  const { data, isLoading, isError } = useQuery(apiEndpoint.href, () =>
+    axios.get(apiEndpoint.href, { headers: defaultHeaders })
   );
 
   const options = [
