@@ -20,7 +20,7 @@ export function Invoices() {
   const columns: DataTableColumns = [
     {
       id: 'number',
-      label: t('number'),
+      label: t('invoice_number'),
       format: (value, resource) => (
         <Link to={generatePath('/invoices/:id', { id: resource.id })}>
           {value}
