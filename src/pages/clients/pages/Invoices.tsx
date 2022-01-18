@@ -9,7 +9,9 @@
  */
 
 import { Link } from '@invoiceninja/forms';
+import invoiceStatus from 'common/constants/invoice-status';
 import { DataTable, DataTableColumns } from 'components/DataTable';
+import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
 
@@ -31,7 +33,11 @@ export function Invoices() {
     { id: 'amount', label: t('amount') },
     { id: 'balance', label: t('balance') },
     { id: 'due_date', label: t('due_date') },
-    { id: 'status_id', label: t('status') },
+    {
+      id: 'status_id',
+      label: t('status'),
+      format: (value) => <StatusBadge for={invoiceStatus} code={value} />,
+    },
   ];
 
   return (
