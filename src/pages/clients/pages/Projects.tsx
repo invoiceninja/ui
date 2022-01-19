@@ -8,12 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import paymentStatus from 'common/constants/payment-status';
 import { Link } from '@invoiceninja/forms';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { DataTable, DataTableColumns } from 'components/DataTable';
-import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
 
