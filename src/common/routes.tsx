@@ -94,6 +94,7 @@ import {
 import {
   Client,
   ClientCredits,
+  ClientExpenses,
   ClientInvoices,
   ClientPayments,
   ClientProjects,
@@ -124,6 +125,7 @@ export const routes = (
           <Route path="credits" element={<ClientCredits />} />
           <Route path="projects" element={<ClientProjects />} />
           <Route path="tasks" element={<ClientTasks />} />
+          <Route path="expenses" element={<ClientExpenses />} />
           <Route
             path="recurring_invoices"
             element={<ClientRecurringInvoices />}
