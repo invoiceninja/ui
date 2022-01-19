@@ -58,6 +58,10 @@ export function Client() {
       name: t('credits'),
       href: generatePath('/clients/:id/credits', { id }),
     },
+    {
+      name: t('projects'),
+      href: generatePath('/clients/:id/projects', { id }),
+    },
   ];
 
   console.log(client);
