@@ -9,3 +9,4 @@ export { Credits as ClientCredits } from './pages/Credits';
 export { Projects as ClientProjects } from './pages/Projects';
 export { Tasks as ClientTasks } from './pages/Tasks';
 export { Expenses as ClientExpenses } from './pages/Expenses';
+export { RecurringExpenses as ClientRecurringExpenses } from './pages/RecurringExpenses';

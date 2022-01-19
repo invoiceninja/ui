@@ -70,9 +70,11 @@ export function Client() {
       name: t('expenses'),
       href: generatePath('/clients/:id/expenses', { id }),
     },
+    {
+      name: t('recurring_expenses'),
+      href: generatePath('/clients/:id/recurring_expenses', { id }),
+    },
   ];
-
-  console.log(client);
 
   return (
     <Default
