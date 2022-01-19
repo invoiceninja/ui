@@ -54,6 +54,10 @@ export function Client() {
       name: t('recurring_invoices'),
       href: generatePath('/clients/:id/recurring_invoices', { id }),
     },
+    {
+      name: t('credits'),
+      href: generatePath('/clients/:id/credits', { id }),
+    },
   ];
 
   console.log(client);

@@ -93,6 +93,7 @@ import {
 } from 'pages/settings/expense-categories';
 import {
   Client,
+  ClientCredits,
   ClientInvoices,
   ClientPayments,
   ClientQuotes,
@@ -118,6 +119,7 @@ export const routes = (
           <Route path="" element={<ClientInvoices />} />
           <Route path="quotes" element={<ClientQuotes />} />
           <Route path="payments" element={<ClientPayments />} />
+          <Route path="credits" element={<ClientCredits />} />
           <Route
             path="recurring_invoices"
             element={<ClientRecurringInvoices />}
