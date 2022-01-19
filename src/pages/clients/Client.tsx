@@ -23,6 +23,7 @@ import { Details } from './components/Details';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Standing } from './components/Standing';
+import { Dropdown } from 'components/dropdown/Dropdown';
 
 export function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -81,9 +82,13 @@ export function Client() {
       title={documentTitle}
       breadcrumbs={pages}
       topRight={
-        <Button to={generatePath('/clients/:id/edit', { id })}>
-          {t('edit_client')}
-        </Button>
+        <div className="inline-flex items-center space-x-2">
+          <Button to={generatePath('/clients/:id/edit', { id })}>
+            {t('edit_client')}
+          </Button>
+
+          <Dropdown className="divide-y" label={t('more_actions')}></Dropdown>
+        </div>
       }
     >
       {isLoading && <Spinner />}
