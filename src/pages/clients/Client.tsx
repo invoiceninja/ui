@@ -19,11 +19,13 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Outlet, useParams } from 'react-router-dom';
 import { Tab } from 'components/Tabs';
-import { Details } from './components/Details';
-import { Address } from './components/Address';
-import { Contacts } from './components/Contacts';
-import { Standing } from './components/Standing';
 import { Dropdown } from 'components/dropdown/Dropdown';
+import {
+  Address,
+  Contacts,
+  Details,
+  Standing,
+} from './components/pages/client';
 
 export function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');

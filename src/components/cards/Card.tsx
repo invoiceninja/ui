@@ -21,13 +21,16 @@ interface Props {
   onSaveClick?: any;
   saveButtonLabel?: string;
   disableSubmitButton?: boolean;
+  className?: string;
 }
 
 export function Card(props: Props) {
   const [t] = useTranslation();
 
   return (
-    <div className="bg-white shadow overflow-hidden rounded">
+    <div
+      className={`bg-white shadow overflow-hidden rounded ${props.className}`}
+    >
       <form onSubmit={props.onFormSubmit}>
         {props.title && (
           <div className="px-4 py-5 sm:px-6">
