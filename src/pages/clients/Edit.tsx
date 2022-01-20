@@ -20,7 +20,7 @@ import { Spinner } from 'components/Spinner';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import {
   AdditionalInfo,
   Address,
@@ -34,6 +34,7 @@ export function Edit() {
   const { id } = useParams();
   const { data, isLoading } = useClientQuery({ id }, { enabled: false });
   const [client, setClient] = useState<Client>();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (data?.data?.data) {
@@ -67,7 +68,8 @@ export function Edit() {
         console.error(error);
 
         toast.success(t('error_title'), { id: toastId });
-      });
+      })
+      .finally(() => navigate(generatePath('/clients/:id', { id })));
   };
 
   return (
