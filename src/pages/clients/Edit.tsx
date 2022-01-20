@@ -15,6 +15,12 @@ import { Default } from 'components/layouts/Default';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import {
+  AdditionalInfo,
+  Address,
+  Contacts,
+  Details,
+} from './components/pages/edit';
 
 export function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
@@ -30,13 +36,10 @@ export function Edit() {
   return (
     <Default title={documentTitle}>
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-6" title={t('details')}>
-          {/*  */}
-        </Card>
-
-        <Card className="col-span-6" title={t('details')}>
-          {/*  */}
-        </Card>
+        <Details />
+        <Contacts />
+        <Address />
+        <AdditionalInfo />
       </div>
     </Default>
   );
