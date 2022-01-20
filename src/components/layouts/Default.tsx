@@ -211,7 +211,7 @@ export function Default(props: Props) {
               <MenuIcon className="dark:text-gray-100" />
             </button>
             <div className="flex-1 px-4 flex items-center justify-between">
-              <h2 className="text-xl dark:text-gray-100">{props.title}</h2>
+              <h2 className="text-sm md:text-xl dark:text-gray-100">{props.title}</h2>
               <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
                 {props.onCancelClick && (
                   <Button onClick={props.onCancelClick} type="secondary">
