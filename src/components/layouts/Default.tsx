@@ -34,6 +34,7 @@ interface Props extends CommonProps {
   title?: string;
   onSaveClick?: any;
   onCancelClick?: any;
+  onBackClick?: string;
   breadcrumbs?: BreadcrumRecord[];
   topRight?: ReactNode;
 }
@@ -215,6 +216,12 @@ export function Default(props: Props) {
                 {props.onCancelClick && (
                   <Button onClick={props.onCancelClick} type="secondary">
                     {t('cancel')}
+                  </Button>
+                )}
+
+                {props.onBackClick && (
+                  <Button to={props.onBackClick} type="secondary">
+                    {t('back')}
                   </Button>
                 )}
 
