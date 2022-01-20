@@ -10,43 +10,55 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import { User } from 'common/interfaces/user';
+import { useUsersQuery } from 'common/queries/users';
 import { useTranslation } from 'react-i18next';
+import { Client } from '../../../../../common/interfaces/client';
 
-export function Details() {
+export function Details(props: { client: Client }) {
   const [t] = useTranslation();
+  const { data: users } = useUsersQuery();
 
   return (
     <Card className="col-span-12 xl:col-span-6" title={t('details')}>
       <Element leftSide={t('name')}>
-        <InputField id="name" />
+        <InputField id="name" value={props.client.name} />
       </Element>
 
       <Element leftSide={t('number')}>
-        <InputField id="number" />
+        <InputField id="number" value={props.client.number} />
       </Element>
 
       <Element leftSide={t('group')}>
         <SelectField />
       </Element>
 
-      <Element leftSide={t('user')}>
-        <SelectField />
-      </Element>
+      {users && (
+        <Element leftSide={t('user')}>
+          <SelectField>
+            {users.data.data.map((user: User, index: number) => (
+              <option key={index}>
+                {user.first_name} {user.last_name}
+              </option>
+            ))}
+          </SelectField>
+        </Element>
+      )}
 
       <Element leftSide={t('id_number')}>
-        <InputField id="id_number" />
+        <InputField id="id_number" value={props.client.id_number} />
       </Element>
 
       <Element leftSide={t('vat_number')}>
-        <InputField id="vat_number" />
+        <InputField id="vat_number" value={props.client.vat_number} />
       </Element>
 
       <Element leftSide={t('website')}>
-        <InputField id="website" />
+        <InputField id="website" value={props.client.website} />
       </Element>
 
       <Element leftSide={t('phone')}>
-        <InputField id="phone" />
+        <InputField id="phone" value={props.client.phone} />
       </Element>
     </Card>
   );

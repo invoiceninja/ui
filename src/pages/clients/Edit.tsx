@@ -9,10 +9,12 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { Client } from 'common/interfaces/client';
 import { useClientQuery } from 'common/queries/clients';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
-import { useEffect } from 'react';
+import { Spinner } from 'components/Spinner';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
 import {
@@ -27,10 +29,17 @@ export function Edit() {
 
   const [t] = useTranslation();
   const { id } = useParams();
-  const { data: client } = useClientQuery({ id });
+  const { data, isLoading } = useClientQuery({ id });
+  const [client, setClient] = useState<Client | undefined>();
 
   useEffect(() => {
-    setDocumentTitle(client?.data?.data?.display_name || 'edit_client');
+    if (data?.data?.data) {
+      setClient(data.data.data);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    setDocumentTitle(client?.display_name || 'edit_client');
   }, [client]);
 
   const pages: BreadcrumRecord[] = [
@@ -43,12 +52,16 @@ export function Edit() {
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
-      <div className="grid grid-cols-12 gap-4">
-        <Details />
-        <Contacts />
-        <Address />
-        <AdditionalInfo />
-      </div>
+      {isLoading && <Spinner />}
+
+      {client && (
+        <div className="grid grid-cols-12 gap-4">
+          <Details client={client} />
+          <Contacts />
+          <Address />
+          <AdditionalInfo />
+        </div>
+      )}
     </Default>
   );
 }
