@@ -63,7 +63,7 @@ export function Create() {
             })
           );
         })
-        .catch((error: AxiosError) => console.log(error))
+        .catch((error: AxiosError) => console.error(error))
         .finally(() => formik.setSubmitting(false));
     },
   });

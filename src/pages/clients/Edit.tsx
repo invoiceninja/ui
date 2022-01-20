@@ -32,7 +32,7 @@ export function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
   const [t] = useTranslation();
   const { id } = useParams();
-  const { data, isLoading } = useClientQuery({ id }, { enabled: false });
+  const { data, isLoading } = useClientQuery({ id }, { refetchOnWindowFocus: false });
   const [client, setClient] = useState<Client>();
   const navigate = useNavigate();
 
