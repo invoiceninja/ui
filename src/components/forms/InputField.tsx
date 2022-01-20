@@ -10,6 +10,7 @@
 
 import classNames from 'classnames';
 import { Alert } from 'components/Alert';
+import { ChangeEvent } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -25,6 +26,7 @@ interface Props extends CommonProps {
   name?: string;
   errorMessage?: string;
   debounceTimeout?: number;
+  onChange?: (event: ChangeEvent<HTMLInputElement>) => any;
 }
 
 export function InputField(props: Props) {
