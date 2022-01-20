@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
 import { useTitle } from 'common/hooks/useTitle';
 import { useClientQuery } from 'common/queries/clients';
+import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import {
   AdditionalInfo,
   Address,
@@ -33,8 +33,16 @@ export function Edit() {
     setDocumentTitle(client?.data?.data?.display_name || 'edit_client');
   }, [client]);
 
+  const pages: BreadcrumRecord[] = [
+    { name: t('clients'), href: '/clients' },
+    {
+      name: documentTitle,
+      href: generatePath('/clients/:id', { id }),
+    },
+  ];
+
   return (
-    <Default title={documentTitle}>
+    <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-4">
         <Details />
         <Contacts />

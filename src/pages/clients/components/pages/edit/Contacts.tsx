@@ -15,7 +15,7 @@ export function Contacts() {
   const [t] = useTranslation();
 
   return (
-    <Card className="col-span-6" title={t('contacts')}>
+    <Card className="col-span-12 xl:col-span-6" title={t('contacts')}>
       {/*  */}
     </Card>
   );
