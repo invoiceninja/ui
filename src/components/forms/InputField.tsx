@@ -26,7 +26,6 @@ interface Props extends CommonProps {
   name?: string;
   errorMessage?: string;
   debounceTimeout?: number;
-  onChange?: (event: ChangeEvent<HTMLInputElement>) => any;
 }
 
 export function InputField(props: Props) {
