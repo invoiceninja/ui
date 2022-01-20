@@ -10,14 +10,17 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import { GroupSettings } from 'common/interfaces/group-settings';
 import { User } from 'common/interfaces/user';
+import { useGroupSettingsQuery } from 'common/queries/group-settings';
 import { useUsersQuery } from 'common/queries/users';
 import { useTranslation } from 'react-i18next';
-import { Client } from '../../../../../common/interfaces/client';
+import { Client } from 'common/interfaces/client';
 
 export function Details(props: { client: Client }) {
   const [t] = useTranslation();
   const { data: users } = useUsersQuery();
+  const { data: groupSettings } = useGroupSettingsQuery();
 
   return (
     <Card className="col-span-12 xl:col-span-6" title={t('details')}>
@@ -29,9 +32,17 @@ export function Details(props: { client: Client }) {
         <InputField id="number" value={props.client.number} />
       </Element>
 
-      <Element leftSide={t('group')}>
-        <SelectField />
-      </Element>
+      {groupSettings && (
+        <Element leftSide={t('group')}>
+          <SelectField>
+            {groupSettings.data.data.map(
+              (group: GroupSettings, index: number) => (
+                <option key={index}>{group.name}</option>
+              )
+            )}
+          </SelectField>
+        </Element>
+      )}
 
       {users && (
         <Element leftSide={t('user')}>
