@@ -16,28 +16,54 @@ import { useGroupSettingsQuery } from 'common/queries/group-settings';
 import { useUsersQuery } from 'common/queries/users';
 import { useTranslation } from 'react-i18next';
 import { Client } from 'common/interfaces/client';
+import { set } from 'lodash';
+import { ChangeEvent } from 'react';
+interface Props {
+  client: Client;
+  setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
+}
 
-export function Details(props: { client: Client }) {
+export function Details(props: Props) {
   const [t] = useTranslation();
   const { data: users } = useUsersQuery();
   const { data: groupSettings } = useGroupSettingsQuery();
 
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    props.setClient(
+      (client) => client && set(client, event.target.id, event.target.value)
+    );
+  };
+
   return (
     <Card className="col-span-12 xl:col-span-6" title={t('details')}>
       <Element leftSide={t('name')}>
-        <InputField id="name" value={props.client.name} />
+        <InputField
+          id="name"
+          value={props.client.name}
+          onChange={handleChange}
+        />
       </Element>
 
       <Element leftSide={t('number')}>
-        <InputField id="number" value={props.client.number} />
+        <InputField
+          id="number"
+          value={props.client.number}
+          onChange={handleChange}
+        />
       </Element>
 
       {groupSettings && (
         <Element leftSide={t('group')}>
-          <SelectField>
+          <SelectField
+            id="group_settings_id"
+            value={props.client.group_settings_id}
+            onChange={handleChange}
+          >
             {groupSettings.data.data.map(
               (group: GroupSettings, index: number) => (
-                <option key={index}>{group.name}</option>
+                <option value={group.id} key={index}>
+                  {group.name}
+                </option>
               )
             )}
           </SelectField>
@@ -46,9 +72,9 @@ export function Details(props: { client: Client }) {
 
       {users && (
         <Element leftSide={t('user')}>
-          <SelectField>
+          <SelectField id="user_id" onChange={handleChange}>
             {users.data.data.map((user: User, index: number) => (
-              <option key={index}>
+              <option value={user.id} key={index}>
                 {user.first_name} {user.last_name}
               </option>
             ))}
@@ -57,19 +83,35 @@ export function Details(props: { client: Client }) {
       )}
 
       <Element leftSide={t('id_number')}>
-        <InputField id="id_number" value={props.client.id_number} />
+        <InputField
+          id="id_number"
+          value={props.client.id_number}
+          onChange={handleChange}
+        />
       </Element>
 
       <Element leftSide={t('vat_number')}>
-        <InputField id="vat_number" value={props.client.vat_number} />
+        <InputField
+          id="vat_number"
+          value={props.client.vat_number}
+          onChange={handleChange}
+        />
       </Element>
 
       <Element leftSide={t('website')}>
-        <InputField id="website" value={props.client.website} />
+        <InputField
+          id="website"
+          value={props.client.website}
+          onChange={handleChange}
+        />
       </Element>
 
       <Element leftSide={t('phone')}>
-        <InputField id="phone" value={props.client.phone} />
+        <InputField
+          id="phone"
+          value={props.client.phone}
+          onChange={handleChange}
+        />
       </Element>
     </Card>
   );
