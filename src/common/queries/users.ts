@@ -14,6 +14,12 @@ import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { defaultHeaders } from './common/headers';
 
+export function useUsersQuery() {
+  return useQuery('/api/v1/users', () => {
+    return axios.get(endpoint('/api/v1/users'), { headers: defaultHeaders });
+  });
+}
+
 export function useUserQuery(params: { id: string }) {
   return useQuery(generatePath('/api/v1/users/:id', params), () => {
     axios.get(endpoint('/api/v1/users/:id', params), {
