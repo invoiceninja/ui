@@ -10,7 +10,6 @@
 
 import classNames from 'classnames';
 import { Alert } from 'components/Alert';
-import { ChangeEvent } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 
 import CommonProps from '../../common/interfaces/common-props.interface';
