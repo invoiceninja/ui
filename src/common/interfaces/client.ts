@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ClientContact } from './client-contact';
 import { Timestamps } from './timestamps';
 
 export interface Client extends Timestamps {
@@ -49,7 +50,7 @@ export interface Client extends Timestamps {
   id_number: string;
   display_name: string;
   number: string;
-  contacts: Record<string, any>[];
+  contacts: ClientContact[];
   documents: any[];
   gateway_tokens: any[];
 }
