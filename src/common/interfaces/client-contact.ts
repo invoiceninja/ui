@@ -9,23 +9,23 @@
  */
 
 export interface ClientContact {
-  archived_at: number;
-  contact_key: string;
+  id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
   created_at: number;
+  updated_at: number;
+  archived_at: number;
+  is_primary: boolean;
+  is_locked: boolean;
+  phone: string;
   custom_value1: string;
   custom_value2: string;
   custom_value3: string;
   custom_value4: string;
-  email: string;
-  first_name: string;
-  id: string;
-  is_locked: boolean;
-  is_primary: boolean;
-  last_login: number;
-  last_name: string;
-  link: string;
-  password: string;
-  phone: string;
+  contact_key: string;
   send_email: boolean;
-  updated_at: number;
+  last_login: number;
+  password: string;
+  link: string;
 }
