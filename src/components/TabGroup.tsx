@@ -15,6 +15,7 @@ import React, { Fragment, ReactElement } from 'react';
 interface Props {
   children: ReactElement[];
   tabs: string[];
+  className?: string;
 }
 
 export function TabGroup(props: Props) {
@@ -22,7 +23,7 @@ export function TabGroup(props: Props) {
 
   return (
     <Tab.Group>
-      <div className="border-b border-gray-200">
+      <div className={`border-b border-gray-200 ${props.className}`}>
         <Tab.List className="-mb-px flex space-x-8">
           {props.tabs.map((tab, index) => (
             <Tab as={Fragment} key={index}>
