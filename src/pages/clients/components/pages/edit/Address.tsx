@@ -14,8 +14,14 @@ import { Tab } from '@headlessui/react';
 import { TabGroup } from 'components/TabGroup';
 import { BillingAddress } from './address/BillingAddress';
 import { ShippingAddress } from './address/ShippingAddress';
+import { Client } from 'common/interfaces/client';
 
-export function Address() {
+interface Props {
+  client: Client;
+  setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
+}
+
+export function Address(props: Props) {
   const [t] = useTranslation();
 
   return (
@@ -25,7 +31,7 @@ export function Address() {
         tabs={[t('billing_address'), t('shipping_address')]}
       >
         <Tab.Panel>
-          <BillingAddress />
+          <BillingAddress {...props} />
         </Tab.Panel>
 
         <Tab.Panel>
