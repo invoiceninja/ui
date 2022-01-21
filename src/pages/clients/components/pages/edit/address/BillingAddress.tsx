@@ -31,8 +31,6 @@ export function BillingAddress(props: Props) {
     );
   };
 
-  console.log(props.client.country_id);
-
   return (
     <>
       <Element leftSide={t('billing_address1')}>
@@ -75,21 +73,23 @@ export function BillingAddress(props: Props) {
         />
       </Element>
 
-      <Element leftSide={t('country')}>
-        <SelectField
-          id="country_id"
-          value={props.client.country_id}
-          onChange={handleChange}
-        >
-          <option value=""></option>
+      {countries.length > 1 && (
+        <Element leftSide={t('country')}>
+          <SelectField
+            id="country_id"
+            defaultValue={props.client.country_id}
+            onChange={handleChange}
+          >
+            <option value=""></option>
 
-          {countries.map((country, index) => (
-            <option key={index} value={country.id}>
-              {country.name}
-            </option>
-          ))}
-        </SelectField>
-      </Element>
+            {countries.map((country, index) => (
+              <option key={index} value={country.id}>
+                {country.name}
+              </option>
+            ))}
+          </SelectField>
+        </Element>
+      )}
     </>
   );
 }
