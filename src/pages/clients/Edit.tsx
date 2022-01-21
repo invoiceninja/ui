@@ -85,11 +85,16 @@ export function Edit() {
       {isLoading && <Spinner />}
 
       {client && (
-        <div className="grid grid-cols-12 gap-4">
-          <Details client={client} setClient={setClient} />
-          <Contacts />
-          <Address client={client} setClient={setClient} />
-          <AdditionalInfo />
+        <div className="flex flex-col xl:flex-row xl:gap-4">
+          <div className="w-full xl:w-1/2">
+            <Details client={client} setClient={setClient} />
+            <Address client={client} setClient={setClient} />
+          </div>
+
+          <div className="w-full xl:w-1/2">
+            <Contacts client={client} setClient={setClient} />
+            <AdditionalInfo />
+          </div>
         </div>
       )}
     </Default>

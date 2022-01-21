@@ -35,7 +35,7 @@ export function Details(props: Props) {
   };
 
   return (
-    <Card className="col-span-12 xl:col-span-6" title={t('details')}>
+    <Card title={t('details')}>
       <Element leftSide={t('name')}>
         <InputField
           id="name"

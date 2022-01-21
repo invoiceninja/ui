@@ -25,7 +25,7 @@ export function Address(props: Props) {
   const [t] = useTranslation();
 
   return (
-    <Card className="col-span-12 xl:col-span-6" title={t('address')}>
+    <Card className="mt-4" title={t('address')}>
       <TabGroup
         className="px-5"
         tabs={[t('billing_address'), t('shipping_address')]}

@@ -15,7 +15,7 @@ export function AdditionalInfo() {
   const [t] = useTranslation();
 
   return (
-    <Card className="col-span-12 xl:col-span-6" title={t('additional_info')}>
+    <Card className="mt-4" title={t('additional_info')}>
       {/*  */}
     </Card>
   );
