@@ -24,7 +24,7 @@ export function TabGroup(props: Props) {
   return (
     <Tab.Group>
       <div className={`border-b border-gray-200 ${props.className}`}>
-        <Tab.List className="-mb-px flex space-x-8">
+        <Tab.List className="-mb-px flex space-x-8 overflow-x-auto">
           {props.tabs.map((tab, index) => (
             <Tab as={Fragment} key={index}>
               {({ selected }) => (
