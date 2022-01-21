@@ -11,7 +11,7 @@
 import { Card, CardContainer } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { Tab } from '@headlessui/react';
-import { TabGroup } from 'components/tabs/TabGroup';
+import { TabGroup } from 'components/TabGroup';
 
 export function Address() {
   const [t] = useTranslation();
