@@ -56,7 +56,7 @@ export function Details(props: Props) {
         <Element leftSide={t('group')}>
           <SelectField
             id="group_settings_id"
-            value={props.client.group_settings_id}
+            defaultValue={props.client.group_settings_id}
             onChange={handleChange}
           >
             {groupSettings.data.data.map(
@@ -72,7 +72,11 @@ export function Details(props: Props) {
 
       {users && (
         <Element leftSide={t('user')}>
-          <SelectField id="assigned_user_id" onChange={handleChange}>
+          <SelectField
+            id="assigned_user_id"
+            onChange={handleChange}
+            defaultValue={props.client.assigned_user_id}
+          >
             {users.data.data.map((user: User, index: number) => (
               <option value={user.id} key={index}>
                 {user.first_name} {user.last_name}
