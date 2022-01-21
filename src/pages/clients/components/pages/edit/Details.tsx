@@ -72,7 +72,7 @@ export function Details(props: Props) {
 
       {users && (
         <Element leftSide={t('user')}>
-          <SelectField id="user_id" onChange={handleChange}>
+          <SelectField id="assigned_user_id" onChange={handleChange}>
             {users.data.data.map((user: User, index: number) => (
               <option value={user.id} key={index}>
                 {user.first_name} {user.last_name}
