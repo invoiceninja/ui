@@ -8,11 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer } from '@invoiceninja/cards';
+import { Card } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { Tab } from '@headlessui/react';
 import { TabGroup } from 'components/TabGroup';
-import { BillingAddress } from '.';
+import { BillingAddress } from './address/BillingAddress';
+import { ShippingAddress } from './address/ShippingAddress';
 
 export function Address() {
   const [t] = useTranslation();
@@ -27,7 +28,9 @@ export function Address() {
           <BillingAddress />
         </Tab.Panel>
 
-        <Tab.Panel>Shipping address</Tab.Panel>
+        <Tab.Panel>
+          <ShippingAddress />
+        </Tab.Panel>
       </TabGroup>
     </Card>
   );

@@ -17,7 +17,7 @@ export function BillingAddress() {
 
   return (
     <>
-      <Element leftSide={t('address1')}>
+      <Element leftSide={t('billing_address1')}>
         <InputField id="address1" />
       </Element>
 
