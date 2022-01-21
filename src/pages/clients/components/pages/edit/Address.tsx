@@ -35,7 +35,7 @@ export function Address(props: Props) {
         </Tab.Panel>
 
         <Tab.Panel>
-          <ShippingAddress />
+          <ShippingAddress {...props} />
         </Tab.Panel>
       </TabGroup>
     </Card>
