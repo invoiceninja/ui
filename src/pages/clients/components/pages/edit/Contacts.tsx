@@ -11,11 +11,10 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import { useAccentColor } from 'common/hooks/useAccentColor';
-import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
 import Toggle from 'components/forms/Toggle';
 import { set } from 'lodash';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
