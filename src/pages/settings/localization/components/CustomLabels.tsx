@@ -88,7 +88,7 @@ export function CustomLabels() {
     );
 
     setDefaultLabelsFiltered(
-      defaultLabelsFiltered.filter(
+      defaultLabels.filter(
         (label) => !translations.includes(label.property)
       )
     );
