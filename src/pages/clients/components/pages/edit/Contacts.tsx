@@ -12,14 +12,15 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import { Client } from 'common/interfaces/client';
+import { ClientContact } from 'common/interfaces/client-contact';
 import Toggle from 'components/forms/Toggle';
 import { set } from 'lodash';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  client: Client;
-  setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
+  contacts: ClientContact[];
+  setContacts: React.Dispatch<React.SetStateAction<ClientContact[]>>;
 }
 
 export function Contacts(props: Props) {
@@ -31,19 +32,24 @@ export function Contacts(props: Props) {
     propertyId: string,
     contactId: string
   ) => {
-    const contactIndex = props.client.contacts.findIndex(
+    const contactIndex = props.contacts.findIndex(
       (contact) => contact.id === contactId
     );
 
-    props.setClient(
-      (client) =>
-        client && set(client, `contacts.[${contactIndex}].${propertyId}`, value)
+    set(props.contacts[contactIndex], propertyId, value);
+
+    props.setContacts(props.contacts);
+  };
+
+  const destroy = (id: string) => {
+    props.setContacts((contacts) =>
+      contacts.filter((contact) => contact.id !== id)
     );
   };
 
   return (
     <Card className="mt-4 xl:mt-0" title={t('contacts')}>
-      {props.client.contacts.map((contact, index, row) => (
+      {props.contacts.map((contact, index, row) => (
         <div key={index} className="pb-4 mb-4 border-b">
           <Element leftSide={t('first_name')}>
             <InputField
@@ -98,7 +104,11 @@ export function Contacts(props: Props) {
             <div className="flex items-center">
               <div className="w-1/2">
                 {row.length >= 2 && (
-                  <button className="text-red-600">
+                  <button
+                    type="button"
+                    onClick={() => destroy(contact.id)}
+                    className="text-red-600"
+                  >
                     {t('remove_contact')}
                   </button>
                 )}

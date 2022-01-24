@@ -12,11 +12,13 @@ import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
+import { ClientContact } from 'common/interfaces/client-contact';
 import { useClientQuery } from 'common/queries/clients';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
+import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -36,18 +38,24 @@ export function Edit() {
     { id },
     { refetchOnWindowFocus: false }
   );
+  const [contacts, setContacts] = useState<ClientContact[]>([]);
   const [client, setClient] = useState<Client>();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (data?.data?.data) {
       setClient(data.data.data);
+      setContacts(data.data.data.contacts);
     }
   }, [data]);
 
   useEffect(() => {
     setDocumentTitle(client?.display_name || 'edit_client');
   }, [client]);
+
+  useEffect(() => {
+    setClient((client) => set(client as Client, 'contacts', contacts));
+  }, [contacts]);
 
   const pages: BreadcrumRecord[] = [
     { name: t('clients'), href: '/clients' },
@@ -92,7 +100,8 @@ export function Edit() {
           </div>
 
           <div className="w-full xl:w-1/2">
-            <Contacts client={client} setClient={setClient} />
+            <Contacts contacts={contacts} setContacts={setContacts} />
+
             <AdditionalInfo />
           </div>
         </div>
