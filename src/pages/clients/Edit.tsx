@@ -32,15 +32,18 @@ import {
 
 export function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
-  const [t] = useTranslation();
   const { id } = useParams();
+
+  const [t] = useTranslation();
+  const navigate = useNavigate();
+
   const { data, isLoading } = useClientQuery(
     { id },
     { refetchOnWindowFocus: false }
   );
-  const [contacts, setContacts] = useState<ClientContact[]>([]);
+
+  const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
   const [client, setClient] = useState<Client>();
-  const navigate = useNavigate();
 
   useEffect(() => {
     if (data?.data?.data) {

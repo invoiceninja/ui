@@ -19,8 +19,8 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  contacts: ClientContact[];
-  setContacts: React.Dispatch<React.SetStateAction<ClientContact[]>>;
+  contacts: Partial<ClientContact>[];
+  setContacts: React.Dispatch<React.SetStateAction<Partial<ClientContact>[]>>;
 }
 
 export function Contacts(props: Props) {
@@ -41,14 +41,28 @@ export function Contacts(props: Props) {
     props.setContacts(props.contacts);
   };
 
-  const destroy = (id: string) => {
-    props.setContacts((contacts) =>
-      contacts.filter((contact) => contact.id !== id)
-    );
+  const destroy = (index: number) => {
+    const contacts = [...props.contacts];
+
+    contacts.splice(index, 1);
+
+    console.log(contacts[contacts.length - 1]);
+
+    props.setContacts(contacts);
   };
 
   const create = () => {
-    // ...
+    const contacts = [...props.contacts];
+
+    contacts.push({
+      first_name: '',
+      last_name: '',
+      email: '',
+      phone: '',
+      send_email: false,
+    });
+
+    props.setContacts(contacts);
   };
 
   return (
@@ -60,7 +74,11 @@ export function Contacts(props: Props) {
               id="first_name"
               value={contact.first_name}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                handleChange(event.target.value, 'first_name', contact.id)
+                handleChange(
+                  event.target.value,
+                  'first_name',
+                  contact.id as string
+                )
               }
             />
           </Element>
@@ -70,7 +88,11 @@ export function Contacts(props: Props) {
               id="last_name"
               value={contact.last_name}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                handleChange(event.target.value, 'last_name', contact.id)
+                handleChange(
+                  event.target.value,
+                  'last_name',
+                  contact.id as string
+                )
               }
             />
           </Element>
@@ -80,7 +102,7 @@ export function Contacts(props: Props) {
               id="email"
               value={contact.email}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                handleChange(event.target.value, 'email', contact.id)
+                handleChange(event.target.value, 'email', contact.id as string)
               }
             />
           </Element>
@@ -90,7 +112,7 @@ export function Contacts(props: Props) {
               id="phone"
               value={contact.phone}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                handleChange(event.target.value, 'phone', contact.id)
+                handleChange(event.target.value, 'phone', contact.id as string)
               }
             />
           </Element>
@@ -99,7 +121,7 @@ export function Contacts(props: Props) {
             <Toggle
               checked={contact.send_email}
               onChange={(value) =>
-                handleChange(value, 'send_email', contact.id)
+                handleChange(value, 'send_email', contact.id as string)
               }
             />
           </Element>
@@ -107,10 +129,10 @@ export function Contacts(props: Props) {
           <Element>
             <div className="flex items-center">
               <div className="w-1/2">
-                {row.length >= 2 && (
+                {props.contacts.length >= 2 && (
                   <button
                     type="button"
-                    onClick={() => destroy(contact.id)}
+                    onClick={() => destroy(index)}
                     className="text-red-600"
                   >
                     {t('remove_contact')}
@@ -119,15 +141,19 @@ export function Contacts(props: Props) {
               </div>
 
               <div className="w-1/2 flex justify-end">
-                {index + 1 === row.length && (
-                  <button
-                    type="button"
-                    onClick={create}
-                    style={{ color: accentColor }}
-                  >
-                    {t('add_contact')}
-                  </button>
-                )}
+                {index + 1 === row.length &&
+                  Object.prototype.hasOwnProperty.call(
+                    props.contacts.at(-1),
+                    'id'
+                  ) && (
+                    <button
+                      type="button"
+                      onClick={create}
+                      style={{ color: accentColor }}
+                    >
+                      {t('add_contact')}
+                    </button>
+                  )}
               </div>
             </div>
           </Element>
