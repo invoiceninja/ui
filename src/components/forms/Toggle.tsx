@@ -19,6 +19,7 @@ interface Props extends CommonProps {
   label?: string;
   checked?: boolean;
   disabled?: boolean;
+  onChange: (value: boolean) => any;
 }
 
 export default function Toggle(props: Props) {
