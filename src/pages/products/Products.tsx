@@ -14,7 +14,7 @@ import { bulk, useProductsQuery } from '../../common/queries/products';
 import { Default } from '../../components/layouts/Default';
 import { generatePath } from 'react-router';
 import { Actions } from '../../components/datatables/Actions';
-import {Link, Checkbox, Button} from '@invoiceninja/forms'
+import { Link, Checkbox, Button } from '@invoiceninja/forms';
 import { CheckSquare, PlusCircle } from 'react-feather';
 import { handleCheckboxChange } from '../../common/helpers';
 import { Spinner } from '../../components/Spinner';
@@ -33,19 +33,20 @@ import {
   Td,
   Pagination,
 } from '@invoiceninja/tables';
-import { Breadcrumbs } from 'components/Breadcrumbs';
-
+import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
+// import DataTable
+import { DataTable, DataTableColumns } from 'components/DataTable';
+// Products Component
 export function Products() {
   const [t] = useTranslation();
 
-  const pages = [
-    { name: t('products'), href: '/products' }
-  ];
+  const pages: BreadcrumRecord[] = [{ name: t('products'), href: '/products' }];
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('products')}`;
   });
 
+  // states
   const [filter, setFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState('10');
@@ -55,11 +56,35 @@ export function Products() {
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const mainCheckbox = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
+  // const [apiEndpoint, setApiEndpoint] = useState(
+  //   new URL(endpoint(props.endpoint))
+  // );
 
+  // options
   const options = [
     { value: 'active', label: t('active') },
     { value: 'archived', label: t('archived') },
     { value: 'deleted', label: t('deleted') },
+  ];
+  // props
+  // resource = "product"
+  // endpoint = "/api/v1/products"
+  // linkToCreate = "/products/create"
+  // linksToEdit = "products/:id/edit"
+  // columns
+  const columns: DataTableColumns = [
+    {
+      id: 'product_key',
+      label: t('product_key'),
+    },
+    {
+      id: 'notes',
+      label: t('notes'),
+    },
+    {
+      id: 'cost',
+      label: t('cost'),
+    },
   ];
 
   const { data } = useProductsQuery({
@@ -127,9 +152,10 @@ export function Products() {
       .finally(() => queryClient.invalidateQueries('/api/v1/products'));
   };
 
+  // ==== RETURN COMPONENT
   return (
-    <Default title={t('products')}>
-      <Breadcrumbs pages={pages} />
+    <Default title={t('products')} breadcrumbs={pages}>
+      {/* <Breadcrumbs pages={pages} /> */}
 
       <Actions
         onStatusChange={setStatus}
@@ -149,6 +175,7 @@ export function Products() {
           <CheckSquare size="20" />
         </Button>
 
+        {/* ===== DropDowns =====*/}
         <Dropdown label={t('actions')}>
           <DropdownElement onClick={archive}>
             {t('archive_product')}
@@ -163,7 +190,9 @@ export function Products() {
           </DropdownElement>
         </Dropdown>
       </Actions>
+      {/* =====  Table ======  */}
       <Table>
+        {/* ===== Table Head ====== */}
         <Thead>
           <Th>
             <Checkbox
@@ -181,6 +210,7 @@ export function Products() {
               }}
             />
           </Th>
+
           <Th
             id="product_key"
             isCurrentlyUsed={sortedBy === 'product_key'}
@@ -191,6 +221,7 @@ export function Products() {
           >
             {t('product')}
           </Th>
+
           <Th
             id="notes"
             isCurrentlyUsed={sortedBy === 'notes'}
@@ -213,7 +244,11 @@ export function Products() {
           </Th>
           <Th />
         </Thead>
+        {/* ===== End of Table Head ====== */}
+
+        {/* ==== Table Body ==== */}
         <Tbody>
+          {/* ==== Loading ==== */}
           {!data && (
             <Tr>
               <Td colSpan={100}>
@@ -221,12 +256,13 @@ export function Products() {
               </Td>
             </Tr>
           )}
-
+          {/*  ==== Error ===== */}
           {data?.data.data.length === 0 && (
             <Tr>
               <Td colSpan={100}>{t('no_results')}</Td>
             </Tr>
           )}
+          {/* ==== Load Table Data ====  */}
 
           {data?.data.data.map((product: any) => {
             return (
@@ -243,6 +279,7 @@ export function Products() {
                     }
                   />
                 </Td>
+                {/* manual */}
                 <Td>
                   <Link
                     to={generatePath('/products/:id/edit', { id: product.id })}
@@ -321,6 +358,7 @@ export function Products() {
             );
           })}
         </Tbody>
+        {/* ==== End of Table Body ==== */}
       </Table>
       {data && (
         <Pagination

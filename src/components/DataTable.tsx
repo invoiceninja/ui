@@ -48,6 +48,7 @@ interface Props {
   bulkRoute?: string;
 }
 
+// DataTable Component
 export function DataTable(props: Props) {
   const [t] = useTranslation();
 
@@ -55,6 +56,7 @@ export function DataTable(props: Props) {
     new URL(endpoint(props.endpoint))
   );
 
+  // states
   const [filter, setFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState('10');
@@ -81,6 +83,7 @@ export function DataTable(props: Props) {
     () => axios.get(apiEndpoint.href, { headers: defaultHeaders })
   );
 
+  // options
   const options = [
     { value: 'active', label: t('active') },
     { value: 'archived', label: t('archived') },
@@ -138,6 +141,7 @@ export function DataTable(props: Props) {
       >
         <span className="text-sm">{t('with_selected')}</span>
 
+        {/* ======  DropDowns ====  */}
         <Dropdown label={t('actions')}>
           <DropdownElement onClick={() => bulk('archive')}>
             {t(`archive_${props.resource}`)}
@@ -152,8 +156,9 @@ export function DataTable(props: Props) {
           </DropdownElement>
         </Dropdown>
       </Actions>
-
+      {/* ===== Table ===== */}
       <Table>
+        {/* === Table Head */}
         <Thead>
           <Th>
             <Checkbox
@@ -171,6 +176,7 @@ export function DataTable(props: Props) {
               }}
             />
           </Th>
+          {/* Table Head */}
           {props.columns.map((column, index) => (
             <Th
               id={column.id}
@@ -185,9 +191,15 @@ export function DataTable(props: Props) {
             </Th>
           ))}
 
+          {/* Table Head */}
+
           {props.withResourcefulActions && <Th></Th>}
         </Thead>
+        {/* end of Thead */}
+        {/* ==== Table Body ==== */}
+
         <Tbody>
+          {/* ==== Loading == */}
           {isLoading && (
             <Tr>
               <Td colSpan={100}>
@@ -195,7 +207,7 @@ export function DataTable(props: Props) {
               </Td>
             </Tr>
           )}
-
+          {/* ==== Error ==== */}
           {isError && (
             <Tr>
               <Td className="text-center" colSpan={100}>
@@ -203,7 +215,7 @@ export function DataTable(props: Props) {
               </Td>
             </Tr>
           )}
-
+          {/* ==== Load Table Data ====  */}
           {data &&
             data?.data?.data?.map((resource: any, index: number) => (
               <Tr key={index}>
@@ -219,7 +231,7 @@ export function DataTable(props: Props) {
                     }
                   />
                 </Td>
-
+                {/* loop */}
                 {props.columns.map((column, index) => (
                   <Td key={index}>
                     {column.format
@@ -282,6 +294,8 @@ export function DataTable(props: Props) {
               </Tr>
             ))}
         </Tbody>
+
+        {/* ====End of Table Body ==== */}
       </Table>
 
       {data && (

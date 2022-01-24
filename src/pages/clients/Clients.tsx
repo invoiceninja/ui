@@ -26,7 +26,7 @@ export function Clients() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const pages: BreadcrumRecord[] = [{ name: t('clients'), href: '/clients' }];
-
+  // columns
   const columns: DataTableColumns = [
     {
       id: 'number',
