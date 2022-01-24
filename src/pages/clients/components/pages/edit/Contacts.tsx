@@ -12,6 +12,8 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import { Client } from 'common/interfaces/client';
 import Toggle from 'components/forms/Toggle';
+import { set } from 'lodash';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -22,28 +24,72 @@ interface Props {
 export function Contacts(props: Props) {
   const [t] = useTranslation();
 
+  const handleChange = (
+    value: string | number | boolean,
+    propertyId: string,
+    contactId: string
+  ) => {
+    const contactIndex = props.client.contacts.findIndex(
+      (contact) => contact.id === contactId
+    );
+
+    props.setClient(
+      (client) =>
+        client && set(client, `contacts.[${contactIndex}].${propertyId}`, value)
+    );
+  };
+
   return (
     <Card className="mt-4 xl:mt-0" title={t('contacts')}>
       {props.client.contacts.map((contact, index) => (
         <div key={index} className="pb-4 mb-4 border-b">
           <Element leftSide={t('first_name')}>
-            <InputField id="first_name" value={contact.first_name} />
+            <InputField
+              id="first_name"
+              value={contact.first_name}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                handleChange(event.target.value, 'first_name', contact.id)
+              }
+            />
           </Element>
 
           <Element leftSide={t('last_name')}>
-            <InputField id="last_name" value={contact.last_name} />
+            <InputField
+              id="last_name"
+              value={contact.last_name}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                handleChange(event.target.value, 'last_name', contact.id)
+              }
+            />
           </Element>
 
           <Element leftSide={t('email')}>
-            <InputField id="email" value={contact.email} />
+            <InputField
+              id="email"
+              value={contact.email}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                handleChange(event.target.value, 'email', contact.id)
+              }
+            />
           </Element>
 
           <Element leftSide={t('phone')}>
-            <InputField id="phone" value={contact.phone} />
+            <InputField
+              id="phone"
+              value={contact.phone}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                handleChange(event.target.value, 'phone', contact.id)
+              }
+            />
           </Element>
 
           <Element leftSide={t('add_to_invoices')}>
-            <Toggle />
+            <Toggle
+              checked={contact.send_email}
+              onChange={(value) =>
+                handleChange(value, 'send_email', contact.id)
+              }
+            />
           </Element>
         </div>
       ))}
