@@ -47,6 +47,10 @@ export function Contacts(props: Props) {
     );
   };
 
+  const create = () => {
+    // ...
+  };
+
   return (
     <Card className="mt-4 xl:mt-0" title={t('contacts')}>
       {props.contacts.map((contact, index, row) => (
@@ -116,7 +120,11 @@ export function Contacts(props: Props) {
 
               <div className="w-1/2 flex justify-end">
                 {index + 1 === row.length && (
-                  <button style={{ color: accentColor }}>
+                  <button
+                    type="button"
+                    onClick={create}
+                    style={{ color: accentColor }}
+                  >
                     {t('add_contact')}
                   </button>
                 )}
