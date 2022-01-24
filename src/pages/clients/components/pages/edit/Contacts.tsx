@@ -10,6 +10,7 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 import { Client } from 'common/interfaces/client';
 import Toggle from 'components/forms/Toggle';
 import { set } from 'lodash';
@@ -23,6 +24,7 @@ interface Props {
 
 export function Contacts(props: Props) {
   const [t] = useTranslation();
+  const accentColor = useAccentColor();
 
   const handleChange = (
     value: string | number | boolean,
@@ -41,7 +43,7 @@ export function Contacts(props: Props) {
 
   return (
     <Card className="mt-4 xl:mt-0" title={t('contacts')}>
-      {props.client.contacts.map((contact, index) => (
+      {props.client.contacts.map((contact, index, row) => (
         <div key={index} className="pb-4 mb-4 border-b">
           <Element leftSide={t('first_name')}>
             <InputField
@@ -90,6 +92,26 @@ export function Contacts(props: Props) {
                 handleChange(value, 'send_email', contact.id)
               }
             />
+          </Element>
+
+          <Element>
+            <div className="flex items-center">
+              <div className="w-1/2">
+                {row.length >= 2 && (
+                  <button className="text-red-600">
+                    {t('remove_contact')}
+                  </button>
+                )}
+              </div>
+
+              <div className="w-1/2 flex justify-end">
+                {index + 1 === row.length && (
+                  <button style={{ color: accentColor }}>
+                    {t('add_contact')}
+                  </button>
+                )}
+              </div>
+            </div>
           </Element>
         </div>
       ))}
