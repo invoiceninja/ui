@@ -8,22 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTitle } from 'common/hooks/useTitle';
 
 import { Default } from '../../components/layouts/Default';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
-// import DataTable
 import { DataTable, DataTableColumns } from 'components/DataTable';
 
-// Products Component
 export function Products() {
   const [t] = useTranslation();
   const pages: BreadcrumRecord[] = [{ name: t('products'), href: '/products' }];
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('products')}`;
-  });
+  useTitle('products');
 
   // Table columns for product page
   const columns: DataTableColumns = [
@@ -49,7 +45,7 @@ export function Products() {
         columns={columns}
         endpoint="/api/v1/products"
         linkToCreate="/products/create"
-        linkToEdit="products/:id/edit"
+        linkToEdit="/products/:id/edit"
         withResourcefulActions
       />
     </Default>

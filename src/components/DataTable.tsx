@@ -48,7 +48,6 @@ interface Props {
   bulkRoute?: string;
 }
 
-// DataTable Component
 export function DataTable(props: Props) {
   const [t] = useTranslation();
 
@@ -56,7 +55,6 @@ export function DataTable(props: Props) {
     new URL(endpoint(props.endpoint))
   );
 
-  // states
   const [filter, setFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState('10');
@@ -83,7 +81,6 @@ export function DataTable(props: Props) {
     () => axios.get(apiEndpoint.href, { headers: defaultHeaders })
   );
 
-  // options
   const options = [
     { value: 'active', label: t('active') },
     { value: 'archived', label: t('archived') },

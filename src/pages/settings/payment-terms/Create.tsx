@@ -72,7 +72,7 @@ export function Create() {
     <Settings title={t('payment_terms')}>
       <Container className="space-y-6">
         <Breadcrumbs pages={pages} />
-        
+
         <Card
           withSaveButton
           disableSubmitButton={formik.isSubmitting}

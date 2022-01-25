@@ -10,7 +10,10 @@
 
 import { ActionCard } from '@invoiceninja/cards';
 import { Button } from '@invoiceninja/forms';
-import { bulk, useExpenseCategoryQuery } from 'common/queries/expense-categories';
+import {
+  bulk,
+  useExpenseCategoryQuery,
+} from 'common/queries/expense-categories';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';

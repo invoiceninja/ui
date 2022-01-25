@@ -17,7 +17,7 @@ interface Props extends CommonProps {
   type?: string | 'success' | 'warning' | 'danger';
 }
 
-export function Alert(props: Props): any {
+export function Alert(props: Props) {
   const [visible, setVisible] = useState<boolean>(true);
 
   return (
