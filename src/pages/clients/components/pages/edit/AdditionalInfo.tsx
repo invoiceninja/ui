@@ -37,8 +37,6 @@ export function AdditionalInfo(props: Props) {
   const { data: paymentTerms } = useQuery('/api/v1/payment_terms');
   const { data: statics } = useStaticsQuery();
 
-  console.log(statics);
-
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const client = { ...props.client };
 
