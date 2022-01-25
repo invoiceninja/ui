@@ -24,6 +24,7 @@ import {
   ProductClone,
   ProductCreate,
   ProductEdit,
+  ProductView,
   Products,
 } from '../pages/products';
 import { Invoices, InvoiceCreate } from '../pages/invoices/index';
@@ -142,6 +143,7 @@ export const routes = (
       <Route path="/products">
         <Route path="" element={<Products />} />
         <Route path="create" element={<ProductCreate />} />
+        <Route path=":id" element={<ProductView />} />
         <Route path=":id/edit" element={<ProductEdit />} />
         <Route path=":id/clone" element={<ProductClone />} />
       </Route>

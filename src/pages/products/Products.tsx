@@ -14,7 +14,7 @@ import { bulk, useProductsQuery } from '../../common/queries/products';
 import { Default } from '../../components/layouts/Default';
 import { generatePath } from 'react-router';
 import { Actions } from '../../components/datatables/Actions';
-import {Link, Checkbox, Button} from '@invoiceninja/forms'
+import { Link, Checkbox, Button } from '@invoiceninja/forms';
 import { CheckSquare, PlusCircle } from 'react-feather';
 import { handleCheckboxChange } from '../../common/helpers';
 import { Spinner } from '../../components/Spinner';
@@ -38,9 +38,7 @@ import { Breadcrumbs } from 'components/Breadcrumbs';
 export function Products() {
   const [t] = useTranslation();
 
-  const pages = [
-    { name: t('products'), href: '/products' }
-  ];
+  const pages = [{ name: t('products'), href: '/products' }];
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('products')}`;
@@ -244,9 +242,8 @@ export function Products() {
                   />
                 </Td>
                 <Td>
-                  <Link
-                    to={generatePath('/products/:id/edit', { id: product.id })}
-                  >
+                  {/* Router Link to Edit Page */}
+                  <Link to={generatePath('/products/:id', { id: product.id })}>
                     {product.product_key}
                   </Link>
                 </Td>
