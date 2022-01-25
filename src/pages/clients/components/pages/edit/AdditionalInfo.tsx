@@ -17,6 +17,7 @@ import { useLanguages } from 'common/hooks/useLanguages';
 import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { PaymentTerm } from 'common/interfaces/payment-term';
+import { useStaticsQuery } from 'common/queries/statics';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
 import { set } from 'lodash';
@@ -34,6 +35,9 @@ export function AdditionalInfo(props: Props) {
   const languages = useLanguages();
 
   const { data: paymentTerms } = useQuery('/api/v1/payment_terms');
+  const { data: statics } = useStaticsQuery();
+
+  console.log(statics);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const client = { ...props.client };
@@ -166,7 +170,48 @@ export function AdditionalInfo(props: Props) {
             />
           </Element>
         </Tab.Panel>
-        <Tab.Panel></Tab.Panel>
+
+        <Tab.Panel>
+          {statics && (
+            <Element leftSide={t('size_id')}>
+              <SelectField
+                id="size_id"
+                defaultValue={props.client.size_id || ''}
+                onChange={handleChange}
+              >
+                <option value=""></option>
+
+                {statics.data.sizes.map(
+                  (size: { id: string; name: string }, index: number) => (
+                    <option key={index} value={size.id}>
+                      {size.name}
+                    </option>
+                  )
+                )}
+              </SelectField>
+            </Element>
+          )}
+
+          {statics && (
+            <Element leftSide={t('industry')}>
+              <SelectField
+                id="industry_id"
+                defaultValue={props.client.industry_id || ''}
+                onChange={handleChange}
+              >
+                <option value=""></option>
+
+                {statics.data.industries.map(
+                  (size: { id: string; name: string }, index: number) => (
+                    <option key={index} value={size.id}>
+                      {size.name}
+                    </option>
+                  )
+                )}
+              </SelectField>
+            </Element>
+          )}
+        </Tab.Panel>
       </TabGroup>
     </Card>
   );
