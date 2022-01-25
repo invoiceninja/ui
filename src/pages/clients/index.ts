@@ -1,5 +1,5 @@
+export * from './index/Clients';
 export * from './Client';
-export * from './Clients';
 export { Edit as EditClient } from './Edit';
 export { Create as CreateClient } from './Create';
 
