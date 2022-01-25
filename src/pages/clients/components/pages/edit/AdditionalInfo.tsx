@@ -16,7 +16,10 @@ import { useLanguages } from 'common/hooks/useLanguages';
 import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { PaymentTerm } from 'common/interfaces/payment-term';
+import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
+import { set } from 'lodash';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -33,12 +36,17 @@ interface Props {
 
 export function AdditionalInfo(props: Props) {
   const [t] = useTranslation();
+
   const currencies = useCurrencies();
   const languages = useLanguages();
+
   const { data: paymentTerms } = useQuery('/api/v1/payment_terms');
 
-  // console.log(props.client);
-  console.log(paymentTerms);
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    props.setClient(
+      (client) => client && set(client, event.target.id, event.target.value)
+    );
+  };
 
   return (
     <Card className="mt-4" title={t('additional_info')}>
@@ -50,7 +58,9 @@ export function AdditionalInfo(props: Props) {
           {currencies.length > 1 && (
             <Element leftSide={t('currency')}>
               <SelectField
+                id="settings.currency_id"
                 defaultValue={props.client.settings?.currency_id || ''}
+                onChange={handleChange}
               >
                 <option value=""></option>
                 {currencies.map((currency, index) => (
@@ -65,7 +75,9 @@ export function AdditionalInfo(props: Props) {
           {languages.length > 1 && (
             <Element leftSide={t('language')}>
               <SelectField
+                id="settings.language_id"
                 defaultValue={props.client.settings?.language_id || ''}
+                onChange={handleChange}
               >
                 <option value=""></option>
                 {languages.map((language, index) => (
@@ -79,11 +91,15 @@ export function AdditionalInfo(props: Props) {
 
           {paymentTerms && (
             <Element leftSide={t('payment_terms')}>
-              <SelectField>
+              <SelectField
+                id="settings.payment_terms"
+                defaultValue={props.client.settings?.payment_terms || ''}
+                onChange={handleChange}
+              >
                 <option value=""></option>
                 {paymentTerms.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
-                    <option key={index} value={paymentTerm.id}>
+                    <option key={index} value={paymentTerm.num_days}>
                       {paymentTerm.name}
                     </option>
                   )
@@ -94,11 +110,15 @@ export function AdditionalInfo(props: Props) {
 
           {paymentTerms && (
             <Element leftSide={t('quote_valid_until')}>
-              <SelectField>
+              <SelectField
+                id="settings.valid_until"
+                defaultValue={props.client.settings?.valid_until || ''}
+                onChange={handleChange}
+              >
                 <option value=""></option>
                 {paymentTerms.data.data.map(
                   (paymentTerm: PaymentTerm, index: number) => (
-                    <option key={index} value={paymentTerm.id}>
+                    <option key={index} value={paymentTerm.num_days}>
                       {paymentTerm.name}
                     </option>
                   )
@@ -108,15 +128,23 @@ export function AdditionalInfo(props: Props) {
           )}
 
           <Element leftSide={t('task_rate')}>
-            <InputField id="task_rate" />
+            <InputField
+              id="settings.default_task_rate"
+              value={props.client.settings?.default_task_rate || ''}
+              onChange={handleChange}
+            />
           </Element>
 
           <Element leftSide={t('send_reminders')}>
-            <SelectField>
-              <option value=""></option>
-              <option value="enabled">{t('enabled')}</option>
-              <option value="disabled">{t('disabled')}</option>
-            </SelectField>
+            <Toggle
+              checked={props.client.settings.send_reminders}
+              onChange={(value) =>
+                props.setClient(
+                  (client) =>
+                    client && set(client, 'settings.send_reminders', value)
+                )
+              }
+            />
           </Element>
         </Tab.Panel>
 
