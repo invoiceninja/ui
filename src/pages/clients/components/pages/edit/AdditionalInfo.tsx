@@ -11,6 +11,7 @@
 import { Tab } from '@headlessui/react';
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import MDEditor from '@uiw/react-md-editor';
 import { useCurrencies } from 'common/hooks/useCurrencies';
 import { useLanguages } from 'common/hooks/useLanguages';
 import { useQuery } from 'common/hooks/useQuery';
@@ -26,14 +27,6 @@ interface Props {
   client: Client;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
 }
-
-// currency_id
-// language_id
-// payment_terms
-// valid_until
-// default_task_rate
-// send_reminders
-
 export function AdditionalInfo(props: Props) {
   const [t] = useTranslation();
 
@@ -43,9 +36,9 @@ export function AdditionalInfo(props: Props) {
   const { data: paymentTerms } = useQuery('/api/v1/payment_terms');
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    props.setClient(
-      (client) => client && set(client, event.target.id, event.target.value)
-    );
+    const client = { ...props.client };
+
+    props.setClient(set(client, event.target.id, event.target.value));
   };
 
   return (
@@ -148,7 +141,31 @@ export function AdditionalInfo(props: Props) {
           </Element>
         </Tab.Panel>
 
-        <Tab.Panel></Tab.Panel>
+        <Tab.Panel>
+          <Element leftSide={t('public_notes')}>
+            <MDEditor
+              value={props.client.public_notes}
+              onChange={(value) => {
+                const client = { ...props.client };
+                client.public_notes = value as string;
+
+                props.setClient(client);
+              }}
+            />
+          </Element>
+
+          <Element leftSide={t('private_notes')}>
+            <MDEditor
+              value={props.client.private_notes}
+              onChange={(value) => {
+                const client = { ...props.client };
+                client.private_notes = value as string;
+
+                props.setClient(client);
+              }}
+            />
+          </Element>
+        </Tab.Panel>
         <Tab.Panel></Tab.Panel>
       </TabGroup>
     </Card>
