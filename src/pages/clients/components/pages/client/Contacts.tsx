@@ -29,15 +29,20 @@ export function Contacts() {
             title={t('contacts')}
             value={
               <div className="space-y-2">
-                {client.data.data.contacts.map((contact: ClientContact) => (
-                  <div key={contact.id}>
-                    <p className="font-semibold" style={{ color: accentColor }}>
-                      {contact.first_name} {contact.last_name}
-                    </p>
+                {client.data.data.contacts.map(
+                  (contact: ClientContact, index: number) => (
+                    <div key={index}>
+                      <p
+                        className="font-semibold"
+                        style={{ color: accentColor }}
+                      >
+                        {contact.first_name} {contact.last_name}
+                      </p>
 
-                    <a href={`mailto:${contact.email}`}>{contact.email}</a>
-                  </div>
-                ))}
+                      <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                    </div>
+                  )
+                )}
               </div>
             }
             className="h-full"
