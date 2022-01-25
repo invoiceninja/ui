@@ -37,6 +37,7 @@ interface UpdateProductDto {
 export function View() {
   const [t] = useTranslation();
   const { id } = useParams();
+  //   console.log(id);
 
   //   Tabs
   const tabs: Tab[] = [
@@ -57,10 +58,6 @@ export function View() {
   ];
 
   const { data, isLoading } = useProductQuery({ id });
-  const [errors, setErrors] = useState<any>();
-  const [alert, setAlert] = useState<
-    { type: string; message: string } | undefined
-  >(undefined);
 
   const queryClient = useQueryClient();
 
@@ -69,71 +66,6 @@ export function View() {
       data?.data.data.product_key
     }`;
   }, [data]);
-
-  const invalidateProductCache = () => {
-    queryClient.invalidateQueries(generatePath('/api/v1/products/:id', { id }));
-  };
-
-  const form = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      product_key: data?.data.data.product_key || '',
-      notes: data?.data.data.notes || '',
-      cost: data?.data.data.cost || 0,
-    },
-    onSubmit: (values: UpdateProductDto) => {
-      setErrors('');
-      setAlert(undefined);
-
-      axios
-        .put(endpoint('/api/v1/products/:id', { id }), values, {
-          headers: defaultHeaders,
-        })
-        .then(() => toast.success(t('updated_product')))
-        .catch((error) => {
-          if (error.response?.status === 422) {
-            setErrors(error.response.data.errors);
-          }
-
-          setAlert({
-            type: 'error',
-            message: error?.response?.data.message,
-          });
-        })
-        .finally(() => {
-          form.setSubmitting(false);
-          invalidateProductCache();
-        });
-    },
-  });
-
-  const archive = () => {
-    bulk([id as string], 'archive')
-      .then(() => invalidateProductCache())
-      .catch((error) =>
-        setAlert({ type: 'danger', message: error.request?.data.message })
-      );
-  };
-
-  function restore() {
-    bulk([id as string], 'restore')
-      .then(() => invalidateProductCache())
-      .catch((error) =>
-        setAlert({ type: 'danger', message: error.request?.data.message })
-      );
-  }
-
-  function _delete() {
-    if (!confirm(t('are_you_sure'))) {
-      return;
-    }
-
-    bulk([id as string], 'delete')
-      .then(() => invalidateProductCache())
-      .catch((error) =>
-        setAlert({ type: 'danger', message: error.request?.data.message })
-      );
-  }
 
   if (isLoading) {
     return (
@@ -153,131 +85,18 @@ export function View() {
         <Breadcrumbs pages={pages} />
         <Tabs tabs={tabs} className="mt-6" />
 
-        {alert && (
-          <Alert className="mb-4" type={alert.type}>
-            {alert.message}.
-          </Alert>
-        )}
-
-        <h2 className="inline-flex items-end text-2xl space-x-2">
-          <span>{data?.data.data.product_key}</span>
-
-          {!data?.data.data.is_deleted && !data?.data.data.archived_at && (
-            <Badge variant="white">{t('active')}</Badge>
-          )}
-
-          {data?.data.data.archived_at && !data?.data.data.is_deleted ? (
-            <Badge variant="yellow">{t('archived')}</Badge>
-          ) : null}
-
-          {data?.data.data.is_deleted && (
-            <Badge variant="red">{t('deleted')}</Badge>
-          )}
-        </h2>
-        <div className="bg-white w-full p-8 rounded shadow my-4">
-          <form onSubmit={form.handleSubmit} className="space-y-6">
-            <InputField
-              label={t('price')}
-              id="product_key"
-              value={form.values.product_key || ''}
-              onChange={form.handleChange}
-            />
-
-            {errors?.product_key && (
-              <Alert type="danger">{errors.product_key}</Alert>
-            )}
-
-            <Textarea
-              label={t('notes')}
-              id="notes"
-              onChange={form.handleChange}
-              value={form.values.notes || ''}
-            />
-
-            {errors?.notes && <Alert type="danger">{errors.notes}</Alert>}
-
-            <InputField
-              label={t('cost')}
-              id="cost"
-              value={form.values.cost || ''}
-              onChange={form.handleChange}
-            />
-
-            {errors?.cost && <Alert type="danger">{errors.cost}</Alert>}
-
-            <div className="flex justify-end items-center space-x-2">
-              {!form.isSubmitting && (
-                <Button to="/products" type="secondary">
-                  {t('cancel')}
-                </Button>
-              )}
-
-              <Button disabled={form.isSubmitting}>{t('save')}</Button>
-            </div>
-          </form>
+        <div className="bg-white w-full py-8 px-4 my-1 shadow my-0">
+          <p className="text-sm pb-3">{t('Price')}</p>
+          <h1 className="text-xl text-gray-600 font-semibold">$143</h1>
         </div>
-
-        {/* Cloning product */}
-        <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
-          <div className="flex items-start justify-between">
-            <section>
-              <h2>{t('clone_product')}</h2>
-              <span className="text-xs text-gray-600"></span>
-            </section>
-            <Button
-              to={generatePath('/products/:id/clone', {
-                id,
-              })}
-            >
-              {t('clone')}
-            </Button>
-          </div>
+        <div className="bg-white w-full py-8 px-4 my-1 shadow my-0">
+          <p className="text-sm pb-3">{t('Price')}</p>
+          <h1 className="text-xl text-gray-600 font-semibold">$143</h1>
         </div>
-
-        {/* Archiving product */}
-        {!data?.data.data.is_deleted && !data?.data.data.archived_at ? (
-          <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
-            <div className="flex items-start justify-between">
-              <section>
-                <h2>{t('archive_product')}</h2>
-                <span className="text-xs text-gray-600">
-                  Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
-                </span>
-              </section>
-              <Button onClick={archive}>{t('archive')}</Button>
-            </div>
-          </div>
-        ) : null}
-
-        {/* Restoring product */}
-        {data?.data.data.archived_at ? (
-          <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
-            <div className="flex items-start justify-between">
-              <section>
-                <h2>{t('restore_product')}</h2>
-                <span className="text-xs text-gray-600">
-                  Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
-                </span>
-              </section>
-              <Button onClick={restore}>{t('restore')}</Button>
-            </div>
-          </div>
-        ) : null}
-
-        {/* Deleting product */}
-        {!data?.data.data.is_deleted ? (
-          <div className="mt-2 bg-white w-full p-8 rounded shadow my-4">
-            <div className="flex items-start justify-between">
-              <section>
-                <h2>{t('delete_product')}</h2>
-                <span className="text-xs text-gray-600">
-                  Lorem, ipsum dolor. Lorem ipsum dolor sit amet.
-                </span>
-              </section>
-              <Button onClick={_delete}>{t('delete')}</Button>
-            </div>
-          </div>
-        ) : null}
+        <div className="bg-white w-full py-8 px-4 my-1 shadow my-0">
+          <p className="text-sm pb-3">{t('Price')}</p>
+          <h1 className="text-xl text-gray-600 font-semibold">$143</h1>
+        </div>
       </Container>
     </Default>
   );
