@@ -42,8 +42,7 @@
     "build": "tsc && vite build",
     "serve": "npm run build && serve -d dist/",
     "format": "prettier --write src/",
-    "lint": "eslint \"**/*.{ts,tsx}\" --max-warnings=0",
-    "prepare": "husky install"
+    "lint": "eslint \"**/*.{ts,tsx}\" --max-warnings=0"
   },
   "browserslist": {
     "production": [
@@ -72,7 +71,6 @@
     "eslint": "^8.5.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-unused-imports": "^2.0.0",
-    "husky": "^7.0.0",
     "postcss": "^8.4.4",
     "prettier": "2.4.1",
     "serve": "^13.0.2",
