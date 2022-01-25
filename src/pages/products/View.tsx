@@ -27,7 +27,7 @@ import { useQueryClient } from 'react-query';
 import { defaultHeaders } from 'common/queries/common/headers';
 import toast from 'react-hot-toast';
 import { Breadcrumbs } from 'components/Breadcrumbs';
-
+import { Tab, Tabs } from '../../components/Tabs';
 interface UpdateProductDto {
   product_key: string;
   notes: string;
@@ -38,6 +38,16 @@ export function View() {
   const [t] = useTranslation();
   const { id } = useParams();
 
+  //   Tabs
+  const tabs: Tab[] = [
+    { name: t('overview'), href: generatePath('/products/:id', { id }) },
+
+    {
+      name: t('document'),
+      href: generatePath('/products/:id/payments', { id }),
+    },
+  ];
+  //   pages
   const pages = [
     { name: t('products'), href: '/products' },
     {
@@ -141,6 +151,7 @@ export function View() {
     <Default>
       <Container>
         <Breadcrumbs pages={pages} />
+        <Tabs tabs={tabs} className="mt-6" />
 
         {alert && (
           <Alert className="mb-4" type={alert.type}>
@@ -166,9 +177,8 @@ export function View() {
         <div className="bg-white w-full p-8 rounded shadow my-4">
           <form onSubmit={form.handleSubmit} className="space-y-6">
             <InputField
-              label={t('product')}
+              label={t('price')}
               id="product_key"
-              required
               value={form.values.product_key || ''}
               onChange={form.handleChange}
             />
