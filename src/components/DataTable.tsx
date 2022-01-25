@@ -138,7 +138,6 @@ export function DataTable(props: Props) {
       >
         <span className="text-sm">{t('with_selected')}</span>
 
-        {/* ======  DropDowns ====  */}
         <Dropdown label={t('actions')}>
           <DropdownElement onClick={() => bulk('archive')}>
             {t(`archive_${props.resource}`)}
@@ -153,9 +152,7 @@ export function DataTable(props: Props) {
           </DropdownElement>
         </Dropdown>
       </Actions>
-      {/* ===== Table ===== */}
       <Table>
-        {/* === Table Head */}
         <Thead>
           <Th>
             <Checkbox
@@ -189,12 +186,8 @@ export function DataTable(props: Props) {
 
           {props.withResourcefulActions && <Th></Th>}
         </Thead>
-        {/* end of Thead */}
-
-        {/* ==== Table Body ==== */}
 
         <Tbody>
-          {/* ==== Loading == */}
           {isLoading && (
             <Tr>
               <Td colSpan={100}>
@@ -202,7 +195,6 @@ export function DataTable(props: Props) {
               </Td>
             </Tr>
           )}
-          {/* ==== Error ==== */}
           {isError && (
             <Tr>
               <Td className="text-center" colSpan={100}>
@@ -210,7 +202,6 @@ export function DataTable(props: Props) {
               </Td>
             </Tr>
           )}
-          {/* ==== Load Table Data ====  */}
           {data &&
             data?.data?.data?.map((resource: any, index: number) => (
               <Tr key={index}>
@@ -226,7 +217,6 @@ export function DataTable(props: Props) {
                     }
                   />
                 </Td>
-                {/* loop */}
                 {props.columns.map((column, index) => (
                   <Td key={index}>
                     {column.format
@@ -235,7 +225,6 @@ export function DataTable(props: Props) {
                   </Td>
                 ))}
 
-                {/* props.withResourcefulActions */}
                 {props.withResourcefulActions && (
                   <Td>
                     <Dropdown label={t('actions')}>
@@ -248,7 +237,6 @@ export function DataTable(props: Props) {
                           {t(`edit_${props.resource}`)}
                         </DropdownElement>
                       )}
-                      {/* ===== archived ==== */}
                       {resource.archived_at === 0 && (
                         <DropdownElement
                           onClick={() => {
@@ -290,8 +278,6 @@ export function DataTable(props: Props) {
               </Tr>
             ))}
         </Tbody>
-
-        {/* ====End of Table Body ==== */}
       </Table>
 
       {data && (
