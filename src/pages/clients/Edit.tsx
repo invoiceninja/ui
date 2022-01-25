@@ -104,8 +104,7 @@ export function Edit() {
 
           <div className="w-full xl:w-1/2">
             <Contacts contacts={contacts} setContacts={setContacts} />
-
-            <AdditionalInfo />
+            <AdditionalInfo client={client} setClient={setClient} />
           </div>
         </div>
       )}
