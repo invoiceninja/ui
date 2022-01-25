@@ -14,6 +14,8 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Default } from '../../components/layouts/Default';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
+import { Link } from '@invoiceninja/forms';
+import { generatePath } from 'react-router-dom';
 
 export function Products() {
   const [t] = useTranslation();
@@ -26,6 +28,11 @@ export function Products() {
     {
       id: 'product_key',
       label: t('product_key'),
+      format: (value, resource) => (
+        <Link to={generatePath('/products/:id', { id: resource.id })}>
+          {value}
+        </Link>
+      ),
     },
     {
       id: 'notes',
@@ -34,6 +41,10 @@ export function Products() {
     {
       id: 'cost',
       label: t('cost'),
+    },
+    {
+      id: 'quantity',
+      label: t('quantity'),
     },
   ];
 
