@@ -176,7 +176,6 @@ export function DataTable(props: Props) {
               }}
             />
           </Th>
-          {/* Table Head */}
           {props.columns.map((column, index) => (
             <Th
               id={column.id}
@@ -191,11 +190,10 @@ export function DataTable(props: Props) {
             </Th>
           ))}
 
-          {/* Table Head */}
-
           {props.withResourcefulActions && <Th></Th>}
         </Thead>
         {/* end of Thead */}
+
         {/* ==== Table Body ==== */}
 
         <Tbody>
@@ -240,6 +238,7 @@ export function DataTable(props: Props) {
                   </Td>
                 ))}
 
+                {/* props.withResourcefulActions */}
                 {props.withResourcefulActions && (
                   <Td>
                     <Dropdown label={t('actions')}>
@@ -252,7 +251,7 @@ export function DataTable(props: Props) {
                           {t(`edit_${props.resource}`)}
                         </DropdownElement>
                       )}
-
+                      {/* ===== archived ==== */}
                       {resource.archived_at === 0 && (
                         <DropdownElement
                           onClick={() => {
