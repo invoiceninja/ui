@@ -23,10 +23,10 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
-import { AdditionalInfo } from './components/edit/AdditionalInfo';
-import { Address } from './components/edit/Address';
-import { Contacts } from './components/edit/Contacts';
-import { Details } from './components/edit/Details';
+import { AdditionalInfo } from './components/AdditionalInfo';
+import { Address } from './components/Address';
+import { Contacts } from './components/Contacts';
+import { Details } from './components/Details';
 
 export function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
