@@ -1,7 +1,6 @@
 export * from './index/Clients';
 export * from './show/Client';
-
-export { Edit as EditClient } from './Edit';
+export { Edit as EditClient } from './edit/Edit';
 export { Create as CreateClient } from './Create';
 
 export { Invoices as ClientInvoices } from './pages/Invoices';
