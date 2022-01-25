@@ -36,7 +36,7 @@ export function ProductSettings() {
     { name: t('settings'), href: '/settings' },
     { name: t('product_settings'), href: '/settings/product_settings' },
   ];
-  
+
   const dispatch = useDispatch();
 
   const company = useCurrentCompany();
@@ -90,7 +90,7 @@ export function ProductSettings() {
       title={t('product_settings')}
     >
       <Breadcrumbs pages={pages} />
-      
+
       <Card title={t('Settings')}>
         <Element
           leftSide={t('show_product_discount')}

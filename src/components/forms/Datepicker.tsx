@@ -13,7 +13,7 @@ import ReactDatePicker from 'react-datepicker';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import 'react-datepicker/dist/react-datepicker.css';
 
-type Props = CommonProps
+type Props = CommonProps;
 
 export function Datepicker(props: Props) {
   const [date, setDate] = useState<Date>(new Date());
