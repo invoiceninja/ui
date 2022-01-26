@@ -13,8 +13,10 @@ import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useQuery as useQueryHook } from 'react-query';
 
-export function useQuery(apiEndpoint: string) {
-  return useQueryHook(apiEndpoint, () =>
-    axios.get(endpoint(apiEndpoint), { headers: defaultHeaders })
+export function useQuery(apiEndpoint: string, options = {}) {
+  return useQueryHook(
+    apiEndpoint,
+    () => axios.get(endpoint(apiEndpoint), { headers: defaultHeaders }),
+    options
   );
 }
