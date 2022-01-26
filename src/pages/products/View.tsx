@@ -8,24 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useFormik } from 'formik';
+import React, { useEffect, useState } from 'react';
+import { ProductDetails } from 'common/interfaces/ProductDetail';
+import { Card, Element } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
-import { endpoint } from '../../common/helpers';
-import { bulk, useProductQuery } from '../../common/queries/products';
-import { Alert } from '../../components/Alert';
+import { useProductQuery } from '../../common/queries/products';
 import { Container } from '../../components/Container';
-import { Button } from '../../components/forms/Button';
-import { InputField } from '../../components/forms/InputField';
-import { Textarea } from '../../components/forms/Textarea';
 import { Default } from '../../components/layouts/Default';
 import { Spinner } from '../../components/Spinner';
-import { Badge } from '../../components/Badge';
-import { useQueryClient } from 'react-query';
-import { defaultHeaders } from 'common/queries/common/headers';
-import toast from 'react-hot-toast';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Tab, Tabs } from '../../components/Tabs';
 interface UpdateProductDto {
@@ -37,6 +28,10 @@ interface UpdateProductDto {
 export function View() {
   const [t] = useTranslation();
   const { id } = useParams();
+  const [ProductDetails, setProductDetails] = useState<ProductDetails>(
+    {} as ProductDetails
+  );
+  const [customValues, setCustomValues] = useState<string[]>([]);
   //   console.log(id);
 
   //   Tabs
@@ -59,7 +54,22 @@ export function View() {
 
   const { data, isLoading } = useProductQuery({ id });
 
-  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (data?.data?.data) {
+      const details = data.data.data;
+      // fetch object props with keys matching cutom_value..
+      const customValues: string[] = [];
+      Object.keys(details).filter((key) => {
+        if (key.includes('custom_value')) {
+          if (details[key]) {
+            customValues.push(details[key]);
+          }
+        }
+      });
+      setCustomValues(customValues);
+      setProductDetails(details);
+    }
+  }, [data]);
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${
@@ -85,18 +95,21 @@ export function View() {
         <Breadcrumbs pages={pages} />
         <Tabs tabs={tabs} className="mt-6" />
 
-        <div className="bg-white w-full py-8 px-4 my-1 shadow my-0">
-          <p className="text-sm pb-3">{t('Price')}</p>
-          <h1 className="text-xl text-gray-600 font-semibold">$143</h1>
-        </div>
-        <div className="bg-white w-full py-8 px-4 my-1 shadow my-0">
-          <p className="text-sm pb-3">{t('Price')}</p>
-          <h1 className="text-xl text-gray-600 font-semibold">$143</h1>
-        </div>
-        <div className="bg-white w-full py-8 px-4 my-1 shadow my-0">
-          <p className="text-sm pb-3">{t('Price')}</p>
-          <h1 className="text-xl text-gray-600 font-semibold">$143</h1>
-        </div>
+        <Card>
+          <Element leftSide={t('price')}>
+            ${ProductDetails?.price?.toFixed(2)}
+          </Element>
+          <Element leftSide={t('Description')}>Product Description</Element>
+          <Element>
+            <ul>
+              {customValues.map((item) => (
+                <li key={item} className="py-1">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </Element>
+        </Card>
       </Container>
     </Default>
   );
