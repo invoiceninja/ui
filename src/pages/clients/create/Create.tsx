@@ -10,6 +10,7 @@
 
 import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
+import { ClientContact } from 'common/interfaces/client-contact';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
@@ -17,6 +18,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { Address } from '../edit/components/Address';
+import { Contacts } from '../edit/components/Contacts';
 import { Details } from '../edit/components/Details';
 
 export function Create() {
@@ -31,6 +33,16 @@ export function Create() {
   ];
 
   const [client, setClient] = useState<Client | undefined>();
+  
+  const [contacts, setContacts] = useState<Partial<ClientContact>[]>([
+    {
+      first_name: '',
+      last_name: '',
+      email: '',
+      phone: '',
+      send_email: false,
+    },
+  ]);
 
   const { data: blankClient, isLoading } = useQuery('/api/v1/clients/create', {
     refetchOnWindowFocus: false,
@@ -60,7 +72,7 @@ export function Create() {
         </div>
 
         <div className="w-full xl:w-1/2">
-          {/* <Contacts contacts={contacts} setContacts={setContacts} /> */}
+          <Contacts contacts={contacts} setContacts={setContacts} />
           {/* <AdditionalInfo client={client} setClient={setClient} /> */}
         </div>
       </div>
