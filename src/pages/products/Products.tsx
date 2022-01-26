@@ -23,7 +23,6 @@ export function Products() {
 
   useTitle('products');
 
-  // Table columns for product page
   const columns: DataTableColumns = [
     {
       id: 'product_key',
@@ -48,7 +47,6 @@ export function Products() {
     },
   ];
 
-  // ==== RETURN COMPONENT
   return (
     <Default title={t('products')} breadcrumbs={pages}>
       <DataTable
