@@ -17,7 +17,7 @@ import { ShippingAddress } from './address/ShippingAddress';
 import { Client } from 'common/interfaces/client';
 
 interface Props {
-  client: Client;
+  client: Client | undefined;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
 }
 

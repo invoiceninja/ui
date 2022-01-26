@@ -17,7 +17,7 @@ import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  client: Client;
+  client: Client | undefined;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
 }
 
@@ -36,7 +36,7 @@ export function BillingAddress(props: Props) {
       <Element leftSide={t('billing_address1')}>
         <InputField
           id="address1"
-          value={props.client.address1}
+          value={props.client?.address1}
           onChange={handleChange}
         />
       </Element>
@@ -44,7 +44,7 @@ export function BillingAddress(props: Props) {
       <Element leftSide={t('address2')}>
         <InputField
           id="address2"
-          value={props.client.address2}
+          value={props.client?.address2}
           onChange={handleChange}
         />
       </Element>
@@ -52,7 +52,7 @@ export function BillingAddress(props: Props) {
       <Element leftSide={t('city')}>
         <InputField
           id="city"
-          value={props.client.city}
+          value={props.client?.city}
           onChange={handleChange}
         />
       </Element>
@@ -60,7 +60,7 @@ export function BillingAddress(props: Props) {
       <Element leftSide={t('state')}>
         <InputField
           id="state"
-          value={props.client.state}
+          value={props.client?.state}
           onChange={handleChange}
         />
       </Element>
@@ -68,7 +68,7 @@ export function BillingAddress(props: Props) {
       <Element leftSide={t('postal_code')}>
         <InputField
           id="postal_code"
-          value={props.client.postal_code}
+          value={props.client?.postal_code}
           onChange={handleChange}
         />
       </Element>
@@ -77,7 +77,7 @@ export function BillingAddress(props: Props) {
         <Element leftSide={t('country')}>
           <SelectField
             id="country_id"
-            defaultValue={props.client.country_id}
+            defaultValue={props.client?.country_id}
             onChange={handleChange}
           >
             <option value=""></option>
