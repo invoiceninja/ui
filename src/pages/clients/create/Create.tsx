@@ -8,15 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import axios, { AxiosError } from 'axios';
+import { endpoint } from 'common/helpers';
 import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
+import { defaultHeaders } from 'common/queries/common/headers';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
+import { set } from 'lodash';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { AdditionalInfo } from '../edit/components/AdditionalInfo';
 import { Address } from '../edit/components/Address';
 import { Contacts } from '../edit/components/Contacts';
@@ -24,6 +29,7 @@ import { Details } from '../edit/components/Details';
 
 export function Create() {
   const [t] = useTranslation();
+  const navigate = useNavigate();
 
   const pages: BreadcrumRecord[] = [
     { name: t('clients'), href: '/clients' },
@@ -34,7 +40,7 @@ export function Create() {
   ];
 
   const [client, setClient] = useState<Client | undefined>();
-  
+
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([
     {
       first_name: '',
@@ -55,7 +61,26 @@ export function Create() {
     }
   }, [blankClient]);
 
-  const onSave = () => {};
+  const onSave = () => {
+    set(client as Client, 'contacts', contacts);
+
+    const toastId = toast.loading(t('processing'));
+
+    axios
+      .post(endpoint('/api/v1/clients'), client, {
+        headers: defaultHeaders,
+      })
+      .then((response) => {
+        toast.success(t('created_client'), { id: toastId });
+
+        navigate(generatePath('/clients/:id', { id: response.data.data.id }));
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+
+        toast.success(t('error_title'), { id: toastId });
+      });
+  };
 
   return (
     <Default
