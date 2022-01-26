@@ -152,7 +152,6 @@ export function DataTable(props: Props) {
           </DropdownElement>
         </Dropdown>
       </Actions>
-
       <Table>
         <Thead>
           <Th>
@@ -187,6 +186,7 @@ export function DataTable(props: Props) {
 
           {props.withResourcefulActions && <Th></Th>}
         </Thead>
+
         <Tbody>
           {isLoading && (
             <Tr>
@@ -201,6 +201,12 @@ export function DataTable(props: Props) {
               <Td className="text-center" colSpan={100}>
                 {t('error_refresh_page')}
               </Td>
+            </Tr>
+          )}
+
+          {data && data.data.data.length === 0 && (
+            <Tr>
+              <Td colSpan={100}>{t('no_records_found')}</Td>
             </Tr>
           )}
 
@@ -219,7 +225,6 @@ export function DataTable(props: Props) {
                     }
                   />
                 </Td>
-
                 {props.columns.map((column, index) => (
                   <Td key={index}>
                     {column.format
@@ -240,7 +245,6 @@ export function DataTable(props: Props) {
                           {t(`edit_${props.resource}`)}
                         </DropdownElement>
                       )}
-
                       {resource.archived_at === 0 && (
                         <DropdownElement
                           onClick={() => {

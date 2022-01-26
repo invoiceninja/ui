@@ -19,7 +19,7 @@ import { Client } from 'common/interfaces/client';
 import { set } from 'lodash';
 import { ChangeEvent } from 'react';
 interface Props {
-  client: Client;
+  client: Client | undefined;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
 }
 
@@ -39,7 +39,7 @@ export function Details(props: Props) {
       <Element leftSide={t('name')}>
         <InputField
           id="name"
-          value={props.client.name}
+          value={props.client?.name}
           onChange={handleChange}
         />
       </Element>
@@ -47,7 +47,7 @@ export function Details(props: Props) {
       <Element leftSide={t('number')}>
         <InputField
           id="number"
-          value={props.client.number}
+          value={props.client?.number}
           onChange={handleChange}
         />
       </Element>
@@ -56,9 +56,10 @@ export function Details(props: Props) {
         <Element leftSide={t('group')}>
           <SelectField
             id="group_settings_id"
-            defaultValue={props.client.group_settings_id}
+            defaultValue={props.client?.group_settings_id}
             onChange={handleChange}
           >
+            <option value=""></option>
             {groupSettings.data.data.map(
               (group: GroupSettings, index: number) => (
                 <option value={group.id} key={index}>
@@ -75,8 +76,9 @@ export function Details(props: Props) {
           <SelectField
             id="assigned_user_id"
             onChange={handleChange}
-            defaultValue={props.client.assigned_user_id}
+            defaultValue={props.client?.assigned_user_id}
           >
+            <option value=""></option>
             {users.data.data.map((user: User, index: number) => (
               <option value={user.id} key={index}>
                 {user.first_name} {user.last_name}
@@ -89,7 +91,7 @@ export function Details(props: Props) {
       <Element leftSide={t('id_number')}>
         <InputField
           id="id_number"
-          value={props.client.id_number}
+          value={props.client?.id_number}
           onChange={handleChange}
         />
       </Element>
@@ -97,7 +99,7 @@ export function Details(props: Props) {
       <Element leftSide={t('vat_number')}>
         <InputField
           id="vat_number"
-          value={props.client.vat_number}
+          value={props.client?.vat_number}
           onChange={handleChange}
         />
       </Element>
@@ -105,7 +107,7 @@ export function Details(props: Props) {
       <Element leftSide={t('website')}>
         <InputField
           id="website"
-          value={props.client.website}
+          value={props.client?.website}
           onChange={handleChange}
         />
       </Element>
@@ -113,7 +115,7 @@ export function Details(props: Props) {
       <Element leftSide={t('phone')}>
         <InputField
           id="phone"
-          value={props.client.phone}
+          value={props.client?.phone}
           onChange={handleChange}
         />
       </Element>

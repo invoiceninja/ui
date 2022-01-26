@@ -45,8 +45,6 @@ export function Contacts(props: Props) {
 
     contacts.splice(index, 1);
 
-    console.log(contacts[contacts.length - 1]);
-
     props.setContacts(contacts);
   };
 
