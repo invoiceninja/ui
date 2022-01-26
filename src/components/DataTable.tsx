@@ -195,6 +195,7 @@ export function DataTable(props: Props) {
               </Td>
             </Tr>
           )}
+
           {isError && (
             <Tr>
               <Td className="text-center" colSpan={100}>
@@ -202,6 +203,13 @@ export function DataTable(props: Props) {
               </Td>
             </Tr>
           )}
+
+          {data && data.data.data.length === 0 && (
+            <Tr>
+              <Td colSpan={100}>{t('no_records_found')}</Td>
+            </Tr>
+          )}
+
           {data &&
             data?.data?.data?.map((resource: any, index: number) => (
               <Tr key={index}>
