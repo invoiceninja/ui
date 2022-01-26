@@ -17,6 +17,7 @@ import { Spinner } from 'components/Spinner';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { AdditionalInfo } from '../edit/components/AdditionalInfo';
 import { Address } from '../edit/components/Address';
 import { Contacts } from '../edit/components/Contacts';
 import { Details } from '../edit/components/Details';
@@ -73,7 +74,7 @@ export function Create() {
 
         <div className="w-full xl:w-1/2">
           <Contacts contacts={contacts} setContacts={setContacts} />
-          {/* <AdditionalInfo client={client} setClient={setClient} /> */}
+          <AdditionalInfo client={client} setClient={setClient} />
         </div>
       </div>
     </Default>

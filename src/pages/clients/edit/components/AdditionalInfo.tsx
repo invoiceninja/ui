@@ -25,7 +25,7 @@ import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  client: Client;
+  client: Client | undefined;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
 }
 export function AdditionalInfo(props: Props) {
@@ -40,7 +40,7 @@ export function AdditionalInfo(props: Props) {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const client = { ...props.client };
 
-    props.setClient(set(client, event.target.id, event.target.value));
+    props.setClient(set(client as Client, event.target.id, event.target.value));
   };
 
   return (
@@ -54,7 +54,7 @@ export function AdditionalInfo(props: Props) {
             <Element leftSide={t('currency')}>
               <SelectField
                 id="settings.currency_id"
-                defaultValue={props.client.settings?.currency_id || ''}
+                defaultValue={props.client?.settings?.currency_id || ''}
                 onChange={handleChange}
               >
                 <option value=""></option>
@@ -71,7 +71,7 @@ export function AdditionalInfo(props: Props) {
             <Element leftSide={t('language')}>
               <SelectField
                 id="settings.language_id"
-                defaultValue={props.client.settings?.language_id || ''}
+                defaultValue={props.client?.settings?.language_id || ''}
                 onChange={handleChange}
               >
                 <option value=""></option>
@@ -88,7 +88,7 @@ export function AdditionalInfo(props: Props) {
             <Element leftSide={t('payment_terms')}>
               <SelectField
                 id="settings.payment_terms"
-                defaultValue={props.client.settings?.payment_terms || ''}
+                defaultValue={props.client?.settings?.payment_terms || ''}
                 onChange={handleChange}
               >
                 <option value=""></option>
@@ -107,7 +107,7 @@ export function AdditionalInfo(props: Props) {
             <Element leftSide={t('quote_valid_until')}>
               <SelectField
                 id="settings.valid_until"
-                defaultValue={props.client.settings?.valid_until || ''}
+                defaultValue={props.client?.settings?.valid_until || ''}
                 onChange={handleChange}
               >
                 <option value=""></option>
@@ -125,14 +125,14 @@ export function AdditionalInfo(props: Props) {
           <Element leftSide={t('task_rate')}>
             <InputField
               id="settings.default_task_rate"
-              value={props.client.settings?.default_task_rate || ''}
+              value={props.client?.settings?.default_task_rate || ''}
               onChange={handleChange}
             />
           </Element>
 
           <Element leftSide={t('send_reminders')}>
             <Toggle
-              checked={props.client.settings.send_reminders}
+              checked={props.client?.settings.send_reminders}
               onChange={(value) =>
                 props.setClient(
                   (client) =>
@@ -146,24 +146,24 @@ export function AdditionalInfo(props: Props) {
         <Tab.Panel>
           <Element leftSide={t('public_notes')}>
             <MDEditor
-              value={props.client.public_notes}
+              value={props.client?.public_notes}
               onChange={(value) => {
                 const client = { ...props.client };
                 client.public_notes = value as string;
 
-                props.setClient(client);
+                props.setClient(client as Client);
               }}
             />
           </Element>
 
           <Element leftSide={t('private_notes')}>
             <MDEditor
-              value={props.client.private_notes}
+              value={props.client?.private_notes}
               onChange={(value) => {
                 const client = { ...props.client };
                 client.private_notes = value as string;
 
-                props.setClient(client);
+                props.setClient(client as Client);
               }}
             />
           </Element>
@@ -174,7 +174,7 @@ export function AdditionalInfo(props: Props) {
             <Element leftSide={t('size_id')}>
               <SelectField
                 id="size_id"
-                defaultValue={props.client.size_id || ''}
+                defaultValue={props.client?.size_id || ''}
                 onChange={handleChange}
               >
                 <option value=""></option>
@@ -194,7 +194,7 @@ export function AdditionalInfo(props: Props) {
             <Element leftSide={t('industry')}>
               <SelectField
                 id="industry_id"
-                defaultValue={props.client.industry_id || ''}
+                defaultValue={props.client?.industry_id || ''}
                 onChange={handleChange}
               >
                 <option value=""></option>
