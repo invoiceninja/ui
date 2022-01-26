@@ -33,7 +33,7 @@ import { ExpenseCategories } from '../expense-categories';
 
 export function ExpenseSettings() {
   const [t] = useTranslation();
-  
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('expense_settings'), href: '/settings/expense_settings' },
@@ -95,7 +95,7 @@ export function ExpenseSettings() {
       title={t('expense_settings')}
     >
       <Breadcrumbs pages={pages} />
-      
+
       <Card title={t('settings')}>
         <Element
           leftSide={t('should_be_invoiced')}

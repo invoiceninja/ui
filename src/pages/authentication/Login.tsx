@@ -60,7 +60,7 @@ export function Login() {
             })
           );
 
-          dispatch(updateCompanyUsers(response.data.data))
+          dispatch(updateCompanyUsers(response.data.data));
         })
         .catch((error: AxiosError) => {
           return error.response?.status === 422

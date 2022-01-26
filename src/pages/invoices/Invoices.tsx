@@ -17,9 +17,7 @@ import { Default } from '../../components/layouts/Default';
 export function Invoices() {
   const [t] = useTranslation();
 
-  const pages = [
-    { name: t('invoices'), href: '/invoices' },
-  ];
+  const pages = [{ name: t('invoices'), href: '/invoices' }];
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('invoices')}`;

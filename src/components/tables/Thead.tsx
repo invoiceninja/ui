@@ -11,7 +11,7 @@
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
-type Props = CommonProps
+type Props = CommonProps;
 
 export function Thead(props: Props) {
   const accentColor = useAccentColor();
