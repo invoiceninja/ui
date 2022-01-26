@@ -16,6 +16,7 @@ import { Spinner } from 'components/Spinner';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { Address } from '../edit/components/Address';
 import { Details } from '../edit/components/Details';
 
 export function Create() {
@@ -55,7 +56,7 @@ export function Create() {
       <div className="flex flex-col xl:flex-row xl:gap-4">
         <div className="w-full xl:w-1/2">
           <Details client={client} setClient={setClient} />
-          {/* <Address client={client} setClient={setClient} /> */}
+          <Address client={client} setClient={setClient} />
         </div>
 
         <div className="w-full xl:w-1/2">

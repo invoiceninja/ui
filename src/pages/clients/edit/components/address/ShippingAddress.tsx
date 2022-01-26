@@ -17,7 +17,7 @@ import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  client: Client;
+  client: Client | undefined;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
 }
 
@@ -36,7 +36,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('billing_address1')}>
         <InputField
           id="shipping_address1"
-          value={props.client.shipping_address1}
+          value={props.client?.shipping_address1}
           onChange={handleChange}
         />
       </Element>
@@ -44,7 +44,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('address2')}>
         <InputField
           id="shipping_address2"
-          value={props.client.shipping_address2}
+          value={props.client?.shipping_address2}
           onChange={handleChange}
         />
       </Element>
@@ -52,7 +52,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('city')}>
         <InputField
           id="shipping_city"
-          value={props.client.shipping_city}
+          value={props.client?.shipping_city}
           onChange={handleChange}
         />
       </Element>
@@ -60,7 +60,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('state')}>
         <InputField
           id="shipping_state"
-          value={props.client.shipping_state}
+          value={props.client?.shipping_state}
           onChange={handleChange}
         />
       </Element>
@@ -68,7 +68,7 @@ export function ShippingAddress(props: Props) {
       <Element leftSide={t('postal_code')}>
         <InputField
           id="shipping_postal_code"
-          value={props.client.shipping_postal_code}
+          value={props.client?.shipping_postal_code}
           onChange={handleChange}
         />
       </Element>
@@ -77,7 +77,7 @@ export function ShippingAddress(props: Props) {
         <Element leftSide={t('country')}>
           <SelectField
             id="shipping_country_id"
-            defaultValue={props.client.shipping_country_id}
+            defaultValue={props.client?.shipping_country_id}
             onChange={handleChange}
           >
             <option value=""></option>
