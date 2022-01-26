@@ -8,15 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { useTranslation } from 'react-i18next';
-
-export function AdditionalInfo() {
-  const [t] = useTranslation();
-
-  return (
-    <Card className="mt-4" title={t('additional_info')}>
-      {/*  */}
-    </Card>
-  );
+export function Create() {
+  return <div>Page to create a client</div>;
 }

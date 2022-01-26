@@ -20,12 +20,10 @@ import { useTranslation } from 'react-i18next';
 import { generatePath, Outlet, useParams } from 'react-router-dom';
 import { Tab } from 'components/Tabs';
 import { Dropdown } from 'components/dropdown/Dropdown';
-import {
-  Address,
-  Contacts,
-  Details,
-  Standing,
-} from './components/pages/client';
+import { Address } from './components/Address';
+import { Contacts } from './components/Contacts';
+import { Details } from './components/Details';
+import { Standing } from './components/Standing';
 
 export function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
