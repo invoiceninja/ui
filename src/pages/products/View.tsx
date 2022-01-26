@@ -19,11 +19,6 @@ import { Default } from '../../components/layouts/Default';
 import { Spinner } from '../../components/Spinner';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Tab, Tabs } from '../../components/Tabs';
-interface UpdateProductDto {
-  product_key: string;
-  notes: string;
-  cost: string;
-}
 
 export function View() {
   const [t] = useTranslation();
@@ -40,7 +35,7 @@ export function View() {
 
     {
       name: t('document'),
-      href: generatePath('/products/:id/payments', { id }),
+      href: generatePath('/products/:id/documents', { id }),
     },
   ];
   //   pages
