@@ -147,7 +147,7 @@ export function Edit() {
       {data && (
         <Container className="space-y-6">
           <Breadcrumbs pages={pages} />
-          
+
           <Card
             withSaveButton
             disableSubmitButton={formik.isSubmitting}

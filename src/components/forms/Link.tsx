@@ -32,7 +32,8 @@ export function Link(props: Props) {
         target="_blank"
         href={props.to}
         className={`text-center text-sm hover:underline ${props.className}`}
-        style={css} rel="noreferrer"
+        style={css}
+        rel="noreferrer"
       >
         {props.children}
       </a>

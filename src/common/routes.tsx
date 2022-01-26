@@ -104,6 +104,7 @@ import {
   ClientRecurringInvoices,
   Clients,
   ClientTasks,
+  CreateClient,
   EditClient,
 } from 'pages/clients';
 
@@ -121,6 +122,7 @@ export const routes = (
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="clients">
         <Route path="" element={<Clients />} />
+        <Route path="create" element={<CreateClient />} />
         <Route path=":id/edit" element={<EditClient />} />
         <Route path=":id" element={<Client />}>
           <Route path="" element={<ClientInvoices />} />

@@ -9,9 +9,7 @@
  */
 
 import { useStaticsQuery } from 'common/queries/statics';
-import {
-  updateChanges,
-} from 'common/stores/slices/company-users';
+import { updateChanges } from 'common/stores/slices/company-users';
 import { RootState } from 'common/stores/store';
 import { Card } from 'components/cards/Card';
 import { Element } from 'components/cards/Element';

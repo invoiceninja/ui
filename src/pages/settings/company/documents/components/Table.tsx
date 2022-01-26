@@ -101,7 +101,8 @@ export function Table() {
                         className="block w-full"
                         href={endpoint('/documents/:hash?inline=true', {
                           hash: document.hash,
-                        })} rel="noreferrer"
+                        })}
+                        rel="noreferrer"
                       >
                         {t('view')}
                       </a>
