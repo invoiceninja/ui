@@ -38,6 +38,7 @@ export function InputField(props: Props) {
       )}
 
       <DebounceInput
+        inputRef={props.innerRef}
         debounceTimeout={props.debounceTimeout ?? 300}
         required={props.required}
         id={props.id}
