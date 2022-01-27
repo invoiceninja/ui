@@ -42,7 +42,6 @@ export function Dashboard() {
       sold: 'ZK0.00',
     },
   ];
-  const css: React.CSSProperties = {};
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('dashboard')}`;
@@ -55,10 +54,10 @@ export function Dashboard() {
       <Breadcrumbs pages={navigation} />
       <div className="container mx-auto my-6">
         <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
-          {columns.map((card) => {
+          {columns.map((card, id) => {
             const { title, amount, sold } = card;
             return (
-              <Card className="col-span-12 lg:col-span-4 py-3 px-5">
+              <Card className="col-span-12 lg:col-span-4 py-3 px-5" key={id}>
                 <h1 className="text-gray-800">{title}</h1>
                 <div className="flex flex-row justify-between my-1">
                   <div className="font-bold">{amount}</div>
