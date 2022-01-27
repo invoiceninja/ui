@@ -12,4 +12,5 @@ export default {
   accent: '#117DC0',
   primary: '#298AAB',
   secondary: '#7081e0',
+  dark: '#000',
 };
