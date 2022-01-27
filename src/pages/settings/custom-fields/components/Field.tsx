@@ -74,8 +74,6 @@ export function Field(props: Props) {
             .join(',')
         : dropdownTypeRef.current?.value;
 
-      console.log(type);
-
     props.onChange &&
       props.onChange(
         `${inputRef.current?.value || ''}|${type}`,

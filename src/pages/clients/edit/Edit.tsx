@@ -10,14 +10,14 @@
 
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useInjectCompanyForChanges } from 'common/hooks/useInjectCompanyForChanges';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useClientQuery } from 'common/queries/clients';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { updateRecord } from 'common/stores/slices/company-users';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
@@ -26,6 +26,7 @@ import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { AdditionalInfo } from './components/AdditionalInfo';
 import { Address } from './components/Address';
@@ -35,13 +36,10 @@ import { Details } from './components/Details';
 export function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
   const { id } = useParams();
-
   const [t] = useTranslation();
   const navigate = useNavigate();
-
-  useInjectCompanyForChanges();
-
-  const company = useCompanyChanges();
+  const company = useInjectCompanyChanges();
+  const dispatch = useDispatch();
 
   const { data, isLoading } = useClientQuery(
     { id },
@@ -89,7 +87,11 @@ export function Edit() {
           { headers: defaultHeaders }
         ),
       ])
-      .then(() => {
+      .then((response) => {
+        dispatch(
+          updateRecord({ object: 'company', data: response[1].data.data })
+        );
+
         toast.success(t('updated_client'), { id: toastId });
 
         navigate(generatePath('/clients/:id', { id }));
