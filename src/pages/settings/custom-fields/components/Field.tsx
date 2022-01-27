@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ChangeEvent, HTMLInputTypeAttribute, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer, Element } from '../../../../components/cards';
 import { InputField, SelectField } from '../../../../components/forms';
@@ -24,33 +24,35 @@ export enum AvailableTypes {
 interface Props {
   field: string;
   placeholder: string;
-  onChange?: (
-    field: string,
-    value: string,
-    type: AvailableTypes,
-    dropdownContent?: string
-  ) => unknown;
+  onChange?: (value: string, field: string, type: AvailableTypes) => unknown;
 }
 
 export function Field(props: Props) {
   const [t] = useTranslation();
 
-  const [inputType, setInputType] = useState<AvailableTypes>(
+  const [dropdownType, setDropdownType] = useState<AvailableTypes>(
     AvailableTypes.SingleLineText
   );
 
-  const [dropdownContent, setDropdownContent] = useState('');
-
-  const selectRef = useRef();
   const inputRef = useRef<HTMLInputElement>();
+  const dropdownInputRef = useRef<HTMLInputElement>();
+  const dropdownTypeRef = useRef<HTMLSelectElement>();
 
   const handleChange = () => {
+    const type =
+      dropdownTypeRef.current?.value === AvailableTypes.Dropdown
+        ? dropdownInputRef.current?.value ||
+          ''
+            .split(',')
+            .map((part) => part.trim())
+            .join(',')
+        : dropdownTypeRef.current?.value;
+
     props.onChange &&
       props.onChange(
+        `${inputRef.current?.value || ''}|${type}`,
         props.field,
-        inputRef.current?.value || '',
-        inputType,
-        dropdownContent
+        dropdownTypeRef.current?.value as AvailableTypes
       );
   };
 
@@ -67,11 +69,12 @@ export function Field(props: Props) {
         }
       >
         <SelectField
-          innerRef={selectRef}
+          innerRef={dropdownTypeRef}
           onChange={(event: ChangeEvent<HTMLSelectElement>) => {
-            setInputType(event.target.value as AvailableTypes);
+            setDropdownType(event.target.value as AvailableTypes);
             handleChange();
           }}
+          defaultValue={dropdownType}
         >
           <option value="single_line_text">{t('single_line_text')}</option>
           <option value="multi_line_text">{t('multi_line_text')}</option>
@@ -81,20 +84,13 @@ export function Field(props: Props) {
         </SelectField>
       </Element>
 
-      {inputType === AvailableTypes.Dropdown && (
+      {dropdownType === AvailableTypes.Dropdown && (
         <CardContainer>
           <InputField
+            innerRef={dropdownInputRef}
             id="multi_line_text"
             placeholder={t('comma_sparated_list')}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => {
-              setDropdownContent(
-                event.target.value
-                  .split(',')
-                  .map((part) => part.trim())
-                  .join(',')
-              );
-              handleChange();
-            }}
+            onChange={handleChange}
           />
         </CardContainer>
       )}
