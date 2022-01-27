@@ -87,7 +87,12 @@ export function Field(props: Props) {
             id="multi_line_text"
             placeholder={t('comma_sparated_list')}
             onChange={(event: ChangeEvent<HTMLInputElement>) => {
-              setDropdownContent(event.target.value);
+              setDropdownContent(
+                event.target.value
+                  .split(',')
+                  .map((part) => part.trim())
+                  .join(',')
+              );
               handleChange();
             }}
           />
