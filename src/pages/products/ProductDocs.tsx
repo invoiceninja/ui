@@ -9,8 +9,6 @@
  */
 
 import { Breadcrumbs } from 'components/Breadcrumbs';
-import { Settings } from 'components/layouts/Settings';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 // import { Upload, Table as DocumentsTable } from '../../components';
 import {
@@ -21,7 +19,6 @@ import { generatePath, useParams } from 'react-router-dom';
 import { Tabs, Tab } from 'components/Tabs';
 import { Default } from 'components/layouts/Default';
 import { Container } from 'components/Container';
-import { Documents } from 'pages/settings/company/components';
 
 export function ProductDocs() {
   const [t] = useTranslation();
