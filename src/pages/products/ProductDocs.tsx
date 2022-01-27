@@ -21,6 +21,7 @@ import { Default } from 'components/layouts/Default';
 import { Container } from 'components/Container';
 
 export function ProductDocs() {
+  const apiEndpoint = 'api/v1/projects/:id/upload';
   const [t] = useTranslation();
   const { id } = useParams();
 
@@ -48,7 +49,7 @@ export function ProductDocs() {
         <Breadcrumbs pages={pages} />
         <Tabs tabs={tabs} className="mt-6" />
 
-        <Upload />
+        <Upload apiEndpoint={apiEndpoint} />
         <DocumentsTable />
       </Container>
     </Default>
