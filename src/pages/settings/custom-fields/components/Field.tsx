@@ -68,12 +68,13 @@ export function Field(props: Props) {
   const handleChange = () => {
     const type =
       dropdownTypeRef.current?.value === AvailableTypes.Dropdown
-        ? dropdownInputRef.current?.value ||
-          ''
+        ? dropdownInputRef.current?.value
             .split(',')
             .map((part) => part.trim())
             .join(',')
         : dropdownTypeRef.current?.value;
+
+      console.log(type);
 
     props.onChange &&
       props.onChange(
