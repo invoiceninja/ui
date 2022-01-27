@@ -21,6 +21,7 @@ import { useStaticsQuery } from 'common/queries/statics';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
 import { set } from 'lodash';
+import { Field } from 'pages/settings/custom-fields/components';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -47,7 +48,7 @@ export function AdditionalInfo(props: Props) {
     <Card className="mt-4" title={t('additional_info')}>
       <TabGroup
         className="px-5"
-        tabs={[t('settings'), t('notes'), t('classify')]}
+        tabs={[t('settings'), t('notes'), t('classify'), t('custom_fields')]}
       >
         <Tab.Panel>
           {currencies.length > 1 && (
@@ -209,6 +210,35 @@ export function AdditionalInfo(props: Props) {
               </SelectField>
             </Element>
           )}
+        </Tab.Panel>
+
+        <Tab.Panel>
+          <Element
+            leftSide={
+              <div className="inline-flex items-center space-x-2">
+                <span>{t('note')}</span>
+                <span className="text-red-600">*</span>
+              </div>
+            }
+          >
+            Custom fields apply to all clients, they are not specific to this
+            one. <i>Needs translation.</i>
+          </Element>
+
+          {['client1', 'client2', 'client3', 'client4'].map((field) => (
+            <Field
+              key={field}
+              field={field}
+              placeholder={t('client_field')}
+              onChange={(field, value, type, dropdownContent) =>
+                console.log(field, value, dropdownContent)
+              }
+            />
+          ))}
+
+          {/* {['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (
+            <Field key={field} field={field} placeholder={t('contact_field')} />
+          ))} */}
         </Tab.Panel>
       </TabGroup>
     </Card>
