@@ -17,16 +17,12 @@ import {
   Upload,
   Table as DocumentsTable,
 } from 'pages/settings/company/documents/components';
-<<<<<<< HEAD
-import { Documents } from 'pages/settings/company/components';
 import { generatePath, useParams } from 'react-router-dom';
 import { Tabs, Tab } from 'components/Tabs';
 import { Default } from 'components/layouts/Default';
 import { Container } from 'components/Container';
-=======
-import { generatePath, useParams } from 'react-router-dom';
-import { Tabs, Tab } from 'components/Tabs';
->>>>>>> 2663b41fcaf83d32c09dc7ce1505c17047db7614
+import { Documents } from 'pages/settings/company/components';
+
 export function ProductDocs() {
   const [t] = useTranslation();
   const { id } = useParams();
