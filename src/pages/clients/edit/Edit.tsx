@@ -10,18 +10,23 @@
 
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useClientQuery } from 'common/queries/clients';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { updateRecord } from 'common/stores/slices/company-users';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
+import { ValidationAlert } from 'components/ValidationAlert';
 import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { AdditionalInfo } from './components/AdditionalInfo';
 import { Address } from './components/Address';
@@ -31,9 +36,10 @@ import { Details } from './components/Details';
 export function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
   const { id } = useParams();
-
   const [t] = useTranslation();
   const navigate = useNavigate();
+  const company = useInjectCompanyChanges();
+  const dispatch = useDispatch();
 
   const { data, isLoading } = useClientQuery(
     { id },
@@ -42,6 +48,7 @@ export function Edit() {
 
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
   const [client, setClient] = useState<Client>();
+  const [errors, setErrors] = useState<ValidationBag>();
 
   useEffect(() => {
     if (data?.data?.data) {
@@ -70,18 +77,34 @@ export function Edit() {
     const toastId = toast.loading(t('processing'));
 
     axios
-      .put(endpoint('/api/v1/clients/:id', { id }), client, {
-        headers: defaultHeaders,
-      })
-      .then(() => {
+      .all([
+        axios.put(endpoint('/api/v1/clients/:id', { id }), client, {
+          headers: defaultHeaders,
+        }),
+        axios.put(
+          endpoint('/api/v1/companies/:id', { id: company.id }),
+          company,
+          { headers: defaultHeaders }
+        ),
+      ])
+      .then((response) => {
+        dispatch(
+          updateRecord({ object: 'company', data: response[1].data.data })
+        );
+
         toast.success(t('updated_client'), { id: toastId });
+
+        navigate(generatePath('/clients/:id', { id }));
       })
       .catch((error: AxiosError) => {
         console.error(error);
 
-        toast.success(t('error_title'), { id: toastId });
-      })
-      .finally(() => navigate(generatePath('/clients/:id', { id })));
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+        }
+
+        toast.error(t('error_title'), { id: toastId });
+      });
   };
 
   return (
@@ -92,6 +115,8 @@ export function Edit() {
       onSaveClick={onSave}
     >
       {isLoading && <Spinner />}
+
+      {errors && <ValidationAlert errors={errors} />}
 
       {client && (
         <div className="flex flex-col xl:flex-row xl:gap-4">
