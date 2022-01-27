@@ -10,6 +10,8 @@
 
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { useInjectCompanyForChanges } from 'common/hooks/useInjectCompanyForChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
@@ -36,6 +38,10 @@ export function Edit() {
 
   const [t] = useTranslation();
   const navigate = useNavigate();
+
+  useInjectCompanyForChanges();
+
+  const company = useCompanyChanges();
 
   const { data, isLoading } = useClientQuery(
     { id },
@@ -73,9 +79,16 @@ export function Edit() {
     const toastId = toast.loading(t('processing'));
 
     axios
-      .put(endpoint('/api/v1/clients/:id', { id }), client, {
-        headers: defaultHeaders,
-      })
+      .all([
+        axios.put(endpoint('/api/v1/clients/:id', { id }), client, {
+          headers: defaultHeaders,
+        }),
+        axios.put(
+          endpoint('/api/v1/companies/:id', { id: company.id }),
+          company,
+          { headers: defaultHeaders }
+        ),
+      ])
       .then(() => {
         toast.success(t('updated_client'), { id: toastId });
 
