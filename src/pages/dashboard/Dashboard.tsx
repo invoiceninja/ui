@@ -24,6 +24,7 @@ export interface DashboardCard {
 export function Dashboard() {
   const accentColor = useAccentColor();
   const [t] = useTranslation();
+
   // columns
   const columns: DashboardCard[] = [
     {
