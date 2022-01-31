@@ -25,6 +25,7 @@ interface Props extends CommonProps {
   name?: string;
   errorMessage?: string;
   debounceTimeout?: number;
+  element?: string;
 }
 
 export function InputField(props: Props) {
@@ -38,6 +39,7 @@ export function InputField(props: Props) {
       )}
 
       <DebounceInput
+        element={props.element || 'input'}
         inputRef={props.innerRef}
         debounceTimeout={props.debounceTimeout ?? 300}
         required={props.required}
