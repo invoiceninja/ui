@@ -1,4 +1,4 @@
-export interface ProductDetails {
+export interface Product {
   id: string;
   user_id: string;
   assigned_user_id: string;

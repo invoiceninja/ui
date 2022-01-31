@@ -121,6 +121,7 @@ export const routes = (
     </Route>
     <Route element={<PrivateRoute />}>
       <Route path="/dashboard" element={<Dashboard />} />
+
       <Route path="clients">
         <Route path="" element={<Clients />} />
         <Route path="create" element={<CreateClient />} />
@@ -143,7 +144,7 @@ export const routes = (
           />
         </Route>
       </Route>
-      <Route path="/products">
+      <Route path="products">
         <Route path="" element={<Products />} />
         <Route path="create" element={<ProductCreate />} />
         <Route path=":id" element={<ProductView />} />

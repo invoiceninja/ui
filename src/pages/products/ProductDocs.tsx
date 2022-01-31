@@ -10,7 +10,6 @@
 
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useTranslation } from 'react-i18next';
-// import { Upload, Table as DocumentsTable } from '../../components';
 import {
   Upload,
   Table as DocumentsTable,
@@ -25,7 +24,6 @@ export function ProductDocs() {
   const [t] = useTranslation();
   const { id } = useParams();
 
-  //   Tabs
   const tabs: Tab[] = [
     { name: t('overview'), href: generatePath('/products/:id', { id }) },
 
@@ -44,9 +42,8 @@ export function ProductDocs() {
   ];
 
   return (
-    <Default>
+    <Default breadcrumbs={pages}>
       <Container>
-        <Breadcrumbs pages={pages} />
         <Tabs tabs={tabs} className="mt-6" />
 
         <Upload apiEndpoint={apiEndpoint} />
