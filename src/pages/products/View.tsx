@@ -8,28 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import React, { useEffect, useState } from 'react';
-import { ProductDetails } from 'common/interfaces/ProductDetail';
+import { useEffect, useState } from 'react';
+import { Product } from 'common/interfaces/ProductDetail';
 import { Card, Element } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
 import { useProductQuery } from '../../common/queries/products';
 import { Container } from '../../components/Container';
 import { Default } from '../../components/layouts/Default';
-import { Spinner } from '../../components/Spinner';
-import { Breadcrumbs } from 'components/Breadcrumbs';
+
 import { Tab, Tabs } from '../../components/Tabs';
 
 export function View() {
   const [t] = useTranslation();
   const { id } = useParams();
-  const [ProductDetails, setProductDetails] = useState<ProductDetails>(
-    {} as ProductDetails
-  );
+  const [productDetails, setProductDetails] = useState<Product>({} as Product);
   const [customValues, setCustomValues] = useState<string[]>([]);
-  //   console.log(id);
+  const [description, setDescription] = useState('');
 
-  //   Tabs
   const tabs: Tab[] = [
     { name: t('overview'), href: generatePath('/products/:id', { id }) },
 
@@ -38,7 +34,6 @@ export function View() {
       href: generatePath('/products/:id/documents', { id }),
     },
   ];
-  //   pages
   const pages = [
     { name: t('products'), href: '/products' },
     {
@@ -47,12 +42,12 @@ export function View() {
     },
   ];
 
-  const { data, isLoading } = useProductQuery({ id });
+  const { data } = useProductQuery({ id });
 
   useEffect(() => {
     if (data?.data?.data) {
       const details = data.data.data;
-      // fetch object props with keys matching cutom_value..
+      setDescription(details.notes);
       const customValues: string[] = [];
       Object.keys(details).filter((key) => {
         if (key.includes('custom_value')) {
@@ -72,39 +67,27 @@ export function View() {
     }`;
   }, [data]);
 
-  if (isLoading) {
-    return (
-      <Default>
-        <Container>
-          <div className="flex justify-center">
-            <Spinner />
-          </div>
-        </Container>
-      </Default>
-    );
-  }
-
   return (
-    <Default>
+    <Default breadcrumbs={pages}>
       <Container>
-        <Breadcrumbs pages={pages} />
         <Tabs tabs={tabs} className="mt-6" />
-
-        <Card>
-          <Element leftSide={t('price')}>
-            ${ProductDetails?.price?.toFixed(2)}
-          </Element>
-          <Element leftSide={t('Description')}>Product Description</Element>
-          <Element>
-            <ul>
-              {customValues.map((item) => (
-                <li key={item} className="py-1">
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </Element>
-        </Card>
+        {data && (
+          <Card>
+            <Element leftSide={t('price')}>
+              ${productDetails?.price?.toFixed(2)}
+            </Element>
+            <Element leftSide={t('Description')}>{description}</Element>
+            <Element>
+              <ul>
+                {customValues.map((item) => (
+                  <li key={item} className="py-1">
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </Element>
+          </Card>
+        )}
       </Container>
     </Default>
   );
