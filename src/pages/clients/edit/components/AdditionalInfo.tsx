@@ -19,10 +19,10 @@ import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { useStaticsQuery } from 'common/queries/statics';
-import { updateChanges } from 'common/stores/slices/company-users';
+import { injectInChanges, updateChanges } from 'common/stores/slices/company-users';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
-import { set } from 'lodash';
+import { cloneDeep, set } from 'lodash';
 import { Field } from 'pages/settings/custom-fields/components';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -49,7 +49,19 @@ export function AdditionalInfo(props: Props) {
 
   const company = useCompanyChanges();
 
-  const handleCustomFieldChange = (field: string, value: string) =>
+  const handleCustomFieldChange = (field: string, value: string) => {
+    const [label] = value.split('|');
+
+    if (label === '') {
+      // If we don't have a content, we will remove the field from the company.custom_fields.
+
+      const _company = cloneDeep(company);
+
+      delete _company.custom_fields[field];
+
+      return dispatch(injectInChanges({ object: 'company', data: _company }));
+    }
+
     dispatch(
       updateChanges({
         object: 'company',
@@ -57,6 +69,7 @@ export function AdditionalInfo(props: Props) {
         value,
       })
     );
+  };
 
   return (
     <Card className="mt-4" title={t('additional_info')}>
