@@ -16,14 +16,16 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 
-export function Quotes() {
+export function RecurringExpenses() {
   const [t] = useTranslation();
 
-  useTitle('quotes');
+  useTitle('recurring expenses');
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const pages: BreadcrumRecord[] = [{ name: t('quotes'), href: '/quotes' }];
+  const pages: BreadcrumRecord[] = [
+    { name: t('recurring expenses'), href: '/recurring_expenses' },
+  ];
 
   const columns: DataTableColumns = [
     {
@@ -31,31 +33,37 @@ export function Quotes() {
       label: t('status'),
     },
     { id: 'number', label: t('number') },
+    { id: 'vendor', label: t('vendor') },
     { id: 'client', label: t('client') },
     {
-      id: 'amount',
-      label: t('amount'),
+      id: 'frequency',
+      label: t('frequency'),
     },
     {
-      id: 'date',
-      label: t('date'),
+      id: 'next send date',
+      label: t('next send date'),
       format: (value) => date(value, dateFormat),
     },
     {
-      id: 'valid until',
-      label: t('valid until'),
+      id: 'amount',
+      label: t('amount'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      id: 'entity state',
+      label: t('entity state'),
       format: (value) => date(value, dateFormat),
     },
   ];
 
   return (
-    <Default breadcrumbs={pages} title={t('quotes')}>
+    <Default breadcrumbs={pages} title={t('Recurring Expenses')}>
       <DataTable
-        resource="quote"
-        endpoint="api/v1/quote"
+        resource="recurring_expenses"
+        endpoint="/api/v1/recurring_expenses"
         columns={columns}
-        linkToCreate="/quote/create"
-        linkToEdit="/quote/:id/edit"
+        linkToCreate="/recurring_expenses/create"
+        linkToEdit="/recurring_expenses/:id/edit"
         withResourcefulActions
       />
     </Default>

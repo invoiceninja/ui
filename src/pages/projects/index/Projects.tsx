@@ -16,46 +16,53 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 
-export function Quotes() {
+export function Projects() {
   const [t] = useTranslation();
 
-  useTitle('quotes');
+  useTitle('projects');
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const pages: BreadcrumRecord[] = [{ name: t('quotes'), href: '/quotes' }];
+  const pages: BreadcrumRecord[] = [{ name: t('projects'), href: '/projects' }];
 
   const columns: DataTableColumns = [
     {
-      id: 'status',
-      label: t('status'),
+      id: 'name',
+      label: t('name'),
     },
-    { id: 'number', label: t('number') },
     { id: 'client', label: t('client') },
+    { id: 'task rate', label: t('task rate') },
     {
-      id: 'amount',
-      label: t('amount'),
+      id: 'due rate',
+      label: t('due rate'),
     },
     {
-      id: 'date',
-      label: t('date'),
+      id: 'public notes',
+      label: t('public notes'),
+    },
+    {
+      id: 'private notes',
+      label: t('private notes'),
       format: (value) => date(value, dateFormat),
     },
     {
-      id: 'valid until',
-      label: t('valid until'),
-      format: (value) => date(value, dateFormat),
+      id: 'budgeted Hours',
+      label: t('budgeted Hours'),
+    },
+    {
+      id: 'entity state',
+      label: t('entity state'),
     },
   ];
 
   return (
-    <Default breadcrumbs={pages} title={t('quotes')}>
+    <Default breadcrumbs={pages} title={t('projects')}>
       <DataTable
-        resource="quote"
-        endpoint="api/v1/quote"
+        resource="invoice"
+        endpoint="api/v1/projects"
         columns={columns}
-        linkToCreate="/quote/create"
-        linkToEdit="/quote/:id/edit"
+        linkToCreate="/projects/create"
+        linkToEdit="/projects/:id/edit"
         withResourcefulActions
       />
     </Default>

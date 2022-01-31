@@ -25,7 +25,7 @@ export interface DashboardCard {
 export function Dashboard() {
   const accentColor = useAccentColor();
   const [t] = useTranslation();
-  const { data, isLoading } = useDashboardChartsQuery();
+  const { data } = useDashboardChartsQuery();
   console.log(data);
 
   // columns

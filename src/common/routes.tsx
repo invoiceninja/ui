@@ -30,6 +30,12 @@ import { Invoices, InvoiceCreate } from '../pages/invoices/index';
 import { Payments } from 'pages/payments';
 import { RecurringInvoice } from 'pages/recurring_invoices';
 import { Quotes } from 'pages/Quotes';
+import { Credits } from 'pages/credits';
+import { Projects } from 'pages/projects';
+import { Tasks } from 'pages/tasks';
+import { Vendors } from 'pages/vendor';
+import { Expenses } from 'pages/expenses';
+import { RecurringExpenses } from 'pages/recurring_expenses';
 import {
   AccountManagement,
   CompanyDetails,
@@ -163,6 +169,25 @@ export const routes = (
       <Route path="/quotes">
         <Route path="" element={<Quotes />} />
       </Route>
+      <Route path="/credits">
+        <Route path="" element={<Credits />} />
+      </Route>
+      <Route path="/projects">
+        <Route path="" element={<Projects />} />
+      </Route>
+      <Route path="/tasks">
+        <Route path="" element={<Tasks />} />
+      </Route>
+      <Route path="/vendors">
+        <Route path="" element={<Vendors />} />
+      </Route>
+      <Route path="/expenses">
+        <Route path="" element={<Expenses />} />
+      </Route>
+      <Route path="/recurring_expenses">
+        <Route path="" element={<RecurringExpenses />} />
+      </Route>
+
       <Route path="/settings">
         <Route path="" element={<Settings />} />
         <Route path="company_details">

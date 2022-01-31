@@ -16,14 +16,14 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 
-export function Quotes() {
+export function Tasks() {
   const [t] = useTranslation();
 
-  useTitle('quotes');
+  useTitle('tasks');
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const pages: BreadcrumRecord[] = [{ name: t('quotes'), href: '/quotes' }];
+  const pages: BreadcrumRecord[] = [{ name: t('tasks'), href: '/tasks' }];
 
   const columns: DataTableColumns = [
     {
@@ -33,29 +33,28 @@ export function Quotes() {
     { id: 'number', label: t('number') },
     { id: 'client', label: t('client') },
     {
-      id: 'amount',
-      label: t('amount'),
+      id: 'project',
+      label: t('project'),
     },
     {
-      id: 'date',
-      label: t('date'),
-      format: (value) => date(value, dateFormat),
+      id: 'duration',
+      label: t('duration'),
     },
     {
-      id: 'valid until',
-      label: t('valid until'),
+      id: 'entity state',
+      label: t('entity state'),
       format: (value) => date(value, dateFormat),
     },
   ];
 
   return (
-    <Default breadcrumbs={pages} title={t('quotes')}>
+    <Default breadcrumbs={pages} title={t('tasks')}>
       <DataTable
-        resource="quote"
-        endpoint="api/v1/quote"
+        resource="invoice"
+        endpoint="api/v1/tasks"
         columns={columns}
-        linkToCreate="/quote/create"
-        linkToEdit="/quote/:id/edit"
+        linkToCreate="/tasks/create"
+        linkToEdit="/tasks/:id/edit"
         withResourcefulActions
       />
     </Default>
