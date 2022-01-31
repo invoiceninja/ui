@@ -63,7 +63,13 @@ export function AdditionalInfo(props: Props) {
     <Card className="mt-4" title={t('additional_info')}>
       <TabGroup
         className="px-5"
-        tabs={[t('settings'), t('notes'), t('classify'), t('custom_fields')]}
+        tabs={[
+          t('settings'),
+          t('notes'),
+          t('classify'),
+          t('client_fields'),
+          t('contact_fields'),
+        ]}
       >
         <Tab.Panel>
           {currencies.length > 1 && (
@@ -249,8 +255,20 @@ export function AdditionalInfo(props: Props) {
               onChange={(value) => handleCustomFieldChange(field, value)}
             />
           ))}
+        </Tab.Panel>
 
-          <Divider />
+        <Tab.Panel>
+          <Element
+            leftSide={
+              <div className="inline-flex items-center space-x-2">
+                <span>{t('note')}</span>
+                <span className="text-red-600">*</span>
+              </div>
+            }
+          >
+            Custom fields apply to all contacts, they are not specific to this
+            one. <i>Needs translation.</i>
+          </Element>
 
           {['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (
             <Field
