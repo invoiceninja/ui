@@ -13,7 +13,6 @@ import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';
-import { useAccentColor } from 'common/hooks/useAccentColor';
 
 export interface DashboardCard {
   title: string;
