@@ -56,7 +56,7 @@ export function Dashboard() {
   return (
     <Default title={t('dashboard')}>
       <Breadcrumbs pages={navigation} />
-      <div className="container mx-auto my-6">
+      {/* <div className="container mx-auto my-6">
         <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
           {columns.map((card, id) => {
             const { title, amount, sold } = card;
@@ -76,7 +76,7 @@ export function Dashboard() {
             );
           })}
         </div>
-      </div>
+      </div> */}
     </Default>
   );
 }
