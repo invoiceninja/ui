@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useDashboardChartsQuery } from '../../common/queries/dashboard-charts';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -24,6 +25,8 @@ export interface DashboardCard {
 export function Dashboard() {
   const accentColor = useAccentColor();
   const [t] = useTranslation();
+  const { data, isLoading } = useDashboardChartsQuery();
+  console.log(data);
 
   // columns
   const columns: DashboardCard[] = [

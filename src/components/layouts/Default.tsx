@@ -18,6 +18,9 @@ import {
   FileText,
   Settings,
   Users,
+  RefreshCw,
+  CreditCard,
+  Edit,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -68,6 +71,24 @@ export function Default(props: Props) {
       href: '/invoices',
       icon: FileText,
       current: location.pathname === '/invoices',
+    },
+    {
+      name: t('Recurring Invoices'),
+      href: '/recurring_invoices',
+      icon: RefreshCw,
+      current: location.pathname === '/recurring_invoices',
+    },
+    {
+      name: t('payments'),
+      href: '/payments',
+      icon: CreditCard,
+      current: location.pathname === '/payments',
+    },
+    {
+      name: t('quotes'),
+      href: '/quotes',
+      icon: Edit,
+      current: location.pathname === '/quote',
     },
     {
       name: t('settings'),

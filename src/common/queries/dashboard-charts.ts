@@ -14,14 +14,9 @@ import { useQuery } from 'react-query';
 import { defaultHeaders } from './common/headers';
 
 export function useDashboardChartsQuery() {
-  return useQuery('/api/v1/charts/chart_summary', () => {
-    return axios.get(
-      endpoint(
-        '/api/v1/charts/chart_summary?start_date=2020-01-01&end_date=2020-04-06'
-      ),
-      {
-        headers: defaultHeaders,
-      }
-    );
+  return useQuery('/api/v1/charts/totals', () => {
+    return axios.get(endpoint('/api/v1/charts/totals'), {
+      headers: defaultHeaders,
+    });
   });
 }

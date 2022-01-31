@@ -27,6 +27,9 @@ import {
   Products,
 } from '../pages/products';
 import { Invoices, InvoiceCreate } from '../pages/invoices/index';
+import { Payments } from 'pages/payments';
+import { RecurringInvoice } from 'pages/recurring_invoices';
+import { Quotes } from 'pages/Quotes';
 import {
   AccountManagement,
   CompanyDetails,
@@ -119,7 +122,7 @@ export const routes = (
     </Route>
     <Route element={<PrivateRoute />}>
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="clients">
+      <Route path="/clients">
         <Route path="" element={<Clients />} />
         <Route path="create" element={<CreateClient />} />
         <Route path=":id/edit" element={<EditClient />} />
@@ -150,6 +153,15 @@ export const routes = (
       <Route path="/invoices">
         <Route path="" element={<Invoices />} />
         <Route path="create" element={<InvoiceCreate />} />
+      </Route>
+      <Route path="/recurring_invoices">
+        <Route path="" element={<RecurringInvoice />} />
+      </Route>
+      <Route path="/payments">
+        <Route path="" element={<Payments />} />
+      </Route>
+      <Route path="/quotes">
+        <Route path="" element={<Quotes />} />
       </Route>
       <Route path="/settings">
         <Route path="" element={<Settings />} />
