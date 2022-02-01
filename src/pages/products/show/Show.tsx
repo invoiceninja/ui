@@ -12,13 +12,13 @@ import { useEffect, useState } from 'react';
 import { Card, Element } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
-import { useProductQuery } from '../../common/queries/products';
-import { Container } from '../../components/Container';
-import { Default } from '../../components/layouts/Default';
-import { Tab, Tabs } from '../../components/Tabs';
+import { useProductQuery } from '../../../common/queries/products';
+import { Container } from '../../../components/Container';
+import { Default } from '../../../components/layouts/Default';
+import { Tab, Tabs } from '../../../components/Tabs';
 import { Product } from 'common/interfaces/product';
 
-export function View() {
+export function Show() {
   const [t] = useTranslation();
   const { id } = useParams();
   const [productDetails, setProductDetails] = useState<Product>({} as Product);
