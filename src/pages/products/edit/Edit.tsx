@@ -144,12 +144,14 @@ export function Edit() {
           />
         )}
 
-      {product && getEntityState(product.data.data) === EntityState.Active && (
-        <Delete
-          id={product.data.data.id}
-          endpoint={generatePath('/api/v1/products/:id', { id })}
-        />
-      )}
+      {product &&
+        (getEntityState(product.data.data) === EntityState.Active ||
+          getEntityState(product.data.data) === EntityState.Archived) && (
+          <Delete
+            id={product.data.data.id}
+            endpoint={generatePath('/api/v1/products/:id', { id })}
+          />
+        )}
     </>
   );
 }
