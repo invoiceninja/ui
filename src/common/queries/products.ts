@@ -34,10 +34,13 @@ export function useProductsQuery(params: Params) {
 }
 
 export function useProductQuery(params: { id: string | undefined }) {
-  return useQuery(generatePath('/api/v1/products/:id', { id: params.id }), () =>
-    axios.get(endpoint('/api/v1/products/:id', { id: params.id }), {
-      headers: defaultHeaders,
-    })
+  return useQuery(
+    generatePath('/api/v1/products/:id', { id: params.id }),
+    () =>
+      axios.get(endpoint('/api/v1/products/:id', { id: params.id }), {
+        headers: defaultHeaders,
+      }),
+    { staleTime: Infinity }
   );
 }
 
