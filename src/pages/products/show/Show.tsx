@@ -29,6 +29,10 @@ export function Show() {
             <Status product={product.data.data as Product} />
           </Element>
 
+          <Element leftSide={t('product')}>
+            {product.data.data.product_key}
+          </Element>
+
           <Element leftSide={t('price')}>
             {product.data.data.price?.toFixed(2)}
           </Element>
