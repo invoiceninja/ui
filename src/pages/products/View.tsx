@@ -9,15 +9,14 @@
  */
 
 import { useEffect, useState } from 'react';
-import { Product } from 'common/interfaces/ProductDetail';
 import { Card, Element } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
 import { useProductQuery } from '../../common/queries/products';
 import { Container } from '../../components/Container';
 import { Default } from '../../components/layouts/Default';
-
 import { Tab, Tabs } from '../../components/Tabs';
+import { Product } from 'common/interfaces/product';
 
 export function View() {
   const [t] = useTranslation();
@@ -34,6 +33,7 @@ export function View() {
       href: generatePath('/products/:id/documents', { id }),
     },
   ];
+  
   const pages = [
     { name: t('products'), href: '/products' },
     {
