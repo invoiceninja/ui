@@ -23,7 +23,7 @@ interface Props extends CommonProps {
   required?: boolean;
   border?: boolean;
   name?: string;
-  errorMessage?: string;
+  errorMessage?: string | string[];
   debounceTimeout?: number;
   element?: string;
 }
