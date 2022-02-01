@@ -88,9 +88,7 @@ export function CustomLabels() {
     );
 
     setDefaultLabelsFiltered(
-      defaultLabels.filter(
-        (label) => !translations.includes(label.property)
-      )
+      defaultLabels.filter((label) => !translations.includes(label.property))
     );
   }, [companyChanges]);
 

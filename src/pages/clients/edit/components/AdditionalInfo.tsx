@@ -19,7 +19,10 @@ import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { useStaticsQuery } from 'common/queries/statics';
-import { injectInChanges, updateChanges } from 'common/stores/slices/company-users';
+import {
+  injectInChanges,
+  updateChanges,
+} from 'common/stores/slices/company-users';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
 import { cloneDeep, set } from 'lodash';
