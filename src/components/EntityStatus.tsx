@@ -10,7 +10,6 @@
 
 import { EntityState } from 'common/enums/entity-state';
 import { getEntityState } from 'common/helpers';
-import { Product } from 'common/interfaces/product';
 import { Badge } from 'components/Badge';
 import { useTranslation } from 'react-i18next';
 
