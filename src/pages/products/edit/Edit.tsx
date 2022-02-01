@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 import { Archive } from './components/Archive';
+import { Restore } from './components/Restore';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -115,6 +116,14 @@ export function Edit() {
           endpoint={generatePath('/api/v1/products/:id', { id })}
         />
       )}
+
+      {product &&
+        getEntityState(product.data.data) === EntityState.Archived && (
+          <Restore
+            id={product.data.data.id}
+            endpoint={generatePath('/api/v1/products/:id', { id })}
+          />
+        )}
     </>
   );
 }
