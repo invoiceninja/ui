@@ -145,12 +145,6 @@ export const routes = (
           <Route path="clone" element={<Products.Clone />} />
           <Route path="documents" element={<Products.Documents />} />
         </Route>
-
-        {/* <Route path="create" element={<ProductCreate />} />
-        <Route path=":id" element={<ProductView />} />
-        <Route path=":id/edit" element={<ProductEdit />} />
-        <Route path=":id/documents" element={<ProductDocs />} />
-        <Route path=":id/clone" element={<ProductClone />} /> */}
       </Route>
       <Route path="/invoices">
         <Route path="" element={<Invoices />} />
