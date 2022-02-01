@@ -16,6 +16,8 @@ import { endpoint, getEntityState } from 'common/helpers';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useProductQuery } from 'common/queries/products';
+import { Dropdown } from 'components/dropdown/Dropdown';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
 import { useFormik } from 'formik';
 import { useState } from 'react';
@@ -23,10 +25,6 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
-import { Archive } from './components/Archive';
-import { Clone } from './components/Clone';
-import { Delete } from './components/Delete';
-import { Restore } from './components/Restore';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -125,33 +123,28 @@ export function Edit() {
       )}
 
       {product && (
-        <Clone endpoint={generatePath('/products/:id/clone', { id })} />
+        <div className="flex justify-center">
+          <Dropdown label={t('more_actions')}>
+            <DropdownElement to={generatePath('/products/:id/clone', { id })}>
+              {t('clone_product')}
+            </DropdownElement>
+
+            {getEntityState(product.data.data) === EntityState.Active && (
+              <DropdownElement>{t('archive_product')}</DropdownElement>
+            )}
+
+            {(getEntityState(product.data.data) === EntityState.Archived ||
+              getEntityState(product.data.data) === EntityState.Deleted) && (
+              <DropdownElement>{t('restore_product')}</DropdownElement>
+            )}
+
+            {(getEntityState(product.data.data) === EntityState.Active ||
+              getEntityState(product.data.data) === EntityState.Archived) && (
+              <DropdownElement>{t('delete_product')}</DropdownElement>
+            )}
+          </Dropdown>
+        </div>
       )}
-
-      {product && getEntityState(product.data.data) === EntityState.Active && (
-        <Archive
-          id={product.data.data.id}
-          endpoint={generatePath('/api/v1/products/:id', { id })}
-        />
-      )}
-
-      {product &&
-        (getEntityState(product.data.data) === EntityState.Archived ||
-          getEntityState(product.data.data) === EntityState.Deleted) && (
-          <Restore
-            id={product.data.data.id}
-            endpoint={generatePath('/api/v1/products/:id', { id })}
-          />
-        )}
-
-      {product &&
-        (getEntityState(product.data.data) === EntityState.Active ||
-          getEntityState(product.data.data) === EntityState.Archived) && (
-          <Delete
-            id={product.data.data.id}
-            endpoint={generatePath('/api/v1/products/:id', { id })}
-          />
-        )}
     </>
   );
 }
