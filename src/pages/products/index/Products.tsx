@@ -10,11 +10,11 @@
 
 import { useTranslation } from 'react-i18next';
 import { useTitle } from 'common/hooks/useTitle';
-import { Default } from '../../components/layouts/Default';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Link } from '@invoiceninja/forms';
 import { generatePath } from 'react-router-dom';
+import { Default } from 'components/layouts/Default';
 
 export function Products() {
   const [t] = useTranslation();
