@@ -15,6 +15,8 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Link } from '@invoiceninja/forms';
 import { generatePath } from 'react-router-dom';
 import { Default } from 'components/layouts/Default';
+import { Status } from '../components/Status';
+import { Product } from 'common/interfaces/product';
 
 export function Products() {
   const [t] = useTranslation();
@@ -26,9 +28,13 @@ export function Products() {
       id: 'product_key',
       label: t('product_key'),
       format: (value, resource) => (
-        <Link to={generatePath('/products/:id/edit', { id: resource.id })}>
-          {value}
-        </Link>
+        <span className="inline-flex items-center space-x-4">
+          <Status product={resource as Product} />
+
+          <Link to={generatePath('/products/:id/edit', { id: resource.id })}>
+            {value}
+          </Link>
+        </span>
       ),
     },
     {
