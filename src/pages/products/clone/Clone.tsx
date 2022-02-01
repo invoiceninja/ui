@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from 'axios';
+import { Button, InputField, Textarea } from '@invoiceninja/forms';
+import axios, { AxiosError, AxiosResponse } from 'axios';
+import { endpoint } from 'common/helpers';
+import { defaultHeaders } from 'common/queries/common/headers';
+import { useProductQuery } from 'common/queries/products';
+import { Alert } from 'components/Alert';
 import { Breadcrumbs } from 'components/Breadcrumbs';
+import { Container } from 'components/Container';
+import { Default } from 'components/layouts/Default';
+import { Spinner } from 'components/Spinner';
 import { useFormik } from 'formik';
+import { request } from 'http';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router';
-import { endpoint, request } from '../../common/helpers';
-import { useProductQuery } from '../../common/queries/products';
-import { Alert } from '../../components/Alert';
-import { Container } from '../../components/Container';
-import { Button } from '../../components/forms/Button';
-import { InputField } from '../../components/forms/InputField';
-import { Textarea } from '../../components/forms/Textarea';
-import { Default } from '../../components/layouts/Default';
-import { Spinner } from '../../components/Spinner';
-import { CreateProductDto } from './Create';
+import { CreateProductDto } from '..';
 
 export function Clone() {
   const [t] = useTranslation();
@@ -69,9 +69,8 @@ export function Clone() {
     onSubmit: (values: CreateProductDto) => {
       setIsFormBusy(true);
 
-      request('POST', endpoint('/api/v1/products'), values, {
-        'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN'),
-      })
+      axios
+        .post(endpoint('/api/v1/products'), values, { headers: defaultHeaders })
         .then((response: AxiosResponse) =>
           navigate(
             generatePath('/products/:id/edit', { id: response.data.data.id }),
