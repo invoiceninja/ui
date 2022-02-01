@@ -15,7 +15,7 @@ import { EntityState } from 'common/enums/entity-state';
 import { endpoint, getEntityState } from 'common/helpers';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { useProductQuery } from 'common/queries/products';
+import { bulk, useProductQuery } from 'common/queries/products';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
@@ -68,6 +68,26 @@ export function Edit() {
         });
     },
   });
+
+  const handleResourcefulAction = (
+    action: 'archive' | 'restore' | 'delete',
+    id: string
+  ) => {
+    const toastId = toast.loading(t('processing'));
+
+    bulk([id], action)
+      .then(() => toast.success(t(`${action}d_product`), { id: toastId }))
+      .catch((error) => {
+        console.error(error);
+
+        toast.error(t('error_title'), { id: toastId });
+      })
+      .finally(() =>
+        queryClient.invalidateQueries(
+          generatePath('/api/v1/products/:id', { id })
+        )
+      );
+  };
 
   return (
     <>
@@ -130,17 +150,35 @@ export function Edit() {
             </DropdownElement>
 
             {getEntityState(product.data.data) === EntityState.Active && (
-              <DropdownElement>{t('archive_product')}</DropdownElement>
+              <DropdownElement
+                onClick={() =>
+                  handleResourcefulAction('archive', product.data.data.id)
+                }
+              >
+                {t('archive_product')}
+              </DropdownElement>
             )}
 
             {(getEntityState(product.data.data) === EntityState.Archived ||
               getEntityState(product.data.data) === EntityState.Deleted) && (
-              <DropdownElement>{t('restore_product')}</DropdownElement>
+              <DropdownElement
+                onClick={() =>
+                  handleResourcefulAction('restore', product.data.data.id)
+                }
+              >
+                {t('restore_product')}
+              </DropdownElement>
             )}
 
             {(getEntityState(product.data.data) === EntityState.Active ||
               getEntityState(product.data.data) === EntityState.Archived) && (
-              <DropdownElement>{t('delete_product')}</DropdownElement>
+              <DropdownElement
+                onClick={() =>
+                  handleResourcefulAction('delete', product.data.data.id)
+                }
+              >
+                {t('delete_product')}
+              </DropdownElement>
             )}
           </Dropdown>
         </div>
