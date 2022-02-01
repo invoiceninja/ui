@@ -11,6 +11,7 @@
 import axios, { AxiosResponse, Method } from 'axios';
 import dayjs from 'dayjs';
 import { generatePath } from 'react-router';
+import entityState from './constants/entity-state';
 
 export function endpoint(endpoint: string, params = {}): string {
   return import.meta.env.VITE_API_URL + generatePath(endpoint, params);
@@ -83,4 +84,18 @@ export function date(date: number | string, format: string) {
   }
 
   return dayjs(date).format(format);
+}
+
+export function getEntityState(entity: any) {
+  if (!entity.is_deleted && !entity.archived_at) {
+    return entityState.active;
+  }
+
+  if (entity.archived_at && !entity.is_deleted) {
+    return entityState.archived;
+  }
+
+  if (entity.is_deleted) {
+    return entityState.deleted;
+  }
 }
