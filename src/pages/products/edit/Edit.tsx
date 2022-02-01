@@ -11,7 +11,8 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import axios from 'axios';
-import { endpoint } from 'common/helpers';
+import { EntityState } from 'common/enums/entity-state';
+import { endpoint, getEntityState } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useProductQuery } from 'common/queries/products';
 import { EntityStatus } from 'components/EntityStatus';
@@ -20,6 +21,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
+import { Archive } from './components/Archive';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -105,6 +107,13 @@ export function Edit() {
             />
           </Element>
         </Card>
+      )}
+
+      {product && getEntityState(product.data.data) === EntityState.Active && (
+        <Archive
+          id={product.data.data.id}
+          endpoint={generatePath('/api/v1/products/:id', { id })}
+        />
       )}
     </>
   );
