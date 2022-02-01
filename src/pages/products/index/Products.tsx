@@ -26,7 +26,7 @@ export function Products() {
       id: 'product_key',
       label: t('product_key'),
       format: (value, resource) => (
-        <Link to={generatePath('/products/:id', { id: resource.id })}>
+        <Link to={generatePath('/products/:id/edit', { id: resource.id })}>
           {value}
         </Link>
       ),
