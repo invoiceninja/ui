@@ -13,20 +13,18 @@ import axios from 'axios';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router';
-import { endpoint } from '../../common/helpers';
-import { bulk, useProductQuery } from '../../common/queries/products';
-import { Alert } from '../../components/Alert';
-import { Container } from '../../components/Container';
-import { Button } from '../../components/forms/Button';
-import { InputField } from '../../components/forms/InputField';
-import { Textarea } from '../../components/forms/Textarea';
-import { Default } from '../../components/layouts/Default';
-import { Spinner } from '../../components/Spinner';
-import { Badge } from '../../components/Badge';
 import { useQueryClient } from 'react-query';
 import { defaultHeaders } from 'common/queries/common/headers';
 import toast from 'react-hot-toast';
 import { Breadcrumbs } from 'components/Breadcrumbs';
+import { bulk, useProductQuery } from 'common/queries/products';
+import { endpoint } from 'common/helpers';
+import { Default } from 'components/layouts/Default';
+import { Container } from 'components/Container';
+import { Spinner } from 'components/Spinner';
+import { Alert } from 'components/Alert';
+import { Badge } from 'components/Badge';
+import { Button, InputField, Textarea } from '@invoiceninja/forms';
 
 interface UpdateProductDto {
   product_key: string;

@@ -20,7 +20,7 @@ import {
   RecoverPassword,
   Register,
 } from '../pages/authentication';
-import { Products } from '../pages/products';
+import * as Products from '../pages/products';
 import { Invoices, InvoiceCreate } from '../pages/invoices/index';
 import {
   AccountManagement,
@@ -114,7 +114,6 @@ export const routes = (
     </Route>
     <Route element={<PrivateRoute />}>
       <Route path="/dashboard" element={<Dashboard />} />
-
       <Route path="clients">
         <Route path="" element={<Clients />} />
         <Route path="create" element={<CreateClient />} />
@@ -138,7 +137,11 @@ export const routes = (
         </Route>
       </Route>
       <Route path="products">
-        <Route path="" element={<Products />} />
+        <Route path="" element={<Products.Products />} />
+        <Route path=":id" element={<Products.Product />}>
+          <Route path="edit" element={<Products.Edit />} />
+        </Route>
+
         {/* <Route path="create" element={<ProductCreate />} />
         <Route path=":id" element={<ProductView />} />
         <Route path=":id/documents" element={<ProductDocs />} />
