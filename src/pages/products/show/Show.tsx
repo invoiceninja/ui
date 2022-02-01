@@ -33,7 +33,7 @@ export function Show() {
       href: generatePath('/products/:id/documents', { id }),
     },
   ];
-  
+
   const pages = [
     { name: t('products'), href: '/products' },
     {
@@ -68,27 +68,24 @@ export function Show() {
   }, [data]);
 
   return (
-    <Default breadcrumbs={pages}>
-      <Container>
-        <Tabs tabs={tabs} className="mt-6" />
-        {data && (
-          <Card>
-            <Element leftSide={t('price')}>
-              ${productDetails?.price?.toFixed(2)}
-            </Element>
-            <Element leftSide={t('Description')}>{description}</Element>
-            <Element>
-              <ul>
-                {customValues.map((item) => (
-                  <li key={item} className="py-1">
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </Element>
-          </Card>
-        )}
-      </Container>
-    </Default>
+    <>
+      {data && (
+        <Card title={t('overview')}>
+          <Element leftSide={t('price')}>
+            ${productDetails?.price?.toFixed(2)}
+          </Element>
+          <Element leftSide={t('Description')}>{description}</Element>
+          <Element>
+            <ul>
+              {customValues.map((item) => (
+                <li key={item} className="py-1">
+                  {item}
+                </li>
+              ))}
+            </ul>
+          </Element>
+        </Card>
+      )}
+    </>
   );
 }
