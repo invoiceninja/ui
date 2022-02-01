@@ -10,13 +10,15 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { EntityState } from 'common/enums/entity-state';
 import { endpoint, getEntityState } from 'common/helpers';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useProductQuery } from 'common/queries/products';
 import { EntityStatus } from 'components/EntityStatus';
 import { useFormik } from 'formik';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -30,6 +32,7 @@ export function Edit() {
   const { id } = useParams();
   const { data: product } = useProductQuery({ id });
   const queryClient = useQueryClient();
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -41,16 +44,21 @@ export function Edit() {
     },
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
+      setErrors(undefined);
 
       axios
         .put(endpoint('/api/v1/products/:id', { id }), values, {
           headers: defaultHeaders,
         })
         .then(() => toast.success(t('updated_product'), { id: toastId }))
-        .catch((error) => {
+        .catch((error: AxiosError) => {
           console.error(error);
 
           toast.error(t('error_title'), { id: toastId });
+
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+          }
         })
         .finally(() => {
           formik.setSubmitting(false);
@@ -80,6 +88,7 @@ export function Edit() {
               id="product_key"
               value={formik.values.product_key}
               onChange={formik.handleChange}
+              errorMessage={errors?.errors.product_key}
             />
           </Element>
 
@@ -89,6 +98,7 @@ export function Edit() {
               element="textarea"
               value={formik.values.notes}
               onChange={formik.handleChange}
+              errorMessage={errors?.errors.description}
             />
           </Element>
 
@@ -97,6 +107,7 @@ export function Edit() {
               id="price"
               value={formik.values.cost}
               onChange={formik.handleChange}
+              errorMessage={errors?.errors.price}
             />
           </Element>
 
@@ -106,6 +117,7 @@ export function Edit() {
               id="quantity"
               value={formik.values.quantity}
               onChange={formik.handleChange}
+              errorMessage={errors?.errors.quantity}
             />
           </Element>
         </Card>
