@@ -18,7 +18,7 @@ import { Tabs, Tab } from 'components/Tabs';
 import { Default } from 'components/layouts/Default';
 import { Container } from 'components/Container';
 
-export function ProductDocs() {
+export function Documents() {
   const apiEndpoint = 'api/v1/projects/:id/upload';
   const [t] = useTranslation();
   const { id } = useParams();
