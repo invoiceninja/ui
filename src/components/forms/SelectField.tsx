@@ -36,6 +36,7 @@ export function SelectField(props: Props) {
         )}
         defaultValue={props.defaultValue}
         value={props.value}
+        ref={props.innerRef}
       >
         {props.children}
       </select>

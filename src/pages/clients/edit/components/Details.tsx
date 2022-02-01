@@ -18,6 +18,8 @@ import { useTranslation } from 'react-i18next';
 import { Client } from 'common/interfaces/client';
 import { set } from 'lodash';
 import { ChangeEvent } from 'react';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { CustomField } from 'components/CustomField';
 interface Props {
   client: Client | undefined;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
@@ -33,6 +35,15 @@ export function Details(props: Props) {
       (client) => client && set(client, event.target.id, event.target.value)
     );
   };
+
+  const handleCustomFieldChange = (
+    field: string,
+    value: string | number | boolean
+  ) => {
+    props.setClient((client) => client && set(client, field, value));
+  };
+
+  const company = useCurrentCompany();
 
   return (
     <Card title={t('details')}>
@@ -119,6 +130,42 @@ export function Details(props: Props) {
           onChange={handleChange}
         />
       </Element>
+
+      {company?.custom_fields?.client1 && (
+        <CustomField
+          field="client1"
+          defaultValue={props.client?.custom_value1}
+          value={company.custom_fields.client1}
+          onChange={(value) => handleCustomFieldChange('custom_value1', value)}
+        />
+      )}
+
+      {company?.custom_fields?.client2 && (
+        <CustomField
+          field="client2"
+          defaultValue={props.client?.custom_value2}
+          value={company.custom_fields.client2}
+          onChange={(value) => handleCustomFieldChange('custom_value2', value)}
+        />
+      )}
+
+      {company?.custom_fields?.client3 && (
+        <CustomField
+          field="client3"
+          defaultValue={props.client?.custom_value3}
+          value={company.custom_fields.client3}
+          onChange={(value) => handleCustomFieldChange('custom_value3', value)}
+        />
+      )}
+
+      {company?.custom_fields?.client4 && (
+        <CustomField
+          field="client4"
+          defaultValue={props.client?.custom_value4}
+          value={company.custom_fields.client4}
+          onChange={(value) => handleCustomFieldChange('custom_value4', value)}
+        />
+      )}
     </Card>
   );
 }

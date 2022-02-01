@@ -12,18 +12,21 @@ import { Tab } from '@headlessui/react';
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import MDEditor from '@uiw/react-md-editor';
+import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { useCurrencies } from 'common/hooks/useCurrencies';
 import { useLanguages } from 'common/hooks/useLanguages';
 import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { useStaticsQuery } from 'common/queries/statics';
+import { injectInChanges, updateChanges } from 'common/stores/slices/company-users';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
-import { set } from 'lodash';
+import { cloneDeep, set } from 'lodash';
 import { Field } from 'pages/settings/custom-fields/components';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 interface Props {
   client: Client | undefined;
@@ -31,7 +34,7 @@ interface Props {
 }
 export function AdditionalInfo(props: Props) {
   const [t] = useTranslation();
-
+  const dispatch = useDispatch();
   const currencies = useCurrencies();
   const languages = useLanguages();
 
@@ -44,11 +47,41 @@ export function AdditionalInfo(props: Props) {
     props.setClient(set(client as Client, event.target.id, event.target.value));
   };
 
+  const company = useCompanyChanges();
+
+  const handleCustomFieldChange = (field: string, value: string) => {
+    const [label] = value.split('|');
+
+    if (label === '') {
+      // If we don't have a content, we will remove the field from the company.custom_fields.
+
+      const _company = cloneDeep(company);
+
+      delete _company.custom_fields[field];
+
+      return dispatch(injectInChanges({ object: 'company', data: _company }));
+    }
+
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: `custom_fields.${field}`,
+        value,
+      })
+    );
+  };
+
   return (
     <Card className="mt-4" title={t('additional_info')}>
       <TabGroup
         className="px-5"
-        tabs={[t('settings'), t('notes'), t('classify'), t('custom_fields')]}
+        tabs={[
+          t('settings'),
+          t('notes'),
+          t('classify'),
+          t('client_fields'),
+          t('contact_fields'),
+        ]}
       >
         <Tab.Panel>
           {currencies.length > 1 && (
@@ -228,17 +261,36 @@ export function AdditionalInfo(props: Props) {
           {['client1', 'client2', 'client3', 'client4'].map((field) => (
             <Field
               key={field}
+              initialValue={company.custom_fields[field]}
               field={field}
               placeholder={t('client_field')}
-              onChange={(field, value, type, dropdownContent) =>
-                console.log(field, value, dropdownContent)
-              }
+              onChange={(value) => handleCustomFieldChange(field, value)}
             />
           ))}
+        </Tab.Panel>
 
-          {/* {['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (
-            <Field key={field} field={field} placeholder={t('contact_field')} />
-          ))} */}
+        <Tab.Panel>
+          <Element
+            leftSide={
+              <div className="inline-flex items-center space-x-2">
+                <span>{t('note')}</span>
+                <span className="text-red-600">*</span>
+              </div>
+            }
+          >
+            Custom fields apply to all contacts, they are not specific to this
+            one. <i>Needs translation.</i>
+          </Element>
+
+          {['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (
+            <Field
+              key={field}
+              initialValue={company.custom_fields[field]}
+              field={field}
+              placeholder={t('contact_field')}
+              onChange={(value) => handleCustomFieldChange(field, value)}
+            />
+          ))}
         </Tab.Panel>
       </TabGroup>
     </Card>
