@@ -9,11 +9,10 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { Product } from 'common/interfaces/product';
+import { EntityStatus } from 'components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useProductQuery } from '../../../common/queries/products';
-import { Status } from '../components/Status';
 
 export function Show() {
   const [t] = useTranslation();
@@ -26,7 +25,7 @@ export function Show() {
       {product && (
         <Card title={t('overview')}>
           <Element leftSide={t('status')}>
-            <Status product={product.data.data as Product} />
+            <EntityStatus entity={product.data.data} />
           </Element>
 
           <Element leftSide={t('product')}>

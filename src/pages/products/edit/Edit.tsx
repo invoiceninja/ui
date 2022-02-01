@@ -12,15 +12,14 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
-import { Product } from 'common/interfaces/product';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useProductQuery } from 'common/queries/products';
+import { EntityStatus } from 'components/EntityStatus';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
-import { Status } from '../components/Status';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -69,7 +68,7 @@ export function Edit() {
           withSaveButton
         >
           <Element leftSide={t('status')}>
-            <Status product={product.data.data as Product} />
+            <EntityStatus entity={product.data.data} />
           </Element>
 
           <Element leftSide={t('product')}>
