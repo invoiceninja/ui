@@ -38,10 +38,13 @@ export function Product() {
 
   const tabs: Tab[] = [
     { name: t('overview'), href: generatePath('/products/:id', { id }) },
-
     {
       name: t('documents'),
       href: generatePath('/products/:id/documents', { id }),
+    },
+    {
+      name: t('edit'),
+      href: generatePath('/products/:id/edit', { id }),
     },
   ];
 
