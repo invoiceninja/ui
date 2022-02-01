@@ -15,12 +15,12 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router';
-import { endpoint } from '../../common/helpers';
-import { Alert } from '../../components/Alert';
-import { Container } from '../../components/Container';
-import { Default } from '../../components/layouts/Default';
 import { Button, InputField, Textarea } from '@invoiceninja/forms';
 import { Breadcrumbs } from 'components/Breadcrumbs';
+import { endpoint } from 'common/helpers';
+import { Default } from 'components/layouts/Default';
+import { Container } from 'components/Container';
+import { Alert } from 'components/Alert';
 
 export interface CreateProductDto {
   product_key: string;
