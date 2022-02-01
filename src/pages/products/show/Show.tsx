@@ -32,10 +32,6 @@ export function Show() {
             {product.data.data.product_key}
           </Element>
 
-          <Element leftSide={t('price')}>
-            {product.data.data.price?.toFixed(2)}
-          </Element>
-
           <Element leftSide={t('description')}>
             {product.data.data.notes}
           </Element>
