@@ -12,3 +12,5 @@ export { Products } from './Products';
 export { Clone as ProductClone } from './Clone';
 export { Create as ProductCreate } from './Create';
 export { Edit as ProductEdit } from './Edit';
+export { View as ProductView } from './View';
+export { ProductDocs } from './ProductDocs';

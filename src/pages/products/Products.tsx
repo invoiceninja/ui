@@ -10,7 +10,6 @@
 
 import { useTranslation } from 'react-i18next';
 import { useTitle } from 'common/hooks/useTitle';
-
 import { Default } from '../../components/layouts/Default';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
@@ -20,7 +19,6 @@ import { generatePath } from 'react-router-dom';
 export function Products() {
   const [t] = useTranslation();
   const pages: BreadcrumRecord[] = [{ name: t('products'), href: '/products' }];
-
   useTitle('products');
 
   const columns: DataTableColumns = [

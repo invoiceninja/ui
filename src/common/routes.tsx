@@ -24,7 +24,9 @@ import {
   ProductClone,
   ProductCreate,
   ProductEdit,
+  ProductView,
   Products,
+  ProductDocs,
 } from '../pages/products';
 import { Invoices, InvoiceCreate } from '../pages/invoices/index';
 import {
@@ -119,6 +121,7 @@ export const routes = (
     </Route>
     <Route element={<PrivateRoute />}>
       <Route path="/dashboard" element={<Dashboard />} />
+
       <Route path="clients">
         <Route path="" element={<Clients />} />
         <Route path="create" element={<CreateClient />} />
@@ -141,9 +144,11 @@ export const routes = (
           />
         </Route>
       </Route>
-      <Route path="/products">
+      <Route path="products">
         <Route path="" element={<Products />} />
         <Route path="create" element={<ProductCreate />} />
+        <Route path=":id" element={<ProductView />} />
+        <Route path=":id/documents" element={<ProductDocs />} />
         <Route path=":id/edit" element={<ProductEdit />} />
         <Route path=":id/clone" element={<ProductClone />} />
       </Route>
