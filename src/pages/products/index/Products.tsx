@@ -15,7 +15,6 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Link } from '@invoiceninja/forms';
 import { generatePath } from 'react-router-dom';
 import { Default } from 'components/layouts/Default';
-import { Product } from 'common/interfaces/product';
 import { EntityStatus } from 'components/EntityStatus';
 
 export function Products() {
