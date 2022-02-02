@@ -18,10 +18,6 @@ import {
   FileText,
   Settings,
   Users,
-  Mail,
-  MessageSquare,
-  HelpCircle,
-  Info,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -29,7 +25,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@invoiceninja/forms';
 import { CompanySwitcher } from 'components/CompanySwitcher';
 import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
-import Tippy from '@tippyjs/react';
+import { HelpSidebarIcons } from 'components/HelpSidebarIcons';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -205,47 +201,7 @@ export function Default(props: Props) {
                 ))}
               </nav>
 
-              <nav className="flex p-2 justify-around text-white">
-                <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
-                  <Tippy
-                    duration={0}
-                    content={t('contact_us')}
-                    className="text-white rounded text-xs mb-2"
-                  >
-                    <Mail />
-                  </Tippy>
-                </button>
-
-                <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
-                  <Tippy
-                    duration={0}
-                    content={t('support_forum')}
-                    className="text-white rounded text-xs mb-2"
-                  >
-                    <MessageSquare />
-                  </Tippy>
-                </button>
-
-                <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
-                  <Tippy
-                    duration={0}
-                    content={t('user_guide')}
-                    className="text-white rounded text-xs mb-2"
-                  >
-                    <HelpCircle />
-                  </Tippy>
-                </button>
-
-                <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
-                  <Tippy
-                    duration={0}
-                    content={t('about')}
-                    className="text-white rounded text-xs mb-2"
-                  >
-                    <Info />
-                  </Tippy>
-                </button>
-              </nav>
+              <HelpSidebarIcons />
             </div>
           </div>
         </div>
