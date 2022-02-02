@@ -8,8 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Breadcrumbs } from 'components/Breadcrumbs';
-import { useEffect } from 'react';
+import { useTitle } from 'common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
 import { Default } from '../../components/layouts/Default';
@@ -19,14 +18,14 @@ export function Invoices() {
 
   const pages = [{ name: t('invoices'), href: '/invoices' }];
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('invoices')}`;
-  });
+  useTitle('invoices');
 
   return (
-    <Default title={t('invoices')}>
-      <Breadcrumbs pages={pages} />
-
+    <Default
+      title={t('invoices')}
+      breadcrumbs={pages}
+      docsLink="https://invoiceninja.github.io/docs/invoices/"
+    >
       <RouterLink to="/invoices/create">Create an invoice</RouterLink>
     </Default>
   );
