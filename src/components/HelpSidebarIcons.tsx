@@ -105,7 +105,12 @@ export function HelpSidebarIcons() {
           </Tippy>
         </button>
 
-        <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
+        <a
+          href="https://forum.invoiceninja.com"
+          target="_blank"
+          className="p-2 hover:bg-ninja-gray-darker rounded-full"
+          rel="noreferrer"
+        >
           <Tippy
             duration={0}
             content={t('support_forum')}
@@ -113,7 +118,7 @@ export function HelpSidebarIcons() {
           >
             <MessageSquare />
           </Tippy>
-        </button>
+        </a>
 
         <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
           <Tippy
