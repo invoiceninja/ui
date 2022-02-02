@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';
@@ -20,11 +19,7 @@ export function Dashboard() {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('dashboard')}`;
   });
 
-  const navigation = [{ name: t('dashboard'), href: '/dashboard' }];
+  const pages = [{ name: t('dashboard'), href: '/dashboard' }];
 
-  return (
-    <Default title={t('dashboard')}>
-      <Breadcrumbs pages={navigation} />
-    </Default>
-  );
+  return <Default title={t('dashboard')} breadcrumbs={pages}></Default>;
 }

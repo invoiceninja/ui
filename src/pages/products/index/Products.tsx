@@ -51,7 +51,11 @@ export function Products() {
   ];
 
   return (
-    <Default title={t('products')} breadcrumbs={pages}>
+    <Default
+      title={t('products')}
+      breadcrumbs={pages}
+      docsLink="https://invoiceninja.github.io/docs/products/"
+    >
       <DataTable
         resource="product"
         columns={columns}
