@@ -15,7 +15,17 @@ import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useFormik } from 'formik';
 import { useState } from 'react';
-import { HelpCircle, Info, Mail, MessageSquare } from 'react-feather';
+import {
+  Facebook,
+  GitHub,
+  HelpCircle,
+  Info,
+  Mail,
+  MessageSquare,
+  Slack,
+  Twitter,
+  Youtube,
+} from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Button, InputField } from './forms';
@@ -31,6 +41,7 @@ export function HelpSidebarIcons(props: Props) {
   const user = useCurrentUser();
 
   const [isContactVisible, setIsContactVisible] = useState(false);
+  const [isAboutVisible, setIsAboutVisible] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -95,6 +106,62 @@ export function HelpSidebarIcons(props: Props) {
         </Button>
       </Modal>
 
+      <Modal
+        title={t('about')}
+        visible={isAboutVisible}
+        onClose={setIsAboutVisible}
+      >
+        <section>
+          <p className="text-gray-800">
+            {user.first_name} {user.last_name}
+          </p>
+
+          <p>{user.email}</p>
+        </section>
+
+        <div className="flex flex-wrap justify-center items-center space-x-4 pt-6">
+          <a
+            href="https://twitter.com/invoiceninja"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Twitter />
+          </a>
+
+          <a
+            href="https://www.facebook.com/invoiceninja"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Facebook />
+          </a>
+
+          <a
+            href="https://github.com/invoiceninja"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <GitHub />
+          </a>
+
+          <a
+            href="https://www.youtube.com/channel/UCXAHcBvhW05PDtWYIq7WDFA/videos"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Youtube />
+          </a>
+
+          <a
+            href="http://slack.invoiceninja.com/"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <Slack />
+          </a>
+        </div>
+      </Modal>
+
       <nav className="flex p-2 justify-around text-white">
         <button
           className="p-2 hover:bg-ninja-gray-darker rounded-full"
@@ -139,7 +206,10 @@ export function HelpSidebarIcons(props: Props) {
           </Tippy>
         </a>
 
-        <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
+        <button
+          className="p-2 hover:bg-ninja-gray-darker rounded-full"
+          onClick={() => setIsAboutVisible(true)}
+        >
           <Tippy
             duration={0}
             content={t('about')}
