@@ -22,7 +22,11 @@ import { Button, InputField } from './forms';
 import Toggle from './forms/Toggle';
 import { Modal } from './Modal';
 
-export function HelpSidebarIcons() {
+interface Props {
+  docsLink?: string;
+}
+
+export function HelpSidebarIcons(props: Props) {
   const [t] = useTranslation();
   const user = useCurrentUser();
 
@@ -120,7 +124,12 @@ export function HelpSidebarIcons() {
           </Tippy>
         </a>
 
-        <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
+        <a
+          href={props.docsLink || 'https://invoiceninja.github.io'}
+          target="_blank"
+          className="p-2 hover:bg-ninja-gray-darker rounded-full"
+          rel="noreferrer"
+        >
           <Tippy
             duration={0}
             content={t('user_guide')}
@@ -128,7 +137,7 @@ export function HelpSidebarIcons() {
           >
             <HelpCircle />
           </Tippy>
-        </button>
+        </a>
 
         <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
           <Tippy

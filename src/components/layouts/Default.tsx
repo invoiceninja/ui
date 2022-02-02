@@ -38,6 +38,7 @@ interface Props extends CommonProps {
   onBackClick?: string;
   breadcrumbs?: BreadcrumRecord[];
   topRight?: ReactNode;
+  docsLink?: string;
 }
 
 export function Default(props: Props) {
@@ -201,7 +202,7 @@ export function Default(props: Props) {
                 ))}
               </nav>
 
-              <HelpSidebarIcons />
+              <HelpSidebarIcons docsLink={props.docsLink} />
             </div>
           </div>
         </div>
