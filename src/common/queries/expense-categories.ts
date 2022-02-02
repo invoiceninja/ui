@@ -32,10 +32,13 @@ export function useExpenseCategoriesQuery(params: Params) {
 }
 
 export function useExpenseCategoryQuery(params: { id: string | undefined }) {
-  return useQuery(generatePath('/api/v1/expense_categories/:id', params), () =>
-    axios.get(endpoint('/api/v1/expense_categories/:id', params), {
-      headers: defaultHeaders,
-    })
+  return useQuery(
+    generatePath('/api/v1/expense_categories/:id', params),
+    () =>
+      axios.get(endpoint('/api/v1/expense_categories/:id', params), {
+        headers: defaultHeaders,
+      }),
+    { staleTime: Infinity }
   );
 }
 
