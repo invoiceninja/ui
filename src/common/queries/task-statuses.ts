@@ -37,7 +37,8 @@ export function useTaskStatusQuery(params: { id: string | undefined }) {
     () =>
       axios.get(endpoint('/api/v1/task_statuses/:id', { id: params.id }), {
         headers: defaultHeaders,
-      })
+      }),
+    { staleTime: Infinity }
   );
 }
 
