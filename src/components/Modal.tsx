@@ -11,6 +11,7 @@
 import { Dialog, Transition } from '@headlessui/react';
 import classNames from 'classnames';
 import { Fragment, useState, useEffect, ReactNode } from 'react';
+import { X } from 'react-feather';
 
 interface Props {
   visible: boolean;
@@ -68,8 +69,8 @@ export function Modal(props: Props) {
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div className="inline-block align-bottom bg-white rounded px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:max-w-sm sm:p-6">
-              <div>
-                <div className="text-center">
+              <div className="flex justify-between items-start">
+                <div>
                   <Dialog.Title
                     as="h3"
                     className="text-lg leading-6 font-medium text-gray-900"
@@ -82,7 +83,13 @@ export function Modal(props: Props) {
                     )}
                   </div>
                 </div>
+
+                <X
+                  className="cursor-pointer"
+                  onClick={() => props.onClose(false)}
+                />
               </div>
+
               {props.children && (
                 <div
                   className={classNames(
