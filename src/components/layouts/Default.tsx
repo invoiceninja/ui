@@ -18,6 +18,10 @@ import {
   FileText,
   Settings,
   Users,
+  Mail,
+  MessageSquare,
+  HelpCircle,
+  Info,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +29,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@invoiceninja/forms';
 import { CompanySwitcher } from 'components/CompanySwitcher';
 import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
+import Tippy from '@tippyjs/react';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -130,6 +135,7 @@ export function Default(props: Props) {
                 <div className="flex-shrink-0 flex items-center px-4">
                   <CompanySwitcher />
                 </div>
+
                 <div className="mt-5 flex-1 h-0 overflow-y-auto">
                   <nav className="space-y-1">
                     {navigation.map((item) => (
@@ -171,6 +177,7 @@ export function Default(props: Props) {
             <div className="flex items-center flex-shrink-0 px-4">
               <CompanySwitcher />
             </div>
+
             <div className="mt-5 flex-grow flex flex-col">
               <nav className="flex-1 pb-4 space-y-1">
                 {navigation.map((item) => (
@@ -196,6 +203,48 @@ export function Default(props: Props) {
                     {item.name}
                   </Link>
                 ))}
+              </nav>
+
+              <nav className="flex p-2 justify-around text-white">
+                <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
+                  <Tippy
+                    duration={0}
+                    content={t('contact_us')}
+                    className="text-white rounded text-xs mb-2"
+                  >
+                    <Mail />
+                  </Tippy>
+                </button>
+
+                <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
+                  <Tippy
+                    duration={0}
+                    content={t('support_forum')}
+                    className="text-white rounded text-xs mb-2"
+                  >
+                    <MessageSquare />
+                  </Tippy>
+                </button>
+
+                <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
+                  <Tippy
+                    duration={0}
+                    content={t('user_guide')}
+                    className="text-white rounded text-xs mb-2"
+                  >
+                    <HelpCircle />
+                  </Tippy>
+                </button>
+
+                <button className="p-2 hover:bg-ninja-gray-darker rounded-full">
+                  <Tippy
+                    duration={0}
+                    content={t('about')}
+                    className="text-white rounded text-xs mb-2"
+                  >
+                    <Info />
+                  </Tippy>
+                </button>
               </nav>
             </div>
           </div>
