@@ -22,6 +22,7 @@ interface Props {
   onSaveClick?: any;
   onCancelClick?: any;
   breadcrumbs?: BreadcrumRecord[];
+  docsLink?: string;
 }
 
 export function Settings(props: Props) {
@@ -252,6 +253,7 @@ export function Settings(props: Props) {
       onSaveClick={props.onSaveClick}
       onCancelClick={props.onCancelClick}
       title={props.title}
+      docsLink={props.docsLink}
     >
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 md:col-span-4 lg:col-span-3">

@@ -18,7 +18,6 @@ import {
   updateRecord,
 } from 'common/stores/slices/company-users';
 import { RootState } from 'common/stores/store';
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -81,9 +80,9 @@ export function CompanyDetails() {
       onSaveClick={onSave}
       onCancelClick={onCancel}
       title={t('company_details')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#company_details"
     >
-      <Breadcrumbs pages={pages} />
-
       <Details />
       <Logo />
       <Address />
