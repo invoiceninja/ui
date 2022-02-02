@@ -143,7 +143,7 @@ export function Edit() {
       )}
 
       {product && (
-        <div className="flex justify-center">
+        <div className="flex justify-end">
           <Dropdown label={t('more_actions')}>
             <DropdownElement to={generatePath('/products/:id/clone', { id })}>
               {t('clone_product')}
