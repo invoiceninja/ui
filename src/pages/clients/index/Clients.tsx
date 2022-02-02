@@ -52,11 +52,7 @@ export function Clients() {
   ];
 
   return (
-    <Default
-      breadcrumbs={pages}
-      title={t('clients')}
-      docsLink="https://invoiceninja.github.io/docs/clients/"
-    >
+    <Default breadcrumbs={pages} title={t('clients')} docsLink="docs/clients">
       <DataTable
         resource="client"
         endpoint="/api/v1/clients"

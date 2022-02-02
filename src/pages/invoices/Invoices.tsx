@@ -21,11 +21,7 @@ export function Invoices() {
   useTitle('invoices');
 
   return (
-    <Default
-      title={t('invoices')}
-      breadcrumbs={pages}
-      docsLink="https://invoiceninja.github.io/docs/invoices/"
-    >
+    <Default title={t('invoices')} breadcrumbs={pages} docsLink="docs/invoices">
       <RouterLink to="/invoices/create">Create an invoice</RouterLink>
     </Default>
   );

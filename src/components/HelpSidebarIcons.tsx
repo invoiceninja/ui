@@ -192,7 +192,11 @@ export function HelpSidebarIcons(props: Props) {
         </a>
 
         <a
-          href={props.docsLink || 'https://invoiceninja.github.io'}
+          href={
+            (props.docsLink &&
+              `https://invoiceninja.github.io/${props.docsLink}`) ||
+            'https://invoiceninja.github.io'
+          }
           target="_blank"
           className="p-2 hover:bg-ninja-gray-darker rounded-full"
           rel="noreferrer"
