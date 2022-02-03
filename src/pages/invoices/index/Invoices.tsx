@@ -9,9 +9,9 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router-dom';
-import { Default } from '../../components/layouts/Default';
 
 export function Invoices() {
   const [t] = useTranslation();

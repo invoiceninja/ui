@@ -21,7 +21,7 @@ import {
   Register,
 } from '../pages/authentication';
 import * as Products from '../pages/products';
-import { Invoices, InvoiceCreate } from '../pages/invoices/index';
+import * as Invoices from '../pages/invoices';
 import {
   AccountManagement,
   CompanyDetails,
@@ -147,8 +147,8 @@ export const routes = (
         </Route>
       </Route>
       <Route path="/invoices">
-        <Route path="" element={<Invoices />} />
-        <Route path="create" element={<InvoiceCreate />} />
+        <Route path="" element={<Invoices.Invoices />} />
+        <Route path="create" element={<Invoices.Create />} />
       </Route>
       <Route path="/settings">
         <Route path="" element={<Settings />} />
