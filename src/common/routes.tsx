@@ -14,12 +14,7 @@ import { PrivateRoute } from '../components/PrivateRoute';
 import { PublicRoute } from '../components/PublicRoute';
 import { Index } from '../pages/Index';
 import { Dashboard } from '../pages/dashboard/Dashboard';
-import {
-  Login,
-  Logout,
-  RecoverPassword,
-  Register,
-} from '../pages/authentication';
+import * as Authentication from '../pages/authentication';
 import * as Products from '../pages/products';
 import * as Invoices from '../pages/invoices';
 import {
@@ -93,10 +88,13 @@ export const routes = (
   <Routes>
     <Route path="/" element={<Index />} />
     <Route element={<PublicRoute />}>
-      <Route path="/login" element={<Login />} />
-      <Route path="/recover_password" element={<RecoverPassword />} />
+      <Route path="/login" element={<Authentication.Login />} />
+      <Route
+        path="/recover_password"
+        element={<Authentication.RecoverPassword />}
+      />
       <Route element={<HostedRoute />}>
-        <Route path="/register" element={<Register />} />
+        <Route path="/register" element={<Authentication.Register />} />
       </Route>
     </Route>
     <Route element={<PrivateRoute />}>
