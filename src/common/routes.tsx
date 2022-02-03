@@ -86,21 +86,8 @@ import {
   CreateExpenseCategory,
   EditExpenseCategory,
 } from 'pages/settings/expense-categories';
-import {
-  Client,
-  ClientCredits,
-  ClientExpenses,
-  ClientInvoices,
-  ClientPayments,
-  ClientProjects,
-  ClientQuotes,
-  ClientRecurringExpenses,
-  ClientRecurringInvoices,
-  Clients,
-  ClientTasks,
-  CreateClient,
-  EditClient,
-} from 'pages/clients';
+
+import * as Clients from '../pages/clients';
 
 export const routes = (
   <Routes>
@@ -115,24 +102,24 @@ export const routes = (
     <Route element={<PrivateRoute />}>
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="clients">
-        <Route path="" element={<Clients />} />
-        <Route path="create" element={<CreateClient />} />
-        <Route path=":id/edit" element={<EditClient />} />
-        <Route path=":id" element={<Client />}>
-          <Route path="" element={<ClientInvoices />} />
-          <Route path="quotes" element={<ClientQuotes />} />
-          <Route path="payments" element={<ClientPayments />} />
+        <Route path="" element={<Clients.Clients />} />
+        <Route path="create" element={<Clients.Create />} />
+        <Route path=":id/edit" element={<Clients.Edit />} />
+        <Route path=":id" element={<Clients.Client />}>
+          <Route path="" element={<Clients.Invoices />} />
+          <Route path="quotes" element={<Clients.Quotes />} />
+          <Route path="payments" element={<Clients.Payments />} />
           <Route
             path="recurring_invoices"
-            element={<ClientRecurringInvoices />}
+            element={<Clients.RecurringInvoices />}
           />
-          <Route path="credits" element={<ClientCredits />} />
-          <Route path="projects" element={<ClientProjects />} />
-          <Route path="tasks" element={<ClientTasks />} />
-          <Route path="expenses" element={<ClientExpenses />} />
+          <Route path="credits" element={<Clients.Credits />} />
+          <Route path="projects" element={<Clients.Projects />} />
+          <Route path="tasks" element={<Clients.Tasks />} />
+          <Route path="expenses" element={<Clients.Expenses />} />
           <Route
             path="recurring_expenses"
-            element={<ClientRecurringExpenses />}
+            element={<Clients.RecurringExpenses />}
           />
         </Route>
       </Route>
