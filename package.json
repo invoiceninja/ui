@@ -32,6 +32,7 @@
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.0.2",
     "react-select": "^5.2.1",
+    "recharts": "^2.1.8",
     "reflect-metadata": "^0.1.13",
     "remove": "^0.1.5",
     "swr": "^1.0.1",
