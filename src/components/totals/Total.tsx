@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { InfoCard } from 'components/InfoCard';
 import React from 'react';
 
 type Props = {
     Title:string,
     Amount:number,
     Currency:string,
-
+    className?:string
 };
 
-export default function Total({Title,Amount,Currency}: Props) {
+export default function Total(props: Props) {
 
 
 
-  return <div className="px-4 py-5 bg-white shadow rounded overflow-hidden sm:p-6 space-y-2">
-      <h2>{Title}</h2>
-      <p> {Currency}{new Intl.NumberFormat().format(Amount)}</p>
-  </div>;
+  
+return <div className="col-span-12 lg:col-span-3"><InfoCard className='h-full w-1/3' title={props.Title} value={`${props.Currency} ${new Intl.NumberFormat().format(props.Amount)}`}></InfoCard></div>
+        
 }

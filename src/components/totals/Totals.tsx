@@ -13,52 +13,72 @@ import { endpoint, request } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import Chart from 'components/charts/Chart';
 import { InfoCard } from 'components/InfoCard';
-
-import React, { useEffect, useRef, useState } from 'react';
-
+import {DateRangePicker } from 'react-date-range'
+import React, { useEffect, useState } from 'react';
+import 'react-date-range/dist/styles.css'; // main style file
+import 'react-date-range/dist/theme/default.css'; // theme css file
 import Total from './Total';
 
 type Props = {};
 
 export default function Totals({}: Props) {
-  let start_date = '2019-02-02';
+    const [Totals, setTotals] = useState([]);
+  const [Currencies, setCurrencies] = useState([]);
+  const [ChartData, setChartData] = useState([]);
+  const [Currency, setCurrency] = useState(1);
+  let start_date = '2015-02-02';
   let end_date = '2022-02-02';
-  const values: {} = {
+  const body: {} = {
     start_date,
     end_date,
   };
-  const [Totals, setTotals] = useState({});
-  const [Currencies, setCurrencies] = useState({});
-  const date = useRef(HTMLInputElement);
-  const [ChartData, setChartData] = useState({});
-  const [Currency, setCurrency] = useState(Number);
+  const getTotals=()=>{
+    request(
+        'POST',
+        endpoint('/api/v1/charts/totals'),
+        body,
+        defaultHeaders
+      ).then((response: AxiosResponse) => {
+          console.log("getting totals data:")
+        console.log(response.data);
+        setTotals(response.data);
+        
+        setCurrencies(response.data.currencies);
+        console.log("currencies")
+
+        console.log(Totals[Currency])
+      });
+
+  }
+
+  const getChartData=()=>{
+    request(
+        'POST',
+        endpoint('/api/v1/charts/chart_summary'),
+       body,
+        defaultHeaders
+      ).then((response: AxiosResponse) => {
+          //setChartData(Object.entries(response.data).map(([key,value])=>{if(Number(key)==Currency) console.log("value",value)}))
+          console.log("getting chart data:")
+  console.log(response.data)
+      });
+  }
+  const selectionRange = {
+    startDate: new Date(),
+    endDate: new Date(),
+    key: 'selection',
+  }
+  
   useEffect(() => {
-    request(
-      'POST',
-      endpoint('/api/v1/charts/totals'),
-      values,
-      defaultHeaders
-    ).then((response: AxiosResponse) => {
-     // console.log(response.data);
-      setTotals(response.data);
-      setCurrencies(response.data.currencies);
-    });
-    request(
-      'POST',
-      endpoint('/api/v1/charts/chart_summary'),
-      { start_date, end_date },
-      defaultHeaders
-    ).then((response: AxiosResponse) => {
-        setChartData(Object.entries(response.data).map(([key,value])=>{if(Number(key)==Currency) console.log("value",value)}))
-        console.log("data:")
-console.log(ChartData)
-    });
+getTotals()
+getChartData()
+    
   }, []);
 
   return (
     <div>
       <div className="">
-        {Object.entries(Currencies).map(([key, value]) => {
+        {Currencies && Object.entries(Currencies).map(([key, value]) => {
           return (
             <Button
               value={value}
@@ -71,35 +91,28 @@ console.log(ChartData)
               {String(value)}
             </Button>
           );
+
         })}
-        <SelectField
-          defaultValue={'test'}
-          innerRef={date}
-          onChange={() => {
-            //fix lint err
-            console.log(date.current.value);
-            if (date.current.value === 'Custom') {
-              //todo open modal with date picker components like in v5 ui
-              console.log('modal open');
-            }
-          }}
-        >
-          <option selected hidden>
-            current date sellection
-          </option>
-          <option>Last 7 Days</option>
-          <option>Last 30 Days</option>
-          <option>This Quarter</option>
-          <option>Last Month</option>
-          <option>This Quarter</option>
-          <option>Last Quarter</option>
-          <option>This Year</option>
-          <option>Last Year</option>
-          <option>Custom</option>
-        </SelectField>
-        <InfoCard title="Total Revenue" value={70000.52}></InfoCard>
-        <Total Title="Total Expenses" Amount={70000.52} Currency="gbp"></Total>
-        <Total Title="Outstanding" Amount={70000.52} Currency="BAM"></Total>
+
+
+   
+      <DateRangePicker 
+      color='#000000'
+      rangeColors={['#000000']}
+        ranges={[selectionRange]}
+        onChange={(data)=>{
+            console.log(data.selection.startDate)
+        }}
+      />
+    
+         <div className="">
+
+         <Total Title="Total Revenue" Amount={23423423} Currency={Currencies[Currency]}></Total>
+        <Total Title="Total Expenses" Amount={70000.52} Currency={Currencies[Currency]}></Total>
+        <Total Title="Outstanding" Amount={70000.52} Currency={Currencies[Currency]}></Total>
+         </div>
+    
+   
       </div>
       {ChartData &&
       <Chart
@@ -108,6 +121,8 @@ console.log(ChartData)
       ></Chart>
 }
       {JSON.stringify(ChartData)}
+
+      
     </div>
   );
 }
