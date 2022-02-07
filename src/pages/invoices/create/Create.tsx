@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { Client } from './components/clients/Client';
 import { Details } from './components/Details';
+import { Table } from './components/tables/Table';
 
 export function Create() {
   const [t] = useTranslation();
@@ -34,6 +35,7 @@ export function Create() {
       <div className="grid grid-cols-12 gap-4">
         <Client />
         <Details />
+        <Table />
       </div>
     </Default>
   );
