@@ -48,7 +48,7 @@ export function Client() {
   };
 
   return (
-    <Card className="col-span-12 xl:col-span-4" withContainer>
+    <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex items-center justify-between">
         <InputLabel>{t('client')}</InputLabel>
         <CreateClient />

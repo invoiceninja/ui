@@ -93,6 +93,7 @@ export function CreateClient() {
         visible={isModalOpen}
         onClose={setIsModalOpen}
         size="large"
+        backgroundColor="gray"
       >
         {errors && <ValidationAlert errors={errors} />}
 

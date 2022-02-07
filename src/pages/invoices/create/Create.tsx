@@ -14,6 +14,7 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { Client } from './components/clients/Client';
+import { Details } from './components/Details';
 
 export function Create() {
   const [t] = useTranslation();
@@ -32,6 +33,7 @@ export function Create() {
     <Default title={t('new_invoice')} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-4">
         <Client />
+        <Details />
       </div>
     </Default>
   );
