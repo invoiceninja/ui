@@ -20,6 +20,7 @@ interface Props {
   text?: string;
   children?: ReactNode;
   centerContent?: boolean;
+  size?: 'small' | 'regular' | 'large';
 }
 
 export function Modal(props: Props) {
@@ -68,7 +69,16 @@ export function Modal(props: Props) {
             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
-            <div className="inline-block align-bottom bg-white rounded px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:max-w-sm sm:p-6">
+            <div
+              className={classNames(
+                'inline-block align-bottom bg-white rounded px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:p-6',
+                {
+                  'max-w-sm':
+                    props.size === 'small' || typeof props.size === 'undefined',
+                  'max-w-7xl': props.size === 'large',
+                }
+              )}
+            >
               <div className="flex justify-between items-start">
                 <div>
                   <Dialog.Title
