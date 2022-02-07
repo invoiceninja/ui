@@ -35,7 +35,7 @@ export function Card(props: Props) {
     >
       <form onSubmit={props.onFormSubmit}>
         {props.title && (
-          <div className="px-4 py-5 sm:px-6">
+          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
             <h3 className="text-lg leading-6 font-medium text-gray-900">
               {props.title}
             </h3>
@@ -46,7 +46,8 @@ export function Card(props: Props) {
             )}
           </div>
         )}
-        <div className="border-t border-gray-200 py-0">
+
+        <div className="py-0">
           <dl className="py-4">
             {props.withContainer ? (
               <CardContainer>{props.children}</CardContainer>
@@ -55,6 +56,7 @@ export function Card(props: Props) {
             )}
           </dl>
         </div>
+
         {props.withSaveButton && (
           <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
             <dl className="sm:divide-y sm:divide-gray-200">
