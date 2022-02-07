@@ -9,7 +9,7 @@
  */
 
 import { Card } from '@invoiceninja/cards';
-import { Button, InputLabel } from '@invoiceninja/forms';
+import { InputLabel } from '@invoiceninja/forms';
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { Client as IClient } from 'common/interfaces/client';
@@ -17,6 +17,7 @@ import { defaultHeaders } from 'common/queries/common/headers';
 import { debounce } from 'lodash';
 import { useTranslation } from 'react-i18next';
 import AsyncSelect from 'react-select/async';
+import { CreateClient } from './CreateClient';
 
 interface IClientArrayRecord {
   value: string;
@@ -50,7 +51,7 @@ export function Client() {
     <Card className="col-span-12 lg:col-span-6 xl:col-span-4" withContainer>
       <div className="flex items-center justify-between">
         <InputLabel>{t('client')}</InputLabel>
-        <Button type="minimal">{t('new_client')}</Button>
+        <CreateClient />
       </div>
 
       <AsyncSelect
