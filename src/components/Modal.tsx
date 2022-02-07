@@ -21,6 +21,7 @@ interface Props {
   children?: ReactNode;
   centerContent?: boolean;
   size?: 'small' | 'regular' | 'large';
+  backgroundColor?: 'white' | 'gray';
 }
 
 export function Modal(props: Props) {
@@ -71,11 +72,15 @@ export function Modal(props: Props) {
           >
             <div
               className={classNames(
-                'inline-block align-bottom bg-white rounded px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:p-6',
+                'inline-block align-bottom rounded px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:p-6',
                 {
                   'max-w-sm':
                     props.size === 'small' || typeof props.size === 'undefined',
                   'max-w-7xl': props.size === 'large',
+                  'bg-white':
+                    props.backgroundColor === 'white' ||
+                    typeof props.backgroundColor === 'undefined',
+                  'bg-gray-50': props.backgroundColor === 'gray',
                 }
               )}
             >
