@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
 import { useTitle } from 'common/hooks/useTitle';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
