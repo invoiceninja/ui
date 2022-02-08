@@ -1,6 +1,7 @@
 import { InvoiceItemSum } from './invoice-item-sum';
 import { Invoice } from 'common/interfaces/invoice';
 import collect from 'collect.js';
+import { InvoiceStatus } from 'common/enums/invoice-status';
 
 export class InvoiceSum {
   protected taxMap = collect();
@@ -21,6 +22,7 @@ export class InvoiceSum {
     await this.calculateCustomValues();
     await this.setTaxMap();
     await this.calculateTotals();
+    await this.calculateBalance();
 
     return this;
   }
@@ -166,6 +168,29 @@ export class InvoiceSum {
 
   protected async calculateTotals() {
     this.total += this.totalTaxes;
+
+    return this;
+  }
+
+  protected async calculateBalance() {
+    this.setCalculatedAttributes();
+
+    return this;
+  }
+
+  protected setCalculatedAttributes() {
+    if (this.invoice.status_id !== InvoiceStatus.Draft) {
+      if (this.invoice.amount !== this.invoice.balance) {
+        const paidToDate = this.invoice.amount - this.invoice.balance;
+
+        this.invoice.balance = this.total - paidToDate; // Needs implementing formatting with number class.
+      } else {
+        this.invoice.balance = this.total; // Needs implementing formatting with number class.
+      }
+    }
+
+    this.invoice.amount = this.total; // Needs implementing formatting with number class.
+    this.invoice.total_taxes = this.totalTaxes;
 
     return this;
   }
