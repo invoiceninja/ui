@@ -20,6 +20,7 @@ export class InvoiceSum {
     await this.calculateInvoiceTaxes();
     await this.calculateCustomValues();
     await this.setTaxMap();
+    await this.calculateTotals();
 
     return this;
   }
@@ -159,6 +160,12 @@ export class InvoiceSum {
 
       this.totalTaxes += totalLineTax as number;
     });
+
+    return this;
+  }
+
+  protected async calculateTotals() {
+    this.total += this.totalTaxes;
 
     return this;
   }
