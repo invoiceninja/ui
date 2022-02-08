@@ -44,7 +44,8 @@
     "build": "tsc && vite build",
     "serve": "npm run build && serve -d dist/",
     "format": "prettier --write src/",
-    "lint": "eslint \"**/*.{ts,tsx}\" --max-warnings=0"
+    "lint": "eslint \"**/*.{ts,tsx}\" --max-warnings=0",
+    "test": "jest"
   },
   "browserslist": {
     "production": [
