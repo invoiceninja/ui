@@ -13,9 +13,10 @@ import React from 'react';
 
 type Props = {
     Title:string,
-    Amount:number,
+    Amount:string,
     Currency:string,
     className?:string
+    child?:any
 };
 
 export default function Total(props: Props) {
@@ -23,6 +24,18 @@ export default function Total(props: Props) {
 
 
   
-return <div className="col-span-12 lg:col-span-3"><InfoCard className='h-full w-1/3' title={props.Title} value={`${props.Currency} ${new Intl.NumberFormat().format(props.Amount)}`}></InfoCard></div>
+return <InfoCard className='w-full h-44'  title={props.Title} value={<>
+
+<div className=' text-2xl w-full h-24 py-4 font-black flex justify-start '>
+
+
+{props.Currency} {new Intl.NumberFormat().format(Number(props.Amount))}
+
+
+</div>
+</>
+
+
+}></InfoCard>
         
 }

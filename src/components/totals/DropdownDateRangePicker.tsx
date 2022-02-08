@@ -7,10 +7,10 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Datepicker, SelectField } from '@invoiceninja/forms';
+import { Button, Datepicker, SelectField } from '@invoiceninja/forms';
 import { Modal } from 'components/Modal';
 import React, { ChangeEvent, useState } from 'react';
-import { Calendar, DateRangePicker } from 'react-date-range';
+import { Calendar } from 'react-feather';
 
 type Props = {
   start_date: string;
@@ -19,31 +19,32 @@ type Props = {
 };
 
 export default function DropdownDateRangePicker(props: Props) {
-    const selectionRange = {
-        startDate: new Date(),
-        endDate: new Date(),
-        key: 'selection',
-      }
-    const [IsOpenModal, setIsOpenModal] = useState(false);
+  const [IsOpenModal, setIsOpenModal] = useState(false);
+
+  let CustomStartDate: string;
+  let CustomEndDate: string;
   var now = new Date();
   const quarter = Math.floor(now.getMonth() / 3);
   return (
-    <div>
-      {' '}
+    <div className="  flex justify-end items-center">
+      <Calendar className="mx-2" />{' '}
       <SelectField
-        defaultValue={'test'}
+        defaultValue={props.end_date + '/' + props.start_date}
         className={
-          ' orm-select appearance-none block w-full px-3 py-1.5 text-base font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none '
+          ' orm-select appearance-none block w-60 px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none '
         }
-        onChange={(event:ChangeEvent<HTMLInputElement>)=>{
-            if(event.target.value==='Custom'){
-                console.log('test modal')
-                setIsOpenModal(true)   
-            }
-            props.handleDateChange(event)}}
+        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+          event.preventDefault();
+          if (event.target.value === 'Custom') {
+            console.log('test modal');
+            setIsOpenModal(true);
+          } else {
+            props.handleDateChange(event.target.value);
+          }
+        }}
       >
         <option selected hidden>
-          {props.end_date}-{props.start_date}{' '}
+          {props.end_date}/{props.start_date}{' '}
         </option>
         <option
           value={[
@@ -143,17 +144,41 @@ export default function DropdownDateRangePicker(props: Props) {
         </option>
         <option>Custom</option>
       </SelectField>
-      
-      <Modal overFlow={true} title={'Select custom date range'} visible={IsOpenModal} onClose={()=>{
-          setIsOpenModal(false)
-      }} >
-          <div className='flex justify-center flex-col'>
-              <p>Start date</p>
-          <Datepicker></Datepicker>
+      <Modal
+        overFlow={true}
+        title={'Select custom date range'}
+        visible={IsOpenModal}
+        onClose={() => {
+          setIsOpenModal(false);
+        }}
+      >
+        <div className="flex justify-center flex-col">
+          <p>Start date</p>
+          <Datepicker 
+          value={props.start_date}
+            onChange={(SelectedDate: string) => {
+              CustomStartDate = SelectedDate;
+            }}
+          ></Datepicker>
           <br></br>
           <p>End date</p>
-          <Datepicker></Datepicker>
-          </div>
+          <Datepicker
+          value={props.end_date}
+            onChange={(SelectedDate: string) => {
+              CustomEndDate = SelectedDate;
+            }}
+          ></Datepicker>
+          <br></br>
+          <Button
+            type="primary"
+            onClick={() => {
+              props.handleDateChange(CustomStartDate + ',' + CustomEndDate);
+              setIsOpenModal(false)
+            }}
+          >
+            Ok
+          </Button>
+        </div>
       </Modal>
     </div>
   );

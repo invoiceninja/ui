@@ -27,8 +27,7 @@ export function Modal(props: Props) {
 
   useEffect(() => {
     setOpen(props.visible);
-    console.log("overflow")
-    console.log(props.overFlow)
+   
 
   }, [props.visible]);
 
