@@ -5,7 +5,7 @@ export class InvoiceItemSum {
   protected taxCollection: Record<string, unknown>[] = [];
   protected currency = 'USD'; // Needs fixes, obviously.
 
-  protected lineItems: InvoiceItem[] = [];
+  public lineItems: InvoiceItem[] = [];
   protected items = new Map();
   protected item!: InvoiceItem;
 
@@ -15,9 +15,11 @@ export class InvoiceItemSum {
   constructor(protected invoice: Invoice) {}
 
   public async process() {
-    if (this.invoice?.line_items || this.invoice.line_items?.length === 0) {
+    if (!this.invoice?.line_items || this.invoice.line_items?.length === 0) {
       return this.items;
     }
+
+    this.calculateLineItems();
 
     return this;
   }
