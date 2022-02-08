@@ -9,8 +9,9 @@ export class InvoiceItemSum {
   protected items = new Map();
   protected item!: InvoiceItem;
 
-  protected subTotal = 0;
+  public subTotal = 0;
   protected grossSubTotal = 0;
+  protected totalTaxes = 0;
 
   constructor(protected invoice: Invoice) {}
 
@@ -136,5 +137,76 @@ export class InvoiceItemSum {
     this.lineItems.push(this.item);
 
     return this;
+  }
+
+  public calculateTaxesWithAmountDiscount() {
+    this.taxCollection = [];
+
+    let itemTax = 0;
+
+    this.lineItems
+      .filter((item) => item.line_total > 0)
+      .map((item) => {
+        this.item = item;
+
+        const amount =
+          this.subTotal > 0
+            ? this.item.line_total -
+              this.item.line_total * (this.invoice.discount / this.subTotal)
+            : 0;
+
+        //
+
+        const itemTaxRateOneTotal = this.calculateAmountLineTax(
+          this.item.tax_rate1,
+          amount
+        );
+
+        itemTax += itemTaxRateOneTotal;
+
+        if (itemTaxRateOneTotal !== 0) {
+          this.groupTax(
+            this.item.tax_name1,
+            this.item.tax_rate1,
+            itemTaxRateOneTotal
+          );
+        }
+
+        //
+
+        const itemTaxRateTwoTotal = this.calculateAmountLineTax(
+          this.item.tax_rate2,
+          amount
+        );
+
+        itemTax += itemTaxRateTwoTotal;
+
+        if (itemTaxRateTwoTotal !== 0) {
+          this.groupTax(
+            this.item.tax_name2,
+            this.item.tax_rate2,
+            itemTaxRateTwoTotal
+          );
+        }
+
+        //
+
+        const itemTaxRateThree = this.calculateAmountLineTax(
+          this.item.tax_rate3,
+          amount
+        );
+
+        itemTax += itemTaxRateThree;
+
+        if (itemTaxRateThree !== 0) {
+          this.groupTax(
+            this.item.tax_name3,
+            this.item.tax_rate3,
+            itemTaxRateThree
+          );
+        }
+      });
+
+    this.totalTaxes = itemTax;
   }
 }
