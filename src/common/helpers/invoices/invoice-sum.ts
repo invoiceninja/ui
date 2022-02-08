@@ -23,6 +23,7 @@ export class InvoiceSum {
     await this.setTaxMap();
     await this.calculateTotals();
     await this.calculateBalance();
+    await this.calculatePartial();
 
     return this;
   }
@@ -191,6 +192,17 @@ export class InvoiceSum {
 
     this.invoice.amount = this.total; // Needs implementing formatting with number class.
     this.invoice.total_taxes = this.totalTaxes;
+
+    return this;
+  }
+
+  protected calculatePartial() {
+    if (!this.invoice?.id && this.invoice.partial) {
+      this.invoice.partial = Math.max(
+        0,
+        Math.min(this.invoice.partial, this.invoice.balance)
+      ); // Needs formatting (with rounding 2)
+    }
 
     return this;
   }
