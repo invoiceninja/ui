@@ -1,8 +1,9 @@
 import { InvoiceItemSum } from './invoice-item-sum';
 import { Invoice } from 'common/interfaces/invoice';
+import collect from 'collect.js';
 
 export class InvoiceSum {
-  protected taxMap: Record<string, unknown>[] = [];
+  protected taxMap = collect();
   protected invoiceItems = new InvoiceItemSum(this.invoice);
   protected totalTaxMap: Record<string, unknown>[] = [];
 
@@ -18,6 +19,7 @@ export class InvoiceSum {
     await this.calculateDiscount();
     await this.calculateInvoiceTaxes();
     await this.calculateCustomValues();
+    await this.setTaxMap();
 
     return this;
   }
@@ -134,7 +136,31 @@ export class InvoiceSum {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
     }
 
-    this.taxMap = [];
+    this.taxMap = collect();
+
+    const keys = this.invoiceItems.taxCollection.pluck('key').unique();
+    const values = this.invoiceItems.taxCollection;
+
+    keys.map((key) => {
+      const taxName = values
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        .filter((value) => value[key as string] == key)
+        .pluck('tax_name')
+        .first();
+
+      const totalLineTax = values
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        .filter((value) => value[key as string] === key)
+        .sum('total');
+
+      this.taxMap.push({ name: taxName, total: totalLineTax });
+
+      this.totalTaxes += totalLineTax as number;
+    });
+
+    return this;
   }
 
   /////////////

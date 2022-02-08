@@ -1,8 +1,9 @@
+import collect from 'collect.js';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 
 export class InvoiceItemSum {
-  protected taxCollection: Record<string, unknown>[] = [];
+  public taxCollection = collect();
   protected currency = 'USD'; // Needs fixes, obviously.
 
   public lineItems: InvoiceItem[] = [];
@@ -119,7 +120,7 @@ export class InvoiceItemSum {
 
     group = { key, total, name: `${name} ${parseFloat(rate.toString())} %` }; // 'Tax Rate 5.00%'
 
-    this.taxCollection.push(group);
+    this.taxCollection.push(collect(group));
   }
 
   protected calculateAmountLineTax(rate: number, amount: number) {
@@ -140,7 +141,7 @@ export class InvoiceItemSum {
   }
 
   public calculateTaxesWithAmountDiscount() {
-    this.taxCollection = [];
+    this.taxCollection = collect();
 
     let itemTax = 0;
 
