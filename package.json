@@ -60,6 +60,7 @@
   },
   "devDependencies": {
     "@tailwindcss/forms": "^0.4.0",
+    "@types/jest": "^27.4.0",
     "@types/lodash": "^4.14.178",
     "@types/node": "^16.11.11",
     "@types/react": "^17.0.37",
@@ -73,6 +74,7 @@
     "eslint": "^8.5.0",
     "eslint-plugin-react": "^7.28.0",
     "eslint-plugin-unused-imports": "^2.0.0",
+    "jest": "^27.5.0",
     "postcss": "^8.4.4",
     "prettier": "2.4.1",
     "serve": "^13.0.2",
