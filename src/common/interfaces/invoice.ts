@@ -1,3 +1,5 @@
+import { InvoiceItem } from "./invoice-item";
+
 export interface Invoice {
   id: string;
   user_id: string;
@@ -51,7 +53,7 @@ export interface Invoice {
   custom_surcharge_tax2: boolean;
   custom_surcharge_tax3: boolean;
   custom_surcharge_tax4: boolean;
-  line_items: Record<string, unknown>[];
+  line_items: InvoiceItem[];
   entity_type: string;
   reminder1_sent: string;
   reminder2_sent: string;
