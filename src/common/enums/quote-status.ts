@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export enum QuoteStatus {
+export const enum QuoteStatus {
   Draft = '1',
   Active = '2',
   Paused = '3',
