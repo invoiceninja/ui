@@ -29,21 +29,19 @@ export default function DropdownDateRangePicker(props: Props) {
     <div className="  flex justify-end items-center">
       <Calendar className="mx-2" />{' '}
       <SelectField
-      defaultValue={props.end_date + '/' + props.start_date}
+        defaultValue={props.end_date + '/' + props.start_date}
         className={
           ' orm-select appearance-none block w-60 px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none '
         }
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
           event.preventDefault();
           if (event.target.value === 'Custom') {
-            console.log('test modal');
             setIsOpenModal(true);
           } else {
             props.handleDateChange(event.target.value);
           }
         }}
       >
-       
         <option
           value={[
             new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)
@@ -152,8 +150,8 @@ export default function DropdownDateRangePicker(props: Props) {
       >
         <div className="flex justify-center flex-col">
           <p>Start date</p>
-          <Datepicker 
-          value={props.start_date}
+          <Datepicker
+            value={props.start_date}
             onChange={(SelectedDate: string) => {
               CustomStartDate = SelectedDate;
             }}
@@ -161,7 +159,7 @@ export default function DropdownDateRangePicker(props: Props) {
           <br></br>
           <p>End date</p>
           <Datepicker
-          value={props.end_date}
+            value={props.end_date}
             onChange={(SelectedDate: string) => {
               CustomEndDate = SelectedDate;
             }}
@@ -171,7 +169,7 @@ export default function DropdownDateRangePicker(props: Props) {
             type="primary"
             onClick={() => {
               props.handleDateChange(CustomStartDate + ',' + CustomEndDate);
-              setIsOpenModal(false)
+              setIsOpenModal(false);
             }}
           >
             Ok

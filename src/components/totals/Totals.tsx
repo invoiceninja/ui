@@ -7,21 +7,18 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Button, Datepicker, SelectField } from '@invoiceninja/forms';
+import { Button } from '@invoiceninja/forms';
 import { AxiosResponse } from 'axios';
-import { classNames, endpoint, request } from 'common/helpers';
+import { endpoint, request } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import Chart from 'components/charts/Chart';
-import { InfoCard } from 'components/InfoCard';
-import { DateRangePicker } from 'react-date-range';
-import React, { ChangeEvent, useEffect, useRef, useState } from 'react';
-import 'react-date-range/dist/styles.css'; // main style file
-import 'react-date-range/dist/theme/default.css'; // theme css file
+
+import React, { useEffect, useState } from 'react';
+
 import Total from './Total';
 import { ChartDataDTO, TotalDataDTO } from '../../common/dtos/TotalsDTO';
 import { Spinner } from 'components/Spinner';
 import DropdownDateRangePicker from './DropdownDateRangePicker';
-import { Calendar } from 'react-feather';
 import { Card } from '@invoiceninja/cards';
 
 type Props = {};
@@ -50,24 +47,19 @@ export default function Totals({}: Props) {
     setCurrency(Number(id));
   };
   const handleDateChange = (DateSet: string) => {
-    console.log("input date",DateSet.split(','))
     let data = DateSet.split(',');
 
     let s_date = new Date(DateSet.split(',')[0]);
     let e_date = new Date(DateSet.split(',')[1]);
-    
+
     if (s_date > e_date) {
       setbody({
         start_date: data[1],
         end_date: data[0],
-        
       });
-    
     } else {
       setbody({ start_date: data[0], end_date: data[1] });
-    
     }
-  
   };
   const getTotals = async () => {
     await request(
@@ -92,13 +84,11 @@ export default function Totals({}: Props) {
       defaultHeaders
     ).then((response: AxiosResponse) => {
       setChartData(response.data);
-      console.log(response.data[Currency]);
       setChartDataIsLoading(false);
     });
   };
 
   useEffect(() => {
-    console.log("useefect dates ",body)
     getTotals();
     getChartData();
   }, [body]);
@@ -198,21 +188,7 @@ export default function Totals({}: Props) {
       )}
 
       {ChartDataIsLoading && <Spinner />}
-      <button
-        onClick={() => {
-          console.log('------------------------------------------------------');
-          console.log('currency', Currency);
-          console.log('currencies', Currencies);
-          console.log('chart scale', ChartScale);
-          console.log('selected dates', body);
 
-          console.log('chart data:', ChartData);
-          console.log('totals data:', TotalsData);
-        }}
-      >
-        {' '}
-        test all data
-      </button>
       <Card className="px-4 ">
         <div>
           <Chart
