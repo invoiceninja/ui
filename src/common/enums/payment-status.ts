@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export enum PaymentStatus {
+export const enum PaymentStatus {
   PartiallyUnapplied = '-2',
   Unapplied = '-1',
   Pending = '1',
