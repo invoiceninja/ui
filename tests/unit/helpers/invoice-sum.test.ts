@@ -10,3 +10,17 @@ describe('InvoiceSum test', () => {
     await new InvoiceSum(invoice).build();
   });
 });
+
+describe('InvoiceSum test invoice calculation', () => {
+
+  it('playground', async () => {
+
+    invoice.line_items = [];
+    const invoiceSum = await new InvoiceSum(invoice).build();
+
+    expect(invoiceSum.invoice.amount).toEqual(0);
+    expect(invoiceSum.invoice.balance).toEqual(0);
+
+  });
+
+});

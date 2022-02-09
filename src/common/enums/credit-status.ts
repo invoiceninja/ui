@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export enum CreditStatus {
+export const enum CreditStatus {
   Draft = '1',
   Sent = '2',
   Partial = '3',

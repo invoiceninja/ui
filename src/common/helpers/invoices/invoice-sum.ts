@@ -13,7 +13,7 @@ export class InvoiceSum {
   protected totalTaxes = 0;
   protected totalCustomValues = 0;
 
-  constructor(protected invoice: Invoice) {}
+  constructor(public invoice: Invoice) {}
 
   public async build() {
     await this.calculateLineItems();

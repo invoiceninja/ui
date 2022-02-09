@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export enum InvoiceStatus {
+export const enum InvoiceStatus {
   Viewed = '-3',
   Unpaid = '-2',
   PastDue = '-1',
