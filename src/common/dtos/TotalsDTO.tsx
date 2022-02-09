@@ -1,19 +1,7 @@
 export interface TotalDataDTO {
-  revenue: {
-    paid_to_date: string;
-    currency_id: string;
-    code: string;
-  };
-  outstanding: {
-    paid_to_date: string;
-    currency_id: string;
-    code: string;
-  };
-  expenses: {
-    paid_to_date: string;
-    currency_id: string;
-    code: string;
-  };
+  revenue: { paid_to_date: string; code: string };
+  expenses: { amount: string; code: string };
+  outstanding: {};
 }
 export interface ChartDataDTO {
   invoices: { total: string; date: string; currency: string }[];
@@ -24,10 +12,7 @@ export interface ChartDataDTO {
     currency: string;
   }[];
 }
-export interface ChardMapDTO{
-    
-        name: string
-        uv: number,
-        
-
+export interface ChardMapDTO {
+  name: string;
+  uv: number;
 }

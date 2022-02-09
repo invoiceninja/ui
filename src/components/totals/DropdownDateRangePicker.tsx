@@ -29,7 +29,7 @@ export default function DropdownDateRangePicker(props: Props) {
     <div className="  flex justify-end items-center">
       <Calendar className="mx-2" />{' '}
       <SelectField
-        defaultValue={props.end_date + '/' + props.start_date}
+      defaultValue={props.end_date + '/' + props.start_date}
         className={
           ' orm-select appearance-none block w-60 px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none '
         }
@@ -43,9 +43,7 @@ export default function DropdownDateRangePicker(props: Props) {
           }
         }}
       >
-        <option selected hidden>
-          {props.end_date}/{props.start_date}{' '}
-        </option>
+       
         <option
           value={[
             new Date(now.getFullYear(), now.getMonth(), now.getDate() - 7)

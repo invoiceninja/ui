@@ -29,7 +29,7 @@ return <InfoCard className='w-full h-44'  title={props.Title} value={<>
 <div className=' text-2xl w-full h-24 py-4 font-black flex justify-start '>
 
 
-{props.Currency} {new Intl.NumberFormat().format(Number(props.Amount))}
+{props.Currency} {props.Amount? new Intl.NumberFormat().format(Number(props.Amount)):'--' }
 
 
 </div>
