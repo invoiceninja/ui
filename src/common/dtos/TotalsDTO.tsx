@@ -12,7 +12,6 @@ export interface ChartDataDTO {
     currency: string;
   }[];
 }
-export interface ChardMapDTO {
-  name: string;
-  uv: number;
+export interface ChartMapDTO {
+  name:string,invoices:string,expenses:string,payments:string
 }

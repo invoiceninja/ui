@@ -39,7 +39,7 @@ export default function Totals({}: Props) {
     start_date: new Date(
       new Date().getFullYear(),
       new Date().getMonth(),
-      new Date().getDate() - 30
+      new Date().getDate() - 7
     )
       .toISOString()
       .split('T')[0],
