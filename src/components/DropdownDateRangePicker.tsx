@@ -23,7 +23,7 @@ export default function DropdownDateRangePicker(props: Props) {
 
   let CustomStartDate: string;
   let CustomEndDate: string;
-  var now = new Date();
+  const now = new Date();
   const quarter = Math.floor(now.getMonth() / 3);
   return (
     <div className="  flex justify-end items-center">

@@ -8,9 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosResponse } from 'axios';
-import { ChartDataDTO } from 'common/dtos/TotalsDTO';
-import { endpoint, fetcher, request } from 'common/helpers';
+import { ChartDataDTO, ChartMapDTO } from 'common/dtos/TotalsDTO';
 import React, { useEffect, useState } from 'react';
 import {
   Area,
@@ -30,26 +28,19 @@ type Props = {
 };
 
 export default function Chart(props: Props) {
-  const [ChartData, setChartData] = useState<{}[]>([]);
+  const [ChartData, setChartData] = useState<unknown[]>([]);
 
   useEffect(() => {
-    let cdata: {
-      name: string;
-      invoices: string;
-      expenses: string;
-      payments: string;
-    }[] = [];
-    let s_date = new Date(props.dates.start_date);
-    let e_date = new Date(props.dates.end_date);
+    const CompleteChartData: ChartMapDTO[] = [];
 
     switch (props.chartSensitivity) {
       case 'day': {
         for (
-          let date = s_date;
-          date < e_date;
+          let date = new Date(props.dates.start_date);
+          date < new Date(props.dates.end_date);
           date.setDate(date.getDate() + 1)
         ) {
-          cdata.push({
+          CompleteChartData.push({
             name: date.toISOString().split('T')[0],
             invoices: '0',
             expenses: '0',
@@ -60,11 +51,11 @@ export default function Chart(props: Props) {
       }
       case 'week': {
         for (
-          let date = s_date;
-          date < e_date;
+          let date = new Date(props.dates.start_date);
+          date < new Date(props.dates.end_date);
           date.setDate(date.getDate() + 7)
         ) {
-          cdata.push({
+          CompleteChartData.push({
             name: date.toISOString().split('T')[0],
             invoices: '0',
             expenses: '0',
@@ -75,11 +66,11 @@ export default function Chart(props: Props) {
       }
       case 'month': {
         for (
-          let date = s_date;
-          date < e_date;
+          let date = new Date(props.dates.start_date);
+          date < new Date(props.dates.end_date);
           date.setDate(date.getDate() + 30)
         ) {
-          cdata.push({
+          CompleteChartData.push({
             name: date.toISOString().split('T')[0],
             invoices: '0',
             expenses: '0',
@@ -90,16 +81,16 @@ export default function Chart(props: Props) {
       }
     }
 
-    props.data?.expenses.forEach((item, index) => {
+    props.data?.expenses.forEach((item) => {
       let item_added = false;
-      cdata.forEach((element) => {
+      CompleteChartData.forEach((element) => {
         if (element.name === item.date) {
           element.expenses = item.total;
           item_added = true;
         }
       });
       if (!item_added) {
-        cdata.push({
+        CompleteChartData.push({
           name: item.date,
           invoices: '0',
           expenses: item.total,
@@ -107,17 +98,17 @@ export default function Chart(props: Props) {
         });
       }
     });
-    props.data?.payments.forEach((item, index) => {
+    props.data?.payments.forEach((item) => {
       let item_added = false;
 
-      cdata.forEach((element) => {
+      CompleteChartData.forEach((element) => {
         if (element.name === item.date) {
           element.payments = item.total;
           item_added = true;
         }
       });
       if (!item_added) {
-        cdata.push({
+        CompleteChartData.push({
           name: item.date,
           invoices: '0',
           expenses: '0',
@@ -125,17 +116,17 @@ export default function Chart(props: Props) {
         });
       }
     });
-    props.data?.invoices.forEach((item, index) => {
+    props.data?.invoices.forEach((item) => {
       let item_added = false;
 
-      cdata.forEach((element) => {
+      CompleteChartData.forEach((element) => {
         if (element.name === item.date) {
           element.invoices = item.total;
           item_added = true;
         }
       });
       if (!item_added) {
-        cdata.push({
+        CompleteChartData.push({
           name: item.date,
           invoices: item.total,
           expenses: '0',
@@ -144,10 +135,10 @@ export default function Chart(props: Props) {
       }
     });
 
-    cdata.sort((a, b) => {
+    CompleteChartData.sort((a, b) => {
       return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
     });
-    setChartData(cdata);
+    setChartData(CompleteChartData);
   }, [props]);
 
   return (
@@ -174,11 +165,7 @@ export default function Chart(props: Props) {
             <Tooltip />
 
             <XAxis height={50} dataKey="name" />
-            <YAxis
-              type="number"
-              domain={[0, 'dataMax + 1000']}
-              interval="preserveStartEnd"
-            />
+            <YAxis />
             <Area
               dataKey="payments"
               stroke="#131317"

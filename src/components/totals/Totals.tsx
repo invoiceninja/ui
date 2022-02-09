@@ -16,23 +16,25 @@ import Chart from 'components/charts/Chart';
 import React, { useEffect, useState } from 'react';
 
 import Total from './Total';
-import { ChartDataDTO, TotalDataDTO } from '../../common/dtos/TotalsDTO';
+import {
+  ChartDataDTO,
+  RequestBodyDTO,
+  TotalDataDTO,
+} from '../../common/dtos/TotalsDTO';
 import { Spinner } from 'components/Spinner';
-import DropdownDateRangePicker from './DropdownDateRangePicker';
+import DropdownDateRangePicker from '../DropdownDateRangePicker';
 import { Card } from '@invoiceninja/cards';
 
-type Props = {};
-
-export default function Totals({}: Props) {
+export default function Totals() {
   const [TotalsIsLoading, setTotalsIsLoading] = useState(true);
   const [ChartDataIsLoading, setChartDataIsLoading] = useState(true);
-  const [AllTotalsData, setAllTotalsData] = useState([]);
   const [TotalsData, setTotals] = useState<TotalDataDTO[]>([]);
   const [Currencies, setCurrencies] = useState([]);
   const [ChartData, setChartData] = useState<ChartDataDTO[]>([]);
   const [Currency, setCurrency] = useState(1);
   const [ChartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
-  const [body, setbody] = useState<{ start_date: string; end_date: string }>({
+  //default date is last 7 days
+  const [body, setbody] = useState<RequestBodyDTO>({
     start_date: new Date(
       new Date().getFullYear(),
       new Date().getMonth(),
@@ -43,14 +45,10 @@ export default function Totals({}: Props) {
     end_date: new Date().toISOString().split('T')[0],
   });
 
-  const switchCurrency = (id: string) => {
-    setCurrency(Number(id));
-  };
   const handleDateChange = (DateSet: string) => {
-    let data = DateSet.split(',');
-
-    let s_date = new Date(DateSet.split(',')[0]);
-    let e_date = new Date(DateSet.split(',')[1]);
+    const data = DateSet.split(',');
+    const s_date = new Date(DateSet.split(',')[0]);
+    const e_date = new Date(DateSet.split(',')[1]);
 
     if (s_date > e_date) {
       setbody({
@@ -68,7 +66,6 @@ export default function Totals({}: Props) {
       body,
       defaultHeaders
     ).then((response: AxiosResponse) => {
-      setAllTotalsData(response.data);
       setTotals(response.data);
       setCurrencies(response.data.currencies);
 
@@ -92,7 +89,6 @@ export default function Totals({}: Props) {
     getTotals();
     getChartData();
   }, [body]);
-  const active = '   focus:outline-none focus:ring-1 focus:ring-slate-800';
   return (
     <div className="max-w-screen-2xl mx-auto">
       {TotalsIsLoading && <Spinner />}
@@ -109,7 +105,7 @@ export default function Totals({}: Props) {
                     type="secondary"
                     className={'mx-0.5'}
                     onClick={() => {
-                      switchCurrency(key);
+                      setCurrency(Number(key));
                     }}
                   >
                     {String(value)}
