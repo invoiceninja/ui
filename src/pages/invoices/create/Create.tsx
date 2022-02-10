@@ -15,6 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { Client } from './components/clients/Client';
 import { Details } from './components/Details';
+import { Footer } from './components/Footer';
 import { Table } from './components/tables/Table';
 
 export function Create() {
@@ -36,6 +37,7 @@ export function Create() {
         <Client />
         <Details />
         <Table />
+        <Footer />
       </div>
     </Default>
   );
