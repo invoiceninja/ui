@@ -110,7 +110,11 @@ export function Totals() {
   }, [body]);
   return (
     <Container>
-      {totalsIsLoading &&<div className='w-full flex justify-center'><Spinner /></div>}
+      {totalsIsLoading && (
+        <div className="w-full flex justify-center">
+          <Spinner />
+        </div>
+      )}
 
       {!totalsIsLoading && (
         <div className="flex flex-col sm:grid grid-cols-3 gap-5 my-5 ">
@@ -230,15 +234,21 @@ export function Totals() {
         </div>
       )}
 
-      {chartDataIsLoading && <div className='w-full flex justify-center'><Spinner /></div>}
+      {chartDataIsLoading && (
+        <div className="w-full flex justify-center">
+          <Spinner />
+        </div>
+      )}
 
-       <Card>
+      <Card>
         <div className="px-4 py-4">
-        {!chartDataIsLoading && <Chart
-            chartSensitivity={ChartScale}
-            dates={{ start_date: body.start_date, end_date: body.end_date }}
-            data={ChartData[Currency]}
-          ></Chart>}
+          {!chartDataIsLoading && (
+            <Chart
+              chartSensitivity={ChartScale}
+              dates={{ start_date: body.start_date, end_date: body.end_date }}
+              data={ChartData[Currency]}
+            ></Chart>
+          )}
         </div>
       </Card>
     </Container>

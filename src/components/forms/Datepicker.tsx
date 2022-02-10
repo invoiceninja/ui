@@ -16,9 +16,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 type Props = CommonProps;
 
 export function Datepicker(props: Props) {
-  const [date, setDate] = useState<Date>(
-    props.value ? new Date(props.value) : new Date()
-  );
+  const [date, setDate] = useState<Date>(new Date());
   return (
     <ReactDatePicker
       selected={date}
