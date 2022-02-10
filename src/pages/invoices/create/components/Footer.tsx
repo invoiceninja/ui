@@ -18,7 +18,7 @@ export function Footer() {
   const [t] = useTranslation();
 
   return (
-    <Card className="col-span-12 xl:col-span-8" withContainer>
+    <Card className="col-span-12 xl:col-span-8 h-max" withContainer>
       <TabGroup tabs={[t('terms'), t('notes'), t('settings')]}>
         <Tab.Panel>
           <MDEditor />

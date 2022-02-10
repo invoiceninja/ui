@@ -17,6 +17,7 @@ import { Client } from './components/clients/Client';
 import { Details } from './components/Details';
 import { Footer } from './components/Footer';
 import { Table } from './components/tables/Table';
+import { Totals } from './components/Totals';
 
 export function Create() {
   const [t] = useTranslation();
@@ -38,6 +39,7 @@ export function Create() {
         <Details />
         <Table />
         <Footer />
+        <Totals />
       </div>
     </Default>
   );
