@@ -9,7 +9,7 @@
  */
 
 import { Breadcrumbs } from 'components/Breadcrumbs';
-import Totals from 'components/totals/Totals';
+import {Totals} from 'components/totals/Totals';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';
@@ -26,7 +26,7 @@ export function Dashboard() {
   return (
     <Default title={t('dashboard')}>
       <Breadcrumbs pages={navigation} />
-  <Totals></Totals>
+  <Totals/>
     </Default>
   );
 }

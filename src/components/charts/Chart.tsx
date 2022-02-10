@@ -8,8 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ChartDataDTO, ChartMapDTO } from 'common/dtos/TotalsDTO';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Area,
   AreaChart,
@@ -22,16 +21,29 @@ import {
 } from 'recharts';
 
 type Props = {
-  data: ChartDataDTO;
+  data: {
+    invoices: { total: string; date: string; currency: string }[];
+    payments: { total: string; date: string; currency: string }[];
+    expenses: {
+      total: string;
+      date: string;
+      currency: string;
+    }[];
+  };
   dates: any;
   chartSensitivity: 'day' | 'week' | 'month';
 };
 
-export default function Chart(props: Props) {
-  const [ChartData, setChartData] = useState<unknown[]>([]);
+export function Chart(props: Props) {
+  const [chartData, setchartData] = useState<unknown[]>([]);
 
   useEffect(() => {
-    const CompleteChartData: ChartMapDTO[] = [];
+    const completeChartData: {
+      name: string;
+      invoices: string;
+      expenses: string;
+      payments: string;
+    }[] = [];
 
     switch (props.chartSensitivity) {
       case 'day': {
@@ -40,7 +52,7 @@ export default function Chart(props: Props) {
           date < new Date(props.dates.end_date);
           date.setDate(date.getDate() + 1)
         ) {
-          CompleteChartData.push({
+          completeChartData.push({
             name: date.toISOString().split('T')[0],
             invoices: '0',
             expenses: '0',
@@ -55,7 +67,7 @@ export default function Chart(props: Props) {
           date < new Date(props.dates.end_date);
           date.setDate(date.getDate() + 7)
         ) {
-          CompleteChartData.push({
+          completeChartData.push({
             name: date.toISOString().split('T')[0],
             invoices: '0',
             expenses: '0',
@@ -70,7 +82,7 @@ export default function Chart(props: Props) {
           date < new Date(props.dates.end_date);
           date.setDate(date.getDate() + 30)
         ) {
-          CompleteChartData.push({
+          completeChartData.push({
             name: date.toISOString().split('T')[0],
             invoices: '0',
             expenses: '0',
@@ -82,15 +94,15 @@ export default function Chart(props: Props) {
     }
 
     props.data?.expenses.forEach((item) => {
-      let item_added = false;
-      CompleteChartData.forEach((element) => {
+      let itemAdded = false;
+      completeChartData.forEach((element) => {
         if (element.name === item.date) {
           element.expenses = item.total;
-          item_added = true;
+          itemAdded = true;
         }
       });
-      if (!item_added) {
-        CompleteChartData.push({
+      if (!itemAdded) {
+        completeChartData.push({
           name: item.date,
           invoices: '0',
           expenses: item.total,
@@ -99,16 +111,16 @@ export default function Chart(props: Props) {
       }
     });
     props.data?.payments.forEach((item) => {
-      let item_added = false;
+      let itemAdded = false;
 
-      CompleteChartData.forEach((element) => {
+      completeChartData.forEach((element) => {
         if (element.name === item.date) {
           element.payments = item.total;
-          item_added = true;
+          itemAdded = true;
         }
       });
-      if (!item_added) {
-        CompleteChartData.push({
+      if (!itemAdded) {
+        completeChartData.push({
           name: item.date,
           invoices: '0',
           expenses: '0',
@@ -117,16 +129,16 @@ export default function Chart(props: Props) {
       }
     });
     props.data?.invoices.forEach((item) => {
-      let item_added = false;
+      let itemAdded = false;
 
-      CompleteChartData.forEach((element) => {
+      completeChartData.forEach((element) => {
         if (element.name === item.date) {
           element.invoices = item.total;
-          item_added = true;
+          itemAdded = true;
         }
       });
-      if (!item_added) {
-        CompleteChartData.push({
+      if (!itemAdded) {
+        completeChartData.push({
           name: item.date,
           invoices: item.total,
           expenses: '0',
@@ -135,17 +147,17 @@ export default function Chart(props: Props) {
       }
     });
 
-    CompleteChartData.sort((a, b) => {
+    completeChartData.sort((a, b) => {
       return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
     });
-    setChartData(CompleteChartData);
+    setchartData(completeChartData);
   }, [props]);
 
   return (
     <>
       <div>
         <ResponsiveContainer width={'100%'} height={250}>
-          <AreaChart height={200} data={ChartData}>
+          <AreaChart height={200} data={chartData}>
             <Legend></Legend>
             <defs>
               <linearGradient id="colorpayments" x1="0" y1="0" x2="0" y2="1">

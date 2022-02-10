@@ -7,36 +7,39 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Button, Datepicker, SelectField } from '@invoiceninja/forms';
+import { Button, SelectField } from '@invoiceninja/forms';
 import { Modal } from 'components/Modal';
-import React, { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { Calendar } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 
 type Props = {
-  start_date: string;
-  end_date: string;
+  startDate: string;
+  endDate: string;
   handleDateChange: any;
 };
 
-export default function DropdownDateRangePicker(props: Props) {
-  const [IsOpenModal, setIsOpenModal] = useState(false);
+export function DropdownDateRangePicker(props: Props) {
+  const [isOpenModal, setisOpenModal] = useState(false);
 
-  let CustomStartDate: string;
-  let CustomEndDate: string;
+  let customStartDate: string = props.startDate;
+  let customEndDate: string = props.endDate;
   const now = new Date();
+  const [t] = useTranslation();
+
   const quarter = Math.floor(now.getMonth() / 3);
   return (
     <div className="  flex justify-end items-center">
       <Calendar className="mx-2" />{' '}
       <SelectField
-        defaultValue={props.end_date + '/' + props.start_date}
+        defaultValue={props.startDate + '/' + props.startDate}
         className={
-          ' orm-select appearance-none block w-60 px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none '
+          ' orm-select appearance-none block w-44 px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none '
         }
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
           event.preventDefault();
           if (event.target.value === 'Custom') {
-            setIsOpenModal(true);
+            setisOpenModal(true);
           } else {
             props.handleDateChange(event.target.value);
           }
@@ -50,7 +53,7 @@ export default function DropdownDateRangePicker(props: Props) {
             now.toISOString().split('T')[0],
           ]}
         >
-          Last 7 Days
+          {t('last_7_days')}
         </option>
         <option
           value={[
@@ -60,7 +63,7 @@ export default function DropdownDateRangePicker(props: Props) {
             now.toISOString().split('T')[0],
           ]}
         >
-          Last 30 Days
+          {t('last_30_days')}
         </option>
         <option
           value={[
@@ -72,7 +75,7 @@ export default function DropdownDateRangePicker(props: Props) {
               .split('T')[0],
           ]}
         >
-          This Month
+          {t('this_month')}
         </option>
         <option
           value={[
@@ -88,7 +91,7 @@ export default function DropdownDateRangePicker(props: Props) {
               .split('T')[0],
           ]}
         >
-          Last Month
+          {t('last_month')}
         </option>
         <option
           value={[
@@ -104,7 +107,7 @@ export default function DropdownDateRangePicker(props: Props) {
               .split('T')[0],
           ]}
         >
-          This Quarter
+          {t('current_quarter')}
         </option>
         <option
           value={[
@@ -120,7 +123,7 @@ export default function DropdownDateRangePicker(props: Props) {
               .split('T')[0],
           ]}
         >
-          Last Quarter
+          {t('last_quarter')}
         </option>
         <option
           value={[
@@ -128,7 +131,7 @@ export default function DropdownDateRangePicker(props: Props) {
             new Date(now.getFullYear(), 11, 31).toISOString().split('T')[0],
           ]}
         >
-          This Year
+          Current Year needs translation
         </option>
         <option
           value={[
@@ -136,40 +139,44 @@ export default function DropdownDateRangePicker(props: Props) {
             new Date(now.getFullYear() - 1, 11, 31).toISOString().split('T')[0],
           ]}
         >
-          Last Year
+          {t('last_year')}
         </option>
-        <option>Custom</option>
+        <option value={'Custom'}>{`${t('custom_range')}`}</option>
       </SelectField>
       <Modal
-        overFlow={true}
-        title={'Select custom date range'}
-        visible={IsOpenModal}
+        title={t('custom_range')}
+        visible={isOpenModal}
         onClose={() => {
-          setIsOpenModal(false);
+          setisOpenModal(false);
         }}
       >
-        <div className="flex justify-center flex-col">
-          <p>Start date</p>
-          <Datepicker
-            value={props.start_date}
-            onChange={(SelectedDate: string) => {
-              CustomStartDate = SelectedDate;
+        <div className="flex justify-center flex-col my-3">
+          <p>{`${t('start')} ${t('date')}`}</p>
+          <input
+            type="date"
+            defaultValue={props.startDate}
+            onChange={(event) => {
+              customStartDate = event.target.value;
             }}
-          ></Datepicker>
+          ></input>
+
           <br></br>
-          <p>End date</p>
-          <Datepicker
-            value={props.end_date}
-            onChange={(SelectedDate: string) => {
-              CustomEndDate = SelectedDate;
+          <p>{`${t('end')} ${t('date')}`}</p>
+          <input
+            type="date"
+            defaultValue={props.endDate}
+            onChange={(event) => {
+              customEndDate = event.target.value;
             }}
-          ></Datepicker>
+          ></input>
+
           <br></br>
           <Button
+            className="my-2"
             type="primary"
             onClick={() => {
-              props.handleDateChange(CustomStartDate + ',' + CustomEndDate);
-              setIsOpenModal(false);
+              props.handleDateChange(customStartDate + ',' + customEndDate);
+              setisOpenModal(false);
             }}
           >
             Ok
