@@ -13,9 +13,9 @@ describe('Test Access Currency Object', () => {
 
 })
 
-describe('Test Number Formatting USD', () => {
+describe('Test Number Formatting', () => {
 
-    it('playground', async () => {
+    it('USD', async () => {
 
         const currency = currencies.filter(currency => currency.code == 'USD')[0];
 
@@ -32,12 +32,7 @@ describe('Test Number Formatting USD', () => {
         expect(formatValue).toEqual("1,000.25");
     });
 
-});
-
-
-describe('Test Number Formatting EUR', () => {
-
-    it('playground', async () => {
+    it('EUR', async () => {
 
         const currency = currencies.filter(currency => currency.code == 'EUR')[0];
 
@@ -54,11 +49,7 @@ describe('Test Number Formatting EUR', () => {
         expect(formatValue).toEqual("1.000,25");
     });
 
-});
-
-describe('Test Number Formatting GBP', () => {
-
-    it('playground', async () => {
+    it('GBP', async () => {
 
         const currency = currencies.filter(currency => currency.code == 'GBP')[0];
 
@@ -74,12 +65,8 @@ describe('Test Number Formatting GBP', () => {
         formatValue = Number.numberFormat(1000.25, currency);
         expect(formatValue).toEqual("1,000.25");
     });
-
-});
-
-describe('Test Number Formatting JPY', () => {
-
-    it('playground', async () => {
+    
+    it('JPY', async () => {
 
         const currency = currencies.filter(currency => currency.code == 'JPY')[0];
 
