@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTitle } from 'common/hooks/useTitle';
 import { Totals } from 'components/totals/Totals';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';
 
 export function Dashboard() {
   const [t] = useTranslation();
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('dashboard')}`;
-  });
+  useTitle('dashboard');
 
   const pages = [{ name: t('dashboard'), href: '/dashboard' }];
 
-  return <Default title={t('dashboard')} breadcrumbs={pages}>
-    <Totals/>
-  </Default>;
+  return (
+    <Default title={t('dashboard')} breadcrumbs={pages}>
+      <Totals />
+    </Default>
+  );
 }
