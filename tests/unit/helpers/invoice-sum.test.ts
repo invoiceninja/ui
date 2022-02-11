@@ -28,8 +28,6 @@ describe('InvoiceSum test invoice calculation', () => {
 
   it('Line Item Calc', async () => {
 
-    // invoice.line_items = invoice_item;
-
     const invoiceSum = await new InvoiceSum(invoice).build();
 
     expect(invoiceSum.invoice.amount).toEqual(3723);
