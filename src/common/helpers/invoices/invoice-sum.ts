@@ -12,6 +12,7 @@ export class InvoiceSum {
   public total = 0;
   public totalTaxes = 0;
   public totalCustomValues = 0;
+  public subTotal = 0;
 
   constructor(public invoice: Invoice) {}
 
@@ -35,7 +36,8 @@ export class InvoiceSum {
 
     this.invoice.line_items = this.invoiceItems.lineItems;
     this.total = this.invoiceItems.subTotal;
-
+    this.subTotal = this.invoiceItems.subTotal;
+    
     return this;
   }
 
@@ -108,7 +110,7 @@ export class InvoiceSum {
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge4);
 
     this.total += this.totalCustomValues;
-    
+
     return this;
   }
 

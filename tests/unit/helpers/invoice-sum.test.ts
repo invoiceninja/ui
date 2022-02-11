@@ -48,8 +48,8 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.line_items = invoice_item;
     const invoiceSum = await new InvoiceSum(invoice).build();
 
-    expect(invoiceSum.invoice.amount).toEqual(10);
-    expect(invoiceSum.invoice.balance).toEqual(10);
+    expect(invoiceSum.invoice.amount).toEqual(20);
+    expect(invoiceSum.invoice.balance).toEqual(20);
 
   });
 
@@ -60,8 +60,8 @@ describe('InvoiceSum test invoice calculation', () => {
 
     const invoiceSum = await new InvoiceSum(invoice).build();
 
-    expect(invoiceSum.invoice.amount).toEqual(9);
-    expect(invoiceSum.invoice.balance).toEqual(9);
+    expect(invoiceSum.invoice.amount).toEqual(19);
+    expect(invoiceSum.invoice.balance).toEqual(19);
 
   });
 
@@ -72,8 +72,8 @@ describe('InvoiceSum test invoice calculation', () => {
 
     const invoiceSum = await new InvoiceSum(invoice).build();
 
-    expect(invoiceSum.invoice.amount).toEqual(5);
-    expect(invoiceSum.invoice.balance).toEqual(5);
+    expect(invoiceSum.invoice.amount).toEqual(10);
+    expect(invoiceSum.invoice.balance).toEqual(10);
 
   });
 
@@ -85,9 +85,26 @@ describe('InvoiceSum test invoice calculation', () => {
 
     const invoiceSum = await new InvoiceSum(invoice).build();
 
-    expect(invoiceSum.invoice.amount).toEqual(10);
-    expect(invoiceSum.invoice.balance).toEqual(10);
+    expect(invoiceSum.invoice.amount).toEqual(20);
+    expect(invoiceSum.invoice.balance).toEqual(20);
 
   });
+
+  it('Invoice Totals With Discount WithSurcharge With Exclusive Tax', async () => {
+
+    invoice.is_amount_discount = true;
+    invoice.discount = 5;
+    invoice.custom_surcharge1 = 5
+    invoice.tax_rate1 = 10;
+    invoice.tax_name1 = 'GST';
+
+    const invoiceSum = await new InvoiceSum(invoice).build();
+
+    expect(invoiceSum.subTotal).toEqual(20);
+    expect(invoiceSum.invoice.amount).toEqual(21.5);
+    expect(invoiceSum.invoice.balance).toEqual(21.5);
+
+  });
+  
 
 });
