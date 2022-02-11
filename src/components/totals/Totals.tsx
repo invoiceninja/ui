@@ -11,7 +11,7 @@ import { Button } from '@invoiceninja/forms';
 import { AxiosResponse } from 'axios';
 import { endpoint, request } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { Chart } from 'components/charts/Chart';
+import { Chart } from 'components/totals/Chart';
 
 import { useEffect, useState } from 'react';
 
@@ -178,16 +178,14 @@ export function Totals() {
                   className="w-full h-44"
                   title={`${t('total')} ${t('revenue')}`}
                   value={
-                    <>
-                      <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
-                        {totalsData[Currency].revenue.code}{' '}
-                        {totalsData[Currency].revenue.paid_to_date
-                          ? new Intl.NumberFormat().format(
-                              Number(totalsData[Currency].revenue.paid_to_date)
-                            )
-                          : '--'}
-                      </div>
-                    </>
+                    <Card>
+                      {totalsData[Currency].revenue.code}{' '}
+                      {totalsData[Currency].revenue.paid_to_date
+                        ? new Intl.NumberFormat().format(
+                            Number(totalsData[Currency].revenue.paid_to_date)
+                          )
+                        : '--'}
+                    </Card>
                   }
                 />
               </div>
@@ -197,16 +195,14 @@ export function Totals() {
                   className="w-full h-44"
                   title={`${t('total')} ${t('expenses')}`}
                   value={
-                    <>
-                      <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
-                        {totalsData[Currency].expenses.code}{' '}
-                        {totalsData[Currency].expenses.amount
-                          ? new Intl.NumberFormat().format(
-                              Number(totalsData[Currency].expenses.amount)
-                            )
-                          : '--'}
-                      </div>
-                    </>
+                    <Card>
+                      {totalsData[Currency].expenses.code}{' '}
+                      {totalsData[Currency].expenses.amount
+                        ? new Intl.NumberFormat().format(
+                            Number(totalsData[Currency].expenses.amount)
+                          )
+                        : '--'}
+                    </Card>
                   }
                 />
               </div>
@@ -216,16 +212,14 @@ export function Totals() {
                   className="w-full h-44"
                   title={`${t('outstanding')}`}
                   value={
-                    <>
-                      <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
-                        {totalsData[Currency].outstanding.code}{' '}
-                        {totalsData[Currency].outstanding.amount
-                          ? new Intl.NumberFormat().format(
-                              Number(totalsData[Currency].outstanding.amount)
-                            )
-                          : '--'}
-                      </div>
-                    </>
+                    <Card>
+                      {totalsData[Currency].outstanding.code}{' '}
+                      {totalsData[Currency].outstanding.amount
+                        ? new Intl.NumberFormat().format(
+                            Number(totalsData[Currency].outstanding.amount)
+                          )
+                        : '--'}
+                    </Card>
                   }
                 />
               </div>
