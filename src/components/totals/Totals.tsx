@@ -122,64 +122,64 @@ export function Totals() {
         </div>
       )}
 
+      {/* Quick date, currency & date picker. */}
+      <div className="flex justify-end">
+        {currencies && (
+          <Select
+            onChange={(key) => {
+              setCurrency(Number(key?.value));
+            }}
+            defaultValue={currencies[0]}
+            placeholder={t('currency')}
+            options={currencies}
+            isMulti={false}
+          />
+        )}
+
+        <Button
+          key={`day-btn`}
+          className={'mx-0.5'}
+          type="secondary"
+          onClick={() => {
+            setChartScale('day');
+          }}
+        >
+          {t('day')}
+        </Button>
+
+        <Button
+          key={`week-btn`}
+          className={'mx-0.5 '}
+          type="secondary"
+          onClick={() => {
+            setChartScale('week');
+          }}
+        >
+          {t('week')}
+        </Button>
+
+        <Button
+          key={`month-btn`}
+          className={'mx-0.5'}
+          type="secondary"
+          onClick={() => {
+            setChartScale('month');
+          }}
+        >
+          {t('month')}
+        </Button>
+
+        <div className="flex justify-center  sm:col-start-3 ">
+          <DropdownDateRangePicker
+            handleDateChange={handleDateChange}
+            startDate={body.start_date}
+            endDate={body.end_date}
+          />
+        </div>
+      </div>
+
       {!totalsIsLoading && (
-        <div className="flex flex-col sm:grid grid-cols-3 gap-5 my-5 ">
-          <div className="flex flex-wrap justify-center col-start-2">
-            {currencies && (
-              <Select
-                onChange={(key) => {
-                  setCurrency(Number(key?.value));
-                }}
-                defaultValue={currencies[0]}
-                placeholder={t('currency')}
-                options={currencies}
-                isMulti={false}
-              />
-            )}
-          </div>
-          <div className="flex justify-center sm:justify-">
-            <Button
-              key={`day-btn`}
-              className={'mx-0.5'}
-              type="secondary"
-              onClick={() => {
-                setChartScale('day');
-              }}
-            >
-              {t('day')}
-            </Button>
-
-            <Button
-              key={`week-btn`}
-              className={'mx-0.5 '}
-              type="secondary"
-              onClick={() => {
-                setChartScale('week');
-              }}
-            >
-              {t('week')}
-            </Button>
-
-            <Button
-              key={`month-btn`}
-              className={'mx-0.5'}
-              type="secondary"
-              onClick={() => {
-                setChartScale('month');
-              }}
-            >
-              {t('month')}
-            </Button>
-          </div>
-
-          <div className="flex justify-center  sm:col-start-3 ">
-            <DropdownDateRangePicker
-              handleDateChange={handleDateChange}
-              startDate={body.start_date}
-              endDate={body.end_date}
-            />
-          </div>
-
+        <div className="flex justify-end">
           {totalsData[currency] && (
             <>
               <InfoCard
