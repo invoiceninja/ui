@@ -17,27 +17,35 @@ describe('InvoiceSum test', () => {
 
 describe('InvoiceSum test invoice calculation', () => {
 
+  it('Calculate Line Items',async () => {
+    
+    const invoiceItems = await new InvoiceItemSum(invoice);
+    invoiceItems.process();
 
-  it('One Line Item', async () => {
+    expect(invoiceItems.subTotal).toEqual(2628);
 
-    invoice.line_items = invoice_item;
+  });
+
+  it('Line Item Calc', async () => {
+
+    // invoice.line_items = invoice_item;
 
     const invoiceSum = await new InvoiceSum(invoice).build();
 
-    expect(invoiceSum.invoice.amount).toEqual(10);
+    expect(invoiceSum.invoice.amount).toEqual(3766.80);
     expect(invoiceSum.invoice.balance).toEqual(0);
 
   });
 
-  it('Zero sum invoice', async () => {
+  // it('Zero sum invoice', async () => {
 
-    invoice.line_items = [];
-    const invoiceSum = await new InvoiceSum(invoice).build();
+  //   invoice.line_items = [];
+  //   const invoiceSum = await new InvoiceSum(invoice).build();
 
-    expect(invoiceSum.invoice.amount).toEqual(0);
-    expect(invoiceSum.invoice.balance).toEqual(0);
+  //   expect(invoiceSum.invoice.amount).toEqual(0);
+  //   expect(invoiceSum.invoice.balance).toEqual(0);
 
-  });
+  // });
 
 
 });

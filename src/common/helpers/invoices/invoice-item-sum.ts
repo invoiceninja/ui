@@ -30,7 +30,7 @@ export class InvoiceItemSum {
     this.invoice.line_items.map((item: InvoiceItem) => {
       this.item = item;
 
-      this.cleanLineItem().sumLineItem().setDiscount().push();
+      this.cleanLineItem().sumLineItem().setDiscount().calculateTaxes().push();
     });
 
     return this;
@@ -50,7 +50,7 @@ export class InvoiceItemSum {
 
   protected setDiscount() {
     if (this.invoice.is_amount_discount) {
-      this.item.line_total = this.item.line_total - 10; // We don't have definitive number formatter, need to implement that & then replace this with propert formatted value.
+      this.item.line_total = this.item.line_total - this.item.discount; // We don't have definitive number formatter, need to implement that & then replace this with propert formatted value.
     } else {
       const discount = this.item.line_total * (this.item.discount / 100);
 
@@ -109,6 +109,13 @@ export class InvoiceItemSum {
     }
 
     this.item.gross_line_total = this.item.line_total + itemTax;
+
+    console.log(this.item.line_total);
+    console.log(itemTax);
+
+    this.totalTaxes += itemTax;
+    
+    console.log("calculate taxes = " + this.totalTaxes);
 
     return this;
   }
@@ -207,6 +214,8 @@ export class InvoiceItemSum {
           );
         }
       });
+
+console.log("line item taxes = " + itemTax);
 
     this.totalTaxes = itemTax;
   }

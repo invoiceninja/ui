@@ -2,16 +2,17 @@ import { InvoiceItemSum } from './invoice-item-sum';
 import { Invoice } from 'common/interfaces/invoice';
 import collect from 'collect.js';
 import { InvoiceStatus } from 'common/enums/invoice-status';
+import { composeInitialProps } from 'react-i18next';
 
 export class InvoiceSum {
   protected taxMap = collect();
   protected invoiceItems = new InvoiceItemSum(this.invoice);
   protected totalTaxMap: Record<string, unknown>[] = [];
 
-  protected totalDiscount = 0;
-  protected total = 0;
-  protected totalTaxes = 0;
-  protected totalCustomValues = 0;
+  public totalDiscount = 0;
+  public total = 0;
+  public totalTaxes = 0;
+  public totalCustomValues = 0;
 
   constructor(public invoice: Invoice) {}
 
@@ -25,19 +26,30 @@ export class InvoiceSum {
     await this.calculateBalance();
     await this.calculatePartial();
 
+    this.totalDiscount = 123;
+
     return this;
   }
 
   protected async calculateLineItems() {
     await this.invoiceItems.process();
 
+    this.invoice.line_items = this.invoiceItems.lineItems;
+    this.total = this.invoiceItems.subTotal;
+
+    console.log(this.invoice.line_items);
+    console.log(this.total);
+
     return this;
   }
 
   protected async calculateDiscount() {
     this.totalDiscount = this.discount(this.invoiceItems.subTotal);
-    this.total -= this.totalDiscount;
 
+    console.log("subtotal = " + this.invoiceItems.subTotal);
+    console.log(this.totalDiscount);
+    this.total -= this.totalDiscount;
+    console.log(this.total);
     return this;
   }
 
@@ -161,7 +173,10 @@ export class InvoiceSum {
 
       this.taxMap.push({ name: taxName, total: totalLineTax });
 
+      console.log("total line taxes = " + totalLineTax);
       this.totalTaxes += totalLineTax as number;
+      console.log("total taxes = " + this.totalTaxes);
+
     });
 
     return this;
