@@ -32,8 +32,8 @@ describe('InvoiceSum test invoice calculation', () => {
 
     const invoiceSum = await new InvoiceSum(invoice).build();
 
-    expect(invoiceSum.invoice.amount).toEqual(3766.80);
-    expect(invoiceSum.invoice.balance).toEqual(0);
+    expect(invoiceSum.invoice.amount).toEqual(3723);
+    expect(invoiceSum.invoice.balance).toEqual(3723);
 
   });
 

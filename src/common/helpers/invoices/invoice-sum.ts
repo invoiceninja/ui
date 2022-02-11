@@ -37,19 +37,13 @@ export class InvoiceSum {
     this.invoice.line_items = this.invoiceItems.lineItems;
     this.total = this.invoiceItems.subTotal;
 
-    console.log(this.invoice.line_items);
-    console.log(this.total);
-
     return this;
   }
 
   protected async calculateDiscount() {
     this.totalDiscount = this.discount(this.invoiceItems.subTotal);
-
-    console.log("subtotal = " + this.invoiceItems.subTotal);
-    console.log(this.totalDiscount);
     this.total -= this.totalDiscount;
-    console.log(this.total);
+
     return this;
   }
 
@@ -173,9 +167,7 @@ export class InvoiceSum {
 
       this.taxMap.push({ name: taxName, total: totalLineTax });
 
-      console.log("total line taxes = " + totalLineTax);
-      this.totalTaxes += totalLineTax as number;
-      console.log("total taxes = " + this.totalTaxes);
+      this.totalTaxes += this.invoiceItems.totalTaxes;
 
     });
 
