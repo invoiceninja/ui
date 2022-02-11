@@ -19,13 +19,18 @@ import { bulk, useProductQuery } from 'common/queries/products';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
+import ResourcefulActions from 'components/ResourcefulActions';
 import { useFormik } from 'formik';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
-
+interface Actions {
+  name: string;
+  action?: any;
+  to?: any;
+}
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
@@ -88,6 +93,48 @@ export function Edit() {
         )
       );
   };
+  const action: Actions[] = [];
+
+  const createActions = () => {
+    action.push({
+      name: t('clone_product'),
+      to: generatePath('/products/:id/clone', { id }),
+    });
+
+    if (getEntityState(product?.data.data) === EntityState.Active) {
+      action.push({
+        name: t('archive_product'),
+        action: () => {
+          handleResourcefulAction('archive', product?.data.data.id);
+        },
+      });
+    }
+    if (
+      getEntityState(product?.data.data) === EntityState.Archived ||
+      getEntityState(product?.data.data) === EntityState.Deleted
+    ) {
+      action.push({
+        name: t('restore_product'),
+        action: () => {
+          handleResourcefulAction('restore', product?.data.data.id);
+        },
+      });
+    }
+    if (
+      getEntityState(product?.data.data) === EntityState.Active ||
+      getEntityState(product?.data.data) === EntityState.Archived
+    ) {
+      action.push({
+        name: t('delete_product'),
+        action: () => {
+          handleResourcefulAction('delete', product?.data.data.id);
+        },
+      });
+    }
+  };
+  if (product) {
+    createActions();
+  }
 
   return (
     <>
@@ -141,46 +188,13 @@ export function Edit() {
           </Element>
         </Card>
       )}
-
       {product && (
         <div className="flex justify-end">
-          <Dropdown label={t('more_actions')}>
-            <DropdownElement to={generatePath('/products/:id/clone', { id })}>
-              {t('clone_product')}
-            </DropdownElement>
-
-            {getEntityState(product.data.data) === EntityState.Active && (
-              <DropdownElement
-                onClick={() =>
-                  handleResourcefulAction('archive', product.data.data.id)
-                }
-              >
-                {t('archive_product')}
-              </DropdownElement>
-            )}
-
-            {(getEntityState(product.data.data) === EntityState.Archived ||
-              getEntityState(product.data.data) === EntityState.Deleted) && (
-              <DropdownElement
-                onClick={() =>
-                  handleResourcefulAction('restore', product.data.data.id)
-                }
-              >
-                {t('restore_product')}
-              </DropdownElement>
-            )}
-
-            {(getEntityState(product.data.data) === EntityState.Active ||
-              getEntityState(product.data.data) === EntityState.Archived) && (
-              <DropdownElement
-                onClick={() =>
-                  handleResourcefulAction('delete', product.data.data.id)
-                }
-              >
-                {t('delete_product')}
-              </DropdownElement>
-            )}
-          </Dropdown>
+          <ResourcefulActions
+            label={t('more_actions')}
+            actions={action}
+            key={'more_actions'}
+          />
         </div>
       )}
     </>
