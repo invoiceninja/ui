@@ -234,17 +234,15 @@ export function Totals() {
         </div>
       )}
 
-      <Card>
-        <div className="px-4 py-4">
-          {chartData && (
-            <Chart
-              chartSensitivity={chartScale}
-              dates={{ start_date: body.start_date, end_date: body.end_date }}
-              data={chartData[currency]}
-            ></Chart>
-          )}
-        </div>
-      </Card>
+      {chartData && (
+        <Card withContainer className="mt-4">
+          <Chart
+            chartSensitivity={chartScale}
+            dates={{ start_date: body.start_date, end_date: body.end_date }}
+            data={chartData[currency]}
+          ></Chart>
+        </Card>
+      )}
     </>
   );
 }
