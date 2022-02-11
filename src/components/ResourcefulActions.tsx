@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
 interface Actions {
@@ -17,17 +16,16 @@ interface Actions {
   to?: any;
 }
 type Props = {
-  resource: string;
   actions: Actions[];
+  label:string
 };
 
 export default function RecorcefulActions(props: Props) {
-  const [t] = useTranslation();
   return (
-    <Dropdown label={t('actions')}>
-      {props.actions.map((action) => {
+    <Dropdown label={props.label}>
+      {props.actions.map((action,index) => {
         return (
-          <DropdownElement
+          <DropdownElement key={`action_${index}`}
             to={action.to}
             onClick={() => {
               action.action();
