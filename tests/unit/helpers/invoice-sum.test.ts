@@ -1,5 +1,6 @@
 import { InvoiceSum } from './../../../src/common/helpers/invoices/invoice-sum';
 import invoice from '../../helpers/data/invoice';
+import invoice_item from '../../helpers/data/invoice_item';
 import { InvoiceItemSum } from '../../../src/common/helpers/invoices/invoice-item-sum';
 
 
@@ -33,15 +34,60 @@ describe('InvoiceSum test invoice calculation', () => {
 
   });
 
-  // it('Zero sum invoice', async () => {
+  it('Single line item', async () => {
 
-  //   invoice.line_items = [];
-  //   const invoiceSum = await new InvoiceSum(invoice).build();
+    invoice.line_items = [];
 
-  //   expect(invoiceSum.invoice.amount).toEqual(0);
-  //   expect(invoiceSum.invoice.balance).toEqual(0);
+    invoice.tax_name1 = '';
+    invoice.tax_rate1 = 0;
+    invoice.tax_name2 = '';
+    invoice.tax_rate2 = 0;
+    invoice.tax_name3 = '';
+    invoice.tax_rate3 = 0;
 
-  // });
+    invoice.line_items = invoice_item;
+    const invoiceSum = await new InvoiceSum(invoice).build();
 
+    expect(invoiceSum.invoice.amount).toEqual(10);
+    expect(invoiceSum.invoice.balance).toEqual(10);
+
+  });
+
+  it('Amount Invoice Discount', async () => {
+
+    invoice.is_amount_discount = true;
+    invoice.discount = 1;
+
+    const invoiceSum = await new InvoiceSum(invoice).build();
+
+    expect(invoiceSum.invoice.amount).toEqual(9);
+    expect(invoiceSum.invoice.balance).toEqual(9);
+
+  });
+
+  it('Percentage Invoice Discount', async () => {
+
+    invoice.is_amount_discount = false;
+    invoice.discount = 50;
+
+    const invoiceSum = await new InvoiceSum(invoice).build();
+
+    expect(invoiceSum.invoice.amount).toEqual(5);
+    expect(invoiceSum.invoice.balance).toEqual(5);
+
+  });
+
+  it('Invoice Discount With Surcharge', async () => {
+
+    invoice.is_amount_discount = true;
+    invoice.discount = 5;
+    invoice.custom_surcharge1 = 5
+
+    const invoiceSum = await new InvoiceSum(invoice).build();
+
+    expect(invoiceSum.invoice.amount).toEqual(10);
+    expect(invoiceSum.invoice.balance).toEqual(10);
+
+  });
 
 });

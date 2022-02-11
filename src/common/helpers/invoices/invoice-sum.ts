@@ -107,6 +107,8 @@ export class InvoiceSum {
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge3);
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge4);
 
+    this.total += this.totalCustomValues;
+    
     return this;
   }
 
