@@ -1,4 +1,3 @@
-import { InvoiceSum } from './../../../src/common/helpers/invoices/invoice-sum';
 import currencies from '../../helpers/data/currencies';
 import { Number } from './../../../src/common/helpers/number';
 

@@ -2,7 +2,6 @@ import { InvoiceItemSum } from './invoice-item-sum';
 import { Invoice } from 'common/interfaces/invoice';
 import collect from 'collect.js';
 import { InvoiceStatus } from 'common/enums/invoice-status';
-import { composeInitialProps } from 'react-i18next';
 
 export class InvoiceSum {
   protected taxMap = collect();

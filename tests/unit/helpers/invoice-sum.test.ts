@@ -1,7 +1,5 @@
 import { InvoiceSum } from './../../../src/common/helpers/invoices/invoice-sum';
 import invoice from '../../helpers/data/invoice';
-import invoice_item from '../../helpers/data/invoice_item';
-import { InvoiceItem } from './../../../src/common/interfaces/invoice-item';
 import { InvoiceItemSum } from '../../../src/common/helpers/invoices/invoice-item-sum';
 
 
