@@ -39,7 +39,7 @@ export function Totals() {
   const [currencies, setCurrencies] = useState<
     { value: string; label: unknown }[]
   >([]);
-  
+
   const [chartData, setChartData] = useState<
     {
       invoices: { total: string; date: string; currency: string }[];
@@ -78,6 +78,7 @@ export function Totals() {
       setbody({ start_date: startDate, end_date: endDate });
     }
   };
+
   const getTotals = () => {
     request(
       'POST',
@@ -112,6 +113,7 @@ export function Totals() {
     getTotals();
     getChartData();
   }, [body]);
+
   return (
     <Container>
       {totalsIsLoading && (
@@ -146,6 +148,7 @@ export function Totals() {
             >
               {t('day')}
             </Button>
+
             <Button
               key={`week-btn`}
               className={'mx-0.5 '}
@@ -156,6 +159,7 @@ export function Totals() {
             >
               {t('week')}
             </Button>
+
             <Button
               key={`month-btn`}
               className={'mx-0.5'}
@@ -167,6 +171,7 @@ export function Totals() {
               {t('month')}
             </Button>
           </div>
+
           <div className="flex justify-center  sm:col-start-3 ">
             <DropdownDateRangePicker
               handleDateChange={handleDateChange}
@@ -174,65 +179,57 @@ export function Totals() {
               endDate={body.end_date}
             />
           </div>
+
           {totalsData[currency] && (
             <>
-              <div>
-                {' '}
-                <InfoCard
-                  className="w-full h-44"
-                  title={`${t('total')} ${t('revenue')}`}
-                  value={
-                    <>
-                      <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
-                        {totalsData[currency].revenue.code}{' '}
-                        {totalsData[currency].revenue.paid_to_date
-                          ? new Intl.NumberFormat().format(
-                              Number(totalsData[currency].revenue.paid_to_date)
-                            )
-                          : '--'}
-                      </div>
-                    </>
-                  }
-                />
-              </div>
-              <div>
-                {' '}
-                <InfoCard
-                  className="w-full h-44"
-                  title={`${t('total')} ${t('expenses')}`}
-                  value={
-                    <>
-                      <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
-                        {totalsData[currency].expenses.code}{' '}
-                        {totalsData[currency].expenses.amount
-                          ? new Intl.NumberFormat().format(
-                              Number(totalsData[currency].expenses.amount)
-                            )
-                          : '--'}
-                      </div>
-                    </>
-                  }
-                />
-              </div>
-              <div>
-                {' '}
-                <InfoCard
-                  className="w-full h-44"
-                  title={`${t('outstanding')}`}
-                  value={
-                    <>
-                      <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
-                        {totalsData[currency].outstanding.code}{' '}
-                        {totalsData[currency].outstanding.amount
-                          ? new Intl.NumberFormat().format(
-                              Number(totalsData[currency].outstanding.amount)
-                            )
-                          : '--'}
-                      </div>
-                    </>
-                  }
-                />
-              </div>
+              <InfoCard
+                className="w-full h-44"
+                title={`${t('total')} ${t('revenue')}`}
+                value={
+                  <>
+                    <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
+                      {totalsData[currency].revenue.code}{' '}
+                      {totalsData[currency].revenue.paid_to_date
+                        ? new Intl.NumberFormat().format(
+                            Number(totalsData[currency].revenue.paid_to_date)
+                          )
+                        : '--'}
+                    </div>
+                  </>
+                }
+              />
+              <InfoCard
+                className="w-full h-44"
+                title={`${t('total')} ${t('expenses')}`}
+                value={
+                  <>
+                    <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
+                      {totalsData[currency].expenses.code}{' '}
+                      {totalsData[currency].expenses.amount
+                        ? new Intl.NumberFormat().format(
+                            Number(totalsData[currency].expenses.amount)
+                          )
+                        : '--'}
+                    </div>
+                  </>
+                }
+              />
+              <InfoCard
+                className="w-full h-44"
+                title={`${t('outstanding')}`}
+                value={
+                  <>
+                    <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
+                      {totalsData[currency].outstanding.code}{' '}
+                      {totalsData[currency].outstanding.amount
+                        ? new Intl.NumberFormat().format(
+                            Number(totalsData[currency].outstanding.amount)
+                          )
+                        : '--'}
+                    </div>
+                  </>
+                }
+              />
             </>
           )}
         </div>
