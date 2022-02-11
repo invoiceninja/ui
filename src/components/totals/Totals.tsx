@@ -115,7 +115,7 @@ export function Totals() {
   }, [body]);
 
   return (
-    <Container>
+    <>
       {totalsIsLoading && (
         <div className="w-full flex justify-center">
           <Spinner />
@@ -252,6 +252,6 @@ export function Totals() {
           )}
         </div>
       </Card>
-    </Container>
+    </>
   );
 }
