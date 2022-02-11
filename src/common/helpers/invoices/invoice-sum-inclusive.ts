@@ -1,11 +1,11 @@
-import { InvoiceItemSum } from './invoice-item-sum';
+import { InvoiceItemSumInclusive } from './invoice-item-sum-inclusive';
 import { Invoice } from 'common/interfaces/invoice';
 import collect from 'collect.js';
 import { InvoiceStatus } from 'common/enums/invoice-status';
 
-export class InvoiceSum {
+export class InvoiceSumInclusive {
   protected taxMap = collect();
-  protected invoiceItems = new InvoiceItemSum(this.invoice);
+  protected invoiceItems = new InvoiceItemSumInclusive(this.invoice);
   protected totalTaxMap: Record<string, unknown>[] = [];
 
   public totalDiscount = 0;
@@ -19,8 +19,8 @@ export class InvoiceSum {
   public async build() {
     await this.calculateLineItems();
     await this.calculateDiscount();
-    await this.calculateInvoiceTaxes();
     await this.calculateCustomValues();
+    await this.calculateInvoiceTaxes();
     await this.setTaxMap();
     await this.calculateTotals();
     await this.calculateBalance();
@@ -30,12 +30,13 @@ export class InvoiceSum {
   }
 
   protected async calculateLineItems() {
+
     await this.invoiceItems.process();
 
     this.invoice.line_items = this.invoiceItems.lineItems;
     this.total = this.invoiceItems.subTotal;
     this.subTotal = this.invoiceItems.subTotal;
-
+    
     return this;
   }
 
@@ -47,13 +48,19 @@ export class InvoiceSum {
   }
 
   protected async calculateInvoiceTaxes() {
-    if (this.invoice.tax_name1.length >= 1) {
-      let tax = this.taxer(this.total, this.invoice.tax_rate1);
 
-      tax += this.getSurchargeTaxTotalForKey(
-        this.invoice.tax_name1,
-        this.invoice.tax_rate1
-      );
+    let amount = this.total;
+
+    if(this.invoice.discount > 0 && this.invoice.is_amount_discount){
+        amount = this.subTotal - this.invoice.discount;
+    }
+
+    if(this.invoice.discount > 0 && !this.invoice.is_amount_discount){
+        amount = (this.subTotal - (this.subTotal * (this.invoice.discount / 100)));
+    }
+
+    if (this.invoice.tax_rate1 > 0) {
+      let tax = this.calcInclusiveLineTax(this.total, this.invoice.tax_rate1);
 
       this.totalTaxes += tax;
 
@@ -64,13 +71,8 @@ export class InvoiceSum {
       });
     }
 
-    if (this.invoice.tax_name2.length >= 1) {
-      let tax = this.taxer(this.total, this.invoice.tax_rate2);
-
-      tax += this.getSurchargeTaxTotalForKey(
-        this.invoice.tax_name2,
-        this.invoice.tax_rate2
-      );
+    if (this.invoice.tax_rate2 > 0) {
+      let tax = this.calcInclusiveLineTax(this.total, this.invoice.tax_rate2);
 
       this.totalTaxes += tax;
 
@@ -81,13 +83,8 @@ export class InvoiceSum {
       });
     }
 
-    if (this.invoice.tax_name3.length >= 1) {
-      let tax = this.taxer(this.total, this.invoice.tax_rate3);
-
-      tax += this.getSurchargeTaxTotalForKey(
-        this.invoice.tax_name3,
-        this.invoice.tax_rate3
-      );
+    if (this.invoice.tax_rate3 > 0) {
+      let tax = this.calcInclusiveLineTax(this.total, this.invoice.tax_rate3);
 
       this.totalTaxes += tax;
 
@@ -176,7 +173,7 @@ export class InvoiceSum {
   }
 
   protected async calculateTotals() {
-    this.total += this.totalTaxes;
+    // this.total += this.totalTaxes;
 
     return this;
   }
@@ -241,5 +238,10 @@ export class InvoiceSum {
     }
 
     return 0;
+  }
+
+  protected calcInclusiveLineTax(amount:number, rate: number)
+  {
+      return (amount - (amount / (1 + (rate / 100))));
   }
 }
