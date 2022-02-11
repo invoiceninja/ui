@@ -21,9 +21,13 @@ export function useUsersQuery() {
 }
 
 export function useUserQuery(params: { id: string }) {
-  return useQuery(generatePath('/api/v1/users/:id', params), () => {
-    axios.get(endpoint('/api/v1/users/:id', params), {
-      headers: defaultHeaders,
-    });
-  });
+  return useQuery(
+    generatePath('/api/v1/users/:id', params),
+    () => {
+      axios.get(endpoint('/api/v1/users/:id', params), {
+        headers: defaultHeaders,
+      });
+    },
+    { staleTime: Infinity }
+  );
 }

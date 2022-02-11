@@ -28,10 +28,13 @@ export function useApiTokensQuery(params: Params) {
 }
 
 export function useApiTokenQuery(params: { id: string | undefined }) {
-  return useQuery(generatePath('/api/v1/tokens/:id', { id: params.id }), () =>
-    axios.get(endpoint('/api/v1/tokens/:id', { id: params.id }), {
-      headers: defaultHeaders,
-    })
+  return useQuery(
+    generatePath('/api/v1/tokens/:id', { id: params.id }),
+    () =>
+      axios.get(endpoint('/api/v1/tokens/:id', { id: params.id }), {
+        headers: defaultHeaders,
+      }),
+    { staleTime: Infinity }
   );
 }
 

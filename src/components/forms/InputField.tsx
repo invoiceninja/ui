@@ -26,6 +26,7 @@ interface Props extends CommonProps {
   errorMessage?: string | string[];
   debounceTimeout?: number;
   element?: string;
+  disabled?: boolean;
 }
 
 export function InputField(props: Props) {
@@ -39,6 +40,7 @@ export function InputField(props: Props) {
       )}
 
       <DebounceInput
+        disabled={props.disabled}
         element={props.element || 'input'}
         inputRef={props.innerRef}
         debounceTimeout={props.debounceTimeout ?? 300}

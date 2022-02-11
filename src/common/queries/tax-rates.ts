@@ -37,7 +37,8 @@ export function useTaxRateQuery(params: { id: string | undefined }) {
     () =>
       axios.get(endpoint('/api/v1/tax_rates/:id', { id: params.id }), {
         headers: defaultHeaders,
-      })
+      }),
+    { staleTime: Infinity }
   );
 }
 

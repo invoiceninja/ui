@@ -138,19 +138,7 @@ export function DataTable(props: Props) {
       >
         <span className="text-sm">{t('with_selected')}</span>
 
-        <Dropdown label={t('actions')}>
-          <DropdownElement onClick={() => bulk('archive')}>
-            {t(`archive_${props.resource}`)}
-          </DropdownElement>
-
-          <DropdownElement onClick={() => bulk('restore')}>
-            {t(`restore_${props.resource}`)}
-          </DropdownElement>
-
-          <DropdownElement onClick={() => bulk('delete')}>
-            {t(`delete_${props.resource}`)}
-          </DropdownElement>
-        </Dropdown>
+        
       </Actions>
       <Table>
         <Thead>

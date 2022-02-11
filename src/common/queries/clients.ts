@@ -37,6 +37,6 @@ export function useClientQuery(
       axios.get(endpoint('/api/v1/clients/:id', { id: params.id }), {
         headers: defaultHeaders,
       }),
-    options
+    { ...options, staleTime: Infinity }
   );
 }

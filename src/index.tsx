@@ -17,11 +17,13 @@ import { Provider } from 'react-redux';
 import { store } from './common/stores/store';
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import './resources/css/app.css';
-
-import en from './resources/lang/en/en.json';
+import * as Sentry from '@sentry/react';
+import { BrowserTracing } from '@sentry/tracing';
 import { ScrollToTop } from 'components/ScrollToTop';
 import { QueryClient, QueryClientProvider } from 'react-query';
+
+import './resources/css/app.css';
+import en from './resources/lang/en/en.json';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -40,6 +42,12 @@ const Router =
   import.meta.env.VITE_ROUTER === 'hash' ? HashRouter : BrowserRouter;
 
 const queryClient = new QueryClient();
+
+Sentry.init({
+  dsn: import.meta.env.VITE_SENTRY_URL as unknown as string,
+  integrations: [new BrowserTracing()],
+  tracesSampleRate: 1.0,
+});
 
 ReactDOM.render(
   <React.StrictMode>

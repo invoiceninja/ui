@@ -25,6 +25,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@invoiceninja/forms';
 import { CompanySwitcher } from 'components/CompanySwitcher';
 import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
+import { HelpSidebarIcons } from 'components/HelpSidebarIcons';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -37,6 +38,7 @@ interface Props extends CommonProps {
   onBackClick?: string;
   breadcrumbs?: BreadcrumRecord[];
   topRight?: ReactNode;
+  docsLink?: string;
 }
 
 export function Default(props: Props) {
@@ -130,6 +132,7 @@ export function Default(props: Props) {
                 <div className="flex-shrink-0 flex items-center px-4">
                   <CompanySwitcher />
                 </div>
+
                 <div className="mt-5 flex-1 h-0 overflow-y-auto">
                   <nav className="space-y-1">
                     {navigation.map((item) => (
@@ -171,6 +174,7 @@ export function Default(props: Props) {
             <div className="flex items-center flex-shrink-0 px-4">
               <CompanySwitcher />
             </div>
+
             <div className="mt-5 flex-grow flex flex-col">
               <nav className="flex-1 pb-4 space-y-1">
                 {navigation.map((item) => (
@@ -197,6 +201,8 @@ export function Default(props: Props) {
                   </Link>
                 ))}
               </nav>
+
+              <HelpSidebarIcons docsLink={props.docsLink} />
             </div>
           </div>
         </div>

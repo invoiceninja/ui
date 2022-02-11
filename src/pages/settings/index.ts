@@ -37,3 +37,4 @@ export * from './task-statuses';
 export * from './integrations/api-tokens';
 export * from './integrations/api-webhooks';
 export * from './integrations/google-analytics';
+export * from './expense-categories';

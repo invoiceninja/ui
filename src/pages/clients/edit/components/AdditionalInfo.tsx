@@ -12,8 +12,8 @@ import { Tab } from '@headlessui/react';
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import MDEditor from '@uiw/react-md-editor';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { useCurrencies } from 'common/hooks/useCurrencies';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useLanguages } from 'common/hooks/useLanguages';
 import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
@@ -50,7 +50,7 @@ export function AdditionalInfo(props: Props) {
     props.setClient(set(client as Client, event.target.id, event.target.value));
   };
 
-  const company = useCompanyChanges();
+  const company = useInjectCompanyChanges();
 
   const handleCustomFieldChange = (field: string, value: string) => {
     const [label] = value.split('|');
@@ -261,7 +261,7 @@ export function AdditionalInfo(props: Props) {
             one. <i>Needs translation.</i>
           </Element>
 
-          {['client1', 'client2', 'client3', 'client4'].map((field) => (
+          {company && ['client1', 'client2', 'client3', 'client4'].map((field) => (
             <Field
               key={field}
               initialValue={company.custom_fields[field]}
@@ -285,7 +285,7 @@ export function AdditionalInfo(props: Props) {
             one. <i>Needs translation.</i>
           </Element>
 
-          {['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (
+          {company && ['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (
             <Field
               key={field}
               initialValue={company.custom_fields[field]}

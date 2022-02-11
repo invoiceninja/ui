@@ -14,7 +14,13 @@ import { useQuery } from 'react-query';
 import { defaultHeaders } from './common/headers';
 
 export function useStaticsQuery() {
-  return useQuery('/api/v1/statics', () => {
-    return axios.get(endpoint('/api/v1/statics'), { headers: defaultHeaders });
-  });
+  return useQuery(
+    '/api/v1/statics',
+    () => {
+      return axios.get(endpoint('/api/v1/statics'), {
+        headers: defaultHeaders,
+      });
+    },
+    { staleTime: Infinity }
+  );
 }

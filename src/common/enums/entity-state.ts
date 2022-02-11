@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export enum EntityState {
+export const enum EntityState {
   Active = 'active',
   Archived = 'archived',
   Deleted = 'deleted',

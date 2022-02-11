@@ -28,10 +28,13 @@ export function useApiWebhooksQuery(params: Params) {
 }
 
 export function useApiWebhookQuery(params: { id: string | undefined }) {
-  return useQuery(generatePath('/api/v1/webhooks/:id', { id: params.id }), () =>
-    axios.get(endpoint('/api/v1/webhooks/:id', { id: params.id }), {
-      headers: defaultHeaders,
-    })
+  return useQuery(
+    generatePath('/api/v1/webhooks/:id', { id: params.id }),
+    () =>
+      axios.get(endpoint('/api/v1/webhooks/:id', { id: params.id }), {
+        headers: defaultHeaders,
+      }),
+    { staleTime: Infinity }
   );
 }
 

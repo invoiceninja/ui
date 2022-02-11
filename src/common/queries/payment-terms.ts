@@ -32,10 +32,13 @@ export function usePaymentTermsQuery(params: Params) {
 }
 
 export function usePaymentTermQuery(params: { id: string | undefined }) {
-  return useQuery(generatePath('/api/v1/payment_terms/:id', params), () =>
-    axios.get(endpoint('/api/v1/payment_terms/:id', params), {
-      headers: defaultHeaders,
-    })
+  return useQuery(
+    generatePath('/api/v1/payment_terms/:id', params),
+    () =>
+      axios.get(endpoint('/api/v1/payment_terms/:id', params), {
+        headers: defaultHeaders,
+      }),
+    { staleTime: Infinity }
   );
 }
 
