@@ -132,7 +132,7 @@ export class InvoiceItemSum {
     // This needs extraction, it's calling generic Taxer class.
     // This also depends on Number class, previously mentioned.
 
-    return (amount * rate) / 100;
+    return amount * rate / 100;
   }
 
   protected push() {

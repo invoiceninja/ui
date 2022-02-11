@@ -2,6 +2,7 @@ import { InvoiceSum } from './../../../src/common/helpers/invoices/invoice-sum';
 import invoice from '../../helpers/data/invoice';
 import invoice_item from '../../helpers/data/invoice_item';
 import { InvoiceItemSum } from '../../../src/common/helpers/invoices/invoice-item-sum';
+import { InvoiceItem } from '../../../src/common/interfaces/invoice-item';
 
 
 describe('InvoiceSum test', () => {
@@ -90,7 +91,7 @@ describe('InvoiceSum test invoice calculation', () => {
 
   });
 
-  it('Invoice Totals With Discount WithSurcharge With Exclusive Tax', async () => {
+  it('Invoice Totals With Discount With Surcharge With Exclusive Tax', async () => {
 
     invoice.is_amount_discount = true;
     invoice.discount = 5;
@@ -106,5 +107,51 @@ describe('InvoiceSum test invoice calculation', () => {
 
   });
   
+  it('Invoice Totals With Discount With Surcharge With Exclusive Tax', async () => {
+
+    invoice.is_amount_discount = true;
+    invoice.discount = 5;
+    invoice.custom_surcharge1 = 5
+    invoice.tax_rate1 = 10;
+    invoice.tax_name1 = 'GST';
+    invoice.tax_rate2 = 10;
+    invoice.tax_name2 = 'GST';
+
+    const invoiceSum = await new InvoiceSum(invoice).build();
+
+    expect(invoiceSum.subTotal).toEqual(20);
+    expect(invoiceSum.invoice.amount).toEqual(23);
+    expect(invoiceSum.invoice.balance).toEqual(23);
+
+  });
+
+    
+  it('Line Item Tax Rates Exclusive Taxes', async () => {
+
+    invoice.line_items.map((item: InvoiceItem) => {
+      item.tax_name1 = "GST";
+      item.tax_rate1 = 10;
+      return item;
+    });
+
+    invoice.is_amount_discount = true;
+    invoice.discount = 0;
+    invoice.custom_surcharge1 = 0;
+    invoice.tax_rate1 = 10;
+    invoice.tax_name1 = 'GST';
+    invoice.tax_rate2 = 10;
+    invoice.tax_name2 = 'GST';
+    invoice.uses_inclusive_taxes = false;
+
+    const invoiceSum = await new InvoiceSum(invoice).build();
+
+    expect(invoiceSum.subTotal).toEqual(20);
+    expect(invoiceSum.invoice.amount).toEqual(26);
+    expect(invoiceSum.invoice.balance).toEqual(26);
+
+  });
+
+  
+
 
 });
