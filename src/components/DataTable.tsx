@@ -17,9 +17,8 @@ import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { Actions } from './datatables/Actions';
-import { Dropdown } from './dropdown/Dropdown';
-import { DropdownElement } from './dropdown/DropdownElement';
 import { Button, Checkbox } from './forms';
+import ResorcefulActions from './ResourcefulActions';
 import { Spinner } from './Spinner';
 import {
   ColumnSortPayload,
@@ -37,7 +36,11 @@ export type DataTableColumns = {
   label: string;
   format?: (field: string | number, resource?: any) => any;
 }[];
-
+interface Actions {
+  name: string;
+  action?: any;
+  to?: any;
+}
 interface Props {
   resource: string;
   columns: DataTableColumns;
@@ -119,6 +122,71 @@ export function DataTable(props: Props) {
       })
       .finally(() => queryClient.invalidateQueries(apiEndpoint.href));
   };
+  const bulkActions = [
+    {
+      name: t('archive'),
+      action: () => {
+        bulk('archive');
+      },
+    },
+    {
+      name: t('restore'),
+      action: () => {
+        bulk('restore');
+      },
+    },
+    {
+      name: t('delete'),
+      action: () => {
+        bulk('delete');
+      },
+    },
+  ];
+
+  const actions: Actions[][] = [[]];
+
+  data?.data.data.map((resource: any) => {
+    const action: Actions[] = [];
+    if (props.linkToEdit) {
+      action.push({
+        name: t(`edit_${props.resource}`),
+        to: generatePath(props.linkToEdit, {
+          id: resource.id,
+        }),
+      });
+    }
+    if (resource.archived_at === 0) {
+      action.push({
+        name: t(`archive_${props.resource}`),
+        action: () => {
+          setSelected(new Set());
+          setSelected(selected.add(resource.id));
+          bulk('archive');
+        },
+      });
+    }
+    if (resource.archived_at > 0) {
+      action.push({
+        name: t(`restore_${props.resource}`),
+        action: () => {
+          setSelected(new Set());
+          setSelected(selected.add(resource.id));
+          bulk('restore');
+        },
+      });
+    }
+    if (!resource.is_deleted) {
+      action.push({
+        name: t(`delete_${props.resource}`),
+        action: () => {
+          setSelected(new Set());
+          setSelected(selected.add(resource.id));
+          bulk('delete');
+        },
+      });
+    }
+    actions.push(action);
+  });
 
   return (
     <>
@@ -138,19 +206,11 @@ export function DataTable(props: Props) {
       >
         <span className="text-sm">{t('with_selected')}</span>
 
-        <Dropdown label={t('actions')}>
-          <DropdownElement onClick={() => bulk('archive')}>
-            {t(`archive_${props.resource}`)}
-          </DropdownElement>
-
-          <DropdownElement onClick={() => bulk('restore')}>
-            {t(`restore_${props.resource}`)}
-          </DropdownElement>
-
-          <DropdownElement onClick={() => bulk('delete')}>
-            {t(`delete_${props.resource}`)}
-          </DropdownElement>
-        </Dropdown>
+        <ResorcefulActions
+          key={'bulk_actions'}
+          label={t('actions')}
+          actions={bulkActions}
+        />
       </Actions>
       <Table>
         <Thead>
@@ -225,6 +285,7 @@ export function DataTable(props: Props) {
                     }
                   />
                 </Td>
+
                 {props.columns.map((column, index) => (
                   <Td key={index}>
                     {column.format
@@ -235,52 +296,11 @@ export function DataTable(props: Props) {
 
                 {props.withResourcefulActions && (
                   <Td>
-                    <Dropdown label={t('actions')}>
-                      {props.linkToEdit && (
-                        <DropdownElement
-                          to={generatePath(props.linkToEdit, {
-                            id: resource.id,
-                          })}
-                        >
-                          {t(`edit_${props.resource}`)}
-                        </DropdownElement>
-                      )}
-                      {resource.archived_at === 0 && (
-                        <DropdownElement
-                          onClick={() => {
-                            setSelected(new Set());
-                            setSelected(selected.add(resource.id));
-                            bulk('archive');
-                          }}
-                        >
-                          {t(`archive_${props.resource}`)}
-                        </DropdownElement>
-                      )}
-
-                      {resource.archived_at > 0 && (
-                        <DropdownElement
-                          onClick={() => {
-                            setSelected(new Set());
-                            setSelected(selected.add(resource.id));
-                            bulk('restore');
-                          }}
-                        >
-                          {t(`restore_${props.resource}`)}
-                        </DropdownElement>
-                      )}
-
-                      {!resource.is_deleted && (
-                        <DropdownElement
-                          onClick={() => {
-                            setSelected(new Set());
-                            setSelected(selected.add(resource.id));
-                            bulk('delete');
-                          }}
-                        >
-                          {t(`delete_${props.resource}`)}
-                        </DropdownElement>
-                      )}
-                    </Dropdown>
+                    <ResorcefulActions
+                      key={`actions_${index}`}
+                      label={t('more_actions')}
+                      actions={actions[index + 1]}
+                    />
                   </Td>
                 )}
               </Tr>
