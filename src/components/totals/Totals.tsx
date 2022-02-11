@@ -178,60 +178,59 @@ export function Totals() {
         </div>
       </div>
 
-      {!totalsIsLoading && (
-        <div className="flex justify-end">
-          {totalsData[currency] && (
-            <>
-              <InfoCard
-                className="w-full h-44"
-                title={`${t('total')} ${t('revenue')}`}
-                value={
-                  <>
-                    <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
-                      {totalsData[currency].revenue.code}{' '}
-                      {totalsData[currency].revenue.paid_to_date
-                        ? new Intl.NumberFormat().format(
-                            Number(totalsData[currency].revenue.paid_to_date)
-                          )
-                        : ''}
-                    </div>
-                  </>
-                }
-              />
-              <InfoCard
-                className="w-full h-44"
-                title={`${t('total')} ${t('expenses')}`}
-                value={
-                  <>
-                    <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
-                      {totalsData[currency].expenses.code}{' '}
-                      {totalsData[currency].expenses.amount
-                        ? new Intl.NumberFormat().format(
-                            Number(totalsData[currency].expenses.amount)
-                          )
-                        : '0'}
-                    </div>
-                  </>
-                }
-              />
-              <InfoCard
-                className="w-full h-44"
-                title={`${t('outstanding')}`}
-                value={
-                  <>
-                    <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
-                      {totalsData[currency].outstanding.code}{' '}
-                      {totalsData[currency].outstanding.amount
-                        ? new Intl.NumberFormat().format(
-                            Number(totalsData[currency].outstanding.amount)
-                          )
-                        : '0'}
-                    </div>
-                  </>
-                }
-              />
-            </>
-          )}
+      {/* Info cards. */}
+      {totalsData[currency] && (
+        <div className="grid grid-cols-12 gap-4 mt-4">
+          <InfoCard
+            className="col-span-12 lg:col-span-4"
+            title={`${t('total')} ${t('revenue')}`}
+            value={
+              <>
+                <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
+                  {totalsData[currency].revenue.code}{' '}
+                  {totalsData[currency].revenue.paid_to_date
+                    ? new Intl.NumberFormat().format(
+                        Number(totalsData[currency].revenue.paid_to_date)
+                      )
+                    : ''}
+                </div>
+              </>
+            }
+          />
+
+          <InfoCard
+            className="col-span-12 lg:col-span-4"
+            title={`${t('total')} ${t('expenses')}`}
+            value={
+              <>
+                <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
+                  {totalsData[currency].expenses.code}{' '}
+                  {totalsData[currency].expenses.amount
+                    ? new Intl.NumberFormat().format(
+                        Number(totalsData[currency].expenses.amount)
+                      )
+                    : '0'}
+                </div>
+              </>
+            }
+          />
+
+          <InfoCard
+            className="col-span-12 lg:col-span-4"
+            title={`${t('outstanding')}`}
+            value={
+              <>
+                <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
+                  {totalsData[currency].outstanding.code}{' '}
+                  {totalsData[currency].outstanding.amount
+                    ? new Intl.NumberFormat().format(
+                        Number(totalsData[currency].outstanding.amount)
+                      )
+                    : '0'}
+                </div>
+              </>
+            }
+          />
         </div>
       )}
 
