@@ -60,7 +60,7 @@ export class InvoiceSumInclusive {
     }
 
     if (this.invoice.tax_rate1 > 0) {
-      let tax = this.calcInclusiveLineTax(this.total, this.invoice.tax_rate1);
+      const tax = this.calcInclusiveLineTax(this.total, this.invoice.tax_rate1);
 
       this.totalTaxes += tax;
 
@@ -72,7 +72,7 @@ export class InvoiceSumInclusive {
     }
 
     if (this.invoice.tax_rate2 > 0) {
-      let tax = this.calcInclusiveLineTax(this.total, this.invoice.tax_rate2);
+      const tax = this.calcInclusiveLineTax(this.total, this.invoice.tax_rate2);
 
       this.totalTaxes += tax;
 
@@ -84,7 +84,7 @@ export class InvoiceSumInclusive {
     }
 
     if (this.invoice.tax_rate3 > 0) {
-      let tax = this.calcInclusiveLineTax(this.total, this.invoice.tax_rate3);
+      const tax = this.calcInclusiveLineTax(this.total, this.invoice.tax_rate3);
 
       this.totalTaxes += tax;
 
