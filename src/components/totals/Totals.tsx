@@ -234,12 +234,6 @@ export function Totals() {
         </div>
       )}
 
-      {chartDataIsLoading && (
-        <div className="w-full flex justify-center">
-          <Spinner />
-        </div>
-      )}
-
       <Card>
         <div className="px-4 py-4">
           {chartData && (
