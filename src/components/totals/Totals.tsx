@@ -193,7 +193,7 @@ export function Totals() {
                         ? new Intl.NumberFormat().format(
                             Number(totalsData[currency].revenue.paid_to_date)
                           )
-                        : '--'}
+                        : ''}
                     </div>
                   </>
                 }
@@ -209,7 +209,7 @@ export function Totals() {
                         ? new Intl.NumberFormat().format(
                             Number(totalsData[currency].expenses.amount)
                           )
-                        : '--'}
+                        : '0'}
                     </div>
                   </>
                 }
@@ -225,7 +225,7 @@ export function Totals() {
                         ? new Intl.NumberFormat().format(
                             Number(totalsData[currency].outstanding.amount)
                           )
-                        : '--'}
+                        : '0'}
                     </div>
                   </>
                 }
