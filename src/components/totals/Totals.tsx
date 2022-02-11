@@ -82,7 +82,7 @@ export function Totals() {
       defaultHeaders
     ).then((response: AxiosResponse) => {
       setTotals(response.data);
-      let currencies: { value: string; label: unknown }[] = [];
+      const currencies: { value: string; label: unknown }[] = [];
       Object.entries(response.data.currencies).map(([id, name]) => {
         currencies.push({ value: id, label: name });
       });
