@@ -24,6 +24,8 @@ import { InfoCard } from 'components/InfoCard';
 import Select from 'react-select';
 
 export function Totals() {
+  const [t] = useTranslation();
+
   const [totalsIsLoading, settotalsIsLoading] = useState(true);
   const [chartDataIsLoading, setchartDataIsLoading] = useState(true);
   const [totalsData, setTotals] = useState<
@@ -33,10 +35,12 @@ export function Totals() {
       outstanding: { amount: string; code: string };
     }[]
   >([]);
+
   const [currencies, setCurrencies] = useState<
     { value: string; label: unknown }[]
   >([]);
-  const [ChartData, setChartData] = useState<
+
+  const [chartData, setChartData] = useState<
     {
       invoices: { total: string; date: string; currency: string }[];
       payments: { total: string; date: string; currency: string }[];
@@ -47,9 +51,10 @@ export function Totals() {
       }[];
     }[]
   >([]);
-  const [Currency, setCurrency] = useState(1);
-  const [ChartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
-  //default date is last 7 days
+
+  const [currency, setCurrency] = useState(1);
+  const [chartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
+
   const [body, setbody] = useState<{ start_date: string; end_date: string }>({
     start_date: new Date(
       new Date().getFullYear(),
@@ -60,7 +65,6 @@ export function Totals() {
       .split('T')[0],
     end_date: new Date().toISOString().split('T')[0],
   });
-  const [t] = useTranslation();
 
   const handleDateChange = (DateSet: string) => {
     const [startDate, endDate] = DateSet.split(',');
@@ -74,6 +78,7 @@ export function Totals() {
       setbody({ start_date: startDate, end_date: endDate });
     }
   };
+
   const getTotals = () => {
     request(
       'POST',
@@ -108,143 +113,136 @@ export function Totals() {
     getTotals();
     getChartData();
   }, [body]);
+
   return (
-    <Container>
+    <>
       {totalsIsLoading && (
         <div className="w-full flex justify-center">
           <Spinner />
         </div>
       )}
 
-      {!totalsIsLoading && (
-        <div className="flex flex-col sm:grid grid-cols-3 gap-5 my-5 ">
-          <div className="flex flex-wrap justify-center col-start-2">
-            {currencies && (
-              <Select
-                onChange={(key) => {
-                  setCurrency(Number(key?.value));
-                }}
-                defaultValue={currencies[0]}
-                placeholder={t('currency')}
-                options={currencies}
-                isMulti={false}
-              />
-            )}
-          </div>
-          <div className="flex justify-center sm:justify-">
-            <Button
-              key={`day-btn`}
-              className={'mx-0.5'}
-              type="secondary"
-              onClick={() => {
-                setChartScale('day');
-              }}
-            >
-              {t('day')}
-            </Button>
-            <Button
-              key={`week-btn`}
-              className={'mx-0.5 '}
-              type="secondary"
-              onClick={() => {
-                setChartScale('week');
-              }}
-            >
-              {t('week')}
-            </Button>
-            <Button
-              key={`month-btn`}
-              className={'mx-0.5'}
-              type="secondary"
-              onClick={() => {
-                setChartScale('month');
-              }}
-            >
-              {t('month')}
-            </Button>
-          </div>
-          <div className="flex justify-center  sm:col-start-3 ">
-            <DropdownDateRangePicker
-              handleDateChange={handleDateChange}
-              startDate={body.start_date}
-              endDate={body.end_date}
-            />
-          </div>
-          {totalsData[Currency] && (
-            <>
-              <div>
-                {' '}
-                <InfoCard
-                  className="w-full h-44"
-                  title={`${t('total')} ${t('revenue')}`}
-                  value={
-                    <Card>
-                      {totalsData[Currency].revenue.code}{' '}
-                      {totalsData[Currency].revenue.paid_to_date
-                        ? new Intl.NumberFormat().format(
-                            Number(totalsData[Currency].revenue.paid_to_date)
-                          )
-                        : '--'}
-                    </Card>
-                  }
-                />
-              </div>
-              <div>
-                {' '}
-                <InfoCard
-                  className="w-full h-44"
-                  title={`${t('total')} ${t('expenses')}`}
-                  value={
-                    <Card>
-                      {totalsData[Currency].expenses.code}{' '}
-                      {totalsData[Currency].expenses.amount
-                        ? new Intl.NumberFormat().format(
-                            Number(totalsData[Currency].expenses.amount)
-                          )
-                        : '--'}
-                    </Card>
-                  }
-                />
-              </div>
-              <div>
-                {' '}
-                <InfoCard
-                  className="w-full h-44"
-                  title={`${t('outstanding')}`}
-                  value={
-                    <Card>
-                      {totalsData[Currency].outstanding.code}{' '}
-                      {totalsData[Currency].outstanding.amount
-                        ? new Intl.NumberFormat().format(
-                            Number(totalsData[Currency].outstanding.amount)
-                          )
-                        : '--'}
-                    </Card>
-                  }
-                />
-              </div>
-            </>
-          )}
+      {/* Quick date, currency & date picker. */}
+      <div className="flex justify-end">
+        {currencies && (
+          <Select
+            onChange={(key) => {
+              setCurrency(Number(key?.value));
+            }}
+            defaultValue={currencies[0]}
+            placeholder={t('currency')}
+            options={currencies}
+            isMulti={false}
+          />
+        )}
+
+        <Button
+          key={`day-btn`}
+          className={'mx-0.5'}
+          type="secondary"
+          onClick={() => {
+            setChartScale('day');
+          }}
+        >
+          {t('day')}
+        </Button>
+
+        <Button
+          key={`week-btn`}
+          className={'mx-0.5 '}
+          type="secondary"
+          onClick={() => {
+            setChartScale('week');
+          }}
+        >
+          {t('week')}
+        </Button>
+
+        <Button
+          key={`month-btn`}
+          className={'mx-0.5'}
+          type="secondary"
+          onClick={() => {
+            setChartScale('month');
+          }}
+        >
+          {t('month')}
+        </Button>
+
+        <div className="flex justify-center  sm:col-start-3 ">
+          <DropdownDateRangePicker
+            handleDateChange={handleDateChange}
+            startDate={body.start_date}
+            endDate={body.end_date}
+          />
+        </div>
+      </div>
+
+      {/* Info cards. */}
+      {totalsData[currency] && (
+        <div className="grid grid-cols-12 gap-4 mt-4">
+          <InfoCard
+            className="col-span-12 lg:col-span-4"
+            title={`${t('total')} ${t('revenue')}`}
+            value={
+              <>
+                <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
+                  {totalsData[currency].revenue.code}{' '}
+                  {totalsData[currency].revenue.paid_to_date
+                    ? new Intl.NumberFormat().format(
+                        Number(totalsData[currency].revenue.paid_to_date)
+                      )
+                    : ''}
+                </div>
+              </>
+            }
+          />
+
+          <InfoCard
+            className="col-span-12 lg:col-span-4"
+            title={`${t('total')} ${t('expenses')}`}
+            value={
+              <>
+                <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
+                  {totalsData[currency].expenses.code}{' '}
+                  {totalsData[currency].expenses.amount
+                    ? new Intl.NumberFormat().format(
+                        Number(totalsData[currency].expenses.amount)
+                      )
+                    : '0'}
+                </div>
+              </>
+            }
+          />
+
+          <InfoCard
+            className="col-span-12 lg:col-span-4"
+            title={`${t('outstanding')}`}
+            value={
+              <>
+                <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
+                  {totalsData[currency].outstanding.code}{' '}
+                  {totalsData[currency].outstanding.amount
+                    ? new Intl.NumberFormat().format(
+                        Number(totalsData[currency].outstanding.amount)
+                      )
+                    : '0'}
+                </div>
+              </>
+            }
+          />
         </div>
       )}
 
-      {chartDataIsLoading && (
-        <div className="w-full flex justify-center">
-          <Spinner />
-        </div>
+      {chartData && (
+        <Card withContainer className="mt-4">
+          <Chart
+            chartSensitivity={chartScale}
+            dates={{ start_date: body.start_date, end_date: body.end_date }}
+            data={chartData[currency]}
+          />
+        </Card>
       )}
-
-      <Card>
-        <div className="px-4 py-4">
-          {!chartDataIsLoading && (
-            <Chart
-              chartSensitivity={ChartScale}
-              dates={{ start_date: body.start_date, end_date: body.end_date }}
-              data={ChartData[Currency]}
-            ></Chart>
-          )}
-        </div>
-      </Card>
-    </Container>
+    </>
   );
 }
