@@ -153,6 +153,30 @@ describe('InvoiceSum test invoice calculation', () => {
 
   });
 
+  it('Line Item Tax Rates Inclusive Taxes', async () => {
+
+    invoice.line_items.map((item: InvoiceItem) => {
+      item.tax_name1 = "GST";
+      item.tax_rate1 = 10;
+      return item;
+    });
+
+    invoice.is_amount_discount = true;
+    invoice.discount = 0;
+    invoice.custom_surcharge1 = 0;
+    invoice.tax_rate1 = 0;
+    invoice.tax_name1 = '';
+    invoice.tax_rate2 = 0;
+    invoice.tax_name2 = '';
+    invoice.uses_inclusive_taxes = true;
+
+    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+
+    expect(invoiceSum.subTotal).toEqual(20);
+    expect(invoiceSum.totalTaxes).toEqual(1.82);
+
+  });
+
   
 
 

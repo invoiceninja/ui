@@ -37,7 +37,7 @@ export class InvoiceItemSumInclusive {
   }
 
   protected cleanLineItem() {
-    // ..
+    // we are using typescript, we don't have to clean anything.
 
     return this;
   }
