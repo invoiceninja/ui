@@ -242,7 +242,7 @@ export function Totals() {
 
       <Card>
         <div className="px-4 py-4">
-          {!chartDataIsLoading && (
+          {chartData && (
             <Chart
               chartSensitivity={chartScale}
               dates={{ start_date: body.start_date, end_date: body.end_date }}
