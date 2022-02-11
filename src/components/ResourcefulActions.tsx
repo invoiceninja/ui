@@ -22,7 +22,6 @@ type Props = {
 };
 
 export default function RecorcefulActions(props: Props) {
-  console.log('actions:', props.actions);
   const [t] = useTranslation();
   return (
     <Dropdown label={t('actions')}>
