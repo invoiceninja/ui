@@ -185,16 +185,16 @@ export function Totals() {
             className="col-span-12 lg:col-span-4"
             title={`${t('total')} ${t('revenue')}`}
             value={
-              <>
-                <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
+              <Card>
+                
                   {totalsData[currency].revenue.code}{' '}
                   {totalsData[currency].revenue.paid_to_date
                     ? new Intl.NumberFormat().format(
                         Number(totalsData[currency].revenue.paid_to_date)
                       )
                     : ''}
-                </div>
-              </>
+             
+              </Card>
             }
           />
 
@@ -202,16 +202,14 @@ export function Totals() {
             className="col-span-12 lg:col-span-4"
             title={`${t('total')} ${t('expenses')}`}
             value={
-              <>
-                <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
+              <Card>
                   {totalsData[currency].expenses.code}{' '}
                   {totalsData[currency].expenses.amount
                     ? new Intl.NumberFormat().format(
                         Number(totalsData[currency].expenses.amount)
                       )
                     : '0'}
-                </div>
-              </>
+              </Card>
             }
           />
 
@@ -219,16 +217,14 @@ export function Totals() {
             className="col-span-12 lg:col-span-4"
             title={`${t('outstanding')}`}
             value={
-              <>
-                <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
+              <Card>
                   {totalsData[currency].outstanding.code}{' '}
                   {totalsData[currency].outstanding.amount
                     ? new Intl.NumberFormat().format(
                         Number(totalsData[currency].outstanding.amount)
                       )
                     : '0'}
-                </div>
-              </>
+              </Card>
             }
           />
         </div>
