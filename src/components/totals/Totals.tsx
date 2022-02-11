@@ -240,7 +240,7 @@ export function Totals() {
             chartSensitivity={chartScale}
             dates={{ start_date: body.start_date, end_date: body.end_date }}
             data={chartData[currency]}
-          ></Chart>
+          />
         </Card>
       )}
     </>
