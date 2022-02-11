@@ -24,6 +24,8 @@ import { InfoCard } from 'components/InfoCard';
 import Select from 'react-select';
 
 export function Totals() {
+  const [t] = useTranslation();
+
   const [totalsIsLoading, settotalsIsLoading] = useState(true);
   const [chartDataIsLoading, setchartDataIsLoading] = useState(true);
   const [totalsData, setTotals] = useState<
@@ -33,10 +35,12 @@ export function Totals() {
       outstanding: { amount: string; code: string };
     }[]
   >([]);
+
   const [currencies, setCurrencies] = useState<
     { value: string; label: unknown }[]
   >([]);
-  const [ChartData, setChartData] = useState<
+  
+  const [chartData, setChartData] = useState<
     {
       invoices: { total: string; date: string; currency: string }[];
       payments: { total: string; date: string; currency: string }[];
@@ -47,9 +51,10 @@ export function Totals() {
       }[];
     }[]
   >([]);
-  const [Currency, setCurrency] = useState(1);
-  const [ChartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
-  //default date is last 7 days
+
+  const [currency, setCurrency] = useState(1);
+  const [chartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
+
   const [body, setbody] = useState<{ start_date: string; end_date: string }>({
     start_date: new Date(
       new Date().getFullYear(),
@@ -60,7 +65,6 @@ export function Totals() {
       .split('T')[0],
     end_date: new Date().toISOString().split('T')[0],
   });
-  const [t] = useTranslation();
 
   const handleDateChange = (DateSet: string) => {
     const [startDate, endDate] = DateSet.split(',');
@@ -170,7 +174,7 @@ export function Totals() {
               endDate={body.end_date}
             />
           </div>
-          {totalsData[Currency] && (
+          {totalsData[currency] && (
             <>
               <div>
                 {' '}
@@ -180,10 +184,10 @@ export function Totals() {
                   value={
                     <>
                       <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
-                        {totalsData[Currency].revenue.code}{' '}
-                        {totalsData[Currency].revenue.paid_to_date
+                        {totalsData[currency].revenue.code}{' '}
+                        {totalsData[currency].revenue.paid_to_date
                           ? new Intl.NumberFormat().format(
-                              Number(totalsData[Currency].revenue.paid_to_date)
+                              Number(totalsData[currency].revenue.paid_to_date)
                             )
                           : '--'}
                       </div>
@@ -199,10 +203,10 @@ export function Totals() {
                   value={
                     <>
                       <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
-                        {totalsData[Currency].expenses.code}{' '}
-                        {totalsData[Currency].expenses.amount
+                        {totalsData[currency].expenses.code}{' '}
+                        {totalsData[currency].expenses.amount
                           ? new Intl.NumberFormat().format(
-                              Number(totalsData[Currency].expenses.amount)
+                              Number(totalsData[currency].expenses.amount)
                             )
                           : '--'}
                       </div>
@@ -218,10 +222,10 @@ export function Totals() {
                   value={
                     <>
                       <div className=" text-2xl w-full h-24 py-4 font-black flex justify-start ">
-                        {totalsData[Currency].outstanding.code}{' '}
-                        {totalsData[Currency].outstanding.amount
+                        {totalsData[currency].outstanding.code}{' '}
+                        {totalsData[currency].outstanding.amount
                           ? new Intl.NumberFormat().format(
-                              Number(totalsData[Currency].outstanding.amount)
+                              Number(totalsData[currency].outstanding.amount)
                             )
                           : '--'}
                       </div>
@@ -244,9 +248,9 @@ export function Totals() {
         <div className="px-4 py-4">
           {!chartDataIsLoading && (
             <Chart
-              chartSensitivity={ChartScale}
+              chartSensitivity={chartScale}
               dates={{ start_date: body.start_date, end_date: body.end_date }}
-              data={ChartData[Currency]}
+              data={chartData[currency]}
             ></Chart>
           )}
         </div>
