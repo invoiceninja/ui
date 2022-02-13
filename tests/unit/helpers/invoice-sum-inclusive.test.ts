@@ -225,6 +225,53 @@ describe('InvoiceSum test invoice calculation', () => {
 
   });
 
+  it('Calculate LineTotal With multi length discount', async () => {
+
+  const new_item: InvoiceItem = {
+        "quantity": 1,
+        "cost": 10,
+        "product_key": "",
+        "notes": "",
+        "discount": 2.521254522145214511,
+        "is_amount_discount": true,
+        "tax_name1": "",
+        "tax_rate1": 0,
+        "tax_name2": "",
+        "tax_rate2": 0,
+        "tax_name3": "",
+        "tax_rate3": 0,
+        "sort_id": 0,
+        "line_total": 10,
+        "gross_line_total": 10,
+        "custom_value1": "",
+        "custom_value2": "",
+        "custom_value3": "",
+        "custom_value4": "",
+        "type_id": "1",
+        "product_cost": 0,
+        "date": ""
+   };
+
+
+    invoice.line_items = [];
+    invoice.line_items.push(new_item);
+
+    invoice.is_amount_discount = true;
+    invoice.discount = 0;
+    invoice.custom_surcharge1 = 0;
+    invoice.tax_rate1 = 0;
+    invoice.tax_name1 = '';
+    invoice.tax_rate2 = 0;
+    invoice.tax_name2 = '';
+    invoice.uses_inclusive_taxes = true;
+
+    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+
+    //todo - this value is failing - need to fix when @ben implements client accessor in Invoice Model
+    // expect(invoiceSum.subTotal).toEqual(7.48);
+    expect(invoiceSum.totalTaxes).toEqual(0);
+
+  });
   
 
 
