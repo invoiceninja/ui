@@ -177,6 +177,54 @@ describe('InvoiceSum test invoice calculation', () => {
 
   });
 
+
+  it('Calculate Line Item Tax Total', async () => {
+
+  const new_item: InvoiceItem = {
+        "quantity": 1,
+        "cost": 14,
+        "product_key": "",
+        "notes": "",
+        "discount": 0,
+        "is_amount_discount": true,
+        "tax_name1": "GST",
+        "tax_rate1": 10,
+        "tax_name2": "",
+        "tax_rate2": 0,
+        "tax_name3": "",
+        "tax_rate3": 0,
+        "sort_id": 0,
+        "line_total": 10,
+        "gross_line_total": 10,
+        "custom_value1": "",
+        "custom_value2": "",
+        "custom_value3": "",
+        "custom_value4": "",
+        "type_id": "1",
+        "product_cost": 0,
+        "date": ""
+   };
+
+
+    invoice.line_items = [];
+    invoice.line_items.push(new_item);
+
+    invoice.is_amount_discount = true;
+    invoice.discount = 0;
+    invoice.custom_surcharge1 = 0;
+    invoice.tax_rate1 = 0;
+    invoice.tax_name1 = '';
+    invoice.tax_rate2 = 0;
+    invoice.tax_name2 = '';
+    invoice.uses_inclusive_taxes = true;
+
+    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+
+    expect(invoiceSum.subTotal).toEqual(14);
+    expect(invoiceSum.totalTaxes).toEqual(1.27);
+
+  });
+
   
 
 
