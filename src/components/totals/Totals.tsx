@@ -119,7 +119,7 @@ export function Totals() {
       )}
 
       {/* Quick date, currency & date picker. */}
-      <div className="flex justify-end">
+      <div className="flex justify-end space-x-2">
         {currencies && (
           <Select
             onChange={(key) => {
