@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import 'reflect-metadata';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { App } from './App';
