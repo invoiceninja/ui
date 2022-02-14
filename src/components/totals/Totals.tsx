@@ -7,18 +7,16 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import { Button } from '@invoiceninja/forms';
 import { AxiosResponse } from 'axios';
 import { endpoint, request } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { Chart } from 'components/totals/Chart';
-
 import { useEffect, useState } from 'react';
-
 import { Spinner } from 'components/Spinner';
 import { DropdownDateRangePicker } from '../DropdownDateRangePicker';
 import { Card } from '@invoiceninja/cards';
-import { Container } from 'components/Container';
 import { useTranslation } from 'react-i18next';
 import { InfoCard } from 'components/InfoCard';
 import Select from 'react-select';
