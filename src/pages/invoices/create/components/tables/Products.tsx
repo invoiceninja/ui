@@ -8,10 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export const enum QuoteStatus {
-  Draft = '1',
-  Active = '2',
-  Paused = '3',
-  Completed = '4',
-  Pending = '-1',
+export function Products() {
+  return <div>Products table</div>;
 }

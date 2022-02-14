@@ -122,6 +122,7 @@ export function DataTable(props: Props) {
       })
       .finally(() => queryClient.invalidateQueries(apiEndpoint.href));
   };
+  
   const bulkActions = [
     {
       name: t('archive'),
@@ -211,6 +212,7 @@ export function DataTable(props: Props) {
           label={t('actions')}
           actions={bulkActions}
         />
+      
       </Actions>
       <Table>
         <Thead>

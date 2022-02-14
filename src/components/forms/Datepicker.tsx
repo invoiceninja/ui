@@ -17,12 +17,13 @@ type Props = CommonProps;
 
 export function Datepicker(props: Props) {
   const [date, setDate] = useState<Date>(new Date());
-
   return (
     <ReactDatePicker
       selected={date}
       className={`w-full py-2 px-3 rounded border border-gray-300 text-sm ${props.className}`}
-      onChange={(date) => setDate(date as Date)}
+      onChange={(date) => {
+        setDate(date as Date);
+      }}
     />
   );
 }

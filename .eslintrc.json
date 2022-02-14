@@ -22,7 +22,9 @@
     "react/react-in-jsx-scope": "off",
     "@typescript-eslint/no-use-before-define": ["error"],
     "@typescript-eslint/no-empty-function": "off",
-    "@typescript-eslint/no-explicit-any": "off"
+    "@typescript-eslint/no-explicit-any": "off",
+    "no-loss-of-precision": "off",
+    "@typescript-eslint/no-loss-of-precision": ["off"]
   },
   "settings": {
     "react": {
