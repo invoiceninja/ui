@@ -18,6 +18,7 @@ import {
   FileText,
   Settings,
   Users,
+  PlusCircle,Search
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -52,30 +53,38 @@ export function Default(props: Props) {
       href: '/dashboard',
       icon: Home,
       current: location.pathname === '/dashboard',
+      rightButton:{icon:Search,to:''}
     },
     {
       name: t('clients'),
       href: '/clients',
       icon: Users,
       current: location.pathname === '/clients',
+      rightButton:{icon:PlusCircle,to:'/clients/create'}
     },
     {
       name: t('products'),
       href: '/products',
       icon: Box,
       current: location.pathname === '/products',
+      rightButton:{icon:PlusCircle,to:'/products/create'}
+
     },
     {
       name: t('invoices'),
       href: '/invoices',
       icon: FileText,
       current: location.pathname === '/invoices',
+      rightButton:{icon:PlusCircle,to:'/invoices/create'}
+
     },
     {
       name: t('settings'),
       href: '/settings/company_details',
       icon: Settings,
       current: location.pathname.startsWith('/settings'),
+      rightButton:{icon:<></>,to:''}
+
     },
   ];
 
