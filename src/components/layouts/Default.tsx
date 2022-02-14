@@ -151,9 +151,9 @@ export function Default(props: Props) {
                           item.current
                             ? 'bg-ninja-gray-darker text-gray-100 dark:bg-gray-800 dark:text-gray-100'
                             : 'text-gray-100 hover:bg-ninja-gray-darker dark:text-gray-300 dark:hover:text-gray-200 dark:hover:bg-gray-800',
-                          'group flex items-center px-4 py-2 text-base font-medium'
+                          'group flex items-center justify-between px-4 py-2 text-base font-medium'
                         )}
-                      >
+                      ><div className='flex justify-start items-center'>
                         <item.icon
                           className={classNames(
                             item.current
@@ -163,6 +163,10 @@ export function Default(props: Props) {
                           )}
                         />
                         {item.name}
+                        </div>
+                        {item.rightButton && (
+
+<Link to={item.rightButton.to} title={item.name!=t('dashboard')?`${t('new')} ${item.name}`:undefined }> <item.rightButton.icon/></Link>)}
                       </Link>
                     ))}
                   </nav>
