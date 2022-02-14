@@ -18,12 +18,11 @@ describe('InvoiceSumInclusive test', () => {
 describe('InvoiceSum test invoice calculation', () => {
 
   it('Calculate Line Items',async () => {
-    
-    const invoiceItems = await new InvoiceItemSum(invoice);
-    invoiceItems.process();
+    const invoiceItems = new InvoiceItemSum(invoice);
+
+    await invoiceItems.process();
 
     expect(invoiceItems.subTotal).toEqual(2628);
-
   });
 
   it('Line Item Calc', async () => {
