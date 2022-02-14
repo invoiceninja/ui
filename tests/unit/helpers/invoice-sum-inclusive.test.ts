@@ -179,7 +179,7 @@ describe('InvoiceSum test invoice calculation', () => {
 
   it('Calculate Line Item Tax Total', async () => {
 
-  const new_item: InvoiceItem = {
+  const newItem: InvoiceItem = {
         "quantity": 1,
         "cost": 14,
         "product_key": "",
@@ -206,7 +206,7 @@ describe('InvoiceSum test invoice calculation', () => {
 
 
     invoice.line_items = [];
-    invoice.line_items.push(new_item);
+    invoice.line_items.push(newItem);
 
     invoice.is_amount_discount = true;
     invoice.discount = 0;
