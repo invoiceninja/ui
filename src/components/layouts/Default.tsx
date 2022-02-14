@@ -60,21 +60,33 @@ export function Default(props: Props) {
       href: '/clients',
       icon: Users,
       current: location.pathname === '/clients',
-      rightButton: { icon: PlusCircle, to: '/clients/create' ,label:`${t('new')} ${t('client')}` },
+      rightButton: {
+        icon: PlusCircle,
+        to: '/clients/create',
+        label: `${t('new')} ${t('client')}`,
+      },
     },
     {
       name: t('products'),
       href: '/products',
       icon: Box,
       current: location.pathname === '/products',
-      rightButton: { icon: PlusCircle, to: '/products/create' ,label:`${t('new')} ${t('product')}` },
+      rightButton: {
+        icon: PlusCircle,
+        to: '/products/create',
+        label: `${t('new')} ${t('product')}`,
+      },
     },
     {
       name: t('invoices'),
       href: '/invoices',
       icon: FileText,
       current: location.pathname === '/invoices',
-      rightButton: { icon: PlusCircle, to: '/invoices/create',label:`${t('new')} ${t('invoice')}`  },
+      rightButton: {
+        icon: PlusCircle,
+        to: '/invoices/create',
+        label: `${t('new')} ${t('invoice')}`,
+      },
     },
     {
       name: t('settings'),
@@ -163,14 +175,7 @@ export function Default(props: Props) {
                           {item.name}
                         </div>
                         {item.rightButton && (
-                          <Link
-                            to={item.rightButton.to}
-                            title={
-                              item.name != t('dashboard')
-                                ? `${t('new')} ${item.name}`
-                                : undefined
-                            }
-                          >
+                          <Link to={item.rightButton.to}>
                             {' '}
                             <item.rightButton.icon />
                           </Link>
