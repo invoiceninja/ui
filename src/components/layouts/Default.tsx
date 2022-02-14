@@ -83,7 +83,6 @@ export function Default(props: Props) {
       href: '/settings/company_details',
       icon: Settings,
       current: location.pathname.startsWith('/settings'),
-      rightButton:{icon:PlusCircle,to:''}
 
     },
   ];
@@ -209,7 +208,11 @@ export function Default(props: Props) {
                     />
                     {item.name}
                     </div>
-                    <Link to={item.rightButton.to} className='hover:bg-gray-400'> <item.rightButton.icon/></Link>
+                    {item.rightButton && (
+
+<Link to={item.rightButton.to} title={item.name!=t('dashboard')?`${t('new')} ${item.name}`:undefined }> <item.rightButton.icon/></Link>
+
+                    )}
                   </Link>
                 ))}
               </nav>
