@@ -39,7 +39,6 @@
     "recharts": "^2.1.9",
     "reflect-metadata": "^0.1.13",
     "remove": "^0.1.5",
-    "swr": "^1.2.1",
     "typedi": "^0.10.0"
   },
   "scripts": {
