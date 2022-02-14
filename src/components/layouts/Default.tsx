@@ -83,7 +83,7 @@ export function Default(props: Props) {
       href: '/settings/company_details',
       icon: Settings,
       current: location.pathname.startsWith('/settings'),
-      rightButton:{icon:<></>,to:''}
+      rightButton:{icon:PlusCircle,to:''}
 
     },
   ];
@@ -194,9 +194,10 @@ export function Default(props: Props) {
                       item.current
                         ? 'border-l-4 border-transparent bg-ninja-gray-darker text-gray-100 dark:bg-gray-700 dark:text-gray-100'
                         : 'border-l-4 border-transparent text-gray-100 hover:bg-ninja-gray-darker dark:hover:bg-gray-700 dark:hover:text-gray-100',
-                      'group flex items-center px-4 py-2 text-sm font-medium'
+                      'group flex items-center justify-between px-4 py-2 text-sm font-medium'
                     )}
                   >
+                    <div className='flex justify-start items-center'>
                     <item.icon
                       className={classNames(
                         item.current
@@ -207,6 +208,8 @@ export function Default(props: Props) {
                       aria-hidden="true"
                     />
                     {item.name}
+                    </div>
+                    <Link to={item.rightButton.to} className='hover:bg-gray-400'> <item.rightButton.icon/></Link>
                   </Link>
                 ))}
               </nav>
