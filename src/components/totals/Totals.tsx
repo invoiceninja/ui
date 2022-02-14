@@ -27,7 +27,6 @@ export function Totals() {
   const [t] = useTranslation();
 
   const [totalsIsLoading, settotalsIsLoading] = useState(true);
-  const [chartDataIsLoading, setchartDataIsLoading] = useState(true);
   const [totalsData, setTotals] = useState<
     {
       revenue: { paid_to_date: string; code: string };
@@ -103,10 +102,7 @@ export function Totals() {
       endpoint('/api/v1/charts/chart_summary'),
       body,
       defaultHeaders
-    ).then((response: AxiosResponse) => {
-      setChartData(response.data);
-      setchartDataIsLoading(false);
-    });
+    ).then((response: AxiosResponse) => setChartData(response.data));
   };
 
   useEffect(() => {
@@ -186,14 +182,12 @@ export function Totals() {
             title={`${t('total')} ${t('revenue')}`}
             value={
               <Card>
-                
-                  {totalsData[currency].revenue.code}{' '}
-                  {totalsData[currency].revenue.paid_to_date
-                    ? new Intl.NumberFormat().format(
-                        Number(totalsData[currency].revenue.paid_to_date)
-                      )
-                    : ''}
-             
+                {totalsData[currency].revenue.code}{' '}
+                {totalsData[currency].revenue.paid_to_date
+                  ? new Intl.NumberFormat().format(
+                      Number(totalsData[currency].revenue.paid_to_date)
+                    )
+                  : ''}
               </Card>
             }
           />
@@ -203,12 +197,12 @@ export function Totals() {
             title={`${t('total')} ${t('expenses')}`}
             value={
               <Card>
-                  {totalsData[currency].expenses.code}{' '}
-                  {totalsData[currency].expenses.amount
-                    ? new Intl.NumberFormat().format(
-                        Number(totalsData[currency].expenses.amount)
-                      )
-                    : '0'}
+                {totalsData[currency].expenses.code}{' '}
+                {totalsData[currency].expenses.amount
+                  ? new Intl.NumberFormat().format(
+                      Number(totalsData[currency].expenses.amount)
+                    )
+                  : '0'}
               </Card>
             }
           />
@@ -218,12 +212,12 @@ export function Totals() {
             title={`${t('outstanding')}`}
             value={
               <Card>
-                  {totalsData[currency].outstanding.code}{' '}
-                  {totalsData[currency].outstanding.amount
-                    ? new Intl.NumberFormat().format(
-                        Number(totalsData[currency].outstanding.amount)
-                      )
-                    : '0'}
+                {totalsData[currency].outstanding.code}{' '}
+                {totalsData[currency].outstanding.amount
+                  ? new Intl.NumberFormat().format(
+                      Number(totalsData[currency].outstanding.amount)
+                    )
+                  : '0'}
               </Card>
             }
           />
