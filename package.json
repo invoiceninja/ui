@@ -37,9 +37,7 @@
     "react-router-dom": "^6.2.1",
     "react-select": "^5.2.2",
     "recharts": "^2.1.9",
-    "reflect-metadata": "^0.1.13",
-    "remove": "^0.1.5",
-    "typedi": "^0.10.0"
+    "remove": "^0.1.5"
   },
   "scripts": {
     "dev": "vite",
