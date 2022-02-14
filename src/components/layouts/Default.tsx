@@ -54,28 +54,27 @@ export function Default(props: Props) {
       href: '/dashboard',
       icon: Home,
       current: location.pathname === '/dashboard',
-      rightButton: { icon: Search, to: '' },
     },
     {
       name: t('clients'),
       href: '/clients',
       icon: Users,
       current: location.pathname === '/clients',
-      rightButton: { icon: PlusCircle, to: '/clients/create' },
+      rightButton: { icon: PlusCircle, to: '/clients/create' ,label:`${t('new')} ${t('client')}` },
     },
     {
       name: t('products'),
       href: '/products',
       icon: Box,
       current: location.pathname === '/products',
-      rightButton: { icon: PlusCircle, to: '/products/create' },
+      rightButton: { icon: PlusCircle, to: '/products/create' ,label:`${t('new')} ${t('product')}` },
     },
     {
       name: t('invoices'),
       href: '/invoices',
       icon: FileText,
       current: location.pathname === '/invoices',
-      rightButton: { icon: PlusCircle, to: '/invoices/create' },
+      rightButton: { icon: PlusCircle, to: '/invoices/create',label:`${t('new')} ${t('invoice')}`  },
     },
     {
       name: t('settings'),
@@ -224,12 +223,8 @@ export function Default(props: Props) {
                     {item.rightButton && (
                       <Link
                         to={item.rightButton.to}
-                        title={
-                          item.name != t('dashboard')
-                            ? `${t('new')} ${item.name}`
-                            : undefined
-                        }
-                        className="hover:bg-gray-400 hover:bg-opacity-10 rounded-full w-1/4 h-12 flex justify-center items-center"
+                        title={item.rightButton.label}
+                        className="hover:bg-gray-200 hover:bg-opacity-10 rounded-full p-1.5"
                       >
                         {' '}
                         <item.rightButton.icon />
