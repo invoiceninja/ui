@@ -206,10 +206,10 @@ export function Default(props: Props) {
                       item.current
                         ? 'border-l-4 border-transparent bg-ninja-gray-darker text-gray-100 dark:bg-gray-700 dark:text-gray-100'
                         : 'border-l-4 border-transparent text-gray-100 hover:bg-ninja-gray-darker dark:hover:bg-gray-700 dark:hover:text-gray-100',
-                      'group flex items-center justify-between px-4 py-2 text-sm font-medium'
+                      'group flex items-center justify-between px-4 text-sm font-medium'
                     )}
                   >
-                    <div className="flex justify-start items-center">
+                    <div className="flex justify-start items-center my-2">
                       <item.icon
                         className={classNames(
                           item.current
@@ -229,6 +229,7 @@ export function Default(props: Props) {
                             ? `${t('new')} ${item.name}`
                             : undefined
                         }
+                        className="hover:bg-gray-400 hover:bg-opacity-10 rounded-full w-1/4 h-12 flex justify-center items-center"
                       >
                         {' '}
                         <item.rightButton.icon />
