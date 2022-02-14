@@ -2,7 +2,7 @@ import collect from 'collect.js';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 
-export class InvoiceItemSum {
+export class InvoiceItemSumInclusive {
   public taxCollection = collect();
   protected currency = 'USD'; // Needs fixes, obviously.
 
@@ -37,7 +37,7 @@ export class InvoiceItemSum {
   }
 
   protected cleanLineItem() {
-    // ..
+    // we are using typescript, we don't have to clean anything.
 
     return this;
   }
@@ -52,12 +52,9 @@ export class InvoiceItemSum {
   protected setDiscount() {
 
     if (this.invoice.is_amount_discount) {
-      this.item.line_total = this.item.line_total - this.item.discount; // We don't have definitive number formatter, need to implement that & then replace this with propert formatted value.
+        this.item.line_total -= this.item.discount;
     } else {
-
-      const discount = this.item.line_total * (this.item.discount / 100);
-
-      this.item.line_total = this.item.line_total - discount; // We need formatter here also.
+        this.item.line_total -= (this.item.line_total * (this.item.discount / 100));
     }
 
     this.item.is_amount_discount = this.invoice.is_amount_discount;
@@ -74,7 +71,7 @@ export class InvoiceItemSum {
 
     //
 
-    const itemTaxRateOneLocal = this.calculateAmountLineTax(
+    const itemTaxRateOneLocal = this.calcInclusiveLineTax(
       this.item.tax_rate1,
       amount
     );
@@ -87,7 +84,7 @@ export class InvoiceItemSum {
 
     //
 
-    const itemTaxRateTwoLocal = this.calculateAmountLineTax(
+    const itemTaxRateTwoLocal = this.calcInclusiveLineTax(
       this.item.tax_rate2,
       amount
     );
@@ -100,7 +97,7 @@ export class InvoiceItemSum {
 
     //
 
-    const itemTaxRateThreeLocal = this.calculateAmountLineTax(
+    const itemTaxRateThreeLocal = this.calcInclusiveLineTax(
       this.item.tax_rate3,
       amount
     );
@@ -111,12 +108,13 @@ export class InvoiceItemSum {
       this.groupTax(this.item.tax_name3, this.item.tax_rate3, amount);
     }
 
-    this.item.gross_line_total = this.item.line_total + itemTax;
+    // this.item.gross_line_total = this.item.line_total + itemTax;
 
     this.totalTaxes += itemTax;
     
     return this;
   }
+
 
   protected groupTax(name: string, rate: number, total: number) {
     let group = {};
@@ -128,11 +126,9 @@ export class InvoiceItemSum {
     this.taxCollection.push(collect(group));
   }
 
-  protected calculateAmountLineTax(rate: number, amount: number) {
-    // This needs extraction, it's calling generic Taxer class.
-    // This also depends on Number class, previously mentioned.
-
-    return amount * rate / 100;
+  protected calcInclusiveLineTax(rate: number, amount: number)
+  {
+      return amount - (amount / (1 + (rate / 100)));
   }
 
   protected push() {
@@ -162,7 +158,7 @@ export class InvoiceItemSum {
             : 0;
 
             
-        const itemTaxRateOneTotal = this.calculateAmountLineTax(
+        const itemTaxRateOneTotal = this.calcInclusiveLineTax(
           this.item.tax_rate1,
           amount
         );
@@ -179,7 +175,7 @@ export class InvoiceItemSum {
 
         //
 
-        const itemTaxRateTwoTotal = this.calculateAmountLineTax(
+        const itemTaxRateTwoTotal = this.calcInclusiveLineTax(
           this.item.tax_rate2,
           amount
         );
@@ -196,7 +192,7 @@ export class InvoiceItemSum {
 
         //
 
-        const itemTaxRateThree = this.calculateAmountLineTax(
+        const itemTaxRateThree = this.calcInclusiveLineTax(
           this.item.tax_rate3,
           amount
         );
