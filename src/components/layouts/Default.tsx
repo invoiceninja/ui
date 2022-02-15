@@ -63,7 +63,7 @@ export function Default(props: Props) {
       rightButton: {
         icon: PlusCircle,
         to: '/clients/create',
-        label: `${t('new')} ${t('client')}`,
+        label: t('new_client'),
       },
     },
     {
@@ -74,7 +74,7 @@ export function Default(props: Props) {
       rightButton: {
         icon: PlusCircle,
         to: '/products/create',
-        label: `${t('new')} ${t('product')}`,
+        label: t('new_product'),
       },
     },
     {
@@ -85,7 +85,7 @@ export function Default(props: Props) {
       rightButton: {
         icon: PlusCircle,
         to: '/invoices/create',
-        label: `${t('new')} ${t('invoice')}`,
+        label: t('new_invoice'),
       },
     },
     {
