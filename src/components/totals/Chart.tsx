@@ -154,51 +154,50 @@ export function Chart(props: Props) {
   }, [props]);
 
   return (
-    <>
-      <div>
-        <ResponsiveContainer width={'100%'} height={250}>
-          <AreaChart height={200} data={chartData}>
-            <Legend></Legend>
-            <defs>
-              <linearGradient id="colorpayments" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#131317" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#131317" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="colorexpenses" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="colorincoices" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#58585c" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="#58585c" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" />
-            <Tooltip />
+    <ResponsiveContainer width={'100%'} height={250}>
+      <AreaChart height={200} data={chartData}>
+        <Legend></Legend>
+        <defs>
+          <linearGradient id="colorpayments" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#131317" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#131317" stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="colorexpenses" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
+          </linearGradient>
+          <linearGradient id="colorincoices" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="5%" stopColor="#58585c" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#58585c" stopOpacity={0} />
+          </linearGradient>
+        </defs>
+        <CartesianGrid strokeDasharray="3 3" />
+        <Tooltip />
 
-            <XAxis height={50} dataKey="name" />
-            <YAxis />
-            <Area
-              dataKey="payments"
-              stroke="#131317"
-              fill="url(#colorpayments)"
-              fillOpacity={1}
-            />
-            <Area
-              dataKey="expenses"
-              stroke="#82ca9d"
-              fill="url(#colorexpenses)"
-              fillOpacity={1}
-            />
-            <Area
-              dataKey="invoices"
-              stroke="#58585c"
-              fill="url(#colorinvoices)"
-              fillOpacity={1}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-      </div>
-    </>
+        <XAxis height={50} dataKey="name" />
+        <YAxis />
+        <Area
+          name="Invoices"
+          dataKey="invoices"
+          stroke="#58585c"
+          fill="url(#colorinvoices)"
+          fillOpacity={1}
+        />
+        <Area
+          name="Payments"
+          dataKey="payments"
+          stroke="#131317"
+          fill="url(#colorpayments)"
+          fillOpacity={1}
+        />
+        <Area
+          name="Expenses"
+          dataKey="expenses"
+          stroke="#82ca9d"
+          fill="url(#colorexpenses)"
+          fillOpacity={1}
+        />
+      </AreaChart>
+    </ResponsiveContainer>
   );
 }
