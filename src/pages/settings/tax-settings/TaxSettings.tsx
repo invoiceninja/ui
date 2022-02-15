@@ -19,7 +19,6 @@ import {
   updateChanges,
   updateRecord,
 } from 'common/stores/slices/company-users';
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { ChangeEvent, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';

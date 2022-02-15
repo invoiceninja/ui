@@ -19,7 +19,6 @@ import {
   updateUser,
 } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';

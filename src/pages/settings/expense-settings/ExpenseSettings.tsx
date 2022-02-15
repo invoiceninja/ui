@@ -19,7 +19,6 @@ import {
   updateChanges,
   updateRecord,
 } from 'common/stores/slices/company-users';
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Divider } from 'components/cards/Divider';
 import { ChangeEvent, useEffect } from 'react';
 import toast from 'react-hot-toast';

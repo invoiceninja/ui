@@ -20,7 +20,6 @@ import {
   updateRecord,
 } from 'common/stores/slices/company-users';
 import { Alert } from 'components/Alert';
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Divider } from 'components/cards/Divider';
 import { ChangeEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
