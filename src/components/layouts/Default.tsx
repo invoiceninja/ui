@@ -176,7 +176,6 @@ export function Default(props: Props) {
                         </div>
                         {item.rightButton && (
                           <Link to={item.rightButton.to}>
-                            {' '}
                             <item.rightButton.icon />
                           </Link>
                         )}
@@ -231,7 +230,6 @@ export function Default(props: Props) {
                         title={item.rightButton.label}
                         className="hover:bg-gray-200 hover:bg-opacity-10 rounded-full p-1.5"
                       >
-                        {' '}
                         <item.rightButton.icon />
                       </Link>
                     )}
