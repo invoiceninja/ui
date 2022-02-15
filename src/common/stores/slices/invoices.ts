@@ -9,44 +9,25 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { Invoice } from 'common/interfaces/invoice';
 
 interface InvoiceState {
   api?: any;
-  builder: {
-    items: any[];
-  };
+  current?: Invoice;
 }
-
-const blankInvoiceItem = {
-  product_key: null,
-  description: null,
-  unit_cost: null,
-  quantity: null,
-};
 
 const initialState: InvoiceState = {
   api: {},
-  builder: {
-    items: [blankInvoiceItem],
-  },
 };
 
 export const invoiceSlice = createSlice({
   name: 'invoices',
   initialState,
   reducers: {
-    updateBuilderProperty: (
-      state,
-      action: PayloadAction<{
-        itemIndex: number;
-        field: string;
-        value: string | number | null;
-      }>
-    ) => {
-      state.builder.items[action.payload.itemIndex][action.payload.field] =
-        action.payload.value;
+    setCurrentInvoice: (state, payload: PayloadAction<Invoice>) => {
+      state.current = payload.payload;
     },
   },
 });
 
-export const { updateBuilderProperty } = invoiceSlice.actions;
+export const { setCurrentInvoice } = invoiceSlice.actions;
