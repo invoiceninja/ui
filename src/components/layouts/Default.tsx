@@ -19,11 +19,10 @@ import {
   Settings,
   Users,
   PlusCircle,
-  
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@invoiceninja/forms';
 import { CompanySwitcher } from 'components/CompanySwitcher';
 import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
@@ -47,6 +46,7 @@ export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [t] = useTranslation();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navigation = [
     {
@@ -175,9 +175,9 @@ export function Default(props: Props) {
                           {item.name}
                         </div>
                         {item.rightButton && (
-                          <Link to={item.rightButton.to}>
+                          <button onClick={() => navigate(item.rightButton.to)}>
                             <item.rightButton.icon />
-                          </Link>
+                          </button>
                         )}
                       </Link>
                     ))}
@@ -225,13 +225,13 @@ export function Default(props: Props) {
                       {item.name}
                     </div>
                     {item.rightButton && (
-                      <Link
-                        to={item.rightButton.to}
+                      <button
+                        onClick={() => navigate(item.rightButton.to)}
                         title={item.rightButton.label}
                         className="hover:bg-gray-200 hover:bg-opacity-10 rounded-full p-1.5"
                       >
                         <item.rightButton.icon />
-                      </Link>
+                      </button>
                     )}
                   </Link>
                 ))}
