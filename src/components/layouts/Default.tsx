@@ -18,6 +18,8 @@ import {
   FileText,
   Settings,
   Users,
+  PlusCircle,
+  
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -58,18 +60,33 @@ export function Default(props: Props) {
       href: '/clients',
       icon: Users,
       current: location.pathname === '/clients',
+      rightButton: {
+        icon: PlusCircle,
+        to: '/clients/create',
+        label: t('new_client'),
+      },
     },
     {
       name: t('products'),
       href: '/products',
       icon: Box,
       current: location.pathname === '/products',
+      rightButton: {
+        icon: PlusCircle,
+        to: '/products/create',
+        label: t('new_product'),
+      },
     },
     {
       name: t('invoices'),
       href: '/invoices',
       icon: FileText,
       current: location.pathname === '/invoices',
+      rightButton: {
+        icon: PlusCircle,
+        to: '/invoices/create',
+        label: t('new_invoice'),
+      },
     },
     {
       name: t('settings'),
@@ -143,18 +160,25 @@ export function Default(props: Props) {
                           item.current
                             ? 'bg-ninja-gray-darker text-gray-100 dark:bg-gray-800 dark:text-gray-100'
                             : 'text-gray-100 hover:bg-ninja-gray-darker dark:text-gray-300 dark:hover:text-gray-200 dark:hover:bg-gray-800',
-                          'group flex items-center px-4 py-2 text-base font-medium'
+                          'group flex items-center justify-between px-4 py-2 text-base font-medium'
                         )}
                       >
-                        <item.icon
-                          className={classNames(
-                            item.current
-                              ? 'dark:text-gray-200'
-                              : 'dark:text-gray-400 dark:group-hover:text-gray-200',
-                            'mr-4 flex-shrink-0 h-6 w-6'
-                          )}
-                        />
-                        {item.name}
+                        <div className="flex justify-start items-center">
+                          <item.icon
+                            className={classNames(
+                              item.current
+                                ? 'dark:text-gray-200'
+                                : 'dark:text-gray-400 dark:group-hover:text-gray-200',
+                              'mr-4 flex-shrink-0 h-6 w-6'
+                            )}
+                          />
+                          {item.name}
+                        </div>
+                        {item.rightButton && (
+                          <Link to={item.rightButton.to}>
+                            <item.rightButton.icon />
+                          </Link>
+                        )}
                       </Link>
                     ))}
                   </nav>
@@ -185,19 +209,30 @@ export function Default(props: Props) {
                       item.current
                         ? 'border-l-4 border-transparent bg-ninja-gray-darker text-gray-100 dark:bg-gray-700 dark:text-gray-100'
                         : 'border-l-4 border-transparent text-gray-100 hover:bg-ninja-gray-darker dark:hover:bg-gray-700 dark:hover:text-gray-100',
-                      'group flex items-center px-4 py-2 text-sm font-medium'
+                      'group flex items-center justify-between px-4 text-sm font-medium'
                     )}
                   >
-                    <item.icon
-                      className={classNames(
-                        item.current
-                          ? 'dark:text-gray-100'
-                          : 'dark:group-hover:text-gray-100',
-                        'text-gray-100 mr-3 flex-shrink-0 h-6 w-6'
-                      )}
-                      aria-hidden="true"
-                    />
-                    {item.name}
+                    <div className="flex justify-start items-center my-2">
+                      <item.icon
+                        className={classNames(
+                          item.current
+                            ? 'dark:text-gray-100'
+                            : 'dark:group-hover:text-gray-100',
+                          'text-gray-100 mr-3 flex-shrink-0 h-6 w-6'
+                        )}
+                        aria-hidden="true"
+                      />
+                      {item.name}
+                    </div>
+                    {item.rightButton && (
+                      <Link
+                        to={item.rightButton.to}
+                        title={item.rightButton.label}
+                        className="hover:bg-gray-200 hover:bg-opacity-10 rounded-full p-1.5"
+                      >
+                        <item.rightButton.icon />
+                      </Link>
+                    )}
                   </Link>
                 ))}
               </nav>
