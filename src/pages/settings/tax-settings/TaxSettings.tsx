@@ -98,8 +98,9 @@ export function TaxSettings() {
       onSaveClick={onSave}
       onCancelClick={() => dispatch(resetChanges('company'))}
       title={t('tax_settings')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#tax_settings"
     >
-      <Breadcrumbs pages={pages} />
       <Card title={t('tax_settings')}>
         <Element leftSide={t('invoice_tax_rates')}>
           <SelectField

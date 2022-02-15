@@ -78,8 +78,9 @@ export function WorkflowSettings() {
       onSaveClick={onSave}
       onCancelClick={onCancel}
       title={t('workflow_settings')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#workflow_settings"
     >
-      <Breadcrumbs pages={pages} />
       <Invoices />
       <Quotes />
     </Settings>

@@ -81,9 +81,9 @@ export function AccountManagement() {
       onSaveClick={onSave}
       onCancelClick={() => dispatch(resetChanges('company'))}
       title={t('account_management')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#account_management"
     >
-      <Breadcrumbs pages={pages} />
-
       <Plan />
       <Overview />
       <EnabledModules />

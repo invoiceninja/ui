@@ -17,7 +17,10 @@ import { Settings } from '../../../components/layouts/Settings';
 
 export function EmailSettings() {
   const [t] = useTranslation();
-
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('email_settings'), href: '/settings/email_settings' },
+  ];
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
       'email_settings'
@@ -25,7 +28,11 @@ export function EmailSettings() {
   });
 
   return (
-    <Settings title={t('email_settings')}>
+    <Settings
+      title={t('email_settings')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#email_settings"
+    >
       <Card title={t('settings')}>
         <Element leftSide={t('send_from_gmail')}>
           <Toggle />

@@ -91,14 +91,14 @@ export function UserDetails() {
       onSaveClick={() => setPasswordConfirmModalOpen(true)}
       onCancelClick={() => dispatch(resetChanges())}
       title={t('user_details')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#user_details"
     >
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setPasswordConfirmModalOpen}
         onSave={onSave}
       />
-
-      <Breadcrumbs pages={pages} />
 
       <Details />
       <Password />

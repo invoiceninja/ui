@@ -40,9 +40,11 @@ export function OnlinePayments() {
   });
 
   return (
-    <Settings title={t('online_payments')}>
-      <Breadcrumbs pages={pages} />
-
+    <Settings
+      title={t('online_payments')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#online_payments"
+    >
       <Card withSaveButton title={t('settings')}>
         <Element leftSide={t('auto_bill_on')}>
           <SelectField>

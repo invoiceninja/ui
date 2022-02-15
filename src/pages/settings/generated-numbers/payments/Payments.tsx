@@ -23,7 +23,11 @@ export function Payments() {
       'generated_numbers'
     )}`;
   });
-
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('generated_numbers'), href: '/settings/generated_numbers' },
+    { name: t('payments'), href: '/settings/generated_numbers/payments' },
+  ];
   const variables = [
     '{$counter}',
     '{$year}',
@@ -36,7 +40,11 @@ export function Payments() {
   ];
 
   return (
-    <Settings title={t('generated_numbers')}>
+    <Settings
+      title={t('generated_numbers')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#clients-invoices-recurring-invoices-payments-etc"
+    >
       <Card title={`${t('generated_numbers')}: ${t('payments')}`}>
         <Element leftSide={t('number_pattern')}>
           <InputField

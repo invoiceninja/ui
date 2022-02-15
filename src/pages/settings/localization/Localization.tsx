@@ -76,9 +76,9 @@ export function Localization() {
       onSaveClick={onSave}
       onCancelClick={onCancel}
       title={t('localization')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#localization"
     >
-      <Breadcrumbs pages={pages} />
-
       <SettingsComponent />
       <CustomLabels />
     </Settings>

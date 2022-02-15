@@ -24,7 +24,10 @@ import { useTranslation } from 'react-i18next';
 
 export function GroupSettings() {
   const [t] = useTranslation();
-
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('group_settings'), href: '/settings/group_settings' },
+  ];
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
       'group_settings'
@@ -32,7 +35,11 @@ export function GroupSettings() {
   });
 
   return (
-    <Settings title={t('group_settings')}>
+    <Settings
+      title={t('group_settings')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#group_settings"
+    >
       <div className="flex justify-end mt-4 lg:mt-0">
         <Button to="/group_settings/create">Create group</Button>
       </div>

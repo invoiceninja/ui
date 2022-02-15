@@ -17,7 +17,14 @@ import { Settings } from '../../../../components/layouts/Settings';
 export function RecurringExpenses() {
   const [t] = useTranslation();
   const [pattern, setPattern] = useState<string>('');
-
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('generated_numbers'), href: '/settings/generated_numbers' },
+    {
+      name: t('recurring_expenses'),
+      href: '/settings/generated_numbers/recurring_expenses',
+    },
+  ];
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
       'generated_numbers'
@@ -36,7 +43,11 @@ export function RecurringExpenses() {
   ];
 
   return (
-    <Settings title={t('generated_numbers')}>
+    <Settings
+      title={t('generated_numbers')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#clients-invoices-recurring-invoices-payments-etc"
+    >
       <Card title={`${t('generated_numbers')}: ${t('recurring_expenses')}`}>
         <Element leftSide={t('number_pattern')}>
           <InputField

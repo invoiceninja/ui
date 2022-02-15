@@ -19,7 +19,10 @@ export function CustomFields() {
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('custom_fields')}`;
   });
-
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('custom_fields'), href: '/settings/custom_fields' },
+  ];
   const modules = [
     { label: t('company'), link: '/settings/custom_fields/company' },
     { label: t('clients'), link: '/settings/custom_fields/clients' },
@@ -34,7 +37,11 @@ export function CustomFields() {
   ];
 
   return (
-    <Settings title={t('custom_fields')}>
+    <Settings
+      title={t('custom_fields')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#custom_fields"
+    >
       <Card title={t('custom_fields')}>
         {modules.map((module, index) => (
           <ClickableElement key={index} to={module.link}>

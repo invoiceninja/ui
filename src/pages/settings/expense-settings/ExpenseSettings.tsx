@@ -93,9 +93,9 @@ export function ExpenseSettings() {
       onSaveClick={onSave}
       onCancelClick={onCancel}
       title={t('expense_settings')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#expense_settings"
     >
-      <Breadcrumbs pages={pages} />
-
       <Card title={t('settings')}>
         <Element
           leftSide={t('should_be_invoiced')}

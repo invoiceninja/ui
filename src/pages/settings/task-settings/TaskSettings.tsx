@@ -102,9 +102,9 @@ export function TaskSettings() {
       onSaveClick={onSave}
       onCancelClick={() => dispatch(resetChanges('company'))}
       title={t('task_settings')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#task_settings"
     >
-      <Breadcrumbs pages={pages} />
-
       {errors?.errors?.settings && (
         <Alert type="danger">
           {errors?.errors?.settings.map((element: string, index: number) => (

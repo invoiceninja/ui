@@ -24,13 +24,20 @@ import { useTranslation } from 'react-i18next';
 
 export function Subscriptions() {
   const [t] = useTranslation();
-
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('subscriptions'), href: '/settings/subscriptions' },
+  ];
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('subscriptions')}`;
   });
 
   return (
-    <Settings title={t('subscriptions')}>
+    <Settings
+      title={t('subscriptions')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#subscriptions"
+    >
       <div className="flex justify-end mt-4 lg:mt-0">
         <Button to="/subscriptions/create">Create subscription</Button>
       </div>
