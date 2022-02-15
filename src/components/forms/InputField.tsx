@@ -17,7 +17,7 @@ import { InputLabel } from './InputLabel';
 
 interface Props extends CommonProps {
   label?: string;
-  id: string;
+  id?: string;
   type?: string;
   placeholder?: string;
   required?: boolean;
@@ -27,6 +27,7 @@ interface Props extends CommonProps {
   debounceTimeout?: number;
   element?: string;
   disabled?: boolean;
+  list?: string;
 }
 
 export function InputField(props: Props) {
@@ -56,6 +57,7 @@ export function InputField(props: Props) {
         placeholder={props.placeholder}
         onChange={props.onChange}
         value={props.value}
+        list={props.list}
       />
 
       {props.errorMessage && (
