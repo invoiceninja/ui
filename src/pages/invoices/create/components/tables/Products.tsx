@@ -49,10 +49,31 @@ export function Products() {
     return { resource, property };
   };
 
-  const resolveType = (key: string) => {
+  const resolveInputField = (key: string) => {
     const { property } = resolveKey(key);
 
-    return <InputField id={property} />
+    if (['product_key', 'item'].includes(property)) {
+      return (
+        <>
+          <InputField list={property} />
+
+          <datalist id={property}>
+            <option value="Product 1" />
+            <option value="Product 2" />
+          </datalist>
+        </>
+      );
+    }
+
+    if (['discount', 'cost', 'unit_cost', 'quantity'].includes(property)) {
+      return <InputField id={property} type="number" />;
+    }
+
+    if (['line_total'].includes(property)) {
+      return <span>Text</span>;
+    }
+
+    return <InputField id={property} />;
   };
 
   const resolveTranslation = (key: string) => {
@@ -74,7 +95,7 @@ export function Products() {
             {lineItems.map((lineItem, index) => (
               <Tr key={index}>
                 {columns.map((column, index) => (
-                  <Td key={index}>{resolveType(column)}</Td>
+                  <Td key={index}>{resolveInputField(column)}</Td>
                 ))}
               </Tr>
             ))}
