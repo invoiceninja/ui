@@ -19,7 +19,7 @@ import {
   Settings,
   Users,
   PlusCircle,
-  Search,
+  
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
