@@ -16,7 +16,10 @@ import { Settings as SettingsComponent } from './components/Settings';
 
 export function GeneratedNumbers() {
   const [t] = useTranslation();
-
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('generated_numbers'), href: '/settings/generated_numbers' },
+  ];
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
       'generated_numbers'
@@ -24,7 +27,11 @@ export function GeneratedNumbers() {
   });
 
   return (
-    <Settings title={t('generated_numbers')}>
+    <Settings
+      title={t('generated_numbers')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#generated_numbers"
+    >
       <SettingsComponent />
 
       <Card>

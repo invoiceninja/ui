@@ -19,7 +19,6 @@ import {
   updateUser,
 } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -91,14 +90,14 @@ export function UserDetails() {
       onSaveClick={() => setPasswordConfirmModalOpen(true)}
       onCancelClick={() => dispatch(resetChanges())}
       title={t('user_details')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#user_details"
     >
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setPasswordConfirmModalOpen}
         onSave={onSave}
       />
-
-      <Breadcrumbs pages={pages} />
 
       <Details />
       <Password />

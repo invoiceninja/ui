@@ -19,7 +19,6 @@ import {
   updateChanges,
   updateRecord,
 } from 'common/stores/slices/company-users';
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Divider } from 'components/cards/Divider';
 import { ChangeEvent, useEffect } from 'react';
 import toast from 'react-hot-toast';
@@ -93,9 +92,9 @@ export function ExpenseSettings() {
       onSaveClick={onSave}
       onCancelClick={onCancel}
       title={t('expense_settings')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#expense_settings"
     >
-      <Breadcrumbs pages={pages} />
-
       <Card title={t('settings')}>
         <Element
           leftSide={t('should_be_invoiced')}

@@ -15,9 +15,19 @@ import { useTranslation } from 'react-i18next';
 
 export function TemplatesAndReminders() {
   const [t] = useTranslation();
-
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    {
+      name: t('templates_and_reminders'),
+      href: '/settings/templates_and_reminders',
+    },
+  ];
   return (
-    <Settings title={t('templates_and_reminders')}>
+    <Settings
+      title={t('templates_and_reminders')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#templates_and_reminders"
+    >
       <Card title={t('edit')}>
         <Element leftSide={t('template')}>
           <SelectField>

@@ -18,7 +18,6 @@ import {
   resetChanges,
   updateRecord,
 } from 'common/stores/slices/company-users';
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -81,9 +80,9 @@ export function AccountManagement() {
       onSaveClick={onSave}
       onCancelClick={() => dispatch(resetChanges('company'))}
       title={t('account_management')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#account_management"
     >
-      <Breadcrumbs pages={pages} />
-
       <Plan />
       <Overview />
       <EnabledModules />

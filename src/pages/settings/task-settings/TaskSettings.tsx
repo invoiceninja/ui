@@ -20,7 +20,6 @@ import {
   updateRecord,
 } from 'common/stores/slices/company-users';
 import { Alert } from 'components/Alert';
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Divider } from 'components/cards/Divider';
 import { ChangeEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -102,9 +101,9 @@ export function TaskSettings() {
       onSaveClick={onSave}
       onCancelClick={() => dispatch(resetChanges('company'))}
       title={t('task_settings')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#task_settings"
     >
-      <Breadcrumbs pages={pages} />
-
       {errors?.errors?.settings && (
         <Alert type="danger">
           {errors?.errors?.settings.map((element: string, index: number) => (

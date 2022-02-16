@@ -18,13 +18,21 @@ import { Field } from '../components';
 
 export function Invoices() {
   const [t] = useTranslation();
-
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('custom_fields'), href: '/settings/custom_fields' },
+    { name: t('invoices'), href: '/settings/custom_fields/invoices' },
+  ];
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('custom_fields')}`;
   });
 
   return (
-    <Settings title={t('custom_fields')}>
+    <Settings
+      title={t('custom_fields')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#custom_fields"
+    >
       <Card title={`${t('custom_fields')}: ${t('invoices')}`}>
         {['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
           <Field key={field} field={field} placeholder={t('invoice_field')} />

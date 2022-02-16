@@ -24,7 +24,10 @@ import { useTranslation } from 'react-i18next';
 
 export function UserManagement() {
   const [t] = useTranslation();
-
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('user_management'), href: '/settings/user_management' },
+  ];
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
       'user_management'
@@ -32,7 +35,10 @@ export function UserManagement() {
   });
 
   return (
-    <Settings title={t('user_management')}>
+    <Settings title={t('user_management')}
+    breadcrumbs={pages}
+    docsLink='docs/advanced-settings/#user_management'
+    >
       <div className="flex justify-end mt-4 lg:mt-0">
         <Button to="/users/create">Create user</Button>
       </div>

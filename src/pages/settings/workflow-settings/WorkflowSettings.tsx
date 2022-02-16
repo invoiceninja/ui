@@ -18,7 +18,6 @@ import {
   resetChanges,
   updateRecord,
 } from 'common/stores/slices/company-users';
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -78,8 +77,9 @@ export function WorkflowSettings() {
       onSaveClick={onSave}
       onCancelClick={onCancel}
       title={t('workflow_settings')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#workflow_settings"
     >
-      <Breadcrumbs pages={pages} />
       <Invoices />
       <Quotes />
     </Settings>

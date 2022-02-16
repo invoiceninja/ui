@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../components/cards';
@@ -28,9 +27,11 @@ export function ImportExport() {
   });
 
   return (
-    <Settings title={t('import_export')}>
-      <Breadcrumbs pages={pages} />
-
+    <Settings
+      title={t('import_export')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#import_export"
+    >
       <Card withSaveButton saveButtonLabel={t('import')} title={t('import')}>
         <Element leftSide={t('import_type')}>
           <SelectField>

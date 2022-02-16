@@ -19,7 +19,6 @@ import {
   updateChanges,
   updateRecord,
 } from 'common/stores/slices/company-users';
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Divider } from 'components/cards/Divider';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
@@ -88,9 +87,9 @@ export function ProductSettings() {
       onSaveClick={onSave}
       onCancelClick={() => dispatch(resetChanges('company'))}
       title={t('product_settings')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#product_settings"
     >
-      <Breadcrumbs pages={pages} />
-
       <Card title={t('Settings')}>
         <Element
           leftSide={t('show_product_discount')}

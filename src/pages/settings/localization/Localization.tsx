@@ -18,7 +18,6 @@ import {
   resetChanges,
   updateRecord,
 } from 'common/stores/slices/company-users';
-import { Breadcrumbs } from 'components/Breadcrumbs';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -76,9 +75,9 @@ export function Localization() {
       onSaveClick={onSave}
       onCancelClick={onCancel}
       title={t('localization')}
+      breadcrumbs={pages}
+      docsLink="docs/basic-settings/#localization"
     >
-      <Breadcrumbs pages={pages} />
-
       <SettingsComponent />
       <CustomLabels />
     </Settings>

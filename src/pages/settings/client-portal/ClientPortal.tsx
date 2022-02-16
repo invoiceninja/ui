@@ -21,13 +21,20 @@ import {
 
 export function ClientPortal() {
   const [t] = useTranslation();
-
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('client_portal'), href: '/settings/client_portal' },
+  ];
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('client_portal')}`;
   });
 
   return (
-    <Settings title={t('client_portal')}>
+    <Settings
+      title={t('client_portal')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#client_portal"
+    >
       <SettingsComponent />
       <Registration />
       <Authorization />
