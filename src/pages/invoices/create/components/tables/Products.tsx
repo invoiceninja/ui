@@ -13,7 +13,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { RootState } from 'common/stores/store';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
@@ -22,7 +22,7 @@ export function Products() {
   const company = useCurrentCompany();
 
   const [columns, setColumns] = useState([]);
-  const [lineItems, setLineItems] = useState<Partial<InvoiceItem>[]>([]);
+  const [lineItems, setLineItems] = useState<InvoiceItem[]>([]);
   const invoice = useSelector((state: RootState) => state.invoices.current);
 
   useEffect(() => {
@@ -30,17 +30,35 @@ export function Products() {
   }, [company]);
 
   useEffect(() => {
-    if (typeof invoice?.line_items === 'string') {
-      // We are dealing with empty invoice from /create endpoint.
-      // An "empty" line item push is needed.
+    // We are dealing with empty invoice from /create endpoint.
+    // An "empty" line item push is needed.
 
-      lineItems.push({
-        product_key: '',
-        quantity: 0,
-      });
+    lineItems.push({
+      quantity: 0,
+      cost: 0,
+      product_key: '',
+      product_cost: 0,
+      notes: '',
+      discount: 0,
+      is_amount_discount: false,
+      tax_name1: '',
+      tax_rate1: 0,
+      tax_name2: '',
+      tax_rate2: 0,
+      tax_name3: '',
+      tax_rate3: 0,
+      sort_id: 0,
+      line_total: 0,
+      gross_line_total: 0,
+      date: '',
+      custom_value1: '',
+      custom_value2: '',
+      custom_value3: '',
+      custom_value4: '',
+      type_id: '1',
+    });
 
-      setLineItems(lineItems);
-    }
+    setLineItems(lineItems);
   }, [invoice]);
 
   const resolveKey = (key: string) => {
@@ -49,18 +67,22 @@ export function Products() {
     return { resource, property };
   };
 
-  const resolveInputField = (key: string) => {
+  const onChange = (property: string, value: unknown, index: number) => {
+    console.log(property, value, index);
+  };
+
+  const resolveInputField = (key: string, index: number) => {
     const { property } = resolveKey(key);
 
     if (['product_key', 'item'].includes(property)) {
       return (
         <>
-          <InputField list={property} />
-
-          <datalist id={property}>
-            <option value="Product 1" />
-            <option value="Product 2" />
-          </datalist>
+          <InputField
+            id={key}
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              onChange(key, event.target.value, index)
+            }
+          />
         </>
       );
     }
@@ -92,10 +114,12 @@ export function Products() {
             ))}
           </Thead>
           <Tbody>
-            {lineItems.map((lineItem, index) => (
-              <Tr key={index}>
-                {columns.map((column, index) => (
-                  <Td key={index}>{resolveInputField(column)}</Td>
+            {lineItems.map((lineItem, lineItemIndex) => (
+              <Tr key={lineItemIndex}>
+                {columns.map((column, columnIndex) => (
+                  <Td key={columnIndex}>
+                    {resolveInputField(column, lineItemIndex)}
+                  </Td>
                 ))}
               </Tr>
             ))}
