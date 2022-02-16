@@ -68,6 +68,12 @@ export function Products() {
   };
 
   const onChange = (property: string, value: unknown, index: number) => {
+    // Deep compare current object with empty.
+    // If not the same push the new empty into the array of line items.
+
+    // Check the last line item object in the array, if it's "empty" (equal to blank)
+    // And if it's remove pop it from the array.
+
     console.log(property, value, index);
   };
 
