@@ -16,7 +16,6 @@ import { Link } from '@invoiceninja/forms';
 import { generatePath } from 'react-router-dom';
 import { Default } from 'components/layouts/Default';
 import { EntityStatus } from 'components/EntityStatus';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
 
 export function Products() {
   const [t] = useTranslation();
@@ -50,30 +49,7 @@ export function Products() {
       label: t('quantity'),
     },
   ];
-  const actions = [
-    (resource: any) => {
-      return (
-        <DropdownElement
-          onClick={() => {
-            console.log('custom action 1');
-          }}
-        >
-          Custom action 1
-        </DropdownElement>
-      );
-    },
-    (resource: any) => {
-      return (
-        <DropdownElement
-          onClick={() => {
-            console.log('custom action 6');
-          }}
-        >
-          Custom action 6
-        </DropdownElement>
-      );
-    },
-  ];
+
   return (
     <Default title={t('products')} breadcrumbs={pages} docsLink="docs/products">
       <DataTable
@@ -83,7 +59,6 @@ export function Products() {
         linkToCreate="/products/create"
         linkToEdit="/products/:id/edit"
         withResourcefulActions
-        customActions={actions}
       />
     </Default>
   );

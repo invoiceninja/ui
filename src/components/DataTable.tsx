@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError } from 'axios';
-import { endpoint, handleCheckboxChange, request } from 'common/helpers';
+import axios from 'axios';
+import { endpoint, handleCheckboxChange } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { ChangeEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

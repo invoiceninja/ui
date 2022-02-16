@@ -18,11 +18,7 @@ import { useQueryClient } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
-interface Actions {
-  name: string;
-  action?: any;
-  to?: any;
-}
+
 type Props = {
   type: 'default' | 'bulk';
   label: string;
@@ -66,8 +62,6 @@ export default function ResourcefulActions(props: Props) {
         props.mainCheckbox.current.checked = false;
       })
       .catch((error: AxiosError) => {
-        console.log('error from catch');
-        console.log(error);
         console.error(error.response?.data);
 
         toast.error(t('error_title'), {
@@ -87,7 +81,6 @@ export default function ResourcefulActions(props: Props) {
                 id: props.resource?.id,
               })}
             >
-              {console.log('res:', props.resource)}
               {t(`edit_${props.resourceType}`)}
             </DropdownElement>
           )}
@@ -127,7 +120,6 @@ export default function ResourcefulActions(props: Props) {
             </DropdownElement>
           )}
 
-          {console.log('children', props.children)}
           {props.children}
         </Dropdown>
       )}
