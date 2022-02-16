@@ -12,14 +12,11 @@ import axios, { AxiosError } from 'axios';
 import { endpoint, handleCheckboxChange, request } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { ChangeEvent, ReactNode, useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useQuery, useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import { Actions } from './datatables/Actions';
-import { Dropdown } from './dropdown/Dropdown';
-import { DropdownElement } from './dropdown/DropdownElement';
 import { Button, Checkbox } from './forms';
+import ResourcefulActions from './ResourcefulActions';
 import { Spinner } from './Spinner';
 import {
   ColumnSortPayload,
@@ -46,6 +43,7 @@ interface Props {
   linkToEdit?: string;
   withResourcefulActions?: ReactNode[] | boolean;
   bulkRoute?: string;
+  customActions?: any;
 }
 
 export function DataTable(props: Props) {
@@ -62,7 +60,6 @@ export function DataTable(props: Props) {
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState(['active']);
   const [selected, setSelected] = useState(new Set<string>());
-  const queryClient = useQueryClient();
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
@@ -87,39 +84,6 @@ export function DataTable(props: Props) {
     { value: 'deleted', label: t('deleted') },
   ];
 
-  const bulk = (action: 'archive' | 'restore' | 'delete') => {
-    const toastId = toast.loading(t('processing'));
-
-    request(
-      'POST',
-      endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`),
-      {
-        action,
-        ids: Array.from(selected),
-      },
-      defaultHeaders
-    )
-      .then(() => {
-        toast.success(t(`successfully_${action}_${props.resource}`), {
-          id: toastId,
-        });
-
-        selected.clear();
-
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        /** @ts-ignore: Unreachable, if element is null/undefined. */
-        mainCheckbox.current.checked = false;
-      })
-      .catch((error: AxiosError) => {
-        console.error(error.response?.data);
-
-        toast.error(t('error_title'), {
-          id: toastId,
-        });
-      })
-      .finally(() => queryClient.invalidateQueries(apiEndpoint.href));
-  };
-
   return (
     <>
       <Actions
@@ -137,8 +101,18 @@ export function DataTable(props: Props) {
         }
       >
         <span className="text-sm">{t('with_selected')}</span>
-
-        
+        <ResourcefulActions
+          type="bulk"
+          mainCheckbox={mainCheckbox}
+          endpoint={props.endpoint}
+          bulkRoute={props.bulkRoute}
+          apiEndpoint={apiEndpoint}
+          setSelected={setSelected}
+          selected={selected}
+          resourceType={props.resource}
+          linkToEdit={props.linkToEdit}
+          label="More actions"
+        ></ResourcefulActions>
       </Actions>
       <Table>
         <Thead>
@@ -223,52 +197,24 @@ export function DataTable(props: Props) {
 
                 {props.withResourcefulActions && (
                   <Td>
-                    <Dropdown label={t('actions')}>
-                      {props.linkToEdit && (
-                        <DropdownElement
-                          to={generatePath(props.linkToEdit, {
-                            id: resource.id,
-                          })}
-                        >
-                          {t(`edit_${props.resource}`)}
-                        </DropdownElement>
-                      )}
-                      {resource.archived_at === 0 && (
-                        <DropdownElement
-                          onClick={() => {
-                            setSelected(new Set());
-                            setSelected(selected.add(resource.id));
-                            bulk('archive');
-                          }}
-                        >
-                          {t(`archive_${props.resource}`)}
-                        </DropdownElement>
-                      )}
-
-                      {resource.archived_at > 0 && (
-                        <DropdownElement
-                          onClick={() => {
-                            setSelected(new Set());
-                            setSelected(selected.add(resource.id));
-                            bulk('restore');
-                          }}
-                        >
-                          {t(`restore_${props.resource}`)}
-                        </DropdownElement>
-                      )}
-
-                      {!resource.is_deleted && (
-                        <DropdownElement
-                          onClick={() => {
-                            setSelected(new Set());
-                            setSelected(selected.add(resource.id));
-                            bulk('delete');
-                          }}
-                        >
-                          {t(`delete_${props.resource}`)}
-                        </DropdownElement>
-                      )}
-                    </Dropdown>
+                    <ResourcefulActions
+                      type="default"
+                      mainCheckbox={mainCheckbox}
+                      endpoint={props.endpoint}
+                      bulkRoute={props.bulkRoute}
+                      apiEndpoint={apiEndpoint}
+                      setSelected={setSelected}
+                      selected={selected}
+                      resourceType={props.resource}
+                      resource={resource}
+                      linkToEdit={props.linkToEdit}
+                      label="More actions"
+                    >
+                      {props.customActions &&
+                        props.customActions?.map((action: any) => {
+                          return action(resource);
+                        })}
+                    </ResourcefulActions>
                   </Td>
                 )}
               </Tr>
