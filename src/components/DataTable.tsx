@@ -111,7 +111,7 @@ export function DataTable(props: Props) {
           selected={selected}
           resourceType={props.resource}
           linkToEdit={props.linkToEdit}
-          label="More actions"
+          label={`${t('actions')}`}
         ></ResourcefulActions>
       </Actions>
       <Table>
@@ -208,7 +208,7 @@ export function DataTable(props: Props) {
                       resourceType={props.resource}
                       resource={resource}
                       linkToEdit={props.linkToEdit}
-                      label="More actions"
+                      label={`${t('more_actions')}`}
                     >
                       {props.customActions &&
                         props.customActions?.map((action: any) => {
