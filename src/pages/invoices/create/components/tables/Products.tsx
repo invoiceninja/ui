@@ -13,6 +13,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { RootState } from 'common/stores/store';
+import { clone } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -21,12 +22,47 @@ export function Products() {
   const [t] = useTranslation();
   const company = useCurrentCompany();
 
-  const [columns, setColumns] = useState([]);
+  const [columns, setColumns] = useState<string[]>([]);
   const [lineItems, setLineItems] = useState<InvoiceItem[]>([]);
   const invoice = useSelector((state: RootState) => state.invoices.current);
 
   useEffect(() => {
-    setColumns(company?.settings.pdf_variables.product_columns || []);
+    console.log(company);
+
+    // We need to clone the product columns to local object,
+    // because by default it's frozen.
+    const variables: string[] =
+      clone(company?.settings.pdf_variables.product_columns) || [];
+
+    // Local object is needed because we want to spread tax columns in case they're enabled.
+    if (variables.includes('$product.tax')) {
+      const taxes: string[] = [];
+      const enabledTaxRates = company?.enabled_tax_rates || 0;
+
+      if (enabledTaxRates > 0) {
+        taxes.push('$product.tax_rate1');
+      }
+
+      if (enabledTaxRates > 1) {
+        taxes.push('$product.tax_rate2');
+      }
+
+      if (enabledTaxRates > 2) {
+        taxes.push('$product.tax_rate3');
+      }
+
+      // Let's remove original tax field because we don't need it anymore,
+      // but first we gonna keep the index, because that's where we are injecting other input fields.
+      const taxVariableIndex = variables.findIndex(
+        (variable) => variable === '$product.tax'
+      );
+
+      variables.splice(taxVariableIndex + 1, 0, ...taxes);
+
+      setColumns(variables.filter((variable) => variable !== '$product.tax'));
+    }
+
+    // setColumns(local as Array<InvoiceItem>);
   }, [company]);
 
   useEffect(() => {
