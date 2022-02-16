@@ -33,32 +33,36 @@ export function Products() {
     // We are dealing with empty invoice from /create endpoint.
     // An "empty" line item push is needed.
 
-    lineItems.push({
-      quantity: 0,
-      cost: 0,
-      product_key: '',
-      product_cost: 0,
-      notes: '',
-      discount: 0,
-      is_amount_discount: false,
-      tax_name1: '',
-      tax_rate1: 0,
-      tax_name2: '',
-      tax_rate2: 0,
-      tax_name3: '',
-      tax_rate3: 0,
-      sort_id: 0,
-      line_total: 0,
-      gross_line_total: 0,
-      date: '',
-      custom_value1: '',
-      custom_value2: '',
-      custom_value3: '',
-      custom_value4: '',
-      type_id: '1',
-    });
+    // Check if the object contains any and if not push the blank one.
 
-    setLineItems(lineItems);
+    if (lineItems.length === 0) {
+      lineItems.push({
+        quantity: 0,
+        cost: 0,
+        product_key: '',
+        product_cost: 0,
+        notes: '',
+        discount: 0,
+        is_amount_discount: false,
+        tax_name1: '',
+        tax_rate1: 0,
+        tax_name2: '',
+        tax_rate2: 0,
+        tax_name3: '',
+        tax_rate3: 0,
+        sort_id: 0,
+        line_total: 0,
+        gross_line_total: 0,
+        date: '',
+        custom_value1: '',
+        custom_value2: '',
+        custom_value3: '',
+        custom_value4: '',
+        type_id: '1',
+      });
+
+      setLineItems(lineItems);
+    }
   }, [invoice]);
 
   const resolveKey = (key: string) => {
