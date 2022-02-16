@@ -110,11 +110,9 @@ export function Products() {
   const onChange = (property: string, value: unknown, index: number) => {
     // Deep compare current object with empty.
     // If not the same push the new empty into the array of line items.
-
     // Check the last line item object in the array, if it's "empty" (equal to blank)
     // And if it's remove pop it from the array.
-
-    console.log(property, value, index);
+    // console.log(property, value, index);
   };
 
   const resolveInputField = (key: string, index: number) => {
@@ -145,6 +143,16 @@ export function Products() {
   };
 
   const resolveTranslation = (key: string) => {
+    const aliases: Record<string, string> = {
+      '$product.tax_rate1': company?.settings.tax_name1 || t('tax_rate1'),
+      '$product.tax_rate2': company?.settings.tax_name2 || t('tax_rate2'),
+      '$product.tax_rate3': company?.settings.tax_name3 || t('tax_rate3'),
+    };
+
+    if (Object.prototype.hasOwnProperty.call(aliases, key)) {
+      return aliases[key];
+    }
+
     const { property } = resolveKey(key);
 
     return property ? t(property) : t(key);
