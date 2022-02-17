@@ -10,8 +10,6 @@
 
 import { InputField } from '@invoiceninja/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
-import { current } from '@reduxjs/toolkit';
-import { deepStrictEqual } from 'assert';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { RootState } from 'common/stores/store';
@@ -112,10 +110,10 @@ export function Products() {
   };
 
   const onChange = (property: string, value: unknown, index: number) => {
-    // Deep compare current object with empty.
-    // If not the same push the new empty into the array of line items.
-    // Check the last line item object in the array, if it's "empty" (equal to blank)
-    // And if it's remove pop it from the array.
+    // Deep compare current object with empty. ✅
+    // If not the same push the new empty into the array of line items. ✅
+    // Check the last line item object in the array, if it's "empty" (equal to blank) ✅
+    // And if it's remove pop it from the array. ✅
 
     // Some properties don't bind 1:1. Example of this
     // is '$product.item' while in the line item is 'product_key'.
