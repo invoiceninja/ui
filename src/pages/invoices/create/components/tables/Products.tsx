@@ -145,7 +145,13 @@ export function Products() {
         setLineItems(copy);
       }
     } else {
-      setLineItems((current) => [...current, blankLineItem]);
+      // We want to push new blank entry, if the last one isn't blank.
+
+      const lastLineItem = lineItems[lineItems.length - 1];
+
+      if (!isEqual(lastLineItem, blankLineItem)) {
+        setLineItems((current) => [...current, blankLineItem]);
+      }
     }
   };
 
