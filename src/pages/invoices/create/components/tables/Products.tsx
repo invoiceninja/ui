@@ -10,6 +10,7 @@
 
 import { InputField } from '@invoiceninja/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
+import { current } from '@reduxjs/toolkit';
 import { deepStrictEqual } from 'assert';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
@@ -26,7 +27,7 @@ export function Products() {
   const blankLineItem: InvoiceItem = {
     quantity: 0,
     cost: 0,
-    product_key: 'Blank product key',
+    product_key: '',
     product_cost: 0,
     notes: '',
     discount: 0,
@@ -132,7 +133,19 @@ export function Products() {
     set(lineItem, field, value);
 
     if (isEqual(lineItem, blankLineItem)) {
-      // Current line item is same as blank, we don't want to add another one.
+      const nextLineItem = lineItems[index + 1];
+
+      // We want to remove next line item
+      // if the current one we are editing is empty.
+
+      if (isEqual(nextLineItem, blankLineItem)) {
+        const copy = clone(lineItems);
+        copy.pop();
+
+        setLineItems(copy);
+      }
+    } else {
+      setLineItems((current) => [...current, blankLineItem]);
     }
   };
 
