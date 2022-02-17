@@ -10,10 +10,11 @@
 
 import { InputField } from '@invoiceninja/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
+import { deepStrictEqual } from 'assert';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { RootState } from 'common/stores/store';
-import { clone } from 'lodash';
+import { clone, isEqual, set } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -21,6 +22,31 @@ import { useSelector } from 'react-redux';
 export function Products() {
   const [t] = useTranslation();
   const company = useCurrentCompany();
+
+  const blankLineItem: InvoiceItem = {
+    quantity: 0,
+    cost: 0,
+    product_key: 'Blank product key',
+    product_cost: 0,
+    notes: '',
+    discount: 0,
+    is_amount_discount: false,
+    tax_name1: '',
+    tax_rate1: 0,
+    tax_name2: '',
+    tax_rate2: 0,
+    tax_name3: '',
+    tax_rate3: 0,
+    sort_id: 0,
+    line_total: 0,
+    gross_line_total: 0,
+    date: '',
+    custom_value1: '',
+    custom_value2: '',
+    custom_value3: '',
+    custom_value4: '',
+    type_id: '1',
+  };
 
   const [columns, setColumns] = useState<string[]>([]);
   const [lineItems, setLineItems] = useState<InvoiceItem[]>([]);
@@ -72,30 +98,7 @@ export function Products() {
     // Check if the object contains any and if not push the blank one.
 
     if (lineItems.length === 0) {
-      lineItems.push({
-        quantity: 0,
-        cost: 0,
-        product_key: '',
-        product_cost: 0,
-        notes: '',
-        discount: 0,
-        is_amount_discount: false,
-        tax_name1: '',
-        tax_rate1: 0,
-        tax_name2: '',
-        tax_rate2: 0,
-        tax_name3: '',
-        tax_rate3: 0,
-        sort_id: 0,
-        line_total: 0,
-        gross_line_total: 0,
-        date: '',
-        custom_value1: '',
-        custom_value2: '',
-        custom_value3: '',
-        custom_value4: '',
-        type_id: '1',
-      });
+      lineItems.push(blankLineItem);
 
       setLineItems(lineItems);
     }
@@ -112,7 +115,21 @@ export function Products() {
     // If not the same push the new empty into the array of line items.
     // Check the last line item object in the array, if it's "empty" (equal to blank)
     // And if it's remove pop it from the array.
-    // console.log(property, value, index);
+
+    const aliases: Record<string, string> = {
+      item: 'product_key',
+    };
+
+    const { property: key } = resolveKey(property);
+    const field = aliases[key] || key;
+
+    const lineItem = lineItems[index];
+
+    set(lineItem, field, value);
+
+    if (isEqual(lineItem, blankLineItem)) {
+      // Current line item is same as blank, we don't want to add another one.
+    }
   };
 
   const resolveInputField = (key: string, index: number) => {
