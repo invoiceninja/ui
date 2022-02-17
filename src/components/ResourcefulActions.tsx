@@ -136,6 +136,7 @@ export default function ResourcefulActions(props: Props) {
           <DropdownElement onClick={() => bulk('delete')}>
             {t(`delete_${props.resourceType}`)}
           </DropdownElement>
+          {props.children}
         </Dropdown>
       )}
     </>

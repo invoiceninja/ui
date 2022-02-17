@@ -44,6 +44,7 @@ interface Props {
   withResourcefulActions?: ReactNode[] | boolean;
   bulkRoute?: string;
   customActions?: any;
+  customBulkActions?: any;
 }
 
 export function DataTable(props: Props) {
@@ -112,7 +113,12 @@ export function DataTable(props: Props) {
           resourceType={props.resource}
           linkToEdit={props.linkToEdit}
           label={`${t('actions')}`}
-        ></ResourcefulActions>
+        >
+          {props.customBulkActions &&
+            props.customBulkActions?.map((action: any) => {
+              return action(selected);
+            })}
+        </ResourcefulActions>
       </Actions>
       <Table>
         <Thead>
