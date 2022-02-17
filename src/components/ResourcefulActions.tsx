@@ -8,33 +8,137 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import { endpoint, request } from 'common/helpers';
+import { defaultHeaders } from 'common/queries/common/headers';
+import { ReactNode, RefObject } from 'react';
+import { toast } from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
+import { generatePath } from 'react-router-dom';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
-interface Actions {
-  name: string;
-  action?: any;
-  to?: any;
-}
+
 type Props = {
-  actions: Actions[];
-  label:string
+  type: 'default' | 'bulk';
+  label: string;
+  resource?: any;
+  setSelected: React.Dispatch<React.SetStateAction<Set<string>>>;
+  selected: Set<string>;
+  resourceType: string;
+  linkToEdit?: string | undefined;
+  endpoint: string;
+  bulkRoute?: string | undefined;
+  apiEndpoint: URL;
+  children?: ReactNode;
+  mainCheckbox: RefObject<HTMLInputElement>;
 };
 
-export default function RecorcefulActions(props: Props) {
+export default function ResourcefulActions(props: Props) {
+  const [t] = useTranslation();
+  const queryClient = useQueryClient();
+
+  const bulk = (action: 'archive' | 'restore' | 'delete') => {
+    const toastId = toast.loading(t('processing'));
+
+    request(
+      'POST',
+      endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`),
+      {
+        action,
+        ids: Array.from(props.selected),
+      },
+      defaultHeaders
+    )
+      .then(() => {
+        toast.success(t(`successfully_${action}_${props.resourceType}`), {
+          id: toastId,
+        });
+
+        props.selected.clear();
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        /** @ts-ignore: Unreachable, if element is null/undefined. */
+        props.mainCheckbox.current.checked = false;
+      })
+      .catch((error: AxiosError) => {
+        console.error(error.response?.data);
+
+        toast.error(t('error_title'), {
+          id: toastId,
+        });
+      })
+      .finally(() => queryClient.invalidateQueries(props.apiEndpoint.href));
+  };
+
   return (
-    <Dropdown label={props.label}>
-      {props.actions.map((action,index) => {
-        return (
-          <DropdownElement key={`action_${index}`}
-            to={action.to}
-            onClick={() => {
-              action.action();
-            }}
-          >
-            {action.name}
+    <>
+      {props.type === 'default' && (
+        <Dropdown label={props.label}>
+          {props.linkToEdit && (
+            <DropdownElement
+              to={generatePath(props.linkToEdit, {
+                id: props.resource?.id,
+              })}
+            >
+              {t(`edit_${props.resourceType}`)}
+            </DropdownElement>
+          )}
+          {props.resource?.archived_at === 0 && (
+            <DropdownElement
+              onClick={() => {
+                props.setSelected(new Set());
+                props.setSelected(props.selected.add(props.resource?.id));
+                bulk('archive');
+              }}
+            >
+              {t(`archive_${props.resourceType}`)}
+            </DropdownElement>
+          )}
+
+          {props.resource?.archived_at > 0 && (
+            <DropdownElement
+              onClick={() => {
+                props.setSelected(new Set());
+                props.setSelected(props.selected.add(props.resource?.id));
+                bulk('restore');
+              }}
+            >
+              {t(`restore_${props.resourceType}`)}
+            </DropdownElement>
+          )}
+
+          {!props.resource?.is_deleted && (
+            <DropdownElement
+              onClick={() => {
+                props.setSelected(new Set());
+                props.setSelected(props.selected.add(props.resource?.id));
+                bulk('delete');
+              }}
+            >
+              {t(`delete_${props.resourceType}`)}
+            </DropdownElement>
+          )}
+
+          {props.children}
+        </Dropdown>
+      )}
+      {props.type === 'bulk' && (
+        <Dropdown label={t('actions')}>
+          <DropdownElement onClick={() => bulk('archive')}>
+            {t(`archive_${props.resourceType}`)}
           </DropdownElement>
-        );
-      })}
-    </Dropdown>
+
+          <DropdownElement onClick={() => bulk('restore')}>
+            {t(`restore_${props.resourceType}`)}
+          </DropdownElement>
+
+          <DropdownElement onClick={() => bulk('delete')}>
+            {t(`delete_${props.resourceType}`)}
+          </DropdownElement>
+          {props.children}
+        </Dropdown>
+      )}
+    </>
   );
 }
