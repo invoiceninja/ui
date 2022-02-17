@@ -116,6 +116,10 @@ export function Products() {
     // Check the last line item object in the array, if it's "empty" (equal to blank)
     // And if it's remove pop it from the array.
 
+    // Some properties don't bind 1:1. Example of this
+    // is '$product.item' while in the line item is 'product_key'.
+    // To solve this we can define aliases array.
+
     const aliases: Record<string, string> = {
       item: 'product_key',
     };
