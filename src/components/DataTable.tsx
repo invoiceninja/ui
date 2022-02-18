@@ -138,7 +138,7 @@ export function DataTable(props: Props) {
       >
         <span className="text-sm">{t('with_selected')}</span>
 
-        {console.log("data:", data?.data.data)}
+        
       </Actions>
       <Table>
         <Thead>
