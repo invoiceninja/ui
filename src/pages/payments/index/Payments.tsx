@@ -6,9 +6,9 @@ import React from 'react'
 import { useTranslation } from 'react-i18next';
 import { generatePath, Link } from 'react-router-dom';
 
-type Props = {test?:string}
 
-export function Payments(props: Props) {
+
+export function Payments() {
     const [t] = useTranslation();
 
     const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
