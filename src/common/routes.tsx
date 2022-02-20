@@ -20,6 +20,7 @@ import * as Products from '../pages/products';
 import * as Invoices from '../pages/invoices';
 import * as Settings from '../pages/settings';
 import * as Clients from '../pages/clients';
+import * as Payments from '../pages/payments';
 
 export const routes = (
   <Routes>
@@ -71,6 +72,9 @@ export const routes = (
       <Route path="/invoices">
         <Route path="" element={<Invoices.Invoices />} />
         <Route path="create" element={<Invoices.Create />} />
+      </Route>
+      <Route path='/payments'>
+        <Route path="" element={<Payments.Payments/>}></Route>
       </Route>
       <Route path="/settings">
         <Route path="" element={<Settings.Settings />} />
