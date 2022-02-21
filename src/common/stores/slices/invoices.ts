@@ -11,6 +11,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
+import { isEqual } from 'lodash';
 
 const blankLineItem: InvoiceItem = {
   quantity: 0,
@@ -82,7 +83,23 @@ export const invoiceSlice = createSlice({
           payload.payload.property
         ] = payload.payload.value;
 
-        // Injecting blank item..
+        const lineItem = state.current.line_items[payload.payload.position];
+
+        if (isEqual(lineItem, blankLineItem)) {
+          const nextLineItem =
+            state.current.line_items[payload.payload.position + 1];
+
+          if (isEqual(nextLineItem, blankLineItem)) {
+            state.current.line_items.pop();
+          }
+        } else {
+          const lastLineItem =
+            state.current.line_items[state.current.line_items.length - 1];
+
+          if (!isEqual(lastLineItem, blankLineItem)) {
+            state.current.line_items.push(blankLineItem);
+          }
+        }
       }
     },
   },
