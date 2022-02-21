@@ -8,35 +8,32 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import paymentStatus from 'common/constants/payment-status';
+import paymentType from 'common/constants/payment-type';
+import { date } from 'common/helpers';
+import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
-import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 
 export function Payments() {
   const [t] = useTranslation();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
   const columns: DataTableColumns = [
     {
       id: 'status_id',
       label: t('status'),
-      format: (value) => {
-        value ? (
-          <StatusBadge for={paymentStatus} code={value} />
-        ) : (
-          <EntityStatus entity={value}></EntityStatus>
-        );
-      },
+      format: (value) => <StatusBadge for={paymentStatus} code={value} />,
     },
     {
       id: 'number',
       label: t('number'),
     },
     {
-      id: 'client',
+      id: 'client_id',
       label: t('client'),
     },
     {
@@ -50,10 +47,12 @@ export function Payments() {
     {
       id: 'date',
       label: t('date'),
+      format: (value) => date(value, dateFormat),
     },
     {
-      id: 'type',
+      id: 'type_id',
       label: t('type'),
+      format: (value) => <StatusBadge for={paymentType} code={value} />,
     },
     {
       id: 'transaction_reference',
