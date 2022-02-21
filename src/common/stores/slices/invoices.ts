@@ -27,7 +27,18 @@ export const invoiceSlice = createSlice({
     setCurrentInvoice: (state, payload: PayloadAction<Invoice>) => {
       state.current = payload.payload;
     },
+    setCurrentInvoiceProperty: (
+      state,
+      payload: PayloadAction<{ property: keyof Invoice; value: unknown }>
+    ) => {
+      if (state.current) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore 
+        state.current[payload.payload.property] = payload.payload.value;
+      }
+    },
   },
 });
 
-export const { setCurrentInvoice } = invoiceSlice.actions;
+export const { setCurrentInvoice, setCurrentInvoiceProperty } =
+  invoiceSlice.actions;
