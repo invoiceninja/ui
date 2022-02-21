@@ -25,6 +25,7 @@ export function Products() {
 
   const aliases: Record<string, string> = {
     item: 'product_key',
+    description: 'notes',
   };
 
   const blankLineItem: InvoiceItem = {
@@ -55,6 +56,8 @@ export function Products() {
   const [columns, setColumns] = useState<string[]>([]);
   const [lineItems, setLineItems] = useState<InvoiceItem[]>([]);
   const invoice = useSelector((state: RootState) => state.invoices.current);
+
+  useEffect(() => {}, [lineItems]);
 
   useEffect(() => {
     // We need to clone the product columns to local object,
@@ -123,11 +126,13 @@ export function Products() {
     // To solve this we can define aliases array.
 
     const { property: key } = resolveKey(property);
-    const field = aliases[key] || key;
+
+    const definitiveProperty =
+      (aliases[key] as keyof InvoiceItem) || (key as keyof InvoiceItem);
 
     const lineItem = lineItems[index];
 
-    set(lineItem, field, value);
+    set(lineItem, definitiveProperty, value);
 
     if (isEqual(lineItem, blankLineItem)) {
       const nextLineItem = lineItems[index + 1];
@@ -150,6 +155,8 @@ export function Products() {
         setLineItems((current) => [...current, blankLineItem]);
       }
     }
+
+    setLineItems(clone(lineItems));
   };
 
   const resolveInputField = (key: string, index: number) => {
