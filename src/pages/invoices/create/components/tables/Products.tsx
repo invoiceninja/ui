@@ -11,7 +11,10 @@
 import { InputField } from '@invoiceninja/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { setCurrentInvoiceLineItemProperty } from 'common/stores/slices/invoices';
+import {
+  deleteInvoiceLineItem,
+  setCurrentInvoiceLineItemProperty,
+} from 'common/stores/slices/invoices';
 import { RootState } from 'common/stores/store';
 import { ChangeEvent } from 'react';
 import { Trash2 } from 'react-feather';
@@ -101,7 +104,9 @@ export function Products() {
                     {invoice && invoice.line_items.length >= 2 && (
                       <button
                         className="text-gray-600 hover:text-red-600"
-                        // onClick={() => deleteLineItem(lineItemIndex)}
+                        onClick={() =>
+                          dispatch(deleteInvoiceLineItem(lineItemIndex))
+                        }
                       >
                         <Trash2 size={18} />
                       </button>

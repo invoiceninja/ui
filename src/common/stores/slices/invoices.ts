@@ -102,6 +102,11 @@ export const invoiceSlice = createSlice({
         }
       }
     },
+    deleteInvoiceLineItem: (state, payload: PayloadAction<number>) => {
+      if (state.current) {
+        state.current.line_items.splice(payload.payload, 1);
+      }
+    },
   },
 });
 
@@ -109,4 +114,5 @@ export const {
   setCurrentInvoice,
   injectBlankItemIntoCurrent,
   setCurrentInvoiceLineItemProperty,
+  deleteInvoiceLineItem,
 } = invoiceSlice.actions;
