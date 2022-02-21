@@ -18,7 +18,9 @@ import {
   FileText,
   Settings,
   Users,
-  PlusCircle,CreditCard
+  PlusCircle,
+  Repeat,
+  CreditCard,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -97,6 +99,17 @@ export function Default(props: Props) {
         icon: PlusCircle,
         to: '/payments/create',
         label: t('new_payment'),
+      },
+    },
+    {
+      name: t('recurring_invoices'),
+      href: '/recurring_invoices',
+      icon: Repeat,
+      current: location.pathname === '/recurring_invoices',
+      rightButton: {
+        icon: PlusCircle,
+        to: '/recurring_invoices/create',
+        label: t('new_recurring_invoice'),
       },
     },
     {
