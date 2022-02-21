@@ -18,7 +18,7 @@ import {
   FileText,
   Settings,
   Users,
-  PlusCircle,
+  PlusCircle,CreditCard
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -86,6 +86,17 @@ export function Default(props: Props) {
         icon: PlusCircle,
         to: '/invoices/create',
         label: t('new_invoice'),
+      },
+    },
+    {
+      name: t('payments'),
+      href: '/payments',
+      icon: CreditCard,
+      current: location.pathname === '/payments',
+      rightButton: {
+        icon: PlusCircle,
+        to: '/payments/create',
+        label: t('new_payment'),
       },
     },
     {
