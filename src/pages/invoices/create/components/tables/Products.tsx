@@ -158,21 +158,17 @@ export function Products() {
       (aliases[property] as keyof InvoiceItem) ||
       (property as keyof InvoiceItem);
 
-    if (['product_key', 'item'].includes(property)) {
-      return (
-        <>
-          <InputField
-            id={key}
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              onChange(key, event.target.value, index)
-            }
-            value={lineItems[index][definitiveProperty]}
-          />
-        </>
-      );
-    }
+    const numberInputs = [
+      'discount',
+      'cost',
+      'unit_cost',
+      'quantity',
+      'tax_rate1',
+      'tax_rate2',
+      'tax_rate3',
+    ];
 
-    if (['discount', 'cost', 'unit_cost', 'quantity'].includes(property)) {
+    if (numberInputs.includes(property)) {
       return (
         <InputField
           id={property}
