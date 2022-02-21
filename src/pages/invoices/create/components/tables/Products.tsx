@@ -155,8 +155,6 @@ export function Products() {
         setLineItems((current) => [...current, blankLineItem]);
       }
     }
-
-    setLineItems(clone(lineItems));
   };
 
   const resolveInputField = (key: string, index: number) => {
