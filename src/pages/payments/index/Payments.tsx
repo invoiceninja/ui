@@ -1,10 +1,18 @@
+/**
+* Invoice Ninja (https://invoiceninja.com).
+*
+* @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+*
+* @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+*
+* @license https://www.elastic.co/licensing/elastic-license
+*/
+import paymentStatus from 'common/constants/payment-status';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
-import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default'
-import React from 'react'
+import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath, Link } from 'react-router-dom';
 
 
 
@@ -14,17 +22,9 @@ export function Payments() {
     const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
     const columns: DataTableColumns = [
         {
-          id: 'status',
+          id: 'status_id',
           label: t('status'),
-          format: (value, resource) => (
-            <span className="inline-flex items-center space-x-4">
-              <EntityStatus entity={resource} />
-    
-              <Link to={generatePath('/payments/:id/edit', { id: resource.id })}>
-                {value}
-              </Link>
-            </span>
-          ),
+          format: (value) => <StatusBadge for={paymentStatus} code={value} />,
         },
         {
           id: 'number',
