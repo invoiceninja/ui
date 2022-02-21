@@ -9,9 +9,10 @@
  */
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { isEqual } from 'lodash';
+import { cloneDeep, isEqual } from 'lodash';
 
 const blankLineItem: InvoiceItem = {
   quantity: 0,
@@ -101,6 +102,10 @@ export const invoiceSlice = createSlice({
             state.current.line_items.push(blankLineItem);
           }
         }
+
+        state.current = new InvoiceSum(
+          cloneDeep(state.current)
+        ).build().invoice;
       }
     },
     deleteInvoiceLineItem: (state, payload: PayloadAction<number>) => {
