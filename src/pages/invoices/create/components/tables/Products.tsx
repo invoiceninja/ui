@@ -15,12 +15,17 @@ import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { RootState } from 'common/stores/store';
 import { clone, isEqual, set } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
+import { Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 
 export function Products() {
   const [t] = useTranslation();
   const company = useCurrentCompany();
+
+  const aliases: Record<string, string> = {
+    item: 'product_key',
+  };
 
   const blankLineItem: InvoiceItem = {
     quantity: 0,
@@ -52,8 +57,6 @@ export function Products() {
   const invoice = useSelector((state: RootState) => state.invoices.current);
 
   useEffect(() => {
-    console.log(company);
-
     // We need to clone the product columns to local object,
     // because by default it's frozen.
     const variables: string[] =
@@ -119,10 +122,6 @@ export function Products() {
     // is '$product.item' while in the line item is 'product_key'.
     // To solve this we can define aliases array.
 
-    const aliases: Record<string, string> = {
-      item: 'product_key',
-    };
-
     const { property: key } = resolveKey(property);
     const field = aliases[key] || key;
 
@@ -155,6 +154,9 @@ export function Products() {
 
   const resolveInputField = (key: string, index: number) => {
     const { property } = resolveKey(key);
+    const definitiveProperty =
+      (aliases[property] as keyof InvoiceItem) ||
+      (property as keyof InvoiceItem);
 
     if (['product_key', 'item'].includes(property)) {
       return (
@@ -164,6 +166,7 @@ export function Products() {
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
               onChange(key, event.target.value, index)
             }
+            value={lineItems[index][definitiveProperty]}
           />
         </>
       );
@@ -196,6 +199,14 @@ export function Products() {
     return property ? t(property) : t(key);
   };
 
+  const deleteLineItem = (index: number) => {
+    const clonedItems = clone(lineItems);
+
+    clonedItems.splice(index, 1);
+
+    setLineItems(clonedItems);
+  };
+
   return (
     <div>
       {invoice && (
@@ -204,6 +215,7 @@ export function Products() {
             {columns.map((column, index) => (
               <Th key={index}>{resolveTranslation(column)}</Th>
             ))}
+            <Th>{/* This is placeholder for "Remove" button. */}</Th>
           </Thead>
           <Tbody>
             {lineItems.map((lineItem, lineItemIndex) => (
@@ -213,6 +225,17 @@ export function Products() {
                     {resolveInputField(column, lineItemIndex)}
                   </Td>
                 ))}
+
+                <Td>
+                  {lineItems.length >= 2 && (
+                    <button
+                      className="text-gray-600 hover:text-red-600"
+                      onClick={() => deleteLineItem(lineItemIndex)}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+                </Td>
               </Tr>
             ))}
           </Tbody>
