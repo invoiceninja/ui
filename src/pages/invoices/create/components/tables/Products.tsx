@@ -18,7 +18,7 @@ import {
 } from 'common/stores/slices/invoices';
 import { RootState } from 'common/stores/store';
 import { ChangeEvent } from 'react';
-import { Plus, PlusCircle, Trash2 } from 'react-feather';
+import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { resolveProperty } from '../../helpers/resolve-property';

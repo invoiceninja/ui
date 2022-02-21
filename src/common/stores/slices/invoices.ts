@@ -12,7 +12,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { cloneDeep, isEqual } from 'lodash';
+import { cloneDeep } from 'lodash';
 
 const blankLineItem: InvoiceItem = {
   quantity: 0,
