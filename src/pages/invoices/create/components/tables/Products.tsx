@@ -13,17 +13,20 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import {
   deleteInvoiceLineItem,
+  injectBlankItemIntoCurrent,
   setCurrentInvoiceLineItemProperty,
 } from 'common/stores/slices/invoices';
 import { RootState } from 'common/stores/store';
 import { ChangeEvent } from 'react';
-import { Trash2 } from 'react-feather';
+import { Plus, PlusCircle, Trash2 } from 'react-feather';
+import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { resolveProperty } from '../../helpers/resolve-property';
 import { useProductColumns } from '../../hooks/useProductColumns';
 import { useResolveTranslation } from '../../hooks/useResolveTranslation';
 
 export function Products() {
+  const [t] = useTranslation();
   const invoice = useSelector((state: RootState) => state.invoices.current);
   const columns = useProductColumns();
   const resolveTranslation = useResolveTranslation();
@@ -101,7 +104,7 @@ export function Products() {
                   ))}
 
                   <Td>
-                    {invoice && invoice.line_items.length >= 2 && (
+                    {invoice && (
                       <button
                         className="text-gray-600 hover:text-red-600"
                         onClick={() =>
@@ -114,6 +117,18 @@ export function Products() {
                   </Td>
                 </Tr>
               ))}
+
+            <Tr>
+              <Td colSpan={100}>
+                <button
+                  onClick={() => dispatch(injectBlankItemIntoCurrent())}
+                  className="w-full py-2 inline-flex justify-center items-center space-x-2"
+                >
+                  <Plus size={18} />
+                  <span>{t('add_item')}</span>
+                </button>
+              </Td>
+            </Tr>
           </Tbody>
         </Table>
       )}
