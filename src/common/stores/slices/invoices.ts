@@ -10,6 +10,37 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { Invoice } from 'common/interfaces/invoice';
+import { InvoiceItem } from 'common/interfaces/invoice-item';
+
+const blankLineItem: InvoiceItem = {
+  quantity: 0,
+  cost: 0,
+  product_key: '',
+  product_cost: 0,
+  notes: '',
+  discount: 0,
+  is_amount_discount: false,
+  tax_name1: '',
+  tax_rate1: 0,
+  tax_name2: '',
+  tax_rate2: 0,
+  tax_name3: '',
+  tax_rate3: 0,
+  sort_id: 0,
+  line_total: 0,
+  gross_line_total: 0,
+  date: '',
+  custom_value1: '',
+  custom_value2: '',
+  custom_value3: '',
+  custom_value4: '',
+  type_id: '1',
+};
+
+export const aliases: Record<string, string> = {
+  item: 'product_key',
+  description: 'notes',
+};
 
 interface InvoiceState {
   api?: any;
@@ -26,19 +57,35 @@ export const invoiceSlice = createSlice({
   reducers: {
     setCurrentInvoice: (state, payload: PayloadAction<Invoice>) => {
       state.current = payload.payload;
+
+      // For the fresh invoice we get, line items is equal to "[]".
+
+      if (typeof state.current.line_items === 'string') {
+        state.current.line_items = [];
+      }
     },
-    setCurrentInvoiceProperty: (
+    injectBlankItemIntoCurrent: (state) => {
+      state.current?.line_items.push(blankLineItem);
+    },
+    setCurrentInvoiceLineItemProperty: (
       state,
-      payload: PayloadAction<{ property: keyof Invoice; value: unknown }>
+      payload: PayloadAction<{
+        position: number;
+        property: keyof InvoiceItem;
+        value: unknown;
+      }>
     ) => {
       if (state.current) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore 
-        state.current[payload.payload.property] = payload.payload.value;
+        state.current.line_items[payload.payload.position][
+          payload.payload.property
+        ] = payload.payload.value;
       }
     },
   },
 });
 
-export const { setCurrentInvoice, setCurrentInvoiceProperty } =
-  invoiceSlice.actions;
+export const {
+  setCurrentInvoice,
+  injectBlankItemIntoCurrent,
+  setCurrentInvoiceLineItemProperty,
+} = invoiceSlice.actions;
