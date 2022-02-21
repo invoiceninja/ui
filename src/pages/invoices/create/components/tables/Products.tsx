@@ -173,14 +173,31 @@ export function Products() {
     }
 
     if (['discount', 'cost', 'unit_cost', 'quantity'].includes(property)) {
-      return <InputField id={property} type="number" />;
+      return (
+        <InputField
+          id={property}
+          type="number"
+          value={lineItems[index][definitiveProperty]}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            onChange(key, event.target.value, index)
+          }
+        />
+      );
     }
 
     if (['line_total'].includes(property)) {
-      return <span>Text</span>;
+      return <span>{lineItems[index][definitiveProperty]}</span>;
     }
 
-    return <InputField id={property} />;
+    return (
+      <InputField
+        id={property}
+        value={lineItems[index][definitiveProperty]}
+        onChange={(event: ChangeEvent<HTMLInputElement>) =>
+          onChange(key, event.target.value, index)
+        }
+      />
+    );
   };
 
   const resolveTranslation = (key: string) => {
