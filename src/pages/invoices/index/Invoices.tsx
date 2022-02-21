@@ -16,7 +16,6 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { Link as RouterLink } from 'react-router-dom';
 
 export function Invoices() {
   const [t] = useTranslation();
@@ -59,7 +58,6 @@ export function Invoices() {
         linkToEdit="/invoices/:id/edit"
         withResourcefulActions
       ></DataTable>
-      <RouterLink to="/invoices/create">Create an invoice</RouterLink>
     </Default>
   );
 }
