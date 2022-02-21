@@ -41,6 +41,7 @@ const blankLineItem: InvoiceItem = {
 export const aliases: Record<string, string> = {
   item: 'product_key',
   description: 'notes',
+  unit_cost: 'cost',
 };
 
 interface InvoiceState {
