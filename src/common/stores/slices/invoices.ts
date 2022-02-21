@@ -76,9 +76,13 @@ export const invoiceSlice = createSlice({
       }>
     ) => {
       if (state.current) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
         state.current.line_items[payload.payload.position][
           payload.payload.property
         ] = payload.payload.value;
+
+        // Injecting blank item..
       }
     },
   },
