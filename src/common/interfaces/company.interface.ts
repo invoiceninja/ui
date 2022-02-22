@@ -19,4 +19,5 @@ export interface Company {
     email: string;
     phone: string;
   };
+  custom_fields: Record<string, string>;
 }
