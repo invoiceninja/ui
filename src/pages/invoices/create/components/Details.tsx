@@ -10,8 +10,11 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
 import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
+import { CustomField } from 'components/CustomField';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -19,6 +22,8 @@ import { useDispatch } from 'react-redux';
 export function Details() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
+  const invoice = useCurrentInvoice();
+  const company = useCurrentCompany();
 
   const handleChange = (property: keyof Invoice, value: unknown) => {
     dispatch(
@@ -59,6 +64,24 @@ export function Details() {
             }
           />
         </Element>
+
+        {invoice && company && (
+          <CustomField
+            field="invoice1"
+            defaultValue={invoice?.custom_value1 || ''}
+            value={company.custom_fields.invoice1}
+            onChange={(value) => handleChange('custom_value1', value)}
+          />
+        )}
+
+        {invoice && company && (
+          <CustomField
+            field="invoice2"
+            defaultValue={invoice?.custom_value2 || ''}
+            value={company.custom_fields.invoice2}
+            onChange={(value) => handleChange('custom_value2', value)}
+          />
+        )}
       </Card>
 
       <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
@@ -106,6 +129,24 @@ export function Details() {
             </div>
           </div>
         </Element>
+
+        {invoice && company && (
+          <CustomField
+            field="invoice3"
+            defaultValue={invoice?.custom_value3 || ''}
+            value={company.custom_fields.invoice3}
+            onChange={(value) => handleChange('custom_value3', value)}
+          />
+        )}
+
+        {invoice && company && (
+          <CustomField
+            field="invoice4"
+            defaultValue={invoice?.custom_value4 || ''}
+            value={company.custom_fields.invoice4}
+            onChange={(value) => handleChange('custom_value4', value)}
+          />
+        )}
       </Card>
     </>
   );
