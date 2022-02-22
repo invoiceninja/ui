@@ -65,7 +65,7 @@ export function Details() {
           />
         </Element>
 
-        {invoice && company && (
+        {invoice && company?.custom_fields?.invoice1 && (
           <CustomField
             field="invoice1"
             defaultValue={invoice?.custom_value1 || ''}
@@ -74,7 +74,7 @@ export function Details() {
           />
         )}
 
-        {invoice && company && (
+        {invoice && company?.custom_fields?.invoice2 && (
           <CustomField
             field="invoice2"
             defaultValue={invoice?.custom_value2 || ''}
@@ -130,7 +130,7 @@ export function Details() {
           </div>
         </Element>
 
-        {invoice && company && (
+        {invoice && company?.custom_fields?.invoice3 && (
           <CustomField
             field="invoice3"
             defaultValue={invoice?.custom_value3 || ''}
@@ -139,7 +139,7 @@ export function Details() {
           />
         )}
 
-        {invoice && company && (
+        {invoice && company?.custom_fields?.invoice4 && (
           <CustomField
             field="invoice4"
             defaultValue={invoice?.custom_value4 || ''}
