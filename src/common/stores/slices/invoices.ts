@@ -12,7 +12,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, set } from 'lodash';
 
 const blankLineItem: InvoiceItem = {
   quantity: 0,
@@ -70,6 +70,18 @@ export const invoiceSlice = createSlice({
     injectBlankItemIntoCurrent: (state) => {
       state.current?.line_items.push(blankLineItem);
     },
+    setCurrentInvoiceProperty: (
+      state,
+      payload: PayloadAction<{ property: keyof Invoice; value: unknown }>
+    ) => {
+      if (state.current) {
+        state.current = set(
+          state.current,
+          payload.payload.property,
+          payload.payload.value
+        );
+      }
+    },
     setCurrentInvoiceLineItemProperty: (
       state,
       payload: PayloadAction<{
@@ -101,6 +113,7 @@ export const invoiceSlice = createSlice({
 export const {
   setCurrentInvoice,
   injectBlankItemIntoCurrent,
+  setCurrentInvoiceProperty,
   setCurrentInvoiceLineItemProperty,
   deleteInvoiceLineItem,
 } = invoiceSlice.actions;
