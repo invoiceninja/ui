@@ -9,24 +9,14 @@
  */
 
 import { Currency } from 'common/interfaces/currency';
+import { numberFormat } from './number-format';
 
 export class Number {
-  public static numberFormat(value: string | number, currency: Currency) {
-    const number = typeof value === 'string' ? parseFloat(value) : value;
+  public static formatValue(value: string | number, currency: Currency) {
+    const thousand = currency.thousand_separator;
+    const decimal = currency.decimal_separator;
+    const precision = currency.precision;
 
-    const str = number
-      .toFixed(currency.precision || 0)
-      .toString()
-      .split('.');
-
-    const parts = [];
-
-    for (let i = str[0].length; i > 0; i -= 3) {
-      parts.unshift(str[0].substring(Math.max(0, i - 3), i));
-    }
-
-    str[0] = parts.join(currency.thousand_separator || ',');
-
-    return str.join(currency.decimal_separator || '.');
+    return numberFormat(value, precision, decimal, thousand);
   }
 }
