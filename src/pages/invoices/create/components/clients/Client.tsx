@@ -10,12 +10,15 @@
 
 import { Card } from '@invoiceninja/cards';
 import { InputLabel } from '@invoiceninja/forms';
+import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
 import { DebouncedSearch } from 'components/forms/DebouncedSearch';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { CreateClient } from './CreateClient';
 
 export function Client() {
   const [t] = useTranslation();
+  const dispatch = useDispatch();
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
@@ -24,7 +27,18 @@ export function Client() {
         <CreateClient />
       </div>
 
-      <DebouncedSearch endpoint="/api/v1/clients" label="display_name" />
+      <DebouncedSearch
+        endpoint="/api/v1/clients"
+        label="display_name"
+        onChange={(value) =>
+          dispatch(
+            setCurrentInvoiceProperty({
+              property: 'client_id',
+              value: value.value,
+            })
+          )
+        }
+      />
     </Card>
   );
 }
