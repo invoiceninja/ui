@@ -65,6 +65,17 @@ export function Details() {
           />
         </Element>
 
+        {invoice && invoice.partial > 0 && (
+          <Element leftSide={t('partial')}>
+            <InputField
+              type="date"
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                handleChange('partial_due_date', event.target.value)
+              }
+            />
+          </Element>
+        )}
+
         {invoice && company?.custom_fields?.invoice1 && (
           <CustomField
             field="invoice1"
