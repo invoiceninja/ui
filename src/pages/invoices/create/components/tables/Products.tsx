@@ -14,7 +14,7 @@ import { InvoiceItem } from 'common/interfaces/invoice-item';
 import {
   deleteInvoiceLineItem,
   injectBlankItemIntoCurrent,
-  setCurrentInvoiceLineItemProperty,
+  setCurrentLineItemProperty,
 } from 'common/stores/slices/invoices';
 import { RootState } from 'common/stores/store';
 import { ChangeEvent } from 'react';
@@ -34,7 +34,7 @@ export function Products() {
 
   const onChange = (key: keyof InvoiceItem, value: unknown, index: number) => {
     dispatch(
-      setCurrentInvoiceLineItemProperty({
+      setCurrentLineItemProperty({
         position: index,
         property: key,
         value,

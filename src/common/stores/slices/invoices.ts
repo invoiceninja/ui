@@ -8,11 +8,32 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { ClientResolver } from 'common/helpers/clients/client-resolver';
+import { CurrencyResolver } from 'common/helpers/currencies/currency-resolver';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { Currency } from 'common/interfaces/currency';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { cloneDeep, set } from 'lodash';
+
+const clientResolver = new ClientResolver();
+const currencyResolver = new CurrencyResolver();
+
+export const setCurrentLineItemProperty = createAsyncThunk(
+  'invoices/setCurrentInvoiceProperty',
+  async (payload: any, thunkApi) => {
+    const state = thunkApi.getState() as any;
+
+    const client = await clientResolver.find(state.invoices.current.client_id);
+    const currency = await currencyResolver.find(client.settings.currency_id); // or company currency
+
+    payload.client = client;
+    payload.currency = currency;
+
+    return payload;
+  }
+);
 
 const blankLineItem: InvoiceItem = {
   quantity: 0,
@@ -82,14 +103,14 @@ export const invoiceSlice = createSlice({
         );
       }
     },
-    setCurrentInvoiceLineItemProperty: (
-      state,
-      payload: PayloadAction<{
-        position: number;
-        property: keyof InvoiceItem;
-        value: unknown;
-      }>
-    ) => {
+    deleteInvoiceLineItem: (state, payload: PayloadAction<number>) => {
+      if (state.current) {
+        state.current.line_items.splice(payload.payload, 1);
+      }
+    },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(setCurrentLineItemProperty.fulfilled, (state, payload) => {
       if (state.current) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -98,15 +119,11 @@ export const invoiceSlice = createSlice({
         ] = payload.payload.value;
 
         state.current = new InvoiceSum(
-          cloneDeep(state.current)
+          cloneDeep(state.current as Invoice),
+          cloneDeep(payload.payload.currency as Currency)
         ).build().invoice;
       }
-    },
-    deleteInvoiceLineItem: (state, payload: PayloadAction<number>) => {
-      if (state.current) {
-        state.current.line_items.splice(payload.payload, 1);
-      }
-    },
+    });
   },
 });
 
@@ -114,6 +131,5 @@ export const {
   setCurrentInvoice,
   injectBlankItemIntoCurrent,
   setCurrentInvoiceProperty,
-  setCurrentInvoiceLineItemProperty,
   deleteInvoiceLineItem,
 } = invoiceSlice.actions;
