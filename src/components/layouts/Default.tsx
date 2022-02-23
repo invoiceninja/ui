@@ -23,6 +23,7 @@ import {
   CreditCard,
   File,
   Briefcase,
+  Truck,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -122,7 +123,7 @@ export function Default(props: Props) {
       rightButton: {
         icon: PlusCircle,
         to: '/credits/create',
-        label: t('new_credits'),
+        label: t('new_credit'),
       },
     },
     {
@@ -133,10 +134,20 @@ export function Default(props: Props) {
       rightButton: {
         icon: PlusCircle,
         to: '/projects/create',
-        label: t('new_projects'),
+        label: t('new_project'),
       },
     },
-
+    {
+      name: t('vendors'),
+      href: '/vendors',
+      icon: Truck,
+      current: location.pathname === '/vendors',
+      rightButton: {
+        icon: PlusCircle,
+        to: '/vendors/create',
+        label: t('new_vendor'),
+      },
+    },
     {
       name: t('settings'),
       href: '/settings/company_details',
