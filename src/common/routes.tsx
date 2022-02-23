@@ -25,6 +25,7 @@ import * as RecurringInvoices from '../pages/recurringInvoices';
 import * as Credits from '../pages/credits';
 import * as Projects from '../pages/projects';
 import * as Vendors from '../pages/vendors';
+import * as Expenses from '../pages/expenses';
 
 export const routes = (
   <Routes>
@@ -91,6 +92,9 @@ export const routes = (
       </Route>
       <Route path="/vendors">
         <Route path="" element={<Vendors.Vendors />} />
+      </Route>
+      <Route path="/expenses">
+        <Route path="" element={<Expenses.Expenses />} />
       </Route>
       <Route path="/settings">
         <Route path="" element={<Settings.Settings />} />

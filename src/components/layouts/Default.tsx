@@ -24,6 +24,7 @@ import {
   File,
   Briefcase,
   Truck,
+  DollarSign,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -146,6 +147,17 @@ export function Default(props: Props) {
         icon: PlusCircle,
         to: '/vendors/create',
         label: t('new_vendor'),
+      },
+    },
+    {
+      name: t('expenses'),
+      href: '/expenses',
+      icon: DollarSign,
+      current: location.pathname === '/expenses',
+      rightButton: {
+        icon: PlusCircle,
+        to: '/expenses/create',
+        label: t('new_expense'),
       },
     },
     {
