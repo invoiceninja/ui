@@ -21,7 +21,7 @@ export function RecurringInvoices() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
+  const pages: BreadcrumRecord[] = [{ name: t('recurring_invoices'), href: '/recurring_invoices' }];
   const columns: DataTableColumns = [
     {
       id: 'status_id',
@@ -76,7 +76,7 @@ export function RecurringInvoices() {
   return (
     <Default breadcrumbs={pages} docsLink="docs/recurring-invoices/">
       <DataTable
-        resource="reccuring_invoices"
+        resource="recurring_invoice"
         columns={columns}
         endpoint="/api/v1/recurring_invoices"
         linkToCreate="/recurring_invoices/create"

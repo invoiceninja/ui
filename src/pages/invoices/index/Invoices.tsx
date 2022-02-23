@@ -51,13 +51,13 @@ export function Invoices() {
   return (
     <Default title={t('invoices')} breadcrumbs={pages} docsLink="docs/invoices">
       <DataTable
-        resource="invoices"
+        resource="invoice"
         endpoint="/api/v1/invoices"
         columns={columns}
         linkToCreate="/invoices/create"
         linkToEdit="/invoices/:id/edit"
         withResourcefulActions
-      ></DataTable>
+      />
     </Default>
   );
 }
