@@ -2,6 +2,8 @@ import { InvoiceItemSum } from './invoice-item-sum';
 import { Invoice } from 'common/interfaces/invoice';
 import collect from 'collect.js';
 import { InvoiceStatus } from 'common/enums/invoice-status';
+import { Currency } from 'common/interfaces/currency';
+import { NumberFormatter } from '../number-formatter';
 
 export class InvoiceSum {
   protected taxMap = collect();
@@ -14,7 +16,7 @@ export class InvoiceSum {
   public totalCustomValues = 0;
   public subTotal = 0;
 
-  constructor(public invoice: Invoice) {}
+  constructor(public invoice: Invoice, protected currency: Currency) {}
 
   public build() {
     this.calculateLineItems()
@@ -191,13 +193,21 @@ export class InvoiceSum {
       if (this.invoice.amount !== this.invoice.balance) {
         const paidToDate = this.invoice.amount - this.invoice.balance;
 
-        this.invoice.balance = this.total - paidToDate; // Needs implementing formatting with number class.
+        this.invoice.balance =
+          parseFloat(
+            NumberFormatter.formatValue(this.total, this.currency.precision)
+          ) - paidToDate;
       } else {
-        this.invoice.balance = this.total; // Needs implementing formatting with number class.
+        this.invoice.balance = parseFloat(
+          NumberFormatter.formatValue(this.total, this.currency.precision)
+        );
       }
     }
 
-    this.invoice.amount = this.total; // Needs implementing formatting with number class.
+    this.invoice.amount = parseFloat(
+      NumberFormatter.formatValue(this.total, this.currency.precision)
+    );
+
     this.invoice.total_taxes = this.totalTaxes;
 
     return this;
@@ -207,8 +217,11 @@ export class InvoiceSum {
     if (!this.invoice?.id && this.invoice.partial) {
       this.invoice.partial = Math.max(
         0,
-        Math.min(this.invoice.partial, this.invoice.balance)
-      ); // Needs formatting (with rounding 2)
+        Math.min(
+          parseFloat(NumberFormatter.formatValue(this.invoice.partial, 2)),
+          this.invoice.balance
+        )
+      );
     }
 
     return this;
