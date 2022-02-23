@@ -41,7 +41,6 @@ export function Credits() {
     {
       id: 'paid_to_date',
       label: t('remaining'),
-      //not sure if this check is ok since there is no "remaining" value
       format: (value, resource) => {
         return resource.amount - resource.paid_to_date;
       },

@@ -21,7 +21,6 @@ export function Expenses() {
   const pages = [{ name: t('expenses'), href: '/expenses' }];
   const columns: DataTableColumns = [
     {
-      //no status field
       id: 'status_id',
       label: t('status'),
     },
