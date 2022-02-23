@@ -48,7 +48,7 @@ export function Credits() {
     },
   ];
   return (
-    <Default breadcrumbs={pages} docsLink="docs/credits/">
+    <Default title={t('credits')} breadcrumbs={pages} docsLink="docs/credits/">
       <DataTable
         resource="credit"
         endpoint="/api/v1/credits"

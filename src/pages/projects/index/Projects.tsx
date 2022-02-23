@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { date } from 'common/helpers';
+import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
@@ -15,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 
 export function Projects() {
   const [t] = useTranslation();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const pages = [{ name: t('projects'), href: '/projects' }];
   const columns: DataTableColumns = [
@@ -27,8 +30,13 @@ export function Projects() {
     {
       id: 'task_rate',
       label: t('task_rate'),
+    }, //due date format
+    {
+      id: 'due_date',
+      label: t('due_date'),
+      format: (value) => date(value, dateFormat),
     },
-    { id: 'due_date', label: t('due_date') },
+
     {
       id: 'public_notes',
       label: t('public_notes'),
@@ -48,7 +56,11 @@ export function Projects() {
     },
   ];
   return (
-    <Default breadcrumbs={pages} docsLink="docs/projects/">
+    <Default
+      title={t('projects')}
+      breadcrumbs={pages}
+      docsLink="docs/projects/"
+    >
       <DataTable
         resource="project"
         endpoint="/api/v1/projects"

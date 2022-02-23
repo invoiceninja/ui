@@ -60,7 +60,11 @@ export function Payments() {
     },
   ];
   return (
-    <Default breadcrumbs={pages} docsLink="docs/payments/">
+    <Default
+      title={t('payments')}
+      breadcrumbs={pages}
+      docsLink="docs/payments/"
+    >
       <DataTable
         resource="payment"
         columns={columns}
