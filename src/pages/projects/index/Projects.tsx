@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date } from 'common/helpers';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
@@ -17,7 +15,6 @@ import { useTranslation } from 'react-i18next';
 
 export function Projects() {
   const [t] = useTranslation();
-  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const pages = [{ name: t('projects'), href: '/projects' }];
   const columns: DataTableColumns = [
