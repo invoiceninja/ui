@@ -42,7 +42,7 @@ export const routes = (
       </Route>
     </Route>
     <Route element={<PrivateRoute />}>
-      <Route path="/dashbDollarSignoard" element={<Dashboard />} />
+      <Route path="/dashboard" element={<Dashboard />} />
       <Route path="clients">
         <Route path="" element={<Clients.Clients />} />
         <Route path="create" element={<Clients.Create />} />
