@@ -24,7 +24,6 @@ export function RecurringExpenses() {
 
   const columns: DataTableColumns = [
     {
-      //no status id enum
       id: 'status_id',
       label: t('status'),
     },
@@ -35,7 +34,6 @@ export function RecurringExpenses() {
     { id: 'vendor_id', label: t('vendor') },
 
     { id: 'client_id', label: t('client') },
-    //no frequency id enum
     { id: 'frequency_id', label: t('frequency') },
     {
       id: 'next_send_date',

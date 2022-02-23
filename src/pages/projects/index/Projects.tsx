@@ -30,7 +30,7 @@ export function Projects() {
     {
       id: 'task_rate',
       label: t('task_rate'),
-    }, //due date format
+    },
     {
       id: 'due_date',
       label: t('due_date'),

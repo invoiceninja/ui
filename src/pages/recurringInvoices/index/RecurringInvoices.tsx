@@ -64,7 +64,6 @@ export function RecurringInvoices() {
       id: 'due_date_days',
       label: t('due_date'),
       format: (value) => {
-        //needs translation
         if (value === 'terms') return t('use_payment_format');
         else if (Number(value) === 1) return t('first_day_of_month');
         else return value;
