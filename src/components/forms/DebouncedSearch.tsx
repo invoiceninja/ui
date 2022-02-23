@@ -51,7 +51,10 @@ export function DebouncedSearch(props: Props) {
       defaultOptions
       loadOptions={loadOptions}
       menuPortalTarget={document.body}
-      onChange={props.onChange}
+      onChange={(value) =>
+        props.onChange &&
+        props.onChange(value as { value: unknown; label: unknown })
+      }
     />
   );
 }

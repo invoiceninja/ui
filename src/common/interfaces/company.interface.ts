@@ -9,6 +9,7 @@
  */
 
 export interface Company {
+  id: string;
   size_id: string;
   industry_id: string;
   settings: {
@@ -18,6 +19,15 @@ export interface Company {
     website: string;
     email: string;
     phone: string;
+    date_format_id: string;
+    company_logo: string;
+    pdf_variables: {
+      product_columns: string[];
+    };
+    tax_name1: string;
+    tax_name2: string;
+    tax_name3: string;
   };
   custom_fields: Record<string, string>;
+  enabled_tax_rates: number;
 }

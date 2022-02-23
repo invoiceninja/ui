@@ -12,7 +12,7 @@ import { Company } from 'common/interfaces/company.interface';
 import { RootState } from 'common/stores/store';
 import { useSelector } from 'react-redux';
 
-export function useCurrentCompany(): Company | undefined {
+export function useCurrentCompany(): Company {
   const companyUserState = useSelector(
     (state: RootState) => state.companyUsers
   );
