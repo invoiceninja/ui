@@ -21,7 +21,8 @@ import {
   PlusCircle,
   Repeat,
   CreditCard,
-  File
+  File,
+  Briefcase,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -122,6 +123,17 @@ export function Default(props: Props) {
         icon: PlusCircle,
         to: '/credits/create',
         label: t('new_credits'),
+      },
+    },
+    {
+      name: t('projects'),
+      href: '/projects',
+      icon: Briefcase,
+      current: location.pathname === '/projects',
+      rightButton: {
+        icon: PlusCircle,
+        to: '/projects/create',
+        label: t('new_projects'),
       },
     },
 
