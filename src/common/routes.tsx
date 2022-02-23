@@ -26,6 +26,7 @@ import * as Credits from '../pages/credits';
 import * as Projects from '../pages/projects';
 import * as Vendors from '../pages/vendors';
 import * as Expenses from '../pages/expenses';
+import * as RecurringExpenses from '../pages/recurringExpenses';
 
 export const routes = (
   <Routes>
@@ -41,7 +42,7 @@ export const routes = (
       </Route>
     </Route>
     <Route element={<PrivateRoute />}>
-      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/dashbDollarSignoard" element={<Dashboard />} />
       <Route path="clients">
         <Route path="" element={<Clients.Clients />} />
         <Route path="create" element={<Clients.Create />} />
@@ -95,6 +96,9 @@ export const routes = (
       </Route>
       <Route path="/expenses">
         <Route path="" element={<Expenses.Expenses />} />
+      </Route>
+      <Route path="/recurring_expenses">
+        <Route path="" element={<RecurringExpenses.RecurringExpenses />} />
       </Route>
       <Route path="/settings">
         <Route path="" element={<Settings.Settings />} />

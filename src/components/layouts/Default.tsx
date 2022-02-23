@@ -25,6 +25,7 @@ import {
   Briefcase,
   Truck,
   DollarSign,
+  RefreshCcw,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -158,6 +159,17 @@ export function Default(props: Props) {
         icon: PlusCircle,
         to: '/expenses/create',
         label: t('new_expense'),
+      },
+    },
+    {
+      name: t('recurring_expenses'),
+      href: '/recurring_expenses',
+      icon: RefreshCcw,
+      current: location.pathname === '/recurring_expenses',
+      rightButton: {
+        icon: PlusCircle,
+        to: '/recurring_expenses/create',
+        label: t('new_recurring_expense'),
       },
     },
     {
