@@ -22,6 +22,8 @@ import * as Settings from '../pages/settings';
 import * as Clients from '../pages/clients';
 import * as Payments from '../pages/payments';
 import * as RecurringInvoices from '../pages/recurringInvoices';
+import * as Credits from '../pages/credits';
+
 export const routes = (
   <Routes>
     <Route path="/" element={<Index />} />
@@ -79,6 +81,9 @@ export const routes = (
       <Route path="/payments">
         <Route path="" element={<Payments.Payments />}></Route>
       </Route>
+      <Route path="/credits">
+        <Route path='' element={<Credits.Credits/>}/>
+        </Route>
       <Route path="/settings">
         <Route path="" element={<Settings.Settings />} />
         <Route path="company_details">

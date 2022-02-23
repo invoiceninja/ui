@@ -21,6 +21,7 @@ import {
   PlusCircle,
   Repeat,
   CreditCard,
+  File
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -91,6 +92,17 @@ export function Default(props: Props) {
       },
     },
     {
+      name: t('recurring_invoices'),
+      href: '/recurring_invoices',
+      icon: Repeat,
+      current: location.pathname === '/recurring_invoices',
+      rightButton: {
+        icon: PlusCircle,
+        to: '/recurring_invoices/create',
+        label: t('new_recurring_invoice'),
+      },
+    },
+    {
       name: t('payments'),
       href: '/payments',
       icon: CreditCard,
@@ -102,16 +114,17 @@ export function Default(props: Props) {
       },
     },
     {
-      name: t('recurring_invoices'),
-      href: '/recurring_invoices',
-      icon: Repeat,
-      current: location.pathname === '/recurring_invoices',
+      name: t('credits'),
+      href: '/credits',
+      icon: File,
+      current: location.pathname === '/credits',
       rightButton: {
         icon: PlusCircle,
-        to: '/recurring_invoices/create',
-        label: t('new_recurring_invoice'),
+        to: '/credits/create',
+        label: t('new_credits'),
       },
     },
+
     {
       name: t('settings'),
       href: '/settings/company_details',
