@@ -2,6 +2,8 @@ import { InvoiceItemSum } from './invoice-item-sum';
 import { Invoice } from 'common/interfaces/invoice';
 import collect from 'collect.js';
 import { InvoiceStatus } from 'common/enums/invoice-status';
+import { Currency } from 'common/interfaces/currency';
+import { NumberFormatter } from '../number-formatter';
 
 export class InvoiceSum {
   protected taxMap = collect();
@@ -14,23 +16,23 @@ export class InvoiceSum {
   public totalCustomValues = 0;
   public subTotal = 0;
 
-  constructor(public invoice: Invoice) {}
+  constructor(public invoice: Invoice, protected currency: Currency) {}
 
-  public async build() {
-    await this.calculateLineItems();
-    await this.calculateDiscount();
-    await this.calculateInvoiceTaxes();
-    await this.calculateCustomValues();
-    await this.setTaxMap();
-    await this.calculateTotals();
-    await this.calculateBalance();
-    await this.calculatePartial();
+  public build() {
+    this.calculateLineItems()
+      .calculateDiscount()
+      .calculateInvoiceTaxes()
+      .calculateCustomValues()
+      .setTaxMap()
+      .calculateTotals()
+      .calculateBalance()
+      .calculatePartial();
 
     return this;
   }
 
-  protected async calculateLineItems() {
-    await this.invoiceItems.process();
+  protected calculateLineItems() {
+    this.invoiceItems.process();
 
     this.invoice.line_items = this.invoiceItems.lineItems;
     this.total = this.invoiceItems.subTotal;
@@ -39,14 +41,14 @@ export class InvoiceSum {
     return this;
   }
 
-  protected async calculateDiscount() {
+  protected calculateDiscount() {
     this.totalDiscount = this.discount(this.invoiceItems.subTotal);
     this.total -= this.totalDiscount;
 
     return this;
   }
 
-  protected async calculateInvoiceTaxes() {
+  protected calculateInvoiceTaxes() {
     if (this.invoice.tax_name1.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate1);
 
@@ -101,7 +103,7 @@ export class InvoiceSum {
     return this;
   }
 
-  protected async calculateCustomValues() {
+  protected calculateCustomValues() {
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge1);
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge2);
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge3);
@@ -142,7 +144,7 @@ export class InvoiceSum {
     return taxComponent;
   }
 
-  protected async setTaxMap() {
+  protected setTaxMap() {
     if (this.invoice.is_amount_discount) {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
     }
@@ -169,19 +171,18 @@ export class InvoiceSum {
       this.taxMap.push({ name: taxName, total: totalLineTax });
 
       this.totalTaxes += this.invoiceItems.totalTaxes;
-
     });
 
     return this;
   }
 
-  protected async calculateTotals() {
+  protected calculateTotals() {
     this.total += this.totalTaxes;
 
     return this;
   }
 
-  protected async calculateBalance() {
+  protected calculateBalance() {
     this.setCalculatedAttributes();
 
     return this;
@@ -192,13 +193,21 @@ export class InvoiceSum {
       if (this.invoice.amount !== this.invoice.balance) {
         const paidToDate = this.invoice.amount - this.invoice.balance;
 
-        this.invoice.balance = this.total - paidToDate; // Needs implementing formatting with number class.
+        this.invoice.balance =
+          parseFloat(
+            NumberFormatter.formatValue(this.total, this.currency.precision)
+          ) - paidToDate;
       } else {
-        this.invoice.balance = this.total; // Needs implementing formatting with number class.
+        this.invoice.balance = parseFloat(
+          NumberFormatter.formatValue(this.total, this.currency.precision)
+        );
       }
     }
 
-    this.invoice.amount = this.total; // Needs implementing formatting with number class.
+    this.invoice.amount = parseFloat(
+      NumberFormatter.formatValue(this.total, this.currency.precision)
+    );
+
     this.invoice.total_taxes = this.totalTaxes;
 
     return this;
@@ -208,8 +217,11 @@ export class InvoiceSum {
     if (!this.invoice?.id && this.invoice.partial) {
       this.invoice.partial = Math.max(
         0,
-        Math.min(this.invoice.partial, this.invoice.balance)
-      ); // Needs formatting (with rounding 2)
+        Math.min(
+          parseFloat(NumberFormatter.formatValue(this.invoice.partial, 2)),
+          this.invoice.balance
+        )
+      );
     }
 
     return this;

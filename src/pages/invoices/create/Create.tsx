@@ -10,7 +10,10 @@
 
 import { useQuery } from 'common/hooks/useQuery';
 import { useTitle } from 'common/hooks/useTitle';
-import { setCurrentInvoice } from 'common/stores/slices/invoices';
+import {
+  injectBlankItemIntoCurrent,
+  setCurrentInvoice,
+} from 'common/stores/slices/invoices';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect } from 'react';
@@ -44,6 +47,7 @@ export function Create() {
   useEffect(() => {
     if (data?.data.data) {
       dispatch(setCurrentInvoice(data.data.data));
+      dispatch(injectBlankItemIntoCurrent());
     }
   }, [data]);
 

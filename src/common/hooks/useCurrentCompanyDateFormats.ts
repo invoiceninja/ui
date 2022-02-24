@@ -19,7 +19,7 @@ export function useCurrentCompanyDateFormats() {
   const [dateFormat, setDateFormat] = useState('DD/MMM/YYYY');
 
   useEffect(() => {
-    setDateFormatId(company?.settings?.date_format_id);
+    setDateFormatId(company?.settings?.date_format_id || '0');
 
     if (statics?.data?.date_formats) {
       const result = statics.data.date_formats.filter(

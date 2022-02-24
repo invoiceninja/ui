@@ -18,6 +18,7 @@ interface Props {
   endpoint: string;
   value?: string;
   label: string;
+  onChange?: (value: { value: unknown; label: unknown }) => any;
 }
 
 export function DebouncedSearch(props: Props) {
@@ -50,6 +51,10 @@ export function DebouncedSearch(props: Props) {
       defaultOptions
       loadOptions={loadOptions}
       menuPortalTarget={document.body}
+      onChange={(value) =>
+        props.onChange &&
+        props.onChange(value as { value: unknown; label: unknown })
+      }
     />
   );
 }
