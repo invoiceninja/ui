@@ -8,15 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import axios from 'axios';
+import { endpoint } from 'common/helpers';
+import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { useQuery } from 'common/hooks/useQuery';
 import { useTitle } from 'common/hooks/useTitle';
+import { defaultHeaders } from 'common/queries/common/headers';
 import {
   injectBlankItemIntoCurrent,
   setCurrentInvoice,
 } from 'common/stores/slices/invoices';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
@@ -30,6 +34,9 @@ import { Totals } from './components/Totals';
 export function Create() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
+  const invoice = useCurrentInvoice();
+  const [previewStream, setPreviewStream] = useState();
+  const iframeRef = useRef<HTMLIFrameElement>();
 
   useTitle('new_invoice');
 
@@ -52,6 +59,22 @@ export function Create() {
     }
   }, [data]);
 
+  useEffect(() => {
+    axios
+      .post(
+        endpoint('/api/v1/live_preview?entity=invoice'),
+        { ...invoice },
+        { headers: defaultHeaders }
+      )
+      .then((response) => {
+        const file = new Blob([response.data], { type: 'application/pdf' });
+        const fileUrl = URL.createObjectURL(file);
+
+        iframeRef.current?.setAttribute('src', fileUrl);
+      })
+      .catch((error) => console.log(error));
+  }, [invoice]);
+
   return (
     <Default title={t('new_invoice')} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-4">
@@ -65,7 +88,12 @@ export function Create() {
       <Actions />
 
       <div className="py-4">
-        <div className="border-4 border-dashed border-gray-200 rounded-lg h-96" />
+        <iframe
+          ref={iframeRef}
+          width="100%"
+          height="1200"
+          typeof="application/pdf"
+        />
       </div>
     </Default>
   );
