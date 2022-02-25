@@ -28,7 +28,7 @@ export function DebouncedSearch(props: Props) {
         headers: defaultHeaders,
       })
       .then((response) => {
-        const array: Record<string, unknown>[] = [];
+        const array: Record<string, unknown>[] = [{ value: '', label: '' }];
 
         response?.data?.data?.map((resource: any) =>
           array.push({
