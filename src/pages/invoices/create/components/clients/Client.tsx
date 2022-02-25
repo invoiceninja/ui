@@ -13,7 +13,6 @@ import { Checkbox, InputLabel } from '@invoiceninja/forms';
 import { ClientResolver } from 'common/helpers/clients/client-resolver';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Client as ClientInterface } from 'common/interfaces/client';
-import { ClientContact } from 'common/interfaces/client-contact';
 import {
   setCurrentInvoiceProperty,
   toggleCurrentInvoiceInvitation,
