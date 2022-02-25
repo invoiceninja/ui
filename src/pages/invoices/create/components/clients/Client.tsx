@@ -13,6 +13,7 @@ import { Checkbox, InputLabel } from '@invoiceninja/forms';
 import { ClientResolver } from 'common/helpers/clients/client-resolver';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Client as ClientInterface } from 'common/interfaces/client';
+import { ClientContact } from 'common/interfaces/client-contact';
 import {
   setCurrentInvoiceProperty,
   toggleCurrentInvoiceInvitation,
@@ -33,6 +34,14 @@ export function Client() {
 
   const handleContactCheckboxChange = (contactId: string, value: boolean) => {
     dispatch(toggleCurrentInvoiceInvitation({ contactId, checked: value }));
+  };
+
+  const handleCheckedState = (contactId: string) => {
+    const potential = invoice?.invitations.find(
+      (i) => i.client_contact_id === contactId
+    );
+
+    return Boolean(potential);
   };
 
   useEffect(() => {
@@ -83,7 +92,7 @@ export function Client() {
               id={contact.id}
               value={contact.id}
               label={`${contact.first_name} ${contact.last_name}`}
-              checked={contact.send_email}
+              checked={handleCheckedState(contact.id)}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleContactCheckboxChange(
                   event.target.value,
