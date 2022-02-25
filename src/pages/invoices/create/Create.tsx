@@ -90,6 +90,8 @@ export function Create() {
 
       <div className="py-4">
         <iframe
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
           ref={iframeRef}
           width="100%"
           height="1200"

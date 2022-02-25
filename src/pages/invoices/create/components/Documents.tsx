@@ -30,6 +30,8 @@ export function Documents() {
   });
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
     files.forEach((file) => URL.revokeObjectURL(file.preview));
   }, [files]);
 
@@ -61,6 +63,8 @@ export function Documents() {
             className="flex flex-col items-center mr-4 mt-6 lg:mr-0 lg:mt-0"
           >
             <div className="h-32 w-32 rounded object-none p-2 border">
+              {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+              {/* @ts-ignore */}
               <img src={file.preview} className="w-32" />
             </div>
 
