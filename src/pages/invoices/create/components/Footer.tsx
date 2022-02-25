@@ -21,6 +21,7 @@ import { TabGroup } from 'components/TabGroup';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { Documents } from './Documents';
 
 export function Footer() {
   const [t] = useTranslation();
@@ -71,7 +72,9 @@ export function Footer() {
           />
         </Tab.Panel>
 
-        <Tab.Panel>Documents</Tab.Panel>
+        <Tab.Panel>
+          <Documents />
+        </Tab.Panel>
 
         <Tab.Panel>
           <div className="grid grid-cols-12 gap-4">
