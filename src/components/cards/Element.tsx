@@ -9,7 +9,7 @@
  */
 
 import classNames from 'classnames';
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 export function Element(props: {
   leftSide?: ReactNode;
