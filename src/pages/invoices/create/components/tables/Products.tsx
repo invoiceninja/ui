@@ -17,6 +17,7 @@ import {
   setCurrentLineItemProperty,
 } from 'common/stores/slices/invoices';
 import { RootState } from 'common/stores/store';
+import { DebouncedSearch } from 'components/forms/DebouncedSearch';
 import { ChangeEvent } from 'react';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -55,6 +56,16 @@ export function Products() {
       'tax_rate3',
     ];
 
+    if (property === 'product_key') {
+      return (
+        <DebouncedSearch
+          endpoint="/api/v1/products"
+          label="product_key"
+          className="w-64"
+        />
+      );
+    }
+
     if (numberInputs.includes(property)) {
       return (
         <InputField
@@ -64,6 +75,7 @@ export function Products() {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, parseFloat(event.target.value), index)
           }
+          className="w-24"
         />
       );
     }
