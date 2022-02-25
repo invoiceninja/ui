@@ -35,7 +35,6 @@ export function Create() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const invoice = useCurrentInvoice();
-  const [previewStream, setPreviewStream] = useState();
   const iframeRef = useRef<HTMLIFrameElement>();
 
   useTitle('new_invoice');
@@ -60,19 +59,21 @@ export function Create() {
   }, [data]);
 
   useEffect(() => {
-    axios
-      .post(
-        endpoint('/api/v1/live_preview?entity=invoice'),
-        { ...invoice },
-        { headers: defaultHeaders }
-      )
-      .then((response) => {
-        const file = new Blob([response.data], { type: 'application/pdf' });
-        const fileUrl = URL.createObjectURL(file);
+    if (invoice?.client_id) {
+      axios
+        .post(
+          endpoint('/api/v1/live_preview?entity=invoice'),
+          { ...invoice },
+          { headers: defaultHeaders }
+        )
+        .then((response) => {
+          const file = new Blob([response.data], { type: 'application/pdf' });
+          const fileUrl = URL.createObjectURL(file);
 
-        iframeRef.current?.setAttribute('src', fileUrl);
-      })
-      .catch((error) => console.log(error));
+          iframeRef.current?.setAttribute('src', fileUrl);
+        })
+        .catch((error) => console.log(error));
+    }
   }, [invoice]);
 
   return (
