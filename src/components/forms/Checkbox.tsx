@@ -13,6 +13,7 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   label?: string;
+  checked?: boolean;
 }
 
 export function Checkbox(props: Props) {
@@ -27,13 +28,17 @@ export function Checkbox(props: Props) {
           id={props.id}
           aria-describedby="comments-description"
           type="checkbox"
-          className={`focus:ring-gray-300 h-4 w-4 border-gray-300 rounded dark:bg-gray-700 dark:border-transparent ${props.className}`}
+          className={`focus:ring-gray-300 h-4 w-4 border-gray-300 rounded dark:bg-gray-700 dark:border-transparent cursor-pointer ${props.className}`}
           style={{ color: accentColor }}
           onChange={props.onChange}
+          checked={props.checked}
         />
       </div>
       <div className="ml-3 text-sm">
-        <label htmlFor={props.id} className="font-medium text-gray-700">
+        <label
+          htmlFor={props.id}
+          className="font-medium text-gray-700 cursor-pointer"
+        >
           {props.label}
         </label>
       </div>
