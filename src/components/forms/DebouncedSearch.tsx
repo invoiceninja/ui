@@ -19,6 +19,7 @@ interface Props {
   value?: string;
   label: string;
   onChange?: (value: { value: unknown; label: unknown }) => any;
+  className?: string;
 }
 
 export function DebouncedSearch(props: Props) {
@@ -47,6 +48,7 @@ export function DebouncedSearch(props: Props) {
 
   return (
     <AsyncSelect
+      className={props.className}
       cacheOptions
       defaultOptions
       loadOptions={loadOptions}
