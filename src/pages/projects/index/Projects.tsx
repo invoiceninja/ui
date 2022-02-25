@@ -40,10 +40,12 @@ export function Projects() {
     {
       id: 'public_notes',
       label: t('public_notes'),
+      format: (value) => <span className="truncate">{value}</span>,
     },
     {
       id: 'private_notes',
       label: t('private_notes'),
+      format: (value) => <span className="truncate">{value}</span>,
     },
     {
       id: 'budgeted_hours',
