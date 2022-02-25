@@ -75,7 +75,7 @@ export function Footer() {
 
         <Tab.Panel>
           <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-6 space-y-6">
+            <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
                 <InputLabel>{t('project')}</InputLabel>
                 <DebouncedSearch
@@ -100,7 +100,7 @@ export function Footer() {
               />
             </div>
 
-            <div className="col-span-6 space-y-6">
+            <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
                 <InputLabel>{t('user')}</InputLabel>
                 <DebouncedSearch
