@@ -46,8 +46,8 @@ export function Projects() {
       label: t('private_notes'),
     },
     {
-      id: 'bugeted_hours',
-      label: t('bugeted_hours'),
+      id: 'budgeted_hours',
+      label: t('budgeted_hours'),
     },
     {
       id: 'entity_state',
