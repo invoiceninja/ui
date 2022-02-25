@@ -60,6 +60,20 @@ const blankLineItem: InvoiceItem = {
   type_id: '1',
 };
 
+const blankInvitation = {
+  client_contact_id: '',
+  is_deleted: false,
+  isChanged: false,
+  key: '',
+  link: '',
+  opened_date: '',
+  sent_date: '',
+  viewed_date: '',
+  created_at: 0,
+  archived_at: 0,
+  updated_at: 0,
+};
+
 export const aliases: Record<string, string> = {
   item: 'product_key',
   description: 'notes',
@@ -108,6 +122,36 @@ export const invoiceSlice = createSlice({
         state.current.line_items.splice(payload.payload, 1);
       }
     },
+    toggleCurrentInvoiceInvitation: (
+      state,
+      payload: PayloadAction<{ contactId: string; checked: boolean }>
+    ) => {
+      const invitations = state.current?.invitations;
+
+      const potential =
+        invitations?.find(
+          (invitation) =>
+            invitation.client_contact_id === payload.payload.contactId
+        ) || -1;
+
+      if (
+        potential !== -1 &&
+        payload.payload.checked === false &&
+        state.current
+      ) {
+        state.current.invitations = state.current.invitations.filter(
+          (i) => i.client_contact_id !== payload.payload.contactId
+        );
+      }
+
+      if (potential === -1) {
+        const invitation = cloneDeep(blankInvitation);
+
+        invitation.client_contact_id = payload.payload.contactId;
+
+        state.current?.invitations.push(invitation);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(setCurrentLineItemProperty.fulfilled, (state, payload) => {
@@ -132,4 +176,5 @@ export const {
   injectBlankItemIntoCurrent,
   setCurrentInvoiceProperty,
   deleteInvoiceLineItem,
+  toggleCurrentInvoiceInvitation,
 } = invoiceSlice.actions;
