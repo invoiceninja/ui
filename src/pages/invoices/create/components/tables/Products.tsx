@@ -65,7 +65,7 @@ export function Products() {
         setCurrentLineItemProperty({
           position: index,
           property: 'cost',
-          value: resource.cost,
+          value: resource?.cost || 0,
         })
       );
     }
@@ -74,7 +74,7 @@ export function Products() {
       setCurrentLineItemProperty({
         position: index,
         property: 'notes',
-        value: resource.notes,
+        value: resource?.notes || '',
       })
     );
   };
