@@ -19,7 +19,7 @@ export function Actions() {
   const dispatch = useDispatch();
 
   return (
-    <div className="w-full flex justify-center my-6 space-x-4">
+    <div className="w-full flex justify-center my-6 space-x-2">
       <DebouncedSearch
         endpoint="/api/v1/designs"
         label="name"
@@ -34,8 +34,14 @@ export function Actions() {
         }
       />
 
-      <Button type="secondary">{t('save_draft')}</Button>
-      <Button type="secondary">{t('mark_sent')}</Button>
+      <button className="text-white bg-gray-700 py-2 px-4 rounded text-sm">
+        {t('save_draft')}
+      </button>
+
+      <button className="text-white bg-green-600 py-2 px-4 rounded text-sm">
+        {t('mark_sent')}
+      </button>
+
       <Button>{t('email_invoice')}</Button>
     </div>
   );
