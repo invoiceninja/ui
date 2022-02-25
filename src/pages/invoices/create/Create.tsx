@@ -20,6 +20,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
+import { Actions } from './components/Actions';
 import { Client } from './components/clients/Client';
 import { Details } from './components/Details';
 import { Footer } from './components/Footer';
@@ -59,6 +60,12 @@ export function Create() {
         <Table />
         <Footer />
         <Totals />
+      </div>
+
+      <Actions />
+
+      <div className="py-4">
+        <div className="border-4 border-dashed border-gray-200 rounded-lg h-96" />
       </div>
     </Default>
   );
