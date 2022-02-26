@@ -9,6 +9,7 @@
  */
 
 import reccuringInvoice from 'common/constants/reccuring-invoice';
+import recurringInvoicesFrequency from 'common/constants/recurring-invoices-frequency';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
@@ -59,6 +60,9 @@ export function RecurringInvoices() {
     {
       id: 'frequency_id',
       label: t('frequency'),
+      format: (value) => (
+        <StatusBadge for={recurringInvoicesFrequency} code={value} />
+      ),
     },
     {
       id: 'due_date_days',

@@ -21,12 +21,12 @@ import * as Invoices from '../pages/invoices';
 import * as Settings from '../pages/settings';
 import * as Clients from '../pages/clients';
 import * as Payments from '../pages/payments';
-import * as RecurringInvoices from '../pages/recurringInvoices';
+import * as RecurringInvoices from '../pages/recurring-invoices';
 import * as Credits from '../pages/credits';
 import * as Projects from '../pages/projects';
 import * as Vendors from '../pages/vendors';
 import * as Expenses from '../pages/expenses';
-import * as RecurringExpenses from '../pages/recurringExpenses';
+import * as RecurringExpenses from '../pages/recurring-expenses';
 
 export const routes = (
   <Routes>
