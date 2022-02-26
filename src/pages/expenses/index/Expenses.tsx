@@ -23,6 +23,11 @@ export function Expenses() {
     {
       id: 'status_id',
       label: t('status'),
+      format: (value, resource) => {
+        if (resource.should_be_invoiced) return t('pending');
+        else if (resource.invoice_id) return t('invoiced');
+        else return t('logged');
+      },
     },
     {
       id: 'number',
@@ -35,7 +40,11 @@ export function Expenses() {
       format: (value) => date(value, dateFormat),
     },
     { id: 'amount', label: t('amount') },
-    { id: 'public_notes', label: t('public_notes') },
+    {
+      id: 'public_notes',
+      label: t('public_notes'),
+      format: (value) => <span className="truncate">{value}</span>,
+    },
     {
       id: 'entity_status',
       label: t('entity_status'),
