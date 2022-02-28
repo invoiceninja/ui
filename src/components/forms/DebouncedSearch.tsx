@@ -78,7 +78,7 @@ export function DebouncedSearch(props: Props) {
               placeholder={props.placeholder || ''}
               className="w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 border border-gray-300"
               onChange={(event) => debouncedSearch(event.target.value)}
-              displayValue={(record) => record.label}
+              displayValue={(record: Record) => record.label}
             />
             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
               <ChevronDown
