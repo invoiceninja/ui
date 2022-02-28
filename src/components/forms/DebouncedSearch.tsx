@@ -18,6 +18,7 @@ interface Props {
   label: string;
   placeholder?: string;
   onChange: (value: Record) => any;
+  formatLabel?: (resource: any) => any;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -97,7 +98,9 @@ export function DebouncedSearch(props: Props) {
                   key={index}
                   value={record}
                 >
-                  {record.label}
+                  {props.formatLabel
+                    ? props.formatLabel(record.resource)
+                    : record.label}
                 </Combobox.Option>
               ))}
           </Combobox.Options>
