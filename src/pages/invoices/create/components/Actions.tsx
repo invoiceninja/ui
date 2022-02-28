@@ -23,7 +23,6 @@ export function Actions() {
       <DebouncedSearch
         endpoint="/api/v1/designs"
         label="name"
-        className="w-48"
         onChange={(payload) =>
           dispatch(
             setCurrentInvoiceProperty({

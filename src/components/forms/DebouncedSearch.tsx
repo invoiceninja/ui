@@ -26,7 +26,7 @@ export function DebouncedSearch(props: Props) {
   const [records, setRecords] = useState<Record[]>([internalRecord]);
   const [selectedOption, setSelectedOption] = useState(records[0]);
 
-  const debouncedSearch = debounce((query) => {
+  const request = (query: string) => {
     axios
       .get(endpoint(`${props.endpoint}?filter=${query}`), {
         headers: defaultHeaders,
@@ -45,8 +45,12 @@ export function DebouncedSearch(props: Props) {
 
         setRecords(array);
       });
+  };
 
+  const debouncedSearch = debounce((query) => {
     const internal = records.findIndex((record) => record.internal);
+
+    request(query);
 
     setRecords((current) => {
       current[internal].label = query;
@@ -57,6 +61,8 @@ export function DebouncedSearch(props: Props) {
 
     setSelectedOption(clone(records[0]));
   }, 500);
+
+  useEffect(() => request(''), []);
 
   useEffect(() => {
     props.onChange(selectedOption);
