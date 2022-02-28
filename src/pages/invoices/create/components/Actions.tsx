@@ -19,19 +19,22 @@ export function Actions() {
   const dispatch = useDispatch();
 
   return (
-    <div className="w-full flex justify-center my-6 space-x-2">
-      <DebouncedSearch
-        endpoint="/api/v1/designs"
-        label="name"
-        onChange={(payload) =>
-          dispatch(
-            setCurrentInvoiceProperty({
-              property: 'design_id',
-              value: payload.value,
-            })
-          )
-        }
-      />
+    <div className="w-full flex flex-col lg:flex-row lg:items-center space-y-3 lg:space-y-0 justify-center my-6 lg:space-x-2">
+      <div className="w-full lg:w-80">
+        <DebouncedSearch
+          endpoint="/api/v1/designs"
+          label="name"
+          placeholder={t('search_designs')}
+          onChange={(payload) =>
+            dispatch(
+              setCurrentInvoiceProperty({
+                property: 'design_id',
+                value: payload.value,
+              })
+            )
+          }
+        />
+      </div>
 
       <button className="text-white bg-gray-700 py-2 px-4 rounded text-sm">
         {t('save_draft')}

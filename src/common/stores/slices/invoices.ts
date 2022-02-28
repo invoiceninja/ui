@@ -35,6 +35,18 @@ export const setCurrentLineItemProperty = createAsyncThunk(
   }
 );
 
+export const deleteInvoiceLineItem = createAsyncThunk(
+  'invoices/deleteInvoiceLineItem',
+  async (payload: any, thunkApi) => {
+    const state = thunkApi.getState() as any;
+
+    const client = await clientResolver.find(state.invoices.current.client_id);
+    const currency = await currencyResolver.find(client.settings.currency_id); // or company currency
+
+    return { client, currency, payload };
+  }
+);
+
 const blankLineItem: InvoiceItem = {
   quantity: 0,
   cost: 0,
@@ -117,11 +129,6 @@ export const invoiceSlice = createSlice({
         );
       }
     },
-    deleteInvoiceLineItem: (state, payload: PayloadAction<number>) => {
-      if (state.current) {
-        state.current.line_items.splice(payload.payload, 1);
-      }
-    },
     toggleCurrentInvoiceInvitation: (
       state,
       payload: PayloadAction<{ contactId: string; checked: boolean }>
@@ -168,6 +175,17 @@ export const invoiceSlice = createSlice({
         ).build().invoice;
       }
     });
+
+    builder.addCase(deleteInvoiceLineItem.fulfilled, (state, payload) => {
+      if (state.current) {
+        state.current.line_items.splice(payload.payload.payload, 1);
+      }
+
+      state.current = new InvoiceSum(
+        cloneDeep(state.current as Invoice),
+        cloneDeep(payload.payload.currency as Currency)
+      ).build().invoice;
+    });
   },
 });
 
@@ -175,6 +193,5 @@ export const {
   setCurrentInvoice,
   injectBlankItemIntoCurrent,
   setCurrentInvoiceProperty,
-  deleteInvoiceLineItem,
   toggleCurrentInvoiceInvitation,
 } = invoiceSlice.actions;

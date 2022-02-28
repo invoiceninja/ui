@@ -162,7 +162,6 @@ export function Products() {
                 </Td>
               </Tr>
             ))}
-
           {invoice?.client_id && (
             <Tr>
               <Td colSpan={100}>
@@ -176,7 +175,6 @@ export function Products() {
               </Td>
             </Tr>
           )}
-
           {!invoice?.client_id && (
             <Tr>
               <Td colSpan={100}>{t('no_client_selected')}.</Td>
