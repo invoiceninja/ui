@@ -82,7 +82,7 @@ export function DebouncedSearch(props: Props) {
           </div>
         </div>
         {records.filter((record) => !record.internal).length >= 1 && (
-          <Combobox.Options className="absolute w-80 py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-xl max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+          <Combobox.Options className="absolute z-10 w-80 py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-xl max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
             {records
               .filter((record) => !record.internal)
               .map((record, index) => (
