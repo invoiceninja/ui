@@ -88,7 +88,7 @@ export function Create() {
 
       <Actions />
 
-      <div className="py-4">
+      {/* <div className="py-4">
         <iframe
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
@@ -97,7 +97,7 @@ export function Create() {
           height="1200"
           typeof="application/pdf"
         />
-      </div>
+      </div> */}
     </Default>
   );
 }

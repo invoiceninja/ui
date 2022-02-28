@@ -131,39 +131,39 @@ export function Products() {
 
   return (
     <div>
-      {invoice?.client_id && (
-        <Table>
-          <Thead>
-            {columns.map((column, index) => (
-              <Th key={index}>{resolveTranslation(column)}</Th>
-            ))}
-            <Th>{/* This is placeholder for "Remove" button. */}</Th>
-          </Thead>
-          <Tbody>
-            {invoice &&
-              invoice.line_items.map((lineItem, lineItemIndex) => (
-                <Tr key={lineItemIndex}>
-                  {columns.map((column, columnIndex) => (
-                    <Td key={columnIndex}>
-                      {resolveInputField(column, lineItemIndex)}
-                    </Td>
-                  ))}
-
-                  <Td>
-                    {invoice && (
-                      <button
-                        className="text-gray-600 hover:text-red-600"
-                        onClick={() =>
-                          dispatch(deleteInvoiceLineItem(lineItemIndex))
-                        }
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    )}
+      <Table>
+        <Thead>
+          {columns.map((column, index) => (
+            <Th key={index}>{resolveTranslation(column)}</Th>
+          ))}
+          <Th>{/* This is placeholder for "Remove" button. */}</Th>
+        </Thead>
+        <Tbody>
+          {invoice?.client_id &&
+            invoice.line_items.map((lineItem, lineItemIndex) => (
+              <Tr key={lineItemIndex}>
+                {columns.map((column, columnIndex) => (
+                  <Td key={columnIndex}>
+                    {resolveInputField(column, lineItemIndex)}
                   </Td>
-                </Tr>
-              ))}
+                ))}
 
+                <Td>
+                  {invoice && (
+                    <button
+                      className="text-gray-600 hover:text-red-600"
+                      onClick={() =>
+                        dispatch(deleteInvoiceLineItem(lineItemIndex))
+                      }
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+                </Td>
+              </Tr>
+            ))}
+
+          {invoice?.client_id && (
             <Tr>
               <Td colSpan={100}>
                 <button
@@ -175,9 +175,15 @@ export function Products() {
                 </button>
               </Td>
             </Tr>
-          </Tbody>
-        </Table>
-      )}
+          )}
+
+          {!invoice?.client_id && (
+            <Tr>
+              <Td colSpan={100}>{t('no_client_selected')}.</Td>
+            </Tr>
+          )}
+        </Tbody>
+      </Table>
     </div>
   );
 }

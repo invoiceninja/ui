@@ -16,12 +16,14 @@ import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
 import { CustomField } from 'components/CustomField';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { useFormatMoney } from '../hooks/useFormatMoney';
 
 export function Totals() {
   const [t] = useTranslation();
   const invoice = useCurrentInvoice();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
+  const formatMoney = useFormatMoney();
 
   const handleChange = (property: keyof Invoice, value: unknown) => {
     dispatch(
@@ -35,11 +37,11 @@ export function Totals() {
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
       <Element leftSide={t('subtotal')} pushContentToRight>
-        {invoice?.amount}
+        {formatMoney(invoice?.amount || 0)}
       </Element>
 
       <Element leftSide={t('balance_due')} pushContentToRight>
-        {invoice?.balance}
+        {formatMoney(invoice?.balance || 0)}
       </Element>
 
       {invoice && company?.custom_fields?.surcharge1 && (
