@@ -8,11 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import recurringInvoice from 'common/constants/reccuring-invoice';
+import recurringInvoicesFrequency from 'common/constants/recurring-invoices-frequency';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
+import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 
 export function RecurringExpenses() {
@@ -26,6 +29,7 @@ export function RecurringExpenses() {
     {
       id: 'status_id',
       label: t('status'),
+      format: (value) => <StatusBadge for={recurringInvoice} code={value} />,
     },
     {
       id: 'number',
@@ -34,7 +38,14 @@ export function RecurringExpenses() {
     { id: 'vendor_id', label: t('vendor') },
 
     { id: 'client_id', label: t('client') },
-    { id: 'frequency_id', label: t('frequency') },
+    {
+      id: 'frequency_id',
+      label: t('frequency'),
+      format: (value) => (
+        <StatusBadge for={recurringInvoicesFrequency} code={value} headless />
+      ),
+    },
+
     {
       id: 'next_send_date',
       label: t('next_send_date'),

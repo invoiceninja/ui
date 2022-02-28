@@ -61,7 +61,7 @@ export function RecurringInvoices() {
       id: 'frequency_id',
       label: t('frequency'),
       format: (value) => (
-        <StatusBadge for={recurringInvoicesFrequency} code={value} />
+        <StatusBadge for={recurringInvoicesFrequency} code={value} headless />
       ),
     },
     {
@@ -69,13 +69,14 @@ export function RecurringInvoices() {
       label: t('due_date'),
       format: (value) => {
         if (value === 'terms') return t('use_payment_format');
-        else if (Number(value) === 1) return t('first_day_of_month');
+        else if (Number(value) === 1) return t('first_day_of_the_month');
         else return value;
       },
     },
     {
       id: 'auto_bill',
       label: t('auto_bill'),
+      format: (value) => t(String(value)),
     },
   ];
   return (
