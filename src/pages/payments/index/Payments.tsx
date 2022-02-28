@@ -1,17 +1,17 @@
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
- * @link https://github.com/invoiceninja/invoiceninja source repository
+ * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-
-import invoiceStatus from 'common/constants/invoice-status';
+import paymentStatus from 'common/constants/payment-status';
+import paymentType from 'common/constants/payment-type';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useTitle } from 'common/hooks/useTitle';
+import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
@@ -19,15 +19,16 @@ import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 
-export function Invoices() {
+export function Payments() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
-  const pages = [{ name: t('invoices'), href: '/invoices' }];
+
+  const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
   const columns: DataTableColumns = [
     {
       id: 'status_id',
       label: t('status'),
-      format: (value) => <StatusBadge for={invoiceStatus} code={value} />,
+      format: (value) => <StatusBadge for={paymentStatus} code={value} />,
     },
     {
       id: 'number',
@@ -42,29 +43,44 @@ export function Invoices() {
         </Link>
       ),
     },
-    { id: 'amount', label: t('amount') },
-    { id: 'balance', label: t('balance') },
+    {
+      id: 'amount',
+      label: t('amount'),
+    },
+    {
+      id: 'invoice_number',
+      label: t('invoice_number'),
+      format: (value, resource) => resource.invoices[0]?.number,
+    },
     {
       id: 'date',
       label: t('date'),
       format: (value) => date(value, dateFormat),
     },
     {
-      id: 'due_date',
-      label: t('due_date'),
-      format: (value) => date(value, dateFormat),
+      id: 'type_id',
+      label: t('type'),
+      format: (value) => (
+        <StatusBadge for={paymentType} code={value} headless />
+      ),
+    },
+    {
+      id: 'transaction_reference',
+      label: t('transaction_reference'),
     },
   ];
-  useTitle('invoices');
-
   return (
-    <Default title={t('invoices')} breadcrumbs={pages} docsLink="docs/invoices">
+    <Default
+      title={t('payments')}
+      breadcrumbs={pages}
+      docsLink="docs/payments/"
+    >
       <DataTable
-        resource="invoice"
-        endpoint="/api/v1/invoices?include=client"
+        resource="payment"
         columns={columns}
-        linkToCreate="/invoices/create"
-        linkToEdit="/invoices/:id/edit"
+        endpoint="/api/v1/payments?include=client,invoices"
+        linkToCreate="/payments/create"
+        linkToEdit="/payments/:id/edit"
         withResourcefulActions
       />
     </Default>

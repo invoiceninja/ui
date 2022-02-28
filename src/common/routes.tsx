@@ -20,6 +20,13 @@ import * as Products from '../pages/products';
 import * as Invoices from '../pages/invoices';
 import * as Settings from '../pages/settings';
 import * as Clients from '../pages/clients';
+import * as Payments from '../pages/payments';
+import * as RecurringInvoices from '../pages/recurring-invoices';
+import * as Credits from '../pages/credits';
+import * as Projects from '../pages/projects';
+import * as Vendors from '../pages/vendors';
+import * as Expenses from '../pages/expenses';
+import * as RecurringExpenses from '../pages/recurring-expenses';
 
 export const routes = (
   <Routes>
@@ -71,6 +78,27 @@ export const routes = (
       <Route path="/invoices">
         <Route path="" element={<Invoices.Invoices />} />
         <Route path="create" element={<Invoices.Create />} />
+      </Route>
+      <Route path="/recurring_invoices">
+        <Route path="" element={<RecurringInvoices.RecurringInvoices />} />
+      </Route>
+      <Route path="/payments">
+        <Route path="" element={<Payments.Payments />}></Route>
+      </Route>
+      <Route path="/credits">
+        <Route path="" element={<Credits.Credits />} />
+      </Route>
+      <Route path="/projects">
+        <Route path="" element={<Projects.Projects />} />
+      </Route>
+      <Route path="/vendors">
+        <Route path="" element={<Vendors.Vendors />} />
+      </Route>
+      <Route path="/expenses">
+        <Route path="" element={<Expenses.Expenses />} />
+      </Route>
+      <Route path="/recurring_expenses">
+        <Route path="" element={<RecurringExpenses.RecurringExpenses />} />
       </Route>
       <Route path="/settings">
         <Route path="" element={<Settings.Settings />} />
