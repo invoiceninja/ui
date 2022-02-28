@@ -6,10 +6,11 @@ import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 
-interface Record {
+export interface Record {
   value: string | number;
   label: string;
   internal: boolean;
+  resource?: any;
 }
 interface Props {
   endpoint: string;
@@ -31,13 +32,14 @@ export function DebouncedSearch(props: Props) {
         headers: defaultHeaders,
       })
       .then((response) => {
-        const array: Record[] = [{ value: '', label: '', internal: true }];
+        const array: Record[] = [internalRecord];
 
         response?.data?.data?.map((resource: any) =>
           array.push({
             value: resource[props.value ?? 'id'],
             label: resource[props.label],
             internal: false,
+            resource,
           })
         );
 
