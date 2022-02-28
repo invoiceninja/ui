@@ -53,9 +53,6 @@ export function Products() {
     );
 
     if (!value.internal && value.resource) {
-      console.log(value);
-      
-
       dispatch(
         setCurrentLineItemProperty({
           position: index,
