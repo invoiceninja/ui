@@ -33,7 +33,6 @@ export function Expenses() {
       id: 'number',
       label: t('number'),
     },
-    { id: 'client_id', label: t('client') },
     {
       id: 'date',
       label: t('date'),

@@ -16,6 +16,7 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
+import { generatePath, Link } from 'react-router-dom';
 
 export function Payments() {
   const [t] = useTranslation();
@@ -35,6 +36,11 @@ export function Payments() {
     {
       id: 'client_id',
       label: t('client'),
+      format: (value, resource) => (
+        <Link to={generatePath('/clients/:id', { id: resource.client.id })}>
+          {resource.client.display_name}
+        </Link>
+      ),
     },
     {
       id: 'amount',
@@ -43,6 +49,7 @@ export function Payments() {
     {
       id: 'invoice_number',
       label: t('invoice_number'),
+      format: (value, resource) => resource.invoices[0]?.number,
     },
     {
       id: 'date',
@@ -52,7 +59,9 @@ export function Payments() {
     {
       id: 'type_id',
       label: t('type'),
-      format: (value) => <StatusBadge for={paymentType} code={value} />,
+      format: (value) => (
+        <StatusBadge for={paymentType} code={value} headless />
+      ),
     },
     {
       id: 'transaction_reference',
@@ -68,7 +77,7 @@ export function Payments() {
       <DataTable
         resource="payment"
         columns={columns}
-        endpoint="/api/v1/payments"
+        endpoint="/api/v1/payments?include=client,invoices"
         linkToCreate="/payments/create"
         linkToEdit="/payments/:id/edit"
         withResourcefulActions

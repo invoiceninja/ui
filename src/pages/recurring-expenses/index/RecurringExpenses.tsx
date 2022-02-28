@@ -35,9 +35,7 @@ export function RecurringExpenses() {
       id: 'number',
       label: t('number'),
     },
-    { id: 'vendor_id', label: t('vendor') },
 
-    { id: 'client_id', label: t('client') },
     {
       id: 'frequency_id',
       label: t('frequency'),

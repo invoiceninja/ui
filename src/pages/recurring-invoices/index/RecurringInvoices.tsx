@@ -36,10 +36,6 @@ export function RecurringInvoices() {
       label: t('number'),
     },
     {
-      id: 'client_id',
-      label: t('client'),
-    },
-    {
       id: 'amount',
       label: t('amount'),
     },

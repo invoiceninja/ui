@@ -31,7 +31,6 @@ export function Credits() {
       id: 'number',
       label: t('number'),
     },
-    { id: 'client_id', label: t('client') },
     { id: 'amount', label: t('amount') },
     {
       id: 'date',

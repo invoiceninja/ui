@@ -25,8 +25,6 @@ export function Projects() {
       id: 'name',
       label: t('name'),
     },
-
-    { id: 'client_id', label: t('client') },
     {
       id: 'task_rate',
       label: t('task_rate'),
