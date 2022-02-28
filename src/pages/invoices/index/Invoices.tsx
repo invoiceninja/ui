@@ -13,10 +13,11 @@ import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { DataTable, DataTableColumns } from 'components/DataTable';
+import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath, Link } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
 
 export function Invoices() {
   const [t] = useTranslation();
