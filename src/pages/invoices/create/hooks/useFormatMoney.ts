@@ -11,9 +11,9 @@
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { Number } from 'common/helpers/number';
-import { useCountries } from 'common/hooks/useCountries';
-import { useCurrencies } from 'common/hooks/useCurrencies';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
+import { useResolveClientCurrency } from 'common/hooks/useResolveClientCurrency';
+import { useResolveCountry } from 'common/hooks/useResolveCountry';
 import { Client } from 'common/interfaces/client';
 import { Country } from 'common/interfaces/country';
 import { Currency } from 'common/interfaces/currency';
@@ -23,8 +23,9 @@ import { useQueryClient } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
 export function useFormatMoney() {
-  const currencies = useCurrencies();
-  const countries = useCountries();
+  const resolveCurrency = useResolveClientCurrency();
+  const resolveCountry = useResolveCountry();
+
   const invoice = useCurrentInvoice();
   const queryClient = useQueryClient();
 
@@ -52,13 +53,10 @@ export function useFormatMoney() {
   }, [invoice]);
 
   useEffect(() => {
-    setCountry(countries.find((country) => country.id == client?.country_id));
-
-    setCurrency(
-      currencies.find(
-        (currency) => currency.id == client?.settings?.currency_id
-      )
-    );
+    if (client) {
+      setCurrency(resolveCurrency(client));
+      setCountry(resolveCountry(client.country_id));
+    }
   }, [client]);
 
   return (value: number | string) => {
