@@ -23,6 +23,7 @@ import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { resolveProperty } from '../../helpers/resolve-property';
+import { useFormatMoney } from '../../hooks/useFormatMoney';
 import { useProductColumns } from '../../hooks/useProductColumns';
 import { useResolveTranslation } from '../../hooks/useResolveTranslation';
 
@@ -32,6 +33,7 @@ export function Products() {
   const columns = useProductColumns();
   const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
+  const formatMoney = useFormatMoney();
 
   const onChange = (key: keyof InvoiceItem, value: unknown, index: number) => {
     dispatch(
@@ -109,7 +111,11 @@ export function Products() {
     }
 
     if (['line_total'].includes(property)) {
-      return <span>{invoice?.line_items[index][property]}</span>;
+      return (
+        <span>
+          {formatMoney(invoice?.line_items[index][property] as number)}
+        </span>
+      );
     }
 
     return (
@@ -125,7 +131,7 @@ export function Products() {
 
   return (
     <div>
-      {invoice && (
+      {invoice?.client_id && (
         <Table>
           <Thead>
             {columns.map((column, index) => (
