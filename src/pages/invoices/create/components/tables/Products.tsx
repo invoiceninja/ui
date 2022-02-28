@@ -17,7 +17,7 @@ import {
   setCurrentLineItemProperty,
 } from 'common/stores/slices/invoices';
 import { RootState } from 'common/stores/store';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
+import { DebouncedSearch, Record } from 'components/forms/DebouncedSearch';
 import { ChangeEvent } from 'react';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -43,29 +43,24 @@ export function Products() {
     );
   };
 
-  const handleProductChange = (
-    index: number,
-    value: unknown,
-    label: unknown,
-    selected: boolean,
-    resource?: any
-  ) => {
+  const handleProductChange = (index: number, value: Record) => {
     dispatch(
       setCurrentLineItemProperty({
         position: index,
         property: 'product_key',
-        value: label,
+        value: value.label,
       })
     );
 
-    console.log(resource);
+    if (!value.internal && value.resource) {
+      console.log(value);
+      
 
-    if (selected && resource) {
       dispatch(
         setCurrentLineItemProperty({
           position: index,
           property: 'cost',
-          value: resource?.cost || 0,
+          value: value.resource?.cost || 0,
         })
       );
     }
@@ -74,7 +69,7 @@ export function Products() {
       setCurrentLineItemProperty({
         position: index,
         property: 'notes',
-        value: resource?.notes || '',
+        value: value.resource?.notes || '',
       })
     );
   };
@@ -94,12 +89,10 @@ export function Products() {
 
     if (property === 'product_key') {
       return (
-        <DebouncedCombobox
+        <DebouncedSearch
           endpoint="/api/v1/products"
           label="product_key"
-          onChange={(value, label, selected, resource) =>
-            handleProductChange(index, value, label, selected, resource)
-          }
+          onChange={(value) => handleProductChange(index, value)}
         />
       );
     }
