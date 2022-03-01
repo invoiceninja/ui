@@ -19,6 +19,7 @@ interface Props {
   placeholder?: string;
   onChange: (value: Record) => any;
   formatLabel?: (resource: any) => any;
+  className?: string;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -70,7 +71,7 @@ export function DebouncedSearch(props: Props) {
   }, [selectedOption]);
 
   return (
-    <div className="w-full">
+    <div className={`w-full ${props.className}`}>
       <Combobox value={selectedOption} onChange={setSelectedOption}>
         <div className="relative mt-1">
           <div className="relative w-full">
