@@ -22,6 +22,7 @@ import { ChangeEvent } from 'react';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { resolveProperty } from '../../helpers/resolve-property';
 import { useFormatMoney } from '../../hooks/useFormatMoney';
 import { useProductColumns } from '../../hooks/useProductColumns';
@@ -34,6 +35,7 @@ export function Products() {
   const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
   const formatMoney = useFormatMoney();
+  const navigate = useNavigate();
 
   const onChange = (key: keyof InvoiceItem, value: unknown, index: number) => {
     dispatch(
@@ -93,6 +95,8 @@ export function Products() {
           label="product_key"
           onChange={(value) => handleProductChange(index, value)}
           className="w-36"
+          onActionClick={() => navigate(generatePath('/products/create'))}
+          actionLabel={t('new_product')}
         />
       );
     }
