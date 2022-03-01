@@ -90,7 +90,11 @@ export function Client() {
             <Checkbox
               id={contact.id}
               value={contact.id}
-              label={`${contact.first_name} ${contact.last_name}`}
+              label={
+                contact.first_name.length >= 1
+                  ? `${contact.first_name} ${contact.last_name}`
+                  : t('blank_contact')
+              }
               checked={handleCheckedState(contact.id)}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleContactCheckboxChange(
