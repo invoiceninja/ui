@@ -138,59 +138,26 @@ export function Products() {
         <Tbody>
           {invoice?.client_id &&
             invoice.line_items.map((lineItem, lineItemIndex) => (
-              <>
-                <Tr>
-                  {columns.map((column, columnIndex) => (
-                    <Td key={columnIndex}>
-                      {resolveInputField(column, lineItemIndex)}
-                    </Td>
-                  ))}
-
-                  <Td>
-                    {invoice && (
-                      <button
-                        className="text-gray-600 hover:text-red-600"
-                        onClick={() =>
-                          dispatch(deleteInvoiceLineItem(lineItemIndex))
-                        }
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    )}
+              <Tr key={lineItemIndex}>
+                {columns.map((column, columnIndex) => (
+                  <Td key={columnIndex}>
+                    {resolveInputField(column, lineItemIndex)}
                   </Td>
-                </Tr>
+                ))}
 
-                <Tr>
-                  <Td colSpan={columns.length - 1}>
-                    <div className="flex items-center justify-end space-x-4">
-                      <p>{t('tax')} #1</p>
-
-                      <div className="w-80">
-                        <DebouncedSearch
-                          placeholder={t('search_tax_rates')}
-                          endpoint="/api/v1/tax_rates"
-                          value="rate"
-                          label="name"
-                          formatLabel={(resource) =>
-                            `${resource.name} (${resource.rate}%)`
-                          }
-                          onChange={(value) => {
-                            onChange('tax_rate1', value.value, lineItemIndex);
-                            onChange('tax_name1', value.label, lineItemIndex);
-                          }}
-                        />
-                      </div>
-                    </div>
-                  </Td>
-
-                  <Td>
-                    {formatMoney(
-                      (lineItem.tax_rate1 / 100) * lineItem.line_total
-                    )}
-                  </Td>
-                  <Td></Td>
-                </Tr>
-              </>
+                <Td>
+                  {invoice && (
+                    <button
+                      className="text-gray-600 hover:text-red-600"
+                      onClick={() =>
+                        dispatch(deleteInvoiceLineItem(lineItemIndex))
+                      }
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+                </Td>
+              </Tr>
             ))}
 
           {invoice?.client_id && (
