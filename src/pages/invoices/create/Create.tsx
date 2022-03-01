@@ -52,7 +52,7 @@ export function Create() {
   });
 
   useEffect(() => {
-    if (data?.data.data) {
+    if (data?.data.data && !invoice) {
       dispatch(setCurrentInvoice(data.data.data));
       dispatch(injectBlankItemIntoCurrent());
     }

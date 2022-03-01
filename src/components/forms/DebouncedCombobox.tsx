@@ -17,9 +17,11 @@ interface Props {
   value?: string;
   label: string;
   placeholder?: string;
+  className?: string;
   onChange: (value: Record) => any;
   formatLabel?: (resource: any) => any;
-  className?: string;
+  onActionClick?: () => any;
+  actionLabel?: string;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -104,6 +106,16 @@ export function DebouncedCombobox(props: Props) {
                   {record.label}
                 </Combobox.Option>
               ))}
+
+            {props.onActionClick && props.actionLabel && (
+              <button
+                className="cursor-pointer select-none relative py-2 px-3 text-gray-900 hover:bg-gray-100 w-full"
+                type="button"
+                onClick={props.onActionClick}
+              >
+                {props.actionLabel}
+              </button>
+            )}
           </Combobox.Options>
         )}
       </Combobox>
