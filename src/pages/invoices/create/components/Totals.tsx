@@ -17,6 +17,7 @@ import { CustomField } from 'components/CustomField';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import { useFormatMoney } from '../hooks/useFormatMoney';
 
 export function Totals() {
@@ -25,6 +26,7 @@ export function Totals() {
   const company = useCurrentCompany();
   const dispatch = useDispatch();
   const formatMoney = useFormatMoney();
+  const navigate = useNavigate();
 
   const handleChange = (property: keyof Invoice, value: unknown) => {
     dispatch(
@@ -92,6 +94,8 @@ export function Totals() {
               handleChange('tax_rate1', value.value);
               handleChange('tax_name1', value.label);
             }}
+            onActionClick={() => navigate('/settings/tax_rates/create')}
+            actionLabel={t('new_tax_rate')}
           />
         </Element>
       )}
@@ -106,6 +110,8 @@ export function Totals() {
               handleChange('tax_rate2', value.value);
               handleChange('tax_name2', value.label);
             }}
+            onActionClick={() => navigate('/settings/tax_rates/create')}
+            actionLabel={t('new_tax_rate')}
           />
         </Element>
       )}
@@ -120,6 +126,8 @@ export function Totals() {
               handleChange('tax_rate3', value.value);
               handleChange('tax_name3', value.label);
             }}
+            onActionClick={() => navigate('/settings/tax_rates/create')}
+            actionLabel={t('new_tax_rate')}
           />
         </Element>
       )}
