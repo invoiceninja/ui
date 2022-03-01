@@ -27,6 +27,7 @@ export interface Company {
     tax_name1: string;
     tax_name2: string;
     tax_name3: string;
+    currency_id: string;
   };
   custom_fields: Record<string, string>;
   enabled_tax_rates: number;
