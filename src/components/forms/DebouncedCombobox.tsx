@@ -39,7 +39,9 @@ export function DebouncedCombobox(props: Props) {
         response?.data?.data?.map((resource: any) =>
           array.push({
             value: resource[props.value ?? 'id'],
-            label: resource[props.label],
+            label: props.formatLabel
+              ? props.formatLabel(resource)
+              : resource[props.label],
             internal: false,
             resource,
           })
@@ -99,9 +101,7 @@ export function DebouncedCombobox(props: Props) {
                   key={index}
                   value={record}
                 >
-                  {props.formatLabel
-                    ? props.formatLabel(record.resource)
-                    : record.label}
+                  {record.label}
                 </Combobox.Option>
               ))}
           </Combobox.Options>
