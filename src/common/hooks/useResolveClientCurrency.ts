@@ -10,16 +10,16 @@
 
 import { Client } from 'common/interfaces/client';
 import { useCurrencies } from './useCurrencies';
+import { useCurrentCompany } from './useCurrentCompany';
 
 export function useResolveClientCurrency() {
   const currencies = useCurrencies();
+  const company = useCurrentCompany();
 
   return (client: Client) => {
-    // This is right place to adjust if we want client currency
-    // Or company-level currency
+    const currencyId =
+      client?.settings?.currency_id || company?.settings?.currency_id;
 
-    return currencies.find(
-      (currency) => currency.id == client?.settings?.currency_id
-    );
+    return currencies.find((currency) => currency.id == currencyId);
   };
 }
