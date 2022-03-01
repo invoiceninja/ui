@@ -17,7 +17,7 @@ import {
   setCurrentLineItemProperty,
 } from 'common/stores/slices/invoices';
 import { RootState } from 'common/stores/store';
-import { DebouncedSearch, Record } from 'components/forms/DebouncedSearch';
+import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import { ChangeEvent } from 'react';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -88,7 +88,7 @@ export function Products() {
 
     if (property === 'product_key') {
       return (
-        <DebouncedSearch
+        <DebouncedCombobox
           endpoint="/api/v1/products"
           label="product_key"
           onChange={(value) => handleProductChange(index, value)}

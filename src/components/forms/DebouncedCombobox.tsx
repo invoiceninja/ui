@@ -24,7 +24,7 @@ interface Props {
 
 const internalRecord = { value: '', label: '', internal: true };
 
-export function DebouncedSearch(props: Props) {
+export function DebouncedCombobox(props: Props) {
   const [records, setRecords] = useState<Record[]>([internalRecord]);
   const [selectedOption, setSelectedOption] = useState(records[0]);
 

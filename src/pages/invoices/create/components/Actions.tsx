@@ -10,7 +10,7 @@
 
 import { Button } from '@invoiceninja/forms';
 import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
-import { DebouncedSearch } from 'components/forms/DebouncedSearch';
+import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
@@ -21,7 +21,7 @@ export function Actions() {
   return (
     <div className="w-full flex flex-col lg:flex-row lg:items-center space-y-3 lg:space-y-0 justify-center my-6 lg:space-x-2">
       <div className="w-full lg:w-80">
-        <DebouncedSearch
+        <DebouncedCombobox
           endpoint="/api/v1/designs"
           label="name"
           placeholder={t('search_designs')}

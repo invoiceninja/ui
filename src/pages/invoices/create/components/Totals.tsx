@@ -14,6 +14,7 @@ import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
 import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
 import { CustomField } from 'components/CustomField';
+import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useFormatMoney } from '../hooks/useFormatMoney';
@@ -78,6 +79,39 @@ export function Totals() {
           value={company.custom_fields.surcharge4}
           onChange={(value) => handleChange('custom_surcharge4', value)}
         />
+      )}
+
+      {company?.enabled_tax_rates > 0 && (
+        <Element leftSide={t('tax')}>
+          <DebouncedCombobox
+            endpoint="/api/v1/tax_rates"
+            label="name"
+            formatLabel={(resource) => `${resource.rate} ${resource.name}`}
+            onChange={(value) => console.log(value)}
+          />
+        </Element>
+      )}
+
+      {company?.enabled_tax_rates > 1 && (
+        <Element leftSide={t('tax')}>
+          <DebouncedCombobox
+            endpoint="/api/v1/tax_rates"
+            label="name"
+            formatLabel={(resource) => `${resource.rate} ${resource.name}`}
+            onChange={(value) => console.log(value)}
+          />
+        </Element>
+      )}
+
+      {company?.enabled_tax_rates > 2 && (
+        <Element leftSide={t('tax')}>
+          <DebouncedCombobox
+            endpoint="/api/v1/tax_rates"
+            label="name"
+            formatLabel={(resource) => `${resource.rate} ${resource.name}`}
+            onChange={(value) => console.log(value)}
+          />
+        </Element>
       )}
     </Card>
   );

@@ -17,7 +17,7 @@ import {
   setCurrentInvoiceProperty,
   toggleCurrentInvoiceInvitation,
 } from 'common/stores/slices/invoices';
-import { DebouncedSearch } from 'components/forms/DebouncedSearch';
+import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -71,7 +71,7 @@ export function Client() {
         <CreateClient />
       </div>
 
-      <DebouncedSearch
+      <DebouncedCombobox
         endpoint="/api/v1/clients"
         label="display_name"
         onChange={(value) =>

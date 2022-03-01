@@ -15,7 +15,7 @@ import MDEditor from '@uiw/react-md-editor';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
 import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
-import { DebouncedSearch } from 'components/forms/DebouncedSearch';
+import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
 import { ChangeEvent } from 'react';
@@ -81,7 +81,7 @@ export function Footer() {
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
                 <InputLabel>{t('project')}</InputLabel>
-                <DebouncedSearch
+                <DebouncedCombobox
                   endpoint="/api/v1/projects"
                   label="name"
                   onChange={(value) => handleChange('project_id', value.value)}
@@ -106,7 +106,7 @@ export function Footer() {
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
                 <InputLabel>{t('user')}</InputLabel>
-                <DebouncedSearch
+                <DebouncedCombobox
                   endpoint="/api/v1/users"
                   label="first_name"
                   onChange={(value) =>
@@ -117,7 +117,7 @@ export function Footer() {
 
               <div className="space-y-2">
                 <InputLabel>{t('vendor')}</InputLabel>
-                <DebouncedSearch
+                <DebouncedCombobox
                   endpoint="/api/v1/vendors"
                   label="name"
                   onChange={(value) => handleChange('vendor_id', value.value)}
