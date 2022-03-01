@@ -92,6 +92,7 @@ export function Products() {
           endpoint="/api/v1/products"
           label="product_key"
           onChange={(value) => handleProductChange(index, value)}
+          className="w-36"
         />
       );
     }
