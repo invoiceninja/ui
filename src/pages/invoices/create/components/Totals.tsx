@@ -86,8 +86,12 @@ export function Totals() {
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
             label="name"
-            formatLabel={(resource) => `${resource.rate} ${resource.name}`}
-            onChange={(value) => console.log(value)}
+            value="rate"
+            formatLabel={(resource) => `${resource.rate}% ${resource.name}`}
+            onChange={(value) => {
+              handleChange('tax_rate1', value.value);
+              handleChange('tax_name1', value.label);
+            }}
           />
         </Element>
       )}
@@ -97,8 +101,11 @@ export function Totals() {
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
             label="name"
-            formatLabel={(resource) => `${resource.rate} ${resource.name}`}
-            onChange={(value) => console.log(value)}
+            formatLabel={(resource) => `${resource.rate}% ${resource.name}`}
+            onChange={(value) => {
+              handleChange('tax_rate2', value.value);
+              handleChange('tax_name2', value.label);
+            }}
           />
         </Element>
       )}
@@ -108,8 +115,11 @@ export function Totals() {
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
             label="name"
-            formatLabel={(resource) => `${resource.rate} ${resource.name}`}
-            onChange={(value) => console.log(value)}
+            formatLabel={(resource) => `${resource.rate}% ${resource.name}`}
+            onChange={(value) => {
+              handleChange('tax_rate3', value.value);
+              handleChange('tax_name3', value.label);
+            }}
           />
         </Element>
       )}

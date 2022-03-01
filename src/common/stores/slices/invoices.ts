@@ -12,6 +12,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { ClientResolver } from 'common/helpers/clients/client-resolver';
 import { CurrencyResolver } from 'common/helpers/currencies/currency-resolver';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { Client } from 'common/interfaces/client';
 import { Currency } from 'common/interfaces/currency';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
@@ -20,8 +21,28 @@ import { cloneDeep, set } from 'lodash';
 const clientResolver = new ClientResolver();
 const currencyResolver = new CurrencyResolver();
 
-export const setCurrentLineItemProperty = createAsyncThunk(
+export const setCurrentInvoiceProperty = createAsyncThunk(
   'invoices/setCurrentInvoiceProperty',
+  async (payload: any, thunkApi) => {
+    let client: Client | undefined = undefined;
+    let currency: Currency | undefined = undefined;
+
+    const state = thunkApi.getState() as any;
+
+    if (state.invoices.current?.client_id) {
+      client = await clientResolver.find(state.invoices.current?.client_id);
+    }
+
+    if (client) {
+      currency = await currencyResolver.find(client.settings?.currency_id); // or company currency
+    }
+
+    return { client, currency, payload };
+  }
+);
+
+export const setCurrentLineItemProperty = createAsyncThunk(
+  'invoices/setCurrentLineItemProperty',
   async (payload: any, thunkApi) => {
     const state = thunkApi.getState() as any;
 
@@ -117,18 +138,6 @@ export const invoiceSlice = createSlice({
     injectBlankItemIntoCurrent: (state) => {
       state.current?.line_items.push(blankLineItem);
     },
-    setCurrentInvoiceProperty: (
-      state,
-      payload: PayloadAction<{ property: keyof Invoice; value: unknown }>
-    ) => {
-      if (state.current) {
-        state.current = set(
-          state.current,
-          payload.payload.property,
-          payload.payload.value
-        );
-      }
-    },
     toggleCurrentInvoiceInvitation: (
       state,
       payload: PayloadAction<{ contactId: string; checked: boolean }>
@@ -186,12 +195,28 @@ export const invoiceSlice = createSlice({
         cloneDeep(payload.payload.currency as Currency)
       ).build().invoice;
     });
+
+    builder.addCase(setCurrentInvoiceProperty.fulfilled, (state, payload) => {
+      if (state.current) {
+        state.current = set(
+          state.current,
+          payload.payload.payload.property,
+          payload.payload.payload.value
+        );
+
+        if (payload.payload.client && payload.payload.currency) {
+          state.current = new InvoiceSum(
+            cloneDeep(state.current),
+            cloneDeep(payload.payload.currency)
+          ).build().invoice;
+        }
+      }
+    });
   },
 });
 
 export const {
   setCurrentInvoice,
   injectBlankItemIntoCurrent,
-  setCurrentInvoiceProperty,
   toggleCurrentInvoiceInvitation,
 } = invoiceSlice.actions;
