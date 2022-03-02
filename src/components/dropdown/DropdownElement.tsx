@@ -13,6 +13,7 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   to?: string;
+  setVisible?: (value: boolean) => any;
 }
 
 export function DropdownElement(props: Props) {
@@ -29,7 +30,10 @@ export function DropdownElement(props: Props) {
 
   return (
     <button
-      onClick={props.onClick}
+      onClick={(event) => {
+        props.onClick(event);
+        props.setVisible && props.setVisible(false);
+      }}
       ref={props.innerRef}
       className="w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
     >
