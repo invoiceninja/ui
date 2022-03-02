@@ -16,6 +16,7 @@ import { endpoint } from 'common/helpers';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { usePaymentQuery } from 'common/queries/payments';
+import { useStaticsQuery } from 'common/queries/statics';
 import { Container } from 'components/Container';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
@@ -25,33 +26,36 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
+import Select from 'react-select';
 
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
   const { data: payment } = usePaymentQuery({ id });
+  const [convertedCurrency, setconvertedCurrency] = useState(1);
+  const [exchangeRate, setexchangeRate] = useState(1.0);
   const queryClient = useQueryClient();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [changeCurrency, setchangeCurrency] = useState(false);
+  const { data: statistic } = useStaticsQuery();
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
       number: payment?.data.data.number || '',
       amount: payment?.data.data.amount || 0,
       date: payment?.data.data.date || '',
-      type_id: payment?.data.data.type_id || 0,
+      type_id: payment?.data.data.type_id || '',
       transaction_reference: payment?.data.data.transaction_reference || '',
       private_notes: payment?.data.data.private_notes || '',
     },
     onSubmit: (values) => {
-      console.log('values', values);
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
       axios
         .put(endpoint('/api/v1/payments/:id', { id }), values, {
           headers: defaultHeaders,
         })
-        .then((data) => {
-          console.log(data);
+        .then(() => {
           toast.success(t('updated_payment'), { id: toastId });
         })
         .catch((error: AxiosError) => {
@@ -69,6 +73,15 @@ export function Edit() {
         });
     },
   });
+  const options: any[] = [];
+
+  statistic?.data.currencies.forEach((element: any) => {
+    options.push({
+      value: element.id,
+      label: element.name,
+      exchangeRate: element.exchange_rate,
+    });
+  });
 
   return (
     <Default>
@@ -79,7 +92,7 @@ export function Edit() {
           onFormSubmit={formik.handleSubmit}
           withSaveButton
         >
-          <div className="bg-white p-8 w-full rounded shadow my-4">
+          <div className="bg-white p-6 w-full rounded shadow my-3">
             <Element leftSide={t('payment_number')}>
               <InputField
                 id="number"
@@ -97,14 +110,20 @@ export function Edit() {
               ></InputField>
             </Element>
             <Element leftSide={t('payment_type')}>
-              <SelectField
-                id="payment_type"
-                value={formik.values.type_id}
-                onChange={formik.handleChange}
-              >
-                {Object.values(paymentType).map((value: any, index: any) => {
-                  console.log(value, index);
-                  return <option key={index}>{t(value)}</option>;
+              <SelectField id="type_id" onChange={formik.handleChange}>
+                {Object.entries(paymentType).map((value: any, index: any) => {
+                  if (value[0] === formik.values.type_id) {
+                    return (
+                      <option value={String(value[0])} selected>
+                        {t(value[1])}
+                      </option>
+                    );
+                  } else
+                    return (
+                      <option key={index} value={String(value[0])}>
+                        {t(value[1])}
+                      </option>
+                    );
                 })}
               </SelectField>
             </Element>
@@ -123,9 +142,37 @@ export function Edit() {
               ></Textarea>
             </Element>
             <Element leftSide="Change currency">
-              <Toggle></Toggle>{' '}
+              <Toggle
+                value={changeCurrency}
+                onChange={() => {
+                  setchangeCurrency(!changeCurrency);
+                }}
+              />
             </Element>
           </div>
+          {changeCurrency && (
+            <div className="bg-white p-6 w-full rounded shadow my-3 z-30">
+              <Element leftSide={t('currency')}>
+                <Select
+                  onChange={(option: any) => {
+                    setconvertedCurrency(
+                      option.exchangeRate * formik.values.amount
+                    );
+                    setexchangeRate(option.exchangeRate);
+                  }}
+                  placeholder={t('status')}
+                  options={options}
+                />
+              </Element>
+              <Element leftSide={t('exchange_rate')}>
+                <InputField value={exchangeRate}></InputField>
+              </Element>
+              {console.log(statistic?.data.currencies)}
+              <Element leftSide={t('converted_amount')}>
+                <InputField value={convertedCurrency}></InputField>
+              </Element>
+            </div>
+          )}
         </Card>
       </Container>
     </Default>
