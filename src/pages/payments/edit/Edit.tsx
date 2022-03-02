@@ -9,8 +9,9 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { InputField, Textarea } from '@invoiceninja/forms';
+import { InputField, SelectField, Textarea } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
+import paymentType from 'common/constants/payment-type';
 import { endpoint } from 'common/helpers';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -31,7 +32,6 @@ export function Edit() {
   const { data: payment } = usePaymentQuery({ id });
   const queryClient = useQueryClient();
   const [errors, setErrors] = useState<ValidationBag>();
-  //for some reason formik doesnt update values
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -80,47 +80,47 @@ export function Edit() {
           withSaveButton
         >
           <div className="bg-white p-8 w-full rounded shadow my-4">
-            <Element leftSide="Number">
+            <Element leftSide={t('payment_number')}>
               <InputField
                 id="number"
-                label={t('payment_number')}
                 value={formik.values.number}
-              ></InputField>
-            </Element>
-            <Element leftSide="Amount">
-              <InputField
-                label={t('amount')}
-                type="number"
-                id="amount"
-                value={formik.values.amount}
                 onChange={formik.handleChange}
                 errorMessage={errors?.errors.payment_amount}
               ></InputField>
             </Element>
-            <Element leftSide="Date">
+            <Element leftSide={t('payment_date')}>
               <InputField
                 id="date"
-                label={t('payment_date')}
                 type="date"
                 value={formik.values.date}
+                onChange={formik.handleChange}
               ></InputField>
             </Element>
-            <Element leftSide="payment_type">
-              <InputField
+            <Element leftSide={t('payment_type')}>
+              <SelectField
                 id="payment_type"
-                label={t('payment_type')}
                 value={formik.values.type_id}
-              ></InputField>
+                onChange={formik.handleChange}
+              >
+                {Object.values(paymentType).map((value: any, index: any) => {
+                  console.log(value, index);
+                  return <option key={index}>{t(value)}</option>;
+                })}
+              </SelectField>
             </Element>
-            <Element leftSide="payment_reference">
+            <Element leftSide={t('transaction_reference')}>
               <InputField
                 id="transaction_reference"
-                label={t('transaction_reference')}
+                onChange={formik.handleChange}
                 value={formik.values.transaction_reference}
               ></InputField>
             </Element>
-            <Element leftSide="private_notes">
-              <Textarea label={t('private_notes')}></Textarea>
+            <Element leftSide={t('private_notes')}>
+              <Textarea
+                id="private_notes"
+                value={formik.values.private_notes}
+                onChange={formik.handleChange}
+              ></Textarea>
             </Element>
             <Element leftSide="Change currency">
               <Toggle></Toggle>{' '}
