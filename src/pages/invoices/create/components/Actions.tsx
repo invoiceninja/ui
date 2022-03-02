@@ -9,6 +9,7 @@
  */
 
 import { Button } from '@invoiceninja/forms';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +18,7 @@ import { useDispatch } from 'react-redux';
 export function Actions() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
+  const company = useCurrentCompany();
 
   return (
     <div className="w-full flex flex-col lg:flex-row lg:items-center space-y-3 lg:space-y-0 justify-center my-6 lg:space-x-2">
@@ -33,6 +35,7 @@ export function Actions() {
               })
             )
           }
+          defaultValue={company?.settings?.invoice_design_id}
         />
       </div>
 
