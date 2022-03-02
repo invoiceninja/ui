@@ -26,6 +26,10 @@ export const store = configureStore({
     settings: settingsSlice.reducer,
     invoices: invoiceSlice.reducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 setupListeners(store.dispatch);

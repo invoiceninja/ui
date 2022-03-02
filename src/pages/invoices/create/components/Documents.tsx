@@ -9,13 +9,17 @@
  */
 
 import { Button } from '@invoiceninja/forms';
+import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
 import { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 export function Documents() {
   const [t] = useTranslation();
+  const dispatch = useDispatch();
   const [files, setFiles] = useState<File[]>([]);
+
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles) => {
       acceptedFiles.map((file) =>
@@ -33,6 +37,10 @@ export function Documents() {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     files.forEach((file) => URL.revokeObjectURL(file.preview));
+
+    dispatch(
+      setCurrentInvoiceProperty({ property: 'documents', value: files })
+    );
   }, [files]);
 
   const remove = (index: number) => {
