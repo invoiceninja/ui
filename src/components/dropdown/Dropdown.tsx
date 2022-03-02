@@ -29,6 +29,8 @@ export function Dropdown(props: Props) {
           <div
             className={`box w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none ${props.className}`}
           >
+            {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
+            {/* @ts-ignore */}
             {props.children?.map((child) =>
               child ? cloneElement(child, { setVisible }) : child
             )}
