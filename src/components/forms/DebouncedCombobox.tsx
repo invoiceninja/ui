@@ -22,6 +22,7 @@ interface Props {
   formatLabel?: (resource: any) => any;
   onActionClick?: () => any;
   actionLabel?: string;
+  defaultValue?: string | number | boolean;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -29,6 +30,8 @@ const internalRecord = { value: '', label: '', internal: true };
 export function DebouncedCombobox(props: Props) {
   const [records, setRecords] = useState<Record[]>([internalRecord]);
   const [selectedOption, setSelectedOption] = useState(records[0]);
+
+  const defaultValueProperty = props.defaultValue || '';
 
   const request = (query: string) => {
     axios
@@ -73,6 +76,16 @@ export function DebouncedCombobox(props: Props) {
   useEffect(() => {
     props.onChange(selectedOption);
   }, [selectedOption]);
+
+  useEffect(() => {
+    const potential = records.find(
+      (record) => record.value == defaultValueProperty
+    );
+
+    if (potential) {
+      setSelectedOption(potential);
+    }
+  }, [records]);
 
   return (
     <div className={`w-full ${props.className}`}>
