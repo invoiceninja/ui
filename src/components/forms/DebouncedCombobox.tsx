@@ -94,7 +94,17 @@ export function DebouncedCombobox(props: Props) {
           </div>
         </div>
         {records.filter((record) => !record.internal).length >= 1 && (
-          <Combobox.Options className="absolute z-10 w-80 py-1 mt-1 overflow-auto text-base bg-white rounded-md shadow-xl max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+          <Combobox.Options className="absolute z-10 w-80 py-1 mt-2.5 overflow-auto text-base bg-white rounded-md shadow-xl max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            {props.onActionClick && props.actionLabel && (
+              <button
+                className="w-full bg-gray-100 -mt-1 border-b cursor-pointer select-none relative py-2 px-3 text-gray-900"
+                type="button"
+                onClick={props.onActionClick}
+              >
+                {props.actionLabel}
+              </button>
+            )}
+
             {records
               .filter((record) => !record.internal)
               .map((record, index) => (
@@ -106,16 +116,6 @@ export function DebouncedCombobox(props: Props) {
                   {record.label}
                 </Combobox.Option>
               ))}
-
-            {props.onActionClick && props.actionLabel && (
-              <button
-                className="cursor-pointer select-none relative py-2 px-3 text-gray-900 hover:bg-gray-100 w-full"
-                type="button"
-                onClick={props.onActionClick}
-              >
-                {props.actionLabel}
-              </button>
-            )}
           </Combobox.Options>
         )}
       </Combobox>
