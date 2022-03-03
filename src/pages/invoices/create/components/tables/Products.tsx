@@ -8,23 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputField } from '@invoiceninja/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
-import { InvoiceItem } from 'common/interfaces/invoice-item';
 import {
   deleteInvoiceLineItem,
   injectBlankItemIntoCurrent,
-  setCurrentLineItemProperty,
 } from 'common/stores/slices/invoices';
 import { RootState } from 'common/stores/store';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
-import { ChangeEvent } from 'react';
+import { useResolveInputField } from 'pages/invoices/common/hooks/useResolveInputField';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { generatePath, useNavigate } from 'react-router-dom';
-import { resolveProperty } from '../../helpers/resolve-property';
-import { useFormatMoney } from '../../hooks/useFormatMoney';
 import { useProductColumns } from '../../hooks/useProductColumns';
 import { useResolveTranslation } from '../../hooks/useResolveTranslation';
 
@@ -34,101 +27,7 @@ export function Products() {
   const columns = useProductColumns();
   const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
-  const formatMoney = useFormatMoney();
-  const navigate = useNavigate();
-
-  const onChange = (key: keyof InvoiceItem, value: unknown, index: number) => {
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: key,
-        value,
-      })
-    );
-  };
-
-  const handleProductChange = (index: number, value: Record) => {
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'product_key',
-        value: value.label,
-      })
-    );
-
-    if (!value.internal && value.resource) {
-      dispatch(
-        setCurrentLineItemProperty({
-          position: index,
-          property: 'cost',
-          value: value.resource?.cost || 0,
-        })
-      );
-    }
-
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'notes',
-        value: value.resource?.notes || '',
-      })
-    );
-  };
-
-  const resolveInputField = (key: string, index: number) => {
-    const property = resolveProperty(key);
-
-    const numberInputs = [
-      'discount',
-      'cost',
-      'unit_cost',
-      'quantity',
-      'tax_rate1',
-      'tax_rate2',
-      'tax_rate3',
-    ];
-
-    if (property === 'product_key') {
-      return (
-        <DebouncedCombobox
-          endpoint="/api/v1/products"
-          label="product_key"
-          onChange={(value) => handleProductChange(index, value)}
-          className="w-36"
-          onActionClick={() => navigate(generatePath('/products/create'))}
-          actionLabel={t('new_product')}
-        />
-      );
-    }
-
-    if (numberInputs.includes(property)) {
-      return (
-        <InputField
-          id={property}
-          type="number"
-          value={invoice?.line_items[index][property]}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onChange(property, parseFloat(event.target.value), index)
-          }
-          className="w-24"
-        />
-      );
-    }
-
-    if (['line_total'].includes(property)) {
-      return formatMoney(invoice?.line_items[index][property] as number);
-    }
-
-    return (
-      <InputField
-        id={property}
-        value={invoice?.line_items[index][property]}
-        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          onChange(property, event.target.value, index)
-        }
-      />
-    );
-  };
+  const resolveInputField = useResolveInputField();
 
   return (
     <div>
