@@ -26,7 +26,7 @@ import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
 import { Actions } from './components/Actions';
 import { Client } from './components/clients/Client';
-import { InvoiceDetails } from '../components/InvoiceDetails';
+import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { Footer } from './components/Footer';
 import { Table } from './components/tables/Table';
 import { Totals } from './components/Totals';

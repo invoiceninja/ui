@@ -17,8 +17,9 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
-import { ClientSelector } from '../components/ClientSelector';
-import { InvoiceDetails } from '../components/InvoiceDetails';
+import { ClientSelector } from '../common/components/ClientSelector';
+import { InvoiceDetails } from '../common/components/InvoiceDetails';
+import { ProductsTable } from '../common/components/ProductsTable';
 
 export function Edit() {
   const { id } = useParams();
@@ -46,6 +47,10 @@ export function Edit() {
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector readonly />
         <InvoiceDetails />
+
+        <div className="col-span-12">
+          <ProductsTable />
+        </div>
       </div>
     </Default>
   );

@@ -18,7 +18,7 @@ import {
   toggleCurrentInvoiceInvitation,
 } from 'common/stores/slices/invoices';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
-import { ClientCreate } from 'pages/invoices/components/ClientCreate';
+import { ClientCreate } from 'pages/invoices/common/components/ClientCreate';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
