@@ -46,7 +46,7 @@ export function Expenses() {
     },
     {
       id: 'entity_status',
-      label: t('entity_status'),
+      label: t('entity_state'),
       format: (value, resource) => <EntityStatus entity={resource} />,
     },
   ];
