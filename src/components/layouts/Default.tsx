@@ -286,38 +286,41 @@ export function Default(props: Props) {
             <div className="mt-5 flex-grow flex flex-col">
               <nav className="flex-1 pb-4 space-y-1">
                 {navigation.map((item) => (
-                  <Link
+                  <div
                     key={item.name}
-                    to={item.href}
                     className={classNames(
+                      'flex items-center justify-between',
                       item.current
                         ? 'border-l-4 border-transparent bg-ninja-gray-darker text-gray-100 dark:bg-gray-700 dark:text-gray-100'
                         : 'border-l-4 border-transparent text-gray-100 hover:bg-ninja-gray-darker dark:hover:bg-gray-700 dark:hover:text-gray-100',
                       'group flex items-center justify-between px-4 text-sm font-medium'
                     )}
                   >
-                    <div className="flex justify-start items-center my-2">
-                      <item.icon
-                        className={classNames(
-                          item.current
-                            ? 'dark:text-gray-100'
-                            : 'dark:group-hover:text-gray-100',
-                          'text-gray-100 mr-3 flex-shrink-0 h-6 w-6'
-                        )}
-                        aria-hidden="true"
-                      />
-                      {item.name}
-                    </div>
+                    <Link to={item.href} className="w-full">
+                      <div className="flex justify-start items-center my-2">
+                        <item.icon
+                          className={classNames(
+                            item.current
+                              ? 'dark:text-gray-100'
+                              : 'dark:group-hover:text-gray-100',
+                            'text-gray-100 mr-3 flex-shrink-0 h-6 w-6'
+                          )}
+                          aria-hidden="true"
+                        />
+                        {item.name}
+                      </div>
+                    </Link>
+
                     {item.rightButton && (
-                      <button
-                        onClick={() => navigate(item.rightButton.to)}
+                      <Link
+                        to={item.rightButton.to}
                         title={item.rightButton.label}
                         className="hover:bg-gray-200 hover:bg-opacity-10 rounded-full p-1.5"
                       >
                         <item.rightButton.icon />
-                      </button>
+                      </Link>
                     )}
-                  </Link>
+                  </div>
                 ))}
               </nav>
 
