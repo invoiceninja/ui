@@ -13,24 +13,18 @@ import { Card } from '@invoiceninja/cards';
 import { InputField, InputLabel } from '@invoiceninja/forms';
 import MDEditor from '@uiw/react-md-editor';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { Invoice } from 'common/interfaces/invoice';
-import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { Documents } from './Documents';
+import { Documents } from '../../create/components/Documents';
+import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 
 export function Footer() {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
   const invoice = useCurrentInvoice();
-
-  const handleChange = (property: keyof Invoice, value: unknown) => {
-    dispatch(setCurrentInvoiceProperty({ property, value }));
-  };
+  const handleChange = useSetCurrentInvoiceProperty();
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
@@ -85,6 +79,7 @@ export function Footer() {
                   endpoint="/api/v1/projects"
                   label="name"
                   onChange={(value) => handleChange('project_id', value.value)}
+                  defaultValue={invoice?.project_id}
                 />
               </div>
 
@@ -112,6 +107,7 @@ export function Footer() {
                   onChange={(value) =>
                     handleChange('assigned_user_id', value.value)
                   }
+                  defaultValue={invoice?.assigned_user_id}
                 />
               </div>
 
@@ -121,6 +117,7 @@ export function Footer() {
                   endpoint="/api/v1/vendors"
                   label="name"
                   onChange={(value) => handleChange('vendor_id', value.value)}
+                  defaultValue={invoice?.vendor_id}
                 />
               </div>
 

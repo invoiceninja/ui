@@ -27,7 +27,7 @@ import { generatePath } from 'react-router-dom';
 import { Actions } from './components/Actions';
 import { Client } from './components/clients/Client';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
-import { Footer } from './components/Footer';
+import { Footer } from '../common/components/Footer';
 import { Table } from './components/tables/Table';
 import { Totals } from './components/Totals';
 

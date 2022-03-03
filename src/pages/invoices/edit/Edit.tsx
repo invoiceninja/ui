@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
 import { ClientSelector } from '../common/components/ClientSelector';
+import { Footer } from '../common/components/Footer';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { ProductsTable } from '../common/components/ProductsTable';
 
@@ -51,6 +52,8 @@ export function Edit() {
         <div className="col-span-12">
           <ProductsTable />
         </div>
+
+        <Footer />
       </div>
     </Default>
   );
