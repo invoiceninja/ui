@@ -11,31 +11,21 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { Invoice } from 'common/interfaces/invoice';
-import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
 import { CustomField } from 'components/CustomField';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
+import { useSetCurrentInvoiceProperty } from 'pages/invoices/common/hooks/useSetCurrentInvoiceProperty';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { useFormatMoney } from '../hooks/useFormatMoney';
+import { useFormatMoney } from '../../create/hooks/useFormatMoney';
 
-export function Totals() {
+export function InvoiceTotals() {
   const [t] = useTranslation();
   const invoice = useCurrentInvoice();
   const company = useCurrentCompany();
-  const dispatch = useDispatch();
   const formatMoney = useFormatMoney();
   const navigate = useNavigate();
 
-  const handleChange = (property: keyof Invoice, value: unknown) => {
-    dispatch(
-      setCurrentInvoiceProperty({
-        property,
-        value,
-      })
-    );
-  };
+  const handleChange = useSetCurrentInvoiceProperty();
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
@@ -96,6 +86,7 @@ export function Totals() {
             }}
             onActionClick={() => navigate('/settings/tax_rates/create')}
             actionLabel={t('new_tax_rate')}
+            defaultValue={invoice?.tax_rate1}
           />
         </Element>
       )}
@@ -112,6 +103,7 @@ export function Totals() {
             }}
             onActionClick={() => navigate('/settings/tax_rates/create')}
             actionLabel={t('new_tax_rate')}
+            defaultValue={invoice?.tax_rate2}
           />
         </Element>
       )}
@@ -128,6 +120,7 @@ export function Totals() {
             }}
             onActionClick={() => navigate('/settings/tax_rates/create')}
             actionLabel={t('new_tax_rate')}
+            defaultValue={invoice?.tax_rate3}
           />
         </Element>
       )}

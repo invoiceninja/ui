@@ -18,9 +18,10 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
 import { ClientSelector } from '../common/components/ClientSelector';
-import { Footer } from '../common/components/Footer';
+import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { ProductsTable } from '../common/components/ProductsTable';
+import { InvoiceTotals } from '../common/components/InvoiceTotals';
 
 export function Edit() {
   const { id } = useParams();
@@ -53,7 +54,8 @@ export function Edit() {
           <ProductsTable />
         </div>
 
-        <Footer />
+        <InvoiceFooter />
+        <InvoiceTotals />
       </div>
     </Default>
   );

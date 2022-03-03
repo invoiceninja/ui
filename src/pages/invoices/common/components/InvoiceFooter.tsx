@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { Documents } from '../../create/components/Documents';
 import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 
-export function Footer() {
+export function InvoiceFooter() {
   const [t] = useTranslation();
   const invoice = useCurrentInvoice();
   const handleChange = useSetCurrentInvoiceProperty();

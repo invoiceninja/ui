@@ -27,9 +27,9 @@ import { generatePath } from 'react-router-dom';
 import { Actions } from './components/Actions';
 import { Client } from './components/clients/Client';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
-import { Footer } from '../common/components/Footer';
+import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { Table } from './components/tables/Table';
-import { Totals } from './components/Totals';
+import { InvoiceTotals } from '../common/components/InvoiceTotals';
 
 export function Create() {
   const [t] = useTranslation();
@@ -82,8 +82,8 @@ export function Create() {
         <Client />
         <InvoiceDetails />
         <Table />
-        <Footer />
-        <Totals />
+        <InvoiceFooter />
+        <InvoiceTotals />
       </div>
 
       <Actions />
