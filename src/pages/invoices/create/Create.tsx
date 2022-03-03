@@ -26,7 +26,7 @@ import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
 import { Actions } from './components/Actions';
 import { Client } from './components/clients/Client';
-import { Details } from './components/Details';
+import { InvoiceDetails } from '../components/InvoiceDetails';
 import { Footer } from './components/Footer';
 import { Table } from './components/tables/Table';
 import { Totals } from './components/Totals';
@@ -80,7 +80,7 @@ export function Create() {
     <Default title={t('new_invoice')} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-4">
         <Client />
-        <Details />
+        <InvoiceDetails />
         <Table />
         <Footer />
         <Totals />

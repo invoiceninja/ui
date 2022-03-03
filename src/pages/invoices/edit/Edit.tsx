@@ -18,12 +18,13 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
 import { ClientSelector } from '../components/ClientSelector';
+import { InvoiceDetails } from '../components/InvoiceDetails';
 
 export function Edit() {
   const { id } = useParams();
   const { documentTitle } = useTitle('edit_invoice');
-  const [t] = useTranslation();
   const { data: invoice } = useInvoiceQuery({ id });
+  const [t] = useTranslation();
   const dispatch = useDispatch();
 
   const pages: BreadcrumRecord[] = [
@@ -44,6 +45,7 @@ export function Edit() {
     <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector readonly />
+        <InvoiceDetails />
       </div>
     </Default>
   );

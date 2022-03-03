@@ -19,7 +19,7 @@ import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
-export function Details() {
+export function InvoiceDetails() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const invoice = useCurrentInvoice();
@@ -43,6 +43,7 @@ export function Details() {
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
               handleChange('date', event.target.value)
             }
+            value={invoice?.date || ''}
           />
         </Element>
 
@@ -52,6 +53,7 @@ export function Details() {
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
               handleChange('due_date', event.target.value)
             }
+            value={invoice?.due_date || ''}
           />
         </Element>
 
@@ -62,6 +64,7 @@ export function Details() {
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
               handleChange('partial', parseFloat(event.target.value))
             }
+            value={invoice?.partial || ''}
           />
         </Element>
 
@@ -72,6 +75,7 @@ export function Details() {
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleChange('partial_due_date', event.target.value)
               }
+              value={invoice?.partial_due_date || ''}
             />
           </Element>
         )}
@@ -102,6 +106,7 @@ export function Details() {
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
               handleChange('number', event.target.value)
             }
+            value={invoice?.number || ''}
           />
         </Element>
 
@@ -111,6 +116,7 @@ export function Details() {
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
               handleChange('po_number', event.target.value)
             }
+            value={invoice?.po_number || ''}
           />
         </Element>
 
@@ -122,6 +128,7 @@ export function Details() {
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   handleChange('discount', parseFloat(event.target.value))
                 }
+                value={invoice?.discount || ''}
               />
             </div>
 
@@ -133,6 +140,7 @@ export function Details() {
                     JSON.parse(event.target.value)
                   )
                 }
+                value={invoice?.is_amount_discount.toString()}
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
