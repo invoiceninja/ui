@@ -37,6 +37,9 @@ export function Edit() {
       state: vendor?.data.data.state,
       postal_code: vendor?.data.data.postal_code,
       country_id: vendor?.data.data.country_id,
+      currency: vendor?.data.data.currency_id,
+      private_notes: vendor?.data.data.private_notes,
+      public_notes: vendor?.data.data.public_notes,
     },
     onSubmit: () => {
       console.log('value');

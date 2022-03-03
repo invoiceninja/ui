@@ -9,8 +9,9 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
+import { InputField, Textarea } from '@invoiceninja/forms';
 import { useTranslation } from 'react-i18next';
+import Select, { MultiValue, SingleValue } from 'react-select';
 
 type Props = { data?: any };
 
@@ -20,13 +21,13 @@ export function AdditionalInfo(props: Props) {
   return (
     <Card title={t('additional_info')} className="mb-5">
       <Element leftSide={t('currency')}>
-        <InputField></InputField>
+        <Select value={props.data.curreny_id} />
       </Element>
       <Element leftSide={t('public_notes')}>
-        <InputField></InputField>
+        <Textarea value={props.data.public_notes}></Textarea>
       </Element>
       <Element leftSide={t('private_notes')}>
-        <InputField></InputField>
+        <Textarea value={props.data.private_notes}></Textarea>
       </Element>
     </Card>
   );
