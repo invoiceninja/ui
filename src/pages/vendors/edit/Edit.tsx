@@ -25,7 +25,12 @@ export function Edit() {
     enableReinitialize: true,
     initialValues: {
       name: vendor?.data.data.name,
-      number:vendor?.data.data.number
+      number: vendor?.data.data.number,
+      user: vendor?.data.data.user_id,
+      id_number: vendor?.data.data.id_number,
+      vat_number: vendor?.data.data.vat_number,
+      website: vendor?.data.data.website,
+      phone: vendor?.data.data.phone,
     },
     onSubmit: () => {
       console.log('value');
@@ -37,12 +42,12 @@ export function Edit() {
       <div className="flex flex-col xl:flex-row xl:gap-4">
         <div className="w-full xl:w-1/2">
           <Details data={formik.values}></Details>
-          <Address></Address>
+          <Address data={formik.values}></Address>
         </div>
         {console.log(vendor?.data.data.name)}
         <div className="w-full xl:w-1/2">
-          <AdditionalInfo></AdditionalInfo>
-          <Contacts></Contacts>
+          <AdditionalInfo data={formik.values}></AdditionalInfo>
+          <Contacts data={formik.values}></Contacts>
         </div>
       </div>
     </Default>

@@ -19,25 +19,25 @@ export function Details(props: Props) {
   return (
     <Card title={t('details')} className="mb-5">
       <Element leftSide={t('name')}>
-        <InputField></InputField>
+        <InputField value={props.data.name} />
       </Element>
       <Element leftSide={t('number')}>
-        <InputField></InputField>
+        <InputField value={props.data.number} />
       </Element>
       <Element leftSide={t('user')}>
-        <InputField></InputField>
+        <InputField value={props.data.user} />
       </Element>
       <Element leftSide={t('id_number')}>
-        <InputField></InputField>
+        <InputField value={props.data.id_number} />
       </Element>
       <Element leftSide={t('vat_number')}>
-        <InputField></InputField>
+        <InputField value={props.data.vat_number} />
       </Element>
       <Element leftSide={t('website')}>
-        <InputField></InputField>
+        <InputField value={props.data.website} />
       </Element>
       <Element leftSide={t('phone')}>
-        <InputField></InputField>
+        <InputField value={props.data.phone} />
       </Element>
     </Card>
   );
