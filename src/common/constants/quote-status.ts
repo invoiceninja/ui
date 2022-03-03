@@ -12,8 +12,8 @@ import { QuoteStatus } from 'common/enums/quote-status';
 
 export default {
   [QuoteStatus.Draft]: 'draft',
-  [QuoteStatus.Active]: 'active',
-  [QuoteStatus.Paused]: 'paused',
-  [QuoteStatus.Completed]: 'completed',
-  [QuoteStatus.Pending]: 'pending',
+  [QuoteStatus.Sent]: 'sent',
+  [QuoteStatus.Approved]: 'approved',
+  [QuoteStatus.Converted]: 'converted',
+  [QuoteStatus.Expired]: 'expired',
 };

@@ -10,8 +10,8 @@
 
 export const enum QuoteStatus {
   Draft = '1',
-  Active = '2',
-  Paused = '3',
-  Completed = '4',
-  Pending = '-1',
+  Sent = '2',
+  Approved = '3',
+  Converted = '4',
+  Expired = '-1',
 }
