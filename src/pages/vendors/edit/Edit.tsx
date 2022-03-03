@@ -31,6 +31,12 @@ export function Edit() {
       vat_number: vendor?.data.data.vat_number,
       website: vendor?.data.data.website,
       phone: vendor?.data.data.phone,
+      address1: vendor?.data.data.address1,
+      address2: vendor?.data.data.address2,
+      city: vendor?.data.data.city,
+      state: vendor?.data.data.state,
+      postal_code: vendor?.data.data.postal_code,
+      country_id: vendor?.data.data.country_id,
     },
     onSubmit: () => {
       console.log('value');
@@ -44,7 +50,7 @@ export function Edit() {
           <Details data={formik.values}></Details>
           <Address data={formik.values}></Address>
         </div>
-        {console.log(vendor?.data.data.name)}
+        {console.log(vendor?.data.data)}
         <div className="w-full xl:w-1/2">
           <AdditionalInfo data={formik.values}></AdditionalInfo>
           <Contacts data={formik.values}></Contacts>

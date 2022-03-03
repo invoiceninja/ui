@@ -20,22 +20,22 @@ export function Address(props: Props) {
   return (
     <Card title={t('address')} className="mb-5">
       <Element leftSide={t('address1')}>
-        <InputField></InputField>
+        <InputField value={props.data.address1} />
       </Element>
       <Element leftSide={t('address2')}>
-        <InputField></InputField>
+        <InputField value={props.data.address2} />
       </Element>
       <Element leftSide={t('city')}>
-        <InputField></InputField>
+        <InputField value={props.data.city} />
       </Element>
       <Element leftSide={t('state')}>
-        <InputField></InputField>
+        <InputField value={props.data.state} />
       </Element>
       <Element leftSide={t('postal_code')}>
-        <InputField></InputField>
+        <InputField value={props.data.postal_code} />
       </Element>
       <Element leftSide={t('country_id')}>
-        <InputField></InputField>
+        <InputField value={props.data.country_id} />
       </Element>
     </Card>
   );
