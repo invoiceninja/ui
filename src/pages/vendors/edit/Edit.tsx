@@ -40,6 +40,7 @@ export function Edit() {
       currency: vendor?.data.data.currency_id,
       private_notes: vendor?.data.data.private_notes,
       public_notes: vendor?.data.data.public_notes,
+      contacts: vendor?.data.data.contacts,
     },
     onSubmit: () => {
       console.log('value');
@@ -56,7 +57,7 @@ export function Edit() {
         {console.log(vendor?.data.data)}
         <div className="w-full xl:w-1/2">
           <AdditionalInfo data={formik.values}></AdditionalInfo>
-          <Contacts data={formik.values}></Contacts>
+          <Contacts data={formik.values.contacts}></Contacts>
         </div>
       </div>
     </Default>

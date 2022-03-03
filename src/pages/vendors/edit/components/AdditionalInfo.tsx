@@ -9,9 +9,9 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { InputField, Textarea } from '@invoiceninja/forms';
+import { Textarea } from '@invoiceninja/forms';
 import { useTranslation } from 'react-i18next';
-import Select, { MultiValue, SingleValue } from 'react-select';
+import Select from 'react-select';
 
 type Props = { data?: any };
 

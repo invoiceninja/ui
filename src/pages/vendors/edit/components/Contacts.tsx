@@ -20,9 +20,11 @@ export function Contacts(props: Props) {
 
   return (
     <Card title={t('contacts')} className="mb-5">
+      {console.log(props.data)}
       <Element leftSide={t('contacts')}>
-       <Contact/>
-       <Contact/><Contact/><Contact/><Contact/><Contact/><Contact/>
+       {props.data && props.data.map((contact:any,index:any)=>{
+return (<Contact data={contact} key={index}/>)
+       })}
       </Element>
     </Card>
   );
