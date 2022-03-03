@@ -23,6 +23,7 @@ interface Props {
   onActionClick?: () => any;
   actionLabel?: string;
   defaultValue?: string | number | boolean;
+  disabled?: boolean;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -30,8 +31,11 @@ const internalRecord = { value: '', label: '', internal: true };
 export function DebouncedCombobox(props: Props) {
   const [records, setRecords] = useState<Record[]>([internalRecord]);
   const [selectedOption, setSelectedOption] = useState(records[0]);
+  const [defaultValueProperty, setDefaultValueProperty] = useState('');
 
-  const defaultValueProperty = props.defaultValue || '';
+  useEffect(() => {
+    setDefaultValueProperty(props.defaultValue as string);
+  }, [props.defaultValue]);
 
   const request = (query: string) => {
     axios
@@ -74,7 +78,9 @@ export function DebouncedCombobox(props: Props) {
   useEffect(() => request(''), []);
 
   useEffect(() => {
-    props.onChange(selectedOption);
+    if (!props.disabled) {
+      props.onChange(selectedOption);
+    }
   }, [selectedOption]);
 
   useEffect(() => {
@@ -85,11 +91,15 @@ export function DebouncedCombobox(props: Props) {
     if (potential) {
       setSelectedOption(potential);
     }
-  }, [records]);
+  }, [records, defaultValueProperty]);
 
   return (
     <div className={`w-full ${props.className}`}>
-      <Combobox value={selectedOption} onChange={setSelectedOption}>
+      <Combobox
+        value={selectedOption}
+        onChange={setSelectedOption}
+        disabled={props.disabled}
+      >
         <div className="relative mt-1">
           <div className="relative w-full">
             <Combobox.Input
