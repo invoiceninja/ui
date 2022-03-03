@@ -53,7 +53,6 @@ export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [t] = useTranslation();
   const location = useLocation();
-  const navigate = useNavigate();
 
   const navigation = [
     {
