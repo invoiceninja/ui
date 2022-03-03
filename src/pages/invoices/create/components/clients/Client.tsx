@@ -18,10 +18,10 @@ import {
   toggleCurrentInvoiceInvitation,
 } from 'common/stores/slices/invoices';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
+import { ClientCreate } from 'pages/invoices/components/ClientCreate';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { CreateClient } from './CreateClient';
 
 export function Client() {
   const [t] = useTranslation();
@@ -68,7 +68,7 @@ export function Client() {
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex items-center justify-between">
         <InputLabel>{t('client')}</InputLabel>
-        <CreateClient />
+        <ClientCreate />
       </div>
 
       <DebouncedCombobox
