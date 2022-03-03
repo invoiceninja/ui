@@ -29,7 +29,7 @@ import {
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@invoiceninja/forms';
 import { CompanySwitcher } from 'components/CompanySwitcher';
 import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
