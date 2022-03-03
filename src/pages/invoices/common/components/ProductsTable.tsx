@@ -14,12 +14,12 @@ import {
   injectBlankItemIntoCurrent,
 } from 'common/stores/slices/invoices';
 import { RootState } from 'common/stores/store';
-import { useProductColumns } from 'pages/invoices/create/hooks/useProductColumns';
-import { useResolveTranslation } from 'pages/invoices/create/hooks/useResolveTranslation';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
+import { useProductColumns } from '../hooks/useProductColumns';
 import { useResolveInputField } from '../hooks/useResolveInputField';
+import { useResolveTranslation } from '../hooks/useResolveTranslation';
 
 export function ProductsTable() {
   const [t] = useTranslation();

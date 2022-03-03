@@ -19,7 +19,7 @@ import { InputField } from '@invoiceninja/forms';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { ChangeEvent } from 'react';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
-import { useFormatMoney } from 'pages/invoices/create/hooks/useFormatMoney';
+import { useFormatMoney } from './useFormatMoney';
 
 const numberInputs = [
   'discount',

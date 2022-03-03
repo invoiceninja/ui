@@ -16,7 +16,7 @@ import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { useSetCurrentInvoiceProperty } from 'pages/invoices/common/hooks/useSetCurrentInvoiceProperty';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import { useFormatMoney } from '../../create/hooks/useFormatMoney';
+import { useFormatMoney } from '../hooks/useFormatMoney';
 
 export function InvoiceTotals() {
   const [t] = useTranslation();
