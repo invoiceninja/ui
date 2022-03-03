@@ -24,7 +24,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
-import { Actions } from './components/Actions';
+import { InvoiceActions } from '../common/components/InvoiceActions';
 import { Client } from './components/clients/Client';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
@@ -86,7 +86,7 @@ export function Create() {
         <InvoiceTotals />
       </div>
 
-      <Actions />
+      <InvoiceActions />
 
       {/* <div className="py-4">
         <iframe

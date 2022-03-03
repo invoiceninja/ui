@@ -22,6 +22,7 @@ import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
+import { InvoiceActions } from '../common/components/InvoiceActions';
 
 export function Edit() {
   const { id } = useParams();
@@ -57,6 +58,8 @@ export function Edit() {
         <InvoiceFooter />
         <InvoiceTotals />
       </div>
+
+      <InvoiceActions />
     </Default>
   );
 }
