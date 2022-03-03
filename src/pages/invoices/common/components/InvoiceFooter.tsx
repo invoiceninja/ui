@@ -18,7 +18,7 @@ import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Documents } from '../../create/components/Documents';
+import { InvoiceDocuments } from './InvoiceDocuments';
 import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 
 export function InvoiceFooter() {
@@ -67,7 +67,7 @@ export function InvoiceFooter() {
         </Tab.Panel>
 
         <Tab.Panel>
-          <Documents />
+          <InvoiceDocuments />
         </Tab.Panel>
 
         <Tab.Panel>

@@ -8,36 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
-import { endpoint } from 'common/helpers';
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { useQuery } from 'common/hooks/useQuery';
 import { useTitle } from 'common/hooks/useTitle';
-import { defaultHeaders } from 'common/queries/common/headers';
-import {
-  injectBlankItemIntoCurrent,
-  setCurrentInvoice,
-} from 'common/stores/slices/invoices';
+import { useBlankInvoiceQuery } from 'common/queries/invoices';
+import { setCurrentInvoice } from 'common/stores/slices/invoices';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
-import { InvoiceActions } from '../common/components/InvoiceActions';
-import { Client } from './components/clients/Client';
-import { InvoiceDetails } from '../common/components/InvoiceDetails';
+import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
-import { Table } from './components/tables/Table';
+import { InvoiceDetails } from '../common/components/InvoiceDetails';
+import { ProductsTable } from '../common/components/ProductsTable';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
+import { InvoiceActions } from '../common/components/InvoiceActions';
 
 export function Create() {
+  const { documentTitle } = useTitle('new_invoice');
+  const { data: invoice } = useBlankInvoiceQuery();
   const [t] = useTranslation();
   const dispatch = useDispatch();
-  const invoice = useCurrentInvoice();
-  const iframeRef = useRef<HTMLIFrameElement>();
-
-  useTitle('new_invoice');
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -47,57 +38,27 @@ export function Create() {
     },
   ];
 
-  const { data } = useQuery('/api/v1/invoices/create', {
-    refetchOnWindowFocus: false,
-  });
-
   useEffect(() => {
-    if (data?.data.data && !invoice) {
-      dispatch(setCurrentInvoice(data.data.data));
-      dispatch(injectBlankItemIntoCurrent());
-    }
-  }, [data]);
-
-  useEffect(() => {
-    if (invoice?.client_id) {
-      axios
-        .post(
-          endpoint('/api/v1/live_preview?entity=invoice'),
-          { ...invoice },
-          { headers: defaultHeaders }
-        )
-        .then((response) => {
-          const file = new Blob([response.data], { type: 'application/pdf' });
-          const fileUrl = URL.createObjectURL(file);
-
-          iframeRef.current?.setAttribute('src', fileUrl);
-        })
-        .catch((error) => console.log(error));
+    if (invoice?.data.data) {
+      dispatch(setCurrentInvoice(invoice.data.data));
     }
   }, [invoice]);
 
   return (
-    <Default title={t('new_invoice')} breadcrumbs={pages}>
+    <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-4">
-        <Client />
+        <ClientSelector />
         <InvoiceDetails />
-        <Table />
+
+        <div className="col-span-12">
+          <ProductsTable />
+        </div>
+
         <InvoiceFooter />
         <InvoiceTotals />
       </div>
 
       <InvoiceActions />
-
-      {/* <div className="py-4">
-        <iframe
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          ref={iframeRef}
-          width="100%"
-          height="1200"
-          typeof="application/pdf"
-        />
-      </div> */}
     </Default>
   );
 }

@@ -15,7 +15,7 @@ import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
-export function Documents() {
+export function InvoiceDocuments() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const [files, setFiles] = useState<File[]>([]);

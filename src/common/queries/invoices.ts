@@ -27,3 +27,14 @@ export function useInvoiceQuery(
     { ...options, staleTime: Infinity }
   );
 }
+
+export function useBlankInvoiceQuery(options: Record<string, any> = {}) {
+  return useQuery(
+    generatePath('/api/v1/invoices/create'),
+    () =>
+      axios.get(endpoint('/api/v1/invoices/create'), {
+        headers: defaultHeaders,
+      }),
+    { ...options, staleTime: Infinity }
+  );
+}

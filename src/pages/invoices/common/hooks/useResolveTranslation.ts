@@ -9,7 +9,7 @@
  */
 
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { resolveKey } from 'pages/invoices/create/helpers/resolve-key';
+import { resolveKey } from 'pages/invoices/common/helpers/resolve-key';
 import { useTranslation } from 'react-i18next';
 
 export function useResolveTranslation() {

@@ -10,7 +10,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { resolveProperty } from 'pages/invoices/create/helpers/resolve-property';
+import { resolveProperty } from 'pages/invoices/common/helpers/resolve-property';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { useHandleProductChange } from './useHandleProductChange';
 import { generatePath, useNavigate } from 'react-router-dom';
