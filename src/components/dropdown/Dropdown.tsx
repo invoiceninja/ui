@@ -31,8 +31,8 @@ export function Dropdown(props: Props) {
           >
             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
             {/* @ts-ignore */}
-            {props.children?.map((child) =>
-              child ? cloneElement(child, { setVisible }) : child
+            {props.children?.map((child, index: number) =>
+              child ? cloneElement(child, { setVisible, key: index }) : child
             )}
           </div>
         )}
