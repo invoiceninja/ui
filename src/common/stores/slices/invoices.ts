@@ -168,6 +168,18 @@ export const invoiceSlice = createSlice({
         state.current?.invitations.push(invitation);
       }
     },
+    setCurrentInvoicePropertySync: (
+      state,
+      payload: PayloadAction<{ property: keyof Invoice; value: unknown }>
+    ) => {
+      if (state.current) {
+        state.current = set(
+          state.current,
+          payload.payload.property,
+          payload.payload.value
+        );
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(setCurrentLineItemProperty.fulfilled, (state, payload) => {
@@ -219,4 +231,5 @@ export const {
   setCurrentInvoice,
   injectBlankItemIntoCurrent,
   toggleCurrentInvoiceInvitation,
+  setCurrentInvoicePropertySync,
 } = invoiceSlice.actions;
