@@ -17,6 +17,7 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { usePaymentQuery } from 'common/queries/payments';
 import { useStaticsQuery } from 'common/queries/statics';
+import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
@@ -31,7 +32,13 @@ export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
   const { data: payment } = usePaymentQuery({ id });
-
+  const pages: BreadcrumRecord[] = [
+    { name: t('payments'), href: '/payments' },
+    {
+      name: t('edit_payment'),
+      href: generatePath('/payments/:id/edit', { id: id }),
+    },
+  ];
   const queryClient = useQueryClient();
   const [errors, setErrors] = useState<ValidationBag>();
   const { data: statics } = useStaticsQuery();
@@ -103,10 +110,14 @@ export function Edit() {
   };
 
   return (
-    <Default>
+    <Default
+      breadcrumbs={pages}
+      title={t('edit_payment')}
+      docsLink="docs/payments/"
+    >
       <Container>
         <Card
-          title={t('edit_payment')}
+          title={formik.values.number}
           disableSubmitButton={formik.isSubmitting}
           onFormSubmit={formik.handleSubmit}
           withSaveButton
@@ -175,12 +186,6 @@ export function Edit() {
             <div className="bg-white p-6 w-full rounded shadow my-3 z-30">
               <Element leftSide={t('currency')}>
                 <SelectField
-                  defaultValue={
-                    statics?.data.currencies.find(
-                      (currency: any) =>
-                        currency.id === formik.values.exchange_currency_id
-                    ).name
-                  }
                   onChange={(event: any) => {
                     formik.setFieldValue(
                       'exchange_rate',
