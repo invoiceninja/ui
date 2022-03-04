@@ -9,10 +9,8 @@
  */
 
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
-import {
-  deleteInvoiceLineItem,
-  injectBlankItemIntoCurrent,
-} from 'common/stores/slices/invoices';
+import { injectBlankItemIntoCurrent } from 'common/stores/slices/invoices';
+import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 import { RootState } from 'common/stores/store';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';

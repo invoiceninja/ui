@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { setCurrentLineItemProperty } from 'common/stores/slices/invoices';
+import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { Record } from 'components/forms/DebouncedCombobox';
 import { useDispatch } from 'react-redux';
 

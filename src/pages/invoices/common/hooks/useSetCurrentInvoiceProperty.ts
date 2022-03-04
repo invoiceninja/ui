@@ -9,7 +9,7 @@
  */
 
 import { Invoice } from 'common/interfaces/invoice';
-import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
+import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-property';
 import { useDispatch } from 'react-redux';
 
 export function useSetCurrentInvoiceProperty() {

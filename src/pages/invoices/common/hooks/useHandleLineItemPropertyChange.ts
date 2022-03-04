@@ -9,7 +9,7 @@
  */
 
 import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { setCurrentLineItemProperty } from 'common/stores/slices/invoices';
+import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { useDispatch } from 'react-redux';
 
 export function useHandleLineItemPropertyChange() {
