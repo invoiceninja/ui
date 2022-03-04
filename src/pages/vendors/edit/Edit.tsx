@@ -7,20 +7,30 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+import { Card } from '@invoiceninja/cards';
+import axios, { AxiosError } from 'axios';
+import { endpoint } from 'common/helpers';
+import { ValidationBag } from 'common/interfaces/validation-bag';
+import { defaultHeaders } from 'common/queries/common/headers';
 import { useVendorQuery } from 'common/queries/vendor';
+import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import { AdditionalInfo } from './components/AdditionalInfo';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
-
+import toast from 'react-hot-toast';
+import { useQueryClient } from 'react-query';
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
   const { data: vendor } = useVendorQuery({ id });
+  const [errors, setErrors] = useState<ValidationBag>();
+  const queryClient = useQueryClient();
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -37,29 +47,66 @@ export function Edit() {
       state: vendor?.data.data.state,
       postal_code: vendor?.data.data.postal_code,
       country_id: vendor?.data.data.country_id,
-      currency: vendor?.data.data.currency_id,
+      currency_id: vendor?.data.data.currency_id,
       private_notes: vendor?.data.data.private_notes,
       public_notes: vendor?.data.data.public_notes,
       contacts: vendor?.data.data.contacts,
     },
-    onSubmit: () => {
-      console.log('value');
+    onSubmit: (values) => {
+      const toastId = toast.loading(t('processing'));
+      setErrors(undefined);
+      axios
+        .put(endpoint('/api/v1/vendors/:id', { id }), values, {
+          headers: defaultHeaders,
+        })
+        .then(() => {
+          toast.success(t('updated_vendor'), { id: toastId });
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+          toast.error(t('error_title'), { id: toastId });
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+          }
+        })
+        .finally(() => {
+          formik.setSubmitting(false);
+          queryClient.invalidateQueries(
+            generatePath('/api/v1/vendors/:id', { id })
+          );
+        });
     },
   });
 
   return (
     <Default title={t('vendor')} onBackClick={''} onSaveClick={''}>
-      <div className="flex flex-col xl:flex-row xl:gap-4">
-        <div className="w-full xl:w-1/2">
-          <Details data={formik.values}></Details>
-          <Address data={formik.values}></Address>
-        </div>
-        {console.log(vendor?.data.data)}
-        <div className="w-full xl:w-1/2">
-          <AdditionalInfo data={formik.values}></AdditionalInfo>
-          <Contacts data={formik.values.contacts}></Contacts>
-        </div>
-      </div>
+      <Container>
+        <Card
+          disableSubmitButton={formik.isSubmitting}
+          onFormSubmit={formik.handleSubmit}
+          withSaveButton
+        >
+          <Details
+            data={formik.values}
+            onChange={formik.handleChange}
+          ></Details>
+          <Address
+            data={formik.values}
+            onChange={formik.handleChange}
+            formikUpdateField={formik.setFieldValue}
+          ></Address>
+
+          <AdditionalInfo
+            data={formik.values}
+            onChange={formik.handleChange}
+            formikUpdateField={formik.setFieldValue}
+          ></AdditionalInfo>
+          <Contacts
+            data={formik.values.contacts}
+            onChange={formik.handleChange}
+          ></Contacts>
+        </Card>
+      </Container>
     </Default>
   );
 }
