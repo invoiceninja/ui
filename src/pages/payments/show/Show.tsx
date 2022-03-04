@@ -95,7 +95,7 @@ export function Show() {
             </Element>
 
             <Element leftSide={t('gateway')}>
-              <InputField value={gateway} />
+              <InputField disabled value={gateway} />
             </Element>
 
             <Element leftSide={t('transaction_reference')}>
