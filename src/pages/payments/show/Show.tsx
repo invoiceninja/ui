@@ -10,7 +10,10 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
+import axios from 'axios';
 import paymentType from 'common/constants/payment-type';
+import { endpoint } from 'common/helpers';
+import { defaultHeaders } from 'common/queries/common/headers';
 
 import { usePaymentQuery } from 'common/queries/payments';
 import { useStaticsQuery } from 'common/queries/statics';
@@ -25,19 +28,35 @@ import { generatePath, useNavigate, useParams } from 'react-router-dom';
 export function Show() {
   const [t] = useTranslation();
   const { id } = useParams();
-  const { data: payment } = usePaymentQuery({ id });
   const navigate = useNavigate();
   const [defaultPaymentType, setpaymentType] = useState('');
   const pages: BreadcrumRecord[] = [
     { name: t('payments'), href: '/payments' },
     { name: t('payment'), href: generatePath('/payments/:id', { id: id }) },
   ];
+  const [gateway, setgateway] = useState('');
+
+  const { data: payment } = usePaymentQuery({ id });
 
   const { data: statics } = useStaticsQuery();
-
-  const [changeCurrency, setchangeCurrency] = useState(false);
-
+  const getCompanyGateway = () => {
+    if (payment?.data.data.company_gateway_id) {
+      axios
+        .get(
+          endpoint('/api/v1/company_gateways/:id', {
+            id: payment?.data.data.company_gateway_id,
+          }),
+          {
+            headers: defaultHeaders,
+          }
+        )
+        .then((data) => {
+          setgateway(data.data.data.label);
+        });
+    }
+  };
   useEffect(() => {
+    getCompanyGateway();
     const type = Object.entries(paymentType).find(([value]: any) => {
       return value === payment?.data.data.type_id;
     });
@@ -52,51 +71,38 @@ export function Show() {
             <Element leftSide={t('client')}>
               <InputField
                 disabled
-                id="number"
                 value={payment?.data.data.client.display_name}
-              ></InputField>
+              />
             </Element>
             <Element leftSide={t('payment_amount')}>
-              <InputField
-                disabled
-                id="number"
-                value={payment?.data.data.amount}
-              ></InputField>
+              <InputField disabled value={payment?.data.data.amount} />
             </Element>
             <Element leftSide={t('applied')}>
-              <InputField
-                disabled
-                id="number"
-                value={payment?.data.data.applied}
-              ></InputField>
+              <InputField disabled value={payment?.data.data.applied} />
             </Element>
-            <Element leftSide={t('payment_number')}>
-              <InputField
-                disabled
-                value={payment?.data.data.number}
-              ></InputField>
-            </Element>
+
             <Element leftSide={t('invoice_number')}>
               <InputField
                 disabled
                 value={payment?.data.data.invoices[0].number}
-              ></InputField>
+              />
             </Element>
             <Element leftSide={t('payment_date')}>
-              <InputField
-                disabled
-                type="date"
-                value={payment?.data.data.date}
-              ></InputField>
+              <InputField disabled value={payment?.data.data.date} />
             </Element>
             <Element leftSide={t('payment_type')}>
               <InputField disabled value={t(defaultPaymentType)} />
             </Element>
+
+            <Element leftSide={t('gateway')}>
+              <InputField value={gateway} />
+            </Element>
+
             <Element leftSide={t('transaction_reference')}>
               <InputField
                 disabled
                 value={payment?.data.data.transaction_reference}
-              ></InputField>
+              />
             </Element>
             <Element leftSide={t('private_notes')}>
               <InputField disabled value={payment?.data.data.private_notes} />
@@ -105,9 +111,6 @@ export function Show() {
               <Toggle
                 disabled
                 checked={payment?.data.data.exchange_currency_id}
-                onChange={() => {
-                  setchangeCurrency(!changeCurrency);
-                }}
               />
             </Element>
           </div>
@@ -126,10 +129,7 @@ export function Show() {
                 />
               </Element>
               <Element leftSide={t('exchange_rate')}>
-                <InputField
-                  disabled
-                  value={payment?.data.data.exchange_rate}
-                ></InputField>
+                <InputField disabled value={payment?.data.data.exchange_rate} />
               </Element>
               {}
               <Element leftSide={t('converted_amount')}>
@@ -139,7 +139,7 @@ export function Show() {
                     Number(payment?.data.data.amount) *
                     Number(payment?.data.data.exchange_rate)
                   }
-                ></InputField>
+                />
               </Element>
             </div>
           )}
@@ -151,7 +151,7 @@ export function Show() {
                 navigate(generatePath('/payments/:id/edit', { id: id }));
               }}
             >
-              Edit{' '}
+              {t('edit_payment')}
             </Button>
           </div>
         </Card>
