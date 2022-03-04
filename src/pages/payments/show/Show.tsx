@@ -107,7 +107,7 @@ export function Show() {
             <Element leftSide={t('private_notes')}>
               <InputField disabled value={payment?.data.data.private_notes} />
             </Element>
-            <Element leftSide="Change currency">
+            <Element leftSide={t("convert_currency")}>
               <Toggle
                 disabled
                 checked={payment?.data.data.exchange_currency_id}

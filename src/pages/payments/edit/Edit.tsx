@@ -171,7 +171,7 @@ export function Edit() {
                 onChange={formik.handleChange}
               ></Textarea>
             </Element>
-            <Element leftSide="Change currency">
+            <Element leftSide={t('convert_currency')}>
               <Toggle
                 checked={formik.values.exchange_currency_id}
                 onChange={() => {
