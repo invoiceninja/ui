@@ -64,7 +64,7 @@ export function Show() {
   }, [payment]);
 
   return (
-    <Default breadcrumbs={pages} title={t('payment')}>
+    <Default breadcrumbs={pages} title={t('payment')} docsLink="docs/payments/">
       <Container>
         <Card title={payment?.data.data.number}>
           <div className="bg-white p-6 w-full rounded shadow my-3">
