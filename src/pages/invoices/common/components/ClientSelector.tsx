@@ -11,8 +11,11 @@
 import { Card } from '@invoiceninja/cards';
 import { InputLabel } from '@invoiceninja/forms';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
+import { injectBlankItemIntoCurrent } from 'common/stores/slices/invoices';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 import { ClientContactSelector } from './ClientContactSelector';
 import { ClientCreate } from './ClientCreate';
@@ -25,6 +28,13 @@ export function ClientSelector(props: Props) {
   const [t] = useTranslation();
   const invoice = useCurrentInvoice();
   const onChange = useSetCurrentInvoiceProperty();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (invoice?.client_id && invoice?.line_items.length === 0) {
+      dispatch(injectBlankItemIntoCurrent());
+    }
+  }, [invoice]);
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
