@@ -109,7 +109,7 @@ export function DebouncedCombobox(props: Props) {
               className="w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 border border-gray-300"
               onChange={(event) => debouncedSearch(event.target.value)}
               displayValue={(record: Record) => record.label}
-              onFocus={() => openDropdownButton.current?.click()}
+              onClick={() => openDropdownButton.current?.click()}
             />
             <ChevronDown
               className="absolute inset-y-0 mt-2 right-0 flex items-center pr-2 w-8 h-5 text-gray-400"
