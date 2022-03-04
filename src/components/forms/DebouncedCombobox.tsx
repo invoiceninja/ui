@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Combobox } from '@headlessui/react';
 import { ChevronDown } from 'react-feather';
 import { clone, debounce } from 'lodash';
@@ -12,6 +12,7 @@ export interface Record {
   internal: boolean;
   resource?: any;
 }
+
 interface Props {
   endpoint: string;
   value?: string;
@@ -32,6 +33,7 @@ export function DebouncedCombobox(props: Props) {
   const [records, setRecords] = useState<Record[]>([internalRecord]);
   const [selectedOption, setSelectedOption] = useState(records[0]);
   const [defaultValueProperty, setDefaultValueProperty] = useState('');
+  const openDropdownButton = useRef<HTMLButtonElement | undefined>();
 
   useEffect(() => {
     setDefaultValueProperty(props.defaultValue as string);
@@ -107,8 +109,14 @@ export function DebouncedCombobox(props: Props) {
               className="w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 border border-gray-300"
               onChange={(event) => debouncedSearch(event.target.value)}
               displayValue={(record: Record) => record.label}
+              onFocus={() => openDropdownButton.current?.click()}
             />
-            <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
+            <Combobox.Button
+              className="absolute inset-y-0 right-0 flex items-center pr-2"
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              ref={openDropdownButton}
+            >
               <ChevronDown
                 className="w-5 h-5 text-gray-400"
                 aria-hidden="true"
