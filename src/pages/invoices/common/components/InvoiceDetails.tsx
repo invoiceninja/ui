@@ -12,27 +12,16 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { Invoice } from 'common/interfaces/invoice';
-import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
 import { CustomField } from 'components/CustomField';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 
 export function InvoiceDetails() {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
   const invoice = useCurrentInvoice();
   const company = useCurrentCompany();
-
-  const handleChange = (property: keyof Invoice, value: unknown) => {
-    dispatch(
-      setCurrentInvoiceProperty({
-        property,
-        value,
-      })
-    );
-  };
+  const handleChange = useSetCurrentInvoiceProperty();
 
   return (
     <>
@@ -69,7 +58,7 @@ export function InvoiceDetails() {
         </Element>
 
         {invoice && invoice.partial > 0 && (
-          <Element leftSide={t('partial')}>
+          <Element leftSide={t('partial_due_date')}>
             <InputField
               type="date"
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
