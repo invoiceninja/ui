@@ -49,7 +49,7 @@ export function ProductsTable() {
                 ))}
 
                 <Td>
-                  {invoice && (
+                  {invoice && invoice.line_items.length > 1 && (
                     <button
                       className="text-gray-600 hover:text-red-600"
                       onClick={() =>
