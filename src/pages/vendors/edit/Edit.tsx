@@ -95,13 +95,13 @@ export function Edit() {
             onChange={formik.handleChange}
             formikUpdateField={formik.setFieldValue}
           ></Address>
-
           <AdditionalInfo
             data={formik.values}
             onChange={formik.handleChange}
             formikUpdateField={formik.setFieldValue}
           ></AdditionalInfo>
           <Contacts
+            formik={formik}
             data={formik.values.contacts}
             onChange={formik.handleChange}
           ></Contacts>
