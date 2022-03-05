@@ -84,7 +84,7 @@ export function Show() {
             <Element leftSide={t('invoice_number')}>
               <InputField
                 disabled
-                value={payment?.data.data.invoices[0].number}
+                value={payment?.data.data.invoices[0]?.number}
               />
             </Element>
             <Element leftSide={t('payment_date')}>
