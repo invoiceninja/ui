@@ -8,71 +8,42 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { Modal } from 'components/Modal';
+import { Card } from '@invoiceninja/cards';
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { ContactModal } from './ContactModal';
 
-type Props = { data?: any; onChange?: any };
+type Props = {
+  data?: any;
+  onChange?: any;
+  formikUpdateField?: any;
+  index?: any;
+  formik?: any;
+};
 
 export function Contact(props: Props) {
   const [isOpen, setisOpen] = useState(false);
-  const [t] = useTranslation();
 
   return (
     <>
       {' '}
-      <Card>
+      <Card className="my-3">
         <div
           className="flex flex-col justify-center items-start p-5 hover:bg-gray-300 hover:rounded"
           onClick={() => {
             setisOpen(!isOpen);
           }}
         >
-          <p>
-            {props.data.first_name}
-            {props.data.last_name}
-          </p>
+          <p>{props.data.first_name + ' ' + props.data.last_name}</p>
           <p>{props.data.email}</p>
         </div>
+        <ContactModal
+          isOpen={isOpen}
+          setIsOpen={setisOpen}
+          data={props.data}
+          index={props.index}
+          formik={props.formik}
+        />
       </Card>
-      <Modal
-        visible={isOpen}
-        title={t('new_contact')}
-        onClose={() => {
-          setisOpen(!isOpen);
-        }}
-      >
-        <Element leftSide={t('first_name')}>
-          <InputField
-            id="phone"
-            onChange={props.onChange}
-            value={props.data.first_name}
-          />
-        </Element>
-        <Element leftSide={t('last_name')}>
-          <InputField
-            id="phone"
-            onChange={props.onChange}
-            value={props.data.last_name}
-          />
-        </Element>
-        <Element leftSide={t('email')}>
-          <InputField
-            id="phone"
-            onChange={props.onChange}
-            value={props.data.email}
-          />
-        </Element>
-        <Element leftSide={t('phone')}>
-          <InputField
-            id="phone"
-            onChange={props.onChange}
-            value={props.data.phone}
-          />
-        </Element>
-      </Modal>
     </>
   );
 }
