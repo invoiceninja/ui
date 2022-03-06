@@ -32,6 +32,7 @@ export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
   const { data: payment } = usePaymentQuery({ id });
+
   const pages: BreadcrumRecord[] = [
     { name: t('payments'), href: '/payments' },
     {
@@ -39,9 +40,11 @@ export function Edit() {
       href: generatePath('/payments/:id/edit', { id: id }),
     },
   ];
+
   const queryClient = useQueryClient();
   const [errors, setErrors] = useState<ValidationBag>();
   const { data: statics } = useStaticsQuery();
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -79,6 +82,7 @@ export function Edit() {
         });
     },
   });
+
   const [changeCurrency, setchangeCurrency] = useState(false);
   useEffect(() => {
     setchangeCurrency(Boolean(payment?.data.data.exchange_currency_id));
@@ -117,73 +121,69 @@ export function Edit() {
     >
       <Container>
         <Card
-          title={formik.values.number}
+          title={t('edit_payment')}
           disableSubmitButton={formik.isSubmitting}
           onFormSubmit={formik.handleSubmit}
           withSaveButton
         >
-          <div className="bg-white p-6 w-full rounded shadow my-3">
-            <Element leftSide={t('payment_number')}>
-              <InputField
-                id="number"
-                value={formik.values.number}
-                onChange={formik.handleChange}
-                errorMessage={errors?.errors.payment_amount}
-              ></InputField>
-            </Element>
-            <Element leftSide={t('payment_date')}>
-              <InputField
-                id="date"
-                type="date"
-                value={formik.values.date}
-                onChange={formik.handleChange}
-              ></InputField>
-            </Element>
-            <Element leftSide={t('payment_type')}>
-              <SelectField id="type_id" onChange={formik.handleChange}>
-                {Object.entries(paymentType).map((value: any, index: any) => {
-                  if (value[0] === formik.values.type_id) {
-                    return (
-                      <option key={index} value={String(value[0])} selected>
-                        {t(value[1])}
-                      </option>
-                    );
-                  } else
-                    return (
-                      <option key={index} value={String(value[0])}>
-                        {t(value[1])}
-                      </option>
-                    );
-                })}
-              </SelectField>
-            </Element>
-            <Element leftSide={t('transaction_reference')}>
-              <InputField
-                id="transaction_reference"
-                onChange={formik.handleChange}
-                value={formik.values.transaction_reference}
-              ></InputField>
-            </Element>
-            <Element leftSide={t('private_notes')}>
-              <Textarea
-                id="private_notes"
-                value={formik.values.private_notes}
-                onChange={formik.handleChange}
-              ></Textarea>
-            </Element>
-            <Element leftSide={t('convert_currency')}>
-              <Toggle
-                checked={formik.values.exchange_currency_id}
-                onChange={() => {
-                  setchangeCurrency(!changeCurrency);
-                  formik.setFieldValue('exchange_currency_id', '');
-                  formik.setFieldValue('exchange_rate', '');
-                }}
-              />
-            </Element>
-          </div>
+          <Element leftSide={t('payment_number')}>
+            <InputField
+              id="number"
+              value={formik.values.number}
+              onChange={formik.handleChange}
+              errorMessage={errors?.errors.payment_amount}
+            />
+          </Element>
+          <Element leftSide={t('payment_date')}>
+            <InputField
+              id="date"
+              type="date"
+              value={formik.values.date}
+              onChange={formik.handleChange}
+            />
+          </Element>
+          <Element leftSide={t('payment_type')}>
+            <SelectField
+              id="type_id"
+              defaultValue={'aa'}
+              onChange={formik.handleChange}
+            >
+              <option value=""></option>
+              {Object.entries(paymentType).map((value: any, index: any) => {
+                return (
+                  <option key={index} value={String(value[0])}>
+                    {t(value[1])}
+                  </option>
+                );
+              })}
+            </SelectField>
+          </Element>
+          <Element leftSide={t('transaction_reference')}>
+            <InputField
+              id="transaction_reference"
+              onChange={formik.handleChange}
+              value={formik.values.transaction_reference}
+            ></InputField>
+          </Element>
+          <Element leftSide={t('private_notes')}>
+            <Textarea
+              id="private_notes"
+              value={formik.values.private_notes}
+              onChange={formik.handleChange}
+            />
+          </Element>
+          <Element leftSide={t('convert_currency')}>
+            <Toggle
+              checked={formik.values.exchange_currency_id}
+              onChange={() => {
+                setchangeCurrency(!changeCurrency);
+                formik.setFieldValue('exchange_currency_id', '');
+                formik.setFieldValue('exchange_rate', '');
+              }}
+            />
+          </Element>
           {changeCurrency && (
-            <div className="bg-white p-6 w-full rounded shadow my-3 z-30">
+            <>
               <Element leftSide={t('currency')}>
                 <SelectField
                   onChange={(event: any) => {
@@ -200,19 +200,13 @@ export function Edit() {
                     );
                   }}
                 >
+                  <option value=""></option>
                   {statics?.data.currencies.map((element: any, index: any) => {
-                    if (element.id === formik.values.exchange_currency_id) {
-                      return (
-                        <option value={element.id} key={index} selected>
-                          {element.name}
-                        </option>
-                      );
-                    } else
-                      return (
-                        <option value={element.id} key={index}>
-                          {element.name}
-                        </option>
-                      );
+                    return (
+                      <option value={element.id} key={index}>
+                        {element.name}
+                      </option>
+                    );
                   })}
                 </SelectField>
               </Element>
@@ -222,15 +216,14 @@ export function Edit() {
                     formik.setFieldValue('exchange_rate', event.target.valeu);
                   }}
                   value={formik.values.exchange_rate}
-                ></InputField>
+                />
               </Element>
-              {}
               <Element leftSide={t('converted_amount')}>
                 <InputField
                   value={formik.values.amount * formik.values.exchange_rate}
-                ></InputField>
+                />
               </Element>
-            </div>
+            </>
           )}
         </Card>
       </Container>
