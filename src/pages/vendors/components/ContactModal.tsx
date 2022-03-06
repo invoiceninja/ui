@@ -10,7 +10,7 @@
 
 import { Modal } from 'components/Modal';
 import { useTranslation } from 'react-i18next';
-import { Card, Element } from '@invoiceninja/cards';
+import { Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 
 type Props = {
@@ -32,7 +32,7 @@ export function ContactModal(props: Props) {
         props.setIsOpen(!props.isOpen);
       }}
     >
-      <Card>
+      <div>
         <Element leftSide={t('first_name')}>
           <InputField
             id={`contacts[${props.index}].first_name`}
@@ -61,7 +61,7 @@ export function ContactModal(props: Props) {
             value={props.data.phone}
           />
         </Element>
-        <div className="flex justify-between">
+        <div className="flex justify-between p-5">
           <Button
             type="minimal"
             onClick={(event: any) => {
@@ -85,7 +85,7 @@ export function ContactModal(props: Props) {
             {t('ok')}
           </Button>
         </div>
-      </Card>
+      </div>
     </Modal>
   );
 }

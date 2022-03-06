@@ -20,7 +20,12 @@ type Props = { data?: any; formik?: any };
 export function Contacts(props: Props) {
   const [t] = useTranslation();
   return (
-    <Card title={t('contacts')}>
+    <Card
+      disableSubmitButton={props.formik.isSubmitting}
+      onFormSubmit={props.formik.handleSubmit}
+      withSaveButton
+      title={t('contacts')}
+    >
       <Element leftSide={t('contacts')}>
         {props.data &&
           props.data.map((contact: any, index: any) => {

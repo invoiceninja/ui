@@ -14,7 +14,7 @@ import { useStaticsQuery } from 'common/queries/statics';
 import { Alert } from 'components/Alert';
 import { useTranslation } from 'react-i18next';
 
-type Props = { data?: any;formik?: any; errors?: any };
+type Props = { data?: any; formik?: any; errors?: any };
 
 export function Address(props: Props) {
   const [t] = useTranslation();
@@ -64,19 +64,13 @@ export function Address(props: Props) {
             props.formik.setFieldValue('country_id', event.target.value);
           }}
         >
+          <option value=""></option>
           {statics?.data.countries.map((element: any, index: any) => {
-            if (element.id === props.data.country_id) {
-              return (
-                <option value={element.id} key={index} selected>
-                  {element.full_name}
-                </option>
-              );
-            } else
-              return (
-                <option value={element.id} key={index}>
-                  {element.full_name}
-                </option>
-              );
+            return (
+              <option value={element.id} key={index}>
+                {element.full_name}
+              </option>
+            );
           })}
         </SelectField>
       </Element>

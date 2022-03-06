@@ -29,19 +29,13 @@ export function AdditionalInfo(props: Props) {
             props.formik.setFieldValue('currency_id', event.target.value);
           }}
         >
+          <option value=""></option>
           {statics?.data.currencies.map((element: any, index: any) => {
-            if (element.id === props.data.currency_id) {
-              return (
-                <option value={element.id} key={index} selected>
-                  {element.name}
-                </option>
-              );
-            } else
-              return (
-                <option value={element.id} key={index}>
-                  {element.name}
-                </option>
-              );
+            return (
+              <option value={element.id} key={index}>
+                {element.name}
+              </option>
+            );
           })}
         </SelectField>
       </Element>
@@ -50,14 +44,14 @@ export function AdditionalInfo(props: Props) {
           id="public_notes"
           onChange={props.formik.handleChange}
           value={props.data.public_notes}
-        ></Textarea>
+        />
       </Element>
       <Element leftSide={t('private_notes')}>
         <Textarea
           id="private_notes"
           onChange={props.formik.handleChange}
           value={props.data.private_notes}
-        ></Textarea>
+        />
       </Element>
     </Card>
   );

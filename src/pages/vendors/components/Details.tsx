@@ -20,7 +20,7 @@ export function Details(props: Props) {
   const { data: users } = useUsersQuery();
 
   return (
-    <Card title={t('details')} className="mb-5">
+    <Card title={t('details')}>
       <Element leftSide={t('name')}>
         <InputField
           id="name"
@@ -44,10 +44,7 @@ export function Details(props: Props) {
           defaultValue={'User'}
           onChange={props.formik.handleChange}
         >
-          <option hidden selected>
-            {' '}
-            {t('user')}
-          </option>
+          <option value=""></option>
           {users?.data.data.map((user: any, index: any) => {
             return (
               <option value={user.id} key={index}>

@@ -7,14 +7,11 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Card } from '@invoiceninja/cards';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useVendorQuery } from 'common/queries/vendor';
-import { Container } from 'components/Container';
-import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,10 +23,8 @@ import { Details } from '../components/Details';
 import toast from 'react-hot-toast';
 import { useQueryClient } from 'react-query';
 import { ValidationAlert } from 'components/ValidationAlert';
-import { Tab, Tabs } from 'components/Tabs';
-type Props = { includeTabs?: boolean };
 
-export function Edit(props: Props) {
+export function Edit() {
   const [t] = useTranslation();
 
   const { id } = useParams();
@@ -83,46 +78,14 @@ export function Edit(props: Props) {
         });
     },
   });
-  const pages = [
-    { name: t('vendors'), href: '/vendors' },
-    {
-      name: vendor?.data.data.number,
-      href: generatePath('/vendors/:id', { id }),
-    },
-  ];
-
-  const tabs: Tab[] = [
-    { name: t('details'), href: generatePath('/vendors/:id', { id }) },
-    {
-      name: t('expenses'),
-      href: generatePath('/vendors/:id/expenses', { id }),
-    },
-    {
-      name: t('recurring_expenses'),
-      href: generatePath('/vendors/:id/recurring_expenses', { id }),
-    },
-  ];
 
   return (
-    <Default title={t('vendor')} breadcrumbs={pages} docsLink="docs/vendors/">
-      <Container>
-        {props.includeTabs && <Tabs tabs={tabs} className="mt-6" />}
-        <Card
-          disableSubmitButton={formik.isSubmitting}
-          onFormSubmit={formik.handleSubmit}
-          withSaveButton
-        >
-          {errors && <ValidationAlert errors={errors} />}
-          <Details data={formik.values} formik={formik} errors={errors} />
-          <Address data={formik.values} formik={formik} errors={errors} />
-          <AdditionalInfo
-            data={formik.values}
-            formik={formik}
-            errors={errors}
-          />
-          <Contacts formik={formik} data={formik.values.contacts} />
-        </Card>
-      </Container>
-    </Default>
+    <>
+      {errors && <ValidationAlert errors={errors} />}
+      <Details data={formik.values} formik={formik} errors={errors} />
+      <Address data={formik.values} formik={formik} errors={errors} />
+      <AdditionalInfo data={formik.values} formik={formik} errors={errors} />
+      <Contacts formik={formik} data={formik.values.contacts} />
+    </>
   );
 }
