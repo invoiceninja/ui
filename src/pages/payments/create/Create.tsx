@@ -31,6 +31,8 @@ import { generatePath } from 'react-router-dom';
 
 export function Create() {
   const [t] = useTranslation();
+  const [invoiceBasedPayment, setinvoiceBasedPayment] = useState()
+const [clientBasedPayment, setclientBasedPayment] = useState()
   const { data: payment } = useBlankPaymentQuery();
   const pages: BreadcrumRecord[] = [
     { name: t('payments'), href: '/payments' },
@@ -79,6 +81,11 @@ export function Create() {
         });
     },
   });
+useEffect(() => {
+axios.get(generatePath('/api/v1/invoices?client_id=:id',{id:formik.values.client_id})).then(data=>{console.log("data",data)})
+}, [])
+
+
   const [changeCurrency, setchangeCurrency] = useState(false);
   useEffect(() => {
     setchangeCurrency(Boolean(payment?.data.data.exchange_currency_id));
@@ -136,6 +143,15 @@ export function Create() {
               </SelectField>
             </Element>
             <Element leftSide={t('amount')}>
+              <InputField
+                id="number"
+                onChange={formik.handleChange}
+                errorMessage={errors?.errors.payment_amount}
+              ></InputField>
+            </Element>
+           {
+
+           } <Element leftSide={t('invoice')}>
               <InputField
                 id="number"
                 onChange={formik.handleChange}
