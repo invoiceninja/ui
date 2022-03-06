@@ -13,6 +13,7 @@ import { InputField, SelectField, Textarea } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import paymentType from 'common/constants/payment-type';
 import { endpoint } from 'common/helpers';
+import { useConvertCurrencyToggle } from 'common/hooks/useConvertCurrancy';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { usePaymentQuery } from 'common/queries/payments';
@@ -22,7 +23,7 @@ import { Container } from 'components/Container';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -32,7 +33,9 @@ export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
   const { data: payment } = usePaymentQuery({ id });
-
+  const [convertCurrency, setconvertCurrency] = useConvertCurrencyToggle({
+    id,
+  });
   const pages: BreadcrumRecord[] = [
     { name: t('payments'), href: '/payments' },
     {
@@ -82,11 +85,6 @@ export function Edit() {
         });
     },
   });
-
-  const [changeCurrency, setchangeCurrency] = useState(false);
-  useEffect(() => {
-    setchangeCurrency(Boolean(payment?.data.data.exchange_currency_id));
-  }, [payment]);
 
   const getExchangeRate = (fromCurrencyId: string, toCurrencyId: string) => {
     if (fromCurrencyId == null || toCurrencyId == null) {
@@ -176,13 +174,13 @@ export function Edit() {
             <Toggle
               checked={formik.values.exchange_currency_id}
               onChange={() => {
-                setchangeCurrency(!changeCurrency);
+                setconvertCurrency(!convertCurrency);
                 formik.setFieldValue('exchange_currency_id', '');
                 formik.setFieldValue('exchange_rate', '');
               }}
             />
           </Element>
-          {changeCurrency && (
+          {convertCurrency && (
             <>
               <Element leftSide={t('currency')}>
                 <SelectField
