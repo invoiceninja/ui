@@ -10,22 +10,21 @@
 
 import { Card } from '@invoiceninja/cards';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ContactModal } from './ContactModal';
 
 type Props = {
   data?: any;
-  onChange?: any;
-  formikUpdateField?: any;
   index?: any;
   formik?: any;
 };
 
 export function Contact(props: Props) {
   const [isOpen, setisOpen] = useState(false);
+  const [t] = useTranslation();
 
   return (
     <>
-      {' '}
       <Card className="my-3">
         <div
           className="flex flex-col justify-center items-start p-5 hover:bg-gray-300 hover:rounded"
@@ -33,7 +32,11 @@ export function Contact(props: Props) {
             setisOpen(!isOpen);
           }}
         >
-          <p>{props.data.first_name + ' ' + props.data.last_name}</p>
+          <p>
+            {!props.data.first_name || !props.data.first_name
+              ? t('blank_contact')
+              : props.data.first_name + ' ' + props.data.last_name}
+          </p>
           <p>{props.data.email}</p>
         </div>
         <ContactModal

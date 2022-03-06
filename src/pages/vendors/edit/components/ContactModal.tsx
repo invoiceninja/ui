@@ -33,7 +33,6 @@ export function ContactModal(props: Props) {
       }}
     >
       <Card>
-
         <Element leftSide={t('first_name')}>
           <InputField
             id={`contacts[${props.index}].first_name`}
