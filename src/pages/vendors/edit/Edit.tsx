@@ -82,7 +82,7 @@ export function Edit(props: Props) {
     },
   });
   const tabs: Tab[] = [
-    { name: t('details'), href: generatePath('/vendors/:id/edit', { id }) },
+    { name: t('details'), href: generatePath('/vendors/:id', { id }) },
     {
       name: t('expenses'),
       href: generatePath('/vendors/:id/expenses', { id }),
@@ -101,7 +101,6 @@ export function Edit(props: Props) {
     <Default title={t('vendor')} onBackClick={''} onSaveClick={''}>
       <Container>
         {props.includeTabs && <Tabs tabs={tabs} className="mt-6" />}
-
         <Card
           disableSubmitButton={formik.isSubmitting}
           onFormSubmit={formik.handleSubmit}

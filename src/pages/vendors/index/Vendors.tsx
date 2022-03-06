@@ -27,7 +27,7 @@ export function Vendors() {
       id: 'number',
       label: t('number'),
       format: (value, resource) => (
-        <Link to={generatePath('/vendors/:id/edit', { id: resource.id })}>
+        <Link to={generatePath('/vendors/:id', { id: resource.id })}>
           {resource.number}
         </Link>
       ),

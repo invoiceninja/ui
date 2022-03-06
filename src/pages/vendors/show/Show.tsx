@@ -19,7 +19,7 @@ export function Show() {
   const { data: vendor } = useVendorQuery({ id });
   const [t] = useTranslation();
   const tabs: Tab[] = [
-    { name: t('details'), href: generatePath('/vendors/:id/edit', { id }) },
+    { name: t('details'), href: generatePath('/vendors/:id', { id }) },
     {
       name: t('expenses'),
       href: generatePath('/vendors/:id/expenses', { id }),
@@ -33,9 +33,7 @@ export function Show() {
       href: generatePath('/vendors/:id/documents', { id }),
     },
   ];
-  {
-    console.log(vendor?.data.data);
-  }
+
   return (
     <Default title={t('vendor')}>
       <Tabs tabs={tabs} className="mt-6" />
