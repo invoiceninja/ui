@@ -36,6 +36,7 @@ export function Edit() {
   const [convertCurrency, setconvertCurrency] = useConvertCurrencyToggle({
     id,
   });
+
   const pages: BreadcrumRecord[] = [
     { name: t('payments'), href: '/payments' },
     {
