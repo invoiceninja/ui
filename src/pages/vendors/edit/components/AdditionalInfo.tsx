@@ -11,9 +11,10 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { SelectField, Textarea } from '@invoiceninja/forms';
 import { useStaticsQuery } from 'common/queries/statics';
+import { Alert } from 'components/Alert';
 import { useTranslation } from 'react-i18next';
 
-type Props = { data?: any; onChange?: any; formikUpdateField?: any };
+type Props = { data?: any; formik?: any; errors?: any };
 
 export function AdditionalInfo(props: Props) {
   const [t] = useTranslation();
@@ -21,10 +22,11 @@ export function AdditionalInfo(props: Props) {
 
   return (
     <Card title={t('additional_info')} className="mb-5">
+      {props.errors?.notes && <Alert type="danger">{props.errors.notes}</Alert>}
       <Element leftSide={t('currency')}>
         <SelectField
           onChange={(event: any) => {
-            props.formikUpdateField('currency_id', event.target.value);
+            props.formik.setFieldValue('currency_id', event.target.value);
           }}
         >
           {statics?.data.currencies.map((element: any, index: any) => {
@@ -46,14 +48,14 @@ export function AdditionalInfo(props: Props) {
       <Element leftSide={t('public_notes')}>
         <Textarea
           id="public_notes"
-          onChange={props.onChange}
+          onChange={props.formik.handleChange}
           value={props.data.public_notes}
         ></Textarea>
       </Element>
       <Element leftSide={t('private_notes')}>
         <Textarea
           id="private_notes"
-          onChange={props.onChange}
+          onChange={props.formik.handleChange}
           value={props.data.private_notes}
         ></Textarea>
       </Element>
