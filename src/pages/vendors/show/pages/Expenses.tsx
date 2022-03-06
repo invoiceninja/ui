@@ -66,10 +66,7 @@ export function Expenses() {
       name: t('recurring_expenses'),
       href: generatePath('/vendors/:id/recurring_expenses', { id }),
     },
-    {
-      name: t('documents'),
-      href: generatePath('/vendors/:id/documents', { id }),
-    },
+    
   ];
 
   return (
