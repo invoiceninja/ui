@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useVendorQuery } from 'common/queries/vendor';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
 import { useTranslation } from 'react-i18next';
@@ -16,7 +15,6 @@ import { generatePath, useParams } from 'react-router-dom';
 
 export function Show() {
   const { id } = useParams();
-  const { data: vendor } = useVendorQuery({ id });
   const [t] = useTranslation();
   const tabs: Tab[] = [
     { name: t('details'), href: generatePath('/vendors/:id', { id }) },

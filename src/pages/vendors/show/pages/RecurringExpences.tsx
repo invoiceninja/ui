@@ -26,6 +26,7 @@ export function RecurringExpenses() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
   const pages = [
+    { name: t('vendors'), href: '/vendors' },
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
   ];
 
@@ -92,9 +93,8 @@ export function RecurringExpenses() {
         resource="recurring_expense"
         endpoint={`/api/v1/recurring_expenses?client_id=${id}`}
         columns={columns}
-        linkToCreate="/recurring_expenses/create"
-        linkToEdit="/recurring_expenses/:id/edit"
         withResourcefulActions
+        bulkRoute="/api/v1/recurring_expenses/bulk"
       />
     </Default>
   );

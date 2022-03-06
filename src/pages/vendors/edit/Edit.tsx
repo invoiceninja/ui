@@ -31,10 +31,12 @@ type Props = { includeTabs?: boolean };
 
 export function Edit(props: Props) {
   const [t] = useTranslation();
+
   const { id } = useParams();
   const { data: vendor } = useVendorQuery({ id });
   const [errors, setErrors] = useState<ValidationBag>();
   const queryClient = useQueryClient();
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -81,6 +83,14 @@ export function Edit(props: Props) {
         });
     },
   });
+  const pages = [
+    { name: t('vendors'), href: '/vendors' },
+    {
+      name: vendor?.data.data.number,
+      href: generatePath('/vendors/:id', { id }),
+    },
+  ];
+
   const tabs: Tab[] = [
     { name: t('details'), href: generatePath('/vendors/:id', { id }) },
     {
@@ -98,7 +108,7 @@ export function Edit(props: Props) {
   ];
 
   return (
-    <Default title={t('vendor')} onBackClick={''} onSaveClick={''}>
+    <Default title={t('vendor')} breadcrumbs={pages} docsLink="docs/vendors/">
       <Container>
         {props.includeTabs && <Tabs tabs={tabs} className="mt-6" />}
         <Card

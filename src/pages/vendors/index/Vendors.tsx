@@ -58,7 +58,7 @@ export function Vendors() {
         endpoint="/api/v1/vendors"
         columns={columns}
         linkToCreate="/vendors/create"
-        linkToEdit="/vendors/:id/edit"
+        linkToEdit="/vendors/:id"
         withResourcefulActions
       />
     </Default>
