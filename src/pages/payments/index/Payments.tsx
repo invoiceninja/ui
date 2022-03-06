@@ -33,11 +33,14 @@ export function Payments() {
     {
       id: 'number',
       label: t('number'),
-      format: (value, resource) => (
-        <Link to={generatePath('/payments/:id', { id: resource.id })}>
-          {resource.number}
-        </Link>
-      ),
+      format: (value, resource) => {
+        console.log(resource);
+        return (
+          <Link to={generatePath('/payments/:id', { id: resource.id })}>
+            {resource.number}
+          </Link>
+        );
+      },
     },
     {
       id: 'client_id',

@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField, Textarea } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import paymentType from 'common/constants/payment-type';
+import { InvoiceStatus } from 'common/enums/invoice-status';
 import { endpoint } from 'common/helpers';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useClientsQuery } from 'common/queries/clients';
@@ -28,11 +29,14 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath } from 'react-router-dom';
+import { Invoices } from '../components/Invoices';
 
 export function Create() {
   const [t] = useTranslation();
-  const [invoiceBasedPayment, setinvoiceBasedPayment] = useState()
-const [clientBasedPayment, setclientBasedPayment] = useState()
+  const [invoiceBasedPayment, setinvoiceBasedPayment] = useState();
+  const [clientBasedPayment, setclientBasedPayment] = useState();
+  const [selectedInvoices, setselectedInvoices] = useState([]);
+  const [amount, setamount] = useState(0)
   const { data: payment } = useBlankPaymentQuery();
   const pages: BreadcrumRecord[] = [
     { name: t('payments'), href: '/payments' },
@@ -41,6 +45,7 @@ const [clientBasedPayment, setclientBasedPayment] = useState()
       href: '/payments',
     },
   ];
+  const [invoices, setinvoices] = useState([]);
   const queryClient = useQueryClient();
   const [errors, setErrors] = useState<ValidationBag>();
   const { data: clients } = useClientsQuery();
@@ -57,6 +62,7 @@ const [clientBasedPayment, setclientBasedPayment] = useState()
       private_notes: payment?.data.data.private_notes || '',
       exchange_currency_id: payment?.data.data.exchange_currency_id || '',
       exchange_rate: payment?.data.data.exchange_rate,
+      invoices: payment?.data.data.invoices||[],
     },
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
@@ -81,10 +87,20 @@ const [clientBasedPayment, setclientBasedPayment] = useState()
         });
     },
   });
-useEffect(() => {
-axios.get(generatePath('/api/v1/invoices?client_id=:id',{id:formik.values.client_id})).then(data=>{console.log("data",data)})
-}, [])
 
+  useEffect(() => {
+    axios
+      .get(
+        endpoint('/api/v1/invoices?client_id=:id', {
+          id: formik.values.client_id,
+        }),
+        { headers: defaultHeaders }
+      )
+      .then((data) => {
+        console.log('data', data.data.data);
+        setinvoices(data?.data.data);
+      });
+  }, [formik.values.client_id]);
 
   const [changeCurrency, setchangeCurrency] = useState(false);
   useEffect(() => {
@@ -122,14 +138,14 @@ axios.get(generatePath('/api/v1/invoices?client_id=:id',{id:formik.values.client
       title={t('new_payment')}
       docsLink="docs/payments/"
     >
+      {console.log("empty payment",payment?.data.data)}
       <Container>
-        {console.log(payment?.data.data)}
         <Card
           disableSubmitButton={formik.isSubmitting}
           onFormSubmit={formik.handleSubmit}
           withSaveButton
         >
-          <div className="bg-white p-6 w-full rounded shadow my-3">
+          <div className="bg-white p-6 w-full rounded shadow ">
             <Element leftSide={t('client')}>
               <SelectField id="client_id" onChange={formik.handleChange}>
                 {clients?.data.data.map((value: any, index: any) => {
@@ -144,21 +160,34 @@ axios.get(generatePath('/api/v1/invoices?client_id=:id',{id:formik.values.client
             </Element>
             <Element leftSide={t('amount')}>
               <InputField
-                id="number"
+                id="amount"
+                disabled
                 onChange={formik.handleChange}
+                value={amount}
                 errorMessage={errors?.errors.payment_amount}
               ></InputField>
             </Element>
-           {
-
-           } <Element leftSide={t('invoice')}>
-              <InputField
-                id="number"
-                onChange={formik.handleChange}
-                errorMessage={errors?.errors.payment_amount}
-              ></InputField>
+            <Element leftSide={t('invoice')}>
+              <SelectField
+                onChange={(event: any) => {
+                  console.log("change value",event.target.value)
+                   formik.values.invoices.push(invoices.filter((invoice:any)=>invoice.id===event.target.value));
+                  formik.setFieldValue('invoices', formik.values.invoices);
+                }}
+              >
+                {
+                  invoices?.map((value: any, index: any) => {
+                    if (value.status_id !== InvoiceStatus.Paid)
+                      return (
+                        <option key={index} value={value.id}>
+                          {value.number}
+                        </option>
+                      );
+                  })}
+              </SelectField>
+              {console.log("formik data",formik.values)}
             </Element>
-
+            {} <Invoices data={invoices} formik={formik}></Invoices>
             <Element leftSide={t('payment_date')}>
               <InputField
                 id="date"
