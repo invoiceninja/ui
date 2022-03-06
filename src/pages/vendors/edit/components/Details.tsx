@@ -40,7 +40,7 @@ export function Details(props: Props) {
       </Element>
       <Element leftSide={t('user')}>
         <SelectField
-          id="user"
+          id="user_id"
           defaultValue={'User'}
           onChange={props.formik.handleChange}
         >
