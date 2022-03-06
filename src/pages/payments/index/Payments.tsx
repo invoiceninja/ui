@@ -36,7 +36,7 @@ export function Payments() {
       format: (value, resource) => {
         console.log(resource);
         return (
-          <Link to={generatePath('/payments/:id', { id: resource.id })}>
+          <Link to={generatePath('/payments/:id/edit', { id: resource.id })}>
             {resource.number}
           </Link>
         );
