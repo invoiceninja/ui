@@ -13,17 +13,10 @@ import { endpoint } from 'common/helpers';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { defaultHeaders } from './common/headers';
-import { Params } from './common/params.interface';
 
-export function useClientsQuery(params: Params) {
-  return useQuery(['/api/v1/clients', params], () =>
-    axios.get(
-      endpoint('/api/v1/clients?per_page=:perPage&page=:currentPage', {
-        perPage: params.perPage,
-        currentPage: params.currentPage,
-      }),
-      { headers: defaultHeaders }
-    )
+export function useClientsQuery() {
+  return useQuery(['/api/v1/clients'], () =>
+    axios.get(endpoint('/api/v1/clients'), { headers: defaultHeaders })
   );
 }
 
