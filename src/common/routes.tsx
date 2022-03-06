@@ -101,7 +101,6 @@ export const routes = (
             path="recurring_expenses"
             element={<Vendors.RecurringExpenses />}
           />
-          <Route path="documents" element={<Vendors.Documents />} />
 
           <Route path="expenses" element={<Vendors.Expenses />} />
         </Route>
