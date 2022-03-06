@@ -7,7 +7,6 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Card } from '@invoiceninja/cards';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -25,7 +24,6 @@ import { Contacts } from '../components/Contacts';
 import { Details } from '../components/Details';
 import toast from 'react-hot-toast';
 import { useQueryClient } from 'react-query';
-import { ValidationAlert } from 'components/ValidationAlert';
 
 export function Create() {
   const [t] = useTranslation();
@@ -63,7 +61,7 @@ export function Create() {
           headers: defaultHeaders,
         })
         .then(() => {
-          toast.success(t('added_vendor'), { id: toastId });
+          toast.success(t('new_vendor'), { id: toastId });
         })
         .catch((error: AxiosError) => {
           console.error(error);
@@ -81,30 +79,39 @@ export function Create() {
   const pages = [
     { name: t('vendors'), href: '/vendors' },
     {
-      name: vendor?.data.data.number,
-      href: generatePath('/vendors/'),
+      name: t('new_vendor'),
+      href: generatePath('/vendors/create'),
     },
   ];
 
   return (
     <Default title={t('vendor')} breadcrumbs={pages} docsLink="docs/vendors/">
       <Container>
-        <Card
-          disableSubmitButton={formik.isSubmitting}
-          onFormSubmit={formik.handleSubmit}
-          withSaveButton
-        >
-          {errors && <ValidationAlert errors={errors} />}
-
-          <Details data={formik.values} formik={formik} errors={errors} />
-          <Address data={formik.values} formik={formik} errors={errors} />
-          <AdditionalInfo
-            data={formik.values}
-            formik={formik}
-            errors={errors}
-          />
-          <Contacts formik={formik} data={formik.values.contacts} />
-        </Card>
+        <Details
+          data={formik.values}
+          setFieldValue={formik.setFieldValue}
+          handleChange={formik.handleChange}
+          errors={errors}
+        />
+        <Address
+          data={formik.values}
+          setFieldValue={formik.setFieldValue}
+          handleChange={formik.handleChange}
+          errors={errors}
+        />
+        <AdditionalInfo
+          data={formik.values}
+          handleChange={formik.handleChange}
+          setFieldValue={formik.setFieldValue}
+          errors={errors}
+        />
+        <Contacts
+          handleChange={formik.handleChange}
+          setFieldValue={formik.setFieldValue}
+          isSubmitting={formik.isSubmitting}
+          handleSubmit={formik.handleSubmit}
+          data={formik.values.contacts}
+        />
       </Container>
     </Default>
   );

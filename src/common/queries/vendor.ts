@@ -24,6 +24,7 @@ export function useVendorQuery(params: { id: string | undefined }) {
     { staleTime: Infinity }
   );
 }
+
 export function useBlankVendorQuery() {
   return useQuery(
     endpoint('/api/v1/vendors/create'),

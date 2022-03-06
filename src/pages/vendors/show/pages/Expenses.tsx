@@ -55,7 +55,7 @@ export function Expenses() {
   return (
     <DataTable
       resource="expense"
-      endpoint={`/api/v1/expenses?client_id=${id}`}
+      endpoint={`/api/v1/expenses?vendor_id=${id}`}
       columns={columns}
       bulkRoute="/api/v1/expenses/bulk"
       withResourcefulActions

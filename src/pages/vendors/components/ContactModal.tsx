@@ -13,17 +13,26 @@ import { useTranslation } from 'react-i18next';
 import { Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 
-type Props = {
-  data?: any;
-  formik?: any;
+interface Props {
+  contact?: any;
+  formikValues?: any;
+  handleChange?: any;
+  setFieldValue?: any;
   isOpen: any;
   setIsOpen: any;
   index?: any;
-};
+}
 
 export function ContactModal(props: Props) {
   const [t] = useTranslation();
-
+  const removeContact = () => {
+    props.setFieldValue(
+      'contacts',
+      props.formikValues.filter(
+        (contact: any) => contact.id !== props.contact.id
+      )
+    );
+  };
   return (
     <Modal
       visible={props.isOpen}
@@ -36,49 +45,38 @@ export function ContactModal(props: Props) {
         <Element leftSide={t('first_name')}>
           <InputField
             id={`contacts[${props.index}].first_name`}
-            onChange={props.formik.handleChange}
-            value={props.data.first_name}
+            onChange={props.handleChange}
+            value={props.contact.first_name}
           />
         </Element>
         <Element leftSide={t('last_name')}>
           <InputField
             id={`contacts[${props.index}].last_name`}
-            onChange={props.formik.handleChange}
-            value={props.data.last_name}
+            onChange={props.handleChange}
+            value={props.contact.last_name}
           />
         </Element>
         <Element leftSide={t('email')}>
           <InputField
             id={`contacts[${props.index}].email`}
-            onChange={props.formik.handleChange}
-            value={props.data.email}
+            onChange={props.handleChange}
+            value={props.contact.email}
           />
         </Element>
         <Element leftSide={t('phone')}>
           <InputField
             id={`contacts[${props.index}].phone`}
-            onChange={props.formik.handleChange}
-            value={props.data.phone}
+            onChange={props.handleChange}
+            value={props.contact.phone}
           />
         </Element>
         <div className="flex justify-between p-5">
-          <Button
-            type="minimal"
-            onClick={(event: any) => {
-              event.preventDefault();
-              props.formik.setFieldValue(
-                'contacts',
-                props.formik.values.contacts.filter(
-                  (contact: any) => contact.id !== props.data.id
-                )
-              );
-            }}
-          >
+          <Button behavior="button" type="minimal" onClick={removeContact}>
             Remove
           </Button>
           <Button
-            onClick={(event: any) => {
-              event.preventDefault();
+            behavior="button"
+            onClick={() => {
               props.setIsOpen(false);
             }}
           >

@@ -14,7 +14,12 @@ import { useStaticsQuery } from 'common/queries/statics';
 import { Alert } from 'components/Alert';
 import { useTranslation } from 'react-i18next';
 
-type Props = { data?: any; formik?: any; errors?: any };
+interface Props {
+  data: any;
+  handleChange?: any;
+  setFieldValue?: any;
+  errors?: any;
+}
 
 export function Address(props: Props) {
   const [t] = useTranslation();
@@ -26,42 +31,42 @@ export function Address(props: Props) {
       <Element leftSide={t('address1')}>
         <InputField
           id="address1"
-          onChange={props.formik.handleChange}
+          onChange={props.handleChange}
           value={props.data.address1}
         />
       </Element>
       <Element leftSide={t('address2')}>
         <InputField
           id="address2"
-          onChange={props.formik.handleChange}
+          onChange={props.handleChange}
           value={props.data.address2}
         />
       </Element>
       <Element leftSide={t('city')}>
         <InputField
           id="city"
-          onChange={props.formik.handleChange}
+          onChange={props.handleChange}
           value={props.data.city}
         />
       </Element>
       <Element leftSide={t('state')}>
         <InputField
           id="state"
-          onChange={props.formik.handleChange}
+          onChange={props.handleChange}
           value={props.data.state}
         />
       </Element>
       <Element leftSide={t('postal_code')}>
         <InputField
           id="postal_code"
-          onChange={props.formik.handleChange}
+          onChange={props.handleChange}
           value={props.data.postal_code}
         />
       </Element>
       <Element leftSide={t('country_id')}>
         <SelectField
           onChange={(event: any) => {
-            props.formik.setFieldValue('country_id', event.target.value);
+            props.setFieldValue('country_id', event.target.value);
           }}
         >
           <option value=""></option>

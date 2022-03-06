@@ -14,7 +14,12 @@ import { useStaticsQuery } from 'common/queries/statics';
 import { Alert } from 'components/Alert';
 import { useTranslation } from 'react-i18next';
 
-type Props = { data?: any; formik?: any; errors?: any };
+interface Props {
+  data: any;
+  errors?: any;
+  handleChange: any;
+  setFieldValue: any;
+}
 
 export function AdditionalInfo(props: Props) {
   const [t] = useTranslation();
@@ -26,7 +31,7 @@ export function AdditionalInfo(props: Props) {
       <Element leftSide={t('currency')}>
         <SelectField
           onChange={(event: any) => {
-            props.formik.setFieldValue('currency_id', event.target.value);
+            props.setFieldValue('currency_id', event.target.value);
           }}
         >
           <option value=""></option>
@@ -42,14 +47,14 @@ export function AdditionalInfo(props: Props) {
       <Element leftSide={t('public_notes')}>
         <Textarea
           id="public_notes"
-          onChange={props.formik.handleChange}
+          onChange={props.handleChange}
           value={props.data.public_notes}
         />
       </Element>
       <Element leftSide={t('private_notes')}>
         <Textarea
           id="private_notes"
-          onChange={props.formik.handleChange}
+          onChange={props.handleChange}
           value={props.data.private_notes}
         />
       </Element>

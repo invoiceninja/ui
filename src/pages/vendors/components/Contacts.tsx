@@ -9,20 +9,46 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { random } from '../../../common/helpers/id';
-
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { Contact } from './Contact';
 
-type Props = { data?: any; formik?: any };
+interface Props {
+  data: any;
+  handleChange:any,
+  setFieldValue:any
+  isSubmitting:any,
+  handleSubmit:any
+}
 
 export function Contacts(props: Props) {
   const [t] = useTranslation();
+  const addNewContact = () => {
+    props.data.push({
+      archived_at: 0,
+      created_at: Date.now().toString(),
+      custom_value1: '',
+      custom_value2: '',
+      custom_value3: '',
+      custom_value4: '',
+      email: '',
+      first_name: '',
+      id: '',
+      is_primary: props.data?.find((contact: any) => {
+        return contact.is_primary;
+      })
+        ? false
+        : true,
+      last_name: '',
+      phone: '',
+      updated_at: Date.now().toString(),
+    });
+    props.setFieldValue('contacts', props.data);
+  };
   return (
     <Card
-      disableSubmitButton={props.formik.isSubmitting}
-      onFormSubmit={props.formik.handleSubmit}
+      disableSubmitButton={props.isSubmitting}
+      onFormSubmit={props.handleSubmit}
       withSaveButton
       title={t('contacts')}
     >
@@ -34,36 +60,16 @@ export function Contacts(props: Props) {
                 data={contact}
                 key={index}
                 index={index}
-                formik={props.formik}
+                handleChange={props.handleChange}
+                setFieldValue={props.setFieldValue}
+                formikValues={props.data}
               />
             );
           })}
         <button
+          type="button"
           className="w-full py-2 inline-flex justify-center items-center space-x-2"
-          onClick={(event: any) => {
-            event.preventDefault();
-
-            props.data.push({
-              archived_at: 0,
-              created_at: Date.now().toString(),
-              custom_value1: '',
-              custom_value2: '',
-              custom_value3: '',
-              custom_value4: '',
-              email: '',
-              first_name: '',
-              id: random(10),
-              is_primary: props.data?.find((contact: any) => {
-                return contact.is_primary;
-              })
-                ? false
-                : true,
-              last_name: '',
-              phone: '',
-              updated_at: Date.now().toString(),
-            });
-            props.formik.setFieldValue('contacts', props.data);
-          }}
+          onClick={addNewContact}
         >
           <Plus size={18} />
           <span>{t('add_item')}</span>

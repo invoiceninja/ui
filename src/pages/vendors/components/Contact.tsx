@@ -12,11 +12,13 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContactModal } from './ContactModal';
 
-type Props = {
-  data?: any;
-  index?: any;
-  formik?: any;
-};
+interface Props {
+  data: any;
+  index: any;
+  formikValues: any;
+  handleChange?: any;
+  setFieldValue?: any;
+}
 
 export function Contact(props: Props) {
   const [isOpen, setisOpen] = useState(false);
@@ -40,9 +42,11 @@ export function Contact(props: Props) {
       <ContactModal
         isOpen={isOpen}
         setIsOpen={setisOpen}
-        data={props.data}
+        contact={props.data}
         index={props.index}
-        formik={props.formik}
+        formikValues={props.formikValues}
+        handleChange={props.handleChange}
+        setFieldValue={props.setFieldValue}
       />
     </>
   );

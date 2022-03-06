@@ -18,10 +18,12 @@ import { useTranslation } from 'react-i18next';
 import { generatePath, Outlet, useParams } from 'react-router-dom';
 
 export function Vendor() {
+
   const { id } = useParams();
   const [t] = useTranslation();
   const [documentTitle, setdocumentTitle] = useState('');
   const { data: vendor } = useVendorQuery({ id });
+
   const tabs: Tab[] = [
     { name: t('details'), href: generatePath('/vendors/:id/edit', { id }) },
     {
@@ -33,6 +35,7 @@ export function Vendor() {
       href: generatePath('/vendors/:id/recurring_expenses', { id }),
     },
   ];
+  
   const pages: BreadcrumRecord[] = [
     { name: t('vendors'), href: '/vendors' },
     {
