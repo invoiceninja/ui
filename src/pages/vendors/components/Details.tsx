@@ -33,7 +33,7 @@ export function Details(props: Props) {
       </Element>
       <Element leftSide={t('number')}>
         <InputField
-          id="name"
+          id="number"
           onChange={props.formik.handleChange}
           value={props.data.number}
         />

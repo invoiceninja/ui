@@ -24,3 +24,13 @@ export function useVendorQuery(params: { id: string | undefined }) {
     { staleTime: Infinity }
   );
 }
+export function useBlankVendorQuery() {
+  return useQuery(
+    endpoint('/api/v1/vendors/create'),
+    () =>
+      axios.get(endpoint('/api/v1/vendors/create'), {
+        headers: defaultHeaders,
+      }),
+    { staleTime: Infinity }
+  );
+}
