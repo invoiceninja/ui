@@ -25,6 +25,7 @@ import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
 import toast from 'react-hot-toast';
 import { useQueryClient } from 'react-query';
+import { ValidationAlert } from 'components/ValidationAlert';
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
@@ -36,7 +37,7 @@ export function Edit() {
     initialValues: {
       name: vendor?.data.data.name,
       number: vendor?.data.data.number,
-      user: vendor?.data.data.user_id,
+      user_id: vendor?.data.data.user_id,
       id_number: vendor?.data.data.id_number,
       vat_number: vendor?.data.data.vat_number,
       website: vendor?.data.data.website,
@@ -86,25 +87,15 @@ export function Edit() {
           onFormSubmit={formik.handleSubmit}
           withSaveButton
         >
-          <Details
-            data={formik.values}
-            onChange={formik.handleChange}
-          ></Details>
-          <Address
-            data={formik.values}
-            onChange={formik.handleChange}
-            formikUpdateField={formik.setFieldValue}
-          ></Address>
+          {errors && <ValidationAlert errors={errors} />}
+          <Details data={formik.values} formik={formik} errors={errors} />
+          <Address data={formik.values} formik={formik} errors={errors} />
           <AdditionalInfo
             data={formik.values}
-            onChange={formik.handleChange}
-            formikUpdateField={formik.setFieldValue}
-          ></AdditionalInfo>
-          <Contacts
             formik={formik}
-            data={formik.values.contacts}
-            onChange={formik.handleChange}
-          ></Contacts>
+            errors={errors}
+          />
+          <Contacts formik={formik} data={formik.values.contacts} />
         </Card>
       </Container>
     </Default>

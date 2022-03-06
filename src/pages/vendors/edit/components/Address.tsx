@@ -14,7 +14,7 @@ import { useStaticsQuery } from 'common/queries/statics';
 import { Alert } from 'components/Alert';
 import { useTranslation } from 'react-i18next';
 
-type Props = { data?: any; onChange?: any; formik?: any; errors?: any };
+type Props = { data?: any;formik?: any; errors?: any };
 
 export function Address(props: Props) {
   const [t] = useTranslation();
