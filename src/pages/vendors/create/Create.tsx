@@ -25,6 +25,7 @@ import { Contacts } from '../components/Contacts';
 import { Details } from '../components/Details';
 import toast from 'react-hot-toast';
 import { useQueryClient } from 'react-query';
+import { ValidationAlert } from 'components/ValidationAlert';
 
 export function Create() {
   const [t] = useTranslation();
@@ -93,6 +94,8 @@ export function Create() {
           onFormSubmit={formik.handleSubmit}
           withSaveButton
         >
+          {errors && <ValidationAlert errors={errors} />}
+
           <Details data={formik.values} formik={formik} errors={errors} />
           <Address data={formik.values} formik={formik} errors={errors} />
           <AdditionalInfo
