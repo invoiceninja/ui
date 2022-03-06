@@ -11,9 +11,10 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { useStaticsQuery } from 'common/queries/statics';
+import { Alert } from 'components/Alert';
 import { useTranslation } from 'react-i18next';
 
-type Props = { data?: any; onChange?: any; formikUpdateField?: any };
+type Props = { data?: any; onChange?: any; formik?: any; errors?: any };
 
 export function Address(props: Props) {
   const [t] = useTranslation();
@@ -21,45 +22,46 @@ export function Address(props: Props) {
 
   return (
     <Card title={t('address')} className="mb-5">
+      {props.errors?.notes && <Alert type="danger">{props.errors.notes}</Alert>}
       <Element leftSide={t('address1')}>
         <InputField
           id="address1"
-          onChange={props.onChange}
+          onChange={props.formik.handleChange}
           value={props.data.address1}
         />
       </Element>
       <Element leftSide={t('address2')}>
         <InputField
           id="address2"
-          onChange={props.onChange}
+          onChange={props.formik.handleChange}
           value={props.data.address2}
         />
       </Element>
       <Element leftSide={t('city')}>
         <InputField
           id="city"
-          onChange={props.onChange}
+          onChange={props.formik.handleChange}
           value={props.data.city}
         />
       </Element>
       <Element leftSide={t('state')}>
         <InputField
           id="state"
-          onChange={props.onChange}
+          onChange={props.formik.handleChange}
           value={props.data.state}
         />
       </Element>
       <Element leftSide={t('postal_code')}>
         <InputField
           id="postal_code"
-          onChange={props.onChange}
+          onChange={props.formik.handleChange}
           value={props.data.postal_code}
         />
       </Element>
       <Element leftSide={t('country_id')}>
         <SelectField
           onChange={(event: any) => {
-            props.formikUpdateField('country_id', event.target.value);
+            props.formik.setFieldValue('country_id', event.target.value);
           }}
         >
           {statics?.data.countries.map((element: any, index: any) => {
