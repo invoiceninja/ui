@@ -93,6 +93,8 @@ export const routes = (
       </Route>
       <Route path="/vendors">
         <Route path="" element={<Vendors.Vendors />} />
+        <Route path="create" element={<Vendors.Create />} />
+
         <Route path=":id">
           <Route path="" element={<Vendors.Edit includeTabs />} />
           <Route
@@ -103,8 +105,6 @@ export const routes = (
 
           <Route path="expenses" element={<Vendors.Expenses />} />
         </Route>
-
-        <Route path="create" element={<Vendors.Edit />} />
       </Route>
       <Route path="/expenses">
         <Route path="" element={<Expenses.Expenses />} />

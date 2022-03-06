@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { random } from '../../../../common/helpers/id';
+import { random } from '../../../common/helpers/id';
 
 import { Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
