@@ -31,6 +31,7 @@ export function usePaymentQuery(params: { id: string | undefined }) {
     { staleTime: Infinity }
   );
 }
+
 export function useBlankPaymentQuery() {
   return useQuery(
     generatePath('/api/v1/payments/create'),
