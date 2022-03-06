@@ -26,7 +26,10 @@ import { Details } from './components/Details';
 import toast from 'react-hot-toast';
 import { useQueryClient } from 'react-query';
 import { ValidationAlert } from 'components/ValidationAlert';
-export function Edit() {
+import { Tab, Tabs } from 'components/Tabs';
+type Props = { includeTabs?: boolean };
+
+export function Edit(props: Props) {
   const [t] = useTranslation();
   const { id } = useParams();
   const { data: vendor } = useVendorQuery({ id });
@@ -78,10 +81,27 @@ export function Edit() {
         });
     },
   });
+  const tabs: Tab[] = [
+    { name: t('details'), href: generatePath('/vendors/:id/edit', { id }) },
+    {
+      name: t('expenses'),
+      href: generatePath('/vendors/:id/expenses', { id }),
+    },
+    {
+      name: t('recurring_expenses'),
+      href: generatePath('/vendors/:id/recurring_expenses', { id }),
+    },
+    {
+      name: t('documents'),
+      href: generatePath('/vendors/:id/documents', { id }),
+    },
+  ];
 
   return (
     <Default title={t('vendor')} onBackClick={''} onSaveClick={''}>
       <Container>
+        {props.includeTabs && <Tabs tabs={tabs} className="mt-6" />}
+
         <Card
           disableSubmitButton={formik.isSubmitting}
           onFormSubmit={formik.handleSubmit}
