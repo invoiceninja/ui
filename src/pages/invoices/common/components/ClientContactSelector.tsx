@@ -8,28 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { Checkbox, InputLabel } from '@invoiceninja/forms';
+import { Checkbox } from '@invoiceninja/forms';
 import { ClientResolver } from 'common/helpers/clients/client-resolver';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { Client as ClientInterface } from 'common/interfaces/client';
+import { Client } from 'common/interfaces/client';
 import {
-  setCurrentInvoiceProperty,
+  setCurrentInvoicePropertySync,
   toggleCurrentInvoiceInvitation,
 } from 'common/stores/slices/invoices';
-import { DebouncedSearch } from 'components/forms/DebouncedSearch';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { CreateClient } from './CreateClient';
 
-export function Client() {
-  const [t] = useTranslation();
-  const dispatch = useDispatch();
-  const [client, setClient] = useState<ClientInterface>();
+export function ClientContactSelector() {
+  const [client, setClient] = useState<Client>();
   const invoice = useCurrentInvoice();
-
   const clientResolver = new ClientResolver();
+  const dispatch = useDispatch();
+  const [t] = useTranslation();
 
   const handleContactCheckboxChange = (contactId: string, value: boolean) => {
     dispatch(toggleCurrentInvoiceInvitation({ contactId, checked: value }));
@@ -51,7 +47,10 @@ export function Client() {
           setClient(client);
 
           dispatch(
-            setCurrentInvoiceProperty({ property: 'invitations', value: [] })
+            setCurrentInvoicePropertySync({
+              property: 'invitations',
+              value: [],
+            })
           );
 
           client.contacts.map((contact) => {
@@ -65,32 +64,18 @@ export function Client() {
   }, [invoice?.client_id]);
 
   return (
-    <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-      <div className="flex items-center justify-between">
-        <InputLabel>{t('client')}</InputLabel>
-        <CreateClient />
-      </div>
-
-      <DebouncedSearch
-        endpoint="/api/v1/clients"
-        label="display_name"
-        onChange={(value) =>
-          dispatch(
-            setCurrentInvoiceProperty({
-              property: 'client_id',
-              value: value.value,
-            })
-          )
-        }
-      />
-
+    <>
       {client &&
         client.contacts.map((contact, index) => (
           <div key={index}>
             <Checkbox
               id={contact.id}
               value={contact.id}
-              label={`${contact.first_name} ${contact.last_name}`}
+              label={
+                contact.first_name.length >= 1
+                  ? `${contact.first_name} ${contact.last_name}`
+                  : t('blank_contact')
+              }
               checked={handleCheckedState(contact.id)}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleContactCheckboxChange(
@@ -103,6 +88,6 @@ export function Client() {
             <span className="text-sm text-gray-700">{contact.email}</span>
           </div>
         ))}
-    </Card>
+    </>
   );
 }

@@ -9,14 +9,14 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { useBlankInvoiceQuery } from 'common/queries/invoices';
+import { useInvoiceQuery } from 'common/queries/invoices';
 import { setCurrentInvoice } from 'common/stores/slices/invoices';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
@@ -24,17 +24,18 @@ import { ProductsTable } from '../common/components/ProductsTable';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { InvoiceActions } from '../common/components/InvoiceActions';
 
-export function Create() {
-  const { documentTitle } = useTitle('new_invoice');
-  const { data: invoice } = useBlankInvoiceQuery();
+export function Edit() {
+  const { id } = useParams();
+  const { documentTitle } = useTitle('edit_invoice');
+  const { data: invoice } = useInvoiceQuery({ id });
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
     {
-      name: t('new_invoice'),
-      href: generatePath('/invoices/create'),
+      name: t('edit_invoice'),
+      href: generatePath('/invoices/:id/edit', { id }),
     },
   ];
 
@@ -47,7 +48,7 @@ export function Create() {
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector />
+        <ClientSelector readonly />
         <InvoiceDetails />
 
         <div className="col-span-12">

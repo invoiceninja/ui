@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { QuoteStatus } from 'common/enums/quote-status';
+import { useCountries } from './useCountries';
 
-export default {
-  [QuoteStatus.Draft]: 'draft',
-  [QuoteStatus.Sent]: 'sent',
-  [QuoteStatus.Approved]: 'approved',
-  [QuoteStatus.Converted]: 'converted',
-  [QuoteStatus.Expired]: 'expired',
-};
+export function useResolveCountry() {
+  const countries = useCountries();
+
+  return (id: number | string) => {
+    return countries.find((country) => country.id == id);
+  };
+}

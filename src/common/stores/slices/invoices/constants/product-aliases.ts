@@ -8,7 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
- export function Tasks() {
-    return <div>Tasks table</div>;
-  }
-  
+export const aliases: Record<string, string> = {
+  item: 'product_key',
+  description: 'notes',
+  unit_cost: 'cost',
+};

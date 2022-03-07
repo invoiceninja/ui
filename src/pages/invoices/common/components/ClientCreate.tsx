@@ -28,7 +28,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 
-export function CreateClient() {
+export function ClientCreate() {
   const [t] = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [client, setClient] = useState<Client | undefined>();

@@ -1,6 +1,3 @@
-import { useTranslation } from 'react-i18next';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { resolveKey } from '../helpers/resolve-key';
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -10,6 +7,10 @@ import { resolveKey } from '../helpers/resolve-key';
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { resolveKey } from 'pages/invoices/common/helpers/resolve-key';
+import { useTranslation } from 'react-i18next';
 
 export function useResolveTranslation() {
   const company = useCurrentCompany();

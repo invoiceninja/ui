@@ -8,78 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ClientResolver } from 'common/helpers/clients/client-resolver';
-import { CurrencyResolver } from 'common/helpers/currencies/currency-resolver';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { Currency } from 'common/interfaces/currency';
 import { Invoice } from 'common/interfaces/invoice';
-import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { cloneDeep, set } from 'lodash';
-
-const clientResolver = new ClientResolver();
-const currencyResolver = new CurrencyResolver();
-
-export const setCurrentLineItemProperty = createAsyncThunk(
-  'invoices/setCurrentInvoiceProperty',
-  async (payload: any, thunkApi) => {
-    const state = thunkApi.getState() as any;
-
-    const client = await clientResolver.find(state.invoices.current.client_id);
-    const currency = await currencyResolver.find(client.settings.currency_id); // or company currency
-
-    payload.client = client;
-    payload.currency = currency;
-
-    return payload;
-  }
-);
-
-const blankLineItem: InvoiceItem = {
-  quantity: 0,
-  cost: 0,
-  product_key: '',
-  product_cost: 0,
-  notes: '',
-  discount: 0,
-  is_amount_discount: false,
-  tax_name1: '',
-  tax_rate1: 0,
-  tax_name2: '',
-  tax_rate2: 0,
-  tax_name3: '',
-  tax_rate3: 0,
-  sort_id: 0,
-  line_total: 0,
-  gross_line_total: 0,
-  date: '',
-  custom_value1: '',
-  custom_value2: '',
-  custom_value3: '',
-  custom_value4: '',
-  type_id: '1',
-};
-
-const blankInvitation = {
-  client_contact_id: '',
-  is_deleted: false,
-  isChanged: false,
-  key: '',
-  link: '',
-  opened_date: '',
-  sent_date: '',
-  viewed_date: '',
-  created_at: 0,
-  archived_at: 0,
-  updated_at: 0,
-};
-
-export const aliases: Record<string, string> = {
-  item: 'product_key',
-  description: 'notes',
-  unit_cost: 'cost',
-};
-
+import { blankInvitation } from './invoices/constants/blank-invitation';
+import { blankLineItem } from './invoices/constants/blank-line-item';
+import { deleteInvoiceLineItem } from './invoices/extra-reducers/delete-invoice-item';
+import { setCurrentInvoiceProperty } from './invoices/extra-reducers/set-current-invoice-property';
+import { setCurrentLineItemProperty } from './invoices/extra-reducers/set-current-line-item-property';
 interface InvoiceState {
   api?: any;
   current?: Invoice;
@@ -104,23 +42,6 @@ export const invoiceSlice = createSlice({
     },
     injectBlankItemIntoCurrent: (state) => {
       state.current?.line_items.push(blankLineItem);
-    },
-    setCurrentInvoiceProperty: (
-      state,
-      payload: PayloadAction<{ property: keyof Invoice; value: unknown }>
-    ) => {
-      if (state.current) {
-        state.current = set(
-          state.current,
-          payload.payload.property,
-          payload.payload.value
-        );
-      }
-    },
-    deleteInvoiceLineItem: (state, payload: PayloadAction<number>) => {
-      if (state.current) {
-        state.current.line_items.splice(payload.payload, 1);
-      }
     },
     toggleCurrentInvoiceInvitation: (
       state,
@@ -152,6 +73,18 @@ export const invoiceSlice = createSlice({
         state.current?.invitations.push(invitation);
       }
     },
+    setCurrentInvoicePropertySync: (
+      state,
+      payload: PayloadAction<{ property: keyof Invoice; value: unknown }>
+    ) => {
+      if (state.current) {
+        state.current = set(
+          state.current,
+          payload.payload.property,
+          payload.payload.value
+        );
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(setCurrentLineItemProperty.fulfilled, (state, payload) => {
@@ -168,13 +101,40 @@ export const invoiceSlice = createSlice({
         ).build().invoice;
       }
     });
+
+    builder.addCase(deleteInvoiceLineItem.fulfilled, (state, payload) => {
+      if (state.current) {
+        state.current.line_items.splice(payload.payload.payload, 1);
+      }
+
+      state.current = new InvoiceSum(
+        cloneDeep(state.current as Invoice),
+        cloneDeep(payload.payload.currency as Currency)
+      ).build().invoice;
+    });
+
+    builder.addCase(setCurrentInvoiceProperty.fulfilled, (state, payload) => {
+      if (state.current) {
+        state.current = set(
+          state.current,
+          payload.payload.payload.property,
+          payload.payload.payload.value
+        );
+
+        if (payload.payload.client && payload.payload.currency) {
+          state.current = new InvoiceSum(
+            cloneDeep(state.current),
+            cloneDeep(payload.payload.currency)
+          ).build().invoice;
+        }
+      }
+    });
   },
 });
 
 export const {
   setCurrentInvoice,
   injectBlankItemIntoCurrent,
-  setCurrentInvoiceProperty,
-  deleteInvoiceLineItem,
   toggleCurrentInvoiceInvitation,
+  setCurrentInvoicePropertySync,
 } = invoiceSlice.actions;

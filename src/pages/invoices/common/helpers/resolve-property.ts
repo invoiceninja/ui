@@ -9,7 +9,7 @@
  */
 
 import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { aliases } from 'common/stores/slices/invoices';
+import { aliases } from 'common/stores/slices/invoices/constants/product-aliases';
 import { resolveKey } from './resolve-key';
 
 export function resolveProperty(property: string) {

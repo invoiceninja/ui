@@ -13,24 +13,18 @@ import { Card } from '@invoiceninja/cards';
 import { InputField, InputLabel } from '@invoiceninja/forms';
 import MDEditor from '@uiw/react-md-editor';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { Invoice } from 'common/interfaces/invoice';
-import { setCurrentInvoiceProperty } from 'common/stores/slices/invoices';
-import { DebouncedSearch } from 'components/forms/DebouncedSearch';
+import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { Documents } from './Documents';
+import { InvoiceDocuments } from './InvoiceDocuments';
+import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 
-export function Footer() {
+export function InvoiceFooter() {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
   const invoice = useCurrentInvoice();
-
-  const handleChange = (property: keyof Invoice, value: unknown) => {
-    dispatch(setCurrentInvoiceProperty({ property, value }));
-  };
+  const handleChange = useSetCurrentInvoiceProperty();
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
@@ -73,7 +67,7 @@ export function Footer() {
         </Tab.Panel>
 
         <Tab.Panel>
-          <Documents />
+          <InvoiceDocuments />
         </Tab.Panel>
 
         <Tab.Panel>
@@ -81,10 +75,11 @@ export function Footer() {
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
                 <InputLabel>{t('project')}</InputLabel>
-                <DebouncedSearch
+                <DebouncedCombobox
                   endpoint="/api/v1/projects"
                   label="name"
                   onChange={(value) => handleChange('project_id', value.value)}
+                  defaultValue={invoice?.project_id}
                 />
               </div>
 
@@ -106,21 +101,23 @@ export function Footer() {
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
                 <InputLabel>{t('user')}</InputLabel>
-                <DebouncedSearch
+                <DebouncedCombobox
                   endpoint="/api/v1/users"
                   label="first_name"
                   onChange={(value) =>
                     handleChange('assigned_user_id', value.value)
                   }
+                  defaultValue={invoice?.assigned_user_id}
                 />
               </div>
 
               <div className="space-y-2">
                 <InputLabel>{t('vendor')}</InputLabel>
-                <DebouncedSearch
+                <DebouncedCombobox
                   endpoint="/api/v1/vendors"
                   label="name"
                   onChange={(value) => handleChange('vendor_id', value.value)}
+                  defaultValue={invoice?.vendor_id}
                 />
               </div>
 
