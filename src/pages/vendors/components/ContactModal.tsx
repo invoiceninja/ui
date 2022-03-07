@@ -41,46 +41,47 @@ export function ContactModal(props: Props) {
         props.setIsOpen(!props.isOpen);
       }}
     >
-      <div>
-        <Element leftSide={t('first_name')}>
-          <InputField
-            id={`contacts[${props.index}].first_name`}
-            onChange={props.handleChange}
-            value={props.contact.first_name}
-          />
-        </Element>
-        <Element leftSide={t('last_name')}>
-          <InputField
-            id={`contacts[${props.index}].last_name`}
-            onChange={props.handleChange}
-            value={props.contact.last_name}
-          />
-        </Element>
-        <Element leftSide={t('email')}>
-          <InputField
-            id={`contacts[${props.index}].email`}
-            onChange={props.handleChange}
-            value={props.contact.email}
-          />
-        </Element>
-        <Element leftSide={t('phone')}>
-          <InputField
-            id={`contacts[${props.index}].phone`}
-            onChange={props.handleChange}
-            value={props.contact.phone}
-          />
-        </Element>
-        <div className="flex justify-between p-5">
+      <div className="space-y-4">
+        <InputField
+          label={t('first_name')}
+          id={`contacts[${props.index}].first_name`}
+          onChange={props.handleChange}
+          value={props.contact.first_name}
+        />
+
+        <InputField
+          label={t('last_name')}
+          id={`contacts[${props.index}].last_name`}
+          onChange={props.handleChange}
+          value={props.contact.last_name}
+        />
+
+        <InputField
+          label={t('email_address')}
+          id={`contacts[${props.index}].email`}
+          onChange={props.handleChange}
+          value={props.contact.email}
+        />
+
+        <InputField
+          label={t('phone')}
+          id={`contacts[${props.index}].phone`}
+          onChange={props.handleChange}
+          value={props.contact.phone}
+        />
+
+        <div className="flex justify-between items-center">
           <Button behavior="button" type="minimal" onClick={removeContact}>
             Remove
           </Button>
+
           <Button
             behavior="button"
             onClick={() => {
               props.setIsOpen(false);
             }}
           >
-            {t('ok')}
+            {t('save')}
           </Button>
         </div>
       </div>
