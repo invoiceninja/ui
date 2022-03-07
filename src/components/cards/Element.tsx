@@ -11,16 +11,20 @@
 import classNames from 'classnames';
 import { ReactNode } from 'react';
 
-export function Element(props: {
+interface Props {
   leftSide?: ReactNode;
   leftSideHelp?: ReactNode;
   pushContentToRight?: boolean;
   children: ReactNode;
   className?: any;
-}) {
+  onClick?: () => unknown;
+}
+
+export function Element(props: Props) {
   return (
     <div
       className={`py-4 px-5 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 sm:px-6 flex flex-col lg:flex-row lg:items-center ${props.className}`}
+      onClick={props.onClick}
     >
       <dt className="text-sm text-gray-500 flex flex-col">
         <span className="text-gray-500 font-medium ">{props.leftSide}</span>

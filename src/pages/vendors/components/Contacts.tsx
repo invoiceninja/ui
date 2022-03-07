@@ -9,24 +9,25 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { Plus } from 'react-feather';
+import { Button } from '@invoiceninja/forms';
 import { useTranslation } from 'react-i18next';
 import { Contact } from './Contact';
 
 interface Props {
   data: any;
-  handleChange:any,
-  setFieldValue:any
-  isSubmitting:any,
-  handleSubmit:any
+  handleChange: any;
+  setFieldValue: any;
+  isSubmitting: any;
+  handleSubmit: any;
 }
 
 export function Contacts(props: Props) {
   const [t] = useTranslation();
+
   const addNewContact = () => {
     props.data.push({
       archived_at: 0,
-      created_at: Date.now().toString(),
+      created_at: '',
       custom_value1: '',
       custom_value2: '',
       custom_value3: '',
@@ -41,8 +42,9 @@ export function Contacts(props: Props) {
         : true,
       last_name: '',
       phone: '',
-      updated_at: Date.now().toString(),
+      updated_at: '',
     });
+
     props.setFieldValue('contacts', props.data);
   };
   return (
@@ -52,28 +54,24 @@ export function Contacts(props: Props) {
       withSaveButton
       title={t('contacts')}
     >
-      <Element leftSide={t('contacts')}>
-        {props.data &&
-          props.data.map((contact: any, index: any) => {
-            return (
-              <Contact
-                data={contact}
-                key={index}
-                index={index}
-                handleChange={props.handleChange}
-                setFieldValue={props.setFieldValue}
-                formikValues={props.data}
-              />
-            );
-          })}
-        <button
-          type="button"
-          className="w-full py-2 inline-flex justify-center items-center space-x-2"
-          onClick={addNewContact}
-        >
-          <Plus size={18} />
-          <span>{t('add_item')}</span>
-        </button>
+      {props.data &&
+        props.data.map((contact: any, index: any) => {
+          return (
+            <Contact
+              data={contact}
+              key={index}
+              index={index}
+              handleChange={props.handleChange}
+              setFieldValue={props.setFieldValue}
+              formikValues={props.data}
+            />
+          );
+        })}
+
+      <Element>
+        <Button type="minimal" behavior="button" onClick={addNewContact}>
+          {t('add_contact')}
+        </Button>
       </Element>
     </Card>
   );
