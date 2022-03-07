@@ -144,7 +144,7 @@ export function Edit() {
           <Element leftSide={t('payment_type')}>
             <SelectField
               id="type_id"
-              defaultValue={'aa'}
+              value={payment?.data.data.type_id}
               onChange={formik.handleChange}
             >
               <option value=""></option>
@@ -185,6 +185,7 @@ export function Edit() {
             <>
               <Element leftSide={t('currency')}>
                 <SelectField
+                  value={payment?.data.data.exchange_currency_id}
                   onChange={(event: any) => {
                     formik.setFieldValue(
                       'exchange_rate',
