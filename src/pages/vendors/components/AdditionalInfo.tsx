@@ -10,18 +10,12 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { SelectField, Textarea } from '@invoiceninja/forms';
+import { VendorProps } from 'common/interfaces/vendor-props';
 import { useStaticsQuery } from 'common/queries/statics';
 import { Alert } from 'components/Alert';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  data: any;
-  errors?: any;
-  handleChange: any;
-  setFieldValue: any;
-}
-
-export function AdditionalInfo(props: Props) {
+export function AdditionalInfo(props: VendorProps) {
   const [t] = useTranslation();
   const { data: statics } = useStaticsQuery();
 
@@ -30,6 +24,7 @@ export function AdditionalInfo(props: Props) {
       {props.errors?.notes && <Alert type="danger">{props.errors.notes}</Alert>}
       <Element leftSide={t('currency')}>
         <SelectField
+          value={props.data.currency_id}
           onChange={(event: any) => {
             props.setFieldValue('currency_id', event.target.value);
           }}

@@ -9,18 +9,12 @@
  */
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import { VendorProps } from 'common/interfaces/vendor-props';
 import { useUsersQuery } from 'common/queries/users';
 import { Alert } from 'components/Alert';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  data: any;
-  handleChange: any;
-  setFieldValue: any;
-  errors?: any;
-}
-
-export function Details(props: Props) {
+export function Details(props: VendorProps) {
   const [t] = useTranslation();
   const { data: users } = useUsersQuery();
 

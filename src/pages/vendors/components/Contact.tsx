@@ -10,16 +10,18 @@
 
 import { Element } from '@invoiceninja/cards';
 import { Button } from '@invoiceninja/forms';
-import { useState } from 'react';
+import { VendorContact } from 'common/interfaces/vendor-contact';
+import { FormikValues } from 'formik';
+import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContactModal } from './ContactModal';
 
 interface Props {
-  data: any;
+  data: VendorContact;
   index: any;
-  formikValues: any;
-  handleChange?: any;
-  setFieldValue?: any;
+  formikValues: FormikValues;
+  handleChange: (e: ChangeEvent) => void;
+  setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
 }
 
 export function Contact(props: Props) {

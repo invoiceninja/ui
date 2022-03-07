@@ -10,18 +10,12 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import { VendorProps } from 'common/interfaces/vendor-props';
 import { useStaticsQuery } from 'common/queries/statics';
 import { Alert } from 'components/Alert';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  data: any;
-  handleChange?: any;
-  setFieldValue?: any;
-  errors?: any;
-}
-
-export function Address(props: Props) {
+export function Address(props: VendorProps) {
   const [t] = useTranslation();
   const { data: statics } = useStaticsQuery();
 
@@ -65,6 +59,7 @@ export function Address(props: Props) {
       </Element>
       <Element leftSide={t('country_id')}>
         <SelectField
+          value={props.data.country_id}
           onChange={(event: any) => {
             props.setFieldValue('country_id', event.target.value);
           }}

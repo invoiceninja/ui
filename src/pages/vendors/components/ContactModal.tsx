@@ -11,15 +11,18 @@
 import { Modal } from 'components/Modal';
 import { useTranslation } from 'react-i18next';
 import { Button, InputField } from '@invoiceninja/forms';
+import { VendorContact } from 'common/interfaces/vendor-contact';
+import { ChangeEvent } from 'react';
+import { FormikValues } from 'formik';
 
 interface Props {
-  contact?: any;
-  formikValues?: any;
-  handleChange?: any;
-  setFieldValue?: any;
+  contact: VendorContact;
+  formikValues: FormikValues;
+  handleChange: (e: ChangeEvent) => void;
+  setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
   isOpen: any;
   setIsOpen: any;
-  index?: any;
+  index: any;
 }
 
 export function ContactModal(props: Props) {

@@ -10,15 +10,17 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Button } from '@invoiceninja/forms';
+import { VendorContact } from 'common/interfaces/vendor-contact';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Contact } from './Contact';
 
 interface Props {
-  data: any;
-  handleChange: any;
-  setFieldValue: any;
-  isSubmitting: any;
-  handleSubmit: any;
+  data: VendorContact[];
+  handleChange: (e: ChangeEvent) => void;
+  setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void;
+  isSubmitting: boolean;
+  handleSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
 export function Contacts(props: Props) {
@@ -27,7 +29,7 @@ export function Contacts(props: Props) {
   const addNewContact = () => {
     props.data.push({
       archived_at: 0,
-      created_at: '',
+      created_at: 0,
       custom_value1: '',
       custom_value2: '',
       custom_value3: '',
@@ -42,7 +44,7 @@ export function Contacts(props: Props) {
         : true,
       last_name: '',
       phone: '',
-      updated_at: '',
+      updated_at: 0,
     });
 
     props.setFieldValue('contacts', props.data);
