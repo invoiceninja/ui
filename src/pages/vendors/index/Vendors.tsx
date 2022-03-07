@@ -12,8 +12,10 @@ import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
+import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
+import { generatePath } from 'react-router-dom';
 
 export function Vendors() {
   const [t] = useTranslation();
@@ -24,6 +26,11 @@ export function Vendors() {
     {
       id: 'number',
       label: t('number'),
+      format: (value, resource) => (
+        <Link to={generatePath('/vendors/:id', { id: resource.id })}>
+          {resource.number}
+        </Link>
+      ),
     },
 
     { id: 'name', label: t('name') },
@@ -51,7 +58,7 @@ export function Vendors() {
         endpoint="/api/v1/vendors"
         columns={columns}
         linkToCreate="/vendors/create"
-        linkToEdit="/vendors/:id/edit"
+        linkToEdit="/vendors/:id"
         withResourcefulActions
       />
     </Default>
