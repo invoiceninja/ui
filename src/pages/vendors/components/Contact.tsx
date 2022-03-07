@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Element } from '@invoiceninja/cards';
+import { Button } from '@invoiceninja/forms';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ContactModal } from './ContactModal';
@@ -26,19 +28,25 @@ export function Contact(props: Props) {
 
   return (
     <>
-      <div
-        className="flex flex-col justify-center items-start p-5 hover:bg-gray-300 hover:rounded"
-        onClick={() => {
-          setisOpen(!isOpen);
-        }}
-      >
-        <p>
-          {!props.data.first_name || !props.data.first_name
+      <Element
+        leftSide={
+          !props.data.first_name || !props.data.first_name
             ? t('blank_contact')
-            : props.data.first_name + ' ' + props.data.last_name}
-        </p>
-        <p>{props.data.email}</p>
-      </div>
+            : props.data.first_name + ' ' + props.data.last_name
+        }
+        leftSideHelp={props.data.email}
+      >
+        <Button
+          behavior="button"
+          type="minimal"
+          onClick={() => {
+            setisOpen(!isOpen);
+          }}
+        >
+          {t('view')}
+        </Button>
+      </Element>
+
       <ContactModal
         isOpen={isOpen}
         setIsOpen={setisOpen}
