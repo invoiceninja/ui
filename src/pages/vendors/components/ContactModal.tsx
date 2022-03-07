@@ -10,7 +10,6 @@
 
 import { Modal } from 'components/Modal';
 import { useTranslation } from 'react-i18next';
-import { Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 
 interface Props {
