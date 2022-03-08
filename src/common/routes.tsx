@@ -85,7 +85,9 @@ export const routes = (
         <Route path=":id/edit" element={<RecurringInvoices.Edit />} />
       </Route>
       <Route path="/payments">
-        <Route path="" element={<Payments.Payments />}></Route>
+        <Route path="" element={<Payments.Payments />} />
+
+        <Route path=":id/edit" element={<Payments.Edit />} />
       </Route>
       <Route path="/credits">
         <Route path="" element={<Credits.Credits />} />

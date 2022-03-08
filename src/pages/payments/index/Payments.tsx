@@ -33,6 +33,13 @@ export function Payments() {
     {
       id: 'number',
       label: t('number'),
+      format: (value, resource) => {
+        return (
+          <Link to={generatePath('/payments/:id/edit', { id: resource.id })}>
+            {resource.number}
+          </Link>
+        );
+      },
     },
     {
       id: 'client_id',
