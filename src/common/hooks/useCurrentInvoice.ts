@@ -1,5 +1,3 @@
-import { RootState } from 'common/stores/store';
-import { useSelector } from 'react-redux';
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -9,6 +7,9 @@ import { useSelector } from 'react-redux';
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
+import { RootState } from 'common/stores/store';
+import { useSelector } from 'react-redux';
 
 export function useCurrentInvoice() {
   return useSelector((state: RootState) => state.invoices.current);
