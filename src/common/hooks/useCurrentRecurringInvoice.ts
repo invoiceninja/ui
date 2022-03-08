@@ -8,9 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { RootState } from 'common/stores/store';
 import { useSelector } from 'react-redux';
 
-export function useCurrentRecurringInvoice() {
+export function useCurrentRecurringInvoice(): RecurringInvoice | undefined {
   return useSelector((state: RootState) => state.recurringInvoices.current);
 }
