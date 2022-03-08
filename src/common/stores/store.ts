@@ -26,7 +26,7 @@ export const store = configureStore({
     products: productsSlice.reducer,
     settings: settingsSlice.reducer,
     invoices: invoiceSlice.reducer,
-    recurringInvoice: recurringInvoiceSlice.reducer,
+    recurringInvoices: recurringInvoiceSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

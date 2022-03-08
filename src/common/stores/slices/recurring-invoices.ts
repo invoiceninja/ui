@@ -9,6 +9,9 @@
  */
 
 import { createSlice } from '@reduxjs/toolkit';
+import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { cloneDeep, set } from 'lodash';
+import { setCurrentRecurringInvoiceProperty } from './recurring-invoices/extra-reducers/set-current-recurring-invoice-property';
 
 interface RecurringInvoiceState {
   api?: any;
@@ -30,6 +33,27 @@ export const recurringInvoiceSlice = createSlice({
         state.current.line_items = [];
       }
     },
+  },
+  extraReducers: (builder) => {
+    builder.addCase(
+      setCurrentRecurringInvoiceProperty.fulfilled,
+      (state, payload) => {
+        if (state.current) {
+          state.current = set(
+            state.current,
+            payload.payload.payload.property,
+            payload.payload.payload.value
+          );
+
+          if (payload.payload.client && payload.payload.currency) {
+            state.current = new InvoiceSum(
+              cloneDeep(state.current),
+              cloneDeep(payload.payload.currency)
+            ).build().invoice;
+          }
+        }
+      }
+    );
   },
 });
 
