@@ -87,7 +87,9 @@ export function DebouncedCombobox(props: Props) {
 
   useEffect(() => {
     const potential = records.find(
-      (record) => record.value == defaultValueProperty
+      (record) =>
+        record.value == defaultValueProperty ||
+        record.label == defaultValueProperty
     );
 
     if (potential) {

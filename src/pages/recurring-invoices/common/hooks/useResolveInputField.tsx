@@ -51,6 +51,7 @@ export function useResolveInputField() {
           className="w-36"
           onActionClick={() => navigate(generatePath('/products/create'))}
           actionLabel={t('new_product')}
+          defaultValue={invoice?.line_items[index][property]}
         />
       );
     }
