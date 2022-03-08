@@ -10,8 +10,11 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { Currency } from 'common/interfaces/currency';
+import { Invoice } from 'common/interfaces/invoice';
 import { cloneDeep, set } from 'lodash';
 import { setCurrentRecurringInvoiceProperty } from './recurring-invoices/extra-reducers/set-current-recurring-invoice-property';
+import { setCurrentLineItemProperty } from './recurring-invoices/extra-reducers/set-current-line-item-property';
 
 interface RecurringInvoiceState {
   api?: any;
@@ -54,6 +57,21 @@ export const recurringInvoiceSlice = createSlice({
         }
       }
     );
+
+    builder.addCase(setCurrentLineItemProperty.fulfilled, (state, payload) => {
+      if (state.current) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        state.current.line_items[payload.payload.position][
+          payload.payload.property
+        ] = payload.payload.value;
+
+        state.current = new InvoiceSum(
+          cloneDeep(state.current as Invoice),
+          cloneDeep(payload.payload.currency as Currency)
+        ).build().invoice;
+      }
+    });
   },
 });
 
