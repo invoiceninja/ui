@@ -16,6 +16,7 @@ import { productsSlice } from './slices/products';
 import { settingsSlice } from './slices/settings';
 import { userSlice } from './slices/user';
 import { companyUserSlice } from './slices/company-users';
+import { recurringInvoiceSlice } from './slices/recurring-invoices';
 
 export const store = configureStore({
   reducer: {
@@ -25,6 +26,7 @@ export const store = configureStore({
     products: productsSlice.reducer,
     settings: settingsSlice.reducer,
     invoices: invoiceSlice.reducer,
+    recurringInvoice: recurringInvoiceSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
