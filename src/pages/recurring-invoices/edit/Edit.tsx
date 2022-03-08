@@ -19,6 +19,7 @@ import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
+import { ProductsTable } from '../common/components/ProductsTable';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_recurring_invoice');
@@ -46,6 +47,10 @@ export function Edit() {
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector readonly />
         <InvoiceDetails />
+
+        <div className="col-span-12">
+          <ProductsTable />
+        </div>
       </div>
     </Default>
   );
