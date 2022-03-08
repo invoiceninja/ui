@@ -9,15 +9,21 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { useRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
+import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_recurring_invoice');
   const [t] = useTranslation();
   const { id } = useParams();
+  const { data: recurringInvoice } = useRecurringInvoiceQuery({ id });
+  const dispatch = useDispatch();
 
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
@@ -27,7 +33,11 @@ export function Edit() {
     },
   ];
 
-  
+  useEffect(() => {
+    if (recurringInvoice?.data.data) {
+      dispatch(setCurrentRecurringInvoice(recurringInvoice.data.data));
+    }
+  }, [recurringInvoice]);
 
   return <Default title={documentTitle} breadcrumbs={pages}></Default>;
 }

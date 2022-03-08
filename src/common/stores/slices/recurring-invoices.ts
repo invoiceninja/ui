@@ -22,5 +22,15 @@ const initialState: RecurringInvoiceState = {
 export const recurringInvoiceSlice = createSlice({
   name: 'recurringInvoice',
   initialState,
-  reducers: {},
+  reducers: {
+    setCurrentRecurringInvoice: (state, payload) => {
+      state.current = payload.payload;
+
+      if (typeof state.current.line_items === 'string') {
+        state.current.line_items = [];
+      }
+    },
+  },
 });
+
+export const { setCurrentRecurringInvoice } = recurringInvoiceSlice.actions;

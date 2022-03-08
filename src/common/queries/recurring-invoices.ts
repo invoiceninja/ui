@@ -26,3 +26,17 @@ export function useBlankRecurringInvoiceQuery(
     { ...options, staleTime: Infinity }
   );
 }
+
+export function useRecurringInvoiceQuery(
+  params: { id: string | undefined },
+  options: Record<string, any> = {}
+) {
+  return useQuery(
+    generatePath('/api/v1/recurring_invoices/:id', { id: params.id }),
+    () =>
+      axios.get(endpoint('/api/v1/recurring_invoices/:id', { id: params.id }), {
+        headers: defaultHeaders,
+      }),
+    { ...options, staleTime: Infinity }
+  );
+}
