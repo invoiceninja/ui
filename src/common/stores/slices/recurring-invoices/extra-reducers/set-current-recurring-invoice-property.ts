@@ -18,7 +18,7 @@ const clientResolver = new ClientResolver();
 const currencyResolver = new CurrencyResolver();
 
 export const setCurrentRecurringInvoiceProperty = createAsyncThunk(
-  'invoices/setCurrentRecurringInvoiceProperty',
+  'recurringInvoices/setCurrentRecurringInvoiceProperty',
   async (payload: any, thunkApi) => {
     let client: Client | undefined = undefined;
     let currency: Currency | undefined = undefined;
