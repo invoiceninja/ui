@@ -12,12 +12,12 @@ import { Button } from '@invoiceninja/forms';
 import { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
-import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
+import { useSetCurrentRecurringInvoiceProperty } from '../hooks/useSetCurrentRecurringInvoiceProperty';
 
 export function InvoiceDocuments() {
   const [t] = useTranslation();
   const [files, setFiles] = useState<File[]>([]);
-  const handleChange = useSetCurrentInvoiceProperty();
+  const handleChange = useSetCurrentRecurringInvoiceProperty();
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles) => {
