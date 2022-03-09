@@ -23,6 +23,7 @@ export interface Company {
     company_logo: string;
     pdf_variables: {
       product_columns: string[];
+      total_columns: string[];
     };
     tax_name1: string;
     tax_name2: string;
