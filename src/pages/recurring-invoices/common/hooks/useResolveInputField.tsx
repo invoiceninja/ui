@@ -16,10 +16,10 @@ import { generatePath, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { InputField } from '@invoiceninja/forms';
 import { ChangeEvent } from 'react';
-import { useHandleProductChange } from 'pages/invoices/common/hooks/useHandleProductChange';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
-import { useFormatMoney } from 'pages/invoices/common/hooks/useFormatMoney';
 import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvoice';
+import { useFormatMoney } from './useFormatMoney';
+import { useHandleProductChange } from './useHandleProductChange';
 
 const numberInputs = [
   'discount',
