@@ -45,6 +45,10 @@ export function Product() {
       name: t('documents'),
       href: generatePath('/products/:id/documents', { id }),
     },
+    {
+      name: t('product_fields'),
+      href: generatePath('/products/:id/product_fields', { id }),
+    },
   ];
 
   return (
