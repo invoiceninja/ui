@@ -16,9 +16,10 @@ export function CustomField(props: Props) {
   const [label, setLabel] = useState('');
 
   useEffect(() => {
-    const [fieldLabel] = props.value.split('|');
-
-    setLabel(fieldLabel);
+    const [fieldLabel] = props.value.includes('|')
+      ? props.value.split('|')
+      : [props.value, ''];
+    setLabel(fieldLabel || '');
   }, []);
 
   return (

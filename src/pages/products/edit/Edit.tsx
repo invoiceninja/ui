@@ -13,9 +13,11 @@ import { InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { EntityState } from 'common/enums/entity-state';
 import { endpoint, getEntityState } from 'common/helpers';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { bulk, useProductQuery } from 'common/queries/products';
+import { CustomField } from 'components/CustomField';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
@@ -32,6 +34,7 @@ export function Edit() {
   const { data: product } = useProductQuery({ id });
   const queryClient = useQueryClient();
   const [errors, setErrors] = useState<ValidationBag>();
+  const company = useCurrentCompany();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -139,6 +142,41 @@ export function Edit() {
               errorMessage={errors?.errors.quantity}
             />
           </Element>
+          {company?.custom_fields?.product1 && (
+            <CustomField
+              field="custom_value1"
+              defaultValue={product?.data.data.custom_value1}
+              value={company.custom_fields.product1}
+              onChange={(value) => formik.setFieldValue('custom_value1', value)}
+            />
+          )}
+
+          {company?.custom_fields?.product2 && (
+            <CustomField
+              field="custom_value2"
+              defaultValue={product?.data.data.custom_value2}
+              value={company.custom_fields.product2}
+              onChange={(value) => formik.setFieldValue('custom_value2', value)}
+            />
+          )}
+
+          {company?.custom_fields?.product3 && (
+            <CustomField
+              field="custom_value3"
+              defaultValue={product?.data.data.custom_value3}
+              value={company.custom_fields.product3}
+              onChange={(value) => formik.setFieldValue('custom_value3', value)}
+            />
+          )}
+
+          {company?.custom_fields?.product4 && (
+            <CustomField
+              field="custom_value4"
+              defaultValue={product?.data.data.custom_value4}
+              value={company.custom_fields.product4}
+              onChange={(value) => formik.setFieldValue('custom_value4', value)}
+            />
+          )}
         </Card>
       )}
 
