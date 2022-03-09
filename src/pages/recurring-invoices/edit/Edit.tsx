@@ -19,6 +19,7 @@ import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
+import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { ProductsTable } from '../common/components/ProductsTable';
 
 export function Edit() {
@@ -51,6 +52,8 @@ export function Edit() {
         <div className="col-span-12">
           <ProductsTable />
         </div>
+
+        <InvoiceFooter />
       </div>
     </Default>
   );
