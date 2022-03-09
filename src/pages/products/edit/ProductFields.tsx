@@ -7,17 +7,14 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import { Card, Element } from '@invoiceninja/cards';
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { defaultHeaders } from 'common/queries/common/headers';
-import {
-  injectInChanges,
-  updateChanges,
-  updateRecord,
-} from 'common/stores/slices/company-users';
-import { cloneDeep } from 'lodash';
+import { updateRecord } from 'common/stores/slices/company-users';
 import { Field } from 'pages/settings/custom-fields/components';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -28,24 +25,7 @@ export function ProductFields() {
   const dispatch = useDispatch();
 
   const [t] = useTranslation();
-  const handleCustomFieldChange = (field: string, value: string) => {
-    const [label] = value.split('|');
-
-    if (label === '') {
-      const _company = cloneDeep(company);
-
-      delete _company.custom_fields[field];
-
-      return dispatch(injectInChanges({ object: 'company', data: _company }));
-    }
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: `custom_fields.${field}`,
-        value,
-      })
-    );
-  };
+  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   const onSave = () => {
     const toastId = toast.loading(t('processing'));

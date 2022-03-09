@@ -13,31 +13,27 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import MDEditor from '@uiw/react-md-editor';
 import { useCurrencies } from 'common/hooks/useCurrencies';
+import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useLanguages } from 'common/hooks/useLanguages';
 import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { useStaticsQuery } from 'common/queries/statics';
-import {
-  injectInChanges,
-  updateChanges,
-} from 'common/stores/slices/company-users';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
-import { cloneDeep, set } from 'lodash';
+import { set } from 'lodash';
 import { Field } from 'pages/settings/custom-fields/components';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 
 interface Props {
   client: Client | undefined;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
 }
+
 export function AdditionalInfo(props: Props) {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
   const currencies = useCurrencies();
   const languages = useLanguages();
 
@@ -51,28 +47,7 @@ export function AdditionalInfo(props: Props) {
   };
 
   const company = useInjectCompanyChanges();
-
-  const handleCustomFieldChange = (field: string, value: string) => {
-    const [label] = value.split('|');
-
-    if (label === '') {
-      // If we don't have a content, we will remove the field from the company.custom_fields.
-
-      const _company = cloneDeep(company);
-
-      delete _company.custom_fields[field];
-
-      return dispatch(injectInChanges({ object: 'company', data: _company }));
-    }
-
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: `custom_fields.${field}`,
-        value,
-      })
-    );
-  };
+  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   return (
     <Card className="mt-4" title={t('additional_info')}>
@@ -261,15 +236,16 @@ export function AdditionalInfo(props: Props) {
             one. <i>Needs translation.</i>
           </Element>
 
-          {company && ['client1', 'client2', 'client3', 'client4'].map((field) => (
-            <Field
-              key={field}
-              initialValue={company.custom_fields[field]}
-              field={field}
-              placeholder={t('client_field')}
-              onChange={(value) => handleCustomFieldChange(field, value)}
-            />
-          ))}
+          {company &&
+            ['client1', 'client2', 'client3', 'client4'].map((field) => (
+              <Field
+                key={field}
+                initialValue={company.custom_fields[field]}
+                field={field}
+                placeholder={t('client_field')}
+                onChange={(value) => handleCustomFieldChange(field, value)}
+              />
+            ))}
         </Tab.Panel>
 
         <Tab.Panel>
@@ -285,15 +261,16 @@ export function AdditionalInfo(props: Props) {
             one. <i>Needs translation.</i>
           </Element>
 
-          {company && ['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (
-            <Field
-              key={field}
-              initialValue={company.custom_fields[field]}
-              field={field}
-              placeholder={t('contact_field')}
-              onChange={(value) => handleCustomFieldChange(field, value)}
-            />
-          ))}
+          {company &&
+            ['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (
+              <Field
+                key={field}
+                initialValue={company.custom_fields[field]}
+                field={field}
+                placeholder={t('contact_field')}
+                onChange={(value) => handleCustomFieldChange(field, value)}
+              />
+            ))}
         </Tab.Panel>
       </TabGroup>
     </Card>
