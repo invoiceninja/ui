@@ -20,6 +20,7 @@ import { generatePath, useParams } from 'react-router-dom';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
+import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
 
 export function Edit() {
@@ -54,6 +55,7 @@ export function Edit() {
         </div>
 
         <InvoiceFooter />
+        <InvoiceTotals />
       </div>
     </Default>
   );
