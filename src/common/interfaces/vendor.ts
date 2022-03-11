@@ -26,5 +26,9 @@ export interface Vendor {
   currency_id: string;
   private_notes: string;
   public_notes: string;
+  custom_value1:string;
+  custom_value2:string;
+  custom_value3:string;
+  custom_value4:string;
   contacts: VendorContact[];
 }

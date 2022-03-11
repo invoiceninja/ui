@@ -51,6 +51,11 @@ export function Edit() {
       currency_id: vendor?.data.data.currency_id,
       private_notes: vendor?.data.data.private_notes,
       public_notes: vendor?.data.data.public_notes,
+      custom_value1: vendor?.data.data.custom_value1,
+      custom_value2: vendor?.data.data.custom_value2,
+      custom_value3: vendor?.data.data.custom_value3,
+      custom_value4: vendor?.data.data.custom_value4,
+
       contacts: vendor?.data.data.contacts,
     },
     onSubmit: (values) => {
@@ -82,6 +87,7 @@ export function Edit() {
     <>
       {errors && <ValidationAlert errors={errors} />}
       <Details
+        datt={vendor?.data.data}
         data={formik.values}
         setFieldValue={formik.setFieldValue}
         handleChange={formik.handleChange}
