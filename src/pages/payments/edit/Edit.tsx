@@ -159,18 +159,17 @@ export function Edit() {
       </Element>
       {company?.custom_fields?.payment1 && (
         <CustomField
-          field="custom_value1"
+          field="payment1"
           defaultValue={payment?.data.data.custom_value1}
-          value={company.custom_fields.product1}
+          value={company?.custom_fields?.payment1}
           onChange={(value) => formik.setFieldValue('custom_value1', value)}
         />
       )}
-
       {company?.custom_fields?.payment2 && (
         <CustomField
           field="custom_value2"
           defaultValue={payment?.data.data.custom_value2}
-          value={company.custom_fields.product2}
+          value={company?.custom_fields?.payment2}
           onChange={(value) => formik.setFieldValue('custom_value2', value)}
         />
       )}
@@ -179,7 +178,7 @@ export function Edit() {
         <CustomField
           field="custom_value3"
           defaultValue={payment?.data.data.custom_value3}
-          value={company.custom_fields.product3}
+          value={company?.custom_fields?.payment3}
           onChange={(value) => formik.setFieldValue('custom_value3', value)}
         />
       )}
@@ -188,7 +187,7 @@ export function Edit() {
         <CustomField
           field="custom_value4"
           defaultValue={payment?.data.data.custom_value4}
-          value={company.custom_fields.product4}
+          value={company?.custom_fields?.payment4}
           onChange={(value) => formik.setFieldValue('custom_value4', value)}
         />
       )}
