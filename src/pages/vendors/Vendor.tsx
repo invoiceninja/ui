@@ -18,7 +18,6 @@ import { useTranslation } from 'react-i18next';
 import { generatePath, Outlet, useParams } from 'react-router-dom';
 
 export function Vendor() {
-
   const { id } = useParams();
   const [t] = useTranslation();
   const [documentTitle, setdocumentTitle] = useState('');
@@ -34,8 +33,12 @@ export function Vendor() {
       name: t('recurring_expenses'),
       href: generatePath('/vendors/:id/recurring_expenses', { id }),
     },
+    {
+      name: t('custom_fields'),
+      href: generatePath('/vendors/:id/vendor_fields', { id }),
+    },
   ];
-  
+
   const pages: BreadcrumRecord[] = [
     { name: t('vendors'), href: '/vendors' },
     {
