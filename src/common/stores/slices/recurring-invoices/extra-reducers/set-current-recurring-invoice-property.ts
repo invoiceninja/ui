@@ -26,7 +26,9 @@ export const setCurrentRecurringInvoiceProperty = createAsyncThunk(
     const state = thunkApi.getState() as any;
 
     if (state.recurringInvoices.current?.client_id) {
-      client = await clientResolver.find(state.recurringInvoices.current?.client_id);
+      client = await clientResolver.find(
+        state.recurringInvoices.current?.client_id
+      );
     }
 
     if (client) {

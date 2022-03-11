@@ -30,13 +30,12 @@ export class InvoiceSumInclusive {
   }
 
   protected async calculateLineItems() {
-
     await this.invoiceItems.process();
 
     this.invoice.line_items = this.invoiceItems.lineItems;
     this.total = this.invoiceItems.subTotal;
     this.subTotal = this.invoiceItems.subTotal;
-    
+
     return this;
   }
 
@@ -48,15 +47,14 @@ export class InvoiceSumInclusive {
   }
 
   protected async calculateInvoiceTaxes() {
-
     let amount = this.total;
 
-    if(this.invoice.discount > 0 && this.invoice.is_amount_discount){
-        amount = this.subTotal - this.invoice.discount;
+    if (this.invoice.discount > 0 && this.invoice.is_amount_discount) {
+      amount = this.subTotal - this.invoice.discount;
     }
 
-    if(this.invoice.discount > 0 && !this.invoice.is_amount_discount){
-        amount = (this.subTotal - (this.subTotal * (this.invoice.discount / 100)));
+    if (this.invoice.discount > 0 && !this.invoice.is_amount_discount) {
+      amount = this.subTotal - this.subTotal * (this.invoice.discount / 100);
     }
 
     if (this.invoice.tax_rate1 > 0) {
@@ -166,7 +164,6 @@ export class InvoiceSumInclusive {
       this.taxMap.push({ name: taxName, total: totalLineTax });
 
       this.totalTaxes += this.invoiceItems.totalTaxes;
-
     });
 
     return this;
@@ -242,8 +239,7 @@ export class InvoiceSumInclusive {
     return 0;
   }
 
-  protected calcInclusiveLineTax(amount:number, rate: number)
-  {
-      return (amount - (amount / (1 + (rate / 100))));
+  protected calcInclusiveLineTax(amount: number, rate: number) {
+    return amount - amount / (1 + rate / 100);
   }
 }

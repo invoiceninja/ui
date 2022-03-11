@@ -43,18 +43,16 @@ export class InvoiceItemSumInclusive {
   }
 
   protected sumLineItem() {
-
     this.item.line_total = this.item.cost * this.item.quantity;
 
     return this;
   }
 
   protected setDiscount() {
-
     if (this.invoice.is_amount_discount) {
-        this.item.line_total -= this.item.discount;
+      this.item.line_total -= this.item.discount;
     } else {
-        this.item.line_total -= (this.item.line_total * (this.item.discount / 100));
+      this.item.line_total -= this.item.line_total * (this.item.discount / 100);
     }
 
     this.item.is_amount_discount = this.invoice.is_amount_discount;
@@ -111,10 +109,9 @@ export class InvoiceItemSumInclusive {
     // this.item.gross_line_total = this.item.line_total + itemTax;
 
     this.totalTaxes += itemTax;
-    
+
     return this;
   }
-
 
   protected groupTax(name: string, rate: number, total: number) {
     let group = {};
@@ -126,9 +123,8 @@ export class InvoiceItemSumInclusive {
     this.taxCollection.push(collect(group));
   }
 
-  protected calcInclusiveLineTax(rate: number, amount: number)
-  {
-      return amount - (amount / (1 + (rate / 100)));
+  protected calcInclusiveLineTax(rate: number, amount: number) {
+    return amount - amount / (1 + rate / 100);
   }
 
   protected push() {
@@ -157,12 +153,11 @@ export class InvoiceItemSumInclusive {
               this.item.line_total * (this.invoice.discount / this.subTotal)
             : 0;
 
-            
         const itemTaxRateOneTotal = this.calcInclusiveLineTax(
           this.item.tax_rate1,
           amount
         );
-        
+
         itemTax += itemTaxRateOneTotal;
 
         if (itemTaxRateOneTotal !== 0) {

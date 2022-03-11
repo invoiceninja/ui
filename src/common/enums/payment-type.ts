@@ -21,7 +21,7 @@ export const enum PaymentType {
   CREDIT_CARD_OTHER = '12',
   PAYPAL = '13',
   CHECK = '15',
-  CARTE_BLANCHE ='16',
+  CARTE_BLANCHE = '16',
   UNIONPAY = '17',
   JCB = '18',
   LASER = '19',

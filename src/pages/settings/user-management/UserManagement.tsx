@@ -35,9 +35,10 @@ export function UserManagement() {
   });
 
   return (
-    <Settings title={t('user_management')}
-    breadcrumbs={pages}
-    docsLink='docs/advanced-settings/#user_management'
+    <Settings
+      title={t('user_management')}
+      breadcrumbs={pages}
+      docsLink="docs/advanced-settings/#user_management"
     >
       <div className="flex justify-end mt-4 lg:mt-0">
         <Button to="/users/create">Create user</Button>

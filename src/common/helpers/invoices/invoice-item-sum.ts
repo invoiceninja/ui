@@ -43,18 +43,15 @@ export class InvoiceItemSum {
   }
 
   protected sumLineItem() {
-
     this.item.line_total = this.item.cost * this.item.quantity;
 
     return this;
   }
 
   protected setDiscount() {
-
     if (this.invoice.is_amount_discount) {
       this.item.line_total = this.item.line_total - this.item.discount; // We don't have definitive number formatter, need to implement that & then replace this with propert formatted value.
     } else {
-
       const discount = this.item.line_total * (this.item.discount / 100);
 
       this.item.line_total = this.item.line_total - discount; // We need formatter here also.
@@ -114,7 +111,7 @@ export class InvoiceItemSum {
     this.item.gross_line_total = this.item.line_total + itemTax;
 
     this.totalTaxes += itemTax;
-    
+
     return this;
   }
 
@@ -132,7 +129,7 @@ export class InvoiceItemSum {
     // This needs extraction, it's calling generic Taxer class.
     // This also depends on Number class, previously mentioned.
 
-    return amount * rate / 100;
+    return (amount * rate) / 100;
   }
 
   protected push() {
@@ -161,12 +158,11 @@ export class InvoiceItemSum {
               this.item.line_total * (this.invoice.discount / this.subTotal)
             : 0;
 
-            
         const itemTaxRateOneTotal = this.calculateAmountLineTax(
           this.item.tax_rate1,
           amount
         );
-        
+
         itemTax += itemTaxRateOneTotal;
 
         if (itemTaxRateOneTotal !== 0) {

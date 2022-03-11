@@ -72,7 +72,7 @@ export function InvoiceDesign() {
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={() => dispatch(resetChanges('company'))}
-      docsLink='docs/advanced-settings/#invoice_design'
+      docsLink="docs/advanced-settings/#invoice_design"
     >
       <GeneralSettings />
 

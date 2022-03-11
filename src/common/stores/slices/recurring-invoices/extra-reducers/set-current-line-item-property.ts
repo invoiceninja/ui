@@ -20,7 +20,9 @@ export const setCurrentLineItemProperty = createAsyncThunk(
   async (payload: any, thunkApi) => {
     const state = thunkApi.getState() as any;
 
-    const client = await clientResolver.find(state.recurringInvoices.current.client_id);
+    const client = await clientResolver.find(
+      state.recurringInvoices.current.client_id
+    );
     const currency = await currencyResolver.find(client.settings.currency_id); // or company currency
 
     payload.client = client;

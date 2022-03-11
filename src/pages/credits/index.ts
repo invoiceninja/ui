@@ -1,1 +1,1 @@
-export * from './index/Credits'
+export * from './index/Credits';
