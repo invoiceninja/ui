@@ -87,7 +87,6 @@ export function Edit() {
     <>
       {errors && <ValidationAlert errors={errors} />}
       <Details
-        datt={vendor?.data.data}
         data={formik.values}
         setFieldValue={formik.setFieldValue}
         handleChange={formik.handleChange}

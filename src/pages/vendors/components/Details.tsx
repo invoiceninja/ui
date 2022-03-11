@@ -15,10 +15,8 @@ import { useUsersQuery } from 'common/queries/users';
 import { Alert } from 'components/Alert';
 import { CustomField } from 'components/CustomField';
 import { useTranslation } from 'react-i18next';
-interface Props extends VendorProps {
-  datt: any;
-}
-export function Details(props: Props) {
+
+export function Details(props: VendorProps) {
   const [t] = useTranslation();
   const company = useCurrentCompany();
   const { data: users } = useUsersQuery();
