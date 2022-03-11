@@ -22,7 +22,7 @@ export function Payment() {
     { name: t('payments'), href: '/payments' },
     {
       name: t('edit_payment'),
-      href: generatePath('/payment/:id/edit', { id: id }),
+      href: generatePath('/payments/:id/edit', { id: id }),
     },
   ];
   const tabs: Tab[] = [
@@ -32,7 +32,7 @@ export function Payment() {
     },
 
     {
-      name: t('payment_fields'),
+      name: t('custom_fields'),
       href: generatePath('/payments/:id/payment_fields', { id }),
     },
   ];
