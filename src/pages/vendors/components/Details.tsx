@@ -9,13 +9,16 @@
  */
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { VendorProps } from 'common/interfaces/vendor-props';
 import { useUsersQuery } from 'common/queries/users';
 import { Alert } from 'components/Alert';
+import { CustomField } from 'components/CustomField';
 import { useTranslation } from 'react-i18next';
 
 export function Details(props: VendorProps) {
   const [t] = useTranslation();
+  const company = useCurrentCompany();
   const { data: users } = useUsersQuery();
 
   return (
@@ -81,6 +84,41 @@ export function Details(props: VendorProps) {
           value={props.data.phone}
         />
       </Element>
+      {company?.custom_fields?.vendor1 && (
+        <CustomField
+          field="custom_value1"
+          defaultValue={props.data?.custom_value1}
+          value={company.custom_fields.vendor1}
+          onChange={(value) => props.setFieldValue('custom_value1', value)}
+        />
+      )}
+
+      {company?.custom_fields?.vendor2 && (
+        <CustomField
+          field="custom_value2"
+          defaultValue={props.data?.custom_value2}
+          value={company.custom_fields.vendor2}
+          onChange={(value) => props.setFieldValue('custom_value2', value)}
+        />
+      )}
+
+      {company?.custom_fields?.vendor3 && (
+        <CustomField
+          field="custom_value3"
+          defaultValue={props.data?.custom_value3}
+          value={company.custom_fields.vendor3}
+          onChange={(value) => props.setFieldValue('custom_value3', value)}
+        />
+      )}
+
+      {company?.custom_fields?.vendor4 && (
+        <CustomField
+          field="custom_value4"
+          defaultValue={props.data?.custom_value4}
+          value={company.custom_fields.vendor4}
+          onChange={(value) => props.setFieldValue('custom_value4', value)}
+        />
+      )}
     </Card>
   );
 }
