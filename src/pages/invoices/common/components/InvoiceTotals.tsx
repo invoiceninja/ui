@@ -8,9 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
+import { Card } from '@invoiceninja/cards';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
-import { useResolveTranslation } from '../hooks/useResolveTranslation';
 import { useTotalVariables } from '../hooks/useTotalVariables';
 
 export function InvoiceTotals() {
