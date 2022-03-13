@@ -11,7 +11,5 @@
 export function resolveKey(key: string, delimiter = '.') {
   const [resource, property] = key.split(delimiter);
 
-  console.log(property);
-
   return { resource, property };
 }
