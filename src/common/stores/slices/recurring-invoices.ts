@@ -15,6 +15,7 @@ import { Invoice } from 'common/interfaces/invoice';
 import { cloneDeep, set } from 'lodash';
 import { setCurrentRecurringInvoiceProperty } from './recurring-invoices/extra-reducers/set-current-recurring-invoice-property';
 import { setCurrentLineItemProperty } from './recurring-invoices/extra-reducers/set-current-line-item-property';
+import { blankLineItem } from './invoices/constants/blank-line-item';
 
 interface RecurringInvoiceState {
   api?: any;
@@ -35,6 +36,9 @@ export const recurringInvoiceSlice = createSlice({
       if (typeof state.current.line_items === 'string') {
         state.current.line_items = [];
       }
+    },
+    injectBlankItemIntoCurrent: (state) => {
+      state.current?.line_items.push(blankLineItem);
     },
   },
   extraReducers: (builder) => {
@@ -75,4 +79,5 @@ export const recurringInvoiceSlice = createSlice({
   },
 });
 
-export const { setCurrentRecurringInvoice } = recurringInvoiceSlice.actions;
+export const { setCurrentRecurringInvoice, injectBlankItemIntoCurrent } =
+  recurringInvoiceSlice.actions;
