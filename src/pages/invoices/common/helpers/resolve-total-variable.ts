@@ -1,4 +1,3 @@
-
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -14,5 +13,5 @@ export function resolveTotalVariable(variable: string) {
 
   // This is right place to do aliasing as well.
 
-  return { dollar, property};
+  return { dollar, property };
 }

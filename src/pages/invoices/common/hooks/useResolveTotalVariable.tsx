@@ -16,17 +16,20 @@ export function useResolveTotalVariable() {
   const formatMoney = useFormatMoney();
   const invoice = useCurrentInvoice();
 
+  const aliases: Record<string, string> = {
+    total: 'amount',
+  };
+
   return (variable: string) => {
     let value = 0;
 
     const { property } = resolveTotalVariable(variable);
-
-    console.log(invoice);
+    const identifier = aliases[property] || property;
 
     if (invoice) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      value = invoice[property] ?? 0;
+      value = invoice[identifier] ?? 0;
     }
 
     return formatMoney(value);
