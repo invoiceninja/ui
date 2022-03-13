@@ -22,12 +22,12 @@ export function useResolveTranslation() {
     '$product.tax_rate3': company?.settings.tax_name3 || t('tax_rate3'),
   };
 
-  return (key: string) => {
+  return (key: string, delimiter = '.') => {
     if (Object.prototype.hasOwnProperty.call(aliases, key)) {
       return aliases[key];
     }
 
-    const { property } = resolveKey(key);
+    const { property } = resolveKey(key, delimiter);
 
     return property ? t(property) : t(key);
   };
