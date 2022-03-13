@@ -32,7 +32,10 @@ const internalRecord = { value: '', label: '', internal: true };
 
 export function DebouncedCombobox(props: Props) {
   const [records, setRecords] = useState<Record[]>([internalRecord]);
-  const [selectedOption, setSelectedOption] = useState(records[0]);
+  const [selectedOption, setSelectedOption] = useState({
+    record: records[0],
+    withoutEvents: true,
+  });
   const [defaultValueProperty, setDefaultValueProperty] = useState('');
   const openDropdownButton = useRef<HTMLButtonElement | undefined>();
   const queryClient = useQueryClient();
@@ -81,14 +84,16 @@ export function DebouncedCombobox(props: Props) {
       return current;
     });
 
-    setSelectedOption(clone(records[0]));
+    const record = clone(records[0]);
+
+    setSelectedOption({ record, withoutEvents: false });
   }, 500);
 
   useEffect(() => request(''), []);
 
   useEffect(() => {
-    if (!props.disabled) {
-      props.onChange(selectedOption);
+    if (!props.disabled && selectedOption.withoutEvents === false) {
+      props.onChange(selectedOption.record);
     }
   }, [selectedOption]);
 
@@ -100,15 +105,17 @@ export function DebouncedCombobox(props: Props) {
     );
 
     if (potential) {
-      setSelectedOption(potential);
+      setSelectedOption({ record: potential, withoutEvents: true });
     }
   }, [records, defaultValueProperty]);
 
   return (
     <div className={`w-full ${props.className}`}>
       <Combobox
-        value={selectedOption}
-        onChange={setSelectedOption}
+        value={selectedOption?.record}
+        onChange={(record) =>
+          setSelectedOption({ record, withoutEvents: false })
+        }
         disabled={props.disabled}
       >
         <div className="relative mt-1">
