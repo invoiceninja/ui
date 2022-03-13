@@ -33,6 +33,10 @@ export function Vendor() {
       name: t('recurring_expenses'),
       href: generatePath('/vendors/:id/recurring_expenses', { id }),
     },
+    {
+      name: t('custom_fields'),
+      href: generatePath('/vendors/:id/vendor_fields', { id }),
+    },
   ];
 
   const pages: BreadcrumRecord[] = [

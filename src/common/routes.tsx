@@ -105,7 +105,7 @@ export const routes = (
         <Route path=":id" element={<Vendors.Vendor />}>
           <Route path="" element={<Vendors.Show />} />
           <Route path="edit" element={<Vendors.Edit />} />
-
+          <Route path="vendor_fields" element={<Vendors.VendorFields />} />
           <Route
             path="recurring_expenses"
             element={<Vendors.RecurringExpenses />}
