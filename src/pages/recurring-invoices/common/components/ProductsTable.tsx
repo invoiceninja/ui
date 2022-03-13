@@ -10,8 +10,9 @@
 
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvoice';
-import { injectBlankItemIntoCurrent } from 'common/stores/slices/invoices';
+
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
+import { injectBlankItemIntoCurrent } from 'common/stores/slices/recurring-invoices';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useResolveTranslation } from 'pages/invoices/common/hooks/useResolveTranslation';
 import { Plus, Trash2 } from 'react-feather';
