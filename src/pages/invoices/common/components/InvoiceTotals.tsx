@@ -20,7 +20,7 @@ export function InvoiceTotals() {
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
-      {variables.map((variable, index) => resolveVariable(variable))}
+      {variables.map((variable) => resolveVariable(variable))}
     </Card>
   );
 }
