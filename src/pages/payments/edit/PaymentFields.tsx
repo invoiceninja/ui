@@ -63,7 +63,7 @@ export function PaymentFields() {
             key={field}
             initialValue={company.custom_fields[field]}
             field={field}
-            placeholder={t('client_field')}
+            placeholder={t('payment_field')}
             onChange={(value) => handleCustomFieldChange(field, value)}
           />
         ))}

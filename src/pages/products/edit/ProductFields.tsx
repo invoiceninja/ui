@@ -63,7 +63,7 @@ export function ProductFields() {
             key={field}
             initialValue={company.custom_fields[field]}
             field={field}
-            placeholder={t('client_field')}
+            placeholder={t('product_field')}
             onChange={(value) => handleCustomFieldChange(field, value)}
           />
         ))}
