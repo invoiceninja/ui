@@ -63,6 +63,7 @@ export function Invoices() {
         resource="invoice"
         endpoint="/api/v1/invoices?include=client"
         columns={columns}
+        bulkRoute="/api/v1/invoices/bulk"
         linkToCreate="/invoices/create"
         linkToEdit="/invoices/:id/edit"
         withResourcefulActions
