@@ -8,8 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export function resolveKey(key: string) {
-  const [resource, property] = key.split('.');
+export function resolveKey(key: string, delimiter = '.') {
+  const [resource, property] = key.split(delimiter);
+
+  console.log(property);
 
   return { resource, property };
 }
