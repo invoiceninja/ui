@@ -87,6 +87,7 @@ export function Payments() {
         columns={columns}
         endpoint="/api/v1/payments?include=client,invoices"
         linkToCreate="/payments/create"
+        bulkRoute="/api/v1/payments/bulk"
         linkToEdit="/payments/:id/edit"
         withResourcefulActions
       />
