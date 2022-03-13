@@ -9,19 +9,19 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { useTranslation } from 'react-i18next';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
+import { useResolveTranslation } from '../hooks/useResolveTranslation';
 import { useTotalVariables } from '../hooks/useTotalVariables';
 
 export function InvoiceTotals() {
-  const [t] = useTranslation();
   const variables = useTotalVariables();
   const resolveVariable = useResolveTotalVariable();
+  const resolveTranslation = useResolveTranslation();
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
       {variables.map((variable, index) => (
-        <Element key={index} leftSide={t(variable)}>
+        <Element key={index} leftSide={resolveTranslation(variable, '$')}>
           {resolveVariable(variable)}
         </Element>
       ))}
