@@ -56,6 +56,19 @@ export function useResolveInputField() {
       );
     }
 
+    if (property === 'notes') {
+      return (
+        <InputField
+          id={property}
+          element="textarea"
+          value={invoice?.line_items[index][property]}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            onChange(property, event.target.value, index)
+          }
+        />
+      );
+    }
+
     if (numberInputs.includes(property)) {
       return (
         <InputField
