@@ -21,10 +21,12 @@ export function useResolveTotalVariable() {
 
     const { property } = resolveTotalVariable(variable);
 
+    console.log(invoice);
+
     if (invoice) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      value = invoice[property];
+      value = invoice[property] ?? 0;
     }
 
     return formatMoney(value);
