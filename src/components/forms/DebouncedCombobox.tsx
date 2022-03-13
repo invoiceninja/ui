@@ -5,6 +5,7 @@ import { clone, debounce } from 'lodash';
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { useQueryClient } from 'react-query';
 
 export interface Record {
   value: string | number;
@@ -34,16 +35,22 @@ export function DebouncedCombobox(props: Props) {
   const [selectedOption, setSelectedOption] = useState(records[0]);
   const [defaultValueProperty, setDefaultValueProperty] = useState('');
   const openDropdownButton = useRef<HTMLButtonElement | undefined>();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     setDefaultValueProperty(props.defaultValue as string);
   }, [props.defaultValue]);
 
   const request = (query: string) => {
-    axios
-      .get(endpoint(`${props.endpoint}?filter=${query}`), {
-        headers: defaultHeaders,
-      })
+    queryClient
+      .fetchQuery(
+        `${props.endpoint}?filter=${query}`,
+        () =>
+          axios.get(endpoint(`${props.endpoint}?filter=${query}`), {
+            headers: defaultHeaders,
+          }),
+        { staleTime: Infinity }
+      )
       .then((response) => {
         const array: Record[] = [internalRecord];
 
