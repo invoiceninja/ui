@@ -47,12 +47,18 @@ export function useResolveTotalVariable() {
   return (variable: string) => {
     let value = 0;
 
-    // console.log(variable);
-
     const { property } = resolveTotalVariable(variable);
     const identifier = aliases[property] || property;
 
     if (variable == '$net_subtotal' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.subTotal)}
+        </Element>
+      );
+    }
+
+    if (variable == '$subtotal' && invoiceSum) {
       return (
         <Element leftSide={resolveTranslation(variable, '$')}>
           {formatMoney(invoiceSum.subTotal)}
