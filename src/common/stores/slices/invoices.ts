@@ -16,11 +16,13 @@ import { cloneDeep, set } from 'lodash';
 import { blankInvitation } from './invoices/constants/blank-invitation';
 import { blankLineItem } from './invoices/constants/blank-line-item';
 import { deleteInvoiceLineItem } from './invoices/extra-reducers/delete-invoice-item';
+import { setCurrentInvoice } from './invoices/extra-reducers/set-current-invoice';
 import { setCurrentInvoiceProperty } from './invoices/extra-reducers/set-current-invoice-property';
 import { setCurrentLineItemProperty } from './invoices/extra-reducers/set-current-line-item-property';
 interface InvoiceState {
   api?: any;
   current?: Invoice;
+  invoiceSum?: InvoiceSum;
 }
 
 const initialState: InvoiceState = {
@@ -31,15 +33,6 @@ export const invoiceSlice = createSlice({
   name: 'invoices',
   initialState,
   reducers: {
-    setCurrentInvoice: (state, payload: PayloadAction<Invoice>) => {
-      state.current = payload.payload;
-
-      // For the fresh invoice we get, line items is equal to "[]".
-
-      if (typeof state.current.line_items === 'string') {
-        state.current.line_items = [];
-      }
-    },
     injectBlankItemIntoCurrent: (state) => {
       state.current?.line_items.push(blankLineItem);
     },
@@ -87,6 +80,25 @@ export const invoiceSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(setCurrentInvoice.fulfilled, (state, payload) => {
+      state.current = payload.payload.invoice;
+
+      if (typeof state.current.line_items === 'string') {
+        state.current.line_items = [];
+      }
+
+      console.log(payload);
+
+      if (payload.payload.client && payload.payload.currency) {
+        state.invoiceSum = new InvoiceSum(
+          cloneDeep(state.current),
+          cloneDeep(payload.payload.currency)
+        ).build();
+
+        state.current = state.invoiceSum.invoice;
+      }
+    });
+
     builder.addCase(setCurrentLineItemProperty.fulfilled, (state, payload) => {
       if (state.current) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -95,10 +107,12 @@ export const invoiceSlice = createSlice({
           payload.payload.property
         ] = payload.payload.value;
 
-        state.current = new InvoiceSum(
+        state.invoiceSum = new InvoiceSum(
           cloneDeep(state.current as Invoice),
           cloneDeep(payload.payload.currency as Currency)
-        ).build().invoice;
+        ).build();
+
+        state.current = state.invoiceSum.invoice;
       }
     });
 
@@ -107,10 +121,12 @@ export const invoiceSlice = createSlice({
         state.current.line_items.splice(payload.payload.payload, 1);
       }
 
-      state.current = new InvoiceSum(
+      state.invoiceSum = new InvoiceSum(
         cloneDeep(state.current as Invoice),
         cloneDeep(payload.payload.currency as Currency)
-      ).build().invoice;
+      ).build();
+
+      state.current = state.invoiceSum.invoice;
     });
 
     builder.addCase(setCurrentInvoiceProperty.fulfilled, (state, payload) => {
@@ -122,10 +138,12 @@ export const invoiceSlice = createSlice({
         );
 
         if (payload.payload.client && payload.payload.currency) {
-          state.current = new InvoiceSum(
+          state.invoiceSum = new InvoiceSum(
             cloneDeep(state.current),
             cloneDeep(payload.payload.currency)
-          ).build().invoice;
+          ).build();
+
+          state.current = state.invoiceSum.invoice;
         }
       }
     });
@@ -133,7 +151,6 @@ export const invoiceSlice = createSlice({
 });
 
 export const {
-  setCurrentInvoice,
   injectBlankItemIntoCurrent,
   toggleCurrentInvoiceInvitation,
   setCurrentInvoicePropertySync,
