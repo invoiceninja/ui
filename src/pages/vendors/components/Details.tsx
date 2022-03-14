@@ -19,7 +19,7 @@ export function Details(props: VendorProps) {
   const { data: users } = useUsersQuery();
 
   return (
-    <Card title={t('details')}>
+    <Card title={t('details')} className="mb-5">
       <Element leftSide={t('name')}>
         <InputField
           id="name"

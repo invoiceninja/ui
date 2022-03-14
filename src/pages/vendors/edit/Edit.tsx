@@ -79,33 +79,38 @@ export function Edit() {
     },
   });
   return (
-    <>
+    <div className="flex flex-col xl:flex-row xl:gap-4">
       {errors && <ValidationAlert errors={errors} />}
-      <Details
-        data={formik.values}
-        setFieldValue={formik.setFieldValue}
-        handleChange={formik.handleChange}
-        errors={errors}
-      />
-      <Address
-        data={formik.values}
-        setFieldValue={formik.setFieldValue}
-        handleChange={formik.handleChange}
-        errors={errors}
-      />
-      <AdditionalInfo
-        data={formik.values}
-        handleChange={formik.handleChange}
-        setFieldValue={formik.setFieldValue}
-        errors={errors}
-      />
-      <Contacts
-        handleChange={formik.handleChange}
-        setFieldValue={formik.setFieldValue}
-        isSubmitting={formik.isSubmitting}
-        handleSubmit={formik.handleSubmit}
-        data={formik.values.contacts}
-      />
-    </>
+
+      <div className="w-full xl:w-1/2">
+        <Details
+          data={formik.values}
+          setFieldValue={formik.setFieldValue}
+          handleChange={formik.handleChange}
+          errors={errors}
+        />
+        <AdditionalInfo
+          data={formik.values}
+          handleChange={formik.handleChange}
+          setFieldValue={formik.setFieldValue}
+          errors={errors}
+        />
+      </div>
+      <div className="w-full xl:w-1/2">
+        <Address
+          data={formik.values}
+          setFieldValue={formik.setFieldValue}
+          handleChange={formik.handleChange}
+          errors={errors}
+        />
+        <Contacts
+          handleChange={formik.handleChange}
+          setFieldValue={formik.setFieldValue}
+          isSubmitting={formik.isSubmitting}
+          handleSubmit={formik.handleSubmit}
+          data={formik.values.contacts}
+        />
+      </div>
+    </div>
   );
 }
