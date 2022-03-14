@@ -74,6 +74,14 @@ export function useResolveTotalVariable() {
       );
     }
 
+    if (variable == '$total' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.total)}
+        </Element>
+      );
+    }
+
     if (variable === '$custom_surcharge1') {
       return (
         <CustomField
