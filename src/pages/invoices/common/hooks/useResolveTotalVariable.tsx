@@ -18,6 +18,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useSetCurrentInvoiceProperty } from './useSetCurrentInvoiceProperty';
 import { Element } from '@invoiceninja/cards';
 import { useResolveTranslation } from './useResolveTranslation';
+import { useInvoiceSum } from './useInvoiceSum';
 
 export function useResolveTotalVariable() {
   const formatMoney = useFormatMoney();
@@ -25,16 +26,39 @@ export function useResolveTotalVariable() {
   const company = useCurrentCompany();
   const handleChange = useSetCurrentInvoiceProperty();
   const resolveTranslation = useResolveTranslation();
+  const invoiceSum = useInvoiceSum();
+
+  // discount => invoice.discount,
+  // paid_to_date => invoice.paid_to_date,
+  // surcharge1-4 => invoice.surcharge1-4,
+  // outstanding => invoice.balance
+
+  // net_subtotal => ->getSubtotal(),
+  // subtotal => ->getSubtotal(),
+  // total_taxes => ->getTotalTaxes(),
+  // line_taxes => ->getLineTaxes(),
+  // total => ->getTotal(),
 
   const aliases: Record<string, string> = {
     total: 'amount',
+    outstanding: 'balance',
   };
 
   return (variable: string) => {
     let value = 0;
 
+    // console.log(variable);
+
     const { property } = resolveTotalVariable(variable);
     const identifier = aliases[property] || property;
+
+    if (variable == '$net_subtotal' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.subTotal)}
+        </Element>
+      );
+    }
 
     if (variable === '$custom_surcharge1') {
       return (
