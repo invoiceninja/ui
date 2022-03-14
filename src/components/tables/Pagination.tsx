@@ -46,7 +46,7 @@ export function Pagination(props: Props) {
   }
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between space-x-2 my-3">
+    <div className="flex flex-col md:flex-row md:items-center justify-between space-x-2 my-3 overflow-y-auto pb-2">
       <div className="flex justify-center md:justify-start items-center space-x-4">
         {/* <span className="text-sm">Showing 1 to 1 of 1 entires</span> */}
         <div className="flex items-center space-x-2">
