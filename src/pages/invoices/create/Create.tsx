@@ -10,7 +10,6 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { useBlankInvoiceQuery } from 'common/queries/invoices';
-import { setCurrentInvoice } from 'common/stores/slices/invoices';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect } from 'react';
@@ -23,6 +22,7 @@ import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { InvoiceActions } from '../common/components/InvoiceActions';
+import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
 
 export function Create() {
   const { documentTitle } = useTitle('new_invoice');
