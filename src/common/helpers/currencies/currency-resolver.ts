@@ -13,28 +13,29 @@ import { endpoint } from 'common/helpers';
 import { Currency } from 'common/interfaces/currency';
 import { Statics } from 'common/interfaces/statics';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { QueryClient } from 'react-query';
 
 export class CurrencyResolver {
   protected declare statics: Statics;
+  protected queryClient: QueryClient;
+
+  constructor() {
+    this.queryClient = new QueryClient({
+      defaultOptions: {
+        queries: {
+          staleTime: Infinity,
+        },
+      },
+    });
+  }
 
   public find(id: string): Promise<Currency | undefined> {
-    return new Promise((resolve, reject) => {
-      if (this.statics) {
-        const currency = this.statics.currencies.find(
-          (currency) => currency.id === id
-        );
-
-        return resolve(currency as unknown as Currency);
-      }
-
-      axios
-        .get(endpoint('/api/v1/statics'), { headers: defaultHeaders })
-        .then((response) => {
-          this.statics = response.data;
-
-          this.find(id);
-        })
-        .catch((errors) => reject(errors));
-    });
+    return this.queryClient
+      .fetchQuery(endpoint('/api/v1/statics'), () =>
+        axios.get(endpoint('/api/v1/statics'), { headers: defaultHeaders })
+      )
+      .then((data) =>
+        data.data.currencies.find((currency: Currency) => currency.id === id)
+      );
   }
 }
