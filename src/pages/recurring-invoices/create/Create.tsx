@@ -9,17 +9,14 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import {
-  useBlankRecurringInvoiceQuery,
-  useRecurringInvoiceQuery,
-} from 'common/queries/recurring-invoices';
+import { useBlankRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
