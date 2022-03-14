@@ -16,7 +16,6 @@ export function InvoiceTotals() {
   const variables = useTotalVariables();
   const resolveVariable = useResolveTotalVariable();
 
-
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
       {variables.map((variable) => resolveVariable(variable))}
