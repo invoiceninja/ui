@@ -87,8 +87,6 @@ export const invoiceSlice = createSlice({
         state.current.line_items = [];
       }
 
-      console.log(payload);
-
       if (payload.payload.client && payload.payload.currency) {
         state.invoiceSum = new InvoiceSum(
           cloneDeep(state.current),
