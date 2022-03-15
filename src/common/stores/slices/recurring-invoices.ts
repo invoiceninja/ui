@@ -16,10 +16,11 @@ import { cloneDeep, set } from 'lodash';
 import { setCurrentRecurringInvoiceProperty } from './recurring-invoices/extra-reducers/set-current-recurring-invoice-property';
 import { setCurrentLineItemProperty } from './recurring-invoices/extra-reducers/set-current-line-item-property';
 import { blankLineItem } from './invoices/constants/blank-line-item';
-
+import { setCurrentRecurringInvoice } from './recurring-invoices/extra-reducers/set-current-recurring-invoice';
 interface RecurringInvoiceState {
   api?: any;
   current?: any;
+  invoiceSum?: InvoiceSum;
 }
 
 const initialState: RecurringInvoiceState = {
@@ -30,18 +31,28 @@ export const recurringInvoiceSlice = createSlice({
   name: 'recurringInvoice',
   initialState,
   reducers: {
-    setCurrentRecurringInvoice: (state, payload) => {
-      state.current = payload.payload;
-
-      if (typeof state.current.line_items === 'string') {
-        state.current.line_items = [];
-      }
-    },
     injectBlankItemIntoCurrent: (state) => {
       state.current?.line_items.push(blankLineItem);
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(setCurrentRecurringInvoice.fulfilled, (state, payload) => {
+      state.current = payload.payload.invoice;
+
+      if (typeof state.current.line_items === 'string') {
+        state.current.line_items = [];
+      }
+
+      if (payload.payload.client && payload.payload.currency) {
+        state.invoiceSum = new InvoiceSum(
+          cloneDeep(state.current),
+          cloneDeep(payload.payload.currency)
+        ).build();
+
+        state.current = state.invoiceSum.invoice;
+      }
+    });
+
     builder.addCase(
       setCurrentRecurringInvoiceProperty.fulfilled,
       (state, payload) => {
@@ -79,5 +90,4 @@ export const recurringInvoiceSlice = createSlice({
   },
 });
 
-export const { setCurrentRecurringInvoice, injectBlankItemIntoCurrent } =
-  recurringInvoiceSlice.actions;
+export const { injectBlankItemIntoCurrent } = recurringInvoiceSlice.actions;
