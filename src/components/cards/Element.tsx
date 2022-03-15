@@ -18,12 +18,16 @@ interface Props {
   children: ReactNode;
   className?: any;
   onClick?: () => unknown;
+  noExternalPadding?: boolean;
 }
 
 export function Element(props: Props) {
   return (
     <div
-      className={`py-4 px-5 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 sm:px-6 flex flex-col lg:flex-row lg:items-center ${props.className}`}
+      className={classNames(
+        `py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row lg:items-center ${props.className}`,
+        { 'px-5 sm:px-6': !props.noExternalPadding }
+      )}
       onClick={props.onClick}
     >
       <dt className="text-sm text-gray-500 flex flex-col">
