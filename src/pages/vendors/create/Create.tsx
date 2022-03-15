@@ -12,7 +12,6 @@ import { endpoint } from 'common/helpers';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useBlankVendorQuery } from 'common/queries/vendor';
-import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
 import { useState } from 'react';
@@ -86,33 +85,37 @@ export function Create() {
 
   return (
     <Default title={t('vendor')} breadcrumbs={pages} docsLink="docs/vendors/">
-      <Container>
-        <Details
-          data={formik.values}
-          setFieldValue={formik.setFieldValue}
-          handleChange={formik.handleChange}
-          errors={errors}
-        />
-        <Address
-          data={formik.values}
-          setFieldValue={formik.setFieldValue}
-          handleChange={formik.handleChange}
-          errors={errors}
-        />
-        <AdditionalInfo
-          data={formik.values}
-          handleChange={formik.handleChange}
-          setFieldValue={formik.setFieldValue}
-          errors={errors}
-        />
-        <Contacts
-          handleChange={formik.handleChange}
-          setFieldValue={formik.setFieldValue}
-          isSubmitting={formik.isSubmitting}
-          handleSubmit={formik.handleSubmit}
-          data={formik.values.contacts}
-        />
-      </Container>
+      <div className="flex flex-col xl:flex-row xl:gap-4">
+        <div className="w-full xl:w-1/2">
+          <Details
+            data={formik.values}
+            setFieldValue={formik.setFieldValue}
+            handleChange={formik.handleChange}
+            errors={errors}
+          />
+          <AdditionalInfo
+            data={formik.values}
+            handleChange={formik.handleChange}
+            setFieldValue={formik.setFieldValue}
+            errors={errors}
+          />
+        </div>
+        <div className="w-full xl:w-1/2">
+          <Address
+            data={formik.values}
+            setFieldValue={formik.setFieldValue}
+            handleChange={formik.handleChange}
+            errors={errors}
+          />
+          <Contacts
+            handleChange={formik.handleChange}
+            setFieldValue={formik.setFieldValue}
+            isSubmitting={formik.isSubmitting}
+            handleSubmit={formik.handleSubmit}
+            data={formik.values.contacts}
+          />
+        </div>
+      </div>
     </Default>
   );
 }
