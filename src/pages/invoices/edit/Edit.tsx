@@ -23,6 +23,7 @@ import { ProductsTable } from '../common/components/ProductsTable';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { InvoiceActions } from '../common/components/InvoiceActions';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
+import { InvoicePreview } from '../common/components/InvoicePreview';
 
 export function Edit() {
   const { id } = useParams();
@@ -60,6 +61,7 @@ export function Edit() {
       </div>
 
       <InvoiceActions />
+      <InvoicePreview />
     </Default>
   );
 }
