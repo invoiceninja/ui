@@ -12,10 +12,11 @@ import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 export function InvoicePreview() {
   const invoice = useCurrentInvoice();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     if (invoice) {
@@ -25,12 +26,19 @@ export function InvoicePreview() {
             id: invoice?.id,
           }),
           invoice,
-          { headers: defaultHeaders }
+          { responseType: 'arraybuffer', headers: defaultHeaders }
         )
-        .then((response) => {})
+        .then((response) => {
+          const blob = new Blob([response.data], { type: 'application/pdf' });
+          const url = URL.createObjectURL(blob);
+
+          if (iframeRef.current) {
+            iframeRef.current.src = url;
+          }
+        })
         .catch((error) => console.log(error));
     }
   }, [invoice]);
 
-  return <div>iframe</div>;
+  return <iframe ref={iframeRef} width="100%" height={1500} />;
 }
