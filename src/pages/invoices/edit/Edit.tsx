@@ -23,6 +23,9 @@ import { ProductsTable } from '../common/components/ProductsTable';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
 import { InvoicePreview } from '../common/components/InvoicePreview';
+import { useInvoiceSave } from './hooks/useInvoiceSave';
+import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
+import { Invoice } from 'common/interfaces/invoice';
 
 export function Edit() {
   const { id } = useParams();
@@ -30,6 +33,8 @@ export function Edit() {
   const { data: invoice } = useInvoiceQuery({ id });
   const [t] = useTranslation();
   const dispatch = useDispatch();
+  const handleInvoiceSave = useInvoiceSave();
+  const currentInvoice = useCurrentInvoice();
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -46,7 +51,17 @@ export function Edit() {
   }, [invoice]);
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onBackClick={generatePath('/invoices')}
+      onSaveClick={() =>
+        handleInvoiceSave(
+          currentInvoice?.id as string,
+          currentInvoice as Invoice
+        )
+      }
+    >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector readonly />
         <InvoiceDetails />
