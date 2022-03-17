@@ -61,7 +61,7 @@ export function Edit() {
       </div>
 
       <InvoiceActions />
-      <InvoicePreview />
+      <InvoicePreview for="invoice" />
     </Default>
   );
 }
