@@ -12,29 +12,25 @@ import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 export function InvoicePreview() {
   const invoice = useCurrentInvoice();
-  const [html, setHtml] = useState({ __html: '' });
 
   useEffect(() => {
     if (invoice) {
       axios
         .post(
-          endpoint(
-            '/api/v1/live_preview?entity=invoice&entity_id=:id&html=true',
-            {
-              id: invoice?.id,
-            }
-          ),
+          endpoint('/api/v1/live_preview?entity=invoice&entity_id=:id', {
+            id: invoice?.id,
+          }),
           invoice,
           { headers: defaultHeaders }
         )
-        .then((response) => setHtml({ __html: response.data }))
+        .then((response) => {})
         .catch((error) => console.log(error));
     }
   }, [invoice]);
 
-  return <div dangerouslySetInnerHTML={html}></div>;
+  return <div>iframe</div>;
 }
