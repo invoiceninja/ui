@@ -14,19 +14,28 @@ import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useEffect, useRef } from 'react';
 
-export function InvoicePreview() {
-  const invoice = useCurrentInvoice();
+interface Props {
+  for: 'create' | 'invoice';
+}
+
+export function InvoicePreview(props: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const invoice = useCurrentInvoice();
 
   useEffect(() => {
     if (invoice) {
       axios
         .post(
-          endpoint('/api/v1/live_preview?entity=invoice&entity_id=:id', {
-            id: invoice?.id,
-          }),
+          props.for === 'create'
+            ? endpoint('/api/v1/live_preview?entity=invoice')
+            : endpoint('/api/v1/live_preview?entity=invoice&entity_id=:id', {
+                id: invoice?.id,
+              }),
           invoice,
-          { responseType: 'arraybuffer', headers: defaultHeaders }
+          {
+            responseType: 'arraybuffer',
+            headers: defaultHeaders,
+          }
         )
         .then((response) => {
           const blob = new Blob([response.data], { type: 'application/pdf' });
