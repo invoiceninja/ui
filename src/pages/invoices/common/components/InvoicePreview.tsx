@@ -23,7 +23,7 @@ export function InvoicePreview(props: Props) {
   const invoice = useCurrentInvoice();
 
   useEffect(() => {
-    if (invoice) {
+    if (invoice && invoice?.client_id) {
       axios
         .post(
           props.for === 'create'
