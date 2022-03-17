@@ -102,6 +102,20 @@ export function InvoiceFooter() {
                 checked={invoice?.auto_bill_enabled || false}
                 onChange={(value) => handleChange('auto_bill_enabled', value)}
               />
+              
+              <div className="space-y-2">
+                <InputLabel>{t('design')}</InputLabel>
+
+                <DebouncedCombobox
+                  endpoint="/api/v1/designs"
+                  label="name"
+                  placeholder={t('search_designs')}
+                  onChange={(payload) =>
+                    handleChange('design_id', payload.value)
+                  }
+                  defaultValue={company?.settings?.invoice_design_id}
+                />
+              </div>
             </div>
 
             <div className="col-span-12 lg:col-span-6 space-y-6">
