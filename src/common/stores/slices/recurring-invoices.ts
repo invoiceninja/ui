@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { Currency } from 'common/interfaces/currency';
 import { Invoice } from 'common/interfaces/invoice';
@@ -17,6 +17,7 @@ import { setCurrentRecurringInvoiceProperty } from './recurring-invoices/extra-r
 import { setCurrentLineItemProperty } from './recurring-invoices/extra-reducers/set-current-line-item-property';
 import { blankLineItem } from './invoices/constants/blank-line-item';
 import { setCurrentRecurringInvoice } from './recurring-invoices/extra-reducers/set-current-recurring-invoice';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 interface RecurringInvoiceState {
   api?: any;
   current?: any;
@@ -33,6 +34,21 @@ export const recurringInvoiceSlice = createSlice({
   reducers: {
     injectBlankItemIntoCurrent: (state) => {
       state.current?.line_items.push(blankLineItem);
+    },
+    setCurrentRecurringInvoicePropertySync: (
+      state,
+      payload: PayloadAction<{
+        property: keyof RecurringInvoice;
+        value: unknown;
+      }>
+    ) => {
+      if (state.current) {
+        state.current = set(
+          state.current,
+          payload.payload.property,
+          payload.payload.value
+        );
+      }
     },
   },
   extraReducers: (builder) => {
@@ -90,4 +106,7 @@ export const recurringInvoiceSlice = createSlice({
   },
 });
 
-export const { injectBlankItemIntoCurrent } = recurringInvoiceSlice.actions;
+export const {
+  injectBlankItemIntoCurrent,
+  setCurrentRecurringInvoicePropertySync,
+} = recurringInvoiceSlice.actions;
