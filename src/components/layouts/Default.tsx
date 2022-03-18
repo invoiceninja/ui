@@ -47,6 +47,7 @@ interface Props extends CommonProps {
   breadcrumbs?: BreadcrumRecord[];
   topRight?: ReactNode;
   docsLink?: string;
+  navigationTopRight?: ReactNode;
 }
 
 export function Default(props: Props) {
@@ -365,6 +366,8 @@ export function Default(props: Props) {
                 {props.onSaveClick && (
                   <Button onClick={props.onSaveClick}>{t('save')}</Button>
                 )}
+
+                {props.navigationTopRight}
               </div>
             </div>
           </div>
