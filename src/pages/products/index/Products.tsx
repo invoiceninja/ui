@@ -64,7 +64,9 @@ export function Products() {
       </DropdownElement>
     ),
     (resource: any) => (
-      <DropdownElement>{t('clone_to_invoice')}</DropdownElement>
+      <DropdownElement to={`/products/${resource.id}/to_invoice`}>
+        {t('clone_to_invoice')}
+      </DropdownElement>
     ),
   ];
   return (

@@ -6,3 +6,4 @@ export * from './clone/Clone';
 export * from './show/Show';
 export * from './documents/Documents';
 export * from './edit/ProductFields';
+export * from './invoice/Invoice'
