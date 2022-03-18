@@ -8,17 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useTranslation } from 'react-i18next';
+import { generatePath, useParams } from 'react-router-dom';
 
 export function Actions() {
   const [t] = useTranslation();
+  const invoice = useCurrentInvoice();
+  const { id } = useParams();
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
       <div>
-        <DropdownElement>{t('view_pdf')}</DropdownElement>
+        <DropdownElement to={generatePath('/invoices/:id/pdf', { id })}>
+          {t('view_pdf')}
+        </DropdownElement>
+        
         <DropdownElement>{t('download')}</DropdownElement>
         <DropdownElement>{t('email_invoice')}</DropdownElement>
         <DropdownElement>{t('mark_paid')}</DropdownElement>
