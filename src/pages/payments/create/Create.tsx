@@ -10,23 +10,34 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import axios, { AxiosError } from 'axios';
 import paymentType from 'common/constants/payment-type';
+import { endpoint } from 'common/helpers';
 import { Client } from 'common/interfaces/client';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useClientsQuery } from 'common/queries/clients';
+import { defaultHeaders } from 'common/queries/common/headers';
 import { useBlankPaymentQuery } from 'common/queries/payments';
 import { useStaticsQuery } from 'common/queries/statics';
+import { Alert } from 'components/Alert';
 import { Container } from 'components/Container';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
 import { useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
+import { generatePath, useNavigate } from 'react-router-dom';
 
 export function Create() {
   const [t] = useTranslation();
   const { data: payment } = useBlankPaymentQuery();
   const { data: clients } = useClientsQuery();
   const { data: statics } = useStaticsQuery();
+  const [errors, setErrors] = useState<ValidationBag>();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [convertCurrency, setconvertCurrency] = useState(false);
   const formik = useFormik({
     enableReinitialize: true,
@@ -35,14 +46,33 @@ export function Create() {
       client_id: '',
       date: payment?.data.data.date,
       transaction_reference: '',
-
       type_id: '',
       private_notes: '',
       exchange_rate: 0,
       exchange_currency_id: payment?.data.data.exchange_currency_id || 0,
     },
     onSubmit: (values) => {
-      console.log(values);
+      const toastId = toast.loading(t('processing'));
+      setErrors(undefined);
+      axios
+        .post(endpoint('/api/v1/payments'), values, {
+          headers: defaultHeaders,
+        })
+        .then((data) => {
+          toast.success(t('added_payment'), { id: toastId });
+          navigate(`/payments/${data.data.data.id}/edit`);
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+          toast.error(t('error_title'), { id: toastId });
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+          }
+        })
+        .finally(() => {
+          formik.setSubmitting(false);
+          queryClient.invalidateQueries(generatePath('/api/v1/payments'));
+        });
     },
   });
 
@@ -74,10 +104,14 @@ export function Create() {
   return (
     <Default title={t('new_payment')}>
       <Container>
-        {console.log(payment?.data.data)}
-        <Card title={t('new_payment')}>
+        <Card
+          title={t('new_payment')}
+          disableSubmitButton={formik.isSubmitting}
+          onFormSubmit={formik.handleSubmit}
+          withSaveButton
+        >
           <Element leftSide={t('client')}>
-            <SelectField onChange={formik.handleChange} id="client_id">
+            <SelectField onChange={formik.handleChange} id="client_id" required>
               <option value=""></option>
               {clients?.data.data.map((client: Client, index: number) => {
                 return (
@@ -87,10 +121,16 @@ export function Create() {
                 );
               })}
             </SelectField>
-            {console.log('formik', formik.values)}
+            {errors?.errors.client_id && (
+              <Alert type="danger">{errors.errors.client_id}</Alert>
+            )}
           </Element>
           <Element leftSide={t('amount')}>
-            <InputField id="amount" onChange={formik.handleChange} />
+            <InputField
+              id="amount"
+              onChange={formik.handleChange}
+              errorMessage={errors?.errors.payment_amount}
+            />
           </Element>
           <Element leftSide={t('invoice')}>
             <InputField />
