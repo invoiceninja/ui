@@ -13,6 +13,7 @@ import { InputField, SelectField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import paymentType from 'common/constants/payment-type';
 import { endpoint } from 'common/helpers';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Client } from 'common/interfaces/client';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useClientsQuery } from 'common/queries/clients';
@@ -21,6 +22,7 @@ import { useBlankPaymentQuery } from 'common/queries/payments';
 import { useStaticsQuery } from 'common/queries/statics';
 import { Alert } from 'components/Alert';
 import { Container } from 'components/Container';
+import { CustomField } from 'components/CustomField';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
@@ -39,6 +41,7 @@ export function Create() {
   const [errors, setErrors] = useState<ValidationBag>();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const company=useCurrentCompany();
   const [convertCurrency, setconvertCurrency] = useState(false);
   const formik = useFormik({
     enableReinitialize: true,
@@ -172,6 +175,40 @@ export function Create() {
               onChange={formik.handleChange}
             />
           </Element>
+          {company?.custom_fields?.payment1 && (
+        <CustomField
+          field="payment1"
+          defaultValue={payment?.data.data.custom_value1}
+          value={company?.custom_fields?.payment1}
+          onChange={(value) => formik.setFieldValue('custom_value1', value)}
+        />
+      )}
+      {company?.custom_fields?.payment2 && (
+        <CustomField
+          field="custom_value2"
+          defaultValue={payment?.data.data.custom_value2}
+          value={company?.custom_fields?.payment2}
+          onChange={(value) => formik.setFieldValue('custom_value2', value)}
+        />
+      )}
+
+      {company?.custom_fields?.payment3 && (
+        <CustomField
+          field="custom_value3"
+          defaultValue={payment?.data.data.custom_value3}
+          value={company?.custom_fields?.payment3}
+          onChange={(value) => formik.setFieldValue('custom_value3', value)}
+        />
+      )}
+
+      {company?.custom_fields?.payment4 && (
+        <CustomField
+          field="custom_value4"
+          defaultValue={payment?.data.data.custom_value4}
+          value={company?.custom_fields?.payment4}
+          onChange={(value) => formik.setFieldValue('custom_value4', value)}
+        />
+      )}
           <Element leftSide={t('send_email')}>
             <Toggle />
           </Element>
