@@ -88,7 +88,9 @@ export const routes = (
       </Route>
       <Route path="/payments">
         <Route path="" element={<Payments.Payments />} />
-        <Route path='create' element={<Payments.Create/>}/>
+        <Route path='create' element={<Payments.Create/>}>
+          <Route path='client/:client_id' element={<Payments.Create/>}/>
+        </Route>
         <Route path=":id" element={<Payments.Payment />}>
           <Route path="payment_fields" element={<Payments.PaymentFields />} />
           <Route path="edit" element={<Payments.Edit />} />

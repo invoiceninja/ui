@@ -28,9 +28,10 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 
 export function Create() {
+  const { client_id } = useParams();
   const [t] = useTranslation();
   const { data: payment } = useBlankPaymentQuery();
   const { data: clients } = useClientsQuery();
@@ -43,7 +44,7 @@ export function Create() {
     enableReinitialize: true,
     initialValues: {
       amount: 0,
-      client_id: '',
+      client_id: client_id || '',
       date: payment?.data.data.date,
       transaction_reference: '',
       type_id: '',
@@ -111,7 +112,12 @@ export function Create() {
           withSaveButton
         >
           <Element leftSide={t('client')}>
-            <SelectField onChange={formik.handleChange} id="client_id" required>
+            <SelectField
+              onChange={formik.handleChange}
+              value={formik.values.client_id}
+              id="client_id"
+              required
+            >
               <option value=""></option>
               {clients?.data.data.map((client: Client, index: number) => {
                 return (

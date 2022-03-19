@@ -21,7 +21,6 @@ import { generatePath, useNavigate } from 'react-router-dom';
 
 export function Clients() {
   const [t] = useTranslation();
-
   const navigate = useNavigate();
   useTitle('clients');
 
@@ -67,7 +66,7 @@ export function Clients() {
       <DropdownElement
         key={'new_payment'}
         onClick={() => {
-          console.log(resource);
+          navigate(`/payments/create/client/${resource.id}`);
         }}
       >
         {t('new_payment')}
