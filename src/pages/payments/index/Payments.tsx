@@ -7,12 +7,16 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+import axios from 'axios';
 import paymentStatus from 'common/constants/payment-status';
 import paymentType from 'common/constants/payment-type';
-import { date } from 'common/helpers';
+import { date, endpoint } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { defaultHeaders } from 'common/queries/common/headers';
+import { bulk } from 'common/queries/payments';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
@@ -76,6 +80,48 @@ export function Payments() {
       label: t('transaction_reference'),
     },
   ];
+  const actions = [
+    (resource: any) => (
+      <DropdownElement onClick={() => {}}>{t('apply_payment')}</DropdownElement>
+    ),
+    (resource: any) => (
+      <DropdownElement
+        onClick={() => {
+          axios
+            .get(endpoint('/api/v1/payments/:id/refund', { id: resource.id }), {
+              headers: defaultHeaders,
+            })
+            .then((data) => console.log(data));
+        }}
+      >
+        {t('refund_payment')}
+      </DropdownElement>
+    ),
+    (resource: any) => (
+      <DropdownElement
+        onClick={() => {
+          axios
+            .get(endpoint('/api/v1/payments/:id/email', { id: resource.id }), {
+              headers: defaultHeaders,
+            })
+            .then((data) => console.log(data));
+        }}
+      >
+        {t('email_payment')}
+      </DropdownElement>
+    ),
+  ];
+  const customBulkActions = [
+    (resource: any) => (
+      <DropdownElement
+        onClick={() => {
+          bulk(resource, 'email').then(data=>console.log(data))
+        }}
+      >
+        {t('email_payment')}
+      </DropdownElement>
+    ),
+  ];
   return (
     <Default
       title={t('payments')}
@@ -90,6 +136,8 @@ export function Payments() {
         bulkRoute="/api/v1/payments/bulk"
         linkToEdit="/payments/:id/edit"
         withResourcefulActions
+        customActions={actions}
+        customBulkActions={customBulkActions}
       />
     </Default>
   );

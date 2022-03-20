@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
-import { endpoint } from '../helpers';
+import { endpoint, request } from '../helpers';
 import { defaultHeaders } from './common/headers';
 
 export function usePaymentQuery(params: { id: string | undefined }) {
@@ -40,5 +40,20 @@ export function useBlankPaymentQuery() {
         headers: defaultHeaders,
       }),
     { staleTime: Infinity }
+  );
+}
+
+export function bulk(
+  id: string[],
+  action: 'archive' | 'restore' | 'delete'| 'email'
+): Promise<AxiosResponse> {
+  return request(
+    'POST',
+    endpoint('/api/v1/payments/bulk'),
+    {
+      action,
+      ids: Array.from(id),
+    },
+    { 'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') }
   );
 }
