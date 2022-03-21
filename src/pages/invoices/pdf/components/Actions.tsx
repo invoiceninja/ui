@@ -10,19 +10,23 @@
 
 import { Button } from '@invoiceninja/forms';
 import { endpoint } from 'common/helpers';
+import { Invoice } from 'common/interfaces/invoice';
 import Toggle from 'components/forms/Toggle';
+import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 
 interface Props {
   blobUrl: string;
   onHandleDeliveryNote: (url: string, isDeliveryNote: boolean) => unknown;
+  invoice: Invoice;
 }
 
 export function Actions(props: Props) {
   const [t] = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
+  const downloadPdf = useDownloadPdf();
 
   const handleDeliveryNoteChange = (value: boolean) =>
     value
@@ -45,7 +49,7 @@ export function Actions(props: Props) {
 
       <Button type="secondary">{t('email')}</Button>
 
-      <Button type="secondary" onClick={() => window.open(props.blobUrl)}>
+      <Button type="secondary" onClick={() => downloadPdf(props.invoice)}>
         {t('download')}
       </Button>
 

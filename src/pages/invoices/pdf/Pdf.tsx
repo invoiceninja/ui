@@ -17,6 +17,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { InvoiceViewer } from '../common/components/InvoiceViewer';
+import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { Actions } from './components/Actions';
 
 export function Pdf() {
@@ -25,24 +26,20 @@ export function Pdf() {
   const { data } = useInvoiceQuery({ id });
   const [pdfUrl, setPdfUrl] = useState<string>();
   const [blobUrl, setBlobUrl] = useState('');
-
-  const generatePdfUrl = () => {
-    if (data?.data.data) {
-      const invoice: Invoice = data.data.data;
-
-      if (invoice.invitations.length > 0) {
-        setPdfUrl(
-          endpoint('/client/invoice/:invitation/download_pdf', {
-            invitation: invoice.invitations[0].key,
-          })
-        );
-      }
-    }
-  };
+  const [invoice, setInvoice] = useState<Invoice>();
+  const url = useGeneratePdfUrl();
 
   useEffect(() => {
-    generatePdfUrl();
+    if (data?.data.data) {
+      setInvoice(data.data.data);
+    }
   }, [data]);
+
+  useEffect(() => {
+    if (invoice) {
+      setPdfUrl(url(invoice));
+    }
+  }, [invoice]);
 
   const onLink = (url: string) => setBlobUrl(url);
 
@@ -50,12 +47,17 @@ export function Pdf() {
     <Default
       title={t('view_pdf')}
       navigationTopRight={
-        <Actions
-          blobUrl={blobUrl}
-          onHandleDeliveryNote={(value, isDeliveryNote) =>
-            isDeliveryNote ? setPdfUrl(value) : generatePdfUrl()
-          }
-        />
+        invoice && (
+          <Actions
+            invoice={invoice}
+            blobUrl={blobUrl}
+            onHandleDeliveryNote={(value, isDeliveryNote) =>
+              isDeliveryNote
+                ? setPdfUrl(value)
+                : setPdfUrl(url(invoice as Invoice))
+            }
+          />
+        )
       }
     >
       {pdfUrl ? (
