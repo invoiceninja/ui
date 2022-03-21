@@ -8,15 +8,18 @@
 * @license https://www.elastic.co/licensing/elastic-license
 */
 
+import { useBlankProductQuery } from "common/queries/products";
 import { Container } from "components/Container";
 import { Default } from "components/layouts/Default";
+import { Spinner } from "components/Spinner";
 import { useTranslation } from "react-i18next";
-import { CreateComponent } from "./CreateComponent";
+import { CreateProductComponent } from "../common/CreateProductComponent";
 
 
 export function Create() {
   const [t] = useTranslation();
-
+const {data:product}=useBlankProductQuery()
+console.log(product?.data.data)
   const pages = [
     { name: t('products'), href: '/products' },
     { name: t('new_product'), href: '/products/create' },
@@ -24,7 +27,10 @@ export function Create() {
   return (
    <Default breadcrumbs={pages}>
 <Container>
-  <CreateComponent/>
+{product?.data.data ? (
+    <CreateProductComponent product={product.data.data} />
+  ) : (
+    <Spinner />)}
 </Container>
    </Default>
   )

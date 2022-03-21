@@ -35,7 +35,7 @@ export interface CreateProductDto {
 interface Props {
   product?: CreateProductDto;
 }
-export function CreateComponent(props: Props) {
+export function CreateProductComponent(props: Props) {
   const [t] = useTranslation();
   const company = useCurrentCompany();
 
