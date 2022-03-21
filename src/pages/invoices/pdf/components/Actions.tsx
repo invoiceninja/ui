@@ -11,14 +11,24 @@
 import { Button, Link } from '@invoiceninja/forms';
 import { useTranslation } from 'react-i18next';
 
-export function Actions() {
+interface Props {
+  blobUrl: string;
+}
+
+export function Actions(props: Props) {
   const [t] = useTranslation();
+  console.log(props);
 
   return (
     <>
       <Link to="/delivery_note">{t('delivery_note')}</Link>
+
       <Button type="secondary">{t('email')}</Button>
-      <Button type="secondary">{t('download')}</Button>
+
+      <Button type="secondary" onClick={() => window.open(props.blobUrl)}>
+        {t('download')}
+      </Button>
+
       <Button type="secondary">{t('close')}</Button>
     </>
   );
