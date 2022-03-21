@@ -26,7 +26,7 @@ export function Pdf() {
   const [pdfUrl, setPdfUrl] = useState<string>();
   const [blobUrl, setBlobUrl] = useState('');
 
-  useEffect(() => {
+  const generatePdfUrl = () => {
     if (data?.data.data) {
       const invoice: Invoice = data.data.data;
 
@@ -38,6 +38,10 @@ export function Pdf() {
         );
       }
     }
+  };
+
+  useEffect(() => {
+    generatePdfUrl();
   }, [data]);
 
   const onLink = (url: string) => setBlobUrl(url);
@@ -45,7 +49,14 @@ export function Pdf() {
   return (
     <Default
       title={t('view_pdf')}
-      navigationTopRight={<Actions blobUrl={blobUrl} />}
+      navigationTopRight={
+        <Actions
+          blobUrl={blobUrl}
+          onHandleDeliveryNote={(value, isDeliveryNote) =>
+            isDeliveryNote ? setPdfUrl(value) : generatePdfUrl()
+          }
+        />
+      }
     >
       {pdfUrl ? (
         <InvoiceViewer onLink={onLink} link={pdfUrl} method="GET" />

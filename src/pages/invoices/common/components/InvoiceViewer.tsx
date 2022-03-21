@@ -11,6 +11,7 @@
 import axios from 'axios';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useEffect, useRef } from 'react';
+import { useQueryClient } from 'react-query';
 
 interface Props {
   link: string;
@@ -21,15 +22,19 @@ interface Props {
 
 export function InvoiceViewer(props: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    axios({
-      method: props.method,
-      url: props.link,
-      data: props.resource,
-      headers: defaultHeaders,
-      responseType: 'arraybuffer',
-    })
+    queryClient
+      .fetchQuery(props.link, () =>
+        axios({
+          method: props.method,
+          url: props.link,
+          data: props.resource,
+          headers: defaultHeaders,
+          responseType: 'arraybuffer',
+        })
+      )
       .then((response) => {
         const blob = new Blob([response.data], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);

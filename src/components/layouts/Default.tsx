@@ -367,7 +367,9 @@ export function Default(props: Props) {
                   <Button onClick={props.onSaveClick}>{t('save')}</Button>
                 )}
 
-                {props.navigationTopRight}
+                <div className="space-x-3 items-center hidden lg:flex">
+                  {props.navigationTopRight}
+                </div>
               </div>
             </div>
           </div>

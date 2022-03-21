@@ -8,20 +8,39 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, Link } from '@invoiceninja/forms';
+import { Button } from '@invoiceninja/forms';
+import { endpoint } from 'common/helpers';
+import Toggle from 'components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 
 interface Props {
   blobUrl: string;
+  onHandleDeliveryNote: (url: string, isDeliveryNote: boolean) => unknown;
 }
 
 export function Actions(props: Props) {
   const [t] = useTranslation();
-  console.log(props);
+  const { id } = useParams();
+
+  const handleDeliveryNoteChange = (value: boolean) =>
+    value
+      ? props.onHandleDeliveryNote(
+          endpoint('/api/v1/invoices/:id/delivery_note?per_page=999999', {
+            id,
+          }),
+          true
+        )
+      : props.onHandleDeliveryNote(props.blobUrl, false);
 
   return (
     <>
-      <Link to="/delivery_note">{t('delivery_note')}</Link>
+      <span className="inline-flex items-center mr-4">
+        <Toggle
+          label={t('delivery_note')}
+          onChange={handleDeliveryNoteChange}
+        />
+      </span>
 
       <Button type="secondary">{t('email')}</Button>
 
