@@ -24,6 +24,7 @@ export function Pdf() {
   const { id } = useParams();
   const { data } = useInvoiceQuery({ id });
   const [pdfUrl, setPdfUrl] = useState<string>();
+  const [blobUrl, setBlobUrl] = useState('');
 
   useEffect(() => {
     if (data?.data.data) {
@@ -39,9 +40,18 @@ export function Pdf() {
     }
   }, [data]);
 
+  const onLink = (url: string) => setBlobUrl(url);
+
   return (
-    <Default title={t('view_pdf')} navigationTopRight={<Actions />}>
-      {pdfUrl ? <InvoiceViewer link={pdfUrl} method="GET" /> : <Spinner />}
+    <Default
+      title={t('view_pdf')}
+      navigationTopRight={<Actions blobUrl={blobUrl} />}
+    >
+      {pdfUrl ? (
+        <InvoiceViewer onLink={onLink} link={pdfUrl} method="GET" />
+      ) : (
+        <Spinner />
+      )}
     </Default>
   );
 }

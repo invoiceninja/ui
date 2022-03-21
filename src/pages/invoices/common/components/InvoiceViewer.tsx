@@ -16,6 +16,7 @@ interface Props {
   link: string;
   resource?: unknown;
   method: 'GET' | 'POST';
+  onLink?: (url: string) => unknown;
 }
 
 export function InvoiceViewer(props: Props) {
@@ -35,6 +36,8 @@ export function InvoiceViewer(props: Props) {
 
         if (iframeRef.current) {
           iframeRef.current.src = url;
+
+          props.onLink && props.onLink(url);
         }
       })
       .catch((error) => console.log(error));
