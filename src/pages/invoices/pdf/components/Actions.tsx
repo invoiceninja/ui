@@ -12,7 +12,7 @@ import { Button } from '@invoiceninja/forms';
 import { endpoint } from 'common/helpers';
 import Toggle from 'components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 
 interface Props {
   blobUrl: string;
@@ -22,6 +22,7 @@ interface Props {
 export function Actions(props: Props) {
   const [t] = useTranslation();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   const handleDeliveryNoteChange = (value: boolean) =>
     value
@@ -48,7 +49,12 @@ export function Actions(props: Props) {
         {t('download')}
       </Button>
 
-      <Button type="secondary">{t('close')}</Button>
+      <Button
+        onClick={() => navigate(generatePath('/invoices'))}
+        type="secondary"
+      >
+        {t('close')}
+      </Button>
     </>
   );
 }
