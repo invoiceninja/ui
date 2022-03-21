@@ -47,7 +47,12 @@ export function Actions(props: Props) {
         />
       </span>
 
-      <Button type="secondary">{t('email')}</Button>
+      <Button
+        type="secondary"
+        onClick={() => navigate(generatePath('/invoices/:id/email', { id }))}
+      >
+        {t('email')}
+      </Button>
 
       <Button type="secondary" onClick={() => downloadPdf(props.invoice)}>
         {t('download')}

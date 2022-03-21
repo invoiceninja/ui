@@ -81,10 +81,11 @@ export const routes = (
         <Route path="create" element={<Invoices.Create />} />
         <Route path=":id/edit" element={<Invoices.Edit />} />
         <Route path=":id/pdf" element={<Invoices.Pdf />} />
+        <Route path=":id/email" element={<Invoices.Email />} />
       </Route>
       <Route path="/recurring_invoices">
         <Route path="" element={<RecurringInvoices.RecurringInvoices />} />
-         <Route path="create" element={<RecurringInvoices.Create />} />
+        <Route path="create" element={<RecurringInvoices.Create />} />
         <Route path=":id/edit" element={<RecurringInvoices.Edit />} />
       </Route>
       <Route path="/payments">
