@@ -18,10 +18,12 @@ import { CreateProductComponent } from '../common/CreateProductComponent';
 export function Create() {
   const [t] = useTranslation();
   const { data: product } = useBlankProductQuery();
+
   const pages = [
     { name: t('products'), href: '/products' },
     { name: t('new_product'), href: '/products/create' },
   ];
+
   return (
     <Default breadcrumbs={pages}>
       <Container>
