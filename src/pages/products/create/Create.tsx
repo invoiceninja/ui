@@ -13,7 +13,7 @@ import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { useTranslation } from 'react-i18next';
-import { CreateProductComponent } from '../common/CreateProductComponent';
+import { CreateProduct } from '../common/components/CreateProduct';
 
 export function Create() {
   const [t] = useTranslation();
@@ -28,7 +28,7 @@ export function Create() {
     <Default breadcrumbs={pages}>
       <Container>
         {product?.data.data ? (
-          <CreateProductComponent product={product.data.data} />
+          <CreateProduct product={product.data.data} />
         ) : (
           <Spinner />
         )}

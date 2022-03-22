@@ -11,7 +11,7 @@
 import { useProductQuery } from 'common/queries/products';
 import { Spinner } from 'components/Spinner';
 import { useParams } from 'react-router';
-import { CreateProductComponent } from '../common/CreateProductComponent';
+import { CreateProduct } from '../common/components/CreateProduct';
 
 export function Clone() {
   const { id } = useParams();
@@ -19,7 +19,7 @@ export function Clone() {
   const { data: product } = useProductQuery({ id });
 
   return product?.data.data ? (
-    <CreateProductComponent product={product.data.data} />
+    <CreateProduct product={product.data.data} />
   ) : (
     <Spinner />
   );

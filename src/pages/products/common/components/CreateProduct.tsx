@@ -33,10 +33,12 @@ export interface CreateProductDto {
   custom_value3: string;
   custom_value4: string;
 }
+
 interface Props {
   product?: CreateProductDto;
 }
-export function CreateProductComponent(props: Props) {
+
+export function CreateProduct(props: Props) {
   const [t] = useTranslation();
   const company = useCurrentCompany();
 
@@ -45,6 +47,7 @@ export function CreateProductComponent(props: Props) {
   const navigate = useNavigate();
 
   const [errors, setErrors] = useState<any>();
+  
   const formik = useFormik({
     initialValues: {
       product_key: props.product?.product_key || '',
