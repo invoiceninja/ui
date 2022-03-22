@@ -28,7 +28,7 @@ import { CustomField } from 'components/CustomField';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
-import {  useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -45,13 +45,14 @@ export function Create() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const company = useCurrentCompany();
-  const [invoices, setinvoices] = useState<string[]>([])
+  const [invoices, setinvoices] = useState<string[]>([]);
   const [convertCurrency, setconvertCurrency] = useState(false);
-  const [totalAmount, settotalAmount] = useState(0)
+  const [totalamount, settotalamount] = useState(0);
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
       amount: 0,
+      aplied: 0,
       client_id: client_id || '',
       date: payment?.data.data.date,
       transaction_reference: '',
@@ -59,7 +60,7 @@ export function Create() {
       private_notes: '',
       exchange_rate: 0,
       exchange_currency_id: payment?.data.data.exchange_currency_id || 0,
-      invoices:[]
+      invoices: [],
     },
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
@@ -110,16 +111,34 @@ export function Create() {
 
     return toCurrency.exchange_rate * (1 / fromCurrency.exchange_rate);
   };
-const allinvocies=useAllInvoicesQuery();
-  
-useEffect(() => {
-  invoices.map((invoiceId:string,index:number)=>{
-    const invoiceItem=allinvocies.find((invoice:Invoice)=>invoice.id==invoiceId)
-  formik.setFieldValue('invoices',[...formik.values.invoices,{amount:invoiceItem?.amount,invoice_id:invoiceItem?.id,credit_id:'',id:""}])
+  const allinvocies = useAllInvoicesQuery({ id: formik.values.client_id });
 
-  })
-
-}, [invoices])
+  useEffect(() => {
+    invoices.map((invoiceId: string, index: number) => {
+      const invoiceItem = allinvocies.find(
+        (invoice: Invoice) => invoice.id == invoiceId
+      );
+      formik.setFieldValue('invoices', [
+        ...formik.values.invoices,
+        {
+          amount: invoiceItem?.balance,
+          invoice_id: invoiceItem?.id,
+          credit_id: '',
+          id: '',
+        },
+      ]);
+    });
+  }, [invoices]);
+  useEffect(() => {
+    let total = 0;
+    formik.values.invoices.map((invoice: any, index: number) => {
+      console.log('balance', invoice.balance);
+      formik.setFieldValue('aplied', totalamount);
+      total = total + Number(invoice.amount);
+    });
+    formik.setFieldValue('aplied', total);
+    formik.setFieldValue('amount', total);
+  }, [formik.values.invoices]);
 
   return (
     <Default title={t('new_payment')}>
@@ -145,6 +164,7 @@ useEffect(() => {
                   </option>
                 );
               })}
+              {console.log(errors)}
             </SelectField>
             {errors?.errors.client_id && (
               <Alert type="danger">{errors.errors.client_id}</Alert>
@@ -158,28 +178,47 @@ useEffect(() => {
               errorMessage={errors?.errors.payment_amount}
             />
           </Element>
-          <Element leftSide={t('invoices')}>
-            <SelectField
-            onChange={(event:any)=>{
-              setinvoices([...invoices,event.target.value])
-            }}
-            >
-              <option value=''></option>
-              {allinvocies.map((invoice:Invoice,index:number)=>{
-                if(invoice.status_id!=InvoiceStatus.Paid && invoice.archived_at==0){
-                  return <option key={index} value={invoice.id}>{invoice.number}</option>
-                }
+          {console.log('amount', totalamount)}
+          {formik.values.client_id && (
+            <>
+              <Element leftSide={t('invoices')}>
+                <SelectField
+                  onChange={(event: any) => {
+                    setinvoices([...invoices, event.target.value]);
+                  }}
+                >
+                  <option value=""></option>
+                  {allinvocies.map((invoice: Invoice, index: number) => {
+                    if (
+                      invoice.status_id != InvoiceStatus.Paid &&
+                      invoice.archived_at == 0
+                    ) {
+                      return (
+                        <option key={index} value={invoice.id}>
+                          {invoice.number}
+                        </option>
+                      );
+                    }
+                  })}
+                </SelectField>
+              </Element>
+              {invoices.map((invoiceId: string, index: number) => {
+                const invoiceItem = allinvocies.find(
+                  (invoice: Invoice) => invoice.id == invoiceId
+                );
+                return (
+                  <Element key={index} leftSide={invoiceItem?.number}>
+                    {console.log('item', invoiceItem)}
+                    <InputField
+                      id={`invoices[${index}].amount`}
+                      value={invoiceItem?.balance}
+                      onChange={formik.handleChange}
+                    />
+                  </Element>
+                );
               })}
-            </SelectField>
-          </Element>
-          {invoices.map((invoiceId:string,index:number)=>{
-            const invoiceItem=allinvocies.find((invoice:Invoice)=>invoice.id==invoiceId)
-            return <Element key={index} leftSide={invoiceItem?.number}>
-              <InputField value={invoiceItem?.amount} onChange={(event:any)=>{
-
-              }}/>
-            </Element>
-          })}
+            </>
+          )}
           <Element leftSide={t('payment_date')}>
             <InputField
               type="date"
@@ -187,8 +226,7 @@ useEffect(() => {
               value={formik.values.date}
               onChange={formik.handleChange}
             />
-            {console.log("formik",formik.values)}
-
+            {console.log('formik', formik.values)}
           </Element>
           <Element leftSide={t('payment_type')}>
             <SelectField id="type_id" onChange={formik.handleChange}>

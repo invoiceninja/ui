@@ -4,12 +4,12 @@ import { Invoice } from 'common/interfaces/invoice';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useEffect, useState } from 'react';
 
-export function useAllInvoicesQuery() {
+export function useAllInvoicesQuery(params:{id:string}) {
   const [page, setpage] = useState(1);
   const [invocesdata, setinvocesdata] = useState<Invoice[]>([])
   useEffect(() => {
     axios
-      .get(endpoint('/api/v1/invoices?page=:page_id', { page_id: page }), {
+      .get(endpoint('/api/v1/invoices?client_id=:id&page=:page_id', { page_id: page,id:params.id }), {
         headers: defaultHeaders,
       })
       .then((data) => {
