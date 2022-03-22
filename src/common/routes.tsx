@@ -75,7 +75,6 @@ export const routes = (
           <Route path="clone" element={<Products.Clone />} />
           <Route path="documents" element={<Products.Documents />} />
         </Route>
-        <Route path=":id/to_invoice" element={<Products.Invoice />} />
       </Route>
       <Route path="/invoices">
         <Route path="" element={<Invoices.Invoices />} />
