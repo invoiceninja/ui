@@ -15,7 +15,6 @@ import { CreateProduct } from '../common/components/CreateProduct';
 
 export function Clone() {
   const { id } = useParams();
-
   const { data: product } = useProductQuery({ id });
 
   return product?.data.data ? (
