@@ -50,7 +50,7 @@ export function CreateProductComponent(props: Props) {
       product_key: props.product?.product_key || '',
       notes: props.product?.notes || '',
       cost: props.product?.cost || '',
-      quantity: props.product?.quantity || 0,
+      quantity: props.product?.quantity || 1,
       custom_value1: props.product?.custom_value1 || '',
       custom_value2: props.product?.custom_value2 || '',
       custom_value3: props.product?.custom_value3 || '',
