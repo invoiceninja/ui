@@ -12,9 +12,11 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import paymentType from 'common/constants/payment-type';
+import { InvoiceStatus } from 'common/enums/invoice-status';
 import { endpoint } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Client } from 'common/interfaces/client';
+import { Invoice } from 'common/interfaces/invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useClientsQuery } from 'common/queries/clients';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -26,11 +28,12 @@ import { CustomField } from 'components/CustomField';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
-import { useState } from 'react';
+import {  useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { useAllInvoicesQuery } from '../common/helpers/invoices-query';
 
 export function Create() {
   const { client_id } = useParams();
@@ -41,8 +44,10 @@ export function Create() {
   const [errors, setErrors] = useState<ValidationBag>();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const company=useCurrentCompany();
+  const company = useCurrentCompany();
+  const [invoices, setinvoices] = useState<string[]>([])
   const [convertCurrency, setconvertCurrency] = useState(false);
+  const [totalAmount, settotalAmount] = useState(0)
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -54,6 +59,7 @@ export function Create() {
       private_notes: '',
       exchange_rate: 0,
       exchange_currency_id: payment?.data.data.exchange_currency_id || 0,
+      invoices:[]
     },
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
@@ -104,6 +110,16 @@ export function Create() {
 
     return toCurrency.exchange_rate * (1 / fromCurrency.exchange_rate);
   };
+const allinvocies=useAllInvoicesQuery();
+  
+useEffect(() => {
+  invoices.map((invoiceId:string,index:number)=>{
+    const invoiceItem=allinvocies.find((invoice:Invoice)=>invoice.id==invoiceId)
+  formik.setFieldValue('invoices',[...formik.values.invoices,{amount:invoiceItem?.amount,invoice_id:invoiceItem?.id,credit_id:'',id:""}])
+
+  })
+
+}, [invoices])
 
   return (
     <Default title={t('new_payment')}>
@@ -137,13 +153,33 @@ export function Create() {
           <Element leftSide={t('amount')}>
             <InputField
               id="amount"
+              value={formik.values.amount}
               onChange={formik.handleChange}
               errorMessage={errors?.errors.payment_amount}
             />
           </Element>
-          <Element leftSide={t('invoice')}>
-            <InputField />
+          <Element leftSide={t('invoices')}>
+            <SelectField
+            onChange={(event:any)=>{
+              setinvoices([...invoices,event.target.value])
+            }}
+            >
+              <option value=''></option>
+              {allinvocies.map((invoice:Invoice,index:number)=>{
+                if(invoice.status_id!=InvoiceStatus.Paid && invoice.archived_at==0){
+                  return <option key={index} value={invoice.id}>{invoice.number}</option>
+                }
+              })}
+            </SelectField>
           </Element>
+          {invoices.map((invoiceId:string,index:number)=>{
+            const invoiceItem=allinvocies.find((invoice:Invoice)=>invoice.id==invoiceId)
+            return <Element key={index} leftSide={invoiceItem?.number}>
+              <InputField value={invoiceItem?.amount} onChange={(event:any)=>{
+
+              }}/>
+            </Element>
+          })}
           <Element leftSide={t('payment_date')}>
             <InputField
               type="date"
@@ -151,6 +187,8 @@ export function Create() {
               value={formik.values.date}
               onChange={formik.handleChange}
             />
+            {console.log("formik",formik.values)}
+
           </Element>
           <Element leftSide={t('payment_type')}>
             <SelectField id="type_id" onChange={formik.handleChange}>
@@ -176,39 +214,39 @@ export function Create() {
             />
           </Element>
           {company?.custom_fields?.payment1 && (
-        <CustomField
-          field="payment1"
-          defaultValue={payment?.data.data.custom_value1}
-          value={company?.custom_fields?.payment1}
-          onChange={(value) => formik.setFieldValue('custom_value1', value)}
-        />
-      )}
-      {company?.custom_fields?.payment2 && (
-        <CustomField
-          field="custom_value2"
-          defaultValue={payment?.data.data.custom_value2}
-          value={company?.custom_fields?.payment2}
-          onChange={(value) => formik.setFieldValue('custom_value2', value)}
-        />
-      )}
+            <CustomField
+              field="payment1"
+              defaultValue={payment?.data.data.custom_value1}
+              value={company?.custom_fields?.payment1}
+              onChange={(value) => formik.setFieldValue('custom_value1', value)}
+            />
+          )}
+          {company?.custom_fields?.payment2 && (
+            <CustomField
+              field="custom_value2"
+              defaultValue={payment?.data.data.custom_value2}
+              value={company?.custom_fields?.payment2}
+              onChange={(value) => formik.setFieldValue('custom_value2', value)}
+            />
+          )}
 
-      {company?.custom_fields?.payment3 && (
-        <CustomField
-          field="custom_value3"
-          defaultValue={payment?.data.data.custom_value3}
-          value={company?.custom_fields?.payment3}
-          onChange={(value) => formik.setFieldValue('custom_value3', value)}
-        />
-      )}
+          {company?.custom_fields?.payment3 && (
+            <CustomField
+              field="custom_value3"
+              defaultValue={payment?.data.data.custom_value3}
+              value={company?.custom_fields?.payment3}
+              onChange={(value) => formik.setFieldValue('custom_value3', value)}
+            />
+          )}
 
-      {company?.custom_fields?.payment4 && (
-        <CustomField
-          field="custom_value4"
-          defaultValue={payment?.data.data.custom_value4}
-          value={company?.custom_fields?.payment4}
-          onChange={(value) => formik.setFieldValue('custom_value4', value)}
-        />
-      )}
+          {company?.custom_fields?.payment4 && (
+            <CustomField
+              field="custom_value4"
+              defaultValue={payment?.data.data.custom_value4}
+              value={company?.custom_fields?.payment4}
+              onChange={(value) => formik.setFieldValue('custom_value4', value)}
+            />
+          )}
           <Element leftSide={t('send_email')}>
             <Toggle />
           </Element>
