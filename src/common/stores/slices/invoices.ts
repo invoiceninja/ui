@@ -36,6 +36,9 @@ export const invoiceSlice = createSlice({
     injectBlankItemIntoCurrent: (state) => {
       state.current?.line_items.push(blankLineItem);
     },
+    injectProductItemIntoCurrent: (state, payload) => {
+      state.current?.line_items.push(payload.payload);
+    },
     toggleCurrentInvoiceInvitation: (
       state,
       payload: PayloadAction<{ contactId: string; checked: boolean }>
@@ -150,6 +153,7 @@ export const invoiceSlice = createSlice({
 
 export const {
   injectBlankItemIntoCurrent,
+  injectProductItemIntoCurrent,
   toggleCurrentInvoiceInvitation,
   setCurrentInvoicePropertySync,
 } = invoiceSlice.actions;

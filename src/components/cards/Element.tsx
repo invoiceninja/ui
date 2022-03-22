@@ -15,6 +15,7 @@ interface Props {
   leftSide?: ReactNode;
   leftSideHelp?: ReactNode;
   pushContentToRight?: boolean;
+  required?: boolean;
   children: ReactNode;
   className?: any;
   onClick?: () => unknown;
@@ -31,7 +32,10 @@ export function Element(props: Props) {
       onClick={props.onClick}
     >
       <dt className="text-sm text-gray-500 flex flex-col">
-        <span className="text-gray-500 font-medium ">{props.leftSide}</span>
+        <span className="text-gray-500 font-medium ">
+          {props.leftSide}{' '}
+          {props.required && <span className="ml-1 text-red-600">*</span>}
+        </span>
         {props.leftSideHelp && (
           <span className="text-gray-400 mt-2 text-xs">
             {props.leftSideHelp}
