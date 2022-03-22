@@ -27,6 +27,7 @@ export interface CreateProductDto {
   product_key: string;
   notes: string;
   cost: string;
+  quantity: number;
   custom_value1: string;
   custom_value2: string;
   custom_value3: string;
@@ -44,12 +45,12 @@ export function CreateProductComponent(props: Props) {
   const navigate = useNavigate();
 
   const [errors, setErrors] = useState<any>();
-  console.log(props.product?.notes);
   const formik = useFormik({
     initialValues: {
       product_key: props.product?.product_key || '',
       notes: props.product?.notes || '',
       cost: props.product?.cost || '',
+      quantity: props.product?.quantity || 0,
       custom_value1: props.product?.custom_value1 || '',
       custom_value2: props.product?.custom_value2 || '',
       custom_value3: props.product?.custom_value3 || '',
@@ -109,6 +110,13 @@ export function CreateProductComponent(props: Props) {
           onChange={formik.handleChange}
         />
         {errors?.cost && <Alert type="danger">{errors.cost}</Alert>}
+      </Element>
+      <Element leftSide={t('quantity')}>
+        <InputField
+          id="quantity"
+          value={formik.initialValues.quantity}
+          onChange={formik.handleChange}
+        />
       </Element>
       {company?.custom_fields?.product1 && (
         <CustomField

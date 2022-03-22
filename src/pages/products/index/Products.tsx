@@ -57,15 +57,9 @@ export function Products() {
       <DropdownElement
         onClick={() => {
           navigate(`/products/${resource.id}/clone`);
-          // console.log('custom action 1');
         }}
       >
         {t('clone')}
-      </DropdownElement>
-    ),
-    (resource: any) => (
-      <DropdownElement to={`/products/${resource.id}/to_invoice`}>
-        {t('clone_to_invoice')}
       </DropdownElement>
     ),
   ];
