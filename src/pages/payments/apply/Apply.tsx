@@ -124,7 +124,7 @@ export function Apply() {
         <InputField value={payment?.data.data.number} />
       </Element>
       <Element leftSide={t('amount')}>
-        <InputField disabled value={payment?.data.data.amount} />
+        <InputField disabled value={payment?.data.data.amount-payment?.data.data.refunded} />
       </Element>
       <Element leftSide={t('applied')}>
         <InputField disabled value={payment?.data.data.applied} />
