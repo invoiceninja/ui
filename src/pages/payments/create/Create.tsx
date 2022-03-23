@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
+import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import paymentType from 'common/constants/payment-type';
 import { InvoiceStatus } from 'common/enums/invoice-status';
@@ -24,7 +24,9 @@ import { useBlankPaymentQuery } from 'common/queries/payments';
 import { useStaticsQuery } from 'common/queries/statics';
 import { Alert } from 'components/Alert';
 import { Container } from 'components/Container';
+import { ConvertCurrency } from 'components/ConvertCurrency';
 import { CustomField } from 'components/CustomField';
+import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
@@ -34,7 +36,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { useAllInvoicesQuery } from '../common/helpers/invoices-query';
-
+import { getExchangeRate } from '../common/helpers/resolve-exchange-rate';
 export function Create() {
   const { client_id } = useParams();
   const [t] = useTranslation();
@@ -46,8 +48,11 @@ export function Create() {
   const navigate = useNavigate();
   const company = useCurrentCompany();
   const [invoices, setinvoices] = useState<string[]>([]);
+  const [invoicedata, setinvoicedata] = useState<Invoice[]>([]);
   const [convertCurrency, setconvertCurrency] = useState(false);
   const [totalamount, settotalamount] = useState(0);
+  const [disabledinvoices, setdisabledinvoices] = useState<Invoice[]>([]);
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -87,31 +92,20 @@ export function Create() {
     },
   });
 
-  const getExchangeRate = (fromCurrencyId: string, toCurrencyId: string) => {
-    if (fromCurrencyId == null || toCurrencyId == null) {
-      return 1;
-    }
-    const fromCurrency = statics?.data.currencies.find(
-      (data: any) => data.id === fromCurrencyId
-    );
-    const toCurrency = statics?.data.currencies.find(
-      (data: any) => data.id === toCurrencyId
-    );
-    const baseCurrency = statics?.data.currencies.find(
-      (data: any) => data.id === '1'
-    );
-
-    if (fromCurrency == baseCurrency) {
-      return toCurrency.exchange_rate;
-    }
-
-    if (toCurrency == baseCurrency) {
-      return 1 / (fromCurrency?.exchange_rate ?? 1);
-    }
-
-    return toCurrency.exchange_rate * (1 / fromCurrency.exchange_rate);
-  };
   const allinvocies = useAllInvoicesQuery({ id: formik.values.client_id });
+  useEffect(() => {
+    const filteredInvoices = allinvocies.filter((invoice: Invoice) => {
+      if (
+        invoice.client_id == formik.values.client_id &&
+        invoice.status_id != InvoiceStatus.Paid &&
+        invoice.archived_at == 0
+      ) {
+        return invoice;
+      }
+    });
+
+    setinvoicedata(filteredInvoices);
+  }, [allinvocies, formik.values.client_id]);
 
   useEffect(() => {
     invoices.map((invoiceId: string, index: number) => {
@@ -132,13 +126,20 @@ export function Create() {
   useEffect(() => {
     let total = 0;
     formik.values.invoices.map((invoice: any, index: number) => {
-      console.log('balance', invoice.balance);
       formik.setFieldValue('aplied', totalamount);
       total = total + Number(invoice.amount);
+      setinvoices(
+        invoices.filter((invoiceId: string) => invoiceId != invoice.invoice_id)
+      );
     });
+
     formik.setFieldValue('aplied', total);
     formik.setFieldValue('amount', total);
   }, [formik.values.invoices]);
+
+  useEffect(() => {
+    formik.setFieldValue('invoices', []);
+  }, [formik.values.client_id]);
 
   return (
     <Default title={t('new_payment')}>
@@ -164,7 +165,6 @@ export function Create() {
                   </option>
                 );
               })}
-              {console.log(errors)}
             </SelectField>
             {errors?.errors.client_id && (
               <Alert type="danger">{errors.errors.client_id}</Alert>
@@ -178,47 +178,69 @@ export function Create() {
               errorMessage={errors?.errors.payment_amount}
             />
           </Element>
-          {console.log('amount', totalamount)}
           {formik.values.client_id && (
             <>
               <Element leftSide={t('invoices')}>
                 <SelectField
+                  value=""
                   onChange={(event: any) => {
-                    setinvoices([...invoices, event.target.value]);
+                    if (
+                      formik.values.invoices.filter(
+                        (invoices: any) =>
+                          invoices.invoice_id == event.target.value
+                      ).length < 1
+                    )
+                      setinvoices([...invoices, event.target.value]);
                   }}
                 >
-                  <option value=""></option>
-                  {allinvocies.map((invoice: Invoice, index: number) => {
-                    if (
-                      invoice.status_id != InvoiceStatus.Paid &&
-                      invoice.archived_at == 0
-                    ) {
-                      return (
-                        <option key={index} value={invoice.id}>
-                          {invoice.number}
-                        </option>
-                      );
-                    }
+                  <option value="" disabled></option>
+                  {invoicedata.map((invoice: Invoice, index: number) => {
+                    return (
+                      <option key={index} value={invoice.id}>
+                        {invoice.number}
+                      </option>
+                    );
                   })}
                 </SelectField>
               </Element>
-              {invoices.map((invoiceId: string, index: number) => {
-                const invoiceItem = allinvocies.find(
-                  (invoice: Invoice) => invoice.id == invoiceId
+              {formik.values.invoices.map((invoiceitem: any, index: number) => {
+                const invoiceItem = invoicedata.find(
+                  (invoice: Invoice) => invoice.id == invoiceitem.invoice_id
                 );
-                return (
-                  <Element key={index} leftSide={invoiceItem?.number}>
-                    {console.log('item', invoiceItem)}
-                    <InputField
-                      id={`invoices[${index}].amount`}
-                      value={invoiceItem?.balance}
-                      onChange={formik.handleChange}
-                    />
-                  </Element>
-                );
+
+                if (invoiceItem)
+                  return (
+                    <Element key={index} leftSide={invoiceItem?.number}>
+                      <InputField
+                        id={`invoices[${index}].amount`}
+                        value={
+                          invoiceItem?.balance > 0
+                            ? invoiceItem?.balance
+                            : invoiceItem?.amount
+                        }
+                        onChange={formik.handleChange}
+                      />
+                      <Button
+                        behavior="button"
+                        type="minimal"
+                        onClick={() => {
+                          formik.setFieldValue(
+                            'invoices',
+                            formik.values.invoices.filter(
+                              (invoice: any) =>
+                                invoice.invoice_id != invoiceitem.invoice_id
+                            )
+                          );
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </Element>
+                  );
               })}
             </>
           )}
+
           <Element leftSide={t('payment_date')}>
             <InputField
               type="date"
@@ -226,7 +248,6 @@ export function Create() {
               value={formik.values.date}
               onChange={formik.handleChange}
             />
-            {console.log('formik', formik.values)}
           </Element>
           <Element leftSide={t('payment_type')}>
             <SelectField id="type_id" onChange={formik.handleChange}>
@@ -299,45 +320,13 @@ export function Create() {
             />{' '}
           </Element>
           {convertCurrency && (
-            <>
-              <Element leftSide={t('currency')}>
-                <SelectField
-                  value={formik.values.exchange_currency_id}
-                  onChange={(event: any) => {
-                    formik.setFieldValue(
-                      'exchange_rate',
-                      getExchangeRate('1', event.target.value)
-                    );
-                    formik.setFieldValue(
-                      'exchange_currency_id',
-                      event.target.value
-                    );
-                  }}
-                >
-                  <option value=""></option>
-                  {statics?.data.currencies.map((element: any, index: any) => {
-                    return (
-                      <option value={element.id} key={index}>
-                        {element.name}
-                      </option>
-                    );
-                  })}
-                </SelectField>
-              </Element>
-              <Element leftSide={t('exchange_rate')}>
-                <InputField
-                  onChange={(event: any) => {
-                    formik.setFieldValue('exchange_rate', event.target.valeu);
-                  }}
-                  value={formik.values.exchange_rate}
-                />
-              </Element>
-              <Element leftSide={t('converted_amount')}>
-                <InputField
-                  value={formik.values.amount * formik.values.exchange_rate}
-                />
-              </Element>
-            </>
+            <ConvertCurrency
+              setFieldValue={formik.setFieldValue}
+              exchange_currency_id={formik.values.exchange_currency_id}
+              currency_id={payment?.data.data.currency_id}
+              amount={formik.values.amount}
+              exchange_rate={formik.values.exchange_rate}
+            />
           )}
         </Card>
       </Container>
