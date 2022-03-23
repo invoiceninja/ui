@@ -95,9 +95,9 @@ export function Apply() {
           ...formik.values.invoices,
           {
             amount:
-              invoiceItem?.balance > 0
-                ? invoiceItem?.balance
-                : invoiceItem?.amount,
+            invoiceItem?.balance > payment?.data.data.amount
+            ? payment?.data.data.amount
+            : invoiceItem?.balance,
             invoice_id: invoiceItem?.id,
             credit_id: '',
             id: '',
@@ -114,8 +114,6 @@ export function Apply() {
         invoices.filter((invoiceId: string) => invoiceId != invoice.invoice_id)
       );
     });
-
-    formik.setFieldValue('aplied', total);
   }, [formik.values.invoices]);
 
   return (
@@ -153,13 +151,15 @@ export function Apply() {
                     );
                   })}
                 </SelectField>
+                {errors?.errors.invoices && (
+              <Alert type="danger">{errors.errors.invoices}</Alert>
+            )}
               </Element>
               {formik.values.invoices.map((invoiceitem: any, index: number) => {
                 const invoiceItem = allUserInvoices.find(
                   (invoice: Invoice) => invoice.id == invoiceitem.invoice_id
                 );
-console.log("invoiceItem",invoiceItem)
-console.log("payment",payment?.data.data)
+
 
                 if (invoiceItem)
                   return (
@@ -173,8 +173,7 @@ console.log("payment",payment?.data.data)
                         }
                         onChange={formik.handleChange}
                       />
-                      {console.log(formik.values)}
-                      {console.log(errors)}
+                     
                       {errors?.errors[`invoices.${[index]}.invoice_id`] && (
                         <Alert type="danger">
                           {errors.errors[`invoices.${[index]}.invoice_id`]}
