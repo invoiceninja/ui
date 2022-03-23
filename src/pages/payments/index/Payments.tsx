@@ -21,12 +21,12 @@ import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 
 export function Payments() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
-
+  const navigate = useNavigate();
   const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
   const columns: DataTableColumns = [
     {
@@ -82,7 +82,13 @@ export function Payments() {
   ];
   const actions = [
     (resource: any) => (
-      <DropdownElement onClick={() => {}}>{t('apply_payment')}</DropdownElement>
+      <DropdownElement
+        onClick={() => {
+          navigate(`${resource.id}/apply`);
+        }}
+      >
+        {t('apply_payment')}
+      </DropdownElement>
     ),
     (resource: any) => (
       <DropdownElement
@@ -115,7 +121,7 @@ export function Payments() {
     (resource: any) => (
       <DropdownElement
         onClick={() => {
-          bulk(resource, 'email').then(data=>console.log(data))
+          bulk(resource, 'email').then((data) => console.log(data));
         }}
       >
         {t('email_payment')}
