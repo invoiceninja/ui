@@ -43,6 +43,16 @@ export function useProductQuery(params: { id: string | undefined }) {
     { staleTime: Infinity }
   );
 }
+export function useBlankProductQuery() {
+  return useQuery(
+    generatePath('/api/v1/products/create'),
+    () =>
+      axios.get(endpoint('/api/v1/products/create'), {
+        headers: defaultHeaders,
+      }),
+    { staleTime: Infinity }
+  );
+}
 
 export function bulk(
   id: string[],

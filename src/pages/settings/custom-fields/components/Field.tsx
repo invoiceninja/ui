@@ -26,6 +26,7 @@ interface Props {
   initialValue?: string;
   placeholder: string;
   onChange?: (value: string, field: string, type: AvailableTypes) => unknown;
+  noExternalPadding?: boolean;
 }
 
 export function Field(props: Props) {
@@ -85,6 +86,7 @@ export function Field(props: Props) {
   return (
     <>
       <Element
+        noExternalPadding={props.noExternalPadding}
         leftSide={
           <InputField
             innerRef={inputRef}

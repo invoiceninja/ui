@@ -55,6 +55,7 @@ export function Contacts(props: Props) {
       onFormSubmit={props.handleSubmit}
       withSaveButton
       title={t('contacts')}
+      className="mb-5"
     >
       {props.data &&
         props.data.map((contact: any, index: any) => {

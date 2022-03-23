@@ -10,7 +10,7 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { useBlankRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
-import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices';
+import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect } from 'react';

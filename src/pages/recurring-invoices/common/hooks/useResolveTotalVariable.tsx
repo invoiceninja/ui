@@ -16,8 +16,9 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Element } from '@invoiceninja/cards';
 import { useSetCurrentRecurringInvoiceProperty } from './useSetCurrentRecurringInvoiceProperty';
 import { useResolveTranslation } from 'pages/invoices/common/hooks/useResolveTranslation';
-import { resolveTotalVariable } from 'pages/invoices/common/helpers/resolve-total-variable';
+import { useInvoiceSum } from './useInvoiceSum';
 import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvoice';
+import { resolveTotalVariable } from 'pages/invoices/common/helpers/resolve-total-variable';
 
 export function useResolveTotalVariable() {
   const formatMoney = useFormatMoney();
@@ -25,9 +26,22 @@ export function useResolveTotalVariable() {
   const company = useCurrentCompany();
   const handleChange = useSetCurrentRecurringInvoiceProperty();
   const resolveTranslation = useResolveTranslation();
+  const invoiceSum = useInvoiceSum();
+
+  // discount => invoice.discount,
+  // paid_to_date => invoice.paid_to_date,
+  // surcharge1-4 => invoice.surcharge1-4,
+  // outstanding => invoice.balance
+
+  // net_subtotal => ->getSubtotal(),
+  // subtotal => ->getSubtotal(),
+  // total_taxes => ->getTotalTaxes(),
+  // line_taxes => ->getLineTaxes(),
+  // total => ->getTotal(),
 
   const aliases: Record<string, string> = {
     total: 'amount',
+    outstanding: 'balance',
   };
 
   return (variable: string) => {
@@ -35,6 +49,38 @@ export function useResolveTotalVariable() {
 
     const { property } = resolveTotalVariable(variable);
     const identifier = aliases[property] || property;
+
+    if (variable == '$net_subtotal' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.subTotal)}
+        </Element>
+      );
+    }
+
+    if (variable == '$subtotal' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.subTotal)}
+        </Element>
+      );
+    }
+
+    if (variable == '$total_taxes' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.totalTaxes)}
+        </Element>
+      );
+    }
+
+    if (variable == '$total' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.total)}
+        </Element>
+      );
+    }
 
     if (variable === '$custom_surcharge1') {
       return (

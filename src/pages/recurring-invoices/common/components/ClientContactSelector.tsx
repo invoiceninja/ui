@@ -10,19 +10,19 @@
 
 import { Checkbox } from '@invoiceninja/forms';
 import { ClientResolver } from 'common/helpers/clients/client-resolver';
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
+import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvoice';
 import { Client } from 'common/interfaces/client';
-import {
-  setCurrentInvoicePropertySync,
-  toggleCurrentInvoiceInvitation,
-} from 'common/stores/slices/invoices';
+import { toggleCurrentInvoiceInvitation } from 'common/stores/slices/invoices';
+import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
+import { setCurrentRecurringInvoicePropertySync } from 'common/stores/slices/recurring-invoices';
+import { cloneDeep } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
 export function ClientContactSelector() {
   const [client, setClient] = useState<Client>();
-  const invoice = useCurrentInvoice();
+  const invoice = useCurrentRecurringInvoice();
   const clientResolver = new ClientResolver();
   const dispatch = useDispatch();
   const [t] = useTranslation();
@@ -46,18 +46,23 @@ export function ClientContactSelector() {
         .then((client) => {
           setClient(client);
 
-          dispatch(
-            setCurrentInvoicePropertySync({
-              property: 'invitations',
-              value: [],
-            })
-          );
+          const invitations: Record<string, unknown>[] = [];
 
           client.contacts.map((contact) => {
             if (contact.send_email) {
-              handleContactCheckboxChange(contact.id, true);
+              const invitation = cloneDeep(blankInvitation);
+
+              invitation.client_contact_id = contact.id;
+              invitations.push(invitation);
             }
           });
+
+          dispatch(
+            setCurrentRecurringInvoicePropertySync({
+              property: 'invitations',
+              value: invitations,
+            })
+          );
         })
         .catch((error) => console.error(error));
     }
