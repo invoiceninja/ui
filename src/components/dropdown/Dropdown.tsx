@@ -34,6 +34,7 @@ export function Dropdown(props: Props) {
             {/* {props.children?.map((child, index: number) =>
               child ? cloneElement(child, { setVisible, key: index }) : child
             )} */}
+            
           {props.children}
           </div>
         )}
