@@ -194,6 +194,9 @@ export function Create() {
               onChange={formik.handleChange}
               errorMessage={errors?.errors.payment_amount}
             />
+            {errors?.errors.amount && (
+              <Alert type="danger">{errors.errors.amount}</Alert>
+            )}
           </Element>
           {formik.values.client_id && (
             <>
@@ -237,6 +240,11 @@ export function Create() {
                         }
                         onChange={formik.handleChange}
                       />
+                      {errors?.errors[`invoices.${[index]}.invoice_id`] && (
+                        <Alert type="danger">
+                          {errors.errors[`invoices.${[index]}.invoice_id`]}
+                        </Alert>
+                      )}
                       <Button
                         behavior="button"
                         type="minimal"
