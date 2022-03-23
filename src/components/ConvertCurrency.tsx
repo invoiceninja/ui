@@ -27,18 +27,22 @@ export function ConvertCurrency(props:Props) {
   return (
     
         <>
-        
+        {
+          console.log("props:",props)
+        }
           <Element leftSide={t('currency')}>
             <SelectField
               value={props.exchange_currency_id}
               onChange={(event: any) => {
+                console.log(1)
                 props.setFieldValue(
                   'exchange_rate',
                   getExchangeRate(
                     props.currency_id,
-                    event.target.value
+                    event.target.value,statics
                   )
-                );
+                );                  console.log(2)
+
                 props.setFieldValue(
                   'exchange_currency_id',
                   event.target.value

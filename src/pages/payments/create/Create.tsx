@@ -26,7 +26,6 @@ import { Alert } from 'components/Alert';
 import { Container } from 'components/Container';
 import { ConvertCurrency } from 'components/ConvertCurrency';
 import { CustomField } from 'components/CustomField';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
@@ -42,7 +41,6 @@ export function Create() {
   const [t] = useTranslation();
   const { data: payment } = useBlankPaymentQuery();
   const { data: clients } = useClientsQuery();
-  const { data: statics } = useStaticsQuery();
   const [errors, setErrors] = useState<ValidationBag>();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -50,9 +48,7 @@ export function Create() {
   const [invoices, setinvoices] = useState<string[]>([]);
   const [invoicedata, setinvoicedata] = useState<Invoice[]>([]);
   const [convertCurrency, setconvertCurrency] = useState(false);
-  const [totalamount, settotalamount] = useState(0);
-  const [disabledinvoices, setdisabledinvoices] = useState<Invoice[]>([]);
-  const [emailInvoice, setemailInvoice] = useState(false)
+  const [emailInvoice, setemailInvoice] = useState(false);
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -64,17 +60,24 @@ export function Create() {
       transaction_reference: '',
       type_id: '',
       private_notes: '',
-      exchange_rate: 0,
-      exchange_currency_id: payment?.data.data.exchange_currency_id || 0,
+      currency_id:clients?.data.data.find((client:any)=>client.id==client_id)?.settings.currency_id,
+      exchange_rate: 1,
+      exchange_currency_id: payment?.data.data.exchange_currency_id,
       invoices: [],
     },
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
       axios
-        .post(endpoint('/api/v1/payments?email_receipt=:email',{email:emailInvoice}), values, {
-          headers: defaultHeaders,
-        })
+        .post(
+          endpoint('/api/v1/payments?email_receipt=:email', {
+            email: emailInvoice,
+          }),
+          values,
+          {
+            headers: defaultHeaders,
+          }
+        )
         .then((data) => {
           toast.success(t('added_payment'), { id: toastId });
           navigate(`/payments/${data.data.data.id}/edit`);
@@ -109,7 +112,7 @@ export function Create() {
   }, [allinvocies, formik.values.client_id]);
 
   useEffect(() => {
-    invoices.map((invoiceId: string, index: number) => {
+    invoices.map((invoiceId: string) => {
       const invoiceItem = allinvocies.find(
         (invoice: Invoice) => invoice.id == invoiceId
       );
@@ -126,8 +129,7 @@ export function Create() {
   }, [invoices]);
   useEffect(() => {
     let total = 0;
-    formik.values.invoices.map((invoice: any, index: number) => {
-      formik.setFieldValue('aplied', totalamount);
+    formik.values.invoices.map((invoice: any) => {
       total = total + Number(invoice.amount);
       setinvoices(
         invoices.filter((invoiceId: string) => invoiceId != invoice.invoice_id)
@@ -153,7 +155,12 @@ export function Create() {
         >
           <Element leftSide={t('client')}>
             <SelectField
-              onChange={formik.handleChange}
+              onChange={(event:any)=>{
+                const client:Client=clients?.data.data.find((client:any)=>client.id==event.target.value)
+                formik.setFieldValue('client_id',event.target.value)
+                formik.setFieldValue('currency_id',client.settings.currency_id)
+
+              }}
               value={formik.values.client_id}
               id="client_id"
               required
@@ -179,6 +186,7 @@ export function Create() {
               errorMessage={errors?.errors.payment_amount}
             />
           </Element>
+          {console.log(formik.values)}
           {formik.values.client_id && (
             <>
               <Element leftSide={t('invoices')}>
@@ -308,8 +316,11 @@ export function Create() {
             />
           )}
           <Element leftSide={t('send_email')}>
-            <Toggle checked={emailInvoice}
-            onChange={()=>{setemailInvoice(!emailInvoice)}}
+            <Toggle
+              checked={emailInvoice}
+              onChange={() => {
+                setemailInvoice(!emailInvoice);
+              }}
             />
           </Element>
           <Element leftSide={t('convert_currency')}>
@@ -326,7 +337,7 @@ export function Create() {
             <ConvertCurrency
               setFieldValue={formik.setFieldValue}
               exchange_currency_id={formik.values.exchange_currency_id}
-              currency_id={payment?.data.data.currency_id}
+              currency_id={formik.values.currency_id}
               amount={formik.values.amount}
               exchange_rate={formik.values.exchange_rate}
             />

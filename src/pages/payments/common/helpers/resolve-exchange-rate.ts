@@ -1,7 +1,6 @@
 import { useStaticsQuery } from "common/queries/statics";
 
-export function getExchangeRate (fromCurrencyId: string, toCurrencyId: string) {
-    const {data:statics}=useStaticsQuery()
+export function getExchangeRate (fromCurrencyId: string, toCurrencyId: string,statics:any) {
     if (fromCurrencyId == null || toCurrencyId == null) {
       return 1;
     }
