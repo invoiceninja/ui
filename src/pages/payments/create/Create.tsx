@@ -52,6 +52,7 @@ export function Create() {
   const [convertCurrency, setconvertCurrency] = useState(false);
   const [totalamount, settotalamount] = useState(0);
   const [disabledinvoices, setdisabledinvoices] = useState<Invoice[]>([]);
+  const [emailInvoice, setemailInvoice] = useState(false)
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -71,7 +72,7 @@ export function Create() {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
       axios
-        .post(endpoint('/api/v1/payments'), values, {
+        .post(endpoint('/api/v1/payments?email_receipt=:email',{email:emailInvoice}), values, {
           headers: defaultHeaders,
         })
         .then((data) => {
@@ -307,7 +308,9 @@ export function Create() {
             />
           )}
           <Element leftSide={t('send_email')}>
-            <Toggle />
+            <Toggle checked={emailInvoice}
+            onChange={()=>{setemailInvoice(!emailInvoice)}}
+            />
           </Element>
           <Element leftSide={t('convert_currency')}>
             <Toggle
