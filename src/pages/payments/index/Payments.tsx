@@ -93,11 +93,7 @@ export function Payments() {
     (resource: any) => (
       <DropdownElement
         onClick={() => {
-          axios
-            .get(endpoint('/api/v1/payments/:id/refund', { id: resource.id }), {
-              headers: defaultHeaders,
-            })
-            .then((data) => console.log(data));
+          navigate(`${resource.id}/refund`);
         }}
       >
         {t('refund_payment')}
