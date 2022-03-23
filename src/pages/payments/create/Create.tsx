@@ -21,7 +21,6 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useClientsQuery } from 'common/queries/clients';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useBlankPaymentQuery } from 'common/queries/payments';
-import { useStaticsQuery } from 'common/queries/statics';
 import { Alert } from 'components/Alert';
 import { Container } from 'components/Container';
 import { ConvertCurrency } from 'components/ConvertCurrency';
@@ -35,7 +34,6 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { useAllInvoicesQuery } from '../common/helpers/invoices-query';
-import { getExchangeRate } from '../common/helpers/resolve-exchange-rate';
 export function Create() {
   const { client_id } = useParams();
   const [t] = useTranslation();
@@ -60,7 +58,9 @@ export function Create() {
       transaction_reference: '',
       type_id: '',
       private_notes: '',
-      currency_id:clients?.data.data.find((client:any)=>client.id==client_id)?.settings.currency_id,
+      currency_id: clients?.data.data.find(
+        (client: any) => client.id == client_id
+      )?.settings.currency_id,
       exchange_rate: 1,
       exchange_currency_id: payment?.data.data.exchange_currency_id,
       invoices: [],
@@ -95,8 +95,8 @@ export function Create() {
         });
     },
   });
+  const allinvocies = useAllInvoicesQuery();
 
-  const allinvocies = useAllInvoicesQuery({ id: formik.values.client_id });
   useEffect(() => {
     const filteredInvoices = allinvocies.filter((invoice: Invoice) => {
       if (
@@ -116,17 +116,22 @@ export function Create() {
       const invoiceItem = allinvocies.find(
         (invoice: Invoice) => invoice.id == invoiceId
       );
-      formik.setFieldValue('invoices', [
-        ...formik.values.invoices,
-        {
-          amount: invoiceItem?.balance,
-          invoice_id: invoiceItem?.id,
-          credit_id: '',
-          id: '',
-        },
-      ]);
+      if (invoiceItem)
+        formik.setFieldValue('invoices', [
+          ...formik.values.invoices,
+          {
+            amount:
+              invoiceItem?.balance > 0
+                ? invoiceItem?.balance
+                : invoiceItem?.amount,
+            invoice_id: invoiceItem?.id,
+            credit_id: '',
+            id: '',
+          },
+        ]);
     });
   }, [invoices]);
+
   useEffect(() => {
     let total = 0;
     formik.values.invoices.map((invoice: any) => {
@@ -155,11 +160,15 @@ export function Create() {
         >
           <Element leftSide={t('client')}>
             <SelectField
-              onChange={(event:any)=>{
-                const client:Client=clients?.data.data.find((client:any)=>client.id==event.target.value)
-                formik.setFieldValue('client_id',event.target.value)
-                formik.setFieldValue('currency_id',client.settings.currency_id)
-
+              onChange={(event: any) => {
+                const client: Client = clients?.data.data.find(
+                  (client: any) => client.id == event.target.value
+                );
+                formik.setFieldValue('client_id', event.target.value);
+                formik.setFieldValue(
+                  'currency_id',
+                  client.settings.currency_id
+                );
               }}
               value={formik.values.client_id}
               id="client_id"
@@ -186,7 +195,6 @@ export function Create() {
               errorMessage={errors?.errors.payment_amount}
             />
           </Element>
-          {console.log(formik.values)}
           {formik.values.client_id && (
             <>
               <Element leftSide={t('invoices')}>
@@ -331,7 +339,7 @@ export function Create() {
                 formik.setFieldValue('exchange_currency_id', '');
                 formik.setFieldValue('exchange_rate', '');
               }}
-            />{' '}
+            />
           </Element>
           {convertCurrency && (
             <ConvertCurrency
