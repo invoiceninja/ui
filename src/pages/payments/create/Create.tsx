@@ -52,7 +52,7 @@ export function Create() {
     enableReinitialize: true,
     initialValues: {
       amount: 0,
-      aplied: 0,
+
       client_id: client_id || '',
       date: payment?.data.data.date,
       transaction_reference: '',
@@ -141,7 +141,6 @@ export function Create() {
       );
     });
 
-    formik.setFieldValue('aplied', total);
     formik.setFieldValue('amount', total);
   }, [formik.values.invoices]);
 
