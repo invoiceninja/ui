@@ -337,7 +337,7 @@ export function Create() {
               onChange={() => {
                 setconvertCurrency(!convertCurrency);
                 formik.setFieldValue('exchange_currency_id', '');
-                formik.setFieldValue('exchange_rate', '');
+                formik.setFieldValue('exchange_rate', 1);
               }}
             />
           </Element>
