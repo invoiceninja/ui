@@ -21,8 +21,8 @@ import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
-import { InvoiceActions } from '../common/components/InvoiceActions';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
+import { InvoicePreview } from '../common/components/InvoicePreview';
 
 export function Create() {
   const { documentTitle } = useTitle('new_invoice');
@@ -58,7 +58,9 @@ export function Create() {
         <InvoiceTotals />
       </div>
 
-      <InvoiceActions />
+      <div className="my-4">
+        <InvoicePreview for="create" />
+      </div>
     </Default>
   );
 }

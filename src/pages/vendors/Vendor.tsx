@@ -10,7 +10,6 @@
 
 import { useVendorQuery } from 'common/queries/vendor';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
-import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
 import { useEffect, useState } from 'react';
@@ -53,10 +52,11 @@ export function Vendor() {
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
-      <Container>
-        <Tabs tabs={tabs} />
+      <Tabs tabs={tabs} />
+
+      <div className="my-4">
         <Outlet />
-      </Container>
+      </div>
     </Default>
   );
 }

@@ -20,11 +20,16 @@ import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InvoiceDocuments } from './InvoiceDocuments';
 import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
+import { Field } from 'pages/settings/custom-fields/components';
 
 export function InvoiceFooter() {
   const [t] = useTranslation();
   const invoice = useCurrentInvoice();
   const handleChange = useSetCurrentInvoiceProperty();
+  const company = useCurrentCompany();
+  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
@@ -36,6 +41,7 @@ export function InvoiceFooter() {
           t('footer'),
           t('documents'),
           t('settings'),
+          t('custom_fields'),
         ]}
       >
         <Tab.Panel>
@@ -96,6 +102,20 @@ export function InvoiceFooter() {
                 checked={invoice?.auto_bill_enabled || false}
                 onChange={(value) => handleChange('auto_bill_enabled', value)}
               />
+              
+              <div className="space-y-2">
+                <InputLabel>{t('design')}</InputLabel>
+
+                <DebouncedCombobox
+                  endpoint="/api/v1/designs"
+                  label="name"
+                  placeholder={t('search_designs')}
+                  onChange={(payload) =>
+                    handleChange('design_id', payload.value)
+                  }
+                  defaultValue={company?.settings?.invoice_design_id}
+                />
+              </div>
             </div>
 
             <div className="col-span-12 lg:col-span-6 space-y-6">
@@ -130,6 +150,20 @@ export function InvoiceFooter() {
               />
             </div>
           </div>
+        </Tab.Panel>
+
+        <Tab.Panel>
+          {company &&
+            ['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
+              <Field
+                key={field}
+                initialValue={company.custom_fields[field]}
+                field={field}
+                placeholder={t('invoice_field')}
+                onChange={(value) => handleCustomFieldChange(field, value)}
+                noExternalPadding
+              />
+            ))}
         </Tab.Panel>
       </TabGroup>
     </Card>

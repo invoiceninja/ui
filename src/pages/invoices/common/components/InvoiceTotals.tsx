@@ -9,6 +9,7 @@
  */
 
 import { Card } from '@invoiceninja/cards';
+import { Fragment } from 'react';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
 import { useTotalVariables } from '../hooks/useTotalVariables';
 
@@ -18,7 +19,9 @@ export function InvoiceTotals() {
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
-      {variables.map((variable) => resolveVariable(variable))}
+      {variables.map((variable, index) => (
+        <Fragment key={index}>{resolveVariable(variable)}</Fragment>
+      ))}
     </Card>
   );
 }

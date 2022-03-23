@@ -36,6 +36,9 @@ export const invoiceSlice = createSlice({
     injectBlankItemIntoCurrent: (state) => {
       state.current?.line_items.push(blankLineItem);
     },
+    injectProductItemIntoCurrent: (state, payload) => {
+      state.current?.line_items.push(payload.payload);
+    },
     toggleCurrentInvoiceInvitation: (
       state,
       payload: PayloadAction<{ contactId: string; checked: boolean }>
@@ -86,8 +89,6 @@ export const invoiceSlice = createSlice({
       if (typeof state.current.line_items === 'string') {
         state.current.line_items = [];
       }
-
-      console.log(payload);
 
       if (payload.payload.client && payload.payload.currency) {
         state.invoiceSum = new InvoiceSum(
@@ -152,6 +153,7 @@ export const invoiceSlice = createSlice({
 
 export const {
   injectBlankItemIntoCurrent,
+  injectProductItemIntoCurrent,
   toggleCurrentInvoiceInvitation,
   setCurrentInvoicePropertySync,
 } = invoiceSlice.actions;

@@ -15,19 +15,27 @@ interface Props {
   leftSide?: ReactNode;
   leftSideHelp?: ReactNode;
   pushContentToRight?: boolean;
+  required?: boolean;
   children: ReactNode;
   className?: any;
   onClick?: () => unknown;
+  noExternalPadding?: boolean;
 }
 
 export function Element(props: Props) {
   return (
     <div
-      className={`py-4 px-5 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 sm:px-6 flex flex-col lg:flex-row lg:items-center ${props.className}`}
+      className={classNames(
+        `py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row lg:items-center ${props.className}`,
+        { 'px-5 sm:px-6': !props.noExternalPadding }
+      )}
       onClick={props.onClick}
     >
       <dt className="text-sm text-gray-500 flex flex-col">
-        <span className="text-gray-500 font-medium ">{props.leftSide}</span>
+        <span className="text-gray-500 font-medium ">
+          {props.leftSide}{' '}
+          {props.required && <span className="ml-1 text-red-600">*</span>}
+        </span>
         {props.leftSideHelp && (
           <span className="text-gray-400 mt-2 text-xs">
             {props.leftSideHelp}

@@ -47,6 +47,9 @@ interface Props extends CommonProps {
   breadcrumbs?: BreadcrumRecord[];
   topRight?: ReactNode;
   docsLink?: string;
+  navigationTopRight?: ReactNode;
+  saveButtonLabel?: string;
+  backButtonLabel?: string;
 }
 
 export function Default(props: Props) {
@@ -358,13 +361,19 @@ export function Default(props: Props) {
 
                 {props.onBackClick && (
                   <Button to={props.onBackClick} type="secondary">
-                    {t('back')}
+                    {props.backButtonLabel ?? t('back')}
                   </Button>
                 )}
 
                 {props.onSaveClick && (
-                  <Button onClick={props.onSaveClick}>{t('save')}</Button>
+                  <Button onClick={props.onSaveClick}>
+                    {props.saveButtonLabel ?? t('save')}
+                  </Button>
                 )}
+
+                <div className="space-x-3 items-center hidden lg:flex">
+                  {props.navigationTopRight}
+                </div>
               </div>
             </div>
           </div>

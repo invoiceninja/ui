@@ -13,12 +13,14 @@ import { useTitle } from 'common/hooks/useTitle';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Link } from '@invoiceninja/forms';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { Default } from 'components/layouts/Default';
 import { EntityStatus } from 'components/EntityStatus';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 
 export function Products() {
   const [t] = useTranslation();
+  const navigate = useNavigate();
   const pages: BreadcrumRecord[] = [{ name: t('products'), href: '/products' }];
   useTitle('products');
 
@@ -50,6 +52,17 @@ export function Products() {
     },
   ];
 
+  const actions = [
+    (resource: any) => (
+      <DropdownElement
+        onClick={() => {
+          navigate(`/products/${resource.id}/clone`);
+        }}
+      >
+        {t('clone')}
+      </DropdownElement>
+    ),
+  ];
   return (
     <Default title={t('products')} breadcrumbs={pages} docsLink="docs/products">
       <DataTable
@@ -59,6 +72,7 @@ export function Products() {
         linkToCreate="/products/create"
         linkToEdit="/products/:id/edit"
         withResourcefulActions
+        customActions={actions}
       />
     </Default>
   );
