@@ -79,7 +79,7 @@ export function Create() {
           }
         )
         .then((data) => {
-          toast.success(t('added_payment'), { id: toastId });
+          toast.success(t('created_payment'), { id: toastId });
           navigate(`/payments/${data.data.data.id}/edit`);
         })
         .catch((error: AxiosError) => {
