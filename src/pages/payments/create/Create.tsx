@@ -25,6 +25,7 @@ import { Alert } from 'components/Alert';
 import { Container } from 'components/Container';
 import { ConvertCurrency } from 'components/ConvertCurrency';
 import { CustomField } from 'components/CustomField';
+import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
@@ -148,6 +149,11 @@ export function Create() {
     formik.setFieldValue('invoices', []);
   }, [formik.values.client_id]);
 
+  const handleClientChange = (clientId: string, currencyId: string) => {
+    formik.setFieldValue('client_id', clientId);
+    formik.setFieldValue('currency_id', currencyId);
+  };
+
   return (
     <Default title={t('new_payment')}>
       <Container>
@@ -158,34 +164,22 @@ export function Create() {
           withSaveButton
         >
           <Element leftSide={t('client')}>
-            <SelectField
-              onChange={(event: any) => {
-                const client: Client = clients?.data.data.find(
-                  (client: any) => client.id == event.target.value
-                );
-                formik.setFieldValue('client_id', event.target.value);
-                formik.setFieldValue(
-                  'currency_id',
-                  client.settings.currency_id
-                );
-              }}
-              value={formik.values.client_id}
-              id="client_id"
-              required
-            >
-              <option value=""></option>
-              {clients?.data.data.map((client: Client, index: number) => {
-                return (
-                  <option value={client.id} key={index}>
-                    {client.display_name}
-                  </option>
-                );
-              })}
-            </SelectField>
+            <DebouncedCombobox
+              endpoint="/api/v1/clients"
+              label="name"
+              onChange={(value: Record<Client>) =>
+                handleClientChange(
+                  value.resource?.id as string,
+                  value.resource?.settings.currency_id
+                )
+              }
+              defaultValue={formik.values.client_id}
+            />
             {errors?.errors.client_id && (
               <Alert type="danger">{errors.errors.client_id}</Alert>
             )}
           </Element>
+
           <Element leftSide={t('amount')}>
             <InputField
               id="amount"
@@ -193,10 +187,8 @@ export function Create() {
               onChange={formik.handleChange}
               errorMessage={errors?.errors.payment_amount}
             />
-            {errors?.errors.amount && (
-              <Alert type="danger">{errors.errors.amount}</Alert>
-            )}
           </Element>
+          
           {formik.values.client_id && (
             <>
               <Element leftSide={t('invoices')}>
