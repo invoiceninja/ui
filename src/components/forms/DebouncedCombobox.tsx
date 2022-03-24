@@ -32,7 +32,6 @@ const internalRecord = { value: '', label: '', internal: true };
 
 export function DebouncedCombobox(props: Props) {
   const [records, setRecords] = useState<Record[]>([internalRecord]);
-  const [apiEndpoint, setApiEndpoint] = useState(props.endpoint);
 
   const [selectedOption, setSelectedOption] = useState({
     record: records[0],
@@ -117,8 +116,6 @@ export function DebouncedCombobox(props: Props) {
   }, [records, defaultValueProperty]);
 
   useEffect(() => {
-    setApiEndpoint(props.endpoint);
-
     request('');
   }, [props.endpoint]);
 

@@ -11,7 +11,7 @@
 import Tippy from '@tippyjs/react/headless';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { ChevronDown } from 'react-feather';
-import { cloneElement, useState } from 'react';
+import { useState } from 'react';
 
 interface Props extends CommonProps {
   label?: string;
