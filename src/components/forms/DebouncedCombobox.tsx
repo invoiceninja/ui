@@ -7,11 +7,11 @@ import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useQueryClient } from 'react-query';
 
-export interface Record {
+export interface Record<T = any> {
   value: string | number;
   label: string;
   internal: boolean;
-  resource?: any;
+  resource?: T;
 }
 
 interface Props {
