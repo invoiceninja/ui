@@ -11,6 +11,7 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
+import collect from 'collect.js';
 import paymentType from 'common/constants/payment-type';
 import { endpoint } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
@@ -103,6 +104,13 @@ export function Create() {
     formik.setFieldValue('invoices', []);
   }, [formik.values.client_id]);
 
+  useEffect(() => {
+    formik.setFieldValue(
+      'amount',
+      collect(formik.values.invoices).sum('amount')
+    );
+  }, [formik.values.invoices]);
+
   const handleClientChange = (clientId: string, currencyId: string) => {
     formik.setFieldValue('client_id', clientId);
     formik.setFieldValue('currency_id', currencyId);
@@ -165,7 +173,7 @@ export function Create() {
             <>
               <Element leftSide={t('invoices')}>
                 <DebouncedCombobox
-                  endpoint="/api/v1/invoices"
+                  endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${formik.values.client_id}`}
                   label="number"
                   onChange={(value: Record<Invoice>) =>
                     handleInvoiceChange(
