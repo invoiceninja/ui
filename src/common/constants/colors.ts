@@ -10,6 +10,6 @@
 
 export default {
   accent: '#117DC0',
-  primary: '#298AAB',
+  primary: '#2F7DC3',
   secondary: '#7081e0',
 };
