@@ -12,7 +12,6 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import paymentType from 'common/constants/payment-type';
-import { InvoiceStatus } from 'common/enums/invoice-status';
 import { endpoint } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Client } from 'common/interfaces/client';
@@ -22,6 +21,7 @@ import { useClientsQuery } from 'common/queries/clients';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useBlankPaymentQuery } from 'common/queries/payments';
 import { Alert } from 'components/Alert';
+import { Divider } from 'components/cards/Divider';
 import { Container } from 'components/Container';
 import { ConvertCurrency } from 'components/ConvertCurrency';
 import { CustomField } from 'components/CustomField';
@@ -30,30 +30,32 @@ import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
+import { X } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
-import { useAllInvoicesQuery } from '../common/helpers/invoices-query';
+import { v4 } from 'uuid';
+
 export function Create() {
-  const { client_id } = useParams();
   const [t] = useTranslation();
+
+  const { client_id } = useParams();
   const { data: payment } = useBlankPaymentQuery();
   const { data: clients } = useClientsQuery();
-  const [errors, setErrors] = useState<ValidationBag>();
+
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const company = useCurrentCompany();
-  const [invoices, setinvoices] = useState<string[]>([]);
-  const [invoicedata, setinvoicedata] = useState<Invoice[]>([]);
-  const [convertCurrency, setconvertCurrency] = useState(false);
-  const [emailInvoice, setemailInvoice] = useState(false);
+
+  const [errors, setErrors] = useState<ValidationBag>();
+  const [convertCurrency, setConvertCurrency] = useState(false);
+  const [emailInvoice, setEmailInvoice] = useState(false);
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
       amount: 0,
-
       client_id: client_id || '',
       date: payment?.data.data.date,
       transaction_reference: '',
@@ -96,54 +98,6 @@ export function Create() {
         });
     },
   });
-  const allinvocies = useAllInvoicesQuery();
-
-  useEffect(() => {
-    const filteredInvoices = allinvocies.filter((invoice: Invoice) => {
-      if (
-        invoice.client_id == formik.values.client_id &&
-        invoice.status_id != InvoiceStatus.Paid &&
-        invoice.archived_at == 0
-      ) {
-        return invoice;
-      }
-    });
-
-    setinvoicedata(filteredInvoices);
-  }, [allinvocies, formik.values.client_id]);
-
-  useEffect(() => {
-    invoices.map((invoiceId: string) => {
-      const invoiceItem = allinvocies.find(
-        (invoice: Invoice) => invoice.id == invoiceId
-      );
-      if (invoiceItem)
-        formik.setFieldValue('invoices', [
-          ...formik.values.invoices,
-          {
-            amount:
-              invoiceItem?.balance > 0
-                ? invoiceItem?.balance
-                : invoiceItem?.amount,
-            invoice_id: invoiceItem?.id,
-            credit_id: '',
-            id: '',
-          },
-        ]);
-    });
-  }, [invoices]);
-
-  useEffect(() => {
-    let total = 0;
-    formik.values.invoices.map((invoice: any) => {
-      total = total + Number(invoice.amount);
-      setinvoices(
-        invoices.filter((invoiceId: string) => invoiceId != invoice.invoice_id)
-      );
-    });
-
-    formik.setFieldValue('amount', total);
-  }, [formik.values.invoices]);
 
   useEffect(() => {
     formik.setFieldValue('invoices', []);
@@ -152,6 +106,22 @@ export function Create() {
   const handleClientChange = (clientId: string, currencyId: string) => {
     formik.setFieldValue('client_id', clientId);
     formik.setFieldValue('currency_id', currencyId);
+  };
+
+  const handleInvoiceChange = (id: string, amount: number) => {
+    formik.setFieldValue('invoices', [
+      ...formik.values.invoices,
+      { _id: v4(), amount, credit_id: '', invoice_id: id },
+    ]);
+  };
+
+  const handleRemovingInvoice = (id: string) => {
+    formik.setFieldValue(
+      'invoices',
+      formik.values.invoices.filter(
+        (record: { _id: string }) => record._id !== id
+      )
+    );
   };
 
   return (
@@ -188,74 +158,45 @@ export function Create() {
               errorMessage={errors?.errors.payment_amount}
             />
           </Element>
-          
+
+          {formik.values.client_id && <Divider />}
+
           {formik.values.client_id && (
             <>
               <Element leftSide={t('invoices')}>
-                <SelectField
-                  value=""
-                  onChange={(event: any) => {
-                    if (
-                      formik.values.invoices.filter(
-                        (invoices: any) =>
-                          invoices.invoice_id == event.target.value
-                      ).length < 1
+                <DebouncedCombobox
+                  endpoint="/api/v1/invoices"
+                  label="number"
+                  onChange={(value: Record<Invoice>) =>
+                    handleInvoiceChange(
+                      value.resource?.id as string,
+                      value.resource?.amount as number
                     )
-                      setinvoices([...invoices, event.target.value]);
-                  }}
-                >
-                  <option value="" disabled></option>
-                  {invoicedata.map((invoice: Invoice, index: number) => {
-                    return (
-                      <option key={index} value={invoice.id}>
-                        {invoice.number}
-                      </option>
-                    );
-                  })}
-                </SelectField>
+                  }
+                />
               </Element>
-              {formik.values.invoices.map((invoiceitem: any, index: number) => {
-                const invoiceItem = invoicedata.find(
-                  (invoice: Invoice) => invoice.id == invoiceitem.invoice_id
-                );
 
-                if (invoiceItem)
-                  return (
-                    <Element key={index} leftSide={invoiceItem?.number}>
-                      <InputField
-                        id={`invoices[${index}].amount`}
-                        value={
-                          invoiceItem?.balance > 0
-                            ? invoiceItem?.balance
-                            : invoiceItem?.amount
-                        }
-                        onChange={formik.handleChange}
-                      />
-                      {errors?.errors[`invoices.${[index]}.invoice_id`] && (
-                        <Alert type="danger">
-                          {errors.errors[`invoices.${[index]}.invoice_id`]}
-                        </Alert>
-                      )}
+              {formik.values.invoices.map(
+                (record: { _id: string; amount: number }, index) => (
+                  <Element key={index} leftSide={t('applied')}>
+                    <div className="flex items-center space-x-2">
+                      <InputField value={record.amount} />
+
                       <Button
                         behavior="button"
                         type="minimal"
-                        onClick={() => {
-                          formik.setFieldValue(
-                            'invoices',
-                            formik.values.invoices.filter(
-                              (invoice: any) =>
-                                invoice.invoice_id != invoiceitem.invoice_id
-                            )
-                          );
-                        }}
+                        onClick={() => handleRemovingInvoice(record._id)}
                       >
-                        Remove
+                        <X />
                       </Button>
-                    </Element>
-                  );
-              })}
+                    </div>
+                  </Element>
+                )
+              )}
             </>
           )}
+
+          {formik.values.client_id && <Divider />}
 
           <Element leftSide={t('payment_date')}>
             <InputField
@@ -265,6 +206,7 @@ export function Create() {
               onChange={formik.handleChange}
             />
           </Element>
+
           <Element leftSide={t('payment_type')}>
             <SelectField id="type_id" onChange={formik.handleChange}>
               <option value=""></option>
@@ -275,12 +217,14 @@ export function Create() {
               ))}
             </SelectField>
           </Element>
+
           <Element leftSide={t('transaction_reference')}>
             <InputField
               id="transaction_reference"
               onChange={formik.handleChange}
             />
           </Element>
+
           <Element leftSide={t('private_notes')}>
             <InputField
               element="textarea"
@@ -288,6 +232,7 @@ export function Create() {
               onChange={formik.handleChange}
             />
           </Element>
+
           {company?.custom_fields?.payment1 && (
             <CustomField
               field="payment1"
@@ -296,6 +241,7 @@ export function Create() {
               onChange={(value) => formik.setFieldValue('custom_value1', value)}
             />
           )}
+
           {company?.custom_fields?.payment2 && (
             <CustomField
               field="custom_value2"
@@ -322,24 +268,27 @@ export function Create() {
               onChange={(value) => formik.setFieldValue('custom_value4', value)}
             />
           )}
+
           <Element leftSide={t('send_email')}>
             <Toggle
               checked={emailInvoice}
               onChange={() => {
-                setemailInvoice(!emailInvoice);
+                setEmailInvoice(!emailInvoice);
               }}
             />
           </Element>
+
           <Element leftSide={t('convert_currency')}>
             <Toggle
               checked={formik.values.exchange_currency_id}
               onChange={() => {
-                setconvertCurrency(!convertCurrency);
+                setConvertCurrency(!convertCurrency);
                 formik.setFieldValue('exchange_currency_id', '');
                 formik.setFieldValue('exchange_rate', 1);
               }}
             />
           </Element>
+
           {convertCurrency && (
             <ConvertCurrency
               setFieldValue={formik.setFieldValue}
