@@ -14,13 +14,14 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import { useTitle } from 'common/hooks/useTitle';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 
 export function Clients() {
   const [t] = useTranslation();
-
+  const navigate = useNavigate();
   useTitle('clients');
 
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -50,6 +51,28 @@ export function Clients() {
       format: (value) => date(value, dateFormat),
     },
   ];
+  const actions = [
+    (resource: any) => (
+      <DropdownElement
+        key={'client portal'}
+        onClick={() => {
+          window.open(resource.contacts[0].link, '__blank');
+        }}
+      >
+        {t('client_portal')}
+      </DropdownElement>
+    ),
+    (resource: any) => (
+      <DropdownElement
+        key={'new_payment'}
+        onClick={() => {
+          navigate(`/payments/create/client/${resource.id}`);
+        }}
+      >
+        {t('new_payment')}
+      </DropdownElement>
+    ),
+  ];
 
   return (
     <Default breadcrumbs={pages} title={t('clients')} docsLink="docs/clients">
@@ -60,6 +83,7 @@ export function Clients() {
         linkToCreate="/clients/create"
         linkToEdit="/clients/:id/edit"
         withResourcefulActions
+        customActions={actions}
       />
     </Default>
   );
