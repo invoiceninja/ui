@@ -32,10 +32,13 @@ const internalRecord = { value: '', label: '', internal: true };
 
 export function DebouncedCombobox(props: Props) {
   const [records, setRecords] = useState<Record[]>([internalRecord]);
+  const [apiEndpoint, setApiEndpoint] = useState(props.endpoint);
+
   const [selectedOption, setSelectedOption] = useState({
     record: records[0],
     withoutEvents: true,
   });
+
   const [defaultValueProperty, setDefaultValueProperty] = useState('');
   const openDropdownButton = useRef<HTMLButtonElement | undefined>();
   const queryClient = useQueryClient();
@@ -45,11 +48,15 @@ export function DebouncedCombobox(props: Props) {
   }, [props.defaultValue]);
 
   const request = (query: string) => {
+    const url = new URL(endpoint(props.endpoint));
+
+    url.searchParams.set('filter', query);
+
     queryClient
       .fetchQuery(
-        `${props.endpoint}?filter=${query}`,
+        url.href,
         () =>
-          axios.get(endpoint(`${props.endpoint}?filter=${query}`), {
+          axios.get(url.href, {
             headers: defaultHeaders,
           }),
         { staleTime: Infinity }
@@ -108,6 +115,12 @@ export function DebouncedCombobox(props: Props) {
       setSelectedOption({ record: potential, withoutEvents: true });
     }
   }, [records, defaultValueProperty]);
+
+  useEffect(() => {
+    setApiEndpoint(props.endpoint);
+
+    request('');
+  }, [props.endpoint]);
 
   return (
     <div className={`w-full ${props.className}`}>
