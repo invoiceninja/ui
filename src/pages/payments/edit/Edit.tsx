@@ -18,7 +18,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { usePaymentQuery } from 'common/queries/payments';
-import { useStaticsQuery } from 'common/queries/statics';
+import { ConvertCurrency } from 'components/ConvertCurrency';
 import { CustomField } from 'components/CustomField';
 import Toggle from 'components/forms/Toggle';
 import { useFormik } from 'formik';
@@ -39,7 +39,6 @@ export function Edit() {
 
   const queryClient = useQueryClient();
   const [errors, setErrors] = useState<ValidationBag>();
-  const { data: statics } = useStaticsQuery();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -78,31 +77,6 @@ export function Edit() {
         });
     },
   });
-
-  const getExchangeRate = (fromCurrencyId: string, toCurrencyId: string) => {
-    if (fromCurrencyId == null || toCurrencyId == null) {
-      return 1;
-    }
-    const fromCurrency = statics?.data.currencies.find(
-      (data: any) => data.id === payment?.data.data.currency_id
-    );
-    const toCurrency = statics?.data.currencies.find(
-      (data: any) => data.id === toCurrencyId
-    );
-    const baseCurrency = statics?.data.currencies.find(
-      (data: any) => data.id === '1'
-    );
-
-    if (fromCurrency == baseCurrency) {
-      return toCurrency.exchange_rate;
-    }
-
-    if (toCurrency == baseCurrency) {
-      return 1 / (fromCurrency?.exchange_rate ?? 1);
-    }
-
-    return toCurrency.exchange_rate * (1 / fromCurrency.exchange_rate);
-  };
 
   return (
     <Card
@@ -203,48 +177,13 @@ export function Edit() {
         />
       </Element>
       {convertCurrency && (
-        <>
-          <Element leftSide={t('currency')}>
-            <SelectField
-              value={payment?.data.data.exchange_currency_id}
-              onChange={(event: any) => {
-                formik.setFieldValue(
-                  'exchange_rate',
-                  getExchangeRate(
-                    payment?.data.data.currency_id,
-                    event.target.value
-                  )
-                );
-                formik.setFieldValue(
-                  'exchange_currency_id',
-                  event.target.value
-                );
-              }}
-            >
-              <option value=""></option>
-              {statics?.data.currencies.map((element: any, index: any) => {
-                return (
-                  <option value={element.id} key={index}>
-                    {element.name}
-                  </option>
-                );
-              })}
-            </SelectField>
-          </Element>
-          <Element leftSide={t('exchange_rate')}>
-            <InputField
-              onChange={(event: any) => {
-                formik.setFieldValue('exchange_rate', event.target.valeu);
-              }}
-              value={formik.values.exchange_rate}
-            />
-          </Element>
-          <Element leftSide={t('converted_amount')}>
-            <InputField
-              value={formik.values.amount * formik.values.exchange_rate}
-            />
-          </Element>
-        </>
+        <ConvertCurrency
+          currency_id={payment?.data.data.currency_id}
+          setFieldValue={formik.setFieldValue}
+          exchange_currency_id={formik.values.exchange_currency_id}
+          amount={formik.values.amount}
+          exchange_rate={formik.values.exchange_rate}
+        />
       )}
     </Card>
   );

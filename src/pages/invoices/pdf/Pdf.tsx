@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
 import { Invoice } from 'common/interfaces/invoice';
 import { useInvoiceQuery } from 'common/queries/invoices';
 import { Default } from 'components/layouts/Default';

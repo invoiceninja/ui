@@ -9,7 +9,6 @@
  */
 
 import axios from 'axios';
-import { endpoint } from 'common/helpers';
 import { Invoice } from 'common/interfaces/invoice';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useQueryClient } from 'react-query';
