@@ -26,9 +26,26 @@ export function Email() {
   const [t] = useTranslation();
   const { documentTitle } = useTitle('send_email');
   const invoice = useResolveCurrentInvoice();
+
   const [templateId, setTemplateId] = useState('email_template_invoice');
-  const template = useResolveTemplate(templateId, 'invoice', invoice?.id || '');
+  const [subject, setSubject] = useState('');
+  const [body, setBody] = useState('');
+
+  const template = useResolveTemplate(
+    body,
+    'invoice',
+    invoice?.id || '',
+    subject,
+    templateId
+  );
+
   const pdfUrl = useGeneratePdfUrl();
+
+  const handleTemplateChange = (id: string) => {
+    setSubject('');
+    setBody('');
+    setTemplateId(id);
+  };
 
   return (
     <Default
@@ -53,7 +70,7 @@ export function Email() {
             <Element leftSide={t('template')}>
               <SelectField
                 onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-                  setTemplateId(event.target.value)
+                  handleTemplateChange(event.target.value)
                 }
               >
                 <option value="email_template_invoice">
@@ -73,12 +90,21 @@ export function Email() {
           </Card>
 
           <Card withContainer>
-            <InputField label={t('subject')} value={template?.raw_subject} />
+            <InputField
+              label={t('subject')}
+              value={subject || template?.raw_subject}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setSubject(event.target.value)
+              }
+            />
 
             <InputField
               label={t('body')}
               element="textarea"
-              value={template?.raw_body}
+              value={body || template?.raw_body}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setBody(event.target.value)
+              }
             />
           </Card>
 
