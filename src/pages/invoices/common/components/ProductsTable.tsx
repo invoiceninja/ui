@@ -47,16 +47,18 @@ export function ProductsTable() {
                 ))}
 
                 <Td>
-                  {invoice && invoice.line_items.length > 1 && (
-                    <button
-                      className="text-gray-600 hover:text-red-600"
-                      onClick={() =>
-                        dispatch(deleteInvoiceLineItem(lineItemIndex))
-                      }
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  )}
+                  {invoice &&
+                    (lineItem.product_key || lineItemIndex > 0) &&
+                    invoice.line_items.length > 0 && (
+                      <button
+                        className="text-gray-600 hover:text-red-600"
+                        onClick={() =>
+                          dispatch(deleteInvoiceLineItem(lineItemIndex))
+                        }
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
                 </Td>
               </Tr>
             ))}
