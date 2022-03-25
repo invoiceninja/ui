@@ -9,8 +9,7 @@
  */
 
 import { Button, InputField } from '@invoiceninja/forms';
-import axios, { AxiosError
- } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
@@ -155,7 +154,6 @@ export function ProductCreate(props: Props) {
           formik.handleSubmit();
         }}
       >
-        {' '}
         {t('save')}
       </Button>
     </Modal>
