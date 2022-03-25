@@ -29,8 +29,6 @@ export function useResolveTemplate(
   subject: string,
   templateId: string
 ) {
-  console.log(subject);
-
   const queryClient = useQueryClient();
   const [template, setTemplate] = useState<EmailTemplate>();
 

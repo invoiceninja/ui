@@ -20,6 +20,7 @@ import { InvoiceViewer } from '../common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { useResolveCurrentInvoice } from '../common/hooks/useResolveCurrentInvoice';
 import { Contact } from './components/Contact';
+import { useHandleSend } from './hooks/useHandleSend';
 import { useResolveTemplate } from './hooks/useResolveTemplate';
 
 export function Email() {
@@ -47,11 +48,15 @@ export function Email() {
     setTemplateId(id);
   };
 
+  const handleSend = useHandleSend();
+
   return (
     <Default
       title={documentTitle}
       onBackClick={generatePath('/invoices')}
-      onSaveClick={() => {}}
+      onSaveClick={() =>
+        handleSend(body, 'invoice', invoice?.id || '', subject, templateId)
+      }
       saveButtonLabel={t('send')}
     >
       <div className="grid grid-cols-12 lg:gap-4">
