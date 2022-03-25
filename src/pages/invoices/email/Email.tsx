@@ -10,30 +10,67 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
 import { useTitle } from 'common/hooks/useTitle';
 import { Default } from 'components/layouts/Default';
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import { InvoiceViewer } from '../common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { useResolveCurrentInvoice } from '../common/hooks/useResolveCurrentInvoice';
-import { Contact } from './components/Contact';
-import { useResolveTemplate } from './hooks/useResolveTemplate';
+import { useHandleSend } from '../../../common/hooks/emails/useHandleSend';
+import { useResolveTemplate } from 'common/hooks/emails/useResolveTemplate';
+import { Contact } from 'components/emails/Contact';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { BreadcrumRecord } from 'components/Breadcrumbs';
 
 export function Email() {
   const [t] = useTranslation();
-  const { documentTitle } = useTitle('send_email');
+  const { documentTitle } = useTitle('email_invoice');
+  const { id } = useParams();
+
+  const pages: BreadcrumRecord[] = [
+    { name: t('invoices'), href: '/invoices' },
+    {
+      name: t('email_invoice'),
+      href: generatePath('/invoices/:id/email', { id }),
+    },
+  ];
+
   const invoice = useResolveCurrentInvoice();
+  const company = useCurrentCompany();
+
   const [templateId, setTemplateId] = useState('email_template_invoice');
-  const template = useResolveTemplate(templateId, 'invoice', invoice?.id || '');
+  const [subject, setSubject] = useState('');
+  const [body, setBody] = useState('');
+
+  const template = useResolveTemplate(
+    body,
+    'invoice',
+    invoice?.id || '',
+    subject,
+    templateId
+  );
+
   const pdfUrl = useGeneratePdfUrl();
+
+  const handleTemplateChange = (id: string) => {
+    setSubject('');
+    setBody('');
+    setTemplateId(id);
+  };
+
+  const handleSend = useHandleSend();
 
   return (
     <Default
       title={documentTitle}
+      breadcrumbs={pages}
       onBackClick={generatePath('/invoices')}
-      onSaveClick={() => {}}
+      onSaveClick={() =>
+        handleSend(body, 'invoice', invoice?.id || '', subject, templateId)
+      }
       saveButtonLabel={t('send')}
     >
       <div className="grid grid-cols-12 lg:gap-4">
@@ -52,40 +89,75 @@ export function Email() {
             <Element leftSide={t('template')}>
               <SelectField
                 onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-                  setTemplateId(event.target.value)
+                  handleTemplateChange(event.target.value)
                 }
               >
                 <option value="email_template_invoice">
                   {t('initial_email')}
                 </option>
+
                 <option value="email_template_reminder1">
                   {t('first_reminder')}
                 </option>
+
                 <option value="email_template_reminder2">
                   {t('second_reminder')}
                 </option>
+
                 <option value="email_template_reminder3">
                   {t('third_reminder')}
                 </option>
+
+                {company?.settings.email_template_custom1 && (
+                  <option value="email_template_custom1">
+                    {company?.settings.email_subject_custom1}
+                  </option>
+                )}
+
+                {company?.settings.email_template_custom2 && (
+                  <option value="email_template_custom2">
+                    {company?.settings.email_subject_custom2}
+                  </option>
+                )}
+
+                {company?.settings.email_template_custom3 && (
+                  <option value="email_template_custom3">
+                    {company?.settings.email_subject_custom3}
+                  </option>
+                )}
               </SelectField>
             </Element>
           </Card>
 
           <Card withContainer>
-            <InputField label={t('subject')} value={template?.raw_subject} />
+            <InputField
+              label={t('subject')}
+              value={subject || template?.raw_subject}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setSubject(event.target.value)
+              }
+            />
 
             <InputField
               label={t('body')}
               element="textarea"
-              value={template?.raw_body}
+              value={body || template?.raw_body}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                setBody(event.target.value)
+              }
             />
           </Card>
 
-          <Card>
-            <span className="text-sm uppercase text-center block">
-              Preview goes here
-            </span>
-          </Card>
+          {template && (
+            <Card style={{ height: 800 }} title={template.subject}>
+              <iframe
+                srcDoc={generateEmailPreview(template.body, template.wrapper)}
+                frameBorder="0"
+                width="100%"
+                height={800}
+              />
+            </Card>
+          )}
         </div>
 
         <div className="col-span-12 lg:col-span-7 bg-blue-300 h-max">

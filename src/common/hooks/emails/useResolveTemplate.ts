@@ -23,9 +23,11 @@ export interface EmailTemplate {
 }
 
 export function useResolveTemplate(
-  templateId: string,
+  body: string,
   entity: string,
-  entityId: string
+  entityId: string,
+  subject: string,
+  templateId: string
 ) {
   const queryClient = useQueryClient();
   const [template, setTemplate] = useState<EmailTemplate>();
@@ -36,10 +38,10 @@ export function useResolveTemplate(
         .post(
           endpoint('/api/v1/templates'),
           {
-            body: '',
+            body,
             entity,
             entity_id: entityId,
-            subject: '',
+            subject,
             template: templateId,
           },
           { headers: defaultHeaders }
@@ -47,7 +49,7 @@ export function useResolveTemplate(
         .then((response) => setTemplate(response.data))
         .catch((error) => console.error(error))
     );
-  }, [templateId]);
+  }, [body, entity, entityId, subject, templateId]);
 
   return template;
 }
