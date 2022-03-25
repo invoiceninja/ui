@@ -20,7 +20,7 @@ import { useResolveInputField } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
 interface Props {
   isModalOpen: boolean;
-  setIsModalOpen: any;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export function ProductsTable(props: Props) {
   const [t] = useTranslation();
@@ -29,8 +29,8 @@ export function ProductsTable(props: Props) {
   const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
   const resolveInputField = useResolveInputField({
-    isModalOpen: props.isModalOpen,
-    setIsModalOpen: props.setIsModalOpen,
+    isProductModalOpen: props.isModalOpen,
+    setIsProductModalOpen: props.setIsModalOpen,
   });
 
   return (

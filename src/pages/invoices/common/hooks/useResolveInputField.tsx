@@ -30,8 +30,8 @@ const numberInputs = [
   'tax_rate3',
 ];
 interface Props {
-  isModalOpen: boolean;
-  setIsModalOpen: any;
+  isProductModalOpen: boolean;
+  setIsProductModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export function useResolveInputField(props: Props) {
   const handleProductChange = useHandleProductChange();
@@ -39,7 +39,7 @@ export function useResolveInputField(props: Props) {
   const [t] = useTranslation();
   const invoice = useCurrentInvoice();
   const formatMoney = useFormatMoney();
-  const { isModalOpen, setIsModalOpen } = props;
+  const { isProductModalOpen, setIsProductModalOpen } = props;
   return (key: string, index: number) => {
     const property = resolveProperty(key);
 
@@ -51,7 +51,7 @@ export function useResolveInputField(props: Props) {
             label="product_key"
             onChange={(value) => handleProductChange(index, value)}
             className="w-36"
-            onActionClick={() => setIsModalOpen(!isModalOpen)}
+            onActionClick={() => setIsProductModalOpen(!isProductModalOpen)}
             actionLabel={t('new_product')}
             defaultValue={invoice?.line_items[index][property]}
           />
