@@ -73,7 +73,6 @@ export function useResolveInputField() {
       return (
         <InputField
           id={property}
-          type="number"
           value={invoice?.line_items[index][property]}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, parseFloat(event.target.value), index)
