@@ -66,8 +66,12 @@ export function Create() {
 
   const onSave = () => {
     set(client as Client, 'contacts', contacts);
-
     const toastId = toast.loading(t('processing'));
+
+    if (client?.name == '') {
+      toast.error(t('error_title'), { id: toastId });
+      return 1;
+    }
 
     axios
       .post(endpoint('/api/v1/clients'), client, {
