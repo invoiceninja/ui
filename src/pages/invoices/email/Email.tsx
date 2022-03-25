@@ -19,9 +19,9 @@ import { generatePath } from 'react-router-dom';
 import { InvoiceViewer } from '../common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { useResolveCurrentInvoice } from '../common/hooks/useResolveCurrentInvoice';
-import { Contact } from './components/Contact';
-import { useHandleSend } from './hooks/useHandleSend';
-import { useResolveTemplate } from './hooks/useResolveTemplate';
+import { useHandleSend } from '../../../common/hooks/emails/useHandleSend';
+import { useResolveTemplate } from 'common/hooks/emails/useResolveTemplate';
+import { Contact } from 'components/emails/Contact';
 
 export function Email() {
   const [t] = useTranslation();

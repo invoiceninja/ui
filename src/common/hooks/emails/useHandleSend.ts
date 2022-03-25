@@ -38,7 +38,7 @@ export function useHandleSend() {
         },
         { headers: defaultHeaders }
       )
-      .then(() => toast.success(t('emailed_invoice'), { id: toastId }))
+      .then(() => toast.success(t(`emailed_${entity}`), { id: toastId }))
       .catch((error) => {
         console.error(error);
 
