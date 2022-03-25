@@ -24,6 +24,7 @@ interface Props {
   disableSubmitButton?: boolean;
   className?: string;
   withContainer?: boolean;
+  style?: React.CSSProperties;
 }
 
 export function Card(props: Props) {
@@ -32,6 +33,7 @@ export function Card(props: Props) {
   return (
     <div
       className={`bg-white shadow overflow-hidden rounded ${props.className}`}
+      style={props.style}
     >
       <form onSubmit={props.onFormSubmit}>
         {props.title && (
