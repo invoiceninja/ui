@@ -10,6 +10,7 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
 import { useTitle } from 'common/hooks/useTitle';
 import { Default } from 'components/layouts/Default';
 import { ChangeEvent, useState } from 'react';
@@ -81,11 +82,16 @@ export function Email() {
             />
           </Card>
 
-          <Card>
-            <span className="text-sm uppercase text-center block">
-              Preview goes here
-            </span>
-          </Card>
+          {template && (
+            <Card style={{ height: 800 }} title={template.subject}>
+              <iframe
+                srcDoc={generateEmailPreview(template.body, template.wrapper)}
+                frameBorder="0"
+                width="100%"
+                height={800}
+              />
+            </Card>
+          )}
         </div>
 
         <div className="col-span-12 lg:col-span-7 bg-blue-300 h-max">
