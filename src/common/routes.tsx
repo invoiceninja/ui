@@ -100,6 +100,7 @@ export const routes = (
       </Route>
       <Route path="/credits">
         <Route path="" element={<Credits.Credits />} />
+        <Route path=":id/email" element={<Credits.Email />} />
       </Route>
       <Route path="/projects">
         <Route path="" element={<Projects.Projects />} />
