@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
-import { endpoint } from 'common/helpers';
+import axios, { AxiosResponse } from 'axios';
+import { endpoint, request } from 'common/helpers';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { defaultHeaders } from './common/headers';
@@ -31,5 +31,19 @@ export function useClientQuery(
         headers: defaultHeaders,
       }),
     { ...options, staleTime: Infinity }
+  );
+}
+export function bulk(
+  id: string[],
+  action: 'archive' | 'delete'
+): Promise<AxiosResponse> {
+  return request(
+    'POST',
+    endpoint('/api/v1/clients/bulk'),
+    {
+      action,
+      ids: Array.from(id),
+    },
+    { 'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') }
   );
 }
