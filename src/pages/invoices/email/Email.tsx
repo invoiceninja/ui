@@ -15,7 +15,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Default } from 'components/layouts/Default';
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import { InvoiceViewer } from '../common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { useResolveCurrentInvoice } from '../common/hooks/useResolveCurrentInvoice';
@@ -23,10 +23,21 @@ import { useHandleSend } from '../../../common/hooks/emails/useHandleSend';
 import { useResolveTemplate } from 'common/hooks/emails/useResolveTemplate';
 import { Contact } from 'components/emails/Contact';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { BreadcrumRecord } from 'components/Breadcrumbs';
 
 export function Email() {
   const [t] = useTranslation();
-  const { documentTitle } = useTitle('send_email');
+  const { documentTitle } = useTitle('email_invoice');
+  const { id } = useParams();
+
+  const pages: BreadcrumRecord[] = [
+    { name: t('invoices'), href: '/invoices' },
+    {
+      name: t('email_invoice'),
+      href: generatePath('/invoices/:id/email', { id }),
+    },
+  ];
+
   const invoice = useResolveCurrentInvoice();
   const company = useCurrentCompany();
 
@@ -55,6 +66,7 @@ export function Email() {
   return (
     <Default
       title={documentTitle}
+      breadcrumbs={pages}
       onBackClick={generatePath('/invoices')}
       onSaveClick={() =>
         handleSend(body, 'invoice', invoice?.id || '', subject, templateId)
