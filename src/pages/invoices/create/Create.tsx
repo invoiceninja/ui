@@ -12,7 +12,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { useBlankInvoiceQuery } from 'common/queries/invoices';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
@@ -23,12 +23,14 @@ import { ProductsTable } from '../common/components/ProductsTable';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
 import { InvoicePreview } from '../common/components/InvoicePreview';
+import { ProductCreate } from '../common/components/ProductCreate';
 
 export function Create() {
   const { documentTitle } = useTitle('new_invoice');
   const { data: invoice } = useBlankInvoiceQuery();
   const [t] = useTranslation();
   const dispatch = useDispatch();
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -51,7 +53,10 @@ export function Create() {
         <InvoiceDetails />
 
         <div className="col-span-12">
-          <ProductsTable />
+          <ProductsTable
+            isModalOpen={isProductModalOpen}
+            setIsModalOpen={setIsProductModalOpen}
+          />
         </div>
 
         <InvoiceFooter />
@@ -61,6 +66,10 @@ export function Create() {
       <div className="my-4">
         <InvoicePreview for="create" />
       </div>
+      <ProductCreate
+        setIsModalOpen={setIsProductModalOpen}
+        isModalOpen={isProductModalOpen}
+      />
     </Default>
   );
 }

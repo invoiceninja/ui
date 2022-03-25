@@ -18,14 +18,20 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useProductColumns } from '../hooks/useProductColumns';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
-
-export function ProductsTable() {
+interface Props {
+  isModalOpen: boolean;
+  setIsModalOpen: any;
+}
+export function ProductsTable(props: Props) {
   const [t] = useTranslation();
   const invoice = useSelector((state: RootState) => state.invoices.current);
   const columns = useProductColumns();
   const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
-  const resolveInputField = useResolveInputField();
+  const resolveInputField = useResolveInputField({
+    isModalOpen: props.isModalOpen,
+    setIsModalOpen: props.setIsModalOpen,
+  });
 
   return (
     <div>

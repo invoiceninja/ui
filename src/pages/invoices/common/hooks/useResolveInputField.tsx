@@ -16,10 +16,9 @@ import { useHandleProductChange } from './useHandleProductChange';
 import { useTranslation } from 'react-i18next';
 import { InputField } from '@invoiceninja/forms';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent } from 'react';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
 import { useFormatMoney } from './useFormatMoney';
-import { ProductCreate } from '../components/ProductCreate';
 
 const numberInputs = [
   'discount',
@@ -30,15 +29,17 @@ const numberInputs = [
   'tax_rate2',
   'tax_rate3',
 ];
-
-export function useResolveInputField() {
+interface Props {
+  isModalOpen: boolean;
+  setIsModalOpen: any;
+}
+export function useResolveInputField(props: Props) {
   const handleProductChange = useHandleProductChange();
   const onChange = useHandleLineItemPropertyChange();
   const [t] = useTranslation();
   const invoice = useCurrentInvoice();
   const formatMoney = useFormatMoney();
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-
+  const { isModalOpen, setIsModalOpen } = props;
   return (key: string, index: number) => {
     const property = resolveProperty(key);
 
@@ -50,18 +51,13 @@ export function useResolveInputField() {
             label="product_key"
             onChange={(value) => handleProductChange(index, value)}
             className="w-36"
-            onActionClick={() => setIsProductModalOpen(!isProductModalOpen)}
+            onActionClick={() => setIsModalOpen(!isModalOpen)}
             actionLabel={t('new_product')}
             defaultValue={invoice?.line_items[index][property]}
-          />
-          <ProductCreate
-            setIsModalOpen={setIsProductModalOpen}
-            isModalOpen={isProductModalOpen}
           />
         </>
       );
     }
-
     if (property === 'notes') {
       return (
         <InputField
