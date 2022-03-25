@@ -13,13 +13,13 @@
 import { resolveProperty } from 'pages/invoices/common/helpers/resolve-property';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { useHandleProductChange } from './useHandleProductChange';
-import { generatePath, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { InputField } from '@invoiceninja/forms';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
 import { useFormatMoney } from './useFormatMoney';
+import { ProductCreate } from '../components/ProductCreate';
 
 const numberInputs = [
   'discount',
@@ -34,25 +34,31 @@ const numberInputs = [
 export function useResolveInputField() {
   const handleProductChange = useHandleProductChange();
   const onChange = useHandleLineItemPropertyChange();
-  const navigate = useNavigate();
   const [t] = useTranslation();
   const invoice = useCurrentInvoice();
   const formatMoney = useFormatMoney();
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
   return (key: string, index: number) => {
     const property = resolveProperty(key);
 
     if (property === 'product_key') {
       return (
-        <DebouncedCombobox
-          endpoint="/api/v1/products"
-          label="product_key"
-          onChange={(value) => handleProductChange(index, value)}
-          className="w-36"
-          onActionClick={() => navigate(generatePath('/products/create'))}
-          actionLabel={t('new_product')}
-          defaultValue={invoice?.line_items[index][property]}
-        />
+        <>
+          <DebouncedCombobox
+            endpoint="/api/v1/products"
+            label="product_key"
+            onChange={(value) => handleProductChange(index, value)}
+            className="w-36"
+            onActionClick={() => setIsProductModalOpen(!isProductModalOpen)}
+            actionLabel={t('new_product')}
+            defaultValue={invoice?.line_items[index][property]}
+          />
+          <ProductCreate
+            setIsModalOpen={setIsProductModalOpen}
+            isModalOpen={isProductModalOpen}
+          />
+        </>
       );
     }
 

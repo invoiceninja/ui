@@ -36,6 +36,8 @@ export interface CreateProductDto {
 
 interface Props {
   product?: CreateProductDto;
+  noTitle?: boolean;
+  noRedirect?: boolean;
 }
 
 export function CreateProduct(props: Props) {
@@ -47,7 +49,7 @@ export function CreateProduct(props: Props) {
   const navigate = useNavigate();
 
   const [errors, setErrors] = useState<any>();
-  
+
   const formik = useFormik({
     initialValues: {
       product_key: props.product?.product_key || '',
@@ -65,10 +67,14 @@ export function CreateProduct(props: Props) {
         .then((response: AxiosResponse) => {
           toast.success(t('created_product'));
 
-          navigate(
-            generatePath('/products/:id/edit', { id: response.data.data.id }),
-            { state: { message: t('created_product') } }
-          );
+          props.noRedirect
+            ? ''
+            : navigate(
+                generatePath('/products/:id/edit', {
+                  id: response.data.data.id,
+                }),
+                { state: { message: t('created_product') } }
+              );
         })
         .catch((error: AxiosError) =>
           error.response?.status === 422
@@ -81,7 +87,7 @@ export function CreateProduct(props: Props) {
 
   return (
     <Card
-      title={t('new_product')}
+      title={props.noTitle ? '' : t('new_product')}
       withSaveButton
       disableSubmitButton={formik.isSubmitting}
       onFormSubmit={formik.handleSubmit}
