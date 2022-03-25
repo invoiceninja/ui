@@ -30,6 +30,12 @@ export interface Company {
     tax_name3: string;
     currency_id: string;
     invoice_design_id: string;
+    email_template_custom1: string;
+    email_template_custom2: string;
+    email_template_custom3: string;
+    email_subject_custom1: string;
+    email_subject_custom2: string;
+    email_subject_custom3: string;
   };
   custom_fields: Record<string, string>;
   enabled_tax_rates: number;

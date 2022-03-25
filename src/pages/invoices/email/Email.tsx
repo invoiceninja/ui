@@ -22,11 +22,13 @@ import { useResolveCurrentInvoice } from '../common/hooks/useResolveCurrentInvoi
 import { useHandleSend } from '../../../common/hooks/emails/useHandleSend';
 import { useResolveTemplate } from 'common/hooks/emails/useResolveTemplate';
 import { Contact } from 'components/emails/Contact';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 
 export function Email() {
   const [t] = useTranslation();
   const { documentTitle } = useTitle('send_email');
   const invoice = useResolveCurrentInvoice();
+  const company = useCurrentCompany();
 
   const [templateId, setTemplateId] = useState('email_template_invoice');
   const [subject, setSubject] = useState('');
@@ -81,15 +83,36 @@ export function Email() {
                 <option value="email_template_invoice">
                   {t('initial_email')}
                 </option>
+
                 <option value="email_template_reminder1">
                   {t('first_reminder')}
                 </option>
+
                 <option value="email_template_reminder2">
                   {t('second_reminder')}
                 </option>
+
                 <option value="email_template_reminder3">
                   {t('third_reminder')}
                 </option>
+
+                {company?.settings.email_template_custom1 && (
+                  <option value="email_template_custom1">
+                    {company?.settings.email_subject_custom1}
+                  </option>
+                )}
+
+                {company?.settings.email_template_custom2 && (
+                  <option value="email_template_custom2">
+                    {company?.settings.email_subject_custom2}
+                  </option>
+                )}
+
+                {company?.settings.email_template_custom3 && (
+                  <option value="email_template_custom3">
+                    {company?.settings.email_subject_custom3}
+                  </option>
+                )}
               </SelectField>
             </Element>
           </Card>
