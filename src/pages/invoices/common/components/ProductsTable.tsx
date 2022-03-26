@@ -12,25 +12,26 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { injectBlankItemIntoCurrent } from 'common/stores/slices/invoices';
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 import { RootState } from 'common/stores/store';
+import { useState } from 'react';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useProductColumns } from '../hooks/useProductColumns';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
-interface Props {
-  isModalOpen: boolean;
-  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-}
-export function ProductsTable(props: Props) {
+import { ProductCreate } from './ProductCreate';
+
+export function ProductsTable() {
   const [t] = useTranslation();
   const invoice = useSelector((state: RootState) => state.invoices.current);
   const columns = useProductColumns();
   const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+
   const resolveInputField = useResolveInputField({
-    isProductModalOpen: props.isModalOpen,
-    setIsProductModalOpen: props.setIsModalOpen,
+    isProductModalOpen: isProductModalOpen,
+    setIsProductModalOpen: setIsProductModalOpen,
   });
 
   return (
@@ -90,6 +91,10 @@ export function ProductsTable(props: Props) {
           )}
         </Tbody>
       </Table>
+      <ProductCreate
+        setIsModalOpen={setIsProductModalOpen}
+        isModalOpen={isProductModalOpen}
+      />
     </div>
   );
 }
