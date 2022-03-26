@@ -63,19 +63,31 @@ export function ClientCreate() {
 
   const onSave = () => {
     set(client as Client, 'contacts', contacts);
-
     const toastId = toast.loading(t('processing'));
-    if (client?.name == '') {
+    setErrors(undefined);
+
+    if (
+      !(
+        client?.name != '' ||
+        contacts[0].first_name != '' ||
+        contacts[0].last_name != ''
+      )
+    ) {
+      setErrors({
+        message: 'Invalid data',
+        errors: { name: [t('please_enter_a_client_or_contact_name')] },
+      });
       toast.error(t('error_title'), { id: toastId });
-      return 1;
+
+      return onSave;
     }
+
     axios
       .post(endpoint('/api/v1/clients'), client, {
         headers: defaultHeaders,
       })
       .then(() => {
         toast.success(t('created_client'), { id: toastId });
-
         setIsModalOpen(false);
       })
       .catch((error: AxiosError) => {
@@ -94,7 +106,10 @@ export function ClientCreate() {
       <Modal
         title={t('new_client')}
         visible={isModalOpen}
-        onClose={setIsModalOpen}
+        onClose={(value) => {
+          setIsModalOpen(value);
+          setErrors(undefined);
+        }}
         size="large"
         backgroundColor="gray"
       >
