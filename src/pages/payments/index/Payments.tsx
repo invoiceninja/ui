@@ -7,12 +7,10 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import axios from 'axios';
 import paymentStatus from 'common/constants/payment-status';
 import paymentType from 'common/constants/payment-type';
-import { date, endpoint } from 'common/helpers';
+import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { bulk } from 'common/queries/payments';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
@@ -21,12 +19,11 @@ import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
 
 export function Payments() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
-  const navigate = useNavigate();
   const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
   const columns: DataTableColumns = [
     {
@@ -82,31 +79,19 @@ export function Payments() {
   ];
   const actions = [
     (resource: any) => (
-      <DropdownElement
-        onClick={() => {
-          navigate(`${resource.id}/apply`);
-        }}
-      >
+      <DropdownElement to={`${resource.id}/apply`}>
         {t('apply_payment')}
       </DropdownElement>
     ),
     (resource: any) => (
-      <DropdownElement
-        onClick={() => {
-          navigate(`${resource.id}/refund`);
-        }}
-      >
+      <DropdownElement to={`${resource.id}/refund`}>
         {t('refund_payment')}
       </DropdownElement>
     ),
     (resource: any) => (
       <DropdownElement
         onClick={() => {
-          axios
-            .get(endpoint('/api/v1/payments/:id/email', { id: resource.id }), {
-              headers: defaultHeaders,
-            })
-            .then((data) => console.log(data));
+          bulk([resource.id], 'email');
         }}
       >
         {t('email_payment')}
@@ -117,7 +102,7 @@ export function Payments() {
     (resource: any) => (
       <DropdownElement
         onClick={() => {
-          bulk(resource, 'email').then((data) => console.log(data));
+          bulk([resource.id], 'email');
         }}
       >
         {t('email_payment')}

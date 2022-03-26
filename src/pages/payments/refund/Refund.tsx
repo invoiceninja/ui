@@ -31,8 +31,8 @@ export function Refund() {
   const [t] = useTranslation();
   const { data: payment } = usePaymentQuery({ id });
   const [errors, setErrors] = useState<ValidationBag>();
-  const [invoices, setinvoices] = useState<string[]>([]);
-  const [email, setemail] = useState(false);
+  const [invoices, setInvoices] = useState<string[]>([]);
+  const [email, setEmail] = useState(false);
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -97,7 +97,7 @@ export function Refund() {
     let total = 0;
     formik.values.invoices.map((invoice: any) => {
       total = total + Number(invoice.amount);
-      setinvoices(
+      setInvoices(
         invoices.filter((invoiceId: string) => invoiceId != invoice.invoice_id)
       );
     });
@@ -138,7 +138,7 @@ export function Refund() {
                 (invoices: any) => invoices.invoice_id == event.target.value
               ).length < 1
             )
-              setinvoices([...invoices, event.target.value]);
+              setInvoices([...invoices, event.target.value]);
           }}
         >
           <option value="" disabled></option>
@@ -203,7 +203,7 @@ export function Refund() {
         <Toggle
           checked={email}
           onChange={() => {
-            setemail(!email);
+            setEmail(!email);
           }}
         />
       </Element>

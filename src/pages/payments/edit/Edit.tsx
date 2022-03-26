@@ -125,7 +125,6 @@ export function Edit() {
         ></InputField>
       </Element>
       <Element leftSide={t('private_notes')}>
-        {console.log(payment?.data.data)}
         <Textarea
           id="private_notes"
           value={formik.values.private_notes}

@@ -90,15 +90,14 @@ export const routes = (
       </Route>
       <Route path="/payments">
         <Route path="" element={<Payments.Payments />} />
-        <Route path='create' element={<Payments.Create/>}>
-          <Route path='client/:client_id' element={<Payments.Create/>}/>
+        <Route path="create" element={<Payments.Create />}>
+          <Route path="client/:client_id" element={<Payments.Create />} />
         </Route>
         <Route path=":id" element={<Payments.Payment />}>
           <Route path="payment_fields" element={<Payments.PaymentFields />} />
           <Route path="edit" element={<Payments.Edit />} />
-          <Route path='apply' element={<Payments.Apply/>}/>
-          <Route path='refund' element={<Payments.Refund/>}/>
-
+          <Route path="apply" element={<Payments.Apply />} />
+          <Route path="refund" element={<Payments.Refund />} />
         </Route>
       </Route>
       <Route path="/credits">
