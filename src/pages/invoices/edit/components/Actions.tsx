@@ -39,8 +39,6 @@ export function Actions() {
           {t('email_invoice')}
         </DropdownElement>
         
-        <DropdownElement>{t('mark_paid')}</DropdownElement>
-        <DropdownElement>{t('enter_payment')}</DropdownElement>
         <DropdownElement>{t('client_portal')}</DropdownElement>
       </div>
 
