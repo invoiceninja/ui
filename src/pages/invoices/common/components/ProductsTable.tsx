@@ -30,8 +30,7 @@ export function ProductsTable() {
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
 
   const resolveInputField = useResolveInputField({
-    isProductModalOpen: isProductModalOpen,
-    setIsProductModalOpen: setIsProductModalOpen,
+    setIsProductModalOpen,
   });
 
   return (
