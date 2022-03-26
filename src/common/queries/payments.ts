@@ -45,7 +45,7 @@ export function useBlankPaymentQuery() {
 
 export function bulk(
   id: string[],
-  action: 'archive' | 'restore' | 'delete'| 'email'
+  action: 'archive' | 'restore' | 'delete' | 'email'
 ): Promise<AxiosResponse> {
   return request(
     'POST',
@@ -54,6 +54,6 @@ export function bulk(
       action,
       ids: Array.from(id),
     },
-    { 'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') }
+    defaultHeaders
   );
 }
