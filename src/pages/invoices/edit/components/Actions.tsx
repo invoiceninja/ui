@@ -44,7 +44,6 @@ export function Actions() {
 
       <div>
         <DropdownElement>{t('clone_to_invoice')}</DropdownElement>
-        <DropdownElement>{t('clone_to_other')}</DropdownElement>
       </div>
 
       <div>
