@@ -74,9 +74,13 @@ export function useResolveInputField() {
         <InputField
           id={property}
           value={invoice?.line_items[index][property]}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onChange(property, parseFloat(event.target.value), index)
-          }
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            if (isNaN(Number(event.target.value)) || event.target.value == '') {
+              event.target.value = '0';
+              return event;
+            }
+            return onChange(property, parseFloat(event.target.value), index);
+          }}
           className="w-24"
         />
       );
