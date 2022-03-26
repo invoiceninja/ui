@@ -87,11 +87,7 @@ export function Client() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {
     const toastId = toast.loading(t('processing'));
-    if (password == '') {
-      toast.dismiss();
-      toast.error(t('password_error_incorrect'));
-      return 1;
-    }
+
     axios
       .post(
         endpoint('/api/v1/clients/:id/purge', { id: client?.data.data.id }),
@@ -112,6 +108,19 @@ export function Client() {
       })
       .finally(() => {});
   };
+  const handleResourcefulAction = (action: 'delete' | 'archive') => {
+    const toastId = toast.loading(t('processing'));
+    bulk([client?.data.data.id], action)
+      .then(() => {
+        toast.success(t(`${action}d_client`), { id: toastId });
+      })
+      .catch((error: AxiosError | unknown) => {
+        console.error(error);
+
+        toast.dismiss();
+        toast.error(t('error_title'));
+      });
+  };
   return (
     <Default
       title={documentTitle}
@@ -126,18 +135,7 @@ export function Client() {
             <DropdownElement
               key={'archive'}
               onClick={() => {
-                const toastId = toast.loading(t('processing'));
-
-                bulk([client?.data.data.id], 'archive')
-                  .then(() => {
-                    toast.success(t('archived_client'), { id: toastId });
-                  })
-                  .catch((error: AxiosError | unknown) => {
-                    console.error(error);
-
-                    toast.dismiss();
-                    toast.error(t('error_title'));
-                  });
+                handleResourcefulAction('archive');
               }}
             >
               {t('archive')}
@@ -145,18 +143,7 @@ export function Client() {
             <DropdownElement
               key={'delete'}
               onClick={() => {
-                const toastId = toast.loading(t('processing'));
-
-                bulk([client?.data.data.id], 'delete')
-                  .then(() => {
-                    toast.success(t('deleted_client'), { id: toastId });
-                  })
-                  .catch((error: AxiosError | unknown) => {
-                    console.error(error);
-
-                    toast.dismiss();
-                    toast.error(t('error_title'));
-                  });
+                handleResourcefulAction('delete');
               }}
             >
               {t('delete')}

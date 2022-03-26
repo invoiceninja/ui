@@ -44,6 +44,6 @@ export function bulk(
       action,
       ids: Array.from(id),
     },
-    { 'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') }
+    defaultHeaders
   );
 }
