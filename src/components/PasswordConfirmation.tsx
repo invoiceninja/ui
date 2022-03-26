@@ -56,19 +56,7 @@ export function PasswordConfirmation(props: Props) {
       />
       <Button
         onClick={() => {
-          if (currentPassword == '')
-            setErrors({
-              message: 'Invalid data',
-              errors: {
-                password: ["Password can't be empty //needs translation"],
-              },
-            });
-          else {
-            props.onClose(false);
-            setErrors(undefined);
-
-            return props.onSave(currentPassword, isPasswordRequired);
-          }
+          return props.onSave(currentPassword, isPasswordRequired);
         }}
       >
         {t('continue')}
