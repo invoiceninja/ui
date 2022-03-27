@@ -16,6 +16,7 @@ import { openClientPortal } from 'pages/invoices/common/helpers/open-client-port
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { useHandleArchive } from '../hooks/useHandleArchive';
 import { useMarkPaid } from '../hooks/useMarkPaid';
 
 export function Actions() {
@@ -25,6 +26,7 @@ export function Actions() {
   const downloadPdf = useDownloadPdf();
   const navigate = useNavigate();
   const markPaid = useMarkPaid();
+  const archive = useHandleArchive();
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
@@ -57,17 +59,22 @@ export function Actions() {
       </div>
 
       <div>
-        <DropdownElement
-          to={generatePath('/invoices/:id/clone', { id: invoice?.id })}
-        >
-          {t('clone_to_invoice')}
-        </DropdownElement>
+        {invoice && (
+          <DropdownElement
+            to={generatePath('/invoices/:id/clone', { id: invoice.id })}
+          >
+            {t('clone_to_invoice')}
+          </DropdownElement>
+        )}
       </div>
 
       <div>
-        <DropdownElement>{t('cancel')}</DropdownElement>
-        <DropdownElement>{t('reverse')}</DropdownElement>
-        <DropdownElement>{t('archive')}</DropdownElement>
+        {invoice && (
+          <DropdownElement onClick={() => archive(invoice)}>
+            {t('archive')}
+          </DropdownElement>
+        )}
+
         <DropdownElement>{t('delete')}</DropdownElement>
       </div>
     </Dropdown>
