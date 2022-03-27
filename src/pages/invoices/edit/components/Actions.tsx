@@ -11,6 +11,7 @@
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
@@ -38,8 +39,12 @@ export function Actions() {
         >
           {t('email_invoice')}
         </DropdownElement>
-        
-        <DropdownElement>{t('client_portal')}</DropdownElement>
+
+        {invoice && (
+          <DropdownElement onClick={() => openClientPortal(invoice)}>
+            {t('client_portal')}
+          </DropdownElement>
+        )}
       </div>
 
       <div>
