@@ -17,6 +17,7 @@ import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { useHandleArchive } from '../hooks/useHandleArchive';
+import { useHandleDelete } from '../hooks/useHandleDelete';
 import { useMarkPaid } from '../hooks/useMarkPaid';
 
 export function Actions() {
@@ -27,6 +28,7 @@ export function Actions() {
   const navigate = useNavigate();
   const markPaid = useMarkPaid();
   const archive = useHandleArchive();
+  const destroy = useHandleDelete();
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
@@ -75,7 +77,11 @@ export function Actions() {
           </DropdownElement>
         )}
 
-        <DropdownElement>{t('delete')}</DropdownElement>
+        {invoice && (
+          <DropdownElement onClick={() => destroy(invoice)}>
+            {t('delete')}
+          </DropdownElement>
+        )}
       </div>
     </Dropdown>
   );
