@@ -20,7 +20,7 @@ import { setCurrentRecurringInvoice } from './recurring-invoices/extra-reducers/
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 interface RecurringInvoiceState {
   api?: any;
-  current?: any;
+  current?: RecurringInvoice;
   invoiceSum?: InvoiceSum;
 }
 

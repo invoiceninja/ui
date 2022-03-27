@@ -9,6 +9,7 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { useRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
@@ -22,6 +23,8 @@ import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
+import { useCurrentRecurringInvoice } from '../common/hooks/useCurrentRecurringInvoice';
+import { useRecurringInvoiceSave } from '../common/hooks/useRecurringInvoiceSave';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_recurring_invoice');
@@ -29,6 +32,8 @@ export function Edit() {
   const { id } = useParams();
   const { data: recurringInvoice } = useRecurringInvoiceQuery({ id });
   const dispatch = useDispatch();
+  const handleSave = useRecurringInvoiceSave();
+  const currentRecurringInvoice = useCurrentRecurringInvoice();
 
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
@@ -45,7 +50,17 @@ export function Edit() {
   }, [recurringInvoice]);
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onBackClick={generatePath('/recurring_invoices')}
+      onSaveClick={() =>
+        handleSave(
+          currentRecurringInvoice?.id || '',
+          currentRecurringInvoice as RecurringInvoice
+        )
+      }
+    >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector readonly />
         <InvoiceDetails />
