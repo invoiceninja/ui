@@ -7,7 +7,8 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-export const enum RecurringInvoice {
+
+export const enum RecurringInvoiceStatus {
   DRAFT = '1',
   ACTIVE = '2',
   PAUSED = '3',

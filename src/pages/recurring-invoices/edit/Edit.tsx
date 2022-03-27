@@ -25,6 +25,7 @@ import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { useCurrentRecurringInvoice } from '../common/hooks/useCurrentRecurringInvoice';
 import { useRecurringInvoiceSave } from '../common/hooks/useRecurringInvoiceSave';
+import { Actions } from './components/Actions';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_recurring_invoice');
@@ -60,6 +61,7 @@ export function Edit() {
           currentRecurringInvoice as RecurringInvoice
         )
       }
+      navigationTopRight={<Actions />}
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector readonly />

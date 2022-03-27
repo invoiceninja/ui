@@ -7,12 +7,13 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { RecurringInvoice } from 'common/enums/recurring-invoice';
+
+import { RecurringInvoiceStatus } from 'common/enums/recurring-invoice-status';
 
 export default {
-  [RecurringInvoice.ACTIVE]: 'active',
-  [RecurringInvoice.COMPLETED]: 'completed',
-  [RecurringInvoice.DRAFT]: 'draft',
-  [RecurringInvoice.PAUSED]: 'paused',
-  [RecurringInvoice.PENDING]: 'pending',
+  [RecurringInvoiceStatus.ACTIVE]: 'active',
+  [RecurringInvoiceStatus.COMPLETED]: 'completed',
+  [RecurringInvoiceStatus.DRAFT]: 'draft',
+  [RecurringInvoiceStatus.PAUSED]: 'paused',
+  [RecurringInvoiceStatus.PENDING]: 'pending',
 };
