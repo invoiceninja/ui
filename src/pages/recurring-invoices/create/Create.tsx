@@ -9,11 +9,14 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
-import { useEffect } from 'react';
+import { ValidationAlert } from 'components/ValidationAlert';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
@@ -22,17 +25,24 @@ import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
+import { useCurrentRecurringInvoice } from '../common/hooks/useCurrentRecurringInvoice';
+import { useHandleCreate } from '../create/hooks/useHandleCreate';
 
 export function Create() {
   const { documentTitle } = useTitle('create_recurring_invoice');
   const { data: recurringInvoice } = useBlankRecurringInvoiceQuery();
+
   const [t] = useTranslation();
+  const [errors, setErrors] = useState<ValidationBag>();
+
   const dispatch = useDispatch();
+  const handleCreate = useHandleCreate(setErrors);
+  const currentRecurringInvoice = useCurrentRecurringInvoice();
 
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
-      name: t('new_recurring_invoice'),
+      name: t('clone_recurring_invoice'),
       href: generatePath('/recurring_invoices/create'),
     },
   ];
@@ -44,7 +54,16 @@ export function Create() {
   }, [recurringInvoice]);
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onBackClick={generatePath('/recurring_invoices')}
+      onSaveClick={() =>
+        handleCreate(currentRecurringInvoice as RecurringInvoice)
+      }
+    >
+      {errors && <ValidationAlert errors={errors} />}
+
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector />
         <InvoiceDetails />
