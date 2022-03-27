@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
@@ -36,5 +36,19 @@ export function useBlankInvoiceQuery(options: Record<string, any> = {}) {
         headers: defaultHeaders,
       }),
     { ...options, staleTime: Infinity }
+  );
+}
+
+export function bulk(
+  id: string[],
+  action: 'archive' | 'restore' | 'delete'
+): Promise<AxiosResponse> {
+  return axios.post(
+    endpoint('/api/v1/invoices/bulk'),
+    {
+      action,
+      ids: Array.from(id),
+    },
+    { headers: defaultHeaders }
   );
 }
