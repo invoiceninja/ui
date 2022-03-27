@@ -17,12 +17,15 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router-dom';
 
-export function useHandleCreate(setErrors: (errors: ValidationBag) => unknown) {
+export function useHandleCreate(
+  setErrors: (errors: ValidationBag | undefined) => unknown
+) {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
   return (invoice: Invoice) => {
     const toastId = toast.loading(t('processing'));
+    setErrors(undefined);
 
     axios
       .post(endpoint('/api/v1/invoices'), invoice, { headers: defaultHeaders })
