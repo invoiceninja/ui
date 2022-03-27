@@ -13,6 +13,7 @@ import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvo
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useTranslation } from 'react-i18next';
+import { generatePath } from 'react-router-dom';
 import { useToggleStartStop } from '../hooks/useToggleStartStop';
 
 export function Actions() {
@@ -40,6 +41,16 @@ export function Actions() {
             {t('stop')}
           </DropdownElement>
         )}
+
+      {recurringInvoice && (
+        <DropdownElement
+          to={generatePath('/recurring_invoices/:id/clone', {
+            id: recurringInvoice.id,
+          })}
+        >
+          {t('clone_to_recurring_invoice')}
+        </DropdownElement>
+      )}
     </Dropdown>
   );
 }
