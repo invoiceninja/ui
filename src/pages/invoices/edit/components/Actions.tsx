@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { InvoiceStatus } from 'common/enums/invoice-status';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
@@ -15,6 +16,7 @@ import { openClientPortal } from 'pages/invoices/common/helpers/open-client-port
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { useMarkPaid } from '../hooks/useMarkPaid';
 
 export function Actions() {
   const [t] = useTranslation();
@@ -22,6 +24,7 @@ export function Actions() {
   const invoice = useCurrentInvoice();
   const downloadPdf = useDownloadPdf();
   const navigate = useNavigate();
+  const markPaid = useMarkPaid();
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
@@ -43,6 +46,12 @@ export function Actions() {
         {invoice && (
           <DropdownElement onClick={() => openClientPortal(invoice)}>
             {t('client_portal')}
+          </DropdownElement>
+        )}
+
+        {invoice?.status_id === InvoiceStatus.Sent && (
+          <DropdownElement onClick={() => markPaid(invoice)}>
+            {t('mark_paid')}
           </DropdownElement>
         )}
       </div>
