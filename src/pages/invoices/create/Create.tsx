@@ -23,12 +23,17 @@ import { ProductsTable } from '../common/components/ProductsTable';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
 import { InvoicePreview } from '../common/components/InvoicePreview';
+import { useHandleCreate } from './hooks/useHandleCreate';
+import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
+import { Invoice } from 'common/interfaces/invoice';
 
 export function Create() {
   const { documentTitle } = useTitle('new_invoice');
   const { data: invoice } = useBlankInvoiceQuery();
   const [t] = useTranslation();
   const dispatch = useDispatch();
+  const handleCreate = useHandleCreate();
+  const currentInvoice = useCurrentInvoice();
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -45,7 +50,12 @@ export function Create() {
   }, [invoice]);
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onBackClick={generatePath('/invoices')}
+      onSaveClick={() => handleCreate(currentInvoice as Invoice)}
+    >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector />
         <InvoiceDetails />
