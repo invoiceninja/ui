@@ -88,11 +88,12 @@ export const routes = (
         <Route path="" element={<RecurringInvoices.RecurringInvoices />} />
         <Route path="create" element={<RecurringInvoices.Create />} />
         <Route path=":id/edit" element={<RecurringInvoices.Edit />} />
+        <Route path=":id/clone" element={<RecurringInvoices.Clone />} />
       </Route>
       <Route path="/payments">
         <Route path="" element={<Payments.Payments />} />
-        <Route path='create' element={<Payments.Create/>}>
-          <Route path='client/:client_id' element={<Payments.Create/>}/>
+        <Route path="create" element={<Payments.Create />}>
+          <Route path="client/:client_id" element={<Payments.Create />} />
         </Route>
         <Route path=":id" element={<Payments.Payment />}>
           <Route path="payment_fields" element={<Payments.PaymentFields />} />
