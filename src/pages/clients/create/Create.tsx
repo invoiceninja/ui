@@ -76,7 +76,7 @@ export function Create() {
       )
     ) {
       setErrors({
-        message: 'Invalid name',
+        message: t('invalid_name'),
         errors: { name: [t('please_enter_a_client_or_contact_name')] },
       });
       toast.error(t('error_title'), { id: toastId });
@@ -112,7 +112,7 @@ export function Create() {
     >
       {isLoading && <Spinner />}
 
-      {errors && errors.message != 'Invalid name' && (
+      {errors && errors.message != t('invalid_name') && (
         <ValidationAlert errors={errors} />
       )}
 
