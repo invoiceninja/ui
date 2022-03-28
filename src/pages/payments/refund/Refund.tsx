@@ -65,11 +65,17 @@ export function Refund() {
         .finally(() => {
           formik.setSubmitting(false);
           queryClient.invalidateQueries(
-            generatePath(`/api/v1/payments/refund?&email_receipt=${email}`)
+            generatePath('/api/v1/payments/refund?email_receipt=:email', {
+              email: String(email),
+            })
           );
         });
     },
   });
+const getInvoiceAmount=(invoiceItem:Invoice)=>invoiceItem?.paid_to_date >
+              payment?.data.data.amount - payment?.data.data.refunded
+                ? payment?.data.data.amount - payment?.data.data.refunded
+                : invoiceItem?.paid_to_date
 
   useEffect(() => {
     invoices.map((invoiceId: string) => {
@@ -81,10 +87,7 @@ export function Refund() {
           ...formik.values.invoices,
           {
             amount:
-              invoiceItem?.paid_to_date >
-              payment?.data.data.amount - payment?.data.data.refunded
-                ? payment?.data.data.amount - payment?.data.data.refunded
-                : invoiceItem?.paid_to_date,
+              getInvoiceAmount(invoiceItem),
             invoice_id: invoiceItem?.id,
             credit_id: '',
             id: '',
@@ -135,7 +138,7 @@ export function Refund() {
           onChange={(event: any) => {
             if (
               formik.values.invoices.filter(
-                (invoices: any) => invoices.invoice_id == event.target.value
+                (invoice:{invoice_id:string}) => invoice.invoice_id == event.target.value
               ).length < 1
             )
               setInvoices([...invoices, event.target.value]);
@@ -144,17 +147,17 @@ export function Refund() {
           <option value="" disabled></option>
           {payment?.data.data.invoices &&
             payment?.data.data.invoices.map(
-              (invoice: Invoice, index: number) => {
-                return (
-                  <option key={index} value={invoice.id}>
-                    {invoice.number}
-                  </option>
-                );
-              }
+              (invoice: Invoice, index: number) => (
+                <option key={index} value={invoice.id}>
+                  {invoice.number}
+                </option>
+              )
             )}
         </SelectField>
         {errors?.errors.invoices && (
-          <Alert type="danger">{errors.errors.invoices}</Alert>
+          <div className="py-2">
+            <Alert type="danger">{errors.errors.invoices}</Alert>
+          </div>
         )}
       </Element>
       {payment?.data.data &&
@@ -194,7 +197,7 @@ export function Refund() {
                     );
                   }}
                 >
-                  Remove
+                  {t('remove')}
                 </Button>
               </Element>
             );

@@ -11,6 +11,7 @@ import paymentStatus from 'common/constants/payment-status';
 import paymentType from 'common/constants/payment-type';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { CustomResourcefulAction } from 'common/interfaces/custom-resourceful-action';
 import { bulk } from 'common/queries/payments';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
@@ -77,7 +78,7 @@ export function Payments() {
       label: t('transaction_reference'),
     },
   ];
-  const actions = [
+  const actions: CustomResourcefulAction[] = [
     (resource: any) => (
       <DropdownElement to={`${resource.id}/apply`}>
         {t('apply_payment')}
@@ -98,7 +99,7 @@ export function Payments() {
       </DropdownElement>
     ),
   ];
-  const customBulkActions = [
+  const customBulkActions: CustomResourcefulAction[] = [
     (resource: any) => (
       <DropdownElement
         onClick={() => {
