@@ -131,7 +131,7 @@ export function Client() {
             {t('edit_client')}
           </Button>
 
-          <Dropdown className="divide-y" label={t('more_actions')}>
+          <Dropdown label={t('more_actions')}>
             <DropdownElement
               key={'archive'}
               onClick={() => {
