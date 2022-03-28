@@ -116,7 +116,7 @@ export function Edit() {
     >
       {isLoading && <Spinner />}
 
-      {errors && errors.message != t('invalid_name') && <ValidationAlert errors={errors} />}
+      {errors && <ValidationAlert errors={errors} />}
 
       {client && (
         <div className="flex flex-col xl:flex-row xl:gap-4">
@@ -126,7 +126,11 @@ export function Edit() {
           </div>
 
           <div className="w-full xl:w-1/2">
-            <Contacts contacts={contacts} setContacts={setContacts} errors={errors} />
+            <Contacts
+              contacts={contacts}
+              setContacts={setContacts}
+              errors={errors}
+            />
             <AdditionalInfo client={client} setClient={setClient} />
           </div>
         </div>

@@ -76,7 +76,7 @@ export function Create() {
       )
     ) {
       setErrors({
-        message: t('invalid_name'),
+        message: t('invalid_name // needs translation'),
         errors: { name: [t('please_enter_a_client_or_contact_name')] },
       });
       toast.error(t('error_title'), { id: toastId });
