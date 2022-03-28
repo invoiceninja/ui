@@ -12,6 +12,7 @@ import { Card, CardContainer } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { Container } from 'components/Container';
 import { Modal } from 'components/Modal';
@@ -25,7 +26,7 @@ interface Props {
   onClose: any;
 }
 export function TaxCreate(props: Props) {
-  const [errors, setErrors] = useState<Record<string, any>>({});
+  const [errors, setErrors] = useState<ValidationBag>();
   const [t] = useTranslation();
   const queryClient = useQueryClient();
   const formik = useFormik({
@@ -34,7 +35,7 @@ export function TaxCreate(props: Props) {
       rate: '',
     },
     onSubmit: (values) => {
-      setErrors({});
+      setErrors(undefined);
 
       axios
         .post(endpoint('/api/v1/tax_rates'), values, {
@@ -44,7 +45,7 @@ export function TaxCreate(props: Props) {
           toast.success(t('created_tax_rate'));
           props.onClose(false)
 
-          queryClient.invalidateQueries('/api/v1/payment_terms');
+          queryClient.invalidateQueries('/api/v1/tax_rates');
         })
         .catch((error: AxiosError) => {
           console.error(error);
