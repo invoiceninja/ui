@@ -72,10 +72,11 @@ export function Refund() {
         });
     },
   });
-const getInvoiceAmount=(invoiceItem:Invoice)=>invoiceItem?.paid_to_date >
-              payment?.data.data.amount - payment?.data.data.refunded
-                ? payment?.data.data.amount - payment?.data.data.refunded
-                : invoiceItem?.paid_to_date
+  const getInvoiceAmount = (invoiceItem: Invoice) =>
+    invoiceItem?.paid_to_date >
+    payment?.data.data.amount - payment?.data.data.refunded
+      ? payment?.data.data.amount - payment?.data.data.refunded
+      : invoiceItem?.paid_to_date;
 
   useEffect(() => {
     invoices.map((invoiceId: string) => {
@@ -86,8 +87,7 @@ const getInvoiceAmount=(invoiceItem:Invoice)=>invoiceItem?.paid_to_date >
         formik.setFieldValue('invoices', [
           ...formik.values.invoices,
           {
-            amount:
-              getInvoiceAmount(invoiceItem),
+            amount: getInvoiceAmount(invoiceItem),
             invoice_id: invoiceItem?.id,
             credit_id: '',
             id: '',
@@ -138,7 +138,8 @@ const getInvoiceAmount=(invoiceItem:Invoice)=>invoiceItem?.paid_to_date >
           onChange={(event: any) => {
             if (
               formik.values.invoices.filter(
-                (invoice:{invoice_id:string}) => invoice.invoice_id == event.target.value
+                (invoice: { invoice_id: string }) =>
+                  invoice.invoice_id == event.target.value
               ).length < 1
             )
               setInvoices([...invoices, event.target.value]);
