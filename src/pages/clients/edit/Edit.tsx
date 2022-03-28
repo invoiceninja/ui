@@ -20,6 +20,7 @@ import { defaultHeaders } from 'common/queries/common/headers';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { Spinner } from 'components/Spinner';
 import { ValidationAlert } from 'components/ValidationAlert';
 import { set } from 'lodash';
@@ -28,6 +29,8 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { CustomResourcefulActions } from '../common/components/CustomResourcefulActions';
+import { usePurgeClient } from '../common/hooks/usePurgeClient';
 import { AdditionalInfo } from './components/AdditionalInfo';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
@@ -40,7 +43,8 @@ export function Edit() {
   const navigate = useNavigate();
   const company = useInjectCompanyChanges();
   const dispatch = useDispatch();
-
+  const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
+    useState(false);
   const { data, isLoading } = useClientQuery(
     { id },
     { refetchOnWindowFocus: false }
@@ -49,7 +53,7 @@ export function Edit() {
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
-
+const onPasswordConformation=usePurgeClient(client)
   useEffect(() => {
     if (data?.data?.data) {
       setClient(data.data.data);
@@ -111,6 +115,7 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
+      topRight={<CustomResourcefulActions client={client} openPurgeModal={setPasswordConfirmModalOpen} />}
       onBackClick={generatePath('/clients/:id', { id })}
       onSaveClick={onSave}
     >
@@ -131,6 +136,11 @@ export function Edit() {
           </div>
         </div>
       )}
+      <PasswordConfirmation
+        show={isPasswordConfirmModalOpen}
+        onClose={setPasswordConfirmModalOpen}
+        onSave={onPasswordConformation}
+      />
     </Default>
   );
 }
