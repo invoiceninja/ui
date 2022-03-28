@@ -53,7 +53,7 @@ export function Edit() {
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
-const onPasswordConformation=usePurgeClient(client)
+  const onPasswordConformation = usePurgeClient(client);
   useEffect(() => {
     if (data?.data?.data) {
       setClient(data.data.data);
@@ -115,7 +115,12 @@ const onPasswordConformation=usePurgeClient(client)
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      topRight={<CustomResourcefulActions client={client} openPurgeModal={setPasswordConfirmModalOpen} />}
+      topRight={
+        <CustomResourcefulActions
+          client={client}
+          openPurgeModal={setPasswordConfirmModalOpen}
+        />
+      }
       onBackClick={generatePath('/clients/:id', { id })}
       onSaveClick={onSave}
     >
