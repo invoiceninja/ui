@@ -53,7 +53,7 @@ export function Edit() {
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
-  const onPasswordConformation = usePurgeClient(client);
+  const onPasswordConformation = usePurgeClient(id);
   useEffect(() => {
     if (data?.data?.data) {
       setClient(data.data.data);

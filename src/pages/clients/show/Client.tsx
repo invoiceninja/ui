@@ -47,7 +47,7 @@ export function Client() {
       href: generatePath('/clients/:id', { id }),
     },
   ];
-  const onSave = usePurgeClient(client?.data.data);
+  const onSave = usePurgeClient(id);
 
   const tabs: Tab[] = [
     { name: t('invoices'), href: generatePath('/clients/:id', { id }) },
