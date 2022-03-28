@@ -96,7 +96,7 @@ export const invoiceSlice = createSlice({
           cloneDeep(payload.payload.currency)
         ).build();
 
-        state.current = state.invoiceSum.invoice;
+        state.current = state.invoiceSum.invoice as Invoice;
       }
     });
 
@@ -113,7 +113,7 @@ export const invoiceSlice = createSlice({
           cloneDeep(payload.payload.currency as Currency)
         ).build();
 
-        state.current = state.invoiceSum.invoice;
+        state.current = state.invoiceSum.invoice as Invoice;
       }
     });
 
@@ -127,7 +127,7 @@ export const invoiceSlice = createSlice({
         cloneDeep(payload.payload.currency as Currency)
       ).build();
 
-      state.current = state.invoiceSum.invoice;
+      state.current = state.invoiceSum.invoice as Invoice;
     });
 
     builder.addCase(setCurrentInvoiceProperty.fulfilled, (state, payload) => {
@@ -144,7 +144,7 @@ export const invoiceSlice = createSlice({
             cloneDeep(payload.payload.currency)
           ).build();
 
-          state.current = state.invoiceSum.invoice;
+          state.current = state.invoiceSum.invoice as Invoice;
         }
       }
     });
