@@ -10,40 +10,43 @@
 
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
-import { Invoice } from 'common/interfaces/invoice';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
+import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { generatePath } from 'react-router-dom';
 
-export function useInvoiceSave() {
+export function useToggleStartStop() {
   const [t] = useTranslation();
-  const queryClient = useQueryClient();
   const dispatch = useDispatch();
 
-  return (id: string, invoice: Invoice) => {
+  return (recurringInvoice: RecurringInvoice, status: boolean) => {
     const toastId = toast.loading(t('processing'));
 
     axios
-      .put(endpoint('/api/v1/invoices/:id', { id }), invoice, {
-        headers: defaultHeaders,
-      })
+      .put(
+        endpoint('/api/v1/recurring_invoices/:id?stop=:status', {
+          id: recurringInvoice.id,
+          status,
+        }),
+        recurringInvoice,
+        { headers: defaultHeaders }
+      )
       .then((response) => {
-        toast.success(t('updated_invoice'), { id: toastId });
-        dispatch(setCurrentInvoice(response.data.data));
+        dispatch(setCurrentRecurringInvoice(response.data.data));
+
+        toast.success(
+          status
+            ? t('started_recurring_invoice')
+            : t('stopped_recurring_invoice'),
+          { id: toastId }
+        );
       })
       .catch((error) => {
         console.error(error);
 
         toast.error(t('error_title'), { id: toastId });
-      })
-      .finally(() =>
-        queryClient.invalidateQueries(
-          generatePath('/api/v1/invoices/:id', { id })
-        )
-      );
+      });
   };
 }

@@ -11,7 +11,7 @@
 import { useTitle } from 'common/hooks/useTitle';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
+import { useRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
@@ -19,7 +19,7 @@ import { ValidationAlert } from 'components/ValidationAlert';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
@@ -28,9 +28,10 @@ import { ProductsTable } from '../common/components/ProductsTable';
 import { useCurrentRecurringInvoice } from '../common/hooks/useCurrentRecurringInvoice';
 import { useHandleCreate } from '../create/hooks/useHandleCreate';
 
-export function Create() {
-  const { documentTitle } = useTitle('create_recurring_invoice');
-  const { data: recurringInvoice } = useBlankRecurringInvoiceQuery();
+export function Clone() {
+  const { documentTitle } = useTitle('clone_recurring_invoice');
+  const { id } = useParams();
+  const { data: recurringInvoice } = useRecurringInvoiceQuery({ id });
 
   const [t] = useTranslation();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -43,7 +44,7 @@ export function Create() {
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
       name: t('clone_recurring_invoice'),
-      href: generatePath('/recurring_invoices/create'),
+      href: generatePath('/recurring_invoices/:id/clone', { id }),
     },
   ];
 

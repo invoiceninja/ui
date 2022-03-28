@@ -4,6 +4,7 @@ import collect from 'collect.js';
 import { InvoiceStatus } from 'common/enums/invoice-status';
 import { Currency } from 'common/interfaces/currency';
 import { NumberFormatter } from '../number-formatter';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 export class InvoiceSum {
   protected taxMap = collect();
@@ -16,7 +17,7 @@ export class InvoiceSum {
   public totalCustomValues = 0;
   public subTotal = 0;
 
-  constructor(public invoice: Invoice, protected currency: Currency) {}
+  constructor(public invoice: Invoice | RecurringInvoice, protected currency: Currency) {}
 
   public build() {
     this.calculateLineItems()

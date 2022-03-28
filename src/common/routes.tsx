@@ -82,16 +82,18 @@ export const routes = (
         <Route path=":id/edit" element={<Invoices.Edit />} />
         <Route path=":id/pdf" element={<Invoices.Pdf />} />
         <Route path=":id/email" element={<Invoices.Email />} />
+        <Route path=":id/clone" element={<Invoices.Clone />} />
       </Route>
       <Route path="/recurring_invoices">
         <Route path="" element={<RecurringInvoices.RecurringInvoices />} />
         <Route path="create" element={<RecurringInvoices.Create />} />
         <Route path=":id/edit" element={<RecurringInvoices.Edit />} />
+        <Route path=":id/clone" element={<RecurringInvoices.Clone />} />
       </Route>
       <Route path="/payments">
         <Route path="" element={<Payments.Payments />} />
-        <Route path='create' element={<Payments.Create/>}>
-          <Route path='client/:client_id' element={<Payments.Create/>}/>
+        <Route path="create" element={<Payments.Create />}>
+          <Route path="client/:client_id" element={<Payments.Create />} />
         </Route>
         <Route path=":id" element={<Payments.Payment />}>
           <Route path="payment_fields" element={<Payments.PaymentFields />} />
@@ -100,6 +102,7 @@ export const routes = (
       </Route>
       <Route path="/credits">
         <Route path="" element={<Credits.Credits />} />
+        <Route path=":id/email" element={<Credits.Email />} />
       </Route>
       <Route path="/projects">
         <Route path="" element={<Projects.Projects />} />

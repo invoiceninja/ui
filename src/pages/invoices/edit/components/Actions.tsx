@@ -8,12 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { InvoiceStatus } from 'common/enums/invoice-status';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { useHandleArchive } from '../hooks/useHandleArchive';
+import { useHandleDelete } from '../hooks/useHandleDelete';
+import { useMarkPaid } from '../hooks/useMarkPaid';
 
 export function Actions() {
   const [t] = useTranslation();
@@ -21,6 +26,9 @@ export function Actions() {
   const invoice = useCurrentInvoice();
   const downloadPdf = useDownloadPdf();
   const navigate = useNavigate();
+  const markPaid = useMarkPaid();
+  const archive = useHandleArchive();
+  const destroy = useHandleDelete();
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
@@ -38,22 +46,42 @@ export function Actions() {
         >
           {t('email_invoice')}
         </DropdownElement>
-        
-        <DropdownElement>{t('mark_paid')}</DropdownElement>
-        <DropdownElement>{t('enter_payment')}</DropdownElement>
-        <DropdownElement>{t('client_portal')}</DropdownElement>
+
+        {invoice && (
+          <DropdownElement onClick={() => openClientPortal(invoice)}>
+            {t('client_portal')}
+          </DropdownElement>
+        )}
+
+        {invoice?.status_id === InvoiceStatus.Sent && (
+          <DropdownElement onClick={() => markPaid(invoice)}>
+            {t('mark_paid')}
+          </DropdownElement>
+        )}
       </div>
 
       <div>
-        <DropdownElement>{t('clone_to_invoice')}</DropdownElement>
-        <DropdownElement>{t('clone_to_other')}</DropdownElement>
+        {invoice && (
+          <DropdownElement
+            to={generatePath('/invoices/:id/clone', { id: invoice.id })}
+          >
+            {t('clone_to_invoice')}
+          </DropdownElement>
+        )}
       </div>
 
       <div>
-        <DropdownElement>{t('cancel')}</DropdownElement>
-        <DropdownElement>{t('reverse')}</DropdownElement>
-        <DropdownElement>{t('archive')}</DropdownElement>
-        <DropdownElement>{t('delete')}</DropdownElement>
+        {invoice && (
+          <DropdownElement onClick={() => archive(invoice)}>
+            {t('archive')}
+          </DropdownElement>
+        )}
+
+        {invoice && (
+          <DropdownElement onClick={() => destroy(invoice)}>
+            {t('delete')}
+          </DropdownElement>
+        )}
       </div>
     </Dropdown>
   );
