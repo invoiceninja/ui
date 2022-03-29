@@ -30,12 +30,13 @@ import { usePurgeClient } from '../common/hooks/usePurgeClient';
 
 export function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
-
-  const [t] = useTranslation();
   const { id } = useParams();
   const { data: client, isLoading } = useClientQuery({ id });
+
+  const [t] = useTranslation();
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState(false);
+
   useEffect(() => {
     setDocumentTitle(client?.data?.data?.display_name || 'view_client');
   }, [client]);
@@ -47,6 +48,7 @@ export function Client() {
       href: generatePath('/clients/:id', { id }),
     },
   ];
+
   const onSave = usePurgeClient(id);
 
   const tabs: Tab[] = [
