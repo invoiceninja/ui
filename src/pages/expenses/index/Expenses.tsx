@@ -10,6 +10,7 @@
 
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { useTitle } from 'common/hooks/useTitle';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
@@ -17,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 
 export function Expenses() {
   const [t] = useTranslation();
+  useTitle(t('expenses'));
   const { dateFormat } = useCurrentCompanyDateFormats();
   const pages = [{ name: t('expenses'), href: '/expenses' }];
   const columns: DataTableColumns = [

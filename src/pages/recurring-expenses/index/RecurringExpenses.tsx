@@ -12,6 +12,7 @@ import recurringInvoice from 'common/constants/reccuring-invoice';
 import recurringInvoicesFrequency from 'common/constants/recurring-invoices-frequency';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { useTitle } from 'common/hooks/useTitle';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
@@ -20,6 +21,7 @@ import { useTranslation } from 'react-i18next';
 
 export function RecurringExpenses() {
   const [t] = useTranslation();
+  useTitle(t('recurring_expenses'));
   const { dateFormat } = useCurrentCompanyDateFormats();
   const pages = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },

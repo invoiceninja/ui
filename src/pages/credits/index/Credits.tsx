@@ -11,6 +11,7 @@
 import creditStatus from 'common/constants/credit-status';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { useTitle } from 'common/hooks/useTitle';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
@@ -20,7 +21,7 @@ export function Credits() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
   const pages = [{ name: t('credits'), href: '/credits' }];
-
+  useTitle(t('credits'));
   const columns: DataTableColumns = [
     {
       id: 'status_id',
