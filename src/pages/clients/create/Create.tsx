@@ -112,9 +112,7 @@ export function Create() {
     >
       {isLoading && <Spinner />}
 
-      {errors && errors.message != t('invalid_name') && (
-        <ValidationAlert errors={errors} />
-      )}
+      {errors && <ValidationAlert errors={errors} />}
 
       <div className="flex flex-col xl:flex-row xl:gap-4">
         <div className="w-full xl:w-1/2">
