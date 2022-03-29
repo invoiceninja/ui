@@ -11,7 +11,7 @@ import paymentStatus from 'common/constants/payment-status';
 import paymentType from 'common/constants/payment-type';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { CustomResourcefulAction } from 'common/interfaces/custom-resourceful-action';
+import { Payment } from 'common/interfaces/payment';
 import { bulk } from 'common/queries/payments';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
@@ -78,18 +78,19 @@ export function Payments() {
       label: t('transaction_reference'),
     },
   ];
+
   const actions = [
-    (resource: any) => (
+    (resource: Payment) => (
       <DropdownElement to={`${resource.id}/apply`}>
         {t('apply_payment')}
       </DropdownElement>
     ),
-    (resource: any) => (
+    (resource: Payment) => (
       <DropdownElement to={`${resource.id}/refund`}>
         {t('refund_payment')}
       </DropdownElement>
     ),
-    (resource: any) => (
+    (resource: Payment) => (
       <DropdownElement
         onClick={() => {
           bulk([resource.id], 'email');
@@ -99,8 +100,9 @@ export function Payments() {
       </DropdownElement>
     ),
   ];
-  const customBulkActions: CustomResourcefulAction[] = [
-    (resource: any) => (
+
+  const customBulkActions = [
+    (resource: Payment) => (
       <DropdownElement
         onClick={() => {
           bulk([resource.id], 'email');
@@ -110,6 +112,7 @@ export function Payments() {
       </DropdownElement>
     ),
   ];
+
   return (
     <Default
       title={t('payments')}
