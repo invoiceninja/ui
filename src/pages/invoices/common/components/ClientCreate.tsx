@@ -63,8 +63,24 @@ export function ClientCreate() {
 
   const onSave = () => {
     set(client as Client, 'contacts', contacts);
-
     const toastId = toast.loading(t('processing'));
+    setErrors(undefined);
+
+    if (
+      !(
+        client?.name != '' ||
+        contacts[0].first_name != '' ||
+        contacts[0].last_name != ''
+      )
+    ) {
+      setErrors({
+        message: t('invalid_data //needs translation'),
+        errors: { name: [t('please_enter_a_client_or_contact_name')] },
+      });
+      toast.error(t('error_title'), { id: toastId });
+
+      return onSave;
+    }
 
     axios
       .post(endpoint('/api/v1/clients'), client, {
@@ -72,7 +88,6 @@ export function ClientCreate() {
       })
       .then(() => {
         toast.success(t('created_client'), { id: toastId });
-
         setIsModalOpen(false);
       })
       .catch((error: AxiosError) => {
@@ -91,20 +106,29 @@ export function ClientCreate() {
       <Modal
         title={t('new_client')}
         visible={isModalOpen}
-        onClose={setIsModalOpen}
+        onClose={(value) => {
+          setIsModalOpen(value);
+          setErrors(undefined);
+        }}
         size="large"
         backgroundColor="gray"
       >
-        {errors && <ValidationAlert errors={errors} />}
+        {errors  && (
+          <ValidationAlert errors={errors} />
+        )}
 
         <div className="flex flex-col xl:flex-row xl:gap-4">
           <div className="w-full xl:w-1/2">
-            <Details client={client} setClient={setClient} />
+            <Details client={client} setClient={setClient} errors={errors} />
             <Address client={client} setClient={setClient} />
           </div>
 
           <div className="w-full xl:w-1/2">
-            <Contacts contacts={contacts} setContacts={setContacts} />
+            <Contacts
+              contacts={contacts}
+              setContacts={setContacts}
+              errors={errors}
+            />
             <AdditionalInfo client={client} setClient={setClient} />
           </div>
         </div>

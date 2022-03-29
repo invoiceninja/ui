@@ -13,6 +13,7 @@ import { InputField } from '@invoiceninja/forms';
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { ClientContact } from 'common/interfaces/client-contact';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { CustomField } from 'components/CustomField';
 import Toggle from 'components/forms/Toggle';
 import { set } from 'lodash';
@@ -22,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 interface Props {
   contacts: Partial<ClientContact>[];
   setContacts: React.Dispatch<React.SetStateAction<Partial<ClientContact>[]>>;
+  errors: ValidationBag | undefined;
 }
 
 export function Contacts(props: Props) {
@@ -80,6 +82,7 @@ export function Contacts(props: Props) {
                   contact.id as string
                 )
               }
+              errorMessage={props.errors?.errors.name}
             />
           </Element>
 
@@ -94,6 +97,7 @@ export function Contacts(props: Props) {
                   contact.id as string
                 )
               }
+              errorMessage={props.errors?.errors.name}
             />
           </Element>
 
