@@ -55,7 +55,7 @@ export function Refund() {
           }
         )
         .then(() => {
-          toast.success(t('updated_payment'), { id: toastId });
+          toast.success(t('refunded_payment'), { id: toastId });
         })
         .catch((error: AxiosError) => {
           console.error(error);
