@@ -20,9 +20,11 @@ import { set } from 'lodash';
 import { ChangeEvent } from 'react';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 interface Props {
   client: Client | undefined;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
+  errors: ValidationBag | undefined;
 }
 
 export function Details(props: Props) {
@@ -52,6 +54,7 @@ export function Details(props: Props) {
           id="name"
           value={props.client?.name}
           onChange={handleChange}
+          errorMessage={props.errors?.errors.name}
         />
       </Element>
 

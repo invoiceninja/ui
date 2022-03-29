@@ -1,6 +1,7 @@
 import collect from 'collect.js';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 export class InvoiceItemSum {
   public taxCollection = collect();
@@ -14,7 +15,7 @@ export class InvoiceItemSum {
   protected grossSubTotal = 0;
   public totalTaxes = 0;
 
-  constructor(protected invoice: Invoice) {}
+  constructor(protected invoice: Invoice | RecurringInvoice) {}
 
   public async process() {
     if (!this.invoice?.line_items || this.invoice.line_items?.length === 0) {

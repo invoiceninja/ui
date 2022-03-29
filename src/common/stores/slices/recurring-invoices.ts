@@ -11,7 +11,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { Currency } from 'common/interfaces/currency';
-import { Invoice } from 'common/interfaces/invoice';
 import { cloneDeep, set } from 'lodash';
 import { setCurrentRecurringInvoiceProperty } from './recurring-invoices/extra-reducers/set-current-recurring-invoice-property';
 import { setCurrentLineItemProperty } from './recurring-invoices/extra-reducers/set-current-line-item-property';
@@ -65,7 +64,7 @@ export const recurringInvoiceSlice = createSlice({
           cloneDeep(payload.payload.currency)
         ).build();
 
-        state.current = state.invoiceSum.invoice;
+        state.current = state.invoiceSum.invoice as RecurringInvoice;
       }
     });
 
@@ -83,7 +82,7 @@ export const recurringInvoiceSlice = createSlice({
             state.current = new InvoiceSum(
               cloneDeep(state.current),
               cloneDeep(payload.payload.currency)
-            ).build().invoice;
+            ).build().invoice as RecurringInvoice;
           }
         }
       }
@@ -98,9 +97,9 @@ export const recurringInvoiceSlice = createSlice({
         ] = payload.payload.value;
 
         state.current = new InvoiceSum(
-          cloneDeep(state.current as Invoice),
+          cloneDeep(state.current),
           cloneDeep(payload.payload.currency as Currency)
-        ).build().invoice;
+        ).build().invoice as RecurringInvoice;
       }
     });
   },

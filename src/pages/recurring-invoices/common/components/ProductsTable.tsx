@@ -14,6 +14,7 @@ import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvo
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 import { injectBlankItemIntoCurrent } from 'common/stores/slices/recurring-invoices';
 import { TaxCreate } from 'pages/invoices/common/components/TaxCreate';
+import { ProductCreate } from 'pages/invoices/common/components/ProductCreate';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useResolveTranslation } from 'pages/invoices/common/hooks/useResolveTranslation';
 import { useState } from 'react';
@@ -29,7 +30,10 @@ export function ProductsTable() {
   const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
   const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
-  const resolveInputField = useResolveInputField({ setIsTaxModalOpen });
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const resolveInputField = useResolveInputField({ setIsTaxModalOpen,setIsProductModalOpen });
+
+  
 
   return (
     <div>
@@ -87,6 +91,10 @@ export function ProductsTable() {
         </Tbody>
       </Table>
       <TaxCreate isVisible={isTaxModalOpen} onClose={setIsTaxModalOpen} />
+      <ProductCreate
+        setIsModalOpen={setIsProductModalOpen}
+        isModalOpen={isProductModalOpen}
+      />
     </div>
   );
 }

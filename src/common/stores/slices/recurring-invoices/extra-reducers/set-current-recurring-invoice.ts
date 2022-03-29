@@ -13,14 +13,14 @@ import { ClientResolver } from 'common/helpers/clients/client-resolver';
 import { CurrencyResolver } from 'common/helpers/currencies/currency-resolver';
 import { Client } from 'common/interfaces/client';
 import { Currency } from 'common/interfaces/currency';
-import { Invoice } from 'common/interfaces/invoice';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 const clientResolver = new ClientResolver();
 const currencyResolver = new CurrencyResolver();
 
 export const setCurrentRecurringInvoice = createAsyncThunk(
   'recurringInvoices/setCurrentRecurringInvoice',
-  async (payload: Invoice) => {
+  async (payload: RecurringInvoice) => {
     let client: Client | undefined = undefined;
     let currency: Currency | undefined = undefined;
 

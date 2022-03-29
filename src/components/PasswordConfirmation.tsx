@@ -33,7 +33,9 @@ export function PasswordConfirmation(props: Props) {
 
   return (
     <Modal
-      onClose={() => props.onClose(false)}
+      onClose={() => {
+        props.onClose(false);
+      }}
       visible={isModalOpen}
       title={t('confirmation')}
       text={t('please_enter_your_password')}
@@ -42,13 +44,14 @@ export function PasswordConfirmation(props: Props) {
         id="current_password"
         type="password"
         label={t('current_password')}
+        required
+        value={currentPassword}
         onChange={(event: ChangeEvent<HTMLInputElement>) =>
           setCurrentPassword(event.target.value)
         }
       />
       <Button
         onClick={() => {
-          props.onClose(false);
           return props.onSave(currentPassword, isPasswordRequired);
         }}
       >

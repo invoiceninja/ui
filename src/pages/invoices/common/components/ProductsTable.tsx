@@ -20,6 +20,7 @@ import { useProductColumns } from '../hooks/useProductColumns';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
 import { TaxCreate } from './TaxCreate';
+import { ProductCreate } from './ProductCreate';
 
 export function ProductsTable() {
   const [t] = useTranslation();
@@ -28,7 +29,12 @@ export function ProductsTable() {
   const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
   const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
-  const resolveInputField = useResolveInputField({ setIsTaxModalOpen });
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const resolveInputField = useResolveInputField({
+    setIsTaxModalOpen,
+    setIsProductModalOpen,
+  });
+
   return (
     <div>
       <Table>
@@ -88,6 +94,10 @@ export function ProductsTable() {
       </Table>
 
       <TaxCreate isVisible={isTaxModalOpen} onClose={setIsTaxModalOpen} />
+      <ProductCreate
+        setIsModalOpen={setIsProductModalOpen}
+        isModalOpen={isProductModalOpen}
+      />
     </div>
   );
 }
