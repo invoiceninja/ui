@@ -108,7 +108,7 @@ export function Refund() {
 
   return (
     <Card
-      title={t('apply_payment')}
+      title={t('refund_payment')}
       disableSubmitButton={formik.isSubmitting}
       onFormSubmit={formik.handleSubmit}
       withSaveButton
@@ -134,7 +134,6 @@ export function Refund() {
       </Element>
       <Element leftSide={t('invoices')}>
         <SelectField
-          value=""
           onChange={(event: any) => {
             if (
               formik.values.invoices.filter(
@@ -145,7 +144,7 @@ export function Refund() {
               setInvoices([...invoices, event.target.value]);
           }}
         >
-          <option value="" disabled></option>
+          <option value=""></option>
           {payment?.data.data.invoices &&
             payment?.data.data.invoices.map(
               (invoice: Invoice, index: number) => (
@@ -162,47 +161,50 @@ export function Refund() {
         )}
       </Element>
       {payment?.data.data &&
-        formik.values.invoices.map((invoiceitem: any, index: number) => {
-          const invoiceItem = payment?.data.data.invoices.find(
-            (invoice: Invoice) => invoice.id == invoiceitem.invoice_id
-          );
-
-          if (invoiceItem)
-            return (
-              <Element key={index} leftSide={invoiceItem?.number}>
-                <InputField
-                  id={`invoices[${index}].amount`}
-                  value={
-                    invoiceItem?.paid_to_date >
-                    payment?.data.data.amount - payment?.data.data.refunded
-                      ? payment?.data.data.amount - payment?.data.data.refunded
-                      : invoiceItem?.paid_to_date
-                  }
-                  onChange={formik.handleChange}
-                />
-                {errors?.errors[`invoices.${[index]}.invoice_id`] && (
-                  <Alert type="danger">
-                    {errors.errors[`invoices.${[index]}.invoice_id`]}
-                  </Alert>
-                )}
-                <Button
-                  behavior="button"
-                  type="minimal"
-                  onClick={() => {
-                    formik.setFieldValue(
-                      'invoices',
-                      formik.values.invoices.filter(
-                        (invoice: any) =>
-                          invoice.invoice_id != invoiceitem.invoice_id
-                      )
-                    );
-                  }}
-                >
-                  {t('remove')}
-                </Button>
-              </Element>
+        formik.values.invoices.map(
+          (requestInvoiceItem: { invoice_id: string }, index: number) => {
+            const invoiceItem = payment?.data.data.invoices.find(
+              (invoice: Invoice) => invoice.id == requestInvoiceItem.invoice_id
             );
-        })}
+
+            if (invoiceItem)
+              return (
+                <Element key={index} leftSide={invoiceItem?.number}>
+                  <InputField
+                    id={`invoices[${index}].amount`}
+                    value={
+                      invoiceItem?.paid_to_date >
+                      payment?.data.data.amount - payment?.data.data.refunded
+                        ? payment?.data.data.amount -
+                          payment?.data.data.refunded
+                        : invoiceItem?.paid_to_date
+                    }
+                    onChange={formik.handleChange}
+                  />
+                  {errors?.errors[`invoices.${[index]}.invoice_id`] && (
+                    <Alert type="danger">
+                      {errors.errors[`invoices.${[index]}.invoice_id`]}
+                    </Alert>
+                  )}
+                  <Button
+                    behavior="button"
+                    type="minimal"
+                    onClick={() => {
+                      formik.setFieldValue(
+                        'invoices',
+                        formik.values.invoices.filter(
+                          (invoice: any) =>
+                            invoice.invoice_id != requestInvoiceItem.invoice_id
+                        )
+                      );
+                    }}
+                  >
+                    {t('remove')}
+                  </Button>
+                </Element>
+              );
+          }
+        )}
       <Element leftSide={t('send_email')}>
         <Toggle
           checked={email}

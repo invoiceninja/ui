@@ -95,7 +95,7 @@ export function Apply() {
       withSaveButton
     >
       <Element leftSide={t('number')}>
-        <InputField value={payment?.data.data.number} />
+        <InputField disabled value={payment?.data.data.number} />
       </Element>
       <Element leftSide={t('amount')}>
         <InputField
@@ -118,7 +118,10 @@ export function Apply() {
           }
         />
         {errors?.errors.invoices && (
+          <div className='py-2'>
           <Alert type="danger">{errors.errors.invoices}</Alert>
+
+          </div>
         )}
       </Element>
       {formik.values.invoices.map(
@@ -141,9 +144,11 @@ export function Apply() {
             </div>
 
             {errors?.errors[`invoices.${[index]}.invoice_id`] && (
+              <div className='py-2'>
               <Alert type="danger">
                 {errors.errors[`invoices.${[index]}.invoice_id`]}
               </Alert>
+              </div>
             )}
           </Element>
         )
