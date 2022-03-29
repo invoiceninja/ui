@@ -78,7 +78,7 @@ export function Payments() {
       label: t('transaction_reference'),
     },
   ];
-  const actions: CustomResourcefulAction[] = [
+  const actions = [
     (resource: any) => (
       <DropdownElement to={`${resource.id}/apply`}>
         {t('apply_payment')}
