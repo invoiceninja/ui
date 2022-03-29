@@ -12,7 +12,6 @@
 
 import { resolveProperty } from 'pages/invoices/common/helpers/resolve-property';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
-import { generatePath, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { InputField } from '@invoiceninja/forms';
 import { ChangeEvent } from 'react';
@@ -31,14 +30,16 @@ const numberInputs = [
   'tax_rate2',
   'tax_rate3',
 ];
-
-export function useResolveInputField() {
+interface Props {
+  setIsProductModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+export function useResolveInputField(props: Props) {
   const handleProductChange = useHandleProductChange();
   const onChange = useHandleLineItemPropertyChange();
-  const navigate = useNavigate();
   const [t] = useTranslation();
   const invoice = useCurrentRecurringInvoice();
   const formatMoney = useFormatMoney();
+  const { setIsProductModalOpen } = props;
 
   return (key: string, index: number) => {
     const property = resolveProperty(key);
@@ -50,7 +51,7 @@ export function useResolveInputField() {
           label="product_key"
           onChange={(value) => handleProductChange(index, value)}
           className="w-36"
-          onActionClick={() => navigate(generatePath('/products/create'))}
+          onActionClick={() => setIsProductModalOpen(true)}
           actionLabel={t('new_product')}
           defaultValue={invoice?.line_items[index][property]}
         />

@@ -47,7 +47,7 @@ export function CreateProduct(props: Props) {
   const navigate = useNavigate();
 
   const [errors, setErrors] = useState<any>();
-  
+
   const formik = useFormik({
     initialValues: {
       product_key: props.product?.product_key || '',
@@ -66,7 +66,9 @@ export function CreateProduct(props: Props) {
           toast.success(t('created_product'));
 
           navigate(
-            generatePath('/products/:id/edit', { id: response.data.data.id }),
+            generatePath('/products/:id/edit', {
+              id: response.data.data.id,
+            }),
             { state: { message: t('created_product') } }
           );
         })
