@@ -81,15 +81,21 @@ export function Payments() {
 
   const actions = [
     (resource: Payment) => (
-      <DropdownElement to={`${resource.id}/apply`}>
+      <DropdownElement
+        to={generatePath('/payments/:id/apply', { id: resource.id })}
+      >
         {t('apply_payment')}
       </DropdownElement>
     ),
+
     (resource: Payment) => (
-      <DropdownElement to={`${resource.id}/refund`}>
+      <DropdownElement
+        to={generatePath('/payments/:id/refund', { id: resource.id })}
+      >
         {t('refund_payment')}
       </DropdownElement>
     ),
+
     (resource: Payment) => (
       <DropdownElement
         onClick={() => {
