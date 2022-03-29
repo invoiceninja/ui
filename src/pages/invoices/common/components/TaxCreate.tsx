@@ -8,13 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
+import { Button, InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
-import { Container } from 'components/Container';
 import { Modal } from 'components/Modal';
 import { useFormik } from 'formik';
 import { useState } from 'react';
@@ -43,7 +41,7 @@ export function TaxCreate(props: Props) {
         })
         .then(() => {
           toast.success(t('created_tax_rate'));
-          props.onClose(false)
+          props.onClose(false);
 
           queryClient.invalidateQueries('/api/v1/tax_rates');
         })
@@ -63,34 +61,32 @@ export function TaxCreate(props: Props) {
       visible={props.isVisible}
       onClose={props.onClose}
     >
-      <Container className="space-y-6">
-        <Card
-          withSaveButton
-          disableSubmitButton={formik.isSubmitting}
-          onFormSubmit={formik.handleSubmit}
-          title={t('create_tax_rate')}
-        >
-          <CardContainer>
-            <InputField
-              type="text"
-              id="name"
-              label={t('name')}
-              errorMessage={errors?.errors?.name}
-              onChange={formik.handleChange}
-              required
-            />
+      <InputField
+        type="text"
+        id="name"
+        label={t('name')}
+        errorMessage={errors?.errors?.name}
+        onChange={formik.handleChange}
+        required
+      />
 
-            <InputField
-              type="text"
-              id="rate"
-              label={t('rate')}
-              errorMessage={errors?.errors?.rate}
-              onChange={formik.handleChange}
-              required
-            />
-          </CardContainer>
-        </Card>
-      </Container>
+      <InputField
+        type="text"
+        id="rate"
+        label={t('rate')}
+        errorMessage={errors?.errors?.rate}
+        onChange={formik.handleChange}
+        required
+      />
+      <Button
+        behavior="button"
+        type="primary"
+        onClick={() => {
+          formik.submitForm();
+        }}
+      >
+        {t('save')}
+      </Button>
     </Modal>
   );
 }
