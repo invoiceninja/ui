@@ -25,16 +25,20 @@ import { X } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 
 export function Refund() {
-  const queryClient = useQueryClient();
   const { id } = useParams();
-  const [t] = useTranslation();
   const { data: payment } = usePaymentQuery({ id });
+
+  const [t] = useTranslation();
   const [errors, setErrors] = useState<ValidationBag>();
   const [invoices, setInvoices] = useState<string[]>([]);
   const [email, setEmail] = useState(false);
+
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -56,6 +60,7 @@ export function Refund() {
         )
         .then(() => {
           toast.success(t('refunded_payment'), { id: toastId });
+          navigate('/payments');
         })
         .catch((error: AxiosError) => {
           console.error(error);
