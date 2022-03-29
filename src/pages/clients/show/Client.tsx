@@ -92,7 +92,7 @@ export function Client() {
             {t('edit_client')}
           </Button>
           <CustomResourcefulActions
-            client={client?.data.data}
+            clientId={id}
             openPurgeModal={setPasswordConfirmModalOpen}
           />
         </div>

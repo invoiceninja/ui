@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ValidationBag } from 'common/interfaces/validation-bag';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InputField } from './forms';
@@ -22,7 +21,6 @@ interface Props {
 
 export function PasswordConfirmation(props: Props) {
   const [t] = useTranslation();
-  const [errors, setErrors] = useState<ValidationBag>();
 
   const [isModalOpen, setIsModalOpen] = useState(props.show ?? false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -37,7 +35,6 @@ export function PasswordConfirmation(props: Props) {
     <Modal
       onClose={() => {
         props.onClose(false);
-        setErrors(undefined);
       }}
       visible={isModalOpen}
       title={t('confirmation')}
@@ -52,7 +49,6 @@ export function PasswordConfirmation(props: Props) {
         onChange={(event: ChangeEvent<HTMLInputElement>) =>
           setCurrentPassword(event.target.value)
         }
-        errorMessage={errors?.errors.password}
       />
       <Button
         onClick={() => {

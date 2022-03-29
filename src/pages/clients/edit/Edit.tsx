@@ -117,7 +117,7 @@ export function Edit() {
       breadcrumbs={pages}
       topRight={
         <CustomResourcefulActions
-          client={client}
+          clientId={id}
           openPurgeModal={setPasswordConfirmModalOpen}
         />
       }

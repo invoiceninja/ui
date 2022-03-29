@@ -9,7 +9,6 @@
  */
 
 import { AxiosError } from 'axios';
-import { Client } from 'common/interfaces/client';
 import { bulk } from 'common/queries/clients';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
@@ -17,15 +16,15 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  client: Client | undefined;
+  clientId: string | undefined;
   openPurgeModal: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export function CustomResourcefulActions(props: Props) {
   const [t] = useTranslation();
   const handleResourcefulAction = (action: 'delete' | 'archive') => {
     const toastId = toast.loading(t('processing'));
-    if (props.client)
-      bulk([props.client?.id], action)
+    if (props.clientId)
+      bulk([props.clientId], action)
         .then(() => {
           toast.success(t(`${action}d_client`), { id: toastId });
         })
