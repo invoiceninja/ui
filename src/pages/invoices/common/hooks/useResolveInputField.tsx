@@ -20,6 +20,7 @@ import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { ChangeEvent } from 'react';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
 import { useFormatMoney } from './useFormatMoney';
+import { isNonNumericValue } from '../../../../common/helpers/invoices/resolve-non-numeric-value';
 
 const numberInputs = [
   'discount',
@@ -73,10 +74,11 @@ export function useResolveInputField() {
       return (
         <InputField
           id={property}
-          type="number"
           value={invoice?.line_items[index][property]}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onChange(property, parseFloat(event.target.value), index)
+            isNonNumericValue(event)
+              ? event
+              : onChange(property, parseFloat(event.target.value), index)
           }
           className="w-24"
         />
