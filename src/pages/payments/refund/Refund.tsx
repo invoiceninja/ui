@@ -115,6 +115,7 @@ export function Refund() {
       disableSubmitButton={formik.isSubmitting}
       onFormSubmit={formik.handleSubmit}
       withSaveButton
+      saveButtonLabel={t('refund')}
     >
       <Element leftSide={t('number')}>
         <InputField disabled value={payment?.data.data.number} />
