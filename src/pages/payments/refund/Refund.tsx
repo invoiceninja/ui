@@ -17,9 +17,11 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { usePaymentQuery } from 'common/queries/payments';
 import { Alert } from 'components/Alert';
+import { Divider } from 'components/cards/Divider';
 import Toggle from 'components/forms/Toggle';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
+import { X } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -72,6 +74,7 @@ export function Refund() {
         });
     },
   });
+
   const getInvoiceAmount = (invoiceItem: Invoice) =>
     invoiceItem?.paid_to_date >
     payment?.data.data.amount - payment?.data.data.refunded
@@ -116,15 +119,18 @@ export function Refund() {
       <Element leftSide={t('number')}>
         <InputField disabled value={payment?.data.data.number} />
       </Element>
+
       <Element leftSide={t('amount')}>
         <InputField
           disabled
           value={payment?.data.data.amount - payment?.data.data.refunded}
         />
       </Element>
+
       <Element leftSide={t('applied')}>
         <InputField disabled value={payment?.data.data.applied} />
       </Element>
+
       <Element leftSide={t('date')}>
         <InputField
           type="date"
@@ -132,6 +138,7 @@ export function Refund() {
           onChange={formik.handleChange}
         />
       </Element>
+
       <Element leftSide={t('invoices')}>
         <SelectField
           onChange={(event: any) => {
@@ -154,12 +161,16 @@ export function Refund() {
               )
             )}
         </SelectField>
+
         {errors?.errors.invoices && (
           <div className="py-2">
             <Alert type="danger">{errors.errors.invoices}</Alert>
           </div>
         )}
       </Element>
+
+      <Divider />
+
       {payment?.data.data &&
         formik.values.invoices.map(
           (requestInvoiceItem: { invoice_id: string }, index: number) => {
@@ -169,42 +180,50 @@ export function Refund() {
 
             if (invoiceItem)
               return (
-                <Element key={index} leftSide={invoiceItem?.number}>
-                  <InputField
-                    id={`invoices[${index}].amount`}
-                    value={
-                      invoiceItem?.paid_to_date >
-                      payment?.data.data.amount - payment?.data.data.refunded
-                        ? payment?.data.data.amount -
-                          payment?.data.data.refunded
-                        : invoiceItem?.paid_to_date
-                    }
-                    onChange={formik.handleChange}
-                  />
-                  {errors?.errors[`invoices.${[index]}.invoice_id`] && (
-                    <Alert type="danger">
-                      {errors.errors[`invoices.${[index]}.invoice_id`]}
-                    </Alert>
-                  )}
-                  <Button
-                    behavior="button"
-                    type="minimal"
-                    onClick={() => {
-                      formik.setFieldValue(
-                        'invoices',
-                        formik.values.invoices.filter(
-                          (invoice: any) =>
-                            invoice.invoice_id != requestInvoiceItem.invoice_id
-                        )
-                      );
-                    }}
-                  >
-                    {t('remove')}
-                  </Button>
+                <Element
+                  key={index}
+                  leftSide={`${t('invoice')}: ${invoiceItem?.number}`}
+                >
+                  <div className="flex items-center space-x-2">
+                    <InputField
+                      id={`invoices[${index}].amount`}
+                      value={
+                        invoiceItem?.paid_to_date >
+                        payment?.data.data.amount - payment?.data.data.refunded
+                          ? payment?.data.data.amount -
+                            payment?.data.data.refunded
+                          : invoiceItem?.paid_to_date
+                      }
+                      onChange={formik.handleChange}
+                      errorMessage={
+                        errors?.errors[`invoices.${[index]}.invoice_id`]
+                      }
+                    />
+
+                    <Button
+                      behavior="button"
+                      type="minimal"
+                      onClick={() => {
+                        formik.setFieldValue(
+                          'invoices',
+                          formik.values.invoices.filter(
+                            (invoice: any) =>
+                              invoice.invoice_id !=
+                              requestInvoiceItem.invoice_id
+                          )
+                        );
+                      }}
+                    >
+                      <X />
+                    </Button>
+                  </div>
                 </Element>
               );
           }
         )}
+
+      <Divider />
+
       <Element leftSide={t('send_email')}>
         <Toggle
           checked={email}
@@ -213,6 +232,7 @@ export function Refund() {
           }}
         />
       </Element>
+
       {errors?.errors.id && <Alert type="danger">{errors.errors.id}</Alert>}
     </Card>
   );
