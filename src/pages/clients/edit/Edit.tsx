@@ -54,6 +54,7 @@ export function Edit() {
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
   const onPasswordConformation = usePurgeClient(id);
+
   useEffect(() => {
     if (data?.data?.data) {
       setClient(data.data.data);
@@ -107,7 +108,9 @@ export function Edit() {
           setErrors(error.response.data);
         }
 
-        toast.error(t('error_title'), { id: toastId });
+        error.response?.status === 412
+          ? toast.error(t('password_error_incorrect'), { id: toastId })
+          : toast.error(t('error_title'), { id: toastId });
       });
   };
 
@@ -145,6 +148,7 @@ export function Edit() {
           </div>
         </div>
       )}
+      
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setPasswordConfirmModalOpen}

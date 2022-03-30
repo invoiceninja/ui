@@ -72,11 +72,14 @@ export function UserDetails() {
 
         window.dispatchEvent(new CustomEvent('user.updated'));
       })
-      .catch((error: AxiosError | unknown) => {
+      .catch((error: AxiosError) => {
         console.error(error);
 
         toast.dismiss();
-        toast.error(t('error_title'));
+
+        error.response?.status === 412
+          ? toast.error(t('password_error_incorrect'))
+          : toast.error(t('error_title'));
       })
       .finally(() => dispatch(deletePassword()));
   };

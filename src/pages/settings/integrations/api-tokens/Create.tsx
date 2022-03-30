@@ -67,17 +67,15 @@ export function Create() {
         .catch((error: AxiosError) => {
           formik.setSubmitting(false);
 
-          if (error.response?.status === 412) {
-            return toast.error(error.response.data.message, { id: toastId });
-          }
-
           if (error.response?.status === 422) {
             toast.dismiss();
 
             return setErrors(error.response.data);
           }
 
-          return toast.error(t('error_title'), { id: toastId });
+          error.response?.status === 412
+            ? toast.error(t('password_error_incorrect'), { id: toastId })
+            : toast.error(t('error_title'), { id: toastId });
         });
     },
   });

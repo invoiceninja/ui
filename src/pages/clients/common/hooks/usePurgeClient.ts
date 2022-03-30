@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 export function usePurgeClient(clientId: string | undefined) {
   const [t] = useTranslation();
   const navigate = useNavigate();
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   return (password: string, passwordIsRequired: boolean) => {
     const toastId = toast.loading(t('processing'));
@@ -24,11 +25,12 @@ export function usePurgeClient(clientId: string | undefined) {
         toast.success(t('purged_client'), { id: toastId });
         navigate('/clients');
       })
-      .catch((error: AxiosError | unknown) => {
+      .catch((error: AxiosError) => {
         console.error(error);
 
-        toast.dismiss();
-        toast.error(t('error_title'));
+        error.response?.status === 412
+          ? toast.error(t('password_error_incorrect'), { id: toastId })
+          : toast.error(t('error_title'), { id: toastId });
       })
       .finally(() => {});
   };
