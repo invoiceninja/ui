@@ -23,6 +23,16 @@ export function Actions() {
 
   return (
     <Dropdown label={t('more_actions')}>
+      {recurringInvoice && (
+        <DropdownElement
+          to={generatePath('/recurring_invoices/:id/pdf', {
+            id: recurringInvoice.id,
+          })}
+        >
+          {t('view_pdf')}
+        </DropdownElement>
+      )}
+
       {recurringInvoice &&
         (recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT ||
           recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED) && (
