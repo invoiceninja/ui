@@ -21,7 +21,7 @@ export function Credits() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
   const pages = [{ name: t('credits'), href: '/credits' }];
-  useTitle(t('credits'));
+  useTitle('credits');
   const columns: DataTableColumns = [
     {
       id: 'status_id',

@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 
 export function RecurringExpenses() {
   const [t] = useTranslation();
-  useTitle(t('recurring_expenses'));
+  useTitle('recurring_expenses');
   const { dateFormat } = useCurrentCompanyDateFormats();
   const pages = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },

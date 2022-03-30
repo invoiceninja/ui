@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 
 export function Expenses() {
   const [t] = useTranslation();
-  useTitle(t('expenses'));
+  useTitle('expenses');
   const { dateFormat } = useCurrentCompanyDateFormats();
   const pages = [{ name: t('expenses'), href: '/expenses' }];
   const columns: DataTableColumns = [

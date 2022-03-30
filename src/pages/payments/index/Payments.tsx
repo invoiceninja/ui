@@ -23,7 +23,7 @@ import { generatePath } from 'react-router-dom';
 export function Payments() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
-  useTitle(t('payments'));
+  useTitle('payments');
   const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
   const columns: DataTableColumns = [
     {

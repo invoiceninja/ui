@@ -21,7 +21,7 @@ import { generatePath } from 'react-router-dom';
 export function Vendors() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
-  useTitle(t('vendors'));
+  useTitle('vendors');
   const pages = [{ name: t('vendors'), href: '/vendors' }];
   const columns: DataTableColumns = [
     {

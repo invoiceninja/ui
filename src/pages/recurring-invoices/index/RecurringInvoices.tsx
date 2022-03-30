@@ -22,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 export function RecurringInvoices() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
-  useTitle(t('recurring_invoices'));
+  useTitle('recurring_invoices');
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
   ];

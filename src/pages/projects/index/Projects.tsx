@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 export function Projects() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
-  useTitle(t('projects'));
+  useTitle('projects');
   const pages = [{ name: t('projects'), href: '/projects' }];
   const columns: DataTableColumns = [
     {
