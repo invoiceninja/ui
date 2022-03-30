@@ -48,7 +48,7 @@ export function Actions() {
             id: recurringInvoice.id,
           })}
         >
-          {t('clone_to_recurring_invoice')}
+          {t('clone')}
         </DropdownElement>
       )}
     </Dropdown>
