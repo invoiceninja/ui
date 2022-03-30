@@ -15,7 +15,7 @@ import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useSearchParams } from 'react-router-dom';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
@@ -28,6 +28,7 @@ import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { ValidationAlert } from 'components/ValidationAlert';
+import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoiceProperty';
 
 export function Create() {
   const { documentTitle } = useTitle('new_invoice');
@@ -37,6 +38,8 @@ export function Create() {
   const [errors, setErrors] = useState<ValidationBag>();
   const handleCreate = useHandleCreate(setErrors);
   const currentInvoice = useCurrentInvoice();
+  const [searchParams] = useSearchParams();
+  const handleChange = useSetCurrentInvoiceProperty();
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -51,6 +54,10 @@ export function Create() {
       dispatch(setCurrentInvoice(invoice.data.data));
     }
   }, [invoice]);
+
+  if (searchParams.has('client') && currentInvoice) {
+    handleChange('client_id', searchParams.get('client'));
+  }
 
   return (
     <Default
