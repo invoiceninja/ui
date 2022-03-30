@@ -51,7 +51,7 @@ export default function ResourcefulActions(props: Props) {
       defaultHeaders
     )
       .then(() => {
-        toast.success(t(`successfully_${action}_${props.resourceType}`), {
+        toast.success(t(`${action}d_${props.resourceType}`), {
           id: toastId,
         });
 
