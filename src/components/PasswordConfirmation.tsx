@@ -31,6 +31,13 @@ export function PasswordConfirmation(props: Props) {
     setIsModalOpen(props.show as boolean);
   }, [props.show]);
 
+  const handleConfirm = () => {
+    props.onClose(false);
+    props.onSave(currentPassword, isPasswordRequired);
+
+    setCurrentPassword('');
+  };
+
   return (
     <Modal
       onClose={() => {
@@ -50,10 +57,11 @@ export function PasswordConfirmation(props: Props) {
           setCurrentPassword(event.target.value)
         }
       />
+
       <Button
-        onClick={() => {
-          return props.onSave(currentPassword, isPasswordRequired);
-        }}
+        disabled={currentPassword.length === 0}
+        onClick={handleConfirm}
+        disableWithoutIcon
       >
         {t('continue')}
       </Button>
