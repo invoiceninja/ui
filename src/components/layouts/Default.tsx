@@ -108,17 +108,17 @@ export function Default(props: Props) {
         label: t('new_recurring_invoice'),
       },
     },
-    // {
-    //   name: t('payments'),
-    //   href: '/payments',
-    //   icon: CreditCard,
-    //   current: location.pathname === '/payments',
-    //   rightButton: {
-    //     icon: PlusCircle,
-    //     to: '/payments/create',
-    //     label: t('new_payment'),
-    //   },
-    // },
+    {
+      name: t('payments'),
+      href: '/payments',
+      icon: CreditCard,
+      current: location.pathname === '/payments',
+      rightButton: {
+        icon: PlusCircle,
+        to: '/payments/create',
+        label: t('new_payment'),
+      },
+    },
     // {
     //   name: t('credits'),
     //   href: '/credits',

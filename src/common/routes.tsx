@@ -102,6 +102,7 @@ export const routes = (
           <Route path="refund" element={<Payments.Refund />} />
         </Route>
       </Route>
+      {/*       
       <Route path="/credits">
         <Route path="" element={<Credits.Credits />} />
         <Route path=":id/email" element={<Credits.Email />} />
@@ -130,7 +131,8 @@ export const routes = (
       </Route>
       <Route path="/recurring_expenses">
         <Route path="" element={<RecurringExpenses.RecurringExpenses />} />
-      </Route>
+      </Route> */}
+
       <Route path="/settings">
         <Route path="" element={<Settings.Settings />} />
         <Route path="company_details">
