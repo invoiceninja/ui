@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -119,61 +121,61 @@ export function Default(props: Props) {
         label: t('new_payment'),
       },
     },
-    {
-      name: t('credits'),
-      href: '/credits',
-      icon: File,
-      current: location.pathname === '/credits',
-      rightButton: {
-        icon: PlusCircle,
-        to: '/credits/create',
-        label: t('new_credit'),
-      },
-    },
-    {
-      name: t('projects'),
-      href: '/projects',
-      icon: Briefcase,
-      current: location.pathname === '/projects',
-      rightButton: {
-        icon: PlusCircle,
-        to: '/projects/create',
-        label: t('new_project'),
-      },
-    },
-    {
-      name: t('vendors'),
-      href: '/vendors',
-      icon: Truck,
-      current: location.pathname === '/vendors',
-      rightButton: {
-        icon: PlusCircle,
-        to: '/vendors/create',
-        label: t('new_vendor'),
-      },
-    },
-    {
-      name: t('expenses'),
-      href: '/expenses',
-      icon: DollarSign,
-      current: location.pathname === '/expenses',
-      rightButton: {
-        icon: PlusCircle,
-        to: '/expenses/create',
-        label: t('new_expense'),
-      },
-    },
-    {
-      name: t('recurring_expenses'),
-      href: '/recurring_expenses',
-      icon: RefreshCcw,
-      current: location.pathname === '/recurring_expenses',
-      rightButton: {
-        icon: PlusCircle,
-        to: '/recurring_expenses/create',
-        label: t('new_recurring_expense'),
-      },
-    },
+    // {
+    //   name: t('credits'),
+    //   href: '/credits',
+    //   icon: File,
+    //   current: location.pathname === '/credits',
+    //   rightButton: {
+    //     icon: PlusCircle,
+    //     to: '/credits/create',
+    //     label: t('new_credit'),
+    //   },
+    // },
+    // {
+    //   name: t('projects'),
+    //   href: '/projects',
+    //   icon: Briefcase,
+    //   current: location.pathname === '/projects',
+    //   rightButton: {
+    //     icon: PlusCircle,
+    //     to: '/projects/create',
+    //     label: t('new_project'),
+    //   },
+    // },
+    // {
+    //   name: t('vendors'),
+    //   href: '/vendors',
+    //   icon: Truck,
+    //   current: location.pathname === '/vendors',
+    //   rightButton: {
+    //     icon: PlusCircle,
+    //     to: '/vendors/create',
+    //     label: t('new_vendor'),
+    //   },
+    // },
+    // {
+    //   name: t('expenses'),
+    //   href: '/expenses',
+    //   icon: DollarSign,
+    //   current: location.pathname === '/expenses',
+    //   rightButton: {
+    //     icon: PlusCircle,
+    //     to: '/expenses/create',
+    //     label: t('new_expense'),
+    //   },
+    // },
+    // {
+    //   name: t('recurring_expenses'),
+    //   href: '/recurring_expenses',
+    //   icon: RefreshCcw,
+    //   current: location.pathname === '/recurring_expenses',
+    //   rightButton: {
+    //     icon: PlusCircle,
+    //     to: '/recurring_expenses/create',
+    //     label: t('new_recurring_expense'),
+    //   },
+    // },
     {
       name: t('settings'),
       href: '/settings/company_details',

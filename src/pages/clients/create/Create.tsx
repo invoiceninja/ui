@@ -66,9 +66,23 @@ export function Create() {
 
   const onSave = () => {
     set(client as Client, 'contacts', contacts);
-
     const toastId = toast.loading(t('processing'));
+    setErrors(undefined);
+    if (
+      !(
+        client?.name != '' ||
+        contacts[0].first_name != '' ||
+        contacts[0].last_name != ''
+      )
+    ) {
+      setErrors({
+        message: t('invalid_name // needs translation'),
+        errors: { name: [t('please_enter_a_client_or_contact_name')] },
+      });
+      toast.error(t('error_title'), { id: toastId });
 
+      return onSave;
+    }
     axios
       .post(endpoint('/api/v1/clients'), client, {
         headers: defaultHeaders,
@@ -102,12 +116,16 @@ export function Create() {
 
       <div className="flex flex-col xl:flex-row xl:gap-4">
         <div className="w-full xl:w-1/2">
-          <Details client={client} setClient={setClient} />
+          <Details client={client} setClient={setClient} errors={errors} />
           <Address client={client} setClient={setClient} />
         </div>
 
         <div className="w-full xl:w-1/2">
-          <Contacts contacts={contacts} setContacts={setContacts} />
+          <Contacts
+            contacts={contacts}
+            setContacts={setContacts}
+            errors={errors}
+          />
           <AdditionalInfo client={client} setClient={setClient} />
         </div>
       </div>

@@ -23,6 +23,7 @@ interface Props extends CommonProps {
   onClick?: any;
   to?: string;
   behavior?: 'button' | 'submit';
+  disableWithoutIcon?: boolean;
 }
 
 const defaultProps: Props = {
@@ -70,7 +71,7 @@ export function Button(props: Props) {
       type={props.behavior}
       disabled={props.disabled}
       className={classNames(
-        `inline-flex items-center space-x-2 justify-center rounded text-sm ${props.className}`,
+        `inline-flex items-center space-x-2 justify-center rounded text-sm ${props.className} disabled:cursor-not-allowed`,
         {
           'py-2 px-4': props.type !== 'minimal',
           'w-full': props.variant === 'block',
@@ -82,7 +83,11 @@ export function Button(props: Props) {
       style={css}
       onClick={props.onClick}
     >
-      {props.disabled ? <Spinner variant="light" /> : props.children}
+      {props.disabled && !props.disableWithoutIcon ? (
+        <Spinner variant="light" />
+      ) : (
+        props.children
+      )}
     </button>
   );
 }

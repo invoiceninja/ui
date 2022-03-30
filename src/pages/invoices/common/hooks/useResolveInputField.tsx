@@ -13,13 +13,13 @@
 import { resolveProperty } from 'pages/invoices/common/helpers/resolve-property';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { useHandleProductChange } from './useHandleProductChange';
-import { generatePath, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { InputField } from '@invoiceninja/forms';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { ChangeEvent } from 'react';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
 import { useFormatMoney } from './useFormatMoney';
+import { isNonNumericValue } from '../../../../common/helpers/invoices/resolve-non-numeric-value';
 
 const numberInputs = [
   'discount',
@@ -30,32 +30,34 @@ const numberInputs = [
   'tax_rate2',
   'tax_rate3',
 ];
-
-export function useResolveInputField() {
+interface Props {
+  setIsProductModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+export function useResolveInputField(props: Props) {
   const handleProductChange = useHandleProductChange();
   const onChange = useHandleLineItemPropertyChange();
-  const navigate = useNavigate();
   const [t] = useTranslation();
   const invoice = useCurrentInvoice();
   const formatMoney = useFormatMoney();
-
+  const { setIsProductModalOpen } = props;
   return (key: string, index: number) => {
     const property = resolveProperty(key);
 
     if (property === 'product_key') {
       return (
-        <DebouncedCombobox
-          endpoint="/api/v1/products"
-          label="product_key"
-          onChange={(value) => handleProductChange(index, value)}
-          className="w-36"
-          onActionClick={() => navigate(generatePath('/products/create'))}
-          actionLabel={t('new_product')}
-          defaultValue={invoice?.line_items[index][property]}
-        />
+        <>
+          <DebouncedCombobox
+            endpoint="/api/v1/products"
+            label="product_key"
+            onChange={(value) => handleProductChange(index, value)}
+            className="w-36"
+            onActionClick={() => setIsProductModalOpen(true)}
+            actionLabel={t('new_product')}
+            defaultValue={invoice?.line_items[index][property]}
+          />
+        </>
       );
     }
-
     if (property === 'notes') {
       return (
         <InputField
@@ -73,10 +75,11 @@ export function useResolveInputField() {
       return (
         <InputField
           id={property}
-          type="number"
           value={invoice?.line_items[index][property]}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            onChange(property, parseFloat(event.target.value), index)
+            isNonNumericValue(event)
+              ? event
+              : onChange(property, parseFloat(event.target.value), index)
           }
           className="w-24"
         />

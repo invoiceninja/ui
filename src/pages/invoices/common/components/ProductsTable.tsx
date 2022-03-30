@@ -12,12 +12,14 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { injectBlankItemIntoCurrent } from 'common/stores/slices/invoices';
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 import { RootState } from 'common/stores/store';
+import { useState } from 'react';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useProductColumns } from '../hooks/useProductColumns';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
+import { ProductCreate } from './ProductCreate';
 
 export function ProductsTable() {
   const [t] = useTranslation();
@@ -25,7 +27,11 @@ export function ProductsTable() {
   const columns = useProductColumns();
   const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
-  const resolveInputField = useResolveInputField();
+  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+
+  const resolveInputField = useResolveInputField({
+    setIsProductModalOpen,
+  });
 
   return (
     <div>
@@ -84,6 +90,10 @@ export function ProductsTable() {
           )}
         </Tbody>
       </Table>
+      <ProductCreate
+        setIsModalOpen={setIsProductModalOpen}
+        isModalOpen={isProductModalOpen}
+      />
     </div>
   );
 }

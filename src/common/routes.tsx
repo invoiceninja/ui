@@ -1,3 +1,5 @@
+/* eslint-disable */ 
+
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -98,8 +100,11 @@ export const routes = (
         <Route path=":id" element={<Payments.Payment />}>
           <Route path="payment_fields" element={<Payments.PaymentFields />} />
           <Route path="edit" element={<Payments.Edit />} />
+          <Route path="apply" element={<Payments.Apply />} />
+          <Route path="refund" element={<Payments.Refund />} />
         </Route>
       </Route>
+      {/*       
       <Route path="/credits">
         <Route path="" element={<Credits.Credits />} />
         <Route path=":id/email" element={<Credits.Email />} />
@@ -128,7 +133,8 @@ export const routes = (
       </Route>
       <Route path="/recurring_expenses">
         <Route path="" element={<RecurringExpenses.RecurringExpenses />} />
-      </Route>
+      </Route> */}
+
       <Route path="/settings">
         <Route path="" element={<Settings.Settings />} />
         <Route path="company_details">

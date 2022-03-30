@@ -12,8 +12,11 @@ import paymentType from 'common/constants/payment-type';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
+import { Payment } from 'common/interfaces/payment';
+import { bulk } from 'common/queries/payments';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
@@ -77,6 +80,47 @@ export function Payments() {
       label: t('transaction_reference'),
     },
   ];
+
+  const actions = [
+    (resource: Payment) => (
+      <DropdownElement
+        to={generatePath('/payments/:id/apply', { id: resource.id })}
+      >
+        {t('apply_payment')}
+      </DropdownElement>
+    ),
+
+    (resource: Payment) => (
+      <DropdownElement
+        to={generatePath('/payments/:id/refund', { id: resource.id })}
+      >
+        {t('refund_payment')}
+      </DropdownElement>
+    ),
+
+    (resource: Payment) => (
+      <DropdownElement
+        onClick={() => {
+          bulk([resource.id], 'email');
+        }}
+      >
+        {t('email_payment')}
+      </DropdownElement>
+    ),
+  ];
+
+  const customBulkActions = [
+    (resource: Payment) => (
+      <DropdownElement
+        onClick={() => {
+          bulk([resource.id], 'email');
+        }}
+      >
+        {t('email_payment')}
+      </DropdownElement>
+    ),
+  ];
+
   return (
     <Default
       title={t('payments')}
@@ -91,6 +135,8 @@ export function Payments() {
         bulkRoute="/api/v1/payments/bulk"
         linkToEdit="/payments/:id/edit"
         withResourcefulActions
+        customActions={actions}
+        customBulkActions={customBulkActions}
       />
     </Default>
   );

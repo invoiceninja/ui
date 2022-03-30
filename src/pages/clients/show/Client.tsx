@@ -15,22 +15,27 @@ import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { Tabs } from 'components/Tabs';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Outlet, useParams } from 'react-router-dom';
 import { Tab } from 'components/Tabs';
-import { Dropdown } from 'components/dropdown/Dropdown';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
 import { Standing } from './components/Standing';
+import { PasswordConfirmation } from 'components/PasswordConfirmation';
+
+import { CustomResourcefulActions } from '../common/components/CustomResourcefulActions';
+import { usePurgeClient } from '../common/hooks/usePurgeClient';
 
 export function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
-
-  const [t] = useTranslation();
   const { id } = useParams();
   const { data: client, isLoading } = useClientQuery({ id });
+
+  const [t] = useTranslation();
+  const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
+    useState(false);
 
   useEffect(() => {
     setDocumentTitle(client?.data?.data?.display_name || 'view_client');
@@ -43,6 +48,8 @@ export function Client() {
       href: generatePath('/clients/:id', { id }),
     },
   ];
+
+  const onSave = usePurgeClient(id);
 
   const tabs: Tab[] = [
     { name: t('invoices'), href: generatePath('/clients/:id', { id }) },
@@ -86,8 +93,10 @@ export function Client() {
           <Button to={generatePath('/clients/:id/edit', { id })}>
             {t('edit_client')}
           </Button>
-
-          <Dropdown className="divide-y" label={t('more_actions')}></Dropdown>
+          <CustomResourcefulActions
+            clientId={id}
+            openPurgeModal={setPasswordConfirmModalOpen}
+          />
         </div>
       }
     >
@@ -109,6 +118,11 @@ export function Client() {
           </div>
         </>
       )}
+      <PasswordConfirmation
+        show={isPasswordConfirmModalOpen}
+        onClose={setPasswordConfirmModalOpen}
+        onSave={onSave}
+      />
     </Default>
   );
 }

@@ -11,7 +11,8 @@
 import Tippy from '@tippyjs/react/headless';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { ChevronDown } from 'react-feather';
-import { useState } from 'react';
+import { cloneElement, useState } from 'react';
+import { DropdownElement } from './DropdownElement';
 
 interface Props extends CommonProps {
   label?: string;
@@ -31,11 +32,11 @@ export function Dropdown(props: Props) {
           >
             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
             {/* @ts-ignore */}
-            {/* {props.children?.map((child, index: number) =>
-              child ? cloneElement(child, { setVisible, key: index }) : child
-            )} */}
-
-            {props.children}
+            {props.children?.map((child, index: number) =>
+              child && child['type'] == DropdownElement
+                ? cloneElement(child, { setVisible, key: index })
+                : child
+            )}
           </div>
         )}
         visible={visible}

@@ -11,16 +11,16 @@
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useTitle } from 'common/hooks/useTitle';
 import { defaultHeaders } from 'common/queries/common/headers';
 import {
   deletePassword,
-  injectInChanges,
   resetChanges,
   updateUser,
 } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -35,6 +35,8 @@ import {
 import { TwoFactorAuthentication } from './components/TwoFactorAuthentication';
 
 export function UserDetails() {
+  useTitle('user_details');
+
   const [t] = useTranslation();
 
   const pages = [
@@ -49,12 +51,6 @@ export function UserDetails() {
     useState(false);
 
   const userState = useSelector((state: RootState) => state.user);
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('user_details')}`;
-
-    dispatch(injectInChanges());
-  }, [user]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {
@@ -76,11 +72,14 @@ export function UserDetails() {
 
         window.dispatchEvent(new CustomEvent('user.updated'));
       })
-      .catch((error: AxiosError | unknown) => {
+      .catch((error: AxiosError) => {
         console.error(error);
 
         toast.dismiss();
-        toast.error(t('error_title'));
+
+        error.response?.status === 412
+          ? toast.error(t('password_error_incorrect'))
+          : toast.error(t('error_title'));
       })
       .finally(() => dispatch(deletePassword()));
   };
