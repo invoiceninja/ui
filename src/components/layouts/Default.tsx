@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *

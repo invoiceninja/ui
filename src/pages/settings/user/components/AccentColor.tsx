@@ -14,7 +14,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateChanges } from 'common/stores/slices/user';
 import { RootState } from '../../../../common/stores/store';
 import colors from 'common/constants/colors';
-import { InputField } from '@invoiceninja/forms';
 import { DebounceInput } from 'react-debounce-input';
 
 export function AccentColor() {
