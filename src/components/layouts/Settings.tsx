@@ -25,6 +25,13 @@ interface Props {
   docsLink?: string;
 }
 
+interface AdvanceSetting {
+  name: string;
+  href: string;
+  current: boolean;
+  children?: AdvanceSetting[];
+}
+
 export function Settings(props: Props) {
   const [t] = useTranslation();
   const location = useLocation();
@@ -87,7 +94,7 @@ export function Settings(props: Props) {
     },
   ];
 
-  const advanced = [
+  const advanced: AdvanceSetting[] = [
     {
       name: t('invoice_design'),
       href: '/settings/invoice_design',
@@ -339,18 +346,19 @@ export function Settings(props: Props) {
 
                 {item.children && item.current && (
                   <div className="bg-gray-100 space-y-4 py-3 rounded-b">
-                    {item.children.map((item, index) => (
-                      <Link
-                        key={index}
-                        to={item.href}
-                        className={classNames(
-                          item.current ? 'text-gray-900 font-semibold' : '',
-                          'ml-4 px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
-                        )}
-                      >
-                        {item.name}
-                      </Link>
-                    ))}
+                    {item.children &&
+                      item.children.map((item, index) => (
+                        <Link
+                          key={index}
+                          to={item.href}
+                          className={classNames(
+                            item.current ? 'text-gray-900 font-semibold' : '',
+                            'ml-4 px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
+                          )}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
                   </div>
                 )}
               </div>
