@@ -13,6 +13,9 @@ import { Card, Element } from '../../../../components/cards';
 import { useDispatch, useSelector } from 'react-redux';
 import { updateChanges } from 'common/stores/slices/user';
 import { RootState } from '../../../../common/stores/store';
+import colors from 'common/constants/colors';
+import { InputField } from '@invoiceninja/forms';
+import { DebounceInput } from 'react-debounce-input';
 
 export function AccentColor() {
   const [t] = useTranslation();
@@ -23,8 +26,10 @@ export function AccentColor() {
   return (
     <Card>
       <Element leftSide={t('accent_color')}>
-        <input
-          value={userChanges?.company_user?.settings?.accent_color || ''}
+        <DebounceInput
+          value={
+            userChanges?.company_user?.settings?.accent_color || colors.primary
+          }
           type="color"
           onChange={(event) =>
             dispatch(
