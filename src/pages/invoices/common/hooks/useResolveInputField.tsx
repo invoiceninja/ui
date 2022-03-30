@@ -87,16 +87,15 @@ export function useResolveInputField(props: Props) {
           endpoint="/api/v1/tax_rates"
           label={property}
           value={String(invoice?.line_items[index][property])}
-          onChange={(event: any) => {
-            const taxName = property.replace('rate', 'name');
-            if (event.resource) {
-              onChange(property, parseFloat(event.resource.rate), index);
+          onChange={(value) => {
+            value.resource &&
+              onChange(property, parseFloat(value.resource.rate), index);
+            value.resource &&
               onChange(
-                taxName as keyof InvoiceItem,
-                event.resource.name,
+                property.replace('rate', 'name') as keyof InvoiceItem,
+                value.resource.name,
                 index
               );
-            }
           }}
           className="w-36"
           formatLabel={(resource) => resource.name}
