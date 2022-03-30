@@ -118,7 +118,7 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      topRight={
+      navigationTopRight={
         <CustomResourcefulActions
           clientId={id}
           openPurgeModal={setPasswordConfirmModalOpen}

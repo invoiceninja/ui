@@ -14,6 +14,7 @@ import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { generatePath } from 'react-router-dom';
 
 interface Props {
   clientId: string | undefined;
@@ -21,8 +22,10 @@ interface Props {
 }
 export function CustomResourcefulActions(props: Props) {
   const [t] = useTranslation();
+
   const handleResourcefulAction = (action: 'delete' | 'archive') => {
     const toastId = toast.loading(t('processing'));
+
     if (props.clientId)
       bulk([props.clientId], action)
         .then(() => {
@@ -35,32 +38,45 @@ export function CustomResourcefulActions(props: Props) {
           toast.error(t('error_title'));
         });
   };
+
   return (
-    <Dropdown label={t('more_actions')}>
-      <DropdownElement
-        key={'archive'}
-        onClick={() => {
-          handleResourcefulAction('archive');
-        }}
-      >
-        {t('archive')}
-      </DropdownElement>
-      <DropdownElement
-        key={'delete'}
-        onClick={() => {
-          handleResourcefulAction('delete');
-        }}
-      >
-        {t('delete')}
-      </DropdownElement>
-      <DropdownElement
-        key={'purge'}
-        onClick={() => {
-          props.openPurgeModal(true);
-        }}
-      >
-        {t('purge')}
-      </DropdownElement>
+    <Dropdown label={t('more_actions')} className="divide-y">
+      <div>
+        <DropdownElement
+          key={'archive'}
+          onClick={() => {
+            handleResourcefulAction('archive');
+          }}
+        >
+          {t('archive')}
+        </DropdownElement>
+        <DropdownElement
+          key={'delete'}
+          onClick={() => {
+            handleResourcefulAction('delete');
+          }}
+        >
+          {t('delete')}
+        </DropdownElement>
+        <DropdownElement
+          key={'purge'}
+          onClick={() => {
+            props.openPurgeModal(true);
+          }}
+        >
+          {t('purge')}
+        </DropdownElement>
+      </div>
+
+      <div>
+        <DropdownElement
+          to={generatePath('/invoices/create?client=:id', {
+            id: props.clientId,
+          })}
+        >
+          {t('new_invoice')}
+        </DropdownElement>
+      </div>
     </Dropdown>
   );
 }

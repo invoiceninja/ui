@@ -38,6 +38,7 @@ export function Create() {
   const [errors, setErrors] = useState<ValidationBag>();
   const handleCreate = useHandleCreate(setErrors);
   const currentInvoice = useCurrentInvoice();
+  const [hasClientSet, setHasClientSet] = useState(false);
   const [searchParams] = useSearchParams();
   const handleChange = useSetCurrentInvoiceProperty();
 
@@ -55,9 +56,12 @@ export function Create() {
     }
   }, [invoice]);
 
-  if (searchParams.has('client') && currentInvoice) {
-    handleChange('client_id', searchParams.get('client'));
-  }
+  useEffect(() => {
+    if (searchParams.has('client') && !hasClientSet && currentInvoice) {
+      handleChange('client_id', searchParams.get('client'));
+      setHasClientSet(true);
+    }
+  }, [currentInvoice]);
 
   return (
     <Default
