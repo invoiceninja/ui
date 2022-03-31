@@ -11,6 +11,7 @@ import paymentStatus from 'common/constants/payment-status';
 import paymentType from 'common/constants/payment-type';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { useTitle } from 'common/hooks/useTitle';
 import { Payment } from 'common/interfaces/payment';
 import { bulk } from 'common/queries/payments';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
@@ -25,6 +26,7 @@ import { generatePath } from 'react-router-dom';
 export function Payments() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+  useTitle('payments');
   const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
   const columns: DataTableColumns = [
     {

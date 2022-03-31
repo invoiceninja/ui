@@ -10,6 +10,7 @@
 
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { useTitle } from 'common/hooks/useTitle';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Link } from 'components/forms/Link';
@@ -20,7 +21,7 @@ import { generatePath } from 'react-router-dom';
 export function Vendors() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
-
+  useTitle('vendors');
   const pages = [{ name: t('vendors'), href: '/vendors' }];
   const columns: DataTableColumns = [
     {

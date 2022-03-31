@@ -12,6 +12,7 @@ import reccuringInvoice from 'common/constants/reccuring-invoice';
 import recurringInvoicesFrequency from 'common/constants/recurring-invoices-frequency';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { useTitle } from 'common/hooks/useTitle';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
@@ -21,7 +22,7 @@ import { useTranslation } from 'react-i18next';
 export function RecurringInvoices() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
-
+  useTitle('recurring_invoices');
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
   ];
