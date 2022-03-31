@@ -89,7 +89,7 @@ export function Upload({ apiEndpoint }: { apiEndpoint: string }) {
             <span className="mt-2 block text-sm font-medium text-gray-900">
               {isDragActive
                 ? 'drop_your_files_here'
-                : 'drag_and_drop_files_here'}
+                : t('dropzone_default_message')}
             </span>
           </div>
         </div>

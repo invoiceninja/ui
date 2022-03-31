@@ -57,8 +57,8 @@ export function Defaults() {
             >
               <option defaultChecked></option>
               <option value="always">{t('enabled')}</option>
-              <option value="optout">{t('enabled_by_default')}</option>
-              <option value="optin">{t('disabled_by_default')}</option>
+              <option value="optout">{t('optout')}</option>
+              <option value="optin">{t('optin')}</option>
               <option value="disabled">{t('disabled')}</option>
             </SelectField>
           </Element>
