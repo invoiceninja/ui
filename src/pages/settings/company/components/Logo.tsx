@@ -99,7 +99,7 @@ export function Logo() {
             <span className="mt-2 block text-sm font-medium text-gray-900">
               {isDragActive
                 ? 'drop_your_logo_here'
-                : 'drop_new_logo_here_or_click_to_select'}
+                : t('dropzone_default_message')}
             </span>
           </div>
         </div>

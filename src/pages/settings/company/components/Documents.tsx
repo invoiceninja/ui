@@ -17,7 +17,7 @@ export function Documents() {
   return (
     <Card title={t('documents')}>
       <ClickableElement to="/settings/company_details/documents">
-        {t('browse_company_documents')}
+        {t('default_documents')}
       </ClickableElement>
     </Card>
   );
