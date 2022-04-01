@@ -60,8 +60,7 @@ export function ImportExport() {
 
       <Card withSaveButton saveButtonLabel={t('export')} title={t('export')}>
         <Element>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Repellat
-          repudiandae error, assumenda dolore qui id?
+          t('export')
         </Element>
       </Card>
     </Settings>
