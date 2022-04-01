@@ -934,7 +934,7 @@ export function GeneralSettings() {
 
       <Divider />
 
-      <Element leftSide={t('hide_empty_columns_on_pdf')}>
+      <Element leftSide={t('empty_columns')}>
         <Toggle
           checked={company?.settings?.hide_empty_columns_on_pdf}
           id="settings.hide_empty_columns_on_pdf"

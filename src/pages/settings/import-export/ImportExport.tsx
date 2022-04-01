@@ -8,23 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect } from 'react';
+import { useTitle } from 'common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../components/cards';
 import { InputField, SelectField } from '../../../components/forms';
 import { Settings } from '../../../components/layouts/Settings';
 
 export function ImportExport() {
+  useTitle('import_export');
+
   const [t] = useTranslation();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('import_export'), href: '/settings/import_export' },
   ];
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('import_export')}`;
-  });
 
   return (
     <Settings
@@ -59,10 +57,7 @@ export function ImportExport() {
       </Card>
 
       <Card withSaveButton saveButtonLabel={t('export')} title={t('export')}>
-        <Element>
-          Lorem ipsum dolor sit amet consectetur, adipisicing elit. Repellat
-          repudiandae error, assumenda dolore qui id?
-        </Element>
+        <Element>{t('export')}</Element>
       </Card>
     </Settings>
   );
