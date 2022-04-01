@@ -113,9 +113,7 @@ export function ClientCreate() {
         size="large"
         backgroundColor="gray"
       >
-        {errors  && (
-          <ValidationAlert errors={errors} />
-        )}
+        {errors && <ValidationAlert errors={errors} />}
 
         <div className="flex flex-col xl:flex-row xl:gap-4">
           <div className="w-full xl:w-1/2">

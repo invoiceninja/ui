@@ -31,9 +31,10 @@ export function ProductsTable() {
   const dispatch = useDispatch();
   const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const resolveInputField = useResolveInputField({ setIsTaxModalOpen,setIsProductModalOpen });
-
-  
+  const resolveInputField = useResolveInputField({
+    setIsTaxModalOpen,
+    setIsProductModalOpen,
+  });
 
   return (
     <div>

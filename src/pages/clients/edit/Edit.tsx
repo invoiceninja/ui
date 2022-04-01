@@ -148,7 +148,7 @@ export function Edit() {
           </div>
         </div>
       )}
-      
+
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setPasswordConfirmModalOpen}

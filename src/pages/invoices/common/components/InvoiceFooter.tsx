@@ -102,7 +102,7 @@ export function InvoiceFooter() {
                 checked={invoice?.auto_bill_enabled || false}
                 onChange={(value) => handleChange('auto_bill_enabled', value)}
               />
-              
+
               <div className="space-y-2">
                 <InputLabel>{t('design')}</InputLabel>
 

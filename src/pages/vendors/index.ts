@@ -5,4 +5,4 @@ export * from './show/Show';
 export * from './show/pages/Expenses';
 export * from './show/pages/RecurringExpences';
 export * from './create/Create';
-export * from './edit/VendorFields'
+export * from './edit/VendorFields';

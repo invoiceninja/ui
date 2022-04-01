@@ -118,9 +118,8 @@ export function Apply() {
           }
         />
         {errors?.errors.invoices && (
-          <div className='py-2'>
-          <Alert type="danger">{errors.errors.invoices}</Alert>
-
+          <div className="py-2">
+            <Alert type="danger">{errors.errors.invoices}</Alert>
           </div>
         )}
       </Element>
@@ -144,10 +143,10 @@ export function Apply() {
             </div>
 
             {errors?.errors[`invoices.${[index]}.invoice_id`] && (
-              <div className='py-2'>
-              <Alert type="danger">
-                {errors.errors[`invoices.${[index]}.invoice_id`]}
-              </Alert>
+              <div className="py-2">
+                <Alert type="danger">
+                  {errors.errors[`invoices.${[index]}.invoice_id`]}
+                </Alert>
               </div>
             )}
           </Element>

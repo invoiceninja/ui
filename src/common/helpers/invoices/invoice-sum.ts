@@ -17,7 +17,10 @@ export class InvoiceSum {
   public totalCustomValues = 0;
   public subTotal = 0;
 
-  constructor(public invoice: Invoice | RecurringInvoice, protected currency: Currency) {}
+  constructor(
+    public invoice: Invoice | RecurringInvoice,
+    protected currency: Currency
+  ) {}
 
   public build() {
     this.calculateLineItems()
