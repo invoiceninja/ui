@@ -13,6 +13,7 @@ import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvo
 
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 import { injectBlankItemIntoCurrent } from 'common/stores/slices/recurring-invoices';
+import { TaxCreate } from 'pages/invoices/common/components/TaxCreate';
 import { ProductCreate } from 'pages/invoices/common/components/ProductCreate';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useResolveTranslation } from 'pages/invoices/common/hooks/useResolveTranslation';
@@ -28,9 +29,10 @@ export function ProductsTable() {
   const columns = useProductColumns();
   const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
+  const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const resolveInputField = useResolveInputField({ setIsTaxModalOpen,setIsProductModalOpen });
 
-  const resolveInputField = useResolveInputField({setIsProductModalOpen});
   
 
   return (
@@ -88,6 +90,7 @@ export function ProductsTable() {
           )}
         </Tbody>
       </Table>
+      <TaxCreate isVisible={isTaxModalOpen} onClose={setIsTaxModalOpen} />
       <ProductCreate
         setIsModalOpen={setIsProductModalOpen}
         isModalOpen={isProductModalOpen}

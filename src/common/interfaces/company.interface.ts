@@ -39,4 +39,5 @@ export interface Company {
   };
   custom_fields: Record<string, string>;
   enabled_tax_rates: number;
+  enabled_item_tax_rates:number
 }

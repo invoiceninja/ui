@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useProductColumns } from '../hooks/useProductColumns';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
+import { TaxCreate } from './TaxCreate';
 import { ProductCreate } from './ProductCreate';
 
 export function ProductsTable() {
@@ -27,9 +28,10 @@ export function ProductsTable() {
   const columns = useProductColumns();
   const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
+  const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-
   const resolveInputField = useResolveInputField({
+    setIsTaxModalOpen,
     setIsProductModalOpen,
   });
 
@@ -90,6 +92,8 @@ export function ProductsTable() {
           )}
         </Tbody>
       </Table>
+
+      <TaxCreate isVisible={isTaxModalOpen} onClose={setIsTaxModalOpen} />
       <ProductCreate
         setIsModalOpen={setIsProductModalOpen}
         isModalOpen={isProductModalOpen}

@@ -25,7 +25,7 @@ export function useProductColumns() {
     // Local object is needed because we want to spread tax columns in case they're enabled.
     if (variables.includes('$product.tax')) {
       const taxes: string[] = [];
-      const enabledTaxRates = company?.enabled_tax_rates || 0;
+      const enabledTaxRates = company?.enabled_item_tax_rates || 0;
 
       if (enabledTaxRates > 0) {
         taxes.push('$product.tax_rate1');

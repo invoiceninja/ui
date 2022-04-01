@@ -8,7 +8,7 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 export class InvoiceSum {
   protected taxMap = collect();
-  protected invoiceItems = new InvoiceItemSum(this.invoice);
+  public invoiceItems = new InvoiceItemSum(this.invoice);
   protected totalTaxMap: Record<string, unknown>[] = [];
 
   public totalDiscount = 0;

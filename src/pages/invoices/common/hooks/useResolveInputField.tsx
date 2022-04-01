@@ -19,27 +19,23 @@ import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { ChangeEvent } from 'react';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
 import { useFormatMoney } from './useFormatMoney';
-import { isNonNumericValue } from '../../../../common/helpers/invoices/resolve-non-numeric-value';
+import { InvoiceItem } from 'common/interfaces/invoice-item';
+import { isNonNumericValue } from 'common/helpers/invoices/resolve-non-numeric-value';
 
-const numberInputs = [
-  'discount',
-  'cost',
-  'unit_cost',
-  'quantity',
-  'tax_rate1',
-  'tax_rate2',
-  'tax_rate3',
-];
+const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
+const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 interface Props {
+  setIsTaxModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsProductModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 export function useResolveInputField(props: Props) {
   const handleProductChange = useHandleProductChange();
   const onChange = useHandleLineItemPropertyChange();
   const [t] = useTranslation();
+  const { setIsTaxModalOpen, setIsProductModalOpen } = props;
   const invoice = useCurrentInvoice();
   const formatMoney = useFormatMoney();
-  const { setIsProductModalOpen } = props;
+
   return (key: string, index: number) => {
     const property = resolveProperty(key);
 
@@ -85,7 +81,30 @@ export function useResolveInputField(props: Props) {
         />
       );
     }
-
+    if (taxInputs.includes(property)) {
+      return (
+        <DebouncedCombobox
+          endpoint="/api/v1/tax_rates"
+          label={property}
+          value={String(invoice?.line_items[index][property])}
+          onChange={(value) => {
+            value.resource &&
+              onChange(property, parseFloat(value.resource.rate), index);
+            value.resource &&
+              onChange(
+                property.replace('rate', 'name') as keyof InvoiceItem,
+                value.resource.name,
+                index
+              );
+          }}
+          className="w-36"
+          formatLabel={(resource) => resource.name}
+          onActionClick={() => setIsTaxModalOpen(true)}
+          actionLabel={t('create_tax_rate')}
+          defaultValue={invoice?.line_items[index][property]}
+        />
+      );
+    }
     if (['line_total'].includes(property)) {
       return formatMoney(invoice?.line_items[index][property] as number);
     }
