@@ -43,7 +43,6 @@ export function Clients() {
     {
       id: 'paid_to_date',
       label: t('paid_to_date'),
-      format: (value) => date(value, dateFormat),
     },
     {
       id: 'last_login',
