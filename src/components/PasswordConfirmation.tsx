@@ -47,17 +47,18 @@ export function PasswordConfirmation(props: Props) {
       title={t('confirmation')}
       text={t('please_enter_your_password')}
     >
-      <InputField
-        id="current_password"
-        type="password"
-        label={t('current_password')}
-        required
-        value={currentPassword}
-        onChange={(event: ChangeEvent<HTMLInputElement>) =>
-          setCurrentPassword(event.target.value)
-        }
-      />
-
+      <form onSubmit={handleConfirm}>
+        <InputField
+          id="current_password"
+          type="password"
+          label={t('current_password')}
+          required
+          value={currentPassword}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            setCurrentPassword(event.target.value)
+          }
+        />
+      </form>
       <Button
         disabled={currentPassword.length === 0}
         onClick={handleConfirm}
