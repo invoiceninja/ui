@@ -49,7 +49,11 @@ export function Create() {
 
   useEffect(() => {
     if (recurringInvoice?.data.data) {
-      dispatch(setCurrentRecurringInvoice(recurringInvoice.data.data));
+      const recurringInvoiceCopy: RecurringInvoice = {
+        ...recurringInvoice.data.data,
+      };
+      recurringInvoiceCopy.remaining_cycles = -1;
+      dispatch(setCurrentRecurringInvoice(recurringInvoiceCopy));
     }
   }, [recurringInvoice]);
 
