@@ -26,6 +26,7 @@ import { useDocumentsQuery } from 'common/queries/documents';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { FileIcon } from 'components/FileIcon';
+import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { Spinner } from 'components/Spinner';
 import prettyBytes from 'pretty-bytes';
 import { useState } from 'react';
@@ -38,16 +39,18 @@ export function Table() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
   const { dateFormat } = useCurrentCompanyDateFormats();
-
+  const [document, setDocument] = useState('');
+  const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
+    useState(false);
   const { data, isLoading } = useDocumentsQuery({ perPage, currentPage });
   const queryClient = useQueryClient();
 
-  const destroy = (id: string) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const destroy = (password: string, isRequired = true) => {
     toast.loading(t('processing'));
-
     axios
-      .delete(endpoint('/api/v1/documents/:id', { id }), {
-        headers: defaultHeaders,
+      .delete(endpoint('/api/v1/documents/:id', { id: document }), {
+        headers: { 'X-Api-Password': password, ...defaultHeaders },
       })
       .then(() => {
         toast.dismiss();
@@ -94,7 +97,7 @@ export function Table() {
                 <Td>{document.type}</Td>
                 <Td>{prettyBytes(document.size)}</Td>
                 <Td>
-                  <Dropdown>
+                  <Dropdown label={t('more_actions')}>
                     <DropdownElement>
                       <a
                         target="_blank"
@@ -119,7 +122,12 @@ export function Table() {
                       </a>
                     </DropdownElement>
 
-                    <DropdownElement onClick={() => destroy(document.id)}>
+                    <DropdownElement
+                      onClick={() => {
+                        setDocument(document.id);
+                        setPasswordConfirmModalOpen(true);
+                      }}
+                    >
                       {t('delete')}
                     </DropdownElement>
                   </Dropdown>
@@ -137,6 +145,11 @@ export function Table() {
           totalPages={data.data.meta.pagination.total_pages}
         />
       )}
+      <PasswordConfirmation
+        show={isPasswordConfirmModalOpen}
+        onClose={setPasswordConfirmModalOpen}
+        onSave={destroy}
+      />
     </>
   );
 }
