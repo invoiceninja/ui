@@ -10,9 +10,11 @@
 
 import Tippy from '@tippyjs/react';
 import axios, { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
+import { endpoint, isSelfHosted } from 'common/helpers';
+import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { updateCompanyUsers } from 'common/stores/slices/company-users';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import {
@@ -25,9 +27,11 @@ import {
   Slack,
   Twitter,
   Youtube,
+  AlertCircle,
 } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 import { Button, InputField } from './forms';
 import Toggle from './forms/Toggle';
 import { Modal } from './Modal';
@@ -39,10 +43,12 @@ interface Props {
 export function HelpSidebarIcons(props: Props) {
   const [t] = useTranslation();
   const user = useCurrentUser();
-
+  const account = useCurrentAccount();
+  const dispatch = useDispatch();
   const [isContactVisible, setIsContactVisible] = useState(false);
   const [isAboutVisible, setIsAboutVisible] = useState(false);
-
+  const [cronsNotEnabledModal, setCronsNotEnabledModal] = useState(false);
+  const [disabledButton, setDisabledButton] = useState(false);
   const formik = useFormik({
     initialValues: {
       message: '',
@@ -70,7 +76,16 @@ export function HelpSidebarIcons(props: Props) {
         });
     },
   });
-
+  const refreshData = () => {
+    setDisabledButton(true);
+    axios
+      .post(endpoint('/api/v1/refresh'), {}, { headers: defaultHeaders })
+      .then((data) => {
+        dispatch(updateCompanyUsers(data.data.data));
+        setDisabledButton(false);
+        setCronsNotEnabledModal(false);
+      });
+  };
   return (
     <>
       <Modal
@@ -105,7 +120,32 @@ export function HelpSidebarIcons(props: Props) {
           {t('send')}
         </Button>
       </Modal>
-
+      <Modal
+        title={t('crons_not_enabled')}
+        visible={cronsNotEnabledModal}
+        onClose={setCronsNotEnabledModal}
+      >
+        <Button
+          onClick={() => {
+            window.open(
+              'https://invoiceninja.github.io/docs/self-host-troubleshooting/#cron-not-running-queue-not-running',
+              '_blank'
+            );
+          }}
+        >
+          {t('learn_more')}
+        </Button>
+        <Button disabled={disabledButton} onClick={refreshData}>
+          {t('refresh_data')}
+        </Button>
+        <Button
+          onClick={() => {
+            setCronsNotEnabledModal(false);
+          }}
+        >
+          {t('dismiss')}
+        </Button>
+      </Modal>
       <Modal
         title={t('about')}
         visible={isAboutVisible}
@@ -163,6 +203,21 @@ export function HelpSidebarIcons(props: Props) {
       </Modal>
 
       <nav className="flex p-2 justify-around text-white">
+        {isSelfHosted() && account && !account.is_scheduler_running && (
+          <button
+            className="p-2 hover:bg-ninja-gray-darker rounded-full"
+            onClick={() => setCronsNotEnabledModal(true)}
+          >
+            <Tippy
+              duration={0}
+              content={t('error')}
+              className="text-white rounded text-xs mb-2"
+            >
+              <AlertCircle />
+            </Tippy>
+          </button>
+        )}
+
         <button
           className="p-2 hover:bg-ninja-gray-darker rounded-full"
           onClick={() => setIsContactVisible(true)}
