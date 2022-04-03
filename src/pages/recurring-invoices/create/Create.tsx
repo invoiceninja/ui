@@ -29,7 +29,7 @@ import { useCurrentRecurringInvoice } from '../common/hooks/useCurrentRecurringI
 import { useHandleCreate } from '../create/hooks/useHandleCreate';
 
 export function Create() {
-  const { documentTitle } = useTitle('create_recurring_invoice');
+  const { documentTitle } = useTitle('new_recurring_invoice');
   const { data: recurringInvoice } = useBlankRecurringInvoiceQuery();
 
   const [t] = useTranslation();
