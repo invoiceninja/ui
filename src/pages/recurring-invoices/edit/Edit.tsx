@@ -14,6 +14,7 @@ import { useRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -73,6 +74,16 @@ export function Edit() {
 
         <InvoiceFooter />
         <InvoiceTotals />
+      </div>
+
+      <div className="my-4">
+        {currentRecurringInvoice && (
+          <InvoicePreview
+            for="invoice"
+            resource={currentRecurringInvoice}
+            entity="recurring_invoice"
+          />
+        )}
       </div>
     </Default>
   );
