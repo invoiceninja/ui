@@ -36,6 +36,8 @@ export function InvoiceViewer(props: Props) {
         })
       )
       .then((response) => {
+        console.log(response)
+
         const blob = new Blob([response.data], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
 

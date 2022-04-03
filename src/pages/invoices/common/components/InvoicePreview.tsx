@@ -10,6 +10,7 @@
 
 import { endpoint } from 'common/helpers';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
+import { useEffect } from 'react';
 import { InvoiceViewer } from './InvoiceViewer';
 
 interface Props {
@@ -19,16 +20,22 @@ interface Props {
 export function InvoicePreview(props: Props) {
   const invoice = useCurrentInvoice();
 
-  if (invoice?.id && invoice?.client_id) {
+  if (invoice?.client_id && props.for === 'create') {
     return (
       <InvoiceViewer
-        link={
-          props.for === 'create'
-            ? endpoint('/api/v1/live_preview?entity=invoice')
-            : endpoint('/api/v1/live_preview?entity=invoice&entity_id=:id', {
-                id: invoice?.id,
-              })
-        }
+        link={endpoint('/api/v1/live_preview?entity=invoice')}
+        resource={invoice}
+        method="POST"
+      />
+    );
+  }
+
+  if (invoice?.id && invoice?.client_id && props.for === 'invoice') {
+    return (
+      <InvoiceViewer
+        link={endpoint('/api/v1/live_preview?entity=invoice&entity_id=:id', {
+          id: invoice?.id,
+        })}
         resource={invoice}
         method="POST"
       />
