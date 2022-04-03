@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isHosted } from 'common/helpers';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { Button } from '../../../../components/forms';
@@ -17,9 +18,11 @@ export function Connect() {
 
   return (
     <Card title={t('oneclick_login')}>
-      <Element leftSide="Google">
-        <Button type="minimal">{t('connect_google')}</Button>
-      </Element>
+      {isHosted() && (
+        <Element leftSide="Google">
+          <Button type="minimal">{t('connect_google')}</Button>
+        </Element>
+      )}
       <Element leftSide="Gmail">
         <Button type="minimal">{t('connect_gmail')}</Button>
       </Element>
