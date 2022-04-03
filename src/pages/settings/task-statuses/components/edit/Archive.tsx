@@ -46,7 +46,7 @@ export function Archive() {
   return (
     <>
       {data && !data.data.data.archived_at && !data.data.data.is_deleted ? (
-        <ActionCard label={t('archive')} help="Lorem ipsum dolor sit amet.">
+        <ActionCard label={t('archive')} help="">
           <Button onClick={archive}>{t('archive')}</Button>
         </ActionCard>
       ) : null}

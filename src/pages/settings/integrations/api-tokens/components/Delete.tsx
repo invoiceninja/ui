@@ -46,7 +46,7 @@ export function Delete() {
   return (
     <>
       {data && !data.data.data.is_deleted && (
-        <ActionCard label={t('delete')} help="Lorem ipsum dolor sit amet.">
+        <ActionCard label={t('delete')} help="">
           <Button onClick={destroy}>{t('delete')}</Button>
         </ActionCard>
       )}
