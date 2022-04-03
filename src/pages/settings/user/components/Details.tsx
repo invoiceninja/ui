@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { updateChanges } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { ChangeEvent } from 'react';
@@ -20,7 +21,7 @@ export function Details() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
   const userChanges = useSelector((state: RootState) => state.user.changes);
-
+  const user = useCurrentUser();
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
     dispatch(
       updateChanges({ property: event.target.id, value: event.target.value })
@@ -33,7 +34,7 @@ export function Details() {
           <Element leftSide={t('first_name')}>
             <InputField
               id="first_name"
-              value={userChanges?.first_name || ''}
+              value={userChanges?.first_name || user.first_name || ''}
               onChange={handleChange}
             />
           </Element>
@@ -41,7 +42,7 @@ export function Details() {
           <Element leftSide={t('last_name')}>
             <InputField
               id="last_name"
-              value={userChanges?.last_name || ''}
+              value={userChanges?.last_name || user.last_name || ''}
               onChange={handleChange}
             />
           </Element>
@@ -49,7 +50,7 @@ export function Details() {
           <Element leftSide={t('email')}>
             <InputField
               id="email"
-              value={userChanges?.email || ''}
+              value={userChanges?.email || user.email || ''}
               type="email"
               onChange={handleChange}
             />
@@ -58,7 +59,7 @@ export function Details() {
           <Element leftSide={t('phone')}>
             <InputField
               id="phone"
-              value={userChanges?.phone || ''}
+              value={userChanges?.phone || user.phone || ''}
               onChange={handleChange}
             />
           </Element>
