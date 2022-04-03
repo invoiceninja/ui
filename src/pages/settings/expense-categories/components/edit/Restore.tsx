@@ -49,7 +49,7 @@ export function Restore() {
   return (
     <>
       {data && (data.data.data.archived_at || data.data.data.is_deleted) ? (
-        <ActionCard label={t('restore')} help="Lorem ipsum dolor sit amet.">
+        <ActionCard label={t('restore')} help="">
           <Button onClick={restore}>{t('restore')}</Button>
         </ActionCard>
       ) : null}

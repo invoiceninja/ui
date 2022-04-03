@@ -22,6 +22,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { generatePath } from 'react-router-dom';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { useLogo } from 'common/hooks/useLogo';
+import { useCompanyName } from 'common/hooks/useLogo';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -30,6 +31,7 @@ export function CompanySwitcher() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const logo = useLogo();
+  const companyName = useCompanyName();
 
   const switchCompany = (index: number) => {
     dispatch(
@@ -52,8 +54,12 @@ export function CompanySwitcher() {
       <div>
         <Menu.Button className="flex items-center space-x-3 justify-center w-full rounded text-sm font-medium text-gray-700 border border-transparent">
           <img className="max-h-6 w-auto" src={logo} alt="Company logo" />
+          <span className="text-white">
+            {companyName}
+          </span>
           <ChevronDown size={18} color="white" />
         </Menu.Button>
+        
       </div>
 
       <Transition

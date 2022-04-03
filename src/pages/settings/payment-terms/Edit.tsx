@@ -179,19 +179,19 @@ export function Edit() {
           </Card>
 
           {!data.data.data.archived_at && !data.data.data.is_deleted ? (
-            <ActionCard label={t('archive')} help="Lorem ipsum dolor sit amet.">
+            <ActionCard label={t('archive')} help="">
               <Button onClick={archive}>{t('archive')}</Button>
             </ActionCard>
           ) : null}
 
           {data.data.data.archived_at || data.data.data.is_deleted ? (
-            <ActionCard label={t('restore')} help="Lorem ipsum dolor sit amet.">
+            <ActionCard label={t('restore')} help="">
               <Button onClick={restore}>{t('restore')}</Button>
             </ActionCard>
           ) : null}
 
           {!data.data.data.is_deleted && (
-            <ActionCard label={t('delete')} help="Lorem ipsum dolor sit amet.">
+            <ActionCard label={t('delete')} help="">
               <Button onClick={_delete}>{t('delete')}</Button>
             </ActionCard>
           )}
