@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InputField } from './forms';
 import { Modal } from './Modal';
@@ -31,7 +31,8 @@ export function PasswordConfirmation(props: Props) {
     setIsModalOpen(props.show as boolean);
   }, [props.show]);
 
-  const handleConfirm = () => {
+  const handleConfirm = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
     props.onClose(false);
     props.onSave(currentPassword, isPasswordRequired);
 
