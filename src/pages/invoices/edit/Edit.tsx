@@ -77,7 +77,9 @@ export function Edit() {
       </div>
 
       <div className="my-4">
-        <InvoicePreview for="invoice" />
+        {currentInvoice && (
+          <InvoicePreview for="invoice" resource={currentInvoice} />
+        )}
       </div>
     </Default>
   );
