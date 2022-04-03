@@ -18,13 +18,16 @@ import { InvoiceViewer } from './InvoiceViewer';
 interface Props {
   for: 'create' | 'invoice';
   resource: Invoice | RecurringInvoice;
+  entity: 'invoice' | 'recurring_invoice';
 }
 
 export function InvoicePreview(props: Props) {
   if (props.resource?.client_id && props.for === 'create') {
     return (
       <InvoiceViewer
-        link={endpoint('/api/v1/live_preview?entity=invoice')}
+        link={endpoint('/api/v1/live_preview?entity=:entity', {
+          entity: props.entity,
+        })}
         resource={props.resource}
         method="POST"
       />
@@ -38,7 +41,8 @@ export function InvoicePreview(props: Props) {
   ) {
     return (
       <InvoiceViewer
-        link={endpoint('/api/v1/live_preview?entity=invoice&entity_id=:id', {
+        link={endpoint('/api/v1/live_preview?entity=:entity&entity_id=:id', {
+          entity: props.entity,
           id: props.resource?.id,
         })}
         resource={props.resource}

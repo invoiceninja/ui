@@ -78,7 +78,11 @@ export function Edit() {
 
       <div className="my-4">
         {currentInvoice && (
-          <InvoicePreview for="invoice" resource={currentInvoice} />
+          <InvoicePreview
+            for="invoice"
+            resource={currentInvoice}
+            entity="invoice"
+          />
         )}
       </div>
     </Default>

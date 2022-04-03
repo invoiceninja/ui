@@ -86,7 +86,11 @@ export function Create() {
 
       <div className="my-4">
         {currentInvoice && (
-          <InvoicePreview for="create" resource={currentInvoice} />
+          <InvoicePreview
+            for="create"
+            resource={currentInvoice}
+            entity="invoice"
+          />
         )}
       </div>
     </Default>
