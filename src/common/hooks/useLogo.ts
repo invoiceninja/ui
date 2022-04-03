@@ -19,7 +19,6 @@ export function useLogo() {
 }
 
 export function useCompanyName() {
-
   const currentCompany = useCurrentCompany();
   const [t] = useTranslation();
 

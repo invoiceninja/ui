@@ -53,13 +53,10 @@ export function CompanySwitcher() {
     <Menu as="div" className="relative inline-block text-left">
       <div>
         <Menu.Button className="flex items-center space-x-3 justify-center w-full rounded text-sm font-medium text-gray-700 border border-transparent">
-          <img className="max-h-6 w-auto" src={logo} alt="Company logo" />
-          <span className="text-white">
-            {companyName}
-          </span>
+          <img className="w-8" src={logo} alt="Company logo" />
+          <span className="text-white text-sm">{companyName}</span>
           <ChevronDown size={18} color="white" />
         </Menu.Button>
-        
       </div>
 
       <Transition
