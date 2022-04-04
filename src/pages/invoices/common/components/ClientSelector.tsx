@@ -10,10 +10,11 @@
 
 import { Card } from '@invoiceninja/cards';
 import { InputLabel } from '@invoiceninja/forms';
+import { ClientResolver } from 'common/helpers/clients/client-resolver';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { injectBlankItemIntoCurrent } from 'common/stores/slices/invoices';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
@@ -29,10 +30,12 @@ export function ClientSelector(props: Props) {
   const invoice = useCurrentInvoice();
   const onChange = useSetCurrentInvoiceProperty();
   const dispatch = useDispatch();
-
+  const resolveClient=new ClientResolver();
+  const [clientName, setClientName] = useState('')
   useEffect(() => {
     if (invoice?.client_id && invoice?.line_items.length === 0) {
       dispatch(injectBlankItemIntoCurrent());
+      resolveClient.find(invoice.client_id).then(client=>setClientName(client.display_name))
     }
   }, [invoice]);
 
@@ -48,7 +51,9 @@ export function ClientSelector(props: Props) {
         label="display_name"
         onChange={(value) => onChange('client_id', value.value)}
         defaultValue={invoice?.client_id}
+        value={invoice?.client_id}
         disabled={props.readonly}
+        test={clientName}
       />
 
       <ClientContactSelector />

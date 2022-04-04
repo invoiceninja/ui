@@ -27,12 +27,14 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
+import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 
 export function ClientCreate() {
   const [t] = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [client, setClient] = useState<Client | undefined>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const onChange = useSetCurrentInvoiceProperty();
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([
     {
       first_name: '',
@@ -86,8 +88,10 @@ export function ClientCreate() {
       .post(endpoint('/api/v1/clients'), client, {
         headers: defaultHeaders,
       })
-      .then(() => {
+      .then((response) => {
         toast.success(t('created_client'), { id: toastId });
+        console.log(response.data.data.id)
+        onChange('client_id', response.data.data.id);
         setIsModalOpen(false);
       })
       .catch((error: AxiosError) => {
