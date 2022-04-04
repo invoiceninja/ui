@@ -90,7 +90,6 @@ export function ClientCreate() {
       })
       .then((response) => {
         toast.success(t('created_client'), { id: toastId });
-        console.log(response.data.data.id)
         onChange('client_id', response.data.data.id);
         setIsModalOpen(false);
       })
