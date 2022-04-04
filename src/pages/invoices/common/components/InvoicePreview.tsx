@@ -9,10 +9,8 @@
  */
 
 import { endpoint } from 'common/helpers';
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
-import { useEffect } from 'react';
 import { InvoiceViewer } from './InvoiceViewer';
 
 interface Props {
