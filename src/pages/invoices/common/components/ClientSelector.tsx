@@ -53,7 +53,6 @@ export function ClientSelector(props: Props) {
         defaultValue={invoice?.client_id}
         value={invoice?.client_id}
         disabled={props.readonly}
-        test={clientName}
       />
 
       <ClientContactSelector />
