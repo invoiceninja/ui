@@ -18,7 +18,7 @@ export function Td(props: Props) {
   return (
     <td
       colSpan={props.colSpan}
-      className={`px-6 py-2 whitespace-nowrap text-sm text-gray-900 ${props.className}`}
+      className={`px-6 py-2.5 whitespace-nowrap text-sm text-gray-900 ${props.className}`}
     >
       {props.children}
     </td>

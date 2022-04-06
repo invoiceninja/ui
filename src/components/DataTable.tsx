@@ -180,7 +180,10 @@ export function DataTable(props: Props) {
 
           {data &&
             data?.data?.data?.map((resource: any, index: number) => (
-              <Tr key={index}>
+              <Tr
+                key={index}
+                onClick={() => document.getElementById(resource.id)?.click()}
+              >
                 <Td>
                   <Checkbox
                     className="child-checkbox"
