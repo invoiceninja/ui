@@ -17,7 +17,7 @@ interface Props extends CommonProps {
   currentPage: number;
   onPageChange: any;
   onRowsChange: (rows: string) => any;
-  totalRecords: number;
+  totalRecords?: number;
 }
 
 const defaultProps: Props = {
@@ -75,7 +75,12 @@ export function Pagination(props: Props) {
           current: props.currentPage,
           total: props.totalPages,
         })}
-        . {props.totalRecords} {t('total_results')}.
+        .
+        {props.totalRecords && (
+          <>
+            {props.totalRecords} {t('total_results')}
+          </>
+        )}
       </p>
 
       <nav className="flex justify-center md:justify-end my-4 md:my-0 items-center">
