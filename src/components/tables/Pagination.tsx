@@ -17,6 +17,7 @@ interface Props extends CommonProps {
   currentPage: number;
   onPageChange: any;
   onRowsChange: (rows: string) => any;
+  totalRecords: number;
 }
 
 const defaultProps: Props = {
@@ -24,6 +25,7 @@ const defaultProps: Props = {
   currentPage: 1,
   onPageChange: (page: number) => page,
   onRowsChange: (rows: string) => rows,
+  totalRecords: 0,
 };
 
 export function Pagination(props: Props) {
@@ -44,10 +46,10 @@ export function Pagination(props: Props) {
   };
 
   return (
-    <div className="flex flex-col md:flex-row md:items-center justify-between space-x-2 my-3 overflow-y-auto pb-2">
+    <div className="flex items-center justify-between space-x-2 my-3 overflow-y-auto pb-2">
       <div className="flex justify-center md:justify-start items-center space-x-4">
         {/* <span className="text-sm">Showing 1 to 1 of 1 entires</span> */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 flex-wrap">
           <select
             id="location"
             name="location"
@@ -67,6 +69,15 @@ export function Pagination(props: Props) {
           </label>
         </div>
       </div>
+
+      <p className="hidden lg:block text-sm font-medium text-gray-700">
+        {t('pdf_page_info', {
+          current: props.currentPage,
+          total: props.totalPages,
+        })}
+        . {props.totalRecords} {t('total_results')}.
+      </p>
+
       <nav className="flex justify-center md:justify-end my-4 md:my-0 items-center">
         <button
           onClick={previous}

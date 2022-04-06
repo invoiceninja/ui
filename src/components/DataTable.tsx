@@ -234,6 +234,7 @@ export function DataTable(props: Props) {
           onPageChange={setCurrentPage}
           onRowsChange={setPerPage}
           totalPages={data.data.meta.pagination.total_pages}
+          totalRecords={data.data.meta.pagination.total}
         />
       )}
     </>
