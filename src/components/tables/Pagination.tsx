@@ -77,9 +77,9 @@ export function Pagination(props: Props) {
         })}
         .
         {props.totalRecords && (
-          <>
-            {props.totalRecords} {t('total_results')}
-          </>
+          <span className="ml-2">
+            {t('total_results')}: {props.totalRecords}
+          </span>
         )}
       </p>
 
