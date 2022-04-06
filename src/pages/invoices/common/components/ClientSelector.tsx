@@ -53,7 +53,6 @@ export function ClientSelector(props: Props) {
         label="display_name"
         onChange={(value) => onChange('client_id', value.value)}
         defaultValue={invoice?.client_id}
-        value={invoice?.client_id}
         disabled={props.readonly}
         placeholder={clientName}
       />
