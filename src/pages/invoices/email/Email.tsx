@@ -24,6 +24,7 @@ import { useResolveTemplate } from 'common/hooks/emails/useResolveTemplate';
 import { Contact } from 'components/emails/Contact';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
+import MDEditor from '@uiw/react-md-editor';
 
 export function Email() {
   const [t] = useTranslation();
@@ -138,13 +139,10 @@ export function Email() {
               }
             />
 
-            <InputField
-              label={t('body')}
-              element="textarea"
+            <MDEditor
               value={body || template?.raw_body}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setBody(event.target.value)
-              }
+              onChange={(value) => setBody(String(value))}
+              preview="edit"
             />
           </Card>
 
