@@ -16,7 +16,7 @@ export function Table(props: Props) {
   return (
     <div className="flex flex-col mt-2">
       <div className="overflow-x-auto">
-        <div className="py-2 align-middle inline-block min-w-full">
+        <div className="py-1.5 align-middle inline-block min-w-full">
           <div className="overflow-hidden border border-gray-200 dark:border-transparent rounded border-b border-t">
             <table className="min-w-full divide-y divide-gray-200">
               {props.children}
