@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useFormik } from 'formik';
 import { useDispatch } from 'react-redux';
 import {
@@ -28,17 +28,16 @@ import { Alert } from '../../components/Alert';
 import { HostedLinks } from './components/HostedLinks';
 import { Header } from './components/Header';
 import { updateCompanyUsers } from 'common/stores/slices/company-users';
+import { useTitle } from 'common/hooks/useTitle';
 
 export function Login() {
+  useTitle('login');
+
   const dispatch = useDispatch();
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [errors, setErrors] = useState<LoginValidation | undefined>(undefined);
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [t] = useTranslation();
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('login')}`;
-  });
 
   const form = useFormik({
     initialValues: {
