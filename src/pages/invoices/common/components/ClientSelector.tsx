@@ -30,12 +30,14 @@ export function ClientSelector(props: Props) {
   const invoice = useCurrentInvoice();
   const onChange = useSetCurrentInvoiceProperty();
   const dispatch = useDispatch();
-  const resolveClient=new ClientResolver();
-  const [clientName, setClientName] = useState('')
+  const resolveClient = new ClientResolver();
+  const [clientName, setClientName] = useState('');
   useEffect(() => {
     if (invoice?.client_id && invoice?.line_items.length === 0) {
       dispatch(injectBlankItemIntoCurrent());
-      resolveClient.find(invoice.client_id).then(client=>setClientName(client.display_name))
+      resolveClient
+        .find(invoice.client_id)
+        .then((client) => setClientName(client.display_name));
     }
   }, [invoice]);
 
@@ -53,9 +55,7 @@ export function ClientSelector(props: Props) {
         defaultValue={invoice?.client_id}
         value={invoice?.client_id}
         disabled={props.readonly}
-        displayLabel={clientName}
-        
-        
+        placeholder={clientName}
       />
 
       <ClientContactSelector />

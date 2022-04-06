@@ -26,7 +26,6 @@ interface Props {
   actionLabel?: string;
   defaultValue?: string | number | boolean;
   disabled?: boolean;
-  displayLabel?: string;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -63,8 +62,6 @@ export function DebouncedCombobox(props: Props) {
       )
       .then((response) => {
         const array: Record[] = [internalRecord];
-
-        if (props.displayLabel) array[0].label = props.displayLabel;
 
         response?.data?.data?.map((resource: any) =>
           array.push({
@@ -121,14 +118,9 @@ export function DebouncedCombobox(props: Props) {
   useEffect(() => {
     request('');
   }, [props.endpoint]);
-  useEffect(() => {
-    if (props.displayLabel)
-      internalRecord.label=props.displayLabel
-  }, [props.displayLabel]);
 
   return (
     <div className={`w-full ${props.className}`}>
-      {console.log(records)}
       <Combobox
         value={selectedOption?.record}
         onChange={(record) =>
