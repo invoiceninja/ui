@@ -75,7 +75,13 @@ export function Clone() {
       </div>
 
       <div className="my-4">
-        <InvoicePreview for="create" />
+        {currentInvoice && (
+          <InvoicePreview
+            for="invoice"
+            resource={currentInvoice}
+            entity="invoice"
+          />
+        )}
       </div>
     </Default>
   );

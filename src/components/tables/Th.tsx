@@ -49,7 +49,7 @@ export function Th(props: Props) {
     <th
       onClick={handleClick}
       className={classNames(
-        `px-6 py-3 text-left text-xs font-medium text-white uppercase tracking-wider ${props.className}`,
+        `px-6 py-2 text-left text-xs font-medium text-white uppercase tracking-wider ${props.className}`,
         {
           'cursor-pointer': props.onColumnClick,
         }
