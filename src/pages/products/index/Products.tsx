@@ -78,6 +78,7 @@ export function Products() {
         resource="product"
         columns={columns}
         endpoint="/api/v1/products?include=company"
+        bulkRoute="/api/v1/products/bulk"
         linkToCreate="/products/create"
         linkToEdit="/products/:id/edit"
         withResourcefulActions
