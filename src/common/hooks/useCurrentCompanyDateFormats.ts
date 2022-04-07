@@ -14,19 +14,22 @@ import { useCurrentCompany } from './useCurrentCompany';
 
 export function useCurrentCompanyDateFormats() {
   const company = useCurrentCompany();
+
   const { data: statics } = useStaticsQuery();
+
   const [dateFormatId, setDateFormatId] = useState('0');
   const [dateFormat, setDateFormat] = useState('DD/MMM/YYYY');
 
   useEffect(() => {
-    setDateFormatId(company?.settings?.date_format_id || '0');
-
     if (statics?.data?.date_formats) {
-      const result = statics.data.date_formats.filter(
-        (format: any) => format.id === dateFormatId
+      const result = statics.data.date_formats.find(
+        (format: any) => format.id === company?.settings?.date_format_id || '0'
       );
 
-      setDateFormat(result?.[0]?.format_moment);
+      if (result) {
+        setDateFormat(result.format_moment);
+        setDateFormatId(result.id);
+      }
     }
   }, [company, statics]);
 

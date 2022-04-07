@@ -28,6 +28,7 @@ export function Invoices() {
   const formatMoney = useFormatMoney();
 
   const pages = [{ name: t('invoices'), href: '/invoices' }];
+
   const columns: DataTableColumns = [
     {
       id: 'status_id',
