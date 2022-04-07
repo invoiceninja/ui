@@ -10,6 +10,7 @@
 
 import invoiceStatus from 'common/constants/invoice-status';
 import { date } from 'common/helpers';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { DataTable, DataTableColumns } from 'components/DataTable';
@@ -20,8 +21,12 @@ import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 
 export function Invoices() {
+  useTitle('invoices');
+
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const formatMoney = useFormatMoney();
+
   const pages = [{ name: t('invoices'), href: '/invoices' }];
   const columns: DataTableColumns = [
     {
@@ -42,8 +47,26 @@ export function Invoices() {
         </Link>
       ),
     },
-    { id: 'amount', label: t('amount') },
-    { id: 'balance', label: t('balance') },
+    {
+      id: 'amount',
+      label: t('amount'),
+      format: (value, resource) =>
+        formatMoney(
+          value,
+          resource?.client.country_id,
+          resource?.client.settings.currency_id
+        ),
+    },
+    {
+      id: 'balance',
+      label: t('balance'),
+      format: (value, resource) =>
+        formatMoney(
+          value,
+          resource?.client.country_id,
+          resource?.client.settings.currency_id
+        ),
+    },
     {
       id: 'date',
       label: t('date'),
@@ -55,7 +78,6 @@ export function Invoices() {
       format: (value) => date(value, dateFormat),
     },
   ];
-  useTitle('invoices');
 
   return (
     <Default title={t('invoices')} breadcrumbs={pages} docsLink="docs/invoices">
