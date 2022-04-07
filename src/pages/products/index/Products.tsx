@@ -17,12 +17,15 @@ import { generatePath, useNavigate } from 'react-router-dom';
 import { Default } from 'components/layouts/Default';
 import { EntityStatus } from 'components/EntityStatus';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 
 export function Products() {
+  useTitle('products');
+
   const [t] = useTranslation();
   const navigate = useNavigate();
+  const formatMoney = useFormatMoney();
   const pages: BreadcrumRecord[] = [{ name: t('products'), href: '/products' }];
-  useTitle('products');
 
   const columns: DataTableColumns = [
     {
@@ -45,6 +48,12 @@ export function Products() {
     {
       id: 'cost',
       label: t('cost'),
+      format: (value, resource) =>
+        formatMoney(
+          value,
+          resource?.company.settings?.country_id,
+          resource?.company.settings?.currency_id
+        ),
     },
     {
       id: 'quantity',
@@ -68,7 +77,7 @@ export function Products() {
       <DataTable
         resource="product"
         columns={columns}
-        endpoint="/api/v1/products"
+        endpoint="/api/v1/products?include=company"
         linkToCreate="/products/create"
         linkToEdit="/products/:id/edit"
         withResourcefulActions
