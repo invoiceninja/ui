@@ -163,8 +163,8 @@ export function InvoiceDetails() {
             }
           >
             <option value="always">{t('enabled')}</option>
-            <option value="optout">{t('enabled_by_default')}</option>
-            <option value="optin">{t('disabled_by_default')}</option>
+            <option value="optout">{t('optout')}</option>
+            <option value="optin">{t('optin')}</option>
             <option value="off">{t('off')}</option>
           </SelectField>
         </Element>
