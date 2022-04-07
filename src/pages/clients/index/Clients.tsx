@@ -10,6 +10,7 @@
 
 import { Link } from '@invoiceninja/forms';
 import { date } from 'common/helpers';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
@@ -20,9 +21,12 @@ import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router-dom';
 
 export function Clients() {
-  const [t] = useTranslation();
-  const navigate = useNavigate();
   useTitle('clients');
+
+  const [t] = useTranslation();
+
+  const navigate = useNavigate();
+  const formatMoney = useFormatMoney();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -39,11 +43,25 @@ export function Clients() {
       ),
     },
     { id: 'name', label: t('name') },
-    { id: 'balance', label: t('balance') },
+    {
+      id: 'balance',
+      label: t('balance'),
+      format: (value, resource) =>
+        formatMoney(
+          value,
+          resource?.country_id,
+          resource?.settings.currency_id
+        ),
+    },
     {
       id: 'paid_to_date',
       label: t('paid_to_date'),
-      format: (value) => date(value, dateFormat),
+      format: (value, resource) =>
+        formatMoney(
+          value,
+          resource?.country_id,
+          resource?.settings.currency_id
+        ),
     },
     {
       id: 'last_login',
@@ -51,6 +69,7 @@ export function Clients() {
       format: (value) => date(value, dateFormat),
     },
   ];
+
   const actions = [
     (resource: any) => (
       <DropdownElement
