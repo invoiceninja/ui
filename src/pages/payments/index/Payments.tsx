@@ -10,6 +10,7 @@
 import paymentStatus from 'common/constants/payment-status';
 import paymentType from 'common/constants/payment-type';
 import { date } from 'common/helpers';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Payment } from 'common/interfaces/payment';
@@ -24,10 +25,15 @@ import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 
 export function Payments() {
-  const [t] = useTranslation();
-  const { dateFormat } = useCurrentCompanyDateFormats();
   useTitle('payments');
+
+  const [t] = useTranslation();
+  const formatMoney = useFormatMoney();
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
   const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
+
   const columns: DataTableColumns = [
     {
       id: 'status_id',
@@ -57,6 +63,12 @@ export function Payments() {
     {
       id: 'amount',
       label: t('amount'),
+      format: (value, resource) =>
+        formatMoney(
+          value,
+          resource?.client.country_id,
+          resource?.client.settings.currency_id
+        ),
     },
     {
       id: 'invoice_number',
