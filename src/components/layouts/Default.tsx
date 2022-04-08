@@ -64,13 +64,13 @@ export function Default(props: Props) {
       name: t('dashboard'),
       href: '/dashboard',
       icon: Home,
-      current: location.pathname === '/dashboard',
+      current: location.pathname.startsWith('/dashboard'),
     },
     {
       name: t('clients'),
       href: '/clients',
       icon: Users,
-      current: location.pathname === '/clients',
+      current: location.pathname.startsWith('/clients'),
       rightButton: {
         icon: PlusCircle,
         to: '/clients/create',
@@ -81,7 +81,7 @@ export function Default(props: Props) {
       name: t('products'),
       href: '/products',
       icon: Box,
-      current: location.pathname === '/products',
+      current: location.pathname.startsWith('/products'),
       rightButton: {
         icon: PlusCircle,
         to: '/products/create',
@@ -92,7 +92,7 @@ export function Default(props: Props) {
       name: t('invoices'),
       href: '/invoices',
       icon: FileText,
-      current: location.pathname === '/invoices',
+      current: location.pathname.startsWith('/invoices'),
       rightButton: {
         icon: PlusCircle,
         to: '/invoices/create',
@@ -103,7 +103,7 @@ export function Default(props: Props) {
       name: t('recurring_invoices'),
       href: '/recurring_invoices',
       icon: Repeat,
-      current: location.pathname === '/recurring_invoices',
+      current: location.pathname.startsWith('/recurring_invoices'),
       rightButton: {
         icon: PlusCircle,
         to: '/recurring_invoices/create',
@@ -114,7 +114,7 @@ export function Default(props: Props) {
       name: t('payments'),
       href: '/payments',
       icon: CreditCard,
-      current: location.pathname === '/payments',
+      current: location.pathname.startsWith('/payments'),
       rightButton: {
         icon: PlusCircle,
         to: '/payments/create',
