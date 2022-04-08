@@ -41,7 +41,7 @@ import {
   Droppable,
   DropResult,
 } from 'react-beautiful-dnd';
-import { X } from 'react-feather';
+import { Menu, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
@@ -141,18 +141,22 @@ export function SortableVariableList(props: Props) {
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                           ref={provided.innerRef}
-                          className="flex items-center space-x-2 py-2 "
+                          className="flex items-center justify-between space-y-6"
                           key={label}
                         >
-                          <Button
-                            type="minimal"
-                            onClick={() => remove(label)}
-                            behavior="button"
-                          >
-                            <X />
-                          </Button>
+                          <div className="flex items-center space-x-2">
+                            <Button
+                              type="minimal"
+                              onClick={() => remove(label)}
+                              behavior="button"
+                            >
+                              <X />
+                            </Button>
 
-                          <span>{resolveTranslation(label)?.label}</span>
+                            <span>{resolveTranslation(label)?.label}</span>
+                          </div>
+
+                          <Menu size={16} />
                         </div>
                       )}
                     </Draggable>
