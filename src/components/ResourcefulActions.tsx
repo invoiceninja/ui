@@ -9,6 +9,7 @@
  */
 
 import { AxiosError } from 'axios';
+import classNames from 'classnames';
 import { endpoint, request } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { ReactNode, RefObject } from 'react';
@@ -74,53 +75,58 @@ export default function ResourcefulActions(props: Props) {
   return (
     <>
       {props.type === 'default' && (
-        <Dropdown label={props.label}>
-          {props.linkToEdit && (
-            <DropdownElement
-              to={generatePath(props.linkToEdit, {
-                id: props.resource?.id,
-              })}
-            >
-              {t(`edit_${props.resourceType}`)}
-            </DropdownElement>
-          )}
-          {props.resource?.archived_at === 0 && (
-            <DropdownElement
-              onClick={() => {
-                props.setSelected(new Set());
-                props.setSelected(props.selected.add(props.resource?.id));
-                bulk('archive');
-              }}
-            >
-              {t(`archive_${props.resourceType}`)}
-            </DropdownElement>
-          )}
+        <Dropdown
+          className={classNames({ 'divide-y': props.children })}
+          label={props.label}
+        >
+          <div>
+            {props.linkToEdit && (
+              <DropdownElement
+                to={generatePath(props.linkToEdit, {
+                  id: props.resource?.id,
+                })}
+              >
+                {t(`edit_${props.resourceType}`)}
+              </DropdownElement>
+            )}
+            {props.resource?.archived_at === 0 && (
+              <DropdownElement
+                onClick={() => {
+                  props.setSelected(new Set());
+                  props.setSelected(props.selected.add(props.resource?.id));
+                  bulk('archive');
+                }}
+              >
+                {t(`archive_${props.resourceType}`)}
+              </DropdownElement>
+            )}
 
-          {props.resource?.archived_at > 0 && (
-            <DropdownElement
-              onClick={() => {
-                props.setSelected(new Set());
-                props.setSelected(props.selected.add(props.resource?.id));
-                bulk('restore');
-              }}
-            >
-              {t(`restore_${props.resourceType}`)}
-            </DropdownElement>
-          )}
+            {props.resource?.archived_at > 0 && (
+              <DropdownElement
+                onClick={() => {
+                  props.setSelected(new Set());
+                  props.setSelected(props.selected.add(props.resource?.id));
+                  bulk('restore');
+                }}
+              >
+                {t(`restore_${props.resourceType}`)}
+              </DropdownElement>
+            )}
 
-          {!props.resource?.is_deleted && (
-            <DropdownElement
-              onClick={() => {
-                props.setSelected(new Set());
-                props.setSelected(props.selected.add(props.resource?.id));
-                bulk('delete');
-              }}
-            >
-              {t(`delete_${props.resourceType}`)}
-            </DropdownElement>
-          )}
+            {!props.resource?.is_deleted && (
+              <DropdownElement
+                onClick={() => {
+                  props.setSelected(new Set());
+                  props.setSelected(props.selected.add(props.resource?.id));
+                  bulk('delete');
+                }}
+              >
+                {t(`delete_${props.resourceType}`)}
+              </DropdownElement>
+            )}
+          </div>
 
-          {props.children}
+          <div>{props.children}</div>
         </Dropdown>
       )}
       {props.type === 'bulk' && (
