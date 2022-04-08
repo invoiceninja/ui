@@ -16,7 +16,7 @@ import {
 import { Divider } from 'components/cards/Divider';
 import { Modal } from 'components/Modal';
 import { cloneDeep } from 'lodash';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -162,7 +162,9 @@ export function CustomLabels() {
         </Link>
       </Modal>
 
-      <Card title={t('custom_labels')}>
+      <Card title={t('custom_labels')} onFormSubmit={(event:FormEvent<HTMLFormElement>)=>{
+         event.preventDefault()
+        }}>
         <Element
           leftSide={
             <SelectField
