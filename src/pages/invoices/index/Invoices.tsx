@@ -97,6 +97,13 @@ export function Invoices() {
         {t('download')}
       </DropdownElement>
     ),
+    (invoice: Invoice) => (
+      <DropdownElement
+        to={generatePath('/invoices/:id/email', { id: invoice.id })}
+      >
+        {t('email_invoice')}
+      </DropdownElement>
+    ),
   ];
 
   return (

@@ -41,9 +41,7 @@ export function Actions() {
           {t('download')}
         </DropdownElement>
 
-        <DropdownElement
-          onClick={() => navigate(generatePath('/invoices/:id/email', { id }))}
-        >
+        <DropdownElement to={generatePath('/invoices/:id/email', { id })}>
           {t('email_invoice')}
         </DropdownElement>
 
