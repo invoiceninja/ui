@@ -25,7 +25,6 @@ export function Actions() {
   const { id } = useParams();
   const invoice = useCurrentInvoice();
   const downloadPdf = useDownloadPdf();
-  const navigate = useNavigate();
   const markPaid = useMarkPaid();
   const archive = useHandleArchive();
   const destroy = useHandleDelete();
