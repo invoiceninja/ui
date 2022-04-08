@@ -13,7 +13,9 @@ import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
+import { Invoice } from 'common/interfaces/invoice';
 import { DataTable, DataTableColumns } from 'components/DataTable';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
@@ -80,6 +82,16 @@ export function Invoices() {
     },
   ];
 
+  const actions = [
+    (invoice: Invoice) => (
+      <DropdownElement
+        to={generatePath('/invoices/:id/pdf', { id: invoice.id })}
+      >
+        {t('view_pdf')}
+      </DropdownElement>
+    ),
+  ];
+
   return (
     <Default title={t('invoices')} breadcrumbs={pages} docsLink="docs/invoices">
       <DataTable
@@ -90,6 +102,7 @@ export function Invoices() {
         linkToCreate="/invoices/create"
         linkToEdit="/invoices/:id/edit"
         withResourcefulActions
+        customActions={actions}
       />
     </Default>
   );
