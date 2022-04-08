@@ -3,14 +3,18 @@ import invoice from '../../helpers/data/invoice';
 import invoice_item from '../../helpers/data/invoice_item';
 import { InvoiceItemSum } from '../../../src/common/helpers/invoices/invoice-item-sum';
 import { InvoiceItem } from '../../../src/common/interfaces/invoice-item';
-
+import currencies from '../../helpers/data/currencies';
+const usd_currency = currencies.filter(
+  (currency) => currency.code == 'USD'
+)[0];
 describe('InvoiceSum test', () => {
+ 
   test('correct instance', () => {
-    expect(new InvoiceSum(invoice)).toBeInstanceOf(InvoiceSum);
+    expect(new InvoiceSum(invoice,usd_currency)).toBeInstanceOf(InvoiceSum);
   });
 
   it('playground', () => {
-    new InvoiceSum(invoice).build();
+    new InvoiceSum(invoice,usd_currency).build();
   });
 });
 
@@ -23,7 +27,7 @@ describe('InvoiceSum test invoice calculation', () => {
   });
 
   it('Line Item Calc', () => {
-    const invoiceSum = new InvoiceSum(invoice).build();
+    const invoiceSum = new InvoiceSum(invoice,usd_currency).build();
 
     expect(invoiceSum.invoice.amount).toEqual(3723);
     expect(invoiceSum.invoice.balance).toEqual(3723);
@@ -40,7 +44,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.tax_rate3 = 0;
 
     invoice.line_items = invoice_item;
-    const invoiceSum = new InvoiceSum(invoice).build();
+    const invoiceSum = new InvoiceSum(invoice,usd_currency).build();
 
     expect(invoiceSum.invoice.amount).toEqual(20);
     expect(invoiceSum.invoice.balance).toEqual(20);
@@ -50,7 +54,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.is_amount_discount = true;
     invoice.discount = 1;
 
-    const invoiceSum = new InvoiceSum(invoice).build();
+    const invoiceSum = new InvoiceSum(invoice,usd_currency).build();
 
     expect(invoiceSum.invoice.amount).toEqual(19);
     expect(invoiceSum.invoice.balance).toEqual(19);
@@ -60,7 +64,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.is_amount_discount = false;
     invoice.discount = 50;
 
-    const invoiceSum = new InvoiceSum(invoice).build();
+    const invoiceSum = new InvoiceSum(invoice,usd_currency).build();
 
     expect(invoiceSum.invoice.amount).toEqual(10);
     expect(invoiceSum.invoice.balance).toEqual(10);
@@ -71,7 +75,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.discount = 5;
     invoice.custom_surcharge1 = 5;
 
-    const invoiceSum = new InvoiceSum(invoice).build();
+    const invoiceSum = new InvoiceSum(invoice,usd_currency).build();
 
     expect(invoiceSum.invoice.amount).toEqual(20);
     expect(invoiceSum.invoice.balance).toEqual(20);
@@ -84,7 +88,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.tax_rate1 = 10;
     invoice.tax_name1 = 'GST';
 
-    const invoiceSum = new InvoiceSum(invoice).build();
+    const invoiceSum = new InvoiceSum(invoice,usd_currency).build();
 
     expect(invoiceSum.subTotal).toEqual(20);
     expect(invoiceSum.invoice.amount).toEqual(21.5);
@@ -100,7 +104,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.tax_rate2 = 10;
     invoice.tax_name2 = 'GST';
 
-    const invoiceSum = new InvoiceSum(invoice).build();
+    const invoiceSum = new InvoiceSum(invoice,usd_currency).build();
 
     expect(invoiceSum.subTotal).toEqual(20);
     expect(invoiceSum.invoice.amount).toEqual(23);
@@ -123,7 +127,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.tax_name2 = 'GST';
     invoice.uses_inclusive_taxes = false;
 
-    const invoiceSum = new InvoiceSum(invoice).build();
+    const invoiceSum = new InvoiceSum(invoice,usd_currency).build();
 
     expect(invoiceSum.subTotal).toEqual(20);
     expect(invoiceSum.invoice.amount).toEqual(26);
