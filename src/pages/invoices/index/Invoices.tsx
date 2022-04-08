@@ -21,6 +21,7 @@ import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { openClientPortal } from '../common/helpers/open-client-portal';
 import { useDownloadPdf } from '../common/hooks/useDownloadPdf';
 
 export function Invoices() {
@@ -102,6 +103,11 @@ export function Invoices() {
         to={generatePath('/invoices/:id/email', { id: invoice.id })}
       >
         {t('email_invoice')}
+      </DropdownElement>
+    ),
+    (invoice: Invoice) => (
+      <DropdownElement onClick={() => openClientPortal(invoice)}>
+        {t('client_portal')}
       </DropdownElement>
     ),
   ];

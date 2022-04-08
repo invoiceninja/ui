@@ -15,7 +15,7 @@ import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import { useHandleArchive } from '../hooks/useHandleArchive';
 import { useHandleDelete } from '../hooks/useHandleDelete';
 import { useMarkPaid } from '../hooks/useMarkPaid';
