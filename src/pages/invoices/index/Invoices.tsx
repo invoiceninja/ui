@@ -21,16 +21,18 @@ import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { useDownloadPdf } from '../common/hooks/useDownloadPdf';
 
 export function Invoices() {
   useTitle('invoices');
 
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
   const formatMoney = useFormatMoney();
+  const downloadPdf = useDownloadPdf();
 
   const pages = [{ name: t('invoices'), href: '/invoices' }];
-
   const columns: DataTableColumns = [
     {
       id: 'status_id',
@@ -88,6 +90,11 @@ export function Invoices() {
         to={generatePath('/invoices/:id/pdf', { id: invoice.id })}
       >
         {t('view_pdf')}
+      </DropdownElement>
+    ),
+    (invoice: Invoice) => (
+      <DropdownElement onClick={() => downloadPdf(invoice)}>
+        {t('download')}
       </DropdownElement>
     ),
   ];
