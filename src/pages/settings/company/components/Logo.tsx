@@ -21,7 +21,11 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useLogo } from 'common/hooks/useLogo';
-import { updateRecord } from 'common/stores/slices/company-users';
+import {
+  updateChanges,
+  updateRecord,
+} from 'common/stores/slices/company-users';
+import { Button } from '@invoiceninja/forms';
 
 export function Logo() {
   const [t] = useTranslation();
@@ -73,7 +77,15 @@ export function Logo() {
     maxFiles: 1,
     accept: 'image/jpeg, image/png',
   });
-
+  const deleteLogo = () => {
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: 'settings.company_logo',
+        value: '',
+      })
+    );  
+  };
   return (
     <Card title={t('logo')}>
       <Element leftSide={t('logo')}>
@@ -103,6 +115,17 @@ export function Logo() {
             </span>
           </div>
         </div>
+      </Element>
+      <Element leftSide={t('remove_logo')}>
+        <Button
+          behavior="button"
+          type="minimal"
+          onClick={() => {
+            deleteLogo();
+          }}
+        >
+          {t('remove_logo')}
+        </Button>
       </Element>
     </Card>
   );
