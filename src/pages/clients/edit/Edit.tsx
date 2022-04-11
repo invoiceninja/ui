@@ -50,7 +50,7 @@ export function Edit() {
     { id },
     { refetchOnWindowFocus: false }
   );
-    const queryClient=useQueryClient()
+  const queryClient = useQueryClient();
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -112,7 +112,12 @@ export function Edit() {
         error.response?.status === 412
           ? toast.error(t('password_error_incorrect'), { id: toastId })
           : toast.error(t('error_title'), { id: toastId });
-      }).finally(()=>queryClient.invalidateQueries( generatePath('/api/v1/clients/:id', { id })))
+      })
+      .finally(() =>
+        queryClient.invalidateQueries(
+          generatePath('/api/v1/clients/:id', { id })
+        )
+      );
   };
 
   return (
