@@ -15,7 +15,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useClientQuery } from 'common/queries/clients';
+import { useClientQuery, useClientsQuery } from 'common/queries/clients';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
@@ -27,6 +27,7 @@ import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { CustomResourcefulActions } from '../common/components/CustomResourcefulActions';
@@ -49,7 +50,7 @@ export function Edit() {
     { id },
     { refetchOnWindowFocus: false }
   );
-
+    const queryClient=useQueryClient()
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -111,7 +112,7 @@ export function Edit() {
         error.response?.status === 412
           ? toast.error(t('password_error_incorrect'), { id: toastId })
           : toast.error(t('error_title'), { id: toastId });
-      });
+      }).finally(()=>queryClient.invalidateQueries( generatePath('/api/v1/clients/:id', { id })))
   };
 
   return (
