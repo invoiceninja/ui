@@ -11,7 +11,6 @@
 import { Tab } from '@headlessui/react';
 import { Card } from '@invoiceninja/cards';
 import { InputField, InputLabel } from '@invoiceninja/forms';
-import MDEditor from '@uiw/react-md-editor';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
@@ -23,6 +22,7 @@ import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoicePrope
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { Field } from 'pages/settings/custom-fields/components';
+import { MarkdownEditor } from 'components/forms/MarkdownEditor';
 
 export function InvoiceFooter() {
   const [t] = useTranslation();
@@ -45,28 +45,28 @@ export function InvoiceFooter() {
         ]}
       >
         <Tab.Panel>
-          <MDEditor
+          <MarkdownEditor
             value={invoice?.public_notes || ''}
             onChange={(value) => handleChange('public_notes', value)}
           />
         </Tab.Panel>
 
         <Tab.Panel>
-          <MDEditor
+          <MarkdownEditor
             value={invoice?.private_notes || ''}
             onChange={(value) => handleChange('private_notes', value)}
           />
         </Tab.Panel>
 
         <Tab.Panel>
-          <MDEditor
+          <MarkdownEditor
             value={invoice?.terms || ''}
             onChange={(value) => handleChange('terms', value)}
           />
         </Tab.Panel>
 
         <Tab.Panel>
-          <MDEditor
+          <MarkdownEditor
             value={invoice?.footer || ''}
             onChange={(value) => handleChange('footer', value)}
           />
