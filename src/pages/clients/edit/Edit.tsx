@@ -15,7 +15,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useClientQuery, useClientsQuery } from 'common/queries/clients';
+import { useClientQuery } from 'common/queries/clients';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
