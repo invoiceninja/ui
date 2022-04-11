@@ -36,5 +36,11 @@ export function MarkdownEditor(props: Props) {
 
   useEffect(() => debouncedSearch(value), [value]);
 
-  return <MDEditor value={value} onChange={(value) => setValue(value ?? '')} />;
+  return (
+    <MDEditor
+      value={value}
+      onChange={(value) => setValue(value ?? '')}
+      preview="edit"
+    />
+  );
 }
