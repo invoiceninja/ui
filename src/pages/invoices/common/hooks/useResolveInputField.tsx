@@ -98,7 +98,11 @@ export function useResolveInputField(props: Props) {
               );
           }}
           className="w-36"
-          formatLabel={(resource) => resource.name}
+          formatLabel={(resource) => (
+            <div className="flex justify-between items-center">
+              <span>{resource.name}</span> <span>{resource.rate}%</span>
+            </div>
+          )}
           onActionClick={() => setIsTaxModalOpen(true)}
           actionLabel={t('create_tax_rate')}
           defaultValue={invoice?.line_items[index][property]}
