@@ -162,9 +162,12 @@ export function CustomLabels() {
         </Link>
       </Modal>
 
-      <Card title={t('custom_labels')} onFormSubmit={(event:FormEvent<HTMLFormElement>)=>{
-         event.preventDefault()
-        }}>
+      <Card
+        title={t('custom_labels')}
+        onFormSubmit={(event: FormEvent<HTMLFormElement>) =>
+          event.preventDefault()
+        }
+      >
         <Element
           leftSide={
             <SelectField
