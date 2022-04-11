@@ -30,7 +30,7 @@ import { useCurrentRecurringInvoice } from '../common/hooks/useCurrentRecurringI
 import { useHandleCreate } from '../create/hooks/useHandleCreate';
 
 export function Clone() {
-  const { documentTitle } = useTitle('clone_recurring_invoice');
+  const { documentTitle } = useTitle('new_recurring_invoice');
   const { id } = useParams();
   const { data: recurringInvoice } = useRecurringInvoiceQuery({ id });
 
