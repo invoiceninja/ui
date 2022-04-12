@@ -25,3 +25,17 @@ export function useHandleCurrentCompanyChange() {
     );
   };
 }
+
+export function useHandleCurrentCompanyChangeProperty() {
+  const dispatch = useDispatch();
+
+  return (property: string, value: number | string | boolean) => {
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property,
+        value,
+      })
+    );
+  };
+}
