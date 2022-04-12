@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { Link, SelectField } from '@invoiceninja/forms';
+import { SelectField } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { Gateway } from 'common/interfaces/statics';
 import { Settings } from 'components/layouts/Settings';
@@ -17,6 +17,7 @@ import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from './components/Credentials';
+import { Settings as GatewaySettings } from './components/Settings';
 
 export function Create() {
   const { documentTitle } = useTitle('online_payments');
@@ -46,6 +47,7 @@ export function Create() {
       </Card>
 
       {gateway && <Credentials gateway={gateway} />}
+      {gateway && <GatewaySettings gateway={gateway} />}
     </Settings>
   );
 }
