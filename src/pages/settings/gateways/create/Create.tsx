@@ -8,6 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Card, Element } from '@invoiceninja/cards';
+import { SelectField } from '@invoiceninja/forms';
+import { useTitle } from 'common/hooks/useTitle';
+import { Settings } from 'components/layouts/Settings';
+import { useTranslation } from 'react-i18next';
+import { useGateways } from '../common/hooks/useGateways';
+
 export function Create() {
-  return <div>Page to create a gateway</div>;
+  const { documentTitle } = useTitle('online_payments');
+  const [t] = useTranslation();
+  const gateways = useGateways();
+
+  console.log(gateways);
+
+  return (
+    <Settings title={documentTitle}>
+      <Card title={t('add_gateway')}>
+        <Element leftSide={t('provider')}>
+          <SelectField withBlank>
+            {gateways.map((gateway, index) => (
+              <option value={gateway.id} key={index}>
+                {gateway.name}
+              </option>
+            ))}
+          </SelectField>
+        </Element>
+      </Card>
+    </Settings>
+  );
 }

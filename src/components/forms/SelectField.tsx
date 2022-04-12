@@ -16,6 +16,7 @@ interface Props extends CommonProps {
   defaultValue?: any;
   label?: string;
   required?: boolean;
+  withBlank?: boolean;
 }
 
 export function SelectField(props: Props) {
@@ -38,6 +39,7 @@ export function SelectField(props: Props) {
         value={props.value}
         ref={props.innerRef}
       >
+        {props.withBlank && <option value=""></option>}
         {props.children}
       </select>
     </section>

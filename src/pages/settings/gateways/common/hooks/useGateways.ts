@@ -19,7 +19,9 @@ export function useGateways() {
   useEffect(() => {
     if (statics?.data.gateways) {
       setGateways(() =>
-        statics.data.gateways.filter((gateway: Gateway) => gateway.visible)
+        statics.data.gateways
+          .filter((gateway: Gateway) => gateway.visible)
+          .sort((x: Gateway, y: Gateway) => x.sort_order > y.sort_order)
       );
     }
   }, [statics]);
