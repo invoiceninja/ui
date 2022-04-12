@@ -21,6 +21,10 @@ export function useResolveInputField() {
   // Dropdow where value is array of possible items
 
   return (property: string, value: Field) => {
+    if (property.toLowerCase().endsWith('color')) {
+      return <input type="color" />;
+    }
+
     if (typeof value === 'string') {
       return <InputField />;
     }
