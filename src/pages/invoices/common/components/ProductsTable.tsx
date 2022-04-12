@@ -24,12 +24,15 @@ import { ProductCreate } from './ProductCreate';
 
 export function ProductsTable() {
   const [t] = useTranslation();
+
   const invoice = useSelector((state: RootState) => state.invoices.current);
   const columns = useProductColumns();
   const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
+
   const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+
   const resolveInputField = useResolveInputField({
     setIsTaxModalOpen,
     setIsProductModalOpen,
