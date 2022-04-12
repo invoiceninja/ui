@@ -25,6 +25,10 @@ export function useResolveInputField() {
       return <input type="color" />;
     }
 
+    if (property === 'appleDomainVerification') {
+      return <InputField element="textarea" />;
+    }
+
     if (typeof value === 'string') {
       return <InputField />;
     }
