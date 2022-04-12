@@ -28,8 +28,10 @@ export function useHandleCustomFieldChange() {
 
       const _company = cloneDeep(company);
 
-      delete _company.custom_fields[field];
-
+      if (_company) {
+        delete _company.custom_fields[field];
+      }
+      
       return dispatch(injectInChanges({ object: 'company', data: _company }));
     }
 

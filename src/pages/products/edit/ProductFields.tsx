@@ -31,7 +31,7 @@ export function ProductFields() {
     const toastId = toast.loading(t('processing'));
 
     axios
-      .put(endpoint('/api/v1/companies/:id', { id: company.id }), company, {
+      .put(endpoint('/api/v1/companies/:id', { id: company?.id }), company, {
         headers: defaultHeaders,
       })
       .then((response) => {

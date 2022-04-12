@@ -88,7 +88,7 @@ export function Edit() {
           headers: defaultHeaders,
         }),
         axios.put(
-          endpoint('/api/v1/companies/:id', { id: company.id }),
+          endpoint('/api/v1/companies/:id', { id: company?.id }),
           company,
           { headers: defaultHeaders }
         ),
