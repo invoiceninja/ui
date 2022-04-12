@@ -115,7 +115,7 @@ export function OnlinePayments() {
       </Card>
 
       <div className="flex justify-end mt-8">
-        <Button to="/gateways/create">{t('add_gateway')}</Button>
+        <Button to="/settings/gateways/create">{t('add_gateway')}</Button>
       </div>
 
       <Table>
