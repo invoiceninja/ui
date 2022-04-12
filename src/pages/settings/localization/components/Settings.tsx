@@ -8,17 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { Currency } from 'common/interfaces/currency';
 import { DateFormat } from 'common/interfaces/date-format';
 import { Language } from 'common/interfaces/language';
 import { Timezone } from 'common/interfaces/timezone';
 import { useStaticsQuery } from 'common/queries/statics';
 import { updateChanges } from 'common/stores/slices/company-users';
-import { RootState } from 'common/stores/store';
 import dayjs from 'dayjs';
+import { useHandleCurrentCompanyChange } from 'pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { Radio, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
@@ -26,21 +27,10 @@ import Toggle from '../../../../components/forms/Toggle';
 export function Settings() {
   const [t] = useTranslation();
   const { data: statics } = useStaticsQuery();
+
   const dispatch = useDispatch();
-
-  const companyChanges = useSelector(
-    (state: RootState) => state.companyUsers.changes.company
-  );
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: event.target.id,
-        value: event.target.value,
-      })
-    );
-  };
+  const companyChanges = useCompanyChanges();
+  const handleChange = useHandleCurrentCompanyChange();
 
   const currencyFormats = [
     {
