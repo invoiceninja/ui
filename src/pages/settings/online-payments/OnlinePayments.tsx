@@ -8,12 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Card, Element } from '../../../components/cards';
-import { Button, SelectField } from '../../../components/forms';
-import Toggle from '../../../components/forms/Toggle';
-import { Settings } from '../../../components/layouts/Settings';
+import { Card, Element } from '@invoiceninja/cards';
 import {
   Pagination,
   Table,
@@ -22,7 +17,12 @@ import {
   Th,
   Thead,
   Tr,
-} from '../../../components/tables';
+} from '@invoiceninja/tables';
+import { useTitle } from 'common/hooks/useTitle';
+import Toggle from 'components/forms/Toggle';
+import { Settings } from 'components/layouts/Settings';
+import { useTranslation } from 'react-i18next';
+import { Button, SelectField } from '../../../components/forms';
 
 export function OnlinePayments() {
   const [t] = useTranslation();
@@ -32,11 +32,7 @@ export function OnlinePayments() {
     { name: t('online_payments'), href: '/settings/online_payments' },
   ];
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'online_payments'
-    )}`;
-  });
+  useTitle('online_payments');
 
   return (
     <Settings
@@ -44,13 +40,14 @@ export function OnlinePayments() {
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#online_payments"
     >
-      <Card withSaveButton title={t('settings')}>
+      <Card title={t('settings')}>
         <Element leftSide={t('auto_bill_on')}>
           <SelectField>
             <option value="due_date">{t('due_date')}</option>
             <option value="send_date">{t('send_date')}</option>
           </SelectField>
         </Element>
+
         <Element leftSide={t('use_available_credits')}>
           <SelectField>
             <option value="enabled">{t('enabled')}</option>
@@ -58,12 +55,14 @@ export function OnlinePayments() {
             <option value="off">{t('off')}</option>
           </SelectField>
         </Element>
+
         <Element leftSide={t('allow_over_payment')}>
           <Toggle
             label={t('allow_over_payment_help')}
             id="allow_over_payment"
           />
         </Element>
+
         <Element leftSide={t('allow_under_payment')}>
           <Toggle
             label={t('allow_under_payment_help')}
