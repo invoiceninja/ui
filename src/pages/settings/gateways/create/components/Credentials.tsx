@@ -11,7 +11,9 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { Link } from '@invoiceninja/forms';
 import { Gateway } from 'common/interfaces/statics';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Field, useResolveInputField } from '../hooks/useResolveInputField';
 
 interface Props {
   gateway: Gateway;
@@ -19,6 +21,13 @@ interface Props {
 
 export function Credentials(props: Props) {
   const [t] = useTranslation();
+  const [gateway, setGateway] = useState<Gateway>(props.gateway);
+  const [fields, setFields] = useState<Record<string, Field>>({});
+
+  useEffect(() => setGateway(props.gateway), [props.gateway]);
+  useEffect(() => setFields(JSON.parse(gateway.fields)), [gateway]);
+
+  const resolveInputField = useResolveInputField();
 
   return (
     <Card title={t('credentials')}>
@@ -29,6 +38,13 @@ export function Credentials(props: Props) {
           </Link>
         </Element>
       )}
+
+      {fields &&
+        Object.keys(fields).map((field, index) => (
+          <Element leftSide={field} key={index}>
+            {resolveInputField(field, fields[field])}
+          </Element>
+        ))}
     </Card>
   );
 }

@@ -31,8 +31,6 @@ export function Create() {
     setGateway(gateways.find((gateway) => gateway.id === event.target.value));
   };
 
-  console.log(gateways);
-
   return (
     <Settings title={documentTitle}>
       <Card title={t('add_gateway')}>
