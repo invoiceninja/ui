@@ -75,13 +75,13 @@ export interface Gateway {
   default_gateway_type_id: string;
   created_at: number;
   updated_at: number;
-  options: any[] | { [key: string]: Option };
+  options: Record<string | number, Option>;
 }
 
 export interface Option {
   refund: boolean;
   token_billing: boolean;
-  webhooks?: unknown;
+  webhooks?: string[];
 }
 
 export interface Industry {
