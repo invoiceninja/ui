@@ -13,6 +13,7 @@ import { Link } from '@invoiceninja/forms';
 import { Gateway } from 'common/interfaces/statics';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { formatLabel } from '../helpers/format-label';
 import { Field, useResolveInputField } from '../hooks/useResolveInputField';
 
 interface Props {
@@ -41,7 +42,7 @@ export function Credentials(props: Props) {
 
       {fields &&
         Object.keys(fields).map((field, index) => (
-          <Element leftSide={field} key={index}>
+          <Element leftSide={formatLabel(field)} key={index}>
             {resolveInputField(field, fields[field])}
           </Element>
         ))}
