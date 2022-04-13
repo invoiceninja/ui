@@ -17,6 +17,7 @@ import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from './components/Credentials';
+import { RequiredFields } from './components/RequiredFields';
 import { Settings as GatewaySettings } from './components/Settings';
 
 export function Create() {
@@ -48,6 +49,7 @@ export function Create() {
 
       {gateway && <Credentials gateway={gateway} />}
       {gateway && <GatewaySettings gateway={gateway} />}
+      {gateway && <RequiredFields gateway={gateway} />}
     </Settings>
   );
 }

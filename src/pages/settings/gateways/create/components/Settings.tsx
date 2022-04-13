@@ -22,6 +22,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { GatewayType } from 'common/enums/gateway-type';
 import { Gateway, Option } from 'common/interfaces/statics';
+import { Divider } from 'components/cards/Divider';
 import Toggle from 'components/forms/Toggle';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -70,6 +71,8 @@ export function Settings(props: Props) {
           </SelectField>
         </Element>
       )}
+
+      <Divider />
 
       {options.map((option, index) => (
         <Element
