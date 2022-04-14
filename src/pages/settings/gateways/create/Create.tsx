@@ -88,7 +88,14 @@ export function Create() {
         />
       )}
 
-      {gateway && <RequiredFields gateway={gateway} />}
+      {gateway && companyGateway && (
+        <RequiredFields
+          gateway={gateway}
+          companyGateway={companyGateway}
+          setCompanyGateway={setCompanyGateway}
+        />
+      )}
+
       {gateway && <LimitsAndFees gateway={gateway} />}
     </Settings>
   );
