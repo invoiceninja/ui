@@ -9,27 +9,20 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import {
-  Pagination,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from '@invoiceninja/tables';
+
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import Toggle from 'components/forms/Toggle';
 import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { Button, SelectField } from '../../../components/forms';
+import { SelectField } from '../../../components/forms';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import {
   useHandleCurrentCompanyChange,
   useHandleCurrentCompanyChangeProperty,
 } from '../common/hooks/useHandleCurrentCompanyChange';
+import { Gateways } from '../gateways/index/Gateways';
 
 export function OnlinePayments() {
   const [t] = useTranslation();
@@ -114,33 +107,7 @@ export function OnlinePayments() {
         </Element>
       </Card>
 
-      <div className="flex justify-end mt-8">
-        <Button to="/settings/gateways/create">{t('add_gateway')}</Button>
-      </div>
-
-      <Table>
-        <Thead>
-          <Th>{t('gateway')}</Th>
-          <Th>{t('limits')}</Th>
-          <Th>{t('fees')}</Th>
-          <Th>{t('action')}</Th>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td>PayPal Express</Td>
-            <Td>No Limits</Td>
-            <Td>Fees are disabled</Td>
-            <Td></Td>
-          </Tr>
-        </Tbody>
-      </Table>
-
-      <Pagination
-        currentPage={1}
-        onPageChange={() => {}}
-        onRowsChange={() => {}}
-        totalPages={1}
-      />
+      <Gateways />
     </Settings>
   );
 }
