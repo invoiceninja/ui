@@ -20,16 +20,21 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
-import { GatewayType } from 'common/enums/gateway-type';
+import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { Gateway, Option } from 'common/interfaces/statics';
 import { Divider } from 'components/cards/Divider';
 import Toggle from 'components/forms/Toggle';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useHandleMethodToggle } from '../hooks/useHandleMethodToggle';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
 
 interface Props {
   gateway: Gateway;
+  companyGateway: CompanyGateway;
+  setCompanyGateway: React.Dispatch<
+    React.SetStateAction<CompanyGateway | undefined>
+  >;
 }
 
 interface OptionWithGatewayTypeId extends Option {
@@ -55,6 +60,21 @@ export function Settings(props: Props) {
 
   const resolveGatewayTypeTranslation = useResolveGatewayTypeTranslation();
 
+  const handleCaptureCardChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    props.setCompanyGateway(
+      (gateway) =>
+        gateway && {
+          ...gateway,
+          token_billing: event.target.value,
+        }
+    );
+  };
+
+  const handlePaymentMethod = useHandleMethodToggle(
+    props.companyGateway,
+    props.setCompanyGateway
+  );
+
   return (
     <Card title={t('settings')}>
       <Element leftSide={t('label')}>
@@ -63,11 +83,11 @@ export function Settings(props: Props) {
 
       {options.some((option) => option.token_billing == true) && (
         <Element leftSide={t('capture_card')}>
-          <SelectField>
-            <option value="">{t('enabled')}</option>
-            <option value="">{t('enabled_by_default')}</option>
-            <option value="">{t('disabled_by_default')}</option>
-            <option value="">{t('off')}</option>
+          <SelectField onChange={handleCaptureCardChange}>
+            <option value="always">{t('enabled')}</option>
+            <option value="optout">{t('enabled_by_default')}</option>
+            <option value="optin">{t('disabled_by_default')}</option>
+            <option value="off">{t('off')}</option>
           </SelectField>
         </Element>
       )}
@@ -79,7 +99,11 @@ export function Settings(props: Props) {
           key={index}
           leftSide={resolveGatewayTypeTranslation(option.gatewayTypeId)}
         >
-          <Toggle checked={option.gatewayTypeId === GatewayType.CreditCard} />
+          <Toggle
+            onChange={(value) =>
+              handlePaymentMethod(option.gatewayTypeId, value)
+            }
+          />
         </Element>
       ))}
     </Card>
