@@ -9,11 +9,22 @@
  */
 
 import { InputField, SelectField } from '@invoiceninja/forms';
+import { useAccentColor } from 'common/hooks/useAccentColor';
+import { CompanyGateway } from 'common/interfaces/company-gateway';
 import Toggle from 'components/forms/Toggle';
+import { ChangeEvent } from 'react';
+import { useHandleCredentialsChange } from './useHandleCredentialsChange';
 
 export type Field = '' | boolean | Array<string>;
 
-export function useResolveInputField() {
+export function useResolveInputField(
+  setCompanyGateway: React.Dispatch<
+    React.SetStateAction<CompanyGateway | undefined>
+  >
+) {
+  const handleChange = useHandleCredentialsChange(setCompanyGateway);
+  const accentColor = useAccentColor();
+
   // Possible types:
 
   // Input field, where value is ""
@@ -22,24 +33,54 @@ export function useResolveInputField() {
 
   return (property: string, value: Field) => {
     if (property.toLowerCase().endsWith('color')) {
-      return <input type="color" />;
+      return (
+        <input
+          type="color"
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            handleChange(property as keyof Field, event.target.value)
+          }
+          defaultValue={accentColor}
+        />
+      );
     }
 
     if (property === 'appleDomainVerification') {
-      return <InputField element="textarea" />;
+      return (
+        <InputField
+          element="textarea"
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            handleChange(property as keyof Field, event.target.value)
+          }
+        />
+      );
     }
 
     if (typeof value === 'string') {
-      return <InputField />;
+      return (
+        <InputField
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            handleChange(property as keyof Field, event.target.value)
+          }
+        />
+      );
     }
 
     if (typeof value === 'boolean') {
-      return <Toggle checked={value} />;
+      return (
+        <Toggle
+          checked={value}
+          onChange={(value) => handleChange(property as keyof Field, value)}
+        />
+      );
     }
 
     if (typeof value === 'object') {
       return (
-        <SelectField>
+        <SelectField
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            handleChange(property as keyof Field, event.target.value)
+          }
+        >
           {value.map((option, index) => (
             <option key={index} value={option}>
               {option}
