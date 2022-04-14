@@ -25,7 +25,7 @@ export interface CompanyGateway {
   show_shipping_address: boolean;
   update_details: boolean;
   config: string;
-  fees_and_limits: FeesAndLimits;
+  fees_and_limits: Record<string, FeesAndLimitsEntry>;
   updated_at: number;
   archived_at: number;
   created_at: number;
@@ -39,4 +39,18 @@ export interface CompanyGateway {
   test_mode: boolean;
 }
 
-export interface FeesAndLimits {}
+export interface FeesAndLimitsEntry {
+  min_limit: number;
+  max_limit: number;
+  fee_amount: number;
+  fee_percent: number;
+  fee_tax_name1: string;
+  fee_tax_name2: string;
+  fee_tax_name3: string;
+  fee_tax_rate1: number;
+  fee_tax_rate2: number;
+  fee_tax_rate3: number;
+  fee_cap: number;
+  adjust_fee_percent: boolean;
+  is_enabled: boolean;
+}
