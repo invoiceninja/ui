@@ -10,25 +10,24 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Link } from '@invoiceninja/forms';
+import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { Gateway } from 'common/interfaces/statics';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatLabel } from '../helpers/format-label';
-import { Field, useResolveInputField } from '../hooks/useResolveInputField';
+import { useResolveInputField } from '../hooks/useResolveInputField';
 
 interface Props {
   gateway: Gateway;
+  companyGateway: CompanyGateway;
+  setCompanyGateway: React.Dispatch<
+    React.SetStateAction<CompanyGateway | undefined>
+  >;
 }
 
 export function Credentials(props: Props) {
   const [t] = useTranslation();
-  const [gateway, setGateway] = useState<Gateway>(props.gateway);
-  const [fields, setFields] = useState<Record<string, Field>>({});
 
-  useEffect(() => setGateway(props.gateway), [props.gateway]);
-  useEffect(() => setFields(JSON.parse(gateway.fields)), [gateway]);
-
-  const resolveInputField = useResolveInputField();
+  const resolveInputField = useResolveInputField(props.setCompanyGateway);
 
   return (
     <Card title={t('credentials')}>
@@ -40,10 +39,10 @@ export function Credentials(props: Props) {
         </Element>
       )}
 
-      {fields &&
-        Object.keys(fields).map((field, index) => (
+      {props.gateway &&
+        Object.keys(JSON.parse(props.gateway.fields)).map((field, index) => (
           <Element leftSide={formatLabel(field)} key={index}>
-            {resolveInputField(field, fields[field])}
+            {resolveInputField(field, JSON.parse(props.gateway.fields)[field])}
           </Element>
         ))}
     </Card>
