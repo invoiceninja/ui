@@ -33,7 +33,7 @@ export function useHandleMethodToggle(
   >
 ) {
   return (gatewayTypeId: string, value: boolean) => {
-    if (Object.hasOwn(companyGateway.fees_and_limits, gatewayTypeId)) {
+    if ((<any>Object).hasOwn(companyGateway.fees_and_limits, gatewayTypeId)) {
       return setCompanyGateway(
         (current) =>
           current && {
