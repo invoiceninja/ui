@@ -27,10 +27,9 @@ export function Create() {
   const { documentTitle } = useTitle('online_payments');
   const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
 
-  const [t] = useTranslation();
-
   const gateways = useGateways();
 
+  const [t] = useTranslation();
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
   const [gateway, setGateway] = useState<Gateway>();
 
@@ -43,6 +42,18 @@ export function Create() {
       setCompanyGateway(blankCompanyGateway.data.data);
     }
   }, [blankCompanyGateway]);
+
+  useEffect(() => {
+    setCompanyGateway(
+      (companyGateway) =>
+        companyGateway &&
+        gateway && {
+          ...companyGateway,
+          gateway_key: gateway.key,
+          // config: gateway.fields,
+        }
+    );
+  }, [gateway]);
 
   return (
     <Settings title={documentTitle}>
@@ -58,7 +69,14 @@ export function Create() {
         </Element>
       </Card>
 
-      {gateway && <Credentials gateway={gateway} />}
+      {gateway && companyGateway && (
+        <Credentials
+          gateway={gateway}
+          companyGateway={companyGateway}
+          setCompanyGateway={setCompanyGateway}
+        />
+      )}
+
       {gateway && <GatewaySettings gateway={gateway} />}
       {gateway && <RequiredFields gateway={gateway} />}
       {gateway && <LimitsAndFees gateway={gateway} />}
