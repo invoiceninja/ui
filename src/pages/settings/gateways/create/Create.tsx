@@ -51,15 +51,18 @@ export function Create() {
           ...companyGateway,
           gateway_key: gateway.key,
           // config: gateway.fields,
+          token_billing: 'always',
         }
     );
   }, [gateway]);
+
+  console.log(companyGateway);
 
   return (
     <Settings title={documentTitle}>
       <Card title={t('add_gateway')}>
         <Element leftSide={t('provider')}>
-          <SelectField withBlank onChange={handleChange}>
+          <SelectField onChange={handleChange} withBlank>
             {gateways.map((gateway, index) => (
               <option value={gateway.id} key={index}>
                 {gateway.name}
@@ -77,7 +80,14 @@ export function Create() {
         />
       )}
 
-      {gateway && <GatewaySettings gateway={gateway} />}
+      {gateway && companyGateway && (
+        <GatewaySettings
+          gateway={gateway}
+          companyGateway={companyGateway}
+          setCompanyGateway={setCompanyGateway}
+        />
+      )}
+
       {gateway && <RequiredFields gateway={gateway} />}
       {gateway && <LimitsAndFees gateway={gateway} />}
     </Settings>
