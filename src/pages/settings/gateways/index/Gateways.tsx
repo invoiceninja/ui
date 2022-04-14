@@ -40,6 +40,7 @@ export function Gateways() {
       columns={columns}
       resource="company_gateway"
       endpoint="/api/v1/company_gateways"
+      linkToCreate="/settings/gateways/create"
       withResourcefulActions
     />
   );

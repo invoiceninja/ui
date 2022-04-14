@@ -44,8 +44,6 @@ export function Create() {
     }
   }, [blankCompanyGateway]);
 
-  console.log(companyGateway);
-
   return (
     <Settings title={documentTitle}>
       <Card title={t('add_gateway')}>
