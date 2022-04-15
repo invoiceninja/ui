@@ -36,8 +36,13 @@ export interface Company {
     email_subject_custom1: string;
     email_subject_custom2: string;
     email_subject_custom3: string;
+    auto_bill_date: 'on_send_date' | 'on_due_date';
+    use_credits_payment: 'always' | 'option' | 'off';
+    client_portal_allow_over_payment: boolean;
+    client_portal_allow_under_payment: boolean;
   };
   custom_fields: Record<string, string>;
   enabled_tax_rates: number;
   enabled_item_tax_rates: number;
+  enable_product_discount: boolean;
 }

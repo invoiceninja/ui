@@ -33,7 +33,7 @@ export function Element(props: Props) {
     >
       <dt className="text-sm text-gray-500 flex flex-col">
         <span className="text-gray-500 font-medium ">
-          {props.leftSide}{' '}
+          {props.leftSide}
           {props.required && <span className="ml-1 text-red-600">*</span>}
         </span>
         {props.leftSideHelp && (

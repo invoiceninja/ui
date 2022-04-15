@@ -162,7 +162,7 @@ export function AdditionalInfo(props: Props) {
               onChange={(value) => {
                 const client = { ...props.client };
                 client.public_notes = value as string;
-                
+
                 props.setClient(client as Client);
               }}
             />

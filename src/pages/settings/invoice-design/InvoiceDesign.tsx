@@ -8,16 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
-import { defaultHeaders } from 'common/queries/common/headers';
-import { resetChanges, updateRecord } from 'common/stores/slices/company-users';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import {
   GeneralSettings,
   ClientDetails,
@@ -35,43 +30,21 @@ export function InvoiceDesign() {
   useTitle('invoice_design');
 
   const [t] = useTranslation();
-  const dispatch = useDispatch();
-  const companyChanges = useInjectCompanyChanges();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('invoice_design'), href: '/settings/invoice_design' },
   ];
 
-  const onSave = () => {
-    toast.loading(t('processing'));
-
-    axios
-      .put(
-        endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
-        companyChanges,
-        { headers: defaultHeaders }
-      )
-      .then((response) => {
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
-
-        toast.dismiss();
-        toast.success(t('updated_settings'));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      });
-  };
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
 
   return (
     <Settings
       title={t('invoice_design')}
       breadcrumbs={pages}
       onSaveClick={onSave}
-      onCancelClick={() => dispatch(resetChanges('company'))}
+      onCancelClick={onCancel}
       docsLink="docs/advanced-settings/#invoice_design"
     >
       <GeneralSettings />

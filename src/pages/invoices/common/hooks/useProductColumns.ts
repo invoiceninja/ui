@@ -19,7 +19,7 @@ export function useProductColumns() {
   useEffect(() => {
     // We need to clone the product columns to local object,
     // because by default it's frozen.
-    const variables: string[] =
+    let variables: string[] =
       clone(company?.settings.pdf_variables.product_columns) || [];
 
     // Local object is needed because we want to spread tax columns in case they're enabled.
@@ -46,6 +46,12 @@ export function useProductColumns() {
       );
 
       variables.splice(taxVariableIndex + 1, 0, ...taxes);
+
+      if (!company.enable_product_discount) {
+        variables = variables.filter(
+          (variable) => variable !== '$product.discount'
+        );
+      }
 
       setColumns(variables.filter((variable) => variable !== '$product.tax'));
     }

@@ -27,6 +27,7 @@ import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { CustomResourcefulActions } from '../common/components/CustomResourcefulActions';
@@ -49,7 +50,7 @@ export function Edit() {
     { id },
     { refetchOnWindowFocus: false }
   );
-
+  const queryClient = useQueryClient();
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -87,7 +88,7 @@ export function Edit() {
           headers: defaultHeaders,
         }),
         axios.put(
-          endpoint('/api/v1/companies/:id', { id: company.id }),
+          endpoint('/api/v1/companies/:id', { id: company?.id }),
           company,
           { headers: defaultHeaders }
         ),
@@ -111,7 +112,12 @@ export function Edit() {
         error.response?.status === 412
           ? toast.error(t('password_error_incorrect'), { id: toastId })
           : toast.error(t('error_title'), { id: toastId });
-      });
+      })
+      .finally(() =>
+        queryClient.invalidateQueries(
+          generatePath('/api/v1/clients/:id', { id })
+        )
+      );
   };
 
   return (

@@ -43,7 +43,7 @@ export function Create() {
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
-      name: t('clone_recurring_invoice'),
+      name: t('new_recurring_invoice'),
       href: generatePath('/recurring_invoices/create'),
     },
   ];

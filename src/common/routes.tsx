@@ -259,6 +259,9 @@ export const routes = (
             element={<Settings.GoogleAnalytics />}
           />
         </Route>
+        <Route path="gateways">
+          <Route path="create" element={<Settings.CreateGateway />} />
+        </Route>
       </Route>
       <Route path="/logout" element={<Authentication.Logout />} />
     </Route>

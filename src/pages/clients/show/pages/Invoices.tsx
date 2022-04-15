@@ -24,7 +24,7 @@ export function Invoices() {
       id: 'number',
       label: t('invoice_number'),
       format: (value, resource) => (
-        <Link to={generatePath('/invoices/:id', { id: resource.id })}>
+        <Link to={generatePath('/invoices/:id/edit', { id: resource.id })}>
           {value}
         </Link>
       ),
