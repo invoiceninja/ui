@@ -86,6 +86,7 @@ export function Settings(props: Props) {
       {options.some((option) => option.token_billing == true) && (
         <Element leftSide={t('capture_card')}>
           <SelectField
+            value={props.companyGateway.token_billing || 'off'}
             onValueChange={(value) => handleChange('token_billing', value)}
           >
             <option value="always">{t('enabled')}</option>
