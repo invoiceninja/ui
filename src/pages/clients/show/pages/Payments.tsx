@@ -27,7 +27,7 @@ export function Payments() {
       id: 'number',
       label: t('number'),
       format: (value, resource) => (
-        <Link to={generatePath('/payments/:id', { id: resource.id })}>
+        <Link to={generatePath('/payments/:id/edit', { id: resource.id })}>
           {value}
         </Link>
       ),
