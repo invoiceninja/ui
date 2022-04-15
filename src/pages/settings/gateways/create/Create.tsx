@@ -17,19 +17,29 @@ import { useBlankCompanyGatewayQuery } from 'common/queries/company-gateways';
 import { Settings } from 'components/layouts/Settings';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from './components/Credentials';
 import { LimitsAndFees } from './components/LimitsAndFees';
 import { RequiredFields } from './components/RequiredFields';
 import { Settings as GatewaySettings } from './components/Settings';
+import { useHandleCreate } from './hooks/useHandleCreate';
 
 export function Create() {
+  const [t] = useTranslation();
+  const navigate = useNavigate();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('online_payments'), href: '/settings/online_payments' },
+    { name: t('add_gateway'), href: '/settings/gateways/create' },
+  ];
+
   const { documentTitle } = useTitle('online_payments');
   const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
 
   const gateways = useGateways();
 
-  const [t] = useTranslation();
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
   const [gateway, setGateway] = useState<Gateway>();
 
@@ -38,10 +48,12 @@ export function Create() {
   };
 
   useEffect(() => {
-    if (blankCompanyGateway?.data.data) {
+    if (blankCompanyGateway?.data.data && companyGateway === undefined) {
       setCompanyGateway(blankCompanyGateway.data.data);
     }
-  }, [blankCompanyGateway]);
+  }, [blankCompanyGateway, gateway]);
+
+  const onSave = useHandleCreate(companyGateway);
 
   useEffect(() => {
     setCompanyGateway(
@@ -56,10 +68,13 @@ export function Create() {
     );
   }, [gateway]);
 
-  console.log(companyGateway);
-
   return (
-    <Settings title={documentTitle}>
+    <Settings
+      title={documentTitle}
+      breadcrumbs={pages}
+      onSaveClick={onSave}
+      onCancelClick={() => navigate('/settings/online_payments')}
+    >
       <Card title={t('add_gateway')}>
         <Element leftSide={t('provider')}>
           <SelectField onChange={handleChange} withBlank>
