@@ -28,6 +28,7 @@ interface Props extends CommonProps {
   element?: string;
   disabled?: boolean;
   list?: string;
+  onValueChange?: (value: string) => unknown;
 }
 
 export function InputField(props: Props) {
@@ -55,7 +56,10 @@ export function InputField(props: Props) {
           }
         )}
         placeholder={props.placeholder}
-        onChange={props.onChange}
+        onChange={(event) => {
+          props.onValueChange && props.onValueChange(event.target.value);
+          props.onChange && props.onChange(event);
+        }}
         value={props.value}
         list={props.list}
       />
