@@ -22,6 +22,7 @@ import { Credentials } from '../create/components/Credentials';
 import { LimitsAndFees } from '../create/components/LimitsAndFees';
 import { RequiredFields } from '../create/components/RequiredFields';
 import { Settings as GatewaySettings } from '../create/components/Settings';
+import { useHandleUpdate } from './hooks/useHandleUpdate';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -44,6 +45,7 @@ export function Edit() {
   const [gateway, setGateway] = useState<Gateway>();
 
   const gateways = useGateways();
+  const onSave = useHandleUpdate(companyGateway);
 
   useEffect(() => {
     companyGateway &&
@@ -62,6 +64,7 @@ export function Edit() {
     <Settings
       title={documentTitle}
       breadcrumbs={pages}
+      onSaveClick={onSave}
       onCancelClick={() => navigate('/settings/online_payments')}
     >
       {companyGateway && (
