@@ -1,0 +1,18 @@
+{
+  "ninja": {
+    "scope": "javascript,typescript,php,typescriptreact",
+    "prefix": "ninja",
+    "body": [
+      "/**",
+      "* Invoice Ninja (https://invoiceninja.com).",
+      "*",
+      "* @link https://github.com/invoiceninja/invoiceninja source repository",
+      "*",
+      "* @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)",
+      "*",
+      "* @license https://www.elastic.co/licensing/elastic-license",
+      "*/"
+    ],
+    "description": "Insert Invoice Ninja copyright for licence"
+  }
+}
