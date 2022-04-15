@@ -27,7 +27,10 @@ interface Props {
 export function Credentials(props: Props) {
   const [t] = useTranslation();
 
-  const resolveInputField = useResolveInputField(props.setCompanyGateway);
+  const resolveInputField = useResolveInputField(
+    props.companyGateway,
+    props.setCompanyGateway
+  );
 
   return (
     <Card title={t('credentials')}>
