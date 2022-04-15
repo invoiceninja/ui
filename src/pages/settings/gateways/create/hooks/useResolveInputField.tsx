@@ -14,14 +14,17 @@ import { CompanyGateway } from 'common/interfaces/company-gateway';
 import Toggle from 'components/forms/Toggle';
 import { ChangeEvent } from 'react';
 import { useHandleCredentialsChange } from './useHandleCredentialsChange';
+import { useResolveConfigValue } from './useResolveConfigValue';
 
 export type Field = '' | boolean | Array<string>;
 
 export function useResolveInputField(
+  companyGateway: CompanyGateway,
   setCompanyGateway: React.Dispatch<
     React.SetStateAction<CompanyGateway | undefined>
   >
 ) {
+  const resolveConfigValue = useResolveConfigValue(companyGateway);
   const handleChange = useHandleCredentialsChange(setCompanyGateway);
   const accentColor = useAccentColor();
 
@@ -39,7 +42,7 @@ export function useResolveInputField(
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             handleChange(property as keyof Field, event.target.value)
           }
-          defaultValue={accentColor}
+          defaultValue={resolveConfigValue(property) || accentColor}
         />
       );
     }
@@ -51,6 +54,7 @@ export function useResolveInputField(
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             handleChange(property as keyof Field, event.target.value)
           }
+          value={resolveConfigValue(property)}
         />
       );
     }
@@ -61,6 +65,7 @@ export function useResolveInputField(
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             handleChange(property as keyof Field, event.target.value)
           }
+          value={resolveConfigValue(property)}
         />
       );
     }
@@ -68,7 +73,7 @@ export function useResolveInputField(
     if (typeof value === 'boolean') {
       return (
         <Toggle
-          checked={value}
+          checked={resolveConfigValue(property)}
           onChange={(value) => handleChange(property as keyof Field, value)}
         />
       );
@@ -80,6 +85,7 @@ export function useResolveInputField(
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             handleChange(property as keyof Field, event.target.value)
           }
+          value={resolveConfigValue(property)}
         >
           {value.map((option, index) => (
             <option key={index} value={option}>
@@ -89,7 +95,5 @@ export function useResolveInputField(
         </SelectField>
       );
     }
-
-    console.log(value);
   };
 }

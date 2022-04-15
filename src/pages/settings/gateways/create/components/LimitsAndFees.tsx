@@ -10,59 +10,180 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import {
+  CompanyGateway,
+  FeesAndLimitsEntry,
+} from 'common/interfaces/company-gateway';
 import { Gateway } from 'common/interfaces/statics';
 import { Divider } from 'components/cards/Divider';
 import Toggle from 'components/forms/Toggle';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useHandleFeesAndLimitsEntryChange } from '../hooks/useHandleFeesAndLimitsEntryChange';
+import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
 
 interface Props {
   gateway: Gateway;
+  companyGateway: CompanyGateway;
+  setCompanyGateway: React.Dispatch<
+    React.SetStateAction<CompanyGateway | undefined>
+  >;
 }
 
 export function LimitsAndFees(props: Props) {
   const [t] = useTranslation();
+  const [currentGatewayTypeId, setCurrentGatewayTypeId] = useState<
+    string | undefined
+  >();
+
+  const resolveGatewayTypeTranslation = useResolveGatewayTypeTranslation();
+  const handleFeesAndLimitsEntryChange = useHandleFeesAndLimitsEntryChange(
+    props.setCompanyGateway
+  );
+
+  useEffect(() => {
+    const enabled = Object.entries(props.companyGateway.fees_and_limits).filter(
+      ([, entry]) => entry.is_enabled
+    );
+
+    enabled.length > 0
+      ? setCurrentGatewayTypeId(enabled[0][0])
+      : setCurrentGatewayTypeId(undefined);
+  }, [props.companyGateway]);
+
+  const handlePaymentTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setCurrentGatewayTypeId(event.target.value);
+  };
+
+  const handleEntryChange = (
+    field: keyof FeesAndLimitsEntry,
+    value: string | number | boolean
+  ) => {
+    if (currentGatewayTypeId) {
+      handleFeesAndLimitsEntryChange(currentGatewayTypeId, field, value);
+    }
+  };
 
   return (
     <Card title={t('limits_and_fees')}>
       <Element leftSide={t('payment_type')}>
-        <SelectField>
-          <option value="">{props.gateway.name} (testing)</option>
+        <SelectField onChange={handlePaymentTypeChange}>
+          {Object.entries(props.companyGateway.fees_and_limits)
+            .filter(([, entry]) => entry.is_enabled)
+            .map(([gatewayTypeId], index) => (
+              <option key={index} value={gatewayTypeId}>
+                {resolveGatewayTypeTranslation(gatewayTypeId)}
+              </option>
+            ))}
         </SelectField>
       </Element>
 
-      <Divider />
+      {currentGatewayTypeId && (
+        <>
+          <Divider />
 
-      <Element leftSide={`${t('min')} ${t('limit')}`}>
-        <div className="space-y-4">
-          <InputField />
-          <Toggle label={t('enable_min')} />
-        </div>
-      </Element>
+          <Element leftSide={`${t('min')} ${t('limit')}`}>
+            <div className="space-y-4">
+              <InputField
+                value={
+                  props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
+                    .min_limit
+                }
+                onValueChange={(value) =>
+                  handleEntryChange('min_limit', parseFloat(value) || -1)
+                }
+              />
 
-      <Element leftSide={`${t('max')} ${t('limit')}`}>
-        <div className="space-y-4">
-          <InputField />
-          <Toggle label={t('enable_max')} />
-        </div>
-      </Element>
+              <Toggle
+                checked={
+                  props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
+                    .min_limit >= 0
+                }
+                label={t('enable_min')}
+                onValueChange={(value) =>
+                  handleEntryChange('min_limit', value ? 0 : -1)
+                }
+              />
+            </div>
+          </Element>
 
-      <Divider />
+          <Element leftSide={`${t('max')} ${t('limit')}`}>
+            <div className="space-y-4">
+              <InputField
+                value={
+                  props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
+                    .max_limit
+                }
+                onValueChange={(value) =>
+                  handleEntryChange('max_limit', parseFloat(value) || -1)
+                }
+              />
 
-      <Element leftSide={t('fee_percent')}>
-        <InputField />
-      </Element>
+              <Toggle
+                checked={
+                  props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
+                    .max_limit >= 0
+                }
+                label={t('enable_max')}
+                onValueChange={(value) =>
+                  handleEntryChange('max_limit', value ? 0 : -1)
+                }
+              />
+            </div>
+          </Element>
 
-      <Element leftSide={t('fee_amount')}>
-        <InputField />
-      </Element>
+          <Divider />
 
-      <Element leftSide={t('fee_cap')}>
-        <InputField />
-      </Element>
+          <Element leftSide={t('fee_percent')}>
+            <InputField
+              value={
+                props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
+                  .fee_percent
+              }
+              onValueChange={(value) =>
+                handleEntryChange('fee_percent', parseFloat(value))
+              }
+            />
+          </Element>
 
-      <Element leftSide={t('adjust_fee_percent')}>
-        <Toggle label={t('adjust_fee_percent_help')} />
-      </Element>
+          <Element leftSide={t('fee_amount')}>
+            <InputField
+              value={
+                props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
+                  .fee_amount
+              }
+              onValueChange={(value) =>
+                handleEntryChange('fee_amount', parseFloat(value))
+              }
+            />
+          </Element>
+
+          <Element leftSide={t('fee_cap')}>
+            <InputField
+              value={
+                props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
+                  .fee_cap
+              }
+              onValueChange={(value) =>
+                handleEntryChange('fee_cap', parseFloat(value))
+              }
+            />
+          </Element>
+
+          <Element leftSide={t('adjust_fee_percent')}>
+            <Toggle
+              checked={
+                props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
+                  .adjust_fee_percent
+              }
+              label={t('adjust_fee_percent_help')}
+              onValueChange={(value) =>
+                handleEntryChange('adjust_fee_percent', value)
+              }
+            />
+          </Element>
+        </>
+      )}
     </Card>
   );
 }

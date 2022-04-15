@@ -24,7 +24,7 @@ import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { Gateway, Option } from 'common/interfaces/statics';
 import { Divider } from 'components/cards/Divider';
 import Toggle from 'components/forms/Toggle';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleMethodToggle } from '../hooks/useHandleMethodToggle';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
@@ -60,13 +60,12 @@ export function Settings(props: Props) {
 
   const resolveGatewayTypeTranslation = useResolveGatewayTypeTranslation();
 
-  const handleCaptureCardChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  const handleChange = (
+    property: keyof CompanyGateway,
+    value: string | number | boolean
+  ) => {
     props.setCompanyGateway(
-      (gateway) =>
-        gateway && {
-          ...gateway,
-          token_billing: event.target.value,
-        }
+      (gateway) => gateway && { ...gateway, [property]: value }
     );
   };
 
@@ -78,12 +77,18 @@ export function Settings(props: Props) {
   return (
     <Card title={t('settings')}>
       <Element leftSide={t('label')}>
-        <InputField value={gateway.name} />
+        <InputField
+          value={props.companyGateway.label || gateway.name}
+          onValueChange={(value) => handleChange('label', value)}
+        />
       </Element>
 
       {options.some((option) => option.token_billing == true) && (
         <Element leftSide={t('capture_card')}>
-          <SelectField onChange={handleCaptureCardChange}>
+          <SelectField
+            value={props.companyGateway.token_billing || 'off'}
+            onValueChange={(value) => handleChange('token_billing', value)}
+          >
             <option value="always">{t('enabled')}</option>
             <option value="optout">{t('enabled_by_default')}</option>
             <option value="optin">{t('disabled_by_default')}</option>

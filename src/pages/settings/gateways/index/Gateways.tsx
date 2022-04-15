@@ -23,7 +23,7 @@ export function Gateways() {
       id: 'label',
       label: t('label'),
       format: (field, resource: CompanyGateway) => (
-        <Link to={generatePath('/settings/gateways/:id', { id: resource.id })}>
+        <Link to={generatePath('/settings/gateways/:id/edit', { id: resource.id })}>
           {field}
         </Link>
       ),
