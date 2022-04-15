@@ -24,7 +24,7 @@ import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { Gateway, Option } from 'common/interfaces/statics';
 import { Divider } from 'components/cards/Divider';
 import Toggle from 'components/forms/Toggle';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleMethodToggle } from '../hooks/useHandleMethodToggle';
 import { useResolveGatewayTypeTranslation } from '../hooks/useResolveGatewayTypeTranslation';
