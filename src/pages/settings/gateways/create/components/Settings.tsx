@@ -60,13 +60,12 @@ export function Settings(props: Props) {
 
   const resolveGatewayTypeTranslation = useResolveGatewayTypeTranslation();
 
-  const handleCaptureCardChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  const handleChange = (
+    property: keyof CompanyGateway,
+    value: string | number | boolean
+  ) => {
     props.setCompanyGateway(
-      (gateway) =>
-        gateway && {
-          ...gateway,
-          token_billing: event.target.value,
-        }
+      (gateway) => gateway && { ...gateway, [property]: value }
     );
   };
 
@@ -78,12 +77,17 @@ export function Settings(props: Props) {
   return (
     <Card title={t('settings')}>
       <Element leftSide={t('label')}>
-        <InputField value={gateway.name} />
+        <InputField
+          value={props.companyGateway.label || gateway.name}
+          onValueChange={(value) => handleChange('label', value)}
+        />
       </Element>
 
       {options.some((option) => option.token_billing == true) && (
         <Element leftSide={t('capture_card')}>
-          <SelectField onChange={handleCaptureCardChange}>
+          <SelectField
+            onValueChange={(value) => handleChange('token_billing', value)}
+          >
             <option value="always">{t('enabled')}</option>
             <option value="optout">{t('enabled_by_default')}</option>
             <option value="optin">{t('disabled_by_default')}</option>
