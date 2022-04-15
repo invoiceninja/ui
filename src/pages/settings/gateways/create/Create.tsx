@@ -96,7 +96,13 @@ export function Create() {
         />
       )}
 
-      {gateway && <LimitsAndFees gateway={gateway} />}
+      {gateway && companyGateway && (
+        <LimitsAndFees
+          gateway={gateway}
+          companyGateway={companyGateway}
+          setCompanyGateway={setCompanyGateway}
+        />
+      )}
     </Settings>
   );
 }
