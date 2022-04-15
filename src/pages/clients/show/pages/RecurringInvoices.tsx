@@ -27,7 +27,7 @@ export function RecurringInvoices() {
       id: 'frequency_id',
       label: t('frequency'),
       format: (value, resource) => (
-        <Link to={generatePath('/recurring_invoices/:id', { id: resource.id })}>
+        <Link to={generatePath('/recurring_invoices/:id/edit', { id: resource.id })}>
           <StatusBadge headless for={frequency} code={value} />
         </Link>
       ),
