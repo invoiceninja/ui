@@ -17,6 +17,7 @@ interface Props extends CommonProps {
   label?: string;
   required?: boolean;
   withBlank?: boolean;
+  onValueChange?: (value: string) => unknown;
 }
 
 export function SelectField(props: Props) {
@@ -30,7 +31,10 @@ export function SelectField(props: Props) {
       )}
 
       <select
-        onChange={props.onChange}
+        onChange={(event) => {
+          props.onValueChange && props.onValueChange(event.target.value);
+          props.onChange && props.onChange(event);
+        }}
         id={props.id}
         className={classNames(
           `w-full py-2 px-3 rounded text-sm  border border-gray-300 ${props.className}`
