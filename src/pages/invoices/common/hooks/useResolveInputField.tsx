@@ -92,7 +92,6 @@ export function useResolveInputField(props: Props) {
         <DebouncedCombobox
           endpoint="/api/v1/tax_rates"
           label={property}
-          value={String(invoice?.line_items[index][property])}
           onChange={(value) => {
             value.resource &&
               onChange(property, parseFloat(value.resource.rate), index);
@@ -107,11 +106,19 @@ export function useResolveInputField(props: Props) {
           formatLabel={(resource) => `${resource.name}(${resource.rate}%)`}
           onActionClick={() => setIsTaxModalOpen(true)}
           actionLabel={t('create_tax_rate')}
-          defaultValue={invoice?.line_items[index][property]}
+          placeholder={
+            String(invoice?.line_items[index][property]) +
+            '% ' +
+            String(
+              invoice?.line_items[index][
+                property.replace('rate', 'name') as keyof InvoiceItem
+              ]
+            )
+          }
         />
       );
     }
-    
+
     if (['line_total'].includes(property)) {
       return formatMoney(invoice?.line_items[index][property] as number);
     }
