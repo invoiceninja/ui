@@ -103,7 +103,7 @@ export function useResolveInputField(props: Props) {
               );
           }}
           className="w-36"
-          formatLabel={(resource) => `${resource.name}(${resource.rate}%)`}
+          formatLabel={(resource) => `${resource.rate}% ${resource.name}`}
           onActionClick={() => setIsTaxModalOpen(true)}
           actionLabel={t('create_tax_rate')}
           placeholder={
