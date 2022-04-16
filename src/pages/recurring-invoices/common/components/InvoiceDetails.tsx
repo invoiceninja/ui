@@ -23,7 +23,7 @@ export function InvoiceDetails() {
   const invoice = useCurrentRecurringInvoice();
   const company = useCurrentCompany();
   const handleChange = useSetCurrentRecurringInvoiceProperty();
-
+  const date = new Date();
   return (
     <>
       <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
@@ -51,6 +51,7 @@ export function InvoiceDetails() {
               handleChange('date', event.target.value)
             }
             value={invoice?.date || ''}
+            min={date.toISOString().split('T')[0]}
           />
         </Element>
 

@@ -28,6 +28,7 @@ interface Props extends CommonProps {
   element?: string;
   disabled?: boolean;
   list?: string;
+  min?: string;
   onValueChange?: (value: string) => unknown;
 }
 
@@ -42,6 +43,7 @@ export function InputField(props: Props) {
       )}
 
       <DebounceInput
+        min={props.min}
         disabled={props.disabled}
         element={props.element || 'input'}
         inputRef={props.innerRef}
