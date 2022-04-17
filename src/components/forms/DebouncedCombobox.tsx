@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Combobox } from '@headlessui/react';
 import { ChevronDown } from 'react-feather';
-import { clone, debounce } from 'lodash';
+import { debounce } from 'lodash';
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -89,10 +89,6 @@ export function DebouncedCombobox(props: Props) {
 
       return current;
     });
-
-    const record = clone(records[0]);
-
-    setSelectedOption({ record, withoutEvents: false });
   }, 500);
 
   useEffect(() => request(''), []);
