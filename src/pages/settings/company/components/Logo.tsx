@@ -22,6 +22,7 @@ import { useDispatch } from 'react-redux';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useLogo } from 'common/hooks/useLogo';
 import { updateRecord } from 'common/stores/slices/company-users';
+import { DeleteLogo } from './DeleteLogo';
 
 export function Logo() {
   const [t] = useTranslation();
@@ -29,7 +30,6 @@ export function Logo() {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState(new FormData());
   const logo = useLogo();
-
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: formData,
@@ -104,6 +104,7 @@ export function Logo() {
           </div>
         </div>
       </Element>
+      <DeleteLogo />
     </Card>
   );
 }
