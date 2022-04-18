@@ -10,23 +10,20 @@
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useTitle } from 'common/hooks/useTitle';
 import { defaultHeaders } from 'common/queries/common/headers';
-import {
-  injectInChanges,
-  resetChanges,
-  updateRecord,
-} from 'common/stores/slices/company-users';
-import { RootState } from 'common/stores/store';
-import { useEffect } from 'react';
+import { resetChanges, updateRecord } from 'common/stores/slices/company-users';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
 import { Address, Defaults, Details, Documents, Logo } from './components';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
+
+  useTitle('company_details');
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -34,26 +31,14 @@ export function CompanyDetails() {
   ];
 
   const dispatch = useDispatch();
-  const company = useCurrentCompany();
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'company_details'
-    )}`;
-
-    dispatch(injectInChanges({ object: 'company', data: company }));
-  }, [company]);
-
-  const companyChanges = useSelector(
-    (state: RootState) => state.companyUsers.changes.company
-  );
+  const companyChanges = useInjectCompanyChanges();
 
   const onSave = () => {
     toast.loading(t('processing'));
 
     axios
       .put(
-        endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
+        endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
         companyChanges,
         { headers: defaultHeaders }
       )
