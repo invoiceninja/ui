@@ -51,6 +51,7 @@ export function InvoiceDetails() {
               handleChange('date', event.target.value)
             }
             value={invoice?.date || ''}
+            min={new Date().toISOString().split('T')[0]}
           />
         </Element>
 
