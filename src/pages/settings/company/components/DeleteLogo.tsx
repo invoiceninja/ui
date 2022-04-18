@@ -22,15 +22,16 @@ import { Element } from '@invoiceninja/cards';
 
 export function DeleteLogo() {
   const [t] = useTranslation();
-  const compoanyChanges = useCompanyChanges();
+
+  const companyChanges = useCompanyChanges();
   const company = useCurrentCompany();
   const dispatch = useDispatch();
 
   const formik = useFormik({
     enableReinitialize: true,
-    initialValues: compoanyChanges,
+    initialValues: companyChanges,
     onSubmit: () => {
-      toast.loading(t('processing'));
+      const toastId = toast.loading(t('processing'));
 
       axios
         .put(
@@ -45,30 +46,24 @@ export function DeleteLogo() {
             updateRecord({ object: 'company', data: response.data.data })
           );
 
-          toast.dismiss();
-          toast.success(t('removed_logo'));
+          toast.success(t('removed_logo'), { id: toastId });
         })
         .catch((error: AxiosError) => {
           console.error(error);
 
-          toast.dismiss();
-          toast.error(t('error_title'));
+          toast.error(t('error_title'), { id: toastId });
         });
     },
   });
+
   const deleteLogo = () => {
     formik.setFieldValue('settings.company_logo', '');
     formik.submitForm();
   };
+
   return (
-    <Element leftSide={t('remove_logo')}>
-      <Button
-        behavior="button"
-        type="minimal"
-        onClick={() => {
-          deleteLogo();
-        }}
-      >
+    <Element>
+      <Button behavior="button" type="minimal" onClick={() => deleteLogo()}>
         {t('remove_logo')}
       </Button>
     </Element>
