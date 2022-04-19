@@ -12,10 +12,15 @@ import React, { ChangeEvent, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputField } from '../forms/InputField';
-import Select, { MultiValue, SingleValue } from 'react-select';
-
+import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
+export interface SelectOption {
+  value: string;
+  label: string;
+  backgroundColor: string;
+  color: string;
+}
 interface Props extends CommonProps {
-  options?: { value: string; label: string }[];
+  options?: SelectOption[];
   defaultOption?: { value: string; label: string };
   optionsPlaceholder?: string;
   optionsMultiSelect?: boolean;
@@ -41,6 +46,28 @@ export function Actions(props: Props) {
 
     return props.onStatusChange(values);
   }
+  const customStyles: StylesConfig<SelectOption, true> = {
+    multiValue: (styles, { data }) => {
+      return {
+        ...styles,
+        backgroundColor: data.backgroundColor,
+        color: data.color,
+        borderRadius: '3px',
+      };
+    },
+    multiValueLabel: (styles, { data }) => ({
+      ...styles,
+      color: data.color,
+    }),
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    multiValueRemove: (styles, { data }) => ({
+      ...styles,
+      ':hover': {
+        color: 'white',
+      },
+      color: '#999999',
+    }),
+  };
 
   return (
     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
@@ -48,11 +75,12 @@ export function Actions(props: Props) {
         {props.children}
         {props.options && (
           <Select
+            styles={customStyles}
+            defaultValue={[props.options[0]]}
             onChange={(options) => onStatusChange(options)}
-            defaultValue={props.defaultOption}
             placeholder={t('status')}
             options={props.options}
-            isMulti={props.optionsMultiSelect}
+            isMulti
           />
         )}
       </div>
