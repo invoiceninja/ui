@@ -122,6 +122,7 @@ export function ProductsTable() {
       </Table>
 
       <TaxCreate isVisible={isTaxModalOpen} onClose={setIsTaxModalOpen} />
+
       <ProductCreate
         setIsModalOpen={setIsProductModalOpen}
         isModalOpen={isProductModalOpen}
