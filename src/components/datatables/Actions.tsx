@@ -21,7 +21,7 @@ export interface SelectOption {
 }
 interface Props extends CommonProps {
   options?: SelectOption[];
-  defaultOption?: { value: string; label: string };
+  defaultOption?: SelectOption;
   optionsPlaceholder?: string;
   optionsMultiSelect?: true | undefined;
   rightSide?: ReactNode;
@@ -76,7 +76,7 @@ export function Actions(props: Props) {
         {props.options && (
           <Select
             styles={customStyles}
-            defaultValue={[props.options[0]]}
+            defaultValue={props.defaultOption}
             onChange={(options) => onStatusChange(options)}
             placeholder={t('status')}
             options={props.options}
