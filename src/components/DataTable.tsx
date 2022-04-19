@@ -14,7 +14,7 @@ import { defaultHeaders } from 'common/queries/common/headers';
 import { ChangeEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
-import { Actions } from './datatables/Actions';
+import { Actions, SelectOption } from './datatables/Actions';
 import { Button, Checkbox } from './forms';
 import ResourcefulActions from './ResourcefulActions';
 import { Spinner } from './Spinner';
@@ -79,10 +79,25 @@ export function DataTable(props: Props) {
     () => axios.get(apiEndpoint.href, { headers: defaultHeaders })
   );
 
-  const options = [
-    { value: 'active', label: t('active') },
-    { value: 'archived', label: t('archived') },
-    { value: 'deleted', label: t('deleted') },
+  const options: SelectOption[] = [
+    {
+      value: 'active',
+      label: t('active'),
+      color: 'black',
+      backgroundColor: '#e4e4e4',
+    },
+    {
+      value: 'archived',
+      label: t('archived'),
+      color: 'white',
+      backgroundColor: '#e6b05c',
+    },
+    {
+      value: 'deleted',
+      label: t('deleted'),
+      color: 'white',
+      backgroundColor: '#c95f53',
+    },
   ];
 
   return (
