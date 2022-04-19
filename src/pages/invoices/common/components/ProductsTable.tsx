@@ -21,12 +21,8 @@ import { useResolveInputField } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
 import { TaxCreate } from './TaxCreate';
 import { ProductCreate } from './ProductCreate';
-import {
-  DragDropContext,
-  Draggable,
-  Droppable,
-  DropResult,
-} from 'react-beautiful-dnd';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
 
 export function ProductsTable() {
   const [t] = useTranslation();
@@ -44,9 +40,7 @@ export function ProductsTable() {
     setIsProductModalOpen,
   });
 
-  const onDragEnd = (result: DropResult) => {
-    console.log(result);
-  };
+  const onDragEnd = useHandleSortingRows();
 
   return (
     <div>
