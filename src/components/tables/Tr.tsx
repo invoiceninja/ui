@@ -17,12 +17,16 @@ interface Props extends CommonProps {
 }
 
 export function Tr(props: Props) {
+  const { onClick, innerRef, ...otherProps } = props;
+
   return (
     <tr
       className={classNames('bg-white dark:bg-gray-800 hover:bg-gray-50', {
-        'cursor-pointer': props.onClick,
+        'cursor-pointer': onClick,
       })}
-      onClick={props.onClick}
+      onClick={onClick}
+      ref={innerRef}
+      {...otherProps}
     >
       {props.children}
     </tr>
