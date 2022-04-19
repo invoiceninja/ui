@@ -23,7 +23,7 @@ interface Props extends CommonProps {
   options?: SelectOption[];
   defaultOption?: { value: string; label: string };
   optionsPlaceholder?: string;
-  optionsMultiSelect?: boolean;
+  optionsMultiSelect?: true | undefined;
   rightSide?: ReactNode;
 
   onFilterChange?: any;
@@ -80,7 +80,7 @@ export function Actions(props: Props) {
             onChange={(options) => onStatusChange(options)}
             placeholder={t('status')}
             options={props.options}
-            isMulti
+            isMulti={props.optionsMultiSelect}
           />
         )}
       </div>
