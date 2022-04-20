@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+import classNames from 'classnames';
 import CommonProps from 'common/interfaces/common-props.interface';
 import { Alert } from 'components/Alert';
 import CurrencyInput from 'react-currency-input-field';
@@ -27,6 +28,9 @@ interface Props extends CommonProps {
   prefix?: string;
   defaultValue?: number;
   decimalLimit?: number;
+  decimalSeperator?: string;
+  thousandSeperator?: string;
+  suffix?: string;
   onValueChange?: (value: string) => unknown;
 }
 
@@ -45,10 +49,19 @@ export function CurrencyInputField(props: Props) {
         defaultValue={props.defaultValue}
         value={props.value}
         placeholder={props.placeholder}
-        onValueChange={(value, name) => console.log(value, name)}
+        onValueChange={(value) => props.onChange(value)}
         decimalsLimit={props.decimalLimit}
+        decimalSeparator={props.decimalSeperator}
+        groupSeparator={props.thousandSeperator}
         name={props.name}
         prefix={props.prefix}
+        suffix={props.suffix}
+        className={classNames(
+          `w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 ${props.className}`,
+          {
+            'border border-gray-300': props.border !== false,
+          }
+        )}
       />
 
       {props.errorMessage && (
