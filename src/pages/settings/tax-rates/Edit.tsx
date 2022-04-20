@@ -67,7 +67,7 @@ export function Edit() {
 
       axios
         .put(endpoint('/api/v1/tax_rates/:id', { id }), value, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then(() => {
           toast.dismiss();

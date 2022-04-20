@@ -56,7 +56,7 @@ export function DebouncedCombobox(props: Props) {
         url.href,
         () =>
           axios.get(url.href, {
-            headers: defaultHeaders,
+            headers: defaultHeaders(),
           }),
         { staleTime: Infinity }
       )

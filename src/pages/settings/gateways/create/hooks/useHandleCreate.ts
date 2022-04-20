@@ -25,7 +25,7 @@ export function useHandleCreate(companyGateway: CompanyGateway | undefined) {
 
     axios
       .post(endpoint('/api/v1/company_gateways'), companyGateway, {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       })
       .then(() => {
         toast.success(t('created_company_gateway'), { id: toastId });

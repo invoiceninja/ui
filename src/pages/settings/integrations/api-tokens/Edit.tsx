@@ -64,7 +64,7 @@ export function Edit() {
 
       axios
         .put(endpoint('/api/v1/tokens/:id', { id }), values, {
-          headers: { 'X-Api-Password': password, ...defaultHeaders },
+          headers: { 'X-Api-Password': password, ...defaultHeaders() },
         })
         .then(() => {
           toast.success(t('updated_token'), { id: toastId });

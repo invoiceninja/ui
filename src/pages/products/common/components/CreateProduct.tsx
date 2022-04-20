@@ -61,7 +61,7 @@ export function CreateProduct(props: Props) {
     },
     onSubmit: (values: CreateProductDto) => {
       axios
-        .post(endpoint('/api/v1/products'), values, { headers: defaultHeaders })
+        .post(endpoint('/api/v1/products'), values, { headers: defaultHeaders() })
         .then((response: AxiosResponse) => {
           toast.success(t('created_product'));
 

@@ -24,7 +24,7 @@ export class ClientResolver {
 
       axios
         .get(endpoint('/api/v1/clients/:id', { id }), {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then((response) => {
           this.client = response.data.data;

@@ -42,7 +42,7 @@ export function DangerZone() {
           id: company.id,
         }),
         { cancellation_message: feedback },
-        { headers: { 'X-Api-Password': password, ...defaultHeaders } }
+        { headers: { 'X-Api-Password': password, ...defaultHeaders() } }
       )
       .then(() => toast.success(t('purge_successful'), { id: toastId }))
       .catch((error) => {
@@ -61,7 +61,7 @@ export function DangerZone() {
         endpoint('/api/v1/companies/:id', {
           id: company.id,
         }),
-        { headers: { 'X-Api-Password': password, ...defaultHeaders } }
+        { headers: { 'X-Api-Password': password, ...defaultHeaders() } }
       )
       .then(() => window.location.reload())
       .catch((error) => {

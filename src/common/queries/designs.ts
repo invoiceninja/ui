@@ -21,7 +21,7 @@ export function useDesignsQuery(params: Params) {
         perPage: params.perPage,
         currentPage: params.currentPage,
       }),
-      { headers: defaultHeaders }
+      { headers: defaultHeaders() }
     )
   );
 }

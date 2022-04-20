@@ -28,7 +28,7 @@ export function useHandleCreate(
     setErrors(undefined);
 
     axios
-      .post(endpoint('/api/v1/invoices'), invoice, { headers: defaultHeaders })
+      .post(endpoint('/api/v1/invoices'), invoice, { headers: defaultHeaders() })
       .then((response) => {
         toast.success(t('created_invoice'), { id: toastId });
 

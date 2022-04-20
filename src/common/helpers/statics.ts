@@ -22,7 +22,7 @@ export class Statics {
     }
 
     return axios
-      .get(endpoint('/api/v1/statics'), { headers: defaultHeaders })
+      .get(endpoint('/api/v1/statics'), { headers: defaultHeaders() })
       .then((response) => (this.cache = response.data))
       .then(() => this.cache);
   }

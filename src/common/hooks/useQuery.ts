@@ -16,7 +16,7 @@ import { useQuery as useQueryHook } from 'react-query';
 export function useQuery(apiEndpoint: string, options = {}) {
   return useQueryHook(
     apiEndpoint,
-    () => axios.get(endpoint(apiEndpoint), { headers: defaultHeaders }),
+    () => axios.get(endpoint(apiEndpoint), { headers: defaultHeaders() }),
     options
   );
 }

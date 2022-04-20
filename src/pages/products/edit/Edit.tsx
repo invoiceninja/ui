@@ -50,7 +50,7 @@ export function Edit() {
 
       axios
         .put(endpoint('/api/v1/products/:id', { id }), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then(() => toast.success(t('updated_product'), { id: toastId }))
         .catch((error: AxiosError) => {

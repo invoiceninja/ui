@@ -70,7 +70,7 @@ export function GoogleAnalytics() {
       .put(
         endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
         companyChanges,
-        { headers: defaultHeaders }
+        { headers: defaultHeaders() }
       )
       .then((response) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));

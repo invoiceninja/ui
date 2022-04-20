@@ -38,7 +38,7 @@ export function DeleteLogo() {
           endpoint('/api/v1/companies/:id', { id: company.id }),
           formik.values,
           {
-            headers: defaultHeaders,
+            headers: defaultHeaders(),
           }
         )
         .then((response: AxiosResponse) => {

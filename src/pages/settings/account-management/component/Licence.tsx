@@ -39,7 +39,7 @@ export function License() {
             key: values.license,
           }),
           {},
-          { headers: defaultHeaders }
+          { headers: defaultHeaders() }
         )
         .then(() => {
           toast.dismiss();

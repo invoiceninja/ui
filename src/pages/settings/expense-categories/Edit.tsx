@@ -55,7 +55,7 @@ export function Edit() {
 
       axios
         .put(endpoint('/api/v1/expense_categories/:id', { id }), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then(() => {
           toast.dismiss();

@@ -70,7 +70,7 @@ export function Edit() {
 
       axios
         .put(endpoint('/api/v1/task_statuses/:id', { id }), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then(() => {
           toast.dismiss();

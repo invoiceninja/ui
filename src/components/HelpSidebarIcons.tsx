@@ -60,7 +60,7 @@ export function HelpSidebarIcons(props: Props) {
 
       axios
         .post(endpoint('/api/v1/support/messages/send'), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then(() =>
           toast.success(t('your_message_has_been_received'), { id: toastId })
@@ -79,7 +79,7 @@ export function HelpSidebarIcons(props: Props) {
   const refreshData = () => {
     setDisabledButton(true);
     axios
-      .post(endpoint('/api/v1/refresh'), {}, { headers: defaultHeaders })
+      .post(endpoint('/api/v1/refresh'), {}, { headers: defaultHeaders() })
       .then((data) => {
         dispatch(updateCompanyUsers(data.data.data));
         setDisabledButton(false);

@@ -29,7 +29,7 @@ export function useInvoiceSave() {
 
     axios
       .put(endpoint('/api/v1/invoices/:id', { id }), invoice, {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       })
       .then((response) => {
         toast.success(t('updated_invoice'), { id: toastId });

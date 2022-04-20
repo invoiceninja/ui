@@ -25,7 +25,7 @@ export function useDownloadPdf() {
       queryClient.fetchQuery(downloadableUrl, () =>
         axios
           .get(downloadableUrl, {
-            headers: defaultHeaders,
+            headers: defaultHeaders(),
             responseType: 'arraybuffer',
           })
           .then((response) => {

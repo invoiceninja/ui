@@ -79,7 +79,7 @@ export function Create() {
           }),
           values,
           {
-            headers: defaultHeaders,
+            headers: defaultHeaders(),
           }
         )
         .then((data) => {

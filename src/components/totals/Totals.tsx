@@ -81,7 +81,7 @@ export function Totals() {
       'POST',
       endpoint('/api/v1/charts/totals'),
       body,
-      defaultHeaders
+      defaultHeaders()
     ).then((response: AxiosResponse) => {
       setTotals(response.data);
       const currencies: { value: string; label: unknown }[] = [];
@@ -99,7 +99,7 @@ export function Totals() {
       'POST',
       endpoint('/api/v1/charts/chart_summary'),
       body,
-      defaultHeaders
+      defaultHeaders()
     ).then((response: AxiosResponse) => setChartData(response.data));
   };
 

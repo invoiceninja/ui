@@ -51,7 +51,7 @@ export function Create() {
 
       axios
         .post(endpoint('/api/v1/payment_terms'), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then((response: AxiosResponse) => {
           toast.dismiss();

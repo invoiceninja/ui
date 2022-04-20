@@ -18,7 +18,7 @@ export function usePurgeClient(clientId: string | undefined) {
         endpoint('/api/v1/clients/:id/purge', { id: clientId }),
         {},
         {
-          headers: { 'X-Api-Password': password, ...defaultHeaders },
+          headers: { 'X-Api-Password': password, ...defaultHeaders() },
         }
       )
       .then(() => {

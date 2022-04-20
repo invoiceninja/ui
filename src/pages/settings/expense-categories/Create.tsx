@@ -44,7 +44,7 @@ export function Create() {
 
       axios
         .post(endpoint('/api/v1/expense_categories'), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then((response) => {
           toast.dismiss();

@@ -22,7 +22,7 @@ export function useApiWebhooksQuery(params: Params) {
         perPage: params.perPage,
         currentPage: params.currentPage,
       }),
-      { headers: defaultHeaders }
+      { headers: defaultHeaders() }
     )
   );
 }
@@ -32,7 +32,7 @@ export function useApiWebhookQuery(params: { id: string | undefined }) {
     generatePath('/api/v1/webhooks/:id', { id: params.id }),
     () =>
       axios.get(endpoint('/api/v1/webhooks/:id', { id: params.id }), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { staleTime: Infinity }
   );
@@ -48,6 +48,6 @@ export function bulk(
       action,
       ids: id,
     },
-    { headers: { ...defaultHeaders } }
+    { headers: { ...defaultHeaders() } }
   );
 }

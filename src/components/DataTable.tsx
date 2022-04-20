@@ -76,7 +76,7 @@ export function DataTable(props: Props) {
 
   const { data, isLoading, isError } = useQuery(
     [apiEndpoint.href, perPage, currentPage, filter, sort, status],
-    () => axios.get(apiEndpoint.href, { headers: defaultHeaders })
+    () => axios.get(apiEndpoint.href, { headers: defaultHeaders() })
   );
 
   const options: SelectOption[] = [

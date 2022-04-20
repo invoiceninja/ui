@@ -25,7 +25,7 @@ export function usePaymentQuery(params: { id: string | undefined }) {
           id: params.id,
         }),
         {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         }
       ),
     { staleTime: Infinity }
@@ -37,7 +37,7 @@ export function useBlankPaymentQuery() {
     generatePath('/api/v1/payments/create'),
     () =>
       axios.get(endpoint('/api/v1/payments/create'), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { staleTime: Infinity }
   );
@@ -54,6 +54,6 @@ export function bulk(
       action,
       ids: Array.from(id),
     },
-    defaultHeaders
+    defaultHeaders()
   );
 }

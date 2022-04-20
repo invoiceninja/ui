@@ -36,7 +36,7 @@ export function useHandleSend() {
           subject,
           template,
         },
-        { headers: defaultHeaders }
+        { headers: defaultHeaders() }
       )
       .then(() => toast.success(t(`emailed_${entity}`), { id: toastId }))
       .catch((error) => {

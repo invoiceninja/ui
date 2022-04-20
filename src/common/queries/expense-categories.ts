@@ -26,7 +26,7 @@ export function useExpenseCategoriesQuery(params: Params) {
           sort: params.sort ?? 'id|asc',
         }
       ),
-      { headers: defaultHeaders }
+      { headers: defaultHeaders() }
     )
   );
 }
@@ -36,7 +36,7 @@ export function useExpenseCategoryQuery(params: { id: string | undefined }) {
     generatePath('/api/v1/expense_categories/:id', params),
     () =>
       axios.get(endpoint('/api/v1/expense_categories/:id', params), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { staleTime: Infinity }
   );
@@ -52,6 +52,6 @@ export function bulk(
       action,
       ids: id,
     },
-    { headers: { ...defaultHeaders } }
+    { headers: { ...defaultHeaders() } }
   );
 }

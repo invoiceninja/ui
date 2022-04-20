@@ -57,7 +57,7 @@ export function Create() {
       setErrors(undefined);
       axios
         .post(endpoint('/api/v1/vendors/'), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then(() => {
           toast.success(t('new_vendor'), { id: toastId });

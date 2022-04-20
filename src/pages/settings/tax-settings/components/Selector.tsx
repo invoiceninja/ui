@@ -27,7 +27,7 @@ export function Selector() {
   const dispatch = useDispatch();
 
   const { data } = useQuery('/api/v1/tax_rates', () =>
-    axios.get(endpoint('/api/v1/tax_rates'), { headers: defaultHeaders })
+    axios.get(endpoint('/api/v1/tax_rates'), { headers: defaultHeaders() })
   );
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {

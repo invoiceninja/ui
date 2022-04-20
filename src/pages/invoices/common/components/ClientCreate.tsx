@@ -84,7 +84,7 @@ export function ClientCreate() {
 
     axios
       .post(endpoint('/api/v1/clients'), client, {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       })
       .then(() => {
         toast.success(t('created_client'), { id: toastId });

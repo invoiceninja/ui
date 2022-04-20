@@ -49,7 +49,7 @@ export default function ResourcefulActions(props: Props) {
         action,
         ids: Array.from(props.selected),
       },
-      defaultHeaders
+      defaultHeaders()
     )
       .then(() => {
         toast.success(t(`${action}d_${props.resourceType}`), {

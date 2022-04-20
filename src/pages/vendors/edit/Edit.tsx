@@ -64,7 +64,7 @@ export function Edit() {
       setErrors(undefined);
       axios
         .put(endpoint('/api/v1/vendors/:id', { id }), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then(() => {
           toast.success(t('updated_vendor'), { id: toastId });

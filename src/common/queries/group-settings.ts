@@ -16,7 +16,7 @@ import { defaultHeaders } from './common/headers';
 export function useGroupSettingsQuery() {
   return useQuery('/api/v1/group_settings', () => {
     return axios.get(endpoint('/api/v1/group_settings'), {
-      headers: defaultHeaders,
+      headers: defaultHeaders(),
     });
   });
 }

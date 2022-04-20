@@ -32,7 +32,7 @@ export class CurrencyResolver {
   public find(id: string): Promise<Currency | undefined> {
     return this.queryClient
       .fetchQuery(endpoint('/api/v1/statics'), () =>
-        axios.get(endpoint('/api/v1/statics'), { headers: defaultHeaders })
+        axios.get(endpoint('/api/v1/statics'), { headers: defaultHeaders() })
       )
       .then((data) =>
         data.data.currencies.find((currency: Currency) => currency.id === id)

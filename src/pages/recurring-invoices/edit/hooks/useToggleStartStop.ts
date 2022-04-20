@@ -31,7 +31,7 @@ export function useToggleStartStop() {
           status,
         }),
         recurringInvoice,
-        { headers: defaultHeaders }
+        { headers: defaultHeaders() }
       )
       .then((response) => {
         dispatch(setCurrentRecurringInvoice(response.data.data));

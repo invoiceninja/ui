@@ -32,7 +32,7 @@ export function PaymentFields() {
 
     axios
       .put(endpoint('/api/v1/companies/:id', { id: company?.id }), company, {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       })
       .then((response) => {
         dispatch(

@@ -39,7 +39,7 @@ export function Upload({ apiEndpoint }: { apiEndpoint: string }) {
       axios
         .post(endpoint(apiEndpoint, { id: company.id }), formData, {
           headers: {
-            ...defaultHeaders,
+            ...defaultHeaders(),
             'Content-Type': 'multipart/form-data',
           },
         })

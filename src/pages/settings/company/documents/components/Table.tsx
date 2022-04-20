@@ -50,7 +50,7 @@ export function Table() {
     toast.loading(t('processing'));
     axios
       .delete(endpoint('/api/v1/documents/:id', { id: document }), {
-        headers: { 'X-Api-Password': password, ...defaultHeaders },
+        headers: { 'X-Api-Password': password, ...defaultHeaders() },
       })
       .then(() => {
         toast.dismiss();

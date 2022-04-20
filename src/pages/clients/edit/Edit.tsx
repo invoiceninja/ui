@@ -85,12 +85,12 @@ export function Edit() {
     axios
       .all([
         axios.put(endpoint('/api/v1/clients/:id', { id }), client, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         }),
         axios.put(
           endpoint('/api/v1/companies/:id', { id: company?.id }),
           company,
-          { headers: defaultHeaders }
+          { headers: defaultHeaders() }
         ),
       ])
       .then((response) => {

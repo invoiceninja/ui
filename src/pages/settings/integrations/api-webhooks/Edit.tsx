@@ -133,7 +133,7 @@ export function Edit() {
 
       axios
         .put(endpoint('/api/v1/webhooks/:id', { id }), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then(() => toast.success(t('updated_webhook'), { id: toastId }))
         .catch((error: AxiosError) => {

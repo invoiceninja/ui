@@ -42,7 +42,7 @@ export function TwoFactorAuthentication() {
 
     axios
       .get(endpoint('/api/v1/settings/enable_two_factor'), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       })
       .then((response) => {
         toast.dismiss();
@@ -72,7 +72,7 @@ export function TwoFactorAuthentication() {
           secret: qrCodeSecret,
           one_time_password: oneTimePassword,
         },
-        { headers: defaultHeaders }
+        { headers: defaultHeaders() }
       )
       .then((response) => {
         toast.dismiss();
@@ -99,7 +99,7 @@ export function TwoFactorAuthentication() {
       .post(
         endpoint('/api/v1/settings/disable_two_factor'),
         {},
-        { headers: defaultHeaders }
+        { headers: defaultHeaders() }
       )
       .then(() => {
         toast.dismiss();

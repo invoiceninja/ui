@@ -26,7 +26,7 @@ export function useTaskStatusesQuery(params: Params) {
           sort: params.sort ?? 'id|asc',
         }
       ),
-      { headers: defaultHeaders }
+      { headers: defaultHeaders() }
     )
   );
 }
@@ -36,7 +36,7 @@ export function useTaskStatusQuery(params: { id: string | undefined }) {
     generatePath('/api/v1/task_statuses/:id', { id: params.id }),
     () =>
       axios.get(endpoint('/api/v1/task_statuses/:id', { id: params.id }), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { staleTime: Infinity }
   );
@@ -52,6 +52,6 @@ export function bulk(
       action,
       ids: id,
     },
-    { headers: { ...defaultHeaders } }
+    { headers: { ...defaultHeaders() } }
   );
 }

@@ -50,7 +50,7 @@ export function ProductCreate(props: Props) {
     },
     onSubmit: (values: CreateProductDto) => {
       axios
-        .post(endpoint('/api/v1/products'), values, { headers: defaultHeaders })
+        .post(endpoint('/api/v1/products'), values, { headers: defaultHeaders() })
         .then(() => {
           toast.success(t('created_product'));
           props.setIsModalOpen(!props.isModalOpen);

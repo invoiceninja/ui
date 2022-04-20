@@ -16,7 +16,7 @@ import { defaultHeaders } from './common/headers';
 
 export function useClientsQuery() {
   return useQuery(['/api/v1/clients'], () =>
-    axios.get(endpoint('/api/v1/clients'), { headers: defaultHeaders })
+    axios.get(endpoint('/api/v1/clients'), { headers: defaultHeaders() })
   );
 }
 
@@ -28,7 +28,7 @@ export function useClientQuery(
     generatePath('/api/v1/clients/:id', { id: params.id }),
     () =>
       axios.get(endpoint('/api/v1/clients/:id', { id: params.id }), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { ...options, staleTime: Infinity }
   );
@@ -44,6 +44,6 @@ export function bulk(
       action,
       ids: Array.from(id),
     },
-    defaultHeaders
+    defaultHeaders()
   );
 }

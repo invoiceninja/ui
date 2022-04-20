@@ -19,7 +19,7 @@ export function useVendorQuery(params: { id: string | undefined }) {
     generatePath('/api/v1/vendors/:id', { id: params.id }),
     () =>
       axios.get(endpoint('/api/v1/vendors/:id', { id: params.id }), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { staleTime: Infinity }
   );
@@ -30,7 +30,7 @@ export function useBlankVendorQuery() {
     endpoint('/api/v1/vendors/create'),
     () =>
       axios.get(endpoint('/api/v1/vendors/create'), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { staleTime: Infinity }
   );

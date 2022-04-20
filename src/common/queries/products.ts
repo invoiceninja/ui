@@ -28,7 +28,7 @@ export function useProductsQuery(params: Params) {
           sort: params.sort ?? 'id|asc',
         }
       ),
-      { headers: defaultHeaders }
+      { headers: defaultHeaders() }
     );
   });
 }
@@ -38,7 +38,7 @@ export function useProductQuery(params: { id: string | undefined }) {
     generatePath('/api/v1/products/:id', { id: params.id }),
     () =>
       axios.get(endpoint('/api/v1/products/:id', { id: params.id }), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { staleTime: Infinity }
   );
@@ -48,7 +48,7 @@ export function useBlankProductQuery() {
     generatePath('/api/v1/products/create'),
     () =>
       axios.get(endpoint('/api/v1/products/create'), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { staleTime: Infinity }
   );

@@ -52,7 +52,7 @@ export function Create() {
 
       axios
         .post(endpoint('/api/v1/task_statuses'), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then((response) => {
           toast.dismiss();

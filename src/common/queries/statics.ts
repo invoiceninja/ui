@@ -18,7 +18,7 @@ export function useStaticsQuery() {
     '/api/v1/statics',
     () => {
       return axios.get(endpoint('/api/v1/statics'), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       });
     },
     { staleTime: Infinity }

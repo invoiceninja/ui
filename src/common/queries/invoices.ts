@@ -22,7 +22,7 @@ export function useInvoiceQuery(
     generatePath('/api/v1/invoices/:id', { id: params.id }),
     () =>
       axios.get(endpoint('/api/v1/invoices/:id', { id: params.id }), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { ...options, staleTime: Infinity }
   );
@@ -33,7 +33,7 @@ export function useBlankInvoiceQuery(options: Record<string, any> = {}) {
     generatePath('/api/v1/invoices/create'),
     () =>
       axios.get(endpoint('/api/v1/invoices/create'), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { ...options, staleTime: Infinity }
   );
@@ -49,6 +49,6 @@ export function bulk(
       action,
       ids: Array.from(id),
     },
-    { headers: defaultHeaders }
+    { headers: defaultHeaders() }
   );
 }

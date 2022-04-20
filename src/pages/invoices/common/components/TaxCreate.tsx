@@ -37,7 +37,7 @@ export function TaxCreate(props: Props) {
 
       axios
         .post(endpoint('/api/v1/tax_rates'), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then(() => {
           toast.success(t('created_tax_rate'));

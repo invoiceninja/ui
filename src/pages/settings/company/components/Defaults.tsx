@@ -29,7 +29,7 @@ export function Defaults() {
   const statics = useStaticsQuery();
 
   const { data: terms } = useQuery('/api/v1/payment_terms', () =>
-    axios.get(endpoint('/api/v1/payment_terms'), { headers: defaultHeaders })
+    axios.get(endpoint('/api/v1/payment_terms'), { headers: defaultHeaders() })
   );
 
   const companyChanges = useSelector(

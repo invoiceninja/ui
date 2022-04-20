@@ -44,7 +44,7 @@ export function useResolveTemplate(
             subject,
             template: templateId,
           },
-          { headers: defaultHeaders }
+          { headers: defaultHeaders() }
         )
         .then((response) => setTemplate(response.data))
         .catch((error) => console.error(error))

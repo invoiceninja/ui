@@ -40,7 +40,7 @@ export function Localization() {
       .put(
         endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
         companyChanges,
-        { headers: defaultHeaders }
+        { headers: defaultHeaders() }
       )
       .then((response: AxiosResponse) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));

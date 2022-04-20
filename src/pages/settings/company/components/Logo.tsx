@@ -38,7 +38,7 @@ export function Logo() {
 
       axios
         .post(endpoint('/api/v1/companies/:id', { id: company.id }), formData, {
-          headers: { ...defaultHeaders, 'Content-Type': 'multipart/form-data' },
+          headers: { ...defaultHeaders(), 'Content-Type': 'multipart/form-data' },
         })
         .then((response: AxiosResponse) => {
           dispatch(

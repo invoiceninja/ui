@@ -21,7 +21,7 @@ export function useBlankRecurringInvoiceQuery(
     generatePath('/api/v1/recurring_invoices/create'),
     () =>
       axios.get(endpoint('/api/v1/recurring_invoices/create'), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { ...options, staleTime: Infinity }
   );
@@ -35,7 +35,7 @@ export function useRecurringInvoiceQuery(
     generatePath('/api/v1/recurring_invoices/:id', { id: params.id }),
     () =>
       axios.get(endpoint('/api/v1/recurring_invoices/:id', { id: params.id }), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { ...options, staleTime: Infinity }
   );

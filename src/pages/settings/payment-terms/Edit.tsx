@@ -66,7 +66,7 @@ export function Edit() {
         .put(
           endpoint('/api/v1/payment_terms/:id', { id: data?.data.data.id }),
           values,
-          { headers: defaultHeaders }
+          { headers: defaultHeaders() }
         )
         .then(() => {
           toast.dismiss();

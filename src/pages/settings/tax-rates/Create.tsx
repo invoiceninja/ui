@@ -52,7 +52,7 @@ export function Create() {
 
       axios
         .post(endpoint('/api/v1/tax_rates'), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then((response) => {
           toast.success(t('created_tax_rate'));

@@ -31,7 +31,7 @@ export function InvoiceViewer(props: Props) {
           method: props.method,
           url: props.link,
           data: props.resource,
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
           responseType: 'arraybuffer',
         })
       )

@@ -53,7 +53,7 @@ export function Create() {
 
       axios
         .post(endpoint('/api/v1/tokens'), values, {
-          headers: { 'X-Api-Password': password, ...defaultHeaders },
+          headers: { 'X-Api-Password': password, ...defaultHeaders() },
         })
         .then((response) => {
           toast.success(t('created_token'), { id: toastId });

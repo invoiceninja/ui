@@ -55,7 +55,7 @@ export function Refund() {
           endpoint('/api/v1/payments/refund?&email_receipt=:email', { email }),
           values,
           {
-            headers: defaultHeaders,
+            headers: defaultHeaders(),
           }
         )
         .then(() => {

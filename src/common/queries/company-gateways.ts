@@ -19,7 +19,7 @@ export function useCompanyGatewayQuery(params: { id: string | undefined }) {
     generatePath('/api/v1/company_gateways/:id', { id: params.id }),
     () =>
       axios.get(endpoint('/api/v1/company_gateways/:id', { id: params.id }), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { staleTime: Infinity }
   );
@@ -30,7 +30,7 @@ export function useBlankCompanyGatewayQuery() {
     generatePath('/api/v1/company_gateways/create'),
     () =>
       axios.get(endpoint('/api/v1/company_gateways/create'), {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       }),
     { staleTime: Infinity }
   );

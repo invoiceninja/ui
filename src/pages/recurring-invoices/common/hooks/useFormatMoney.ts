@@ -42,7 +42,7 @@ export function useFormatMoney() {
             axios.get(
               endpoint('/api/v1/clients/:id', { id: invoice.client_id }),
               {
-                headers: defaultHeaders,
+                headers: defaultHeaders(),
               }
             ),
           { staleTime: Infinity }

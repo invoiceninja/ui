@@ -57,7 +57,7 @@ export function Edit() {
       setErrors(undefined);
       axios
         .put(endpoint('/api/v1/payments/:id', { id }), values, {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         })
         .then(() => {
           toast.success(t('updated_payment'), { id: toastId });

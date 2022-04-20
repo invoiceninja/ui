@@ -33,7 +33,7 @@ export function useHandleUpdate(companyGateway: CompanyGateway | undefined) {
         endpoint('/api/v1/company_gateways/:id', { id: companyGateway.id }),
         companyGateway,
         {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         }
       )
       .then(() => toast.success(t('updated_company_gateway'), { id: toastId }))

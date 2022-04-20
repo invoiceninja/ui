@@ -32,7 +32,7 @@ export function useRecurringInvoiceSave() {
         endpoint('/api/v1/recurring_invoices/:id', { id }),
         recurringInvoice,
         {
-          headers: defaultHeaders,
+          headers: defaultHeaders(),
         }
       )
       .then((response) => {

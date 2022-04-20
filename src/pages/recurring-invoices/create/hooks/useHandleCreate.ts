@@ -29,7 +29,7 @@ export function useHandleCreate(
 
     axios
       .post(endpoint('/api/v1/recurring_invoices'), recurringInvoice, {
-        headers: defaultHeaders,
+        headers: defaultHeaders(),
       })
       .then((response) => {
         toast.success(t('created_recurring_invoice'), { id: toastId });
