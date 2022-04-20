@@ -13,19 +13,20 @@ import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
+
 export interface SelectOption {
   value: string;
   label: string;
   backgroundColor: string;
   color: string;
 }
+
 interface Props extends CommonProps {
   options?: SelectOption[];
   defaultOption?: SelectOption;
   optionsPlaceholder?: string;
   optionsMultiSelect?: true | undefined;
   rightSide?: ReactNode;
-
   onFilterChange?: any;
   onStatusChange?: any;
 }
