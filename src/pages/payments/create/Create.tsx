@@ -14,6 +14,8 @@ import axios, { AxiosError } from 'axios';
 import collect from 'collect.js';
 import paymentType from 'common/constants/payment-type';
 import { endpoint } from 'common/helpers';
+import { ClientResolver } from 'common/helpers/clients/client-resolver';
+import { CurrencyResolver } from 'common/helpers/currencies/currency-resolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Client } from 'common/interfaces/client';
 import { Invoice } from 'common/interfaces/invoice';
@@ -26,6 +28,7 @@ import { Divider } from 'components/cards/Divider';
 import { Container } from 'components/Container';
 import { ConvertCurrency } from 'components/ConvertCurrency';
 import { CustomField } from 'components/CustomField';
+import { CurrencyInputField } from 'components/forms/CurrencyInputField';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
@@ -40,14 +43,22 @@ import { v4 } from 'uuid';
 
 export function Create() {
   const [t] = useTranslation();
+  const clientResolver = new ClientResolver();
+  const currencyResolver = new CurrencyResolver();
 
   const { client_id } = useParams();
   const { data: payment } = useBlankPaymentQuery();
   const { data: clients } = useClientsQuery();
 
+  const [currencyCode, setCurrencyCode] = useState<string>();
+  const [currencySymbol, setCurrencySymbol] = useState<string>();
+  const [decimalSeperator, setDecimalSeperator] = useState<string>();
+  const [thousandSeperator, setThousandSeperator] = useState<string>();
+  const [decimalSpaces, setDecimalSpaces] = useState<number>();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const company = useCurrentCompany();
+  const [defaultValue, setdefaultValue] = useState<number>();
 
   const [errors, setErrors] = useState<ValidationBag>();
   const [convertCurrency, setConvertCurrency] = useState(false);
@@ -109,6 +120,7 @@ export function Create() {
       'amount',
       collect(formik.values.invoices).sum('amount')
     );
+    setdefaultValue(formik.values.amount);
   }, [formik.values.invoices]);
 
   const handleClientChange = (clientId: string, currencyId: string) => {
@@ -131,6 +143,21 @@ export function Create() {
       )
     );
   };
+  const resolveCurrency = async (client_id: string) => {
+    const client = await clientResolver.find(client_id);
+    const currency = await currencyResolver.find(client.settings.currency_id);
+    setCurrencyCode(currency?.code);
+    setCurrencySymbol(currency?.symbol);
+    setDecimalSeperator(currency?.decimal_separator);
+    setThousandSeperator(currency?.thousand_separator);
+    setDecimalSpaces(currency?.precision);
+
+    console.log('currency:', currency);
+  };
+  useEffect(() => {
+    console.log(formik.values.client_id);
+    resolveCurrency(formik.values.client_id);
+  }, [formik.values.client_id]);
 
   return (
     <Default title={t('new_payment')}>
@@ -156,17 +183,33 @@ export function Create() {
             {errors?.errors.client_id && (
               <Alert type="danger">{errors.errors.client_id}</Alert>
             )}
+            {console.log(defaultValue)}
           </Element>
-
-          <Element leftSide={t('amount')}>
-            <InputField
-              id="amount"
-              value={formik.values.amount}
-              onChange={formik.handleChange}
-              errorMessage={errors?.errors.payment_amount}
-            />
-          </Element>
-
+          {formik.values.client_id && (
+            <Element leftSide={t('amount')}>
+              <CurrencyInputField
+                className="rounded-sm"
+                id="amount"
+                defaultValue={defaultValue}
+                prefix={
+                  company.settings.show_currency_code
+                    ? undefined
+                    : currencySymbol
+                }
+                onChange={(value: any) => {
+                  console.log(value);
+                  //formik.setFieldValue('amount', value);
+                }}
+                suffix={
+                  company.settings.show_currency_code ? currencyCode : undefined
+                }
+                decimalLimit={decimalSpaces}
+                decimalSeperator={decimalSeperator}
+                thousandSeperator={thousandSeperator}
+                errorMessage={errors?.errors.payment_amount}
+              />
+            </Element>
+          )}
           {formik.values.client_id && <Divider />}
 
           {formik.values.client_id && (
