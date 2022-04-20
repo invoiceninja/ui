@@ -46,7 +46,7 @@ export function CompanySwitcher() {
 
     queryClient.invalidateQueries();
 
-    location.reload();
+    window.location.href = generatePath('/');
   };
 
   return (
