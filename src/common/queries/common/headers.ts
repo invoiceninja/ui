@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export const defaultHeaders = {
-  'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
-  'X-Requested-With': 'XMLHttpRequest',
-};
+export function defaultHeaders() {
+  return {
+    'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
+    'X-Requested-With': 'XMLHttpRequest',
+  };
+}
