@@ -24,6 +24,7 @@ import { LimitsAndFees } from './components/LimitsAndFees';
 import { RequiredFields } from './components/RequiredFields';
 import { Settings as GatewaySettings } from './components/Settings';
 import { useHandleCreate } from './hooks/useHandleCreate';
+import { blankFeesAndLimitsRecord } from './hooks/useHandleMethodToggle';
 
 export function Create() {
   const [t] = useTranslation();
@@ -66,6 +67,30 @@ export function Create() {
           token_billing: 'always',
         }
     );
+
+    // We want to inject blank credit card record which is checked.
+    // Only in case the gateway supports credit card transactions.
+
+    const supportedGatewayTypes = gateway
+      ? Object.entries(gateway.options)
+      : [];
+
+    const shouldInjectCreditCard = supportedGatewayTypes.find(
+      ([id]) => id === '1'
+    );
+
+    if (shouldInjectCreditCard) {
+      setCompanyGateway(
+        (current) =>
+          current && {
+            ...current,
+            fees_and_limits: {
+              ...current.fees_and_limits,
+              '1': blankFeesAndLimitsRecord,
+            },
+          }
+      );
+    }
   }, [gateway]);
 
   return (
