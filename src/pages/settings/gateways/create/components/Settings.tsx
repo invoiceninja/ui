@@ -74,6 +74,20 @@ export function Settings(props: Props) {
     props.setCompanyGateway
   );
 
+  const isChecked = (gatewayTypeId: string) => {
+    const property = Object.entries(props.companyGateway.fees_and_limits).find(
+      ([companyGatewayId]) => gatewayTypeId === companyGatewayId
+    );
+
+    if (!property) {
+      return false;
+    }
+
+    const [, entry] = property;
+
+    return entry.is_enabled;
+  };
+
   return (
     <Card title={t('settings')}>
       <Element leftSide={t('label')}>
@@ -105,6 +119,7 @@ export function Settings(props: Props) {
           leftSide={resolveGatewayTypeTranslation(option.gatewayTypeId)}
         >
           <Toggle
+            checked={isChecked(option.gatewayTypeId)}
             onChange={(value) =>
               handlePaymentMethod(option.gatewayTypeId, value)
             }
