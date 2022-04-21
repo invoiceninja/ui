@@ -13,7 +13,10 @@ import { SelectField } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { Gateway } from 'common/interfaces/statics';
-import { useBlankCompanyGatewayQuery } from 'common/queries/company-gateways';
+import {
+  useBlankCompanyGatewayQuery,
+  useCompanyGatewaysQuery,
+} from 'common/queries/company-gateways';
 import { Settings } from 'components/layouts/Settings';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,23 +41,44 @@ export function Create() {
 
   const { documentTitle } = useTitle('online_payments');
   const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
-
-  const gateways = useGateways();
+  const { data: companyGateways } = useCompanyGatewaysQuery();
 
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
   const [gateway, setGateway] = useState<Gateway>();
+  const [filteredGateways, setFilteredGateways] = useState<Gateway[]>([]);
+
+  const gateways = useGateways();
+  const onSave = useHandleCreate(companyGateway);
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setGateway(gateways.find((gateway) => gateway.id === event.target.value));
   };
 
   useEffect(() => {
+    let existingCompanyGatewaysKeys: string[] = [];
+
+    setFilteredGateways(gateways);
+
+    companyGateways?.data.data.map(
+      (gateway: CompanyGateway) =>
+        (existingCompanyGatewaysKeys = [
+          ...existingCompanyGatewaysKeys,
+          gateway.gateway_key,
+        ])
+    );
+
+    setFilteredGateways((current) =>
+      current.filter(
+        (gateway) => !existingCompanyGatewaysKeys.includes(gateway.key)
+      )
+    );
+  }, [gateways, companyGateways]);
+
+  useEffect(() => {
     if (blankCompanyGateway?.data.data && companyGateway === undefined) {
       setCompanyGateway(blankCompanyGateway.data.data);
     }
   }, [blankCompanyGateway, gateway]);
-
-  const onSave = useHandleCreate(companyGateway);
 
   useEffect(() => {
     setCompanyGateway(
@@ -103,7 +127,7 @@ export function Create() {
       <Card title={t('add_gateway')}>
         <Element leftSide={t('provider')}>
           <SelectField onChange={handleChange} withBlank>
-            {gateways.map((gateway, index) => (
+            {filteredGateways.map((gateway, index) => (
               <option value={gateway.id} key={index}>
                 {gateway.name}
               </option>
