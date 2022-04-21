@@ -11,7 +11,6 @@
 import { Menu, Transition } from '@headlessui/react';
 import { AuthenticationTypes } from 'common/dtos/authentication';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { changeCurrentIndex } from 'common/stores/slices/company-users';
 import { authenticate } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { Fragment } from 'react';
@@ -42,7 +41,7 @@ export function CompanySwitcher() {
       })
     );
 
-    dispatch(changeCurrentIndex(index));
+    localStorage.setItem('X-CURRENT-INDEX', index.toString());
 
     queryClient.invalidateQueries();
 
