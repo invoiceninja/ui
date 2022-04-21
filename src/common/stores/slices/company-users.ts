@@ -35,11 +35,6 @@ export const companyUserSlice = createSlice({
   reducers: {
     changeCurrentIndex: (state, payload: PayloadAction<number>) => {
       state.currentIndex = payload.payload;
-
-      localStorage.setItem(
-        'X-CURRENT-INDEX',
-        payload.payload as unknown as string
-      );
     },
     updateCompanyUsers: (state, action) => {
       state.api = action.payload;
