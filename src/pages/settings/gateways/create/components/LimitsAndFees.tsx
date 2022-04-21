@@ -85,6 +85,10 @@ export function LimitsAndFees(props: Props) {
           <Element leftSide={`${t('min')} ${t('limit')}`}>
             <div className="space-y-4">
               <InputField
+                disabled={
+                  props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
+                    .min_limit === -1
+                }
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
                     .min_limit
@@ -110,6 +114,10 @@ export function LimitsAndFees(props: Props) {
           <Element leftSide={`${t('max')} ${t('limit')}`}>
             <div className="space-y-4">
               <InputField
+                disabled={
+                  props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
+                    .max_limit === -1
+                }
                 value={
                   props.companyGateway.fees_and_limits?.[currentGatewayTypeId]
                     .max_limit
