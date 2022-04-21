@@ -36,8 +36,6 @@ export function InvoiceViewer(props: Props) {
         })
       )
       .then((response) => {
-        console.log(response);
-
         const blob = new Blob([response.data], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
 
@@ -47,7 +45,7 @@ export function InvoiceViewer(props: Props) {
           props.onLink && props.onLink(url);
         }
       })
-      .catch((error) => console.log(error));
+      .catch((error) => console.error(error));
   }, [props.link, props.resource]);
 
   return <iframe ref={iframeRef} width="100%" height={1500} />;
