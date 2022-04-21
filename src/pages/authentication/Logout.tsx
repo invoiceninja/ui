@@ -27,6 +27,8 @@ export function Logout() {
       }
     ).then(() => {
       localStorage.removeItem('X-NINJA-TOKEN');
+      localStorage.removeItem('X-CURRENT-INDEX');
+
       queryClient.invalidateQueries();
 
       navigate('/');
