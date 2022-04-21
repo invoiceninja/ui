@@ -9,6 +9,7 @@
  */
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { CompanyUser } from 'common/interfaces/company-user';
 import {
   changeCurrentIndex,
   updateCompanyUsers,
@@ -44,9 +45,21 @@ export function useAuthenticated(): boolean {
     )
     .then((response: AxiosResponse) => {
       if (response.status === 200) {
-        const currentIndex = parseInt(
-          localStorage.getItem('X-CURRENT-INDEX') ?? '0'
-        );
+        let currentIndex = 0;
+
+        if (localStorage.getItem('X-CURRENT-INDEX')) {
+          currentIndex = parseInt(
+            localStorage.getItem('X-CURRENT-INDEX') || '0'
+          );
+        } else {
+          const companyUsers: CompanyUser[] = response.data.data;
+          const defaultCompanyId = companyUsers[0].account.default_company_id;
+
+          currentIndex =
+            companyUsers.findIndex(
+              (companyUser) => companyUser.company.id === defaultCompanyId
+            ) || 0;
+        }
 
         dispatch(
           authenticate({
