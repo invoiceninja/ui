@@ -10,7 +10,7 @@
 
 import { CompanyGateway } from 'common/interfaces/company-gateway';
 
-const blank = {
+export const blankFeesAndLimitsRecord = {
   adjust_fee_percent: false,
   fee_amount: 0,
   fee_cap: 0,
@@ -55,7 +55,7 @@ export function useHandleMethodToggle(
           ...current,
           fees_and_limits: {
             ...current.fees_and_limits,
-            [gatewayTypeId]: blank,
+            [gatewayTypeId]: blankFeesAndLimitsRecord,
           },
         }
     );
