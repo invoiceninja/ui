@@ -25,7 +25,6 @@ interface Props extends CommonProps {
   disabled?: boolean;
   defaultValue?: number;
   decimalLimit?: number;
-  decimalSeperator?: string;
 }
 
 export function DecimalInputField(props: Props) {
@@ -53,7 +52,6 @@ export function DecimalInputField(props: Props) {
           return props.onChange(value);
         }}
         decimalsLimit={props.decimalLimit}
-        decimalSeparator={props.decimalSeperator}
         name={props.name}
         className={classNames(
           `w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 ${props.className}`,
