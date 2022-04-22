@@ -23,6 +23,13 @@ export function useHandleProductChange() {
         value: value.label,
       })
     );
+    dispatch(
+      setCurrentLineItemProperty({
+        position: index,
+        property: 'quantity',
+        value: 1,
+      })
+    );
 
     if (!value.internal && value.resource) {
       dispatch(
