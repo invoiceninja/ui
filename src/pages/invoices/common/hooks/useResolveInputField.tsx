@@ -39,6 +39,7 @@ export function useResolveInputField(props: Props) {
   const onChange = useHandleLineItemPropertyChange();
   const invoice = useCurrentInvoice();
   const formatMoney = useFormatMoney();
+
   return (key: string, index: number) => {
     const property = resolveProperty(key);
 
