@@ -10,6 +10,7 @@
 import classNames from 'classnames';
 import CommonProps from 'common/interfaces/common-props.interface';
 import { Alert } from 'components/Alert';
+import { useEffect, useState } from 'react';
 import CurrencyInput from 'react-currency-input-field';
 import { InputLabel } from './InputLabel';
 interface Props extends CommonProps {
@@ -25,10 +26,14 @@ interface Props extends CommonProps {
   defaultValue?: number;
   decimalLimit?: number;
   decimalSeperator?: string;
-  onValueChange?: (value: string) => unknown;
 }
 
 export function DecimalInputField(props: Props) {
+  const [value, setvalue] = useState<string>();
+  useEffect(() => {
+    setvalue(props.value);
+  }, [props.value]);
+
   return (
     <section>
       {props.label && (
@@ -41,9 +46,12 @@ export function DecimalInputField(props: Props) {
         disabled={props.disabled}
         id={props.id}
         defaultValue={props.defaultValue}
-        value={props.value}
+        value={value}
         placeholder={props.placeholder}
-        onValueChange={(value) => props.onChange(value)}
+        onValueChange={(value) => {
+          setvalue(value);
+          return props.onChange(value);
+        }}
         decimalsLimit={props.decimalLimit}
         decimalSeparator={props.decimalSeperator}
         name={props.name}
