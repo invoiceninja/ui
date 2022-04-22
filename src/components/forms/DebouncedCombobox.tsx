@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Combobox } from '@headlessui/react';
-import { ChevronDown } from 'react-feather';
+import { ChevronDown, X } from 'react-feather';
 import { clone, debounce } from 'lodash';
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
@@ -26,6 +26,8 @@ interface Props {
   actionLabel?: string;
   defaultValue?: string | number | boolean;
   disabled?: boolean;
+  clearBtn?: any;
+  onCancelButton?: any;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -137,11 +139,21 @@ export function DebouncedCombobox(props: Props) {
               displayValue={(record: Record) => record.label}
               onClick={() => openDropdownButton.current?.click()}
             />
-            <ChevronDown
-              className="absolute inset-y-0 mt-2 right-0 flex items-center pr-2 w-8 h-5 text-gray-400"
-              aria-hidden="true"
-              onClick={() => openDropdownButton.current?.click()}
-            />
+            {props.clearBtn && (
+              <X
+                className="absolute inset-y-0 mt-2 right-0 flex items-center pr-2 w-8 h-5 text-gray-400 hover:cursor-pointer"
+                onClick={() => {
+                  props.onCancelButton();
+                }}
+              ></X>
+            )}
+            {!props.clearBtn && (
+              <ChevronDown
+                className="absolute inset-y-0 mt-2 right-0 flex items-center pr-2 w-8 h-5 text-gray-400"
+                aria-hidden="true"
+                onClick={() => openDropdownButton.current?.click()}
+              />
+            )}
             <Combobox.Button
               className="hidden"
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
