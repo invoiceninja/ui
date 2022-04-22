@@ -13,6 +13,7 @@ import { Alert } from 'components/Alert';
 import { useEffect, useState } from 'react';
 import CurrencyInput from 'react-currency-input-field';
 import { InputLabel } from './InputLabel';
+
 interface Props extends CommonProps {
   label?: string;
   id?: string;
@@ -29,9 +30,8 @@ interface Props extends CommonProps {
 
 export function DecimalInputField(props: Props) {
   const [value, setvalue] = useState<string>();
-  useEffect(() => {
-    setvalue(props.value);
-  }, [props.value]);
+
+  useEffect(() => setvalue(props.value), [props.value]);
 
   return (
     <section>
@@ -41,6 +41,7 @@ export function DecimalInputField(props: Props) {
           {props.required && <span className="ml-1 text-red-600">*</span>}
         </InputLabel>
       )}
+
       <CurrencyInput
         disabled={props.disabled}
         id={props.id}
