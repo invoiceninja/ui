@@ -24,6 +24,13 @@ export function useHandleProductChange() {
       })
     );
 
+    dispatch(
+      setCurrentLineItemProperty({
+        position: index,
+        property: 'quantity',
+        value: 1,
+      })
+    );
     if (!value.internal && value.resource) {
       dispatch(
         setCurrentLineItemProperty({
