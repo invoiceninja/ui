@@ -23,6 +23,7 @@ export function useHandleProductChange() {
         value: value.label,
       })
     );
+
     dispatch(
       setCurrentLineItemProperty({
         position: index,
