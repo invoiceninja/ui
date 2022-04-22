@@ -20,7 +20,7 @@ import { ChangeEvent } from 'react';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
 import { useFormatMoney } from './useFormatMoney';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { isNonNumericValue } from 'common/helpers/invoices/resolve-non-numeric-value';
+import { DecimalInputField } from 'components/forms/DecimalInputField';
 
 const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
@@ -39,7 +39,6 @@ export function useResolveInputField(props: Props) {
   const onChange = useHandleLineItemPropertyChange();
   const invoice = useCurrentInvoice();
   const formatMoney = useFormatMoney();
-
   return (key: string, index: number) => {
     const property = resolveProperty(key);
 
@@ -74,14 +73,13 @@ export function useResolveInputField(props: Props) {
 
     if (numberInputs.includes(property)) {
       return (
-        <InputField
+        <DecimalInputField
           id={property}
-          value={invoice?.line_items[index][property]}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            isNonNumericValue(event)
-              ? event
-              : onChange(property, parseFloat(event.target.value), index)
+          value={invoice?.line_items[index][property] as string}
+          onChange={(value: any) =>
+            onChange(property, parseFloat(value), index)
           }
+          decimalLimit={2}
           className="w-24"
         />
       );
@@ -111,7 +109,7 @@ export function useResolveInputField(props: Props) {
         />
       );
     }
-    
+
     if (['line_total'].includes(property)) {
       return formatMoney(invoice?.line_items[index][property] as number);
     }
