@@ -145,7 +145,7 @@ export function DebouncedCombobox(props: Props) {
                 onClick={() => {
                   props.onClearButtonClick();
                 }}
-              ></X>
+              />
             )}
             {!props.clearButton && (
               <ChevronDown
