@@ -49,8 +49,8 @@ export function ClientSelector(props: Props) {
         onChange={(value) => onChange('client_id', value.value)}
         defaultValue={invoice?.client_id}
         disabled={props.readonly}
-        clearBtn={Boolean(invoice?.client_id)}
-        onCancelButton={() => onChange('client_id', '')}
+        clearButton={Boolean(invoice?.client_id)}
+        onClearButtonClick={() => onChange('client_id', '')}
       />
 
       <ClientContactSelector />

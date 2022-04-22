@@ -26,8 +26,8 @@ interface Props {
   actionLabel?: string;
   defaultValue?: string | number | boolean;
   disabled?: boolean;
-  clearBtn?: any;
-  onCancelButton?: any;
+  clearButton?: any;
+  onClearButtonClick?: any;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -139,15 +139,15 @@ export function DebouncedCombobox(props: Props) {
               displayValue={(record: Record) => record.label}
               onClick={() => openDropdownButton.current?.click()}
             />
-            {props.clearBtn && (
+            {props.clearButton && (
               <X
                 className="absolute inset-y-0 mt-2 right-0 flex items-center pr-2 w-8 h-5 text-gray-400 hover:cursor-pointer"
                 onClick={() => {
-                  props.onCancelButton();
+                  props.onClearButtonClick();
                 }}
               ></X>
             )}
-            {!props.clearBtn && (
+            {!props.clearButton && (
               <ChevronDown
                 className="absolute inset-y-0 mt-2 right-0 flex items-center pr-2 w-8 h-5 text-gray-400"
                 aria-hidden="true"
