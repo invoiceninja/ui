@@ -23,6 +23,7 @@
     "pretty-bytes": "^6.0.0",
     "react": "^17.0.2",
     "react-beautiful-dnd": "^13.1.0",
+    "react-currency-input-field": "^3.6.4",
     "react-date-range": "^1.4.0",
     "react-datepicker": "^4.6.0",
     "react-debounce-input": "^3.2.5",
