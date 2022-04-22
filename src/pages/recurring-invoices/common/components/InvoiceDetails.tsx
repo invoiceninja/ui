@@ -50,7 +50,7 @@ export function InvoiceDetails() {
             onChange={(event: ChangeEvent<HTMLInputElement>) =>
               handleChange('date', event.target.value)
             }
-            value={invoice?.date || ''}
+            value={invoice?.date || new Date().toISOString().split('T')[0]}
             min={new Date().toISOString().split('T')[0]}
           />
         </Element>
