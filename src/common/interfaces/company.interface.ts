@@ -40,6 +40,7 @@ export interface Company {
     use_credits_payment: 'always' | 'option' | 'off';
     client_portal_allow_over_payment: boolean;
     client_portal_allow_under_payment: boolean;
+    client_portal_under_payment_minimum: string;
   };
   custom_fields: Record<string, string>;
   enabled_tax_rates: number;
