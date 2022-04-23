@@ -3475,7 +3475,7 @@
   "reminder2_sent": "Reminder 2 Sent",
   "reminder3_sent": "Reminder 3 Sent",
   "reminder_last_sent": "Reminder Last Sent",
-  "pdf_page_info": "Page :current of :total",
+  "pdf_page_info": "Page {{current,string}} of {{total,string}}",
   "emailed_credits": "Successfully emailed credits",
   "view_in_stripe": "View in Stripe",
   "rows_per_page": "Rows Per Page",
@@ -4418,5 +4418,6 @@
   "reminder_message": "Reminder for invoice :number for :balance",
   "gmail_credentials_invalid_subject": "Send with GMail invalid credentials",
   "gmail_credentials_invalid_body": "Your GMail credentials are not correct, please log into the administrator portal and navigate to Settings > User Details and disconnect and reconnect your GMail account. We will send you this notification daily until this issue is resolved",
-  "total_columns": "Total Fields"
+  "total_columns": "Total Fields",
+  "total_results": "Total Results"
 }
