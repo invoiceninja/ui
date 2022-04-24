@@ -29,8 +29,6 @@ export function InvoiceTotals() {
 
   const invoice = useCurrentInvoice();
 
-  // console.log(invoice?.tax_rate1);
-
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
       {variables.map((variable, index) => (
@@ -47,6 +45,8 @@ export function InvoiceTotals() {
               handleChange('tax_name1', value.resource?.name);
               handleChange('tax_rate1', value.resource?.rate);
             }}
+            value="rate"
+            defaultValue={invoice?.tax_rate1}
           />
         </Element>
       )}
@@ -61,6 +61,8 @@ export function InvoiceTotals() {
               handleChange('tax_name2', value.resource?.name);
               handleChange('tax_rate2', value.resource?.rate);
             }}
+            value="rate"
+            defaultValue={invoice?.tax_rate2}
           />
         </Element>
       )}
@@ -75,6 +77,8 @@ export function InvoiceTotals() {
               handleChange('tax_name3', value.resource?.name);
               handleChange('tax_rate3', value.resource?.rate);
             }}
+            value="rate"
+            defaultValue={invoice?.tax_rate3}
           />
         </Element>
       )}
