@@ -36,7 +36,7 @@ export function InvoiceTotals() {
         <Element leftSide={t('tax')}>
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
-            label="abc"
+            label={t('tax')}
             formatLabel={(resource) => `${resource.name} (${resource.rate}%)`}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name1', value.resource?.name);
@@ -50,7 +50,7 @@ export function InvoiceTotals() {
         <Element leftSide={t('tax')}>
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
-            label="abc"
+            label={t('tax')}
             formatLabel={(resource) => `${resource.name} (${resource.rate}%)`}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name2', value.resource?.name);
@@ -64,7 +64,7 @@ export function InvoiceTotals() {
         <Element leftSide={t('tax')}>
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
-            label="abc"
+            label={t('tax')}
             formatLabel={(resource) => `${resource.name} (${resource.rate}%)`}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name3', value.resource?.name);

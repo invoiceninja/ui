@@ -10,6 +10,7 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { TaxRate } from 'common/interfaces/tax-rate';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import { Fragment } from 'react';
@@ -26,6 +27,10 @@ export function InvoiceTotals() {
 
   const [t] = useTranslation();
 
+  const invoice = useCurrentInvoice();
+
+  // console.log(invoice?.tax_rate1);
+
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
       {variables.map((variable, index) => (
@@ -36,7 +41,7 @@ export function InvoiceTotals() {
         <Element leftSide={t('tax')}>
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
-            label="abc"
+            label={t('tax')}
             formatLabel={(resource) => `${resource.name} (${resource.rate}%)`}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name1', value.resource?.name);
@@ -50,7 +55,7 @@ export function InvoiceTotals() {
         <Element leftSide={t('tax')}>
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
-            label="abc"
+            label={t('tax')}
             formatLabel={(resource) => `${resource.name} (${resource.rate}%)`}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name2', value.resource?.name);
@@ -64,7 +69,7 @@ export function InvoiceTotals() {
         <Element leftSide={t('tax')}>
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
-            label="abc"
+            label={t('tax')}
             formatLabel={(resource) => `${resource.name} (${resource.rate}%)`}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name3', value.resource?.name);
