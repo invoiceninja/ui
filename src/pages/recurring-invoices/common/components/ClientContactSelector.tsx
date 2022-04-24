@@ -12,9 +12,11 @@ import { Checkbox } from '@invoiceninja/forms';
 import { ClientResolver } from 'common/helpers/clients/client-resolver';
 import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvoice';
 import { Client } from 'common/interfaces/client';
-import { toggleCurrentInvoiceInvitation } from 'common/stores/slices/invoices';
 import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
-import { setCurrentRecurringInvoicePropertySync } from 'common/stores/slices/recurring-invoices';
+import {
+  setCurrentRecurringInvoicePropertySync,
+  toggleCurrentRecurringInvoiceInvitation,
+} from 'common/stores/slices/recurring-invoices';
 import { cloneDeep } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +30,9 @@ export function ClientContactSelector() {
   const [t] = useTranslation();
 
   const handleContactCheckboxChange = (contactId: string, value: boolean) => {
-    dispatch(toggleCurrentInvoiceInvitation({ contactId, checked: value }));
+    dispatch(
+      toggleCurrentRecurringInvoiceInvitation({ contactId, checked: value })
+    );
   };
 
   const handleCheckedState = (contactId: string) => {
@@ -70,7 +74,8 @@ export function ClientContactSelector() {
 
   return (
     <>
-      {client &&
+      {invoice?.client_id &&
+        client &&
         client.contacts.map((contact, index) => (
           <div key={index}>
             <Checkbox

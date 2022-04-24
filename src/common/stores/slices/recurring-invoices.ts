@@ -17,6 +17,7 @@ import { setCurrentLineItemProperty } from './recurring-invoices/extra-reducers/
 import { blankLineItem } from './invoices/constants/blank-line-item';
 import { setCurrentRecurringInvoice } from './recurring-invoices/extra-reducers/set-current-recurring-invoice';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { blankInvitation } from './invoices/constants/blank-invitation';
 interface RecurringInvoiceState {
   api?: any;
   current?: RecurringInvoice;
@@ -47,6 +48,36 @@ export const recurringInvoiceSlice = createSlice({
           payload.payload.property,
           payload.payload.value
         );
+      }
+    },
+    toggleCurrentRecurringInvoiceInvitation: (
+      state,
+      payload: PayloadAction<{ contactId: string; checked: boolean }>
+    ) => {
+      const invitations = state.current?.invitations;
+
+      const potential =
+        invitations?.find(
+          (invitation) =>
+            invitation.client_contact_id === payload.payload.contactId
+        ) || -1;
+
+      if (
+        potential !== -1 &&
+        payload.payload.checked === false &&
+        state.current
+      ) {
+        state.current.invitations = state.current.invitations.filter(
+          (i) => i.client_contact_id !== payload.payload.contactId
+        );
+      }
+
+      if (potential === -1) {
+        const invitation = cloneDeep(blankInvitation);
+
+        invitation.client_contact_id = payload.payload.contactId;
+
+        state.current?.invitations.push(invitation);
       }
     },
   },
@@ -108,4 +139,5 @@ export const recurringInvoiceSlice = createSlice({
 export const {
   injectBlankItemIntoCurrent,
   setCurrentRecurringInvoicePropertySync,
+  toggleCurrentRecurringInvoiceInvitation,
 } = recurringInvoiceSlice.actions;
