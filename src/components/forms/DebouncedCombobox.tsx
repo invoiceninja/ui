@@ -6,6 +6,7 @@ import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useQueryClient } from 'react-query';
+import { InputLabel } from './InputLabel';
 
 export interface Record<T = any> {
   value: string | number;
@@ -28,6 +29,7 @@ interface Props {
   disabled?: boolean;
   clearButton?: any;
   onClearButtonClick?: any;
+  inputLabel?: string;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -123,6 +125,9 @@ export function DebouncedCombobox(props: Props) {
 
   return (
     <div className={`w-full ${props.className}`}>
+      {props.inputLabel && (
+        <InputLabel className="mb-2">{props.inputLabel}</InputLabel>
+      )}
       <Combobox
         value={selectedOption?.record}
         onChange={(record) =>
