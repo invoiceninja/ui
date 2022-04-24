@@ -30,7 +30,7 @@ import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -116,10 +116,15 @@ export function Create() {
     formik.setFieldValue('currency_id', currencyId);
   };
 
-  const handleInvoiceChange = (id: string, amount: number) => {
+  const handleInvoiceChange = (id: string, amount: number, balance: number) => {
     formik.setFieldValue('invoices', [
       ...formik.values.invoices,
-      { _id: v4(), amount, credit_id: '', invoice_id: id },
+      {
+        _id: v4(),
+        amount: balance > 0 ? balance : amount,
+        credit_id: '',
+        invoice_id: id,
+      },
     ]);
   };
 
@@ -178,7 +183,8 @@ export function Create() {
                   onChange={(value: Record<Invoice>) =>
                     handleInvoiceChange(
                       value.resource?.id as string,
-                      value.resource?.amount as number
+                      value.resource?.amount as number,
+                      value.resource?.balance as number
                     )
                   }
                 />
@@ -188,7 +194,17 @@ export function Create() {
                 (record: { _id: string; amount: number }, index) => (
                   <Element key={index} leftSide={t('applied')}>
                     <div className="flex items-center space-x-2">
-                      <InputField value={record.amount} />
+                      <InputField
+                        onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                          formik.setFieldValue('amount', event.target.value);
+
+                          formik.setFieldValue(
+                            `invoices[${index}].amount`,
+                            event.target.value
+                          );
+                        }}
+                        value={record.amount}
+                      />
 
                       <Button
                         behavior="button"
