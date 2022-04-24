@@ -61,7 +61,6 @@ export function Create() {
 
     companyGateways?.data.data.map((gateway: CompanyGateway) => {
       if (!gateway.is_deleted || gateway.archived_at == 0) {
-
         existingCompanyGatewaysKeys = [
           ...existingCompanyGatewaysKeys,
           gateway.gateway_key,

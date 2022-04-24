@@ -25,13 +25,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
-import {
-  AccentColor,
-  Connect,
-  Details,
-  Notifications,
-  Password,
-} from './components';
+import { AccentColor, Details, Notifications, Password } from './components';
 import { TwoFactorAuthentication } from './components/TwoFactorAuthentication';
 
 export function UserDetails() {

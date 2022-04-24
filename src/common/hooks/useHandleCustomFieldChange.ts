@@ -31,7 +31,7 @@ export function useHandleCustomFieldChange() {
       if (_company) {
         delete _company.custom_fields[field];
       }
-      
+
       return dispatch(injectInChanges({ object: 'company', data: _company }));
     }
 

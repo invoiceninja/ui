@@ -27,7 +27,10 @@ import { InputLabel } from '../../components/forms/InputLabel';
 import { Alert } from '../../components/Alert';
 import { HostedLinks } from './components/HostedLinks';
 import { Header } from './components/Header';
-import { changeCurrentIndex, updateCompanyUsers } from 'common/stores/slices/company-users';
+import {
+  changeCurrentIndex,
+  updateCompanyUsers,
+} from 'common/stores/slices/company-users';
 import { useTitle } from 'common/hooks/useTitle';
 import { CompanyUser } from 'common/interfaces/company-user';
 

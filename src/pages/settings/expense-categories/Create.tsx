@@ -34,7 +34,10 @@ export function Create() {
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('expense_settings'), href: '/settings/expense_settings' },
-    { name: t('new_expense_category'), href: '/settings/expense_categories/create' },
+    {
+      name: t('new_expense_category'),
+      href: '/settings/expense_categories/create',
+    },
   ];
 
   const formik = useFormik({

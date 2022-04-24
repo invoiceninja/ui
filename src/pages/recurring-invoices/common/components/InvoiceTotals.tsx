@@ -28,7 +28,6 @@ export function InvoiceTotals() {
 
   const [t] = useTranslation();
 
-
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
       {variables.map((variable, index) => (

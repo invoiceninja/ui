@@ -261,7 +261,7 @@ export const routes = (
         </Route>
         <Route path="gateways">
           <Route path="create" element={<Settings.CreateGateway />} />
-          <Route path=":id/edit" element={<Settings.EditGateway /> } />
+          <Route path=":id/edit" element={<Settings.EditGateway />} />
         </Route>
       </Route>
       <Route path="/logout" element={<Authentication.Logout />} />

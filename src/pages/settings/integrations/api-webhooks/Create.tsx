@@ -116,7 +116,9 @@ export function Create() {
       values.headers = headers;
 
       axios
-        .post(endpoint('/api/v1/webhooks'), values, { headers: defaultHeaders() })
+        .post(endpoint('/api/v1/webhooks'), values, {
+          headers: defaultHeaders(),
+        })
         .then((response) => {
           toast.success(t('created_webhook'), { id: toastId });
 

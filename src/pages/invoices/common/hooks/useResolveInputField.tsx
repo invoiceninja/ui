@@ -111,7 +111,7 @@ export function useResolveInputField(props: Props) {
         />
       );
     }
-    
+
     if (['line_total'].includes(property)) {
       return formatMoney(invoice?.line_items[index][property] as number);
     }
