@@ -92,7 +92,7 @@ export function useResolveInputField(props: Props) {
         <DebouncedCombobox
           endpoint="/api/v1/tax_rates"
           label={property}
-          value={String(invoice?.line_items[index][property])}
+          value="rate"
           onChange={(value) => {
             value.resource &&
               onChange(property, parseFloat(value.resource.rate), index);
