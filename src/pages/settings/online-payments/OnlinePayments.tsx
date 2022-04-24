@@ -15,7 +15,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import Toggle from 'components/forms/Toggle';
 import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { SelectField } from '../../../components/forms';
+import { InputField, SelectField } from '../../../components/forms';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import {
@@ -105,6 +105,19 @@ export function OnlinePayments() {
             }
           />
         </Element>
+        {company?.settings.client_portal_allow_under_payment && (
+          <Element leftSide={t('minimum_under_payment_amount')}>
+            <InputField
+              value={company?.settings.client_portal_under_payment_minimum}
+              onValueChange={(value) =>
+                handleChangeProperty(
+                  'settings.client_portal_under_payment_minimum',
+                  value
+                )
+              }
+            />
+          </Element>
+        )}
       </Card>
 
       <Gateways />
