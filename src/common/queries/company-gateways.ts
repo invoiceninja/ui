@@ -15,13 +15,10 @@ import { generatePath } from 'react-router-dom';
 import { defaultHeaders } from './common/headers';
 
 export function useCompanyGatewaysQuery() {
-  return useQuery(
-    generatePath('/api/v1/company_gateways'),
-    () =>
-      axios.get(endpoint('/api/v1/company_gateways'), {
-        headers: defaultHeaders(),
-      }),
-    { staleTime: Infinity }
+  return useQuery(generatePath('/api/v1/company_gateways'), () =>
+    axios.get(endpoint('/api/v1/company_gateways'), {
+      headers: defaultHeaders(),
+    })
   );
 }
 
