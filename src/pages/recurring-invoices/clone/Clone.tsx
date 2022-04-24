@@ -51,7 +51,12 @@ export function Clone() {
 
   useEffect(() => {
     if (recurringInvoice?.data.data) {
-      dispatch(setCurrentRecurringInvoice(recurringInvoice.data.data));
+      dispatch(
+        setCurrentRecurringInvoice({
+          ...recurringInvoice.data.data,
+          number: '',
+        })
+      );
     }
   }, [recurringInvoice]);
 
