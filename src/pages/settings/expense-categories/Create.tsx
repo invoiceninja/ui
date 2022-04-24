@@ -12,11 +12,13 @@ import { Card, CardContainer } from '@invoiceninja/cards';
 import { InputField, InputLabel } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { useTitle } from 'common/hooks/useTitle';
 import { defaultHeaders } from 'common/queries/common/headers';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router-dom';
@@ -27,11 +29,13 @@ export function Create() {
 
   const [errors, setErrors] = useState<Record<string, any>>({});
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'create_expense_category'
-    )}`;
-  });
+  useTitle('new_expense_category');
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('expense_settings'), href: '/settings/expense_settings' },
+    { name: t('new_expense_category'), href: '/settings/expense_categories/create' },
+  ];
 
   const formik = useFormik({
     initialValues: {
@@ -70,6 +74,8 @@ export function Create() {
   return (
     <Settings title={t('expense_categories')}>
       <Container>
+        <Breadcrumbs pages={pages} />
+
         <Card
           withSaveButton
           disableSubmitButton={formik.isSubmitting}
