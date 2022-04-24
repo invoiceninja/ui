@@ -72,7 +72,8 @@ export function ClientContactSelector() {
 
   return (
     <>
-      {client &&
+      {invoice?.client_id &&
+        client &&
         client.contacts.map((contact, index) => (
           <div key={index}>
             <Checkbox
