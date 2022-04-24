@@ -8,18 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { resolveKey } from 'pages/invoices/common/helpers/resolve-key';
 import { useTranslation } from 'react-i18next';
 
 export function useResolveTranslation() {
-  const company = useCurrentCompany();
   const [t] = useTranslation();
 
   const aliases: Record<string, string> = {
-    '$product.tax_rate1': company?.settings.tax_name1 || t('tax_rate1'),
-    '$product.tax_rate2': company?.settings.tax_name2 || t('tax_rate2'),
-    '$product.tax_rate3': company?.settings.tax_name3 || t('tax_rate3'),
+    '$product.tax_rate1': t('tax_rate1'),
+    '$product.tax_rate2': t('tax_rate2'),
+    '$product.tax_rate3': t('tax_rate3'),
   };
 
   return (key: string, delimiter = '.') => {
