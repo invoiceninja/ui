@@ -100,7 +100,7 @@ export function UserDetails() {
 
       <Details />
       <Password />
-      <Connect />
+      {/* <Connect /> */}
       <TwoFactorAuthentication />
       <AccentColor />
       <Notifications />
