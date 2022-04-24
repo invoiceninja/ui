@@ -40,7 +40,7 @@ export function ClientSelector(props: Props) {
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex items-center justify-between">
         <InputLabel>{t('client')}</InputLabel>
-        {!props.readonly && <ClientCreate />}
+        {!props.readonly && !invoice?.client_id && <ClientCreate />}
       </div>
 
       <DebouncedCombobox
@@ -49,6 +49,8 @@ export function ClientSelector(props: Props) {
         onChange={(value) => onChange('client_id', value.value)}
         defaultValue={invoice?.client_id}
         disabled={props.readonly}
+        clearButton={Boolean(invoice?.client_id)}
+        onClearButtonClick={() => onChange('client_id', '')}
       />
 
       <ClientContactSelector />
