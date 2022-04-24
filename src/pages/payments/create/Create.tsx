@@ -176,25 +176,32 @@ export function Create() {
 
           {formik.values.client_id && (
             <>
-              <Element leftSide={t('invoices')}>
-                <DebouncedCombobox
-                  endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${formik.values.client_id}`}
-                  label="number"
-                  onChange={(value: Record<Invoice>) =>
-                    handleInvoiceChange(
-                      value.resource?.id as string,
-                      value.resource?.amount as number,
-                      value.resource?.balance as number
-                    )
-                  }
-                />
-              </Element>
-
               {formik.values.invoices.map(
                 (record: { _id: string; amount: number }, index) => (
-                  <Element key={index} leftSide={t('applied')}>
+                  <Element
+                    key={index}
+                    leftSide={
+                      <DebouncedCombobox
+                        inputLabel={t('invoice')}
+                        endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${formik.values.client_id}`}
+                        label="number"
+                        onChange={(value: Record<Invoice>) =>
+                          handleInvoiceChange(
+                            value.resource?.id as string,
+                            value.resource?.amount as number,
+                            value.resource?.balance as number
+                          )
+                        }
+                        value="amount"
+                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                        // @ts-ignore
+                        defaultValue={formik.values.invoices[index].amount}
+                      />
+                    }
+                  >
                     <div className="flex items-center space-x-2">
                       <InputField
+                        label={t('applied')}
                         onChange={(event: ChangeEvent<HTMLInputElement>) => {
                           formik.setFieldValue('amount', event.target.value);
 
@@ -217,6 +224,20 @@ export function Create() {
                   </Element>
                 )
               )}
+
+              <Element leftSide={t('invoices')}>
+                <DebouncedCombobox
+                  endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${formik.values.client_id}`}
+                  label="number"
+                  onChange={(value: Record<Invoice>) =>
+                    handleInvoiceChange(
+                      value.resource?.id as string,
+                      value.resource?.amount as number,
+                      value.resource?.balance as number
+                    )
+                  }
+                />
+              </Element>
             </>
           )}
 
