@@ -15,6 +15,7 @@ import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useExpenseCategoryQuery } from 'common/queries/expense-categories';
 import { Badge } from 'components/Badge';
+import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
@@ -34,6 +35,15 @@ export function Edit() {
 
   const { id } = useParams();
   const { data } = useExpenseCategoryQuery({ id });
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('expense_settings'), href: '/settings/expense_settings' },
+    {
+      name: t('edit_expense_category'),
+      href: generatePath('/settings/expense_categories/:id/edit', { id }),
+    },
+  ];
 
   const [errors, setErrors] = useState<Record<string, any>>({});
 
@@ -87,6 +97,8 @@ export function Edit() {
 
       {data && (
         <Container className="space-y-6">
+          <Breadcrumbs pages={pages} />
+
           <Card
             withSaveButton
             disableSubmitButton={formik.isSubmitting}
