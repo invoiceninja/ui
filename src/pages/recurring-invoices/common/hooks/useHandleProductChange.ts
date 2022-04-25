@@ -16,6 +16,7 @@ import { useCurrentRecurringInvoice } from './useCurrentRecurringInvoice';
 export function useHandleProductChange() {
   const dispatch = useDispatch();
   const invoice = useCurrentRecurringInvoice();
+
   return (index: number, value: Record) => {
     dispatch(
       setCurrentLineItemProperty({

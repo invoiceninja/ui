@@ -16,6 +16,7 @@ import { useDispatch } from 'react-redux';
 export function useHandleProductChange() {
   const dispatch = useDispatch();
   const invoice = useCurrentInvoice();
+
   return (index: number, value: Record) => {
     dispatch(
       setCurrentLineItemProperty({
