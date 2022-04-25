@@ -15,6 +15,7 @@
     "axios": "^0.26.0",
     "classnames": "^2.3.1",
     "collect.js": "^4.31.3",
+    "currency.js": "^2.0.4",
     "dayjs": "^1.10.7",
     "formik": "^2.2.9",
     "history": "^5.2.0",
