@@ -8,13 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { Record } from 'components/forms/DebouncedCombobox';
 import { useDispatch } from 'react-redux';
 
 export function useHandleProductChange() {
   const dispatch = useDispatch();
-
+  const invoice = useCurrentInvoice();
   return (index: number, value: Record) => {
     dispatch(
       setCurrentLineItemProperty({
@@ -24,13 +25,14 @@ export function useHandleProductChange() {
       })
     );
 
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'quantity',
-        value: 1,
-      })
-    );
+    if (!value.internal && invoice && invoice.line_items[index].quantity < 1)
+      dispatch(
+        setCurrentLineItemProperty({
+          position: index,
+          property: 'quantity',
+          value: 1,
+        })
+      );
 
     if (!value.internal && value.resource) {
       dispatch(
