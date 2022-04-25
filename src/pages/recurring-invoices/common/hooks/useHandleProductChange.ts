@@ -25,7 +25,7 @@ export function useHandleProductChange() {
       })
     );
 
-    if (!value.internal && invoice && invoice.line_items[index].quantity < 1)
+    if (invoice && invoice.line_items[index].quantity < 1)
       dispatch(
         setCurrentLineItemProperty({
           position: index,
