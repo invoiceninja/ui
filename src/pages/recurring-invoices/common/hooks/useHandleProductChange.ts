@@ -11,9 +11,11 @@
 import { setCurrentLineItemProperty } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-line-item-property';
 import { Record } from 'components/forms/DebouncedCombobox';
 import { useDispatch } from 'react-redux';
+import { useCurrentRecurringInvoice } from './useCurrentRecurringInvoice';
 
 export function useHandleProductChange() {
   const dispatch = useDispatch();
+  const invoice = useCurrentRecurringInvoice();
 
   return (index: number, value: Record) => {
     dispatch(
@@ -24,6 +26,14 @@ export function useHandleProductChange() {
       })
     );
 
+    if (invoice && invoice.line_items[index].quantity < 1)
+      dispatch(
+        setCurrentLineItemProperty({
+          position: index,
+          property: 'quantity',
+          value: 1,
+        })
+      );
     if (!value.internal && value.resource) {
       dispatch(
         setCurrentLineItemProperty({
