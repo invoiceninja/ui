@@ -33,6 +33,7 @@ type Props = {
   apiEndpoint: URL;
   children?: ReactNode;
   mainCheckbox: RefObject<HTMLInputElement>;
+  onClick?: (action: string, payload?: unknown) => unknown;
 };
 
 export default function ResourcefulActions(props: Props) {
@@ -94,7 +95,10 @@ export default function ResourcefulActions(props: Props) {
                 onClick={() => {
                   props.setSelected(new Set());
                   props.setSelected(props.selected.add(props.resource?.id));
+
                   bulk('archive');
+
+                  props.onClick?.('archive');
                 }}
               >
                 {t(`archive_${props.resourceType}`)}
@@ -106,7 +110,10 @@ export default function ResourcefulActions(props: Props) {
                 onClick={() => {
                   props.setSelected(new Set());
                   props.setSelected(props.selected.add(props.resource?.id));
+
                   bulk('restore');
+
+                  props.onClick?.('restore');
                 }}
               >
                 {t(`restore_${props.resourceType}`)}
@@ -118,7 +125,10 @@ export default function ResourcefulActions(props: Props) {
                 onClick={() => {
                   props.setSelected(new Set());
                   props.setSelected(props.selected.add(props.resource?.id));
+
                   bulk('delete');
+
+                  props.onClick?.('delete');
                 }}
               >
                 {t(`delete_${props.resourceType}`)}
@@ -131,15 +141,33 @@ export default function ResourcefulActions(props: Props) {
       )}
       {props.type === 'bulk' && (
         <Dropdown label={t('actions')}>
-          <DropdownElement onClick={() => bulk('archive')}>
+          <DropdownElement
+            onClick={() => {
+              bulk('archive');
+
+              props.onClick?.('archive');
+            }}
+          >
             {t(`archive_${props.resourceType}`)}
           </DropdownElement>
 
-          <DropdownElement onClick={() => bulk('restore')}>
+          <DropdownElement
+            onClick={() => {
+              bulk('restore');
+
+              props.onClick?.('restore');
+            }}
+          >
             {t(`restore_${props.resourceType}`)}
           </DropdownElement>
 
-          <DropdownElement onClick={() => bulk('delete')}>
+          <DropdownElement
+            onClick={() => {
+              bulk('delete');
+              
+              props.onClick?.('delete');
+            }}
+          >
             {t(`delete_${props.resourceType}`)}
           </DropdownElement>
           {props.children}

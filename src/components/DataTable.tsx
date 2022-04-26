@@ -128,6 +128,13 @@ export function DataTable(props: Props) {
           resourceType={props.resource}
           linkToEdit={props.linkToEdit}
           label={`${t('actions')}`}
+          onClick={() => {
+            [...document.getElementsByClassName('child-checkbox')].forEach(
+              (element: any) => (element.checked = false)
+            );
+
+            setSelected(new Set());
+          }}
         >
           {props.customBulkActions &&
             props.customBulkActions?.map((action: any) => {
