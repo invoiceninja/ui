@@ -16,13 +16,21 @@ import { useHandleProductChange } from './useHandleProductChange';
 import { useTranslation } from 'react-i18next';
 import { InputField } from '@invoiceninja/forms';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
 import { useFormatMoney } from './useFormatMoney';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { isNonNumericValue } from 'common/helpers/invoices/resolve-non-numeric-value';
+import { CurrencyInput } from 'components/forms/CurrencyInput';
+import { ClientResolver } from 'common/helpers/clients/client-resolver';
+import { CurrencyResolver } from 'common/helpers/currencies/currency-resolver';
+import { Client } from 'common/interfaces/client';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { Currency } from 'common/interfaces/currency';
+import invoiceStatus from 'common/constants/invoice-status';
+import currency from 'currency.js';
 
-const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
+const numberInputs = ['discount', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 
 interface Props {
@@ -34,11 +42,29 @@ export function useResolveInputField(props: Props) {
   const [t] = useTranslation();
 
   const { setIsTaxModalOpen, setIsProductModalOpen } = props;
-
+  const [currency, setCurrency] = useState<Currency>();
   const handleProductChange = useHandleProductChange();
   const onChange = useHandleLineItemPropertyChange();
   const invoice = useCurrentInvoice();
   const formatMoney = useFormatMoney();
+  const company = useCurrentCompany();
+  const clientResolver = new ClientResolver();
+  const currencyresolver = new CurrencyResolver();
+
+  const getCurrency = async (client_id: string) => {
+    if (invoice?.client_id) {
+      const client: Client = await clientResolver.find(client_id);
+      const currency: Currency | undefined = await currencyresolver.find(
+        client.settings.currency_id
+      );
+      if (currency) setCurrency(currency);
+    } else {
+      const currency: Currency | undefined = await currencyresolver.find(
+        company.settings.currency_id
+      );
+      if (currency) setCurrency(currency);
+    }
+  };
 
   return (key: string, index: number) => {
     const property = resolveProperty(key);
@@ -68,6 +94,20 @@ export function useResolveInputField(props: Props) {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, event.target.value, index)
           }
+        />
+      );
+    }
+    if (property === 'cost') {
+      if (invoice?.client_id && !currency) getCurrency(invoice?.client_id);
+      return (
+        <CurrencyInput
+          id={property}
+          currency={currency}
+          value={invoice?.line_items[index][property]}
+          className="w-24"
+          onChange={(event: string) => {
+            onChange(property, parseFloat(event), index);
+          }}
         />
       );
     }
