@@ -22,6 +22,7 @@ import axios from 'axios';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { RootState } from 'common/stores/store';
 import { updateChanges } from 'common/stores/slices/company-users';
+import { PaymentTerm } from '../../../../common/interfaces/payment-term';
 
 export function Defaults() {
   const [t] = useTranslation();
@@ -88,8 +89,8 @@ export function Defaults() {
                 onChange={handleChange}
               >
                 <option value=""></option>
-                {terms.data.data.map((type: { id: string; name: string }) => (
-                  <option key={type.id} value={type.id}>
+                {terms.data.data.map((type: PaymentTerm) => (
+                  <option key={type.id} value={type.num_days}>
                     {type.name}
                   </option>
                 ))}
@@ -109,8 +110,8 @@ export function Defaults() {
                 onChange={handleChange}
               >
                 <option value=""></option>
-                {terms.data.data.map((type: { id: string; name: string }) => (
-                  <option key={type.id} value={type.id}>
+                {terms.data.data.map((type: PaymentTerm) => (
+                  <option key={type.id} value={type.num_days}>
                     {type.name}
                   </option>
                 ))}
