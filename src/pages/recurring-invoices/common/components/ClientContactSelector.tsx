@@ -13,10 +13,7 @@ import { ClientResolver } from 'common/helpers/clients/client-resolver';
 import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvoice';
 import { Client } from 'common/interfaces/client';
 import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
-import {
-  setCurrentRecurringInvoicePropertySync,
-  toggleCurrentRecurringInvoiceInvitation,
-} from 'common/stores/slices/recurring-invoices';
+import { toggleCurrentRecurringInvoiceInvitation } from 'common/stores/slices/recurring-invoices';
 import { cloneDeep } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

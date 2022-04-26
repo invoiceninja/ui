@@ -12,10 +12,7 @@ import { Checkbox } from '@invoiceninja/forms';
 import { ClientResolver } from 'common/helpers/clients/client-resolver';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Client } from 'common/interfaces/client';
-import {
-  setCurrentInvoicePropertySync,
-  toggleCurrentInvoiceInvitation,
-} from 'common/stores/slices/invoices';
+import { toggleCurrentInvoiceInvitation } from 'common/stores/slices/invoices';
 import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
 import { cloneDeep } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
