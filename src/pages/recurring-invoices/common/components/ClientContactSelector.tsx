@@ -60,13 +60,6 @@ export function ClientContactSelector() {
               invitations.push(invitation);
             }
           });
-
-          dispatch(
-            setCurrentRecurringInvoicePropertySync({
-              property: 'invitations',
-              value: invitations,
-            })
-          );
         })
         .catch((error) => console.error(error));
     }

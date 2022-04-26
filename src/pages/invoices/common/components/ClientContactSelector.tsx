@@ -58,13 +58,6 @@ export function ClientContactSelector() {
               invitations.push(invitation);
             }
           });
-
-          dispatch(
-            setCurrentInvoicePropertySync({
-              property: 'invitations',
-              value: invitations,
-            })
-          );
         })
         .catch((error) => console.error(error));
     }
