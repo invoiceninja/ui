@@ -40,8 +40,6 @@ interface Props extends CommonProps {
 }
 
 export function CurrencyInput(props: Props) {
-  const [value, setValue] = useState<number>();
-
   return (
     <section>
       {props.label && (
@@ -50,7 +48,6 @@ export function CurrencyInput(props: Props) {
           {props.required && <span className="ml-1 text-red-600">*</span>}
         </InputLabel>
       )}
-
       <DebounceInput
         disabled={props.disabled}
         element={props.element || 'input'}
@@ -67,13 +64,18 @@ export function CurrencyInput(props: Props) {
         )}
         placeholder={props.placeholder}
         onChange={(event) => {
-          console.log(currency(event.target.value));
-          setValue(currency(event.target.value).value);
+          props.onChange &&
+            props.onChange(String(currency(event.target.value).value));
         }}
-        value={props.value}
+        value={currency(props.value, {
+          separator: props.currency?.thousand_separator,
+          decimal: props.currency?.decimal_separator,
+          symbol: props.currency?.symbol,
+          precision: props.currency?.precision,
+        }).format()}
         list={props.list}
       />
-      {console.log('value:', value)}
+
       {props.errorMessage && (
         <Alert className="mt-2" type="danger">
           {props.errorMessage}
