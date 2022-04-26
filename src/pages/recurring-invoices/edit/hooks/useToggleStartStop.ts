@@ -23,7 +23,7 @@ export function useToggleStartStop() {
 
   return (recurringInvoice: RecurringInvoice, action: 'start' | 'stop') => {
     const toastId = toast.loading(t('processing'));
-    
+
     const url =
       action === 'start'
         ? '/api/v1/recurring_invoices/:id?start=true'
