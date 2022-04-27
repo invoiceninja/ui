@@ -23,12 +23,15 @@ import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { useEmailPayment } from '../common/hooks/useEmailPayment';
 
 export function Payments() {
   useTitle('payments');
 
   const [t] = useTranslation();
+
   const formatMoney = useFormatMoney();
+  const emailPayment = useEmailPayment();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -113,11 +116,7 @@ export function Payments() {
         </DropdownElement>
       ),
     (resource: Payment) => (
-      <DropdownElement
-        onClick={() => {
-          bulk([resource.id], 'email');
-        }}
-      >
+      <DropdownElement onClick={() => emailPayment(resource)}>
         {t('email_payment')}
       </DropdownElement>
     ),
@@ -125,11 +124,7 @@ export function Payments() {
 
   const customBulkActions = [
     (resource: Payment) => (
-      <DropdownElement
-        onClick={() => {
-          bulk([resource.id], 'email');
-        }}
-      >
+      <DropdownElement onClick={() => emailPayment(resource)}>
         {t('email_payment')}
       </DropdownElement>
     ),
