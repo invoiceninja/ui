@@ -43,51 +43,58 @@ export function Actions() {
         </DropdownElement>
       )}
 
-      <DropdownElement to={generatePath('/invoices/:id/pdf', { id })}>
-        {t('view_pdf')}
-      </DropdownElement>
-
       {invoice && (
-        <DropdownElement onClick={() => downloadPdf(invoice)}>
-          {t('download')}
-        </DropdownElement>
-      )}
-
-      <DropdownElement to={generatePath('/invoices/:id/email', { id })}>
-        {t('email_invoice')}
-      </DropdownElement>
-
-      {invoice?.status_id === InvoiceStatus.Draft && !invoice.is_deleted && (
-        <DropdownElement onClick={() => markSent(invoice)}>
-          {t('mark_sent')}
-        </DropdownElement>
-      )}
-
-      {invoice &&
-        parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
-        !invoice.is_deleted && (
-          <DropdownElement onClick={() => markPaid(invoice)}>
-            {t('mark_paid')}
+        <>
+          <DropdownElement to={generatePath('/invoices/:id/pdf', { id })}>
+            {t('view_pdf')}
           </DropdownElement>
-        )}
 
-      <DropdownElement onClick={() => invoice && openClientPortal(invoice)}>
-        {t('client_portal')}
-      </DropdownElement>
+          <DropdownElement onClick={() => downloadPdf(invoice)}>
+            {t('download')}
+          </DropdownElement>
 
-      {/* <DropdownElement
-        to={generatePath('/invoices/:id/clone', { id: invoice.id })}
-      >
-        {t('clone_to_invoice')}
-      </DropdownElement>
+          <DropdownElement to={generatePath('/invoices/:id/email', { id })}>
+            {t('email_invoice')}
+          </DropdownElement>
 
-      <DropdownElement onClick={() => archive(invoice)}>
-        {t('archive')}
-      </DropdownElement>
+          {invoice.status_id === InvoiceStatus.Draft && !invoice.is_deleted && (
+            <DropdownElement onClick={() => markSent(invoice)}>
+              {t('mark_sent')}
+            </DropdownElement>
+          )}
 
-      <DropdownElement onClick={() => destroy(invoice)}>
-        {t('delete')}
-      </DropdownElement> */}
+          {parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
+            !invoice.is_deleted && (
+              <DropdownElement onClick={() => markPaid(invoice)}>
+                {t('mark_paid')}
+              </DropdownElement>
+            )}
+
+          <DropdownElement onClick={() => invoice && openClientPortal(invoice)}>
+            {t('client_portal')}
+          </DropdownElement>
+
+          {invoice && <Divider withoutPadding />}
+
+          <DropdownElement
+            to={generatePath('/invoices/:id/clone', { id: invoice.id })}
+          >
+            {t('clone_to_invoice')}
+          </DropdownElement>
+
+          <Divider withoutPadding />
+
+          <DropdownElement onClick={() => archive(invoice)}>
+            {t('archive')}
+          </DropdownElement>
+
+          {!invoice.is_deleted && (
+            <DropdownElement onClick={() => destroy(invoice)}>
+              {t('delete')}
+            </DropdownElement>
+          )}
+        </>
+      )}
     </Dropdown>
   );
 }
