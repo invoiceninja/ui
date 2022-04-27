@@ -27,6 +27,7 @@ import { useInvoiceSave } from './hooks/useInvoiceSave';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
 import { Actions } from './components/Actions';
+import { InvoiceStatus } from 'common/enums/invoice-status';
 
 export function Edit() {
   const { id } = useParams();
@@ -62,7 +63,16 @@ export function Edit() {
           currentInvoice as Invoice
         )
       }
-      navigationTopRight={<Actions />}
+      navigationTopRight={
+        currentInvoice &&
+        currentInvoice.status_id !== InvoiceStatus.Cancelled &&
+        !currentInvoice.is_deleted && <Actions />
+      }
+      disableSaveButton={
+        currentInvoice &&
+        (currentInvoice.status_id === InvoiceStatus.Cancelled ||
+          currentInvoice.is_deleted)
+      }
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector readonly />
