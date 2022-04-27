@@ -20,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
 import { useHandleArchive } from '../hooks/useHandleArchive';
 import { useHandleDelete } from '../hooks/useHandleDelete';
+import { useHandleRestore } from '../hooks/useHandleRestore';
 import { useMarkPaid } from '../hooks/useMarkPaid';
 import { useMarkSent } from '../hooks/useMarkSent';
 
@@ -33,6 +34,7 @@ export function Actions() {
   const markPaid = useMarkPaid();
 
   const archive = useHandleArchive();
+  const restore = useHandleRestore();
   const destroy = useHandleDelete();
 
   return (
@@ -87,6 +89,12 @@ export function Actions() {
           {invoice.archived_at === 0 && (
             <DropdownElement onClick={() => archive(invoice)}>
               {t('archive')}
+            </DropdownElement>
+          )}
+
+          {invoice.archived_at > 0 && (
+            <DropdownElement onClick={() => restore(invoice)}>
+              {t('restore')}
             </DropdownElement>
           )}
 
