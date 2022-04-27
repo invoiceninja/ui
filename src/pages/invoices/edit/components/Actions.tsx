@@ -84,9 +84,11 @@ export function Actions() {
 
           <Divider withoutPadding />
 
-          <DropdownElement onClick={() => archive(invoice)}>
-            {t('archive')}
-          </DropdownElement>
+          {invoice.archived_at === 0 && (
+            <DropdownElement onClick={() => archive(invoice)}>
+              {t('archive')}
+            </DropdownElement>
+          )}
 
           {!invoice.is_deleted && (
             <DropdownElement onClick={() => destroy(invoice)}>
