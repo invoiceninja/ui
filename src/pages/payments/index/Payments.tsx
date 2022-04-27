@@ -103,13 +103,15 @@ export function Payments() {
           {t('apply_payment')}
         </DropdownElement>
       ),
-    (resource: Payment) => (
-      <DropdownElement
-        to={generatePath('/payments/:id/refund', { id: resource.id })}
-      >
-        {t('refund_payment')}
-      </DropdownElement>
-    ),
+    (resource: Payment) =>
+      resource.amount !== resource.refunded &&
+      !resource.is_deleted && (
+        <DropdownElement
+          to={generatePath('/payments/:id/refund', { id: resource.id })}
+        >
+          {t('refund_payment')}
+        </DropdownElement>
+      ),
     (resource: Payment) => (
       <DropdownElement
         onClick={() => {
