@@ -8,6 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export function Divider() {
-  return <div className="pt-6 mb-4 border-b"></div>;
+import classNames from 'classnames';
+
+interface Props {
+  withoutPadding?: boolean;
+}
+
+export function Divider(props: Props) {
+  return (
+    <div
+      className={classNames('border-b', {
+        'pt-6 mb-4 border-b': !props.withoutPadding,
+      })}
+    ></div>
+  );
 }
