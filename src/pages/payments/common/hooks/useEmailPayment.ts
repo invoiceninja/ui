@@ -23,7 +23,7 @@ export function useEmailPayment() {
       .then(() => toast.success(t('emailed_payment'), { id: toastId }))
       .catch((error) => {
         console.error(error);
-        
+
         toast.error(t('error_title'), { id: toastId });
       });
   };
