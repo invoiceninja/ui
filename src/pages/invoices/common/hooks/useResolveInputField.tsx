@@ -27,8 +27,6 @@ import { CurrencyResolver } from 'common/helpers/currencies/currency-resolver';
 import { Client } from 'common/interfaces/client';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Currency } from 'common/interfaces/currency';
-import invoiceStatus from 'common/constants/invoice-status';
-import currency from 'currency.js';
 
 const numberInputs = ['discount', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
@@ -57,12 +55,12 @@ export function useResolveInputField(props: Props) {
       const currency: Currency | undefined = await currencyresolver.find(
         client.settings.currency_id
       );
-      if (currency) setCurrency(currency);
+      currency && setCurrency(currency);
     } else {
       const currency: Currency | undefined = await currencyresolver.find(
         company.settings.currency_id
       );
-      if (currency) setCurrency(currency);
+      currency && setCurrency(currency);
     }
   };
 
@@ -100,15 +98,17 @@ export function useResolveInputField(props: Props) {
     if (property === 'cost') {
       if (invoice?.client_id && !currency) getCurrency(invoice?.client_id);
       return (
-        <CurrencyInput
-          id={property}
-          currency={currency}
-          value={invoice?.line_items[index][property]}
-          className="w-24"
-          onChange={(event: string) => {
-            onChange(property, parseFloat(event), index);
-          }}
-        />
+        currency && (
+          <CurrencyInput
+            id={property}
+            currency={currency}
+            value={invoice?.line_items[index][property]}
+            className="w-24"
+            onChange={(event: string) => {
+              onChange(property, parseFloat(event), index);
+            }}
+          />
+        )
       );
     }
 

@@ -11,7 +11,6 @@ import classNames from 'classnames';
 import { Currency } from 'common/interfaces/currency';
 import { Alert } from 'components/Alert';
 import currency from 'currency.js';
-import { useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -25,16 +24,7 @@ interface Props extends CommonProps {
   border?: boolean;
   name?: string;
   errorMessage?: string | string[];
-  debounceTimeout?: number;
-  element?: string;
-  disabled?: boolean;
-  list?: string;
   currency?: Currency;
-  decimalSeparator?: string;
-  groupSeparator?: string;
-  precision?: string;
-  code?: string;
-  symbol?: string;
 
   onValueChange?: (value: string) => unknown;
 }
@@ -49,11 +39,8 @@ export function CurrencyInput(props: Props) {
         </InputLabel>
       )}
       <DebounceInput
-        disabled={props.disabled}
-        element={props.element || 'input'}
-        inputRef={props.innerRef}
-        debounceTimeout={props.debounceTimeout ?? 300}
-        required={props.required}
+        element={'input'}
+        debounceTimeout={300}
         id={props.id}
         type={'text'}
         className={classNames(
@@ -62,7 +49,6 @@ export function CurrencyInput(props: Props) {
             'border border-gray-300': props.border !== false,
           }
         )}
-        placeholder={props.placeholder}
         onChange={(event) => {
           props.onChange &&
             props.onChange(String(currency(event.target.value).value));
@@ -73,7 +59,6 @@ export function CurrencyInput(props: Props) {
           symbol: props.currency?.symbol,
           precision: props.currency?.precision,
         }).format()}
-        list={props.list}
       />
 
       {props.errorMessage && (
