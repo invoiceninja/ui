@@ -18,6 +18,7 @@ import { generatePath, Outlet, useParams } from 'react-router-dom';
 export function Payment() {
   const { id } = useParams();
   const [t] = useTranslation();
+
   const pages: BreadcrumRecord[] = [
     { name: t('payments'), href: '/payments' },
     {
@@ -25,12 +26,12 @@ export function Payment() {
       href: generatePath('/payments/:id/edit', { id: id }),
     },
   ];
+
   const tabs: Tab[] = [
     {
       name: t('edit'),
       href: generatePath('/payments/:id/edit', { id }),
     },
-
     {
       name: t('custom_fields'),
       href: generatePath('/payments/:id/payment_fields', { id }),
@@ -41,7 +42,6 @@ export function Payment() {
     <Default title={t('payment')} breadcrumbs={pages}>
       <Container>
         <Tabs tabs={tabs} />
-
         <Outlet />
       </Container>
     </Default>
