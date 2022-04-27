@@ -63,15 +63,17 @@ export function Actions() {
         </DropdownElement>
       )}
 
+      {invoice &&
+        parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
+        !invoice.is_deleted && (
+          <DropdownElement onClick={() => markPaid(invoice)}>
+            {t('mark_paid')}
+          </DropdownElement>
+        )}
+
       <DropdownElement onClick={() => invoice && openClientPortal(invoice)}>
         {t('client_portal')}
       </DropdownElement>
-
-      {invoice?.status_id === InvoiceStatus.Sent && (
-        <DropdownElement onClick={() => markPaid(invoice)}>
-          {t('mark_paid')}
-        </DropdownElement>
-      )}
 
       {/* <DropdownElement
         to={generatePath('/invoices/:id/clone', { id: invoice.id })}
