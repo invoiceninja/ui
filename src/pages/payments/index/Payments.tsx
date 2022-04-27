@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import paymentStatus from 'common/constants/payment-status';
 import paymentType from 'common/constants/payment-type';
 import { date } from 'common/helpers';
@@ -14,7 +15,6 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Payment } from 'common/interfaces/payment';
-import { bulk } from 'common/queries/payments';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
