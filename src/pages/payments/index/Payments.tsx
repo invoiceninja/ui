@@ -94,14 +94,15 @@ export function Payments() {
   ];
 
   const actions = [
-    (resource: Payment) => (
-      <DropdownElement
-        to={generatePath('/payments/:id/apply', { id: resource.id })}
-      >
-        {t('apply_payment')}
-      </DropdownElement>
-    ),
-
+    (resource: Payment) =>
+      resource.amount - resource.applied > 0 &&
+      !resource.is_deleted && (
+        <DropdownElement
+          to={generatePath('/payments/:id/apply', { id: resource.id })}
+        >
+          {t('apply_payment')}
+        </DropdownElement>
+      ),
     (resource: Payment) => (
       <DropdownElement
         to={generatePath('/payments/:id/refund', { id: resource.id })}
@@ -109,7 +110,6 @@ export function Payments() {
         {t('refund_payment')}
       </DropdownElement>
     ),
-
     (resource: Payment) => (
       <DropdownElement
         onClick={() => {
