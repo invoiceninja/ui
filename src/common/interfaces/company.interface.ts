@@ -14,6 +14,7 @@ export interface Company {
   industry_id: string;
   settings: {
     name: string;
+    auto_bill: string;
     id_number: string;
     vat_number: string;
     website: string;
