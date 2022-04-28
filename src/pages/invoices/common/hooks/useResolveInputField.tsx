@@ -58,7 +58,7 @@ export function useResolveInputField(props: Props) {
       currency && setCurrency(currency);
     } else {
       const currency: Currency | undefined = await currencyresolver.find(
-        company.settings.currency_id
+        company.settings?.currency_id
       );
       currency && setCurrency(currency);
     }
