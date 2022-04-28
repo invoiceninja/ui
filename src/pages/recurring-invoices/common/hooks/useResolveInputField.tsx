@@ -100,6 +100,8 @@ export function useResolveInputField(props: Props) {
     }
 
     if (property === 'cost') {
+      console.log('resolve curr', currency);
+
       return (
         currency && (
           <CurrencyInput

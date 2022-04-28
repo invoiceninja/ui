@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import classNames from 'classnames';
-import { Currency } from 'common/interfaces/currency';
 import { Alert } from 'components/Alert';
 import currency from 'currency.js';
 import { useEffect, useState } from 'react';
@@ -20,7 +19,11 @@ interface Props extends CommonProps {
   id?: string;
   border?: boolean;
   errorMessage?: string | string[];
-  currency?: Currency;
+  currency?: {
+    decimal_separator: string;
+    precision: number;
+    thousand_separator: string;
+  };
   initialValue?: number;
   onValueChange?: (value: string) => unknown;
 }
@@ -38,6 +41,7 @@ export function CurrencyInput(props: Props) {
 
   return (
     <section>
+      {console.log('val', value)}
       {props.currency && (
         <DebounceInput
           element={'input'}

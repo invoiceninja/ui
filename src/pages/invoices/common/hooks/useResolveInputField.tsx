@@ -27,6 +27,7 @@ import { CurrencyResolver } from 'common/helpers/currencies/currency-resolver';
 import { Client } from 'common/interfaces/client';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Currency } from 'common/interfaces/currency';
+import { useResolveCountry } from 'common/hooks/useResolveCountry';
 
 const numberInputs = ['discount', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
@@ -39,7 +40,11 @@ interface Props {
 export function useResolveInputField(props: Props) {
   const [t] = useTranslation();
   const { setIsTaxModalOpen, setIsProductModalOpen } = props;
-  const [currency, setCurrency] = useState<Currency>();
+  const [currency, setCurrency] = useState<{
+    decimal_separator: string;
+    precision: number;
+    thousand_separator: string;
+  }>();
   const handleProductChange = useHandleProductChange();
   const onChange = useHandleLineItemPropertyChange();
 
@@ -49,19 +54,37 @@ export function useResolveInputField(props: Props) {
 
   const clientResolver = new ClientResolver();
   const currencyresolver = new CurrencyResolver();
+  const resolveCountry = useResolveCountry();
 
   const getCurrency = async (client_id: string) => {
     if (invoice?.client_id) {
       const client: Client = await clientResolver.find(client_id);
+
       const currency: Currency | undefined = await currencyresolver.find(
         client.settings.currency_id
       );
-      currency && setCurrency(currency);
+      const country = resolveCountry(client.country_id);
+      console.log('country', country);
+      console.log('currency', currency);
+
+      currency &&
+        setCurrency({
+          thousand_separator:
+            country?.thousand_separator || currency.thousand_separator,
+          decimal_separator:
+            country?.decimal_separator || currency.decimal_separator,
+          precision: currency.precision,
+        });
     } else {
       const currency: Currency | undefined = await currencyresolver.find(
         company.settings?.currency_id
       );
-      currency && setCurrency(currency);
+      currency &&
+        setCurrency({
+          thousand_separator: currency.thousand_separator,
+          decimal_separator: currency.decimal_separator,
+          precision: currency.precision,
+        });
     }
   };
   useEffect(() => {
