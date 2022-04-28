@@ -64,7 +64,7 @@ export function useResolveInputField(props: Props) {
     }
   };
   useEffect(() => {
-    if (invoice?.client_id && !currency) getCurrency(invoice?.client_id);
+    if (invoice?.client_id) getCurrency(invoice?.client_id);
   }, [invoice?.client_id]);
 
   return (key: string, index: number) => {
@@ -99,6 +99,8 @@ export function useResolveInputField(props: Props) {
       );
     }
     if (property === 'cost') {
+      console.log('resolve curr', currency);
+
       return (
         currency && (
           <CurrencyInput
