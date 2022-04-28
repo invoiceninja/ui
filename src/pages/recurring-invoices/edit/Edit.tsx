@@ -66,7 +66,7 @@ export function Edit() {
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector readonly />
-        <InvoiceDetails />
+        <InvoiceDetails auto_bill={currentRecurringInvoice?.auto_bill} />
 
         <div className="col-span-12">
           <ProductsTable />

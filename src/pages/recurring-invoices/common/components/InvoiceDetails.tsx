@@ -17,8 +17,11 @@ import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSetCurrentRecurringInvoiceProperty } from '../hooks/useSetCurrentRecurringInvoiceProperty';
 import frequencies from 'common/constants/frequency';
+interface Props {
+  auto_bill?: string;
+}
 
-export function InvoiceDetails() {
+export function InvoiceDetails(props: Props) {
   const [t] = useTranslation();
   const invoice = useCurrentRecurringInvoice();
   const company = useCurrentCompany();
@@ -158,7 +161,7 @@ export function InvoiceDetails() {
 
         <Element leftSide={t('auto_bill')}>
           <SelectField
-            value={company.settings.auto_bill}
+            value={props.auto_bill}
             onChange={(event: ChangeEvent<HTMLSelectElement>) =>
               handleChange('auto_bill', event.target.value)
             }
@@ -166,7 +169,7 @@ export function InvoiceDetails() {
             <option value="always">{t('enabled')}</option>
             <option value="optout">{t('optout')}</option>
             <option value="optin">{t('optin')}</option>
-            <option value="off">{t('off')}</option>
+            <option value="off">{t('disabled')}</option>
           </SelectField>
         </Element>
 
