@@ -158,7 +158,7 @@ export function InvoiceDetails() {
 
         <Element leftSide={t('auto_bill')}>
           <SelectField
-            value={invoice?.auto_bill}
+            value={company.settings.auto_bill}
             onChange={(event: ChangeEvent<HTMLSelectElement>) =>
               handleChange('auto_bill', event.target.value)
             }
