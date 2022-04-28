@@ -253,7 +253,11 @@ export function Create() {
           </Element>
 
           <Element leftSide={t('payment_type')}>
-            <SelectField id="type_id" onChange={formik.handleChange}>
+            <SelectField
+              id="type_id"
+              defaultValue={company.settings?.payment_type_id}
+              onChange={formik.handleChange}
+            >
               <option value=""></option>
               {Object.entries(paymentType).map(([id, type], index) => (
                 <option value={id} key={index}>
