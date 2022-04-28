@@ -16,7 +16,7 @@ import { useHandleProductChange } from './useHandleProductChange';
 import { useTranslation } from 'react-i18next';
 import { InputField } from '@invoiceninja/forms';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
 import { useFormatMoney } from './useFormatMoney';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
@@ -63,6 +63,9 @@ export function useResolveInputField(props: Props) {
       currency && setCurrency(currency);
     }
   };
+  useEffect(() => {
+    if (invoice?.client_id && !currency) getCurrency(invoice?.client_id);
+  }, [invoice?.client_id]);
 
   return (key: string, index: number) => {
     const property = resolveProperty(key);
@@ -96,13 +99,12 @@ export function useResolveInputField(props: Props) {
       );
     }
     if (property === 'cost') {
-      if (invoice?.client_id && !currency) getCurrency(invoice?.client_id);
       return (
         currency && (
           <CurrencyInput
             id={property}
             currency={currency}
-            value={invoice?.line_items[index][property]}
+            initialValue={invoice?.line_items[index][property]}
             className="w-24"
             onChange={(event: string) => {
               onChange(property, parseFloat(event), index);
