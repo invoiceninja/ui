@@ -26,14 +26,14 @@ interface Props extends CommonProps {
 }
 
 export function CurrencyInput(props: Props) {
-  const [value, setvalue] = useState<number>(0);
+  const [value, setValue] = useState<number>(0);
 
   useEffect(() => {
-    props.initialValue && setvalue(props.initialValue);
+    props.initialValue && setValue(props.initialValue);
   }, []);
 
   useEffect(() => {
-    if (value == 0) props.initialValue && setvalue(props.initialValue);
+    if (value == 0) props.initialValue && setValue(props.initialValue);
   }, [props.initialValue]);
 
   return (

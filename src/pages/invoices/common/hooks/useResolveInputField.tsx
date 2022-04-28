@@ -38,14 +38,15 @@ interface Props {
 
 export function useResolveInputField(props: Props) {
   const [t] = useTranslation();
-
   const { setIsTaxModalOpen, setIsProductModalOpen } = props;
   const [currency, setCurrency] = useState<Currency>();
   const handleProductChange = useHandleProductChange();
   const onChange = useHandleLineItemPropertyChange();
+
   const invoice = useCurrentInvoice();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
+
   const clientResolver = new ClientResolver();
   const currencyresolver = new CurrencyResolver();
 

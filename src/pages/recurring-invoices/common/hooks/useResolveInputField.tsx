@@ -42,6 +42,7 @@ export function useResolveInputField(props: Props) {
   const onChange = useHandleLineItemPropertyChange();
   const [t] = useTranslation();
   const { setIsTaxModalOpen, setIsProductModalOpen } = props;
+
   const invoice = useCurrentRecurringInvoice();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
