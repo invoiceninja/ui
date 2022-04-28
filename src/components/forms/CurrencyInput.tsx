@@ -11,6 +11,7 @@ import classNames from 'classnames';
 import { Currency } from 'common/interfaces/currency';
 import { Alert } from 'components/Alert';
 import currency from 'currency.js';
+import { useEffect, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -20,11 +21,21 @@ interface Props extends CommonProps {
   border?: boolean;
   errorMessage?: string | string[];
   currency?: Currency;
-
+  initialValue?: number;
   onValueChange?: (value: string) => unknown;
 }
 
 export function CurrencyInput(props: Props) {
+  const [value, setvalue] = useState<number>(0);
+
+  useEffect(() => {
+    props.initialValue && setvalue(props.initialValue);
+  }, []);
+
+  useEffect(() => {
+    if (value == 0) props.initialValue && setvalue(props.initialValue);
+  }, [props.initialValue]);
+
   return (
     <section>
       {props.currency && (
@@ -52,7 +63,7 @@ export function CurrencyInput(props: Props) {
                 )
               );
           }}
-          value={currency(props.value, {
+          value={currency(value, {
             separator: props.currency?.thousand_separator,
             decimal: props.currency?.decimal_separator,
             symbol: '',
@@ -60,6 +71,7 @@ export function CurrencyInput(props: Props) {
           }).format()}
         />
       )}
+
       {props.errorMessage && (
         <Alert className="mt-2" type="danger">
           {props.errorMessage}
