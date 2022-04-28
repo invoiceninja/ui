@@ -15,6 +15,7 @@ export interface Company {
   settings: {
     name: string;
     auto_bill: string;
+    payment_type_id: string;
     id_number: string;
     vat_number: string;
     website: string;
