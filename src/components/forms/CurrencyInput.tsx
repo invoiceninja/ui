@@ -18,13 +18,14 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 interface Props extends CommonProps {
   id?: string;
   border?: boolean;
+  precision?: number;
   errorMessage?: string | string[];
   currency?: {
     decimal_separator: string;
     precision: number;
     thousand_separator: string;
   };
-  initialValue?: number;
+  initialValue?: string;
   onValueChange?: (value: string) => unknown;
 }
 
@@ -32,11 +33,12 @@ export function CurrencyInput(props: Props) {
   const [value, setValue] = useState<number>(0);
 
   useEffect(() => {
-    props.initialValue && setValue(props.initialValue);
+    props.initialValue && setValue(parseFloat(props.initialValue));
   }, []);
 
   useEffect(() => {
-    if (value == 0) props.initialValue && setValue(props.initialValue);
+    if (value == 0)
+      props.initialValue && setValue(parseFloat(props.initialValue));
   }, [props.initialValue]);
 
   return (
@@ -62,7 +64,7 @@ export function CurrencyInput(props: Props) {
                     separator: props.currency?.thousand_separator,
                     decimal: props.currency?.decimal_separator,
                     symbol: '',
-                    precision: props.currency?.precision,
+                    precision: props.precision,
                   }).value
                 )
               );
@@ -71,11 +73,14 @@ export function CurrencyInput(props: Props) {
             separator: props.currency?.thousand_separator,
             decimal: props.currency?.decimal_separator,
             symbol: '',
-            precision: props.currency?.precision,
+            precision:
+              props.precision === 6
+                ? value.toString().split('.')[1]?.length || 2
+                : props.precision,
           }).format()}
         />
       )}
-
+      {console.log('aaaaaaa', value.toString().split('.')[1]?.length)}
       {props.errorMessage && (
         <Alert className="mt-2" type="danger">
           {props.errorMessage}
