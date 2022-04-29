@@ -37,6 +37,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { useStaticsQuery } from 'common/queries/statics';
 
 export function Create() {
   const [t] = useTranslation();
@@ -53,6 +54,9 @@ export function Create() {
   const [convertCurrency, setConvertCurrency] = useState(false);
   const [emailInvoice, setEmailInvoice] = useState(false);
 
+  const statics = useStaticsQuery();
+
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
@@ -60,7 +64,7 @@ export function Create() {
       client_id: client_id || '',
       date: payment?.data.data.date,
       transaction_reference: '',
-      type_id: '',
+      type_id: company.settings?.payment_type_id,
       private_notes: '',
       currency_id: clients?.data.data.find(
         (client: any) => client.id == client_id
@@ -256,7 +260,7 @@ export function Create() {
             <SelectField id="type_id" onChange={formik.handleChange}>
               <option value=""></option>
               {Object.entries(paymentType).map(([id, type], index) => (
-                <option value={id} key={index}>
+                <option value={id} key={index} selected={id == company.settings?.payment_type_id} >
                   {t(type)}
                 </option>
               ))}
