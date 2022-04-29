@@ -60,7 +60,7 @@ export function Create() {
       client_id: client_id || '',
       date: payment?.data.data.date,
       transaction_reference: '',
-      type_id: '',
+      type_id: company.settings?.payment_type_id,
       private_notes: '',
       currency_id: clients?.data.data.find(
         (client: any) => client.id == client_id
@@ -255,7 +255,7 @@ export function Create() {
           <Element leftSide={t('payment_type')}>
             <SelectField
               id="type_id"
-              defaultValue={company.settings?.payment_type_id}
+              defaultValue={formik.values.type_id}
               onChange={formik.handleChange}
             >
               <option value=""></option>
