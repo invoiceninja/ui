@@ -29,7 +29,7 @@ interface Props extends CommonProps {
   onValueChange?: (value: string) => unknown;
 }
 
-export function CurrencyInput(props: Props) {
+export function DecimalNumberInput(props: Props) {
   const [value, setValue] = useState<number>(0);
 
   useEffect(() => {
@@ -43,7 +43,6 @@ export function CurrencyInput(props: Props) {
 
   return (
     <section>
-      {console.log('val', value)}
       {props.currency && (
         <DebounceInput
           element={'input'}
@@ -80,7 +79,6 @@ export function CurrencyInput(props: Props) {
           }).format()}
         />
       )}
-      {console.log('aaaaaaa', value.toString().split('.')[1]?.length)}
       {props.errorMessage && (
         <Alert className="mt-2" type="danger">
           {props.errorMessage}

@@ -35,38 +35,42 @@ export function useGetCurrencySeparators(
   const clientResolver = new ClientResolver();
   const currencyresolver = new CurrencyResolver();
   const resolveCountry = useResolveCountry();
-  return async (client_id: string) => {
+
+  return (client_id: string) => {
     if (invoice?.client_id) {
-      const client: Client = await clientResolver.find(client_id);
+      clientResolver.find(client_id).then((client: Client) =>
+        currencyresolver
+          .find(client.settings.currency_id)
+          .then((currency: Currency | undefined) => {
+            const companyCountry = resolveCountry(company.settings.country_id);
 
-      const currency: Currency | undefined = await currencyresolver.find(
-        client.settings.currency_id
+            currency &&
+              setInputCurrencySeparators({
+                thousand_separator:
+                  companyCountry?.thousand_separator ||
+                  currency.thousand_separator,
+                decimal_separator:
+                  companyCountry?.decimal_separator ||
+                  currency.decimal_separator,
+                precision: currency.precision,
+              });
+          })
       );
-      const companyCountry = resolveCountry(company.settings.country_id);
-      console.log('country', companyCountry);
-      console.log('currency', currency);
-
-      currency &&
-        setInputCurrencySeparators({
-          thousand_separator:
-            companyCountry?.thousand_separator || currency.thousand_separator,
-          decimal_separator:
-            companyCountry?.decimal_separator || currency.decimal_separator,
-          precision: currency.precision,
-        });
     } else {
-      const currency: Currency | undefined = await currencyresolver.find(
-        company.settings?.currency_id
-      );
-      const companyCountry = resolveCountry(company.settings.country_id);
+      currencyresolver
+        .find(company.settings?.currency_id)
+        .then((currency: Currency | undefined) => {
+          const companyCountry = resolveCountry(company.settings.country_id);
 
-      currency &&
-        setInputCurrencySeparators({
-          thousand_separator:
-            companyCountry?.thousand_separator || currency.thousand_separator,
-          decimal_separator:
-            companyCountry?.decimal_separator || currency.decimal_separator,
-          precision: currency.precision,
+          currency &&
+            setInputCurrencySeparators({
+              thousand_separator:
+                companyCountry?.thousand_separator ||
+                currency.thousand_separator,
+              decimal_separator:
+                companyCountry?.decimal_separator || currency.decimal_separator,
+              precision: currency.precision,
+            });
         });
     }
   };

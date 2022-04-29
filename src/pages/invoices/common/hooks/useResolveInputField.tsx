@@ -20,16 +20,11 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
 import { useFormatMoney } from './useFormatMoney';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { isNonNumericValue } from 'common/helpers/invoices/resolve-non-numeric-value';
-import { CurrencyInput } from 'components/forms/CurrencyInput';
-import { ClientResolver } from 'common/helpers/clients/client-resolver';
-import { CurrencyResolver } from 'common/helpers/currencies/currency-resolver';
-import { Client } from 'common/interfaces/client';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Currency } from 'common/interfaces/currency';
-import { useResolveCountry } from 'common/hooks/useResolveCountry';
+import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
 
-const numberInputs = ['discount', 'unit_cost', 'quantity'];
+import { useGetCurrencySeparators } from 'common/hooks/useGetCurrencySeparators';
+
+const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 
 interface Props {
@@ -40,7 +35,8 @@ interface Props {
 export function useResolveInputField(props: Props) {
   const [t] = useTranslation();
   const { setIsTaxModalOpen, setIsProductModalOpen } = props;
-  const [currency, setCurrency] = useState<{
+
+  const [inputCurrencySeparators, setInputCurrencySeparators] = useState<{
     decimal_separator: string;
     precision: number;
     thousand_separator: string;
@@ -50,43 +46,8 @@ export function useResolveInputField(props: Props) {
 
   const invoice = useCurrentInvoice();
   const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
+  const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators);
 
-  const clientResolver = new ClientResolver();
-  const currencyresolver = new CurrencyResolver();
-  const resolveCountry = useResolveCountry();
-
-  const getCurrency = async (client_id: string) => {
-    if (invoice?.client_id) {
-      const client: Client = await clientResolver.find(client_id);
-
-      const currency: Currency | undefined = await currencyresolver.find(
-        client.settings.currency_id
-      );
-      const country = resolveCountry(client.country_id);
-      console.log('country', country);
-      console.log('currency', currency);
-
-      currency &&
-        setCurrency({
-          thousand_separator:
-            country?.thousand_separator || currency.thousand_separator,
-          decimal_separator:
-            country?.decimal_separator || currency.decimal_separator,
-          precision: currency.precision,
-        });
-    } else {
-      const currency: Currency | undefined = await currencyresolver.find(
-        company.settings?.currency_id
-      );
-      currency &&
-        setCurrency({
-          thousand_separator: currency.thousand_separator,
-          decimal_separator: currency.decimal_separator,
-          precision: currency.precision,
-        });
-    }
-  };
   useEffect(() => {
     if (invoice?.client_id) getCurrency(invoice?.client_id);
   }, [invoice?.client_id]);
@@ -122,36 +83,22 @@ export function useResolveInputField(props: Props) {
         />
       );
     }
-    if (property === 'cost') {
-      console.log('resolve curr', currency);
-
+    if (numberInputs.includes(property)) {
       return (
-        currency && (
-          <CurrencyInput
+        inputCurrencySeparators && (
+          <DecimalNumberInput
+            precision={
+              property === 'quantity' ? 6 : inputCurrencySeparators.precision
+            }
             id={property}
-            currency={currency}
-            initialValue={invoice?.line_items[index][property]}
+            currency={inputCurrencySeparators}
+            initialValue={invoice?.line_items[index][property] as string}
             className="w-24"
             onChange={(event: string) => {
               onChange(property, parseFloat(event), index);
             }}
           />
         )
-      );
-    }
-
-    if (numberInputs.includes(property)) {
-      return (
-        <InputField
-          id={property}
-          value={invoice?.line_items[index][property]}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            isNonNumericValue(event)
-              ? event
-              : onChange(property, parseFloat(event.target.value), index)
-          }
-          className="w-24"
-        />
       );
     }
 
