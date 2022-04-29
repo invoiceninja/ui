@@ -40,10 +40,10 @@ export function useGetCurrencySeparators(
 
             currency &&
               setInputCurrencySeparators({
-                thousand_separator:
+                thousandSeparator:
                   companyCountry?.thousand_separator ||
                   currency.thousand_separator,
-                decimal_separator:
+                decimalSeparator:
                   companyCountry?.decimal_separator ||
                   currency.decimal_separator,
                 precision: currency.precision,
@@ -58,10 +58,10 @@ export function useGetCurrencySeparators(
 
           currency &&
             setInputCurrencySeparators({
-              thousand_separator:
+              thousandSeparator:
                 companyCountry?.thousand_separator ||
                 currency.thousand_separator,
-              decimal_separator:
+              decimalSeparator:
                 companyCountry?.decimal_separator || currency.decimal_separator,
               precision: currency.precision,
             });
