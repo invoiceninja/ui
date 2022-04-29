@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import classNames from 'classnames';
+import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 import { Alert } from 'components/Alert';
 import currency from 'currency.js';
 import { useEffect, useState } from 'react';
@@ -20,11 +21,7 @@ interface Props extends CommonProps {
   border?: boolean;
   precision?: number;
   errorMessage?: string | string[];
-  currency?: {
-    decimal_separator: string;
-    precision: number;
-    thousand_separator: string;
-  };
+  currency?: DecimalInputSeparators;
   initialValue?: string;
   onValueChange?: (value: string) => unknown;
 }
@@ -60,8 +57,8 @@ export function DecimalNumberInput(props: Props) {
               props.onChange(
                 String(
                   currency(event.target.value, {
-                    separator: props.currency?.thousand_separator,
-                    decimal: props.currency?.decimal_separator,
+                    separator: props.currency?.thousandSeparator,
+                    decimal: props.currency?.decimalSeparator,
                     symbol: '',
                     precision: props.precision,
                   }).value
@@ -69,8 +66,8 @@ export function DecimalNumberInput(props: Props) {
               );
           }}
           value={currency(value, {
-            separator: props.currency?.thousand_separator,
-            decimal: props.currency?.decimal_separator,
+            separator: props.currency?.thousandSeparator,
+            decimal: props.currency?.decimalSeparator,
             symbol: '',
             precision:
               props.precision === 6

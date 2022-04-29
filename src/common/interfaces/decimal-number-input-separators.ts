@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 export interface DecimalInputSeparators {
-  decimal_separator: string;
+  decimalSeparator: string;
   precision: number;
-  thousand_separator: string;
+  thousandSeparator: string;
 }
