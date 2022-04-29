@@ -41,6 +41,7 @@ export interface Company {
     client_portal_allow_over_payment: boolean;
     client_portal_allow_under_payment: boolean;
     client_portal_under_payment_minimum: string;
+    payment_type_id: string;
   };
   custom_fields: Record<string, string>;
   enabled_tax_rates: number;
