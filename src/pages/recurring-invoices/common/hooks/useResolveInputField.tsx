@@ -33,7 +33,7 @@ interface Props {
 
 export function useResolveInputField(props: Props) {
   const handleProductChange = useHandleProductChange();
-  const [currency, setCurrency] = useState<{
+  const [inputCurrencySeparators, setInputCurrencySeparators] = useState<{
     decimal_separator: string;
     precision: number;
     thousand_separator: string;
@@ -45,7 +45,7 @@ export function useResolveInputField(props: Props) {
 
   const invoice = useCurrentRecurringInvoice();
   const formatMoney = useFormatMoney();
-  const getCurrency = useGetCurrencySeparators(setCurrency);
+  const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators);
 
   useEffect(() => {
     if (invoice?.client_id) getCurrency(invoice?.client_id);
@@ -83,15 +83,17 @@ export function useResolveInputField(props: Props) {
 
     if (numberInputs.includes(property)) {
       return (
-        currency && (
+        inputCurrencySeparators && (
           <DecimalNumberInput
             id={property}
-            precision={property === 'quantity' ? 6 : currency.precision}
-            currency={currency}
+            precision={
+              property === 'quantity' ? 6 : inputCurrencySeparators.precision
+            }
+            currency={inputCurrencySeparators}
             initialValue={invoice?.line_items[index][property] as string}
             className="w-24"
-            onChange={(event: string) => {
-              onChange(property, parseFloat(event), index);
+            onChange={(value: string) => {
+              onChange(property, parseFloat(value), index);
             }}
           />
         )

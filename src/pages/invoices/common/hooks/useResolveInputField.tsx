@@ -21,7 +21,6 @@ import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChan
 import { useFormatMoney } from './useFormatMoney';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
-
 import { useGetCurrencySeparators } from 'common/hooks/useGetCurrencySeparators';
 
 const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
@@ -94,8 +93,8 @@ export function useResolveInputField(props: Props) {
             currency={inputCurrencySeparators}
             initialValue={invoice?.line_items[index][property] as string}
             className="w-24"
-            onChange={(event: string) => {
-              onChange(property, parseFloat(event), index);
+            onChange={(value: string) => {
+              onChange(property, parseFloat(value), index);
             }}
           />
         )
