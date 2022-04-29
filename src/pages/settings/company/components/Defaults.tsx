@@ -73,7 +73,7 @@ export function Defaults() {
               <option value="0"></option>
               {statics.data?.data.payment_types.map(
                 (type: { id: string; name: string }) => (
-                  <option key={type.id} value={type.name}>
+                  <option key={type.id} value={type.id}>
                     {type.name}
                   </option>
                 )
