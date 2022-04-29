@@ -18,6 +18,7 @@ import { blankLineItem } from './invoices/constants/blank-line-item';
 import { setCurrentRecurringInvoice } from './recurring-invoices/extra-reducers/set-current-recurring-invoice';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { blankInvitation } from './invoices/constants/blank-invitation';
+import { deleteRecurringInvoiceItem } from './recurring-invoices/extra-reducers/delete-recurring-invoice-item';
 interface RecurringInvoiceState {
   api?: any;
   current?: RecurringInvoice;
@@ -130,6 +131,19 @@ export const recurringInvoiceSlice = createSlice({
         state.current = new InvoiceSum(
           cloneDeep(state.current),
           cloneDeep(payload.payload.currency as Currency)
+        ).build().invoice as RecurringInvoice;
+      }
+    });
+
+    builder.addCase(deleteRecurringInvoiceItem.fulfilled, (state, payload) => {
+      if (state.current) {
+        state.current.line_items.splice(payload.payload.payload, 1);
+      }
+
+      if (state.current && payload.payload.client && payload.payload.currency) {
+        state.current = new InvoiceSum(
+          cloneDeep(state.current),
+          cloneDeep(payload.payload.currency)
         ).build().invoice as RecurringInvoice;
       }
     });
