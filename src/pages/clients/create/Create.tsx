@@ -18,7 +18,6 @@ import { defaultHeaders } from 'common/queries/common/headers';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
-import { ValidationAlert } from 'components/ValidationAlert';
 import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
@@ -111,8 +110,6 @@ export function Create() {
       onBackClick={generatePath('/clients')}
     >
       {isLoading && <Spinner />}
-
-      {errors && <ValidationAlert errors={errors} />}
 
       <div className="flex flex-col xl:flex-row xl:gap-4">
         <div className="w-full xl:w-1/2">
