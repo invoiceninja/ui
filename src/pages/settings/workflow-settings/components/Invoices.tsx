@@ -57,6 +57,18 @@ export function Invoices() {
         />
       </Element>
 
+      <Element
+        leftSide={t('auto_archive_invoice_cancelled')}
+        leftSideHelp={t('auto_archive_invoice_cancelled_help')}
+      >
+        <Toggle
+          checked={companyChanges?.settings?.auto_archive_invoice_cancelled || false}
+          onChange={(value: boolean) =>
+            handleToggleChange('settings.auto_archive_invoice_cancelled', value)
+          }
+        />
+      </Element>
+
       <Divider />
 
       <Element leftSide={t('lock_invoices')}>
