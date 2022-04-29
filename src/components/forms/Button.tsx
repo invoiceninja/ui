@@ -71,7 +71,7 @@ export function Button(props: Props) {
       type={props.behavior}
       disabled={props.disabled}
       className={classNames(
-        `inline-flex items-center space-x-2 justify-center rounded text-sm ${props.className} disabled:cursor-not-allowed`,
+        `inline-flex items-center space-x-2 justify-center rounded text-sm ${props.className} disabled:cursor-not-allowed disabled:opacity-75`,
         {
           'py-2 px-4': props.type !== 'minimal',
           'w-full': props.variant === 'block',

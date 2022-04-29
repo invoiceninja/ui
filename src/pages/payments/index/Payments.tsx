@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import paymentStatus from 'common/constants/payment-status';
 import paymentType from 'common/constants/payment-type';
 import { date } from 'common/helpers';
@@ -14,7 +15,6 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Payment } from 'common/interfaces/payment';
-import { bulk } from 'common/queries/payments';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
@@ -23,12 +23,15 @@ import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { useEmailPayment } from '../common/hooks/useEmailPayment';
 
 export function Payments() {
   useTitle('payments');
 
   const [t] = useTranslation();
+
   const formatMoney = useFormatMoney();
+  const emailPayment = useEmailPayment();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -94,28 +97,26 @@ export function Payments() {
   ];
 
   const actions = [
+    (resource: Payment) =>
+      resource.amount - resource.applied > 0 &&
+      !resource.is_deleted && (
+        <DropdownElement
+          to={generatePath('/payments/:id/apply', { id: resource.id })}
+        >
+          {t('apply_payment')}
+        </DropdownElement>
+      ),
+    (resource: Payment) =>
+      resource.amount !== resource.refunded &&
+      !resource.is_deleted && (
+        <DropdownElement
+          to={generatePath('/payments/:id/refund', { id: resource.id })}
+        >
+          {t('refund_payment')}
+        </DropdownElement>
+      ),
     (resource: Payment) => (
-      <DropdownElement
-        to={generatePath('/payments/:id/apply', { id: resource.id })}
-      >
-        {t('apply_payment')}
-      </DropdownElement>
-    ),
-
-    (resource: Payment) => (
-      <DropdownElement
-        to={generatePath('/payments/:id/refund', { id: resource.id })}
-      >
-        {t('refund_payment')}
-      </DropdownElement>
-    ),
-
-    (resource: Payment) => (
-      <DropdownElement
-        onClick={() => {
-          bulk([resource.id], 'email');
-        }}
-      >
+      <DropdownElement onClick={() => emailPayment(resource)}>
         {t('email_payment')}
       </DropdownElement>
     ),
@@ -123,11 +124,7 @@ export function Payments() {
 
   const customBulkActions = [
     (resource: Payment) => (
-      <DropdownElement
-        onClick={() => {
-          bulk([resource.id], 'email');
-        }}
-      >
+      <DropdownElement onClick={() => emailPayment(resource)}>
         {t('email_payment')}
       </DropdownElement>
     ),

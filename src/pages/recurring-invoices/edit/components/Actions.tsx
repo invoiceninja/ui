@@ -37,7 +37,7 @@ export function Actions() {
         (recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT ||
           recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED) && (
           <DropdownElement
-            onClick={() => toggleStartStop(recurringInvoice, true)}
+            onClick={() => toggleStartStop(recurringInvoice, 'start')}
           >
             {t('start')}
           </DropdownElement>
@@ -46,7 +46,7 @@ export function Actions() {
       {recurringInvoice &&
         recurringInvoice.status_id === RecurringInvoiceStatus.ACTIVE && (
           <DropdownElement
-            onClick={() => toggleStartStop(recurringInvoice, false)}
+            onClick={() => toggleStartStop(recurringInvoice, 'stop')}
           >
             {t('stop')}
           </DropdownElement>

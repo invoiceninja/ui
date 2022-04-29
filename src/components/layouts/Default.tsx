@@ -52,6 +52,7 @@ interface Props extends CommonProps {
   navigationTopRight?: ReactNode;
   saveButtonLabel?: string;
   backButtonLabel?: string;
+  disableSaveButton?: boolean;
 }
 
 export function Default(props: Props) {
@@ -368,7 +369,11 @@ export function Default(props: Props) {
                 )}
 
                 {props.onSaveClick && (
-                  <Button onClick={props.onSaveClick}>
+                  <Button
+                    disabled={props.disableSaveButton}
+                    disableWithoutIcon
+                    onClick={props.onSaveClick}
+                  >
                     {props.saveButtonLabel ?? t('save')}
                   </Button>
                 )}

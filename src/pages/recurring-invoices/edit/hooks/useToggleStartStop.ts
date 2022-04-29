@@ -21,23 +21,23 @@ export function useToggleStartStop() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
-  return (recurringInvoice: RecurringInvoice, status: boolean) => {
+  return (recurringInvoice: RecurringInvoice, action: 'start' | 'stop') => {
     const toastId = toast.loading(t('processing'));
 
+    const url =
+      action === 'start'
+        ? '/api/v1/recurring_invoices/:id?start=true'
+        : '/api/v1/recurring_invoices/:id?stop=true';
+
     axios
-      .put(
-        endpoint('/api/v1/recurring_invoices/:id?stop=:status', {
-          id: recurringInvoice.id,
-          status,
-        }),
-        recurringInvoice,
-        { headers: defaultHeaders() }
-      )
+      .put(endpoint(url, { id: recurringInvoice.id }), recurringInvoice, {
+        headers: defaultHeaders(),
+      })
       .then((response) => {
         dispatch(setCurrentRecurringInvoice(response.data.data));
 
         toast.success(
-          status
+          action === 'start'
             ? t('started_recurring_invoice')
             : t('stopped_recurring_invoice'),
           { id: toastId }

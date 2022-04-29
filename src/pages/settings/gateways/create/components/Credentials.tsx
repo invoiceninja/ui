@@ -15,6 +15,8 @@ import { Gateway } from 'common/interfaces/statics';
 import { useTranslation } from 'react-i18next';
 import { formatLabel } from '../helpers/format-label';
 import { useResolveInputField } from '../hooks/useResolveInputField';
+import { StripeConnect } from './gateways/StripeConnect';
+import { WePay } from './gateways/WePay';
 
 interface Props {
   gateway: Gateway;
@@ -32,6 +34,11 @@ export function Credentials(props: Props) {
     props.setCompanyGateway
   );
 
+  const STRIPE_CONNECT = 'd14dd26a47cecc30fdd65700bfb67b34';
+  const WEPAY = '8fdeed552015b3c7b44ed6c8ebd9e992';
+
+  const hostedGateways = [STRIPE_CONNECT, WEPAY];
+
   return (
     <Card title={t('credentials')}>
       {props.gateway.site_url.length >= 1 && (
@@ -42,7 +49,14 @@ export function Credentials(props: Props) {
         </Element>
       )}
 
+      {props.gateway && props.gateway.key === STRIPE_CONNECT && (
+        <StripeConnect />
+      )}
+
+      {props.gateway && props.gateway.key === WEPAY && <WePay />}
+
       {props.gateway &&
+        !hostedGateways.includes(props.gateway.key) &&
         Object.keys(JSON.parse(props.gateway.fields)).map((field, index) => (
           <Element leftSide={formatLabel(field)} key={index}>
             {resolveInputField(field, JSON.parse(props.gateway.fields)[field])}

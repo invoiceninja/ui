@@ -11,7 +11,6 @@
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvoice';
 
-import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 import { injectBlankItemIntoCurrent } from 'common/stores/slices/recurring-invoices';
 import { TaxCreate } from 'pages/invoices/common/components/TaxCreate';
 import { ProductCreate } from 'pages/invoices/common/components/ProductCreate';
@@ -24,6 +23,7 @@ import { useDispatch } from 'react-redux';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
+import { deleteRecurringInvoiceItem } from 'common/stores/slices/recurring-invoices/extra-reducers/delete-recurring-invoice-item';
 
 export function ProductsTable() {
   const [t] = useTranslation();
@@ -85,7 +85,7 @@ export function ProductsTable() {
                                   className="text-gray-600 hover:text-red-600"
                                   onClick={() =>
                                     dispatch(
-                                      deleteInvoiceLineItem(lineItemIndex)
+                                      deleteRecurringInvoiceItem(lineItemIndex)
                                     )
                                   }
                                 >

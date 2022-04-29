@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -39,7 +40,7 @@ export function Create() {
   const dispatch = useDispatch();
   const handleCreate = useHandleCreate(setErrors);
   const currentRecurringInvoice = useCurrentRecurringInvoice();
-
+  const company = useCurrentCompany();
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
@@ -67,7 +68,7 @@ export function Create() {
 
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector />
-        <InvoiceDetails />
+        <InvoiceDetails autoBill={company.settings.auto_bill} />
 
         <div className="col-span-12">
           <ProductsTable />

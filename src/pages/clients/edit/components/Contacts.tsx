@@ -189,19 +189,15 @@ export function Contacts(props: Props) {
               </div>
 
               <div className="w-1/2 flex justify-end">
-                {index + 1 === row.length &&
-                  Object.prototype.hasOwnProperty.call(
-                    props.contacts.at(-1),
-                    'id'
-                  ) && (
-                    <button
-                      type="button"
-                      onClick={create}
-                      style={{ color: accentColor }}
-                    >
-                      {t('add_contact')}
-                    </button>
-                  )}
+                {index + 1 === row.length && (
+                  <button
+                    type="button"
+                    onClick={create}
+                    style={{ color: accentColor }}
+                  >
+                    {t('add_contact')}
+                  </button>
+                )}
               </div>
             </div>
           </Element>
