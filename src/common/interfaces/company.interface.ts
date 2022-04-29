@@ -14,6 +14,8 @@ export interface Company {
   industry_id: string;
   settings: {
     name: string;
+    auto_bill: string;
+    payment_type_id: string;
     id_number: string;
     vat_number: string;
     website: string;
@@ -41,7 +43,6 @@ export interface Company {
     client_portal_allow_over_payment: boolean;
     client_portal_allow_under_payment: boolean;
     client_portal_under_payment_minimum: string;
-    payment_type_id: string;
   };
   custom_fields: Record<string, string>;
   enabled_tax_rates: number;
