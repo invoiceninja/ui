@@ -68,7 +68,7 @@ export function Create() {
 
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector />
-        <InvoiceDetails auto_bill={company.settings.auto_bill} />
+        <InvoiceDetails autoBill={company.settings.auto_bill} />
 
         <div className="col-span-12">
           <ProductsTable />

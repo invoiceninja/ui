@@ -17,8 +17,9 @@ import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSetCurrentRecurringInvoiceProperty } from '../hooks/useSetCurrentRecurringInvoiceProperty';
 import frequencies from 'common/constants/frequency';
+
 interface Props {
-  auto_bill?: string;
+  autoBill?: string;
 }
 
 export function InvoiceDetails(props: Props) {
@@ -161,7 +162,7 @@ export function InvoiceDetails(props: Props) {
 
         <Element leftSide={t('auto_bill')}>
           <SelectField
-            value={props.auto_bill}
+            value={props.autoBill}
             onChange={(event: ChangeEvent<HTMLSelectElement>) =>
               handleChange('auto_bill', event.target.value)
             }
