@@ -37,7 +37,6 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
-import { useStaticsQuery } from 'common/queries/statics';
 
 export function Create() {
   const [t] = useTranslation();
@@ -53,9 +52,6 @@ export function Create() {
   const [errors, setErrors] = useState<ValidationBag>();
   const [convertCurrency, setConvertCurrency] = useState(false);
   const [emailInvoice, setEmailInvoice] = useState(false);
-
-  const statics = useStaticsQuery();
-
 
   const formik = useFormik({
     enableReinitialize: true,
