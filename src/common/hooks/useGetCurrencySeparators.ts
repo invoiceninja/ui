@@ -12,6 +12,7 @@ import { ClientResolver } from 'common/helpers/clients/client-resolver';
 import { CurrencyResolver } from 'common/helpers/currencies/currency-resolver';
 import { Client } from 'common/interfaces/client';
 import { Currency } from 'common/interfaces/currency';
+import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 import React from 'react';
 import { useCurrentCompany } from './useCurrentCompany';
 import { useCurrentInvoice } from './useCurrentInvoice';
@@ -19,14 +20,7 @@ import { useResolveCountry } from './useResolveCountry';
 
 export function useGetCurrencySeparators(
   setInputCurrencySeparators: React.Dispatch<
-    React.SetStateAction<
-      | {
-          decimal_separator: string;
-          precision: number;
-          thousand_separator: string;
-        }
-      | undefined
-    >
+    React.SetStateAction<DecimalInputSeparators | undefined>
   >
 ) {
   const company = useCurrentCompany();

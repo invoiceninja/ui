@@ -23,6 +23,7 @@ import { InvoiceItem } from 'common/interfaces/invoice-item';
 
 import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
 import { useGetCurrencySeparators } from 'common/hooks/useGetCurrencySeparators';
+import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 
 const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
@@ -33,11 +34,8 @@ interface Props {
 
 export function useResolveInputField(props: Props) {
   const handleProductChange = useHandleProductChange();
-  const [inputCurrencySeparators, setInputCurrencySeparators] = useState<{
-    decimal_separator: string;
-    precision: number;
-    thousand_separator: string;
-  }>();
+  const [inputCurrencySeparators, setInputCurrencySeparators] =
+    useState<DecimalInputSeparators>();
 
   const onChange = useHandleLineItemPropertyChange();
   const [t] = useTranslation();
