@@ -23,6 +23,7 @@ export interface Company {
     phone: string;
     date_format_id: string;
     company_logo: string;
+    country_id: string;
     pdf_variables: {
       product_columns: string[];
       total_columns: string[];

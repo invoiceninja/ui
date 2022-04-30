@@ -16,11 +16,13 @@ import { useHandleProductChange } from './useHandleProductChange';
 import { useTranslation } from 'react-i18next';
 import { InputField } from '@invoiceninja/forms';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
 import { useFormatMoney } from './useFormatMoney';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { isNonNumericValue } from 'common/helpers/invoices/resolve-non-numeric-value';
+import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
+import { useGetCurrencySeparators } from 'common/hooks/useGetCurrencySeparators';
+import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 
 const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
@@ -32,13 +34,20 @@ interface Props {
 
 export function useResolveInputField(props: Props) {
   const [t] = useTranslation();
-
   const { setIsTaxModalOpen, setIsProductModalOpen } = props;
 
+  const [inputCurrencySeparators, setInputCurrencySeparators] =
+    useState<DecimalInputSeparators>();
   const handleProductChange = useHandleProductChange();
   const onChange = useHandleLineItemPropertyChange();
+
   const invoice = useCurrentInvoice();
   const formatMoney = useFormatMoney();
+  const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators);
+
+  useEffect(() => {
+    if (invoice?.client_id) getCurrency(invoice?.client_id);
+  }, [invoice?.client_id]);
 
   return (key: string, index: number) => {
     const property = resolveProperty(key);
@@ -71,19 +80,22 @@ export function useResolveInputField(props: Props) {
         />
       );
     }
-
     if (numberInputs.includes(property)) {
       return (
-        <InputField
-          id={property}
-          value={invoice?.line_items[index][property]}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            isNonNumericValue(event)
-              ? event
-              : onChange(property, parseFloat(event.target.value), index)
-          }
-          className="w-24"
-        />
+        inputCurrencySeparators && (
+          <DecimalNumberInput
+            precision={
+              property === 'quantity' ? 6 : inputCurrencySeparators.precision
+            }
+            id={property}
+            currency={inputCurrencySeparators}
+            initialValue={invoice?.line_items[index][property] as string}
+            className="w-24"
+            onChange={(value: string) => {
+              onChange(property, parseFloat(value), index);
+            }}
+          />
+        )
       );
     }
 
