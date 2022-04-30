@@ -30,6 +30,7 @@ interface Props {
   clearButton?: any;
   onClearButtonClick?: any;
   inputLabel?: string;
+  filterRecords?: any;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -184,15 +185,30 @@ export function DebouncedCombobox(props: Props) {
 
           {records
             .filter((record) => !record.internal)
-            .map((record, index) => (
-              <Combobox.Option
-                className="cursor-pointer select-none relative py-2 px-3 text-gray-900 hover:bg-gray-100"
-                key={index}
-                value={record}
-              >
-                {record.label}
-              </Combobox.Option>
-            ))}
+            .map((record, index) => {
+              if (props.filterRecords) {
+                if (props.filterRecords(record, index))
+                  return (
+                    <Combobox.Option
+                      className="cursor-pointer select-none relative py-2 px-3 text-gray-900 hover:bg-gray-100"
+                      key={index}
+                      value={record}
+                    >
+                      {record.label}
+                    </Combobox.Option>
+                  );
+              } else {
+                return (
+                  <Combobox.Option
+                    className="cursor-pointer select-none relative py-2 px-3 text-gray-900 hover:bg-gray-100"
+                    key={index}
+                    value={record}
+                  >
+                    {record.label}
+                  </Combobox.Option>
+                );
+              }
+            })}
         </Combobox.Options>
       </Combobox>
     </div>
