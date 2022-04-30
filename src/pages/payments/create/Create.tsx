@@ -60,7 +60,7 @@ export function Create() {
       client_id: client_id || '',
       date: payment?.data.data.date,
       transaction_reference: '',
-      type_id: company.settings?.payment_type_id,
+      type_id: company?.settings?.payment_type_id,
       private_notes: '',
       currency_id: clients?.data.data.find(
         (client: any) => client.id == client_id
@@ -183,7 +183,7 @@ export function Create() {
                     leftSide={
                       <DebouncedCombobox
                         inputLabel={t('invoice')}
-                        endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${formik.values.client_id}`}
+                        endpoint={`/api/v1/invoices?payable=${formik.values.client_id}`}
                         label="number"
                         onChange={(value: Record<Invoice>) =>
                           handleInvoiceChange(
@@ -227,7 +227,7 @@ export function Create() {
 
               <Element leftSide={t('invoices')}>
                 <DebouncedCombobox
-                  endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${formik.values.client_id}`}
+                  endpoint={`/api/v1/invoices?payable=${formik.values.client_id}`}
                   label="number"
                   onChange={(value: Record<Invoice>) =>
                     handleInvoiceChange(
