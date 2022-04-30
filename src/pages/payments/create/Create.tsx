@@ -127,7 +127,32 @@ export function Create() {
       },
     ]);
   };
-
+  const handleInvoiceReplace = (
+    newInvoice: {
+      id: string;
+      amount: number;
+      balance: number;
+    },
+    oldInvoice_id: string
+  ) => {
+    console.log('formik', formik.values.invoices);
+    const item = formik.values.invoices.find(
+      (invoice: { _id: string; amount: string; invoice_id: string }) =>
+        invoice.invoice_id === oldInvoice_id
+    );
+    console.log(item);
+    if (item)
+      formik.setFieldValue(
+        `invoices[${formik.values.invoices.indexOf(item)}]`,
+        {
+          _id: v4(),
+          amount:
+            newInvoice.balance > 0 ? newInvoice.balance : newInvoice.amount,
+          credit_id: '',
+          invoice_id: newInvoice.id,
+        }
+      );
+  };
   const handleRemovingInvoice = (id: string) => {
     formik.setFieldValue(
       'invoices',
@@ -177,7 +202,10 @@ export function Create() {
           {formik.values.client_id && (
             <>
               {formik.values.invoices.map(
-                (record: { _id: string; amount: number }, index) => (
+                (
+                  record: { _id: string; amount: number; invoice_id: string },
+                  index
+                ) => (
                   <Element
                     key={index}
                     leftSide={
@@ -186,16 +214,31 @@ export function Create() {
                         endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${formik.values.client_id}`}
                         label="number"
                         onChange={(value: Record<Invoice>) =>
-                          handleInvoiceChange(
-                            value.resource?.id as string,
-                            value.resource?.amount as number,
-                            value.resource?.balance as number
+                          handleInvoiceReplace(
+                            {
+                              id: value.resource?.id as string,
+                              amount: value.resource?.amount as number,
+                              balance: value.resource?.balance as number,
+                            },
+                            record.invoice_id as string
                           )
                         }
-                        value="amount"
+                        filterRecords={(record: any) =>
+                          !(
+                            formik.values.invoices.filter(
+                              (lineItem: {
+                                _id: string;
+                                amount: string;
+                                credit_id: string;
+                                invoice_id: string;
+                              }) => lineItem.invoice_id === record.value
+                            ).length > 0
+                          )
+                        }
+                        value="id"
                         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                         // @ts-ignore
-                        defaultValue={formik.values.invoices[index].amount}
+                        defaultValue={formik.values.invoices[index].invoice_id}
                       />
                     }
                   >
@@ -224,7 +267,7 @@ export function Create() {
                   </Element>
                 )
               )}
-
+              {console.log(formik.values.invoices)}
               <Element leftSide={t('invoices')}>
                 <DebouncedCombobox
                   endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${formik.values.client_id}`}
