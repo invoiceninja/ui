@@ -60,7 +60,7 @@ export function Create() {
       client_id: client_id || '',
       date: payment?.data.data.date,
       transaction_reference: '',
-      type_id: company.settings?.payment_type_id,
+      type_id: company?.settings?.payment_type_id,
       private_notes: '',
       currency_id: clients?.data.data.find(
         (client: any) => client.id == client_id
@@ -234,6 +234,18 @@ export function Create() {
                       value.resource?.id as string,
                       value.resource?.amount as number,
                       value.resource?.balance as number
+                    )
+                  }
+                  filterRecords={(record: any) =>
+                    !(
+                      formik.values.invoices.filter(
+                        (lineItem: {
+                          _id: string;
+                          amount: string;
+                          credit_id: string;
+                          invoice_id: string;
+                        }) => lineItem.invoice_id === record.value
+                      ).length > 0
                     )
                   }
                 />
