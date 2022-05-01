@@ -127,20 +127,19 @@ export function Create() {
       },
     ]);
   };
+
   const handleInvoiceReplace = (
     newInvoice: {
       id: string;
       amount: number;
       balance: number;
     },
-    oldInvoice_id: string
+    oldInvoiceId: string
   ) => {
-    console.log('formik', formik.values.invoices);
     const item = formik.values.invoices.find(
       (invoice: { _id: string; amount: string; invoice_id: string }) =>
-        invoice.invoice_id === oldInvoice_id
+        invoice.invoice_id === oldInvoiceId
     );
-    console.log(item);
     if (item)
       formik.setFieldValue(
         `invoices[${formik.values.invoices.indexOf(item)}]`,
@@ -153,6 +152,7 @@ export function Create() {
         }
       );
   };
+
   const handleRemovingInvoice = (id: string) => {
     formik.setFieldValue(
       'invoices',
@@ -226,12 +226,8 @@ export function Create() {
                         filterRecords={(record: any) =>
                           !(
                             formik.values.invoices.filter(
-                              (lineItem: {
-                                _id: string;
-                                amount: string;
-                                credit_id: string;
-                                invoice_id: string;
-                              }) => lineItem.invoice_id === record.value
+                              (lineItem: { invoice_id: string }) =>
+                                lineItem.invoice_id === record.value
                             ).length > 0
                           )
                         }
@@ -267,7 +263,6 @@ export function Create() {
                   </Element>
                 )
               )}
-              {console.log(formik.values.invoices)}
               <Element leftSide={t('invoices')}>
                 <DebouncedCombobox
                   endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${formik.values.client_id}`}
@@ -282,12 +277,8 @@ export function Create() {
                   filterRecords={(record: any) =>
                     !(
                       formik.values.invoices.filter(
-                        (lineItem: {
-                          _id: string;
-                          amount: string;
-                          credit_id: string;
-                          invoice_id: string;
-                        }) => lineItem.invoice_id === record.value
+                        (lineItem: { invoice_id: string }) =>
+                          lineItem.invoice_id === record.value
                       ).length > 0
                     )
                   }
