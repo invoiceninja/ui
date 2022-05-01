@@ -50,7 +50,7 @@ export function DebouncedCombobox(props: Props) {
     setDefaultValueProperty(props.defaultValue as string);
   }, [props.defaultValue]);
 
-  const request = (query: string) => {
+  const request = (query: string, staleTime = Infinity) => {
     const url = new URL(endpoint(props.endpoint));
 
     if (query) {
@@ -67,7 +67,7 @@ export function DebouncedCombobox(props: Props) {
           axios.get(url.href, {
             headers: defaultHeaders(),
           }),
-        { staleTime: Infinity }
+        { staleTime }
       )
       .then((response) => {
         const array: Record[] = [internalRecord];
@@ -132,7 +132,7 @@ export function DebouncedCombobox(props: Props) {
     window.addEventListener('invalidate.combobox.queries', (event: any) => {
       queryClient.invalidateQueries(event.detail.url);
 
-      request('');
+      request('', 0);
     });
   }, []);
 
