@@ -60,7 +60,7 @@ export function Create() {
       client_id: client_id || '',
       date: payment?.data.data.date,
       transaction_reference: '',
-      type_id: company.settings?.payment_type_id,
+      type_id: company?.settings?.payment_type_id,
       private_notes: '',
       currency_id: clients?.data.data.find(
         (client: any) => client.id == client_id
@@ -84,7 +84,7 @@ export function Create() {
         )
         .then((data) => {
           toast.success(t('created_payment'), { id: toastId });
-          navigate(`/payments/${data.data.data.id}/edit`);
+          navigate(generatePath('/payments/:id/edit', { id: data.data.data.id }));
         })
         .catch((error: AxiosError) => {
           console.error(error);
@@ -183,7 +183,10 @@ export function Create() {
                     leftSide={
                       <DebouncedCombobox
                         inputLabel={t('invoice')}
-                        endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${formik.values.client_id}`}
+                        endpoint={generatePath(
+                          '/api/v1/invoices?payable=:clientId',
+                          { clientId: formik.values.client_id }
+                        )}
                         label="number"
                         onChange={(value: Record<Invoice>) =>
                           handleInvoiceChange(
@@ -227,7 +230,9 @@ export function Create() {
 
               <Element leftSide={t('invoices')}>
                 <DebouncedCombobox
-                  endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${formik.values.client_id}`}
+                  endpoint={generatePath('/api/v1/invocies?payable=:clientId', {
+                    clientId: formik.values.client_id,
+                  })}
                   label="number"
                   onChange={(value: Record<Invoice>) =>
                     handleInvoiceChange(
