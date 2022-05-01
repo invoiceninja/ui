@@ -53,7 +53,12 @@ export function DebouncedCombobox(props: Props) {
   const request = (query: string) => {
     const url = new URL(endpoint(props.endpoint));
 
-    url.searchParams.set('filter', query);
+    if (query) {
+      url.searchParams.set('filter', query);
+    }
+
+    url.searchParams.set('sort', 'created_at|desc');
+    url.searchParams.set('is_deleted', 'false');
 
     queryClient
       .fetchQuery(
@@ -122,6 +127,14 @@ export function DebouncedCombobox(props: Props) {
   useEffect(() => {
     request('');
   }, [props.endpoint]);
+
+  useEffect(() => {
+    window.addEventListener('invalidate.combobox.queries', (event: any) => {
+      queryClient.invalidateQueries(event.detail.url);
+
+      request('');
+    });
+  }, []);
 
   return (
     <div className={`w-full ${props.className}`}>

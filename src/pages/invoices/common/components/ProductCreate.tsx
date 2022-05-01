@@ -56,6 +56,14 @@ export function ProductCreate(props: Props) {
         .then(() => {
           toast.success(t('created_product'));
           props.setIsModalOpen(!props.isModalOpen);
+
+          window.dispatchEvent(
+            new CustomEvent('invalidate.combobox.queries', {
+              detail: {
+                url: endpoint('/api/v1/products'),
+              },
+            })
+          );
         })
         .catch((error: AxiosError) =>
           error.response?.status === 422
@@ -146,9 +154,7 @@ export function ProductCreate(props: Props) {
       <Button
         type="primary"
         behavior="button"
-        onClick={() => {
-          formik.submitForm();
-        }}
+        onClick={() => formik.submitForm()}
       >
         {t('save')}
       </Button>
