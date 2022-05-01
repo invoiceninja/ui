@@ -230,7 +230,7 @@ export function Create() {
 
               <Element leftSide={t('invoices')}>
                 <DebouncedCombobox
-                  endpoint={generatePath('/api/v1/invocies?payable=:clientId', {
+                  endpoint={generatePath('/api/v1/invoices?payable=:clientId', {
                     clientId: formik.values.client_id,
                   })}
                   label="number"
