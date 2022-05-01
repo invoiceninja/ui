@@ -53,6 +53,11 @@ export function InvoiceTotals() {
               setIsCreateTaxModalOpen(true);
             }}
             defaultValue={invoice?.tax_rate1}
+            clearButton={Boolean(invoice?.tax_rate1)}
+            onClearButtonClick={() => {
+              handleChange('tax_name1', '');
+              handleChange('tax_rate1', 0);
+            }}
           />
         </Element>
       )}
@@ -73,6 +78,11 @@ export function InvoiceTotals() {
             }}
             value="rate"
             defaultValue={invoice?.tax_rate2}
+            clearButton={Boolean(invoice?.tax_rate2)}
+            onClearButtonClick={() => {
+              handleChange('tax_name2', '');
+              handleChange('tax_rate2', 0);
+            }}
           />
         </Element>
       )}
@@ -93,6 +103,11 @@ export function InvoiceTotals() {
             }}
             value="rate"
             defaultValue={invoice?.tax_rate3}
+            clearButton={Boolean(invoice?.tax_rate3)}
+            onClearButtonClick={() => {
+              handleChange('tax_name3', '');
+              handleChange('tax_rate3', 0);
+            }}
           />
         </Element>
       )}
