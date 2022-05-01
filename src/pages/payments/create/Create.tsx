@@ -84,7 +84,7 @@ export function Create() {
         )
         .then((data) => {
           toast.success(t('created_payment'), { id: toastId });
-          navigate(`/payments/${data.data.data.id}/edit`);
+          navigate(generatePath('/payments/:id/edit', { id: data.data.data.id }));
         })
         .catch((error: AxiosError) => {
           console.error(error);
@@ -183,7 +183,10 @@ export function Create() {
                     leftSide={
                       <DebouncedCombobox
                         inputLabel={t('invoice')}
-                        endpoint={`/api/v1/invoices?payable=${formik.values.client_id}`}
+                        endpoint={generatePath(
+                          '/api/v1/invoices?payable=:clientId',
+                          { clientId: formik.values.client_id }
+                        )}
                         label="number"
                         onChange={(value: Record<Invoice>) =>
                           handleInvoiceChange(
@@ -227,7 +230,9 @@ export function Create() {
 
               <Element leftSide={t('invoices')}>
                 <DebouncedCombobox
-                  endpoint={`/api/v1/invoices?payable=${formik.values.client_id}`}
+                  endpoint={generatePath('/api/v1/invocies?payable=:clientId', {
+                    clientId: formik.values.client_id,
+                  })}
                   label="number"
                   onChange={(value: Record<Invoice>) =>
                     handleInvoiceChange(
