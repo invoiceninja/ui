@@ -17,7 +17,6 @@ import { ClientContact } from 'common/interfaces/client-contact';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { Modal } from 'components/Modal';
-import { ValidationAlert } from 'components/ValidationAlert';
 import { set } from 'lodash';
 import { AdditionalInfo } from 'pages/clients/edit/components/AdditionalInfo';
 import { Address } from 'pages/clients/edit/components/Address';
@@ -113,8 +112,6 @@ export function ClientCreate() {
         size="large"
         backgroundColor="gray"
       >
-        {errors && <ValidationAlert errors={errors} />}
-
         <div className="flex flex-col xl:flex-row xl:gap-4">
           <div className="w-full xl:w-1/2">
             <Details client={client} setClient={setClient} errors={errors} />
