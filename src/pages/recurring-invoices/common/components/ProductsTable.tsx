@@ -24,6 +24,7 @@ import { useResolveInputField } from '../hooks/useResolveInputField';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
 import { deleteRecurringInvoiceItem } from 'common/stores/slices/recurring-invoices/extra-reducers/delete-recurring-invoice-item';
+import { setCurrentLineItemProperty } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-line-item-property';
 
 export function ProductsTable() {
   const [t] = useTranslation();
@@ -36,10 +37,12 @@ export function ProductsTable() {
 
   const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
+  const [currentLineItemIndex, setCurrentLineItemIndex] = useState(0);
 
   const resolveInputField = useResolveInputField({
     setIsTaxModalOpen,
     setIsProductModalOpen,
+    setCurrentLineItemIndex,
   });
 
   const onDragEnd = useHandleSortingRows();
@@ -128,6 +131,15 @@ export function ProductsTable() {
       <ProductCreate
         setIsModalOpen={setIsProductModalOpen}
         isModalOpen={isProductModalOpen}
+        onProductCreated={(product) =>
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'product_key',
+              value: product.product_key,
+            })
+          )
+        }
       />
     </div>
   );
