@@ -125,6 +125,15 @@ export function useResolveInputField(props: Props) {
           onActionClick={() => setIsTaxModalOpen(true)}
           actionLabel={t('create_tax_rate')}
           defaultValue={invoice?.line_items[index][property]}
+          clearButton={Boolean(invoice?.line_items[index][property])}
+          onClearButtonClick={() => {
+            onChange(property, 0, index);
+            onChange(
+              property.replace('rate', 'name') as keyof InvoiceItem,
+              '',
+              index
+            );
+          }}
         />
       );
     }
