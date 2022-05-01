@@ -29,6 +29,7 @@ import { Invoice } from 'common/interfaces/invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { ValidationAlert } from 'components/ValidationAlert';
 import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoiceProperty';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 
 export function Create() {
   const { documentTitle } = useTitle('new_invoice');
@@ -40,8 +41,9 @@ export function Create() {
   const currentInvoice = useCurrentInvoice();
   const [hasClientSet, setHasClientSet] = useState(false);
   const [searchParams] = useSearchParams();
-  const handleChange = useSetCurrentInvoiceProperty();
 
+  const handleChange = useSetCurrentInvoiceProperty();
+  const company = useCurrentCompany();
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
     {
@@ -53,6 +55,18 @@ export function Create() {
   useEffect(() => {
     if (invoice?.data.data) {
       dispatch(setCurrentInvoice(invoice.data.data));
+      if (company && company.enabled_tax_rates > 0) {
+        handleChange('tax_name1', company.settings?.tax_name1);
+        handleChange('tax_rate1', company.settings?.tax_rate1);
+      }
+      if (company && company.enabled_tax_rates > 1) {
+        handleChange('tax_name2', company.settings?.tax_name2);
+        handleChange('tax_rate2', company.settings?.tax_rate2);
+      }
+      if (company && company.enabled_tax_rates > 2) {
+        handleChange('tax_name3', company.settings?.tax_name3);
+        handleChange('tax_rate3', company.settings?.tax_rate3);
+      }
     }
   }, [invoice]);
 

@@ -28,6 +28,7 @@ import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { useCurrentRecurringInvoice } from '../common/hooks/useCurrentRecurringInvoice';
+import { useSetCurrentRecurringInvoiceProperty } from '../common/hooks/useSetCurrentRecurringInvoiceProperty';
 import { useHandleCreate } from '../create/hooks/useHandleCreate';
 
 export function Create() {
@@ -37,6 +38,7 @@ export function Create() {
   const [t] = useTranslation();
   const [errors, setErrors] = useState<ValidationBag>();
 
+  const handleChange = useSetCurrentRecurringInvoiceProperty();
   const dispatch = useDispatch();
   const handleCreate = useHandleCreate(setErrors);
   const currentRecurringInvoice = useCurrentRecurringInvoice();
@@ -52,6 +54,18 @@ export function Create() {
   useEffect(() => {
     if (recurringInvoice?.data.data) {
       dispatch(setCurrentRecurringInvoice(recurringInvoice.data.data));
+      if (company && company.enabled_tax_rates > 0) {
+        handleChange('tax_name1', company.settings?.tax_name1);
+        handleChange('tax_rate1', company.settings?.tax_rate1);
+      }
+      if (company && company.enabled_tax_rates > 1) {
+        handleChange('tax_name2', company.settings?.tax_name2);
+        handleChange('tax_rate2', company.settings?.tax_rate2);
+      }
+      if (company && company.enabled_tax_rates > 2) {
+        handleChange('tax_name3', company.settings?.tax_name3);
+        handleChange('tax_rate3', company.settings?.tax_rate3);
+      }
     }
   }, [recurringInvoice]);
 
@@ -68,7 +82,7 @@ export function Create() {
 
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector />
-        <InvoiceDetails autoBill={company.settings.auto_bill} />
+        <InvoiceDetails autoBill={company?.settings?.auto_bill} />
 
         <div className="col-span-12">
           <ProductsTable />

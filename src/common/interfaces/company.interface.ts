@@ -31,6 +31,9 @@ export interface Company {
     tax_name1: string;
     tax_name2: string;
     tax_name3: string;
+    tax_rate1: number;
+    tax_rate2: number;
+    tax_rate3: number;
     currency_id: string;
     invoice_design_id: string;
     email_template_custom1: string;
