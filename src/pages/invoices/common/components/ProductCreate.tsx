@@ -22,10 +22,12 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { CustomField } from 'components/CustomField';
 import { CreateProductDto } from 'pages/products/common/components/CreateProduct';
+import { Product } from 'common/interfaces/product';
 
 interface Props {
   isModalOpen: boolean;
   setIsModalOpen?: any;
+  onProductCreated?: (product: Product) => unknown;
 }
 
 export function ProductCreate(props: Props) {
@@ -53,7 +55,7 @@ export function ProductCreate(props: Props) {
         .post(endpoint('/api/v1/products'), values, {
           headers: defaultHeaders(),
         })
-        .then(() => {
+        .then((response) => {
           toast.success(t('created_product'));
           props.setIsModalOpen(!props.isModalOpen);
 
@@ -64,6 +66,8 @@ export function ProductCreate(props: Props) {
               },
             })
           );
+
+          props.onProductCreated && props.onProductCreated(response.data.data);
         })
         .catch((error: AxiosError) =>
           error.response?.status === 422
