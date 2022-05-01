@@ -21,6 +21,7 @@ import { CustomField } from 'components/CustomField';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
+import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
@@ -43,6 +44,12 @@ export function Edit() {
       notes: product?.data.data.notes || '',
       cost: product?.data.data.cost || 0,
       quantity: product?.data.data.quantity || 1,
+      tax_name1: product?.data.data.tax_name1 || '',
+      tax_rate1: product?.data.data.tax_rate1 || 0,
+      tax_name2: product?.data.data.tax_name2 || '',
+      tax_rate2: product?.data.data.tax_rate2 || 0,
+      tax_name3: product?.data.data.tax_name3 || '',
+      tax_rate3: product?.data.data.tax_rate3 || 0,
     },
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
@@ -113,7 +120,6 @@ export function Edit() {
               errorMessage={errors?.errors.product_key}
             />
           </Element>
-
           <Element leftSide={t('description')}>
             <InputField
               id="notes"
@@ -142,6 +148,59 @@ export function Edit() {
               errorMessage={errors?.errors.quantity}
             />
           </Element>
+          {company && company.enabled_item_tax_rates > 0 && (
+            <Element leftSide={t('tax')}>
+              <DebouncedCombobox
+                endpoint="/api/v1/tax_rates"
+                label={t('tax')}
+                formatLabel={(resource) =>
+                  `${resource.name} (${resource.rate}%)`
+                }
+                onChange={(value) => {
+                  formik.setFieldValue('tax_rate1', value.resource.rate);
+                  formik.setFieldValue('tax_name1', value.resource.name);
+                }}
+                value="rate"
+                defaultValue={formik.values.tax_rate1}
+              />
+            </Element>
+          )}
+
+          {company && company.enabled_item_tax_rates > 1 && (
+            <Element leftSide={t('tax')}>
+              <DebouncedCombobox
+                endpoint="/api/v1/tax_rates"
+                label={t('tax')}
+                formatLabel={(resource) =>
+                  `${resource.name} (${resource.rate}%)`
+                }
+                onChange={(value) => {
+                  formik.setFieldValue('tax_rate2', value.resource.rate);
+                  formik.setFieldValue('tax_name2', value.resource.name);
+                }}
+                value="rate"
+                defaultValue={formik.values.tax_rate2}
+              />
+            </Element>
+          )}
+          {console.log(company)}
+          {company && company.enabled_item_tax_rates > 2 && (
+            <Element leftSide={t('tax')}>
+              <DebouncedCombobox
+                endpoint="/api/v1/tax_rates"
+                label={t('tax')}
+                formatLabel={(resource) =>
+                  `${resource.name} (${resource.rate}%)`
+                }
+                onChange={(value) => {
+                  formik.setFieldValue('tax_rate3', value.resource.rate);
+                  formik.setFieldValue('tax_name3', value.resource.name);
+                }}
+                value="rate"
+                defaultValue={formik.values.tax_rate3}
+              />
+            </Element>
+          )}
           {company?.custom_fields?.product1 && (
             <CustomField
               field="custom_value1"
