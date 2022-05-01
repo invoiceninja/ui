@@ -40,7 +40,11 @@ export function ClientSelector(props: Props) {
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex items-center justify-between">
         <InputLabel>{t('client')}</InputLabel>
-        {!props.readonly && !invoice?.client_id && <ClientCreate />}
+        {!props.readonly && !invoice?.client_id && (
+          <ClientCreate
+            onClientCreated={(client) => onChange('client_id', client.id)}
+          />
+        )}
       </div>
 
       <DebouncedCombobox

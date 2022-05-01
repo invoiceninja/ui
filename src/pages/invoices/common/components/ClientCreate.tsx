@@ -27,7 +27,11 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 
-export function ClientCreate() {
+interface Props {
+  onClientCreated?: (client: Client) => unknown;
+}
+
+export function ClientCreate(props: Props) {
   const [t] = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [client, setClient] = useState<Client | undefined>();
@@ -85,9 +89,19 @@ export function ClientCreate() {
       .post(endpoint('/api/v1/clients'), client, {
         headers: defaultHeaders(),
       })
-      .then(() => {
+      .then((response) => {
         toast.success(t('created_client'), { id: toastId });
         setIsModalOpen(false);
+
+        props.onClientCreated && props.onClientCreated(response.data.data);
+
+        window.dispatchEvent(
+          new CustomEvent('invalidate.combobox.queries', {
+            detail: {
+              url: endpoint('/api/v1/clients'),
+            },
+          })
+        );
       })
       .catch((error: AxiosError) => {
         console.error(error);
