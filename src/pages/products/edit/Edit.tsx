@@ -162,6 +162,11 @@ export function Edit() {
                 }}
                 value="rate"
                 defaultValue={formik.values.tax_rate1}
+                clearButton={Boolean(formik.values.tax_rate1)}
+                onClearButtonClick={() => {
+                  formik.setFieldValue('tax_rate1', 0);
+                  formik.setFieldValue('tax_name1', '');
+                }}
               />
             </Element>
           )}
@@ -180,6 +185,11 @@ export function Edit() {
                 }}
                 value="rate"
                 defaultValue={formik.values.tax_rate2}
+                clearButton={Boolean(formik.values.tax_rate2)}
+                onClearButtonClick={() => {
+                  formik.setFieldValue('tax_rate2', 0);
+                  formik.setFieldValue('tax_name2', '');
+                }}
               />
             </Element>
           )}
@@ -198,6 +208,11 @@ export function Edit() {
                 }}
                 value="rate"
                 defaultValue={formik.values.tax_rate3}
+                clearButton={Boolean(formik.values.tax_rate3)}
+                onClearButtonClick={() => {
+                  formik.setFieldValue('tax_rate3', 0);
+                  formik.setFieldValue('tax_name3', '');
+                }}
               />
             </Element>
           )}
