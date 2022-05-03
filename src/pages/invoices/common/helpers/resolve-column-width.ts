@@ -13,8 +13,6 @@ import { resolveProperty } from './resolve-property';
 export function resolveColumnWidth(column: string) {
   const property = resolveProperty(column);
 
-  console.log(property);
-
   const mappings: Record<string, string> = {
     product_key: '15%',
     notes: '30%',
