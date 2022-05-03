@@ -38,11 +38,14 @@ export function Create() {
   const [t] = useTranslation();
   const [errors, setErrors] = useState<ValidationBag>();
 
-  const handleChange = useSetCurrentRecurringInvoiceProperty();
   const dispatch = useDispatch();
+
+  const handleChange = useSetCurrentRecurringInvoiceProperty();
   const handleCreate = useHandleCreate(setErrors);
+
   const currentRecurringInvoice = useCurrentRecurringInvoice();
   const company = useCurrentCompany();
+
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
@@ -54,6 +57,7 @@ export function Create() {
   useEffect(() => {
     if (recurringInvoice?.data.data) {
       dispatch(setCurrentRecurringInvoice(recurringInvoice.data.data));
+
       if (company && company.enabled_tax_rates > 0) {
         handleChange('tax_name1', company.settings?.tax_name1);
         handleChange('tax_rate1', company.settings?.tax_rate1);
