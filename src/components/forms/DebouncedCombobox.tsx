@@ -150,29 +150,35 @@ export function DebouncedCombobox(props: Props) {
         }
       >
         <div className="relative mt-1">
-          <div className="relative w-full">
+          <div className="relative w-full cursor-default overflow-hidden rounded border border-gray-300 bg-white text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 sm:text-sm">
             <Combobox.Input
               placeholder={props.placeholder || ''}
-              className="w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 border border-gray-300"
+              className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
               onChange={(event) => debouncedSearch(event.target.value)}
               displayValue={(record: Record) => record.label}
               onClick={() => openDropdownButton.current?.click()}
               onFocus={props.onInputFocus}
             />
+
             {props.clearButton && !props.disabled && (
-              <X
-                className="absolute inset-y-0 mt-2 right-0 flex items-center pr-2 w-8 h-5 text-gray-400 hover:cursor-pointer"
-                onClick={() => props.onClearButtonClick()}
-              />
+              <div className="absolute inset-y-0 right-0 mt-2.5 mr-0.5 cursor-pointer">
+                <X
+                  className="absolute inset-y-0 right-0 text-gray-400 h-4"
+                  onClick={() => props.onClearButtonClick()}
+                />
+              </div>
             )}
 
             {!props.clearButton && (
-              <ChevronDown
-                className="absolute inset-y-0 mt-2 right-0 flex items-center pr-2 w-8 h-5 text-gray-400"
-                aria-hidden="true"
-                onClick={() => openDropdownButton.current?.click()}
-              />
+              <div className="absolute inset-y-0 right-0 mt-2.5 mr-0.5 cursor-pointer">
+                <ChevronDown
+                  className="absolute inset-y-0 right-0 text-gray-400 h-4"
+                  aria-hidden="true"
+                  onClick={() => openDropdownButton.current?.click()}
+                />
+              </div>
             )}
+
             <Combobox.Button
               className="hidden"
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
