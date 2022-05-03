@@ -31,12 +31,18 @@ interface Props {
   setIsTaxModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsProductModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setCurrentLineItemIndex: React.Dispatch<React.SetStateAction<number>>;
+  setCurrentTaxRate: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export function useResolveInputField(props: Props) {
   const [t] = useTranslation();
-  const { setIsTaxModalOpen, setIsProductModalOpen, setCurrentLineItemIndex } =
-    props;
+
+  const {
+    setIsTaxModalOpen,
+    setIsProductModalOpen,
+    setCurrentLineItemIndex,
+    setCurrentTaxRate,
+  } = props;
 
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
@@ -125,6 +131,10 @@ export function useResolveInputField(props: Props) {
           onActionClick={() => setIsTaxModalOpen(true)}
           actionLabel={t('create_tax_rate')}
           defaultValue={invoice?.line_items[index][property]}
+          onInputFocus={() => {
+            setCurrentLineItemIndex(index);
+            setCurrentTaxRate(property);
+          }}
         />
       );
     }
