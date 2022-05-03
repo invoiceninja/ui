@@ -144,7 +144,7 @@ export function useResolveInputField(props: Props) {
               index);
           }}
           clearButton={Boolean(invoice?.line_items[index][property])}
-          disabled={Boolean(invoice?.line_items[index][property] as number > 0)}
+          disabled={Boolean(invoice?.line_items[index][property].value as number > 1)}
         />
       );
     }
