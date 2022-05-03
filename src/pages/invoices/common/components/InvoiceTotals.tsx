@@ -105,6 +105,7 @@ export function InvoiceTotals() {
           />
         </Element>
       )}
+      
       <TaxCreate
         isVisible={isCreateTaxModalOpen}
         onClose={setIsCreateTaxModalOpen}

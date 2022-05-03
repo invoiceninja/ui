@@ -11,6 +11,7 @@
 import { Button, InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { TaxRate } from 'common/interfaces/tax-rate';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { Modal } from 'components/Modal';
@@ -18,15 +19,17 @@ import { useFormik } from 'formik';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
+
 interface Props {
   isVisible: boolean;
   onClose: any;
+  onTaxCreated?: (taxRate: TaxRate) => unknown;
 }
+
 export function TaxCreate(props: Props) {
   const [errors, setErrors] = useState<ValidationBag>();
   const [t] = useTranslation();
-  const queryClient = useQueryClient();
+
   const formik = useFormik({
     initialValues: {
       name: '',
@@ -39,11 +42,19 @@ export function TaxCreate(props: Props) {
         .post(endpoint('/api/v1/tax_rates'), values, {
           headers: defaultHeaders(),
         })
-        .then(() => {
+        .then((response) => {
           toast.success(t('created_tax_rate'));
           props.onClose(false);
 
-          queryClient.invalidateQueries('/api/v1/tax_rates');
+          window.dispatchEvent(
+            new CustomEvent('invalidate.combobox.queries', {
+              detail: {
+                url: endpoint('/api/v1/tax_rates'),
+              },
+            })
+          );
+
+          props.onTaxCreated && props.onTaxCreated(response.data.data);
         })
         .catch((error: AxiosError) => {
           console.error(error);
