@@ -38,11 +38,13 @@ export function ProductsTable() {
   const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
   const [currentLineItemIndex, setCurrentLineItemIndex] = useState(0);
+  const [currentTaxRate, setCurrentTaxRate] = useState('tax_rate1');
 
   const resolveInputField = useResolveInputField({
     setIsTaxModalOpen,
     setIsProductModalOpen,
     setCurrentLineItemIndex,
+    setCurrentTaxRate,
   });
 
   const onDragEnd = useHandleSortingRows();
@@ -126,7 +128,27 @@ export function ProductsTable() {
         </DragDropContext>
       </Table>
 
-      <TaxCreate isVisible={isTaxModalOpen} onClose={setIsTaxModalOpen} />
+      <TaxCreate
+        isVisible={isTaxModalOpen}
+        onClose={setIsTaxModalOpen}
+        onTaxCreated={(taxRate) => {
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: currentTaxRate,
+              value: taxRate.rate,
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: currentTaxRate.replace('rate', 'name'),
+              value: taxRate.name,
+            })
+          );
+        }}
+      />
 
       <ProductCreate
         setIsModalOpen={setIsProductModalOpen}
