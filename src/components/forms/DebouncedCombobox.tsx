@@ -30,6 +30,7 @@ interface Props {
   clearButton?: any;
   onClearButtonClick?: any;
   inputLabel?: string;
+  onInputFocus?: () => unknown;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -142,11 +143,11 @@ export function DebouncedCombobox(props: Props) {
         <InputLabel className="mb-2">{props.inputLabel}</InputLabel>
       )}
       <Combobox
+        disabled={props.disabled}
         value={selectedOption?.record}
         onChange={(record) =>
           setSelectedOption({ record, withoutEvents: false })
         }
-        disabled={props.disabled}
       >
         <div className="relative mt-1">
           <div className="relative w-full">
@@ -156,6 +157,7 @@ export function DebouncedCombobox(props: Props) {
               onChange={(event) => debouncedSearch(event.target.value)}
               displayValue={(record: Record) => record.label}
               onClick={() => openDropdownButton.current?.click()}
+              onFocus={props.onInputFocus}
             />
             {props.clearButton && !props.disabled && (
               <X
