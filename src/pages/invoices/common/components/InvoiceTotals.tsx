@@ -11,6 +11,7 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
+import { Invoice } from 'common/interfaces/invoice';
 import { TaxRate } from 'common/interfaces/tax-rate';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import { Fragment, useState } from 'react';
@@ -22,14 +23,16 @@ import { TaxCreate } from './TaxCreate';
 
 export function InvoiceTotals() {
   const variables = useTotalVariables();
-  const resolveVariable = useResolveTotalVariable();
   const company = useCurrentCompany();
+  const invoice = useCurrentInvoice();
+
+  const resolveVariable = useResolveTotalVariable();
   const handleChange = useSetCurrentInvoiceProperty();
+
+  const [currentTaxRateInput, setCurrentTaxRateInput] = useState(1);
   const [isCreateTaxModalOpen, setIsCreateTaxModalOpen] =
     useState<boolean>(false);
   const [t] = useTranslation();
-
-  const invoice = useCurrentInvoice();
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
@@ -56,6 +59,7 @@ export function InvoiceTotals() {
               handleChange('tax_name1', '');
               handleChange('tax_rate1', 0);
             }}
+            onInputFocus={() => setCurrentTaxRateInput(1)}
           />
         </Element>
       )}
@@ -79,6 +83,7 @@ export function InvoiceTotals() {
               handleChange('tax_name2', '');
               handleChange('tax_rate2', 0);
             }}
+            onInputFocus={() => setCurrentTaxRateInput(2)}
           />
         </Element>
       )}
@@ -102,13 +107,25 @@ export function InvoiceTotals() {
               handleChange('tax_name3', '');
               handleChange('tax_rate3', 0);
             }}
+            onInputFocus={() => setCurrentTaxRateInput(3)}
           />
         </Element>
       )}
-      
+
       <TaxCreate
         isVisible={isCreateTaxModalOpen}
         onClose={setIsCreateTaxModalOpen}
+        onTaxCreated={(taxRate) => {
+          handleChange(
+            `tax_name${currentTaxRateInput}` as keyof Invoice,
+            taxRate.name
+          );
+
+          handleChange(
+            `tax_rate${currentTaxRateInput}` as keyof Invoice,
+            taxRate.rate
+          );
+        }}
       />
     </Card>
   );
