@@ -12,13 +12,15 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   colSpan?: number;
+  width?: string;
 }
 
 export function Td(props: Props) {
   return (
     <td
+      width={props.width}
       colSpan={props.colSpan}
-      className={`px-6 py-2.5 whitespace-nowrap text-sm text-gray-900 ${props.className}`}
+      className={`px-2 lg:px-2.5 xl:px-4 py-2 whitespace-nowrap text-sm text-gray-900 ${props.className}`}
     >
       {props.children}
     </td>
