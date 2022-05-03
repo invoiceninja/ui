@@ -24,6 +24,7 @@ import { ProductCreate } from './ProductCreate';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
 import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
+import { resolveColumnWidth } from '../helpers/resolve-column-width';
 
 export function ProductsTable() {
   const [t] = useTranslation();
@@ -75,7 +76,10 @@ export function ProductsTable() {
                           key={lineItemIndex}
                         >
                           {columns.map((column, columnIndex) => (
-                            <Td key={columnIndex}>
+                            <Td
+                              width={resolveColumnWidth(column)}
+                              key={columnIndex}
+                            >
                               {resolveInputField(column, lineItemIndex)}
                             </Td>
                           ))}
