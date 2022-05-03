@@ -25,6 +25,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
 import { deleteRecurringInvoiceItem } from 'common/stores/slices/recurring-invoices/extra-reducers/delete-recurring-invoice-item';
 import { setCurrentLineItemProperty } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-line-item-property';
+import { resolveColumnWidth } from 'pages/invoices/common/helpers/resolve-column-width';
 
 export function ProductsTable() {
   const [t] = useTranslation();
@@ -77,7 +78,10 @@ export function ProductsTable() {
                           key={lineItemIndex}
                         >
                           {columns.map((column, columnIndex) => (
-                            <Td key={columnIndex}>
+                            <Td
+                              width={resolveColumnWidth(column)}
+                              key={columnIndex}
+                            >
                               {resolveInputField(column, lineItemIndex)}
                             </Td>
                           ))}

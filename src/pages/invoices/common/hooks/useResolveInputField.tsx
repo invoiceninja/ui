@@ -67,7 +67,7 @@ export function useResolveInputField(props: Props) {
             endpoint="/api/v1/products"
             label="product_key"
             onChange={(value) => handleProductChange(index, value)}
-            className="w-36"
+            className="w-auto"
             onActionClick={() => {
               setIsProductModalOpen(true);
               setCurrentLineItemIndex(index);
@@ -91,6 +91,7 @@ export function useResolveInputField(props: Props) {
         />
       );
     }
+
     if (numberInputs.includes(property)) {
       return (
         inputCurrencySeparators && (
@@ -101,7 +102,7 @@ export function useResolveInputField(props: Props) {
             id={property}
             currency={inputCurrencySeparators}
             initialValue={invoice?.line_items[index][property] as string}
-            className="w-24"
+            className="auto"
             onChange={(value: string) => {
               onChange(property, parseFloat(value), index);
             }}
@@ -126,7 +127,7 @@ export function useResolveInputField(props: Props) {
                 index
               );
           }}
-          className="w-36"
+          className="w-auto"
           formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
           onActionClick={() => setIsTaxModalOpen(true)}
           actionLabel={t('create_tax_rate')}

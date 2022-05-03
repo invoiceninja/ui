@@ -20,13 +20,13 @@ import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvo
 import { useFormatMoney } from './useFormatMoney';
 import { useHandleProductChange } from './useHandleProductChange';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
-
 import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
 import { useGetCurrencySeparators } from 'common/hooks/useGetCurrencySeparators';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 
 const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
+
 interface Props {
   setIsTaxModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsProductModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -65,7 +65,7 @@ export function useResolveInputField(props: Props) {
           endpoint="/api/v1/products"
           label="product_key"
           onChange={(value) => handleProductChange(index, value)}
-          className="w-36"
+          className="w-auto"
           onActionClick={() => {
             setIsProductModalOpen(true);
             setCurrentLineItemIndex(index);
@@ -99,7 +99,7 @@ export function useResolveInputField(props: Props) {
             }
             currency={inputCurrencySeparators}
             initialValue={invoice?.line_items[index][property] as string}
-            className="w-24"
+            className="w-auto"
             onChange={(value: string) => {
               onChange(property, parseFloat(value), index);
             }}
@@ -124,7 +124,7 @@ export function useResolveInputField(props: Props) {
                 index
               );
           }}
-          className="w-36"
+          className="w-auto"
           formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
           onActionClick={() => setIsTaxModalOpen(true)}
           actionLabel={t('create_tax_rate')}
@@ -145,6 +145,7 @@ export function useResolveInputField(props: Props) {
         />
       );
     }
+    
     if (['line_total'].includes(property)) {
       return formatMoney(invoice?.line_items[index][property] as number);
     }
