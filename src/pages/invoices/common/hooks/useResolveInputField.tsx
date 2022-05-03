@@ -127,7 +127,7 @@ export function useResolveInputField(props: Props) {
               );
           }}
           className="w-36"
-          formatLabel={(resource) => `${resource.name}(${resource.rate}%)`}
+          formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
           onActionClick={() => setIsTaxModalOpen(true)}
           actionLabel={t('create_tax_rate')}
           defaultValue={invoice?.line_items[index][property]}
@@ -135,6 +135,16 @@ export function useResolveInputField(props: Props) {
             setCurrentLineItemIndex(index);
             setCurrentTaxRate(property);
           }}
+          onClearButtonClick={() =>{
+            onChange(property, '', index);
+
+            onChange(
+              property.replace('rate','name') as keyof InvoiceItem,
+              '',
+              index);
+          }}
+          clearButton={Boolean(invoice?.line_items[index][property])}
+          disabled={Boolean(invoice?.line_items[index][property].value)}
         />
       );
     }
