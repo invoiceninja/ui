@@ -13,18 +13,20 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { TaxRate } from 'common/interfaces/tax-rate';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
 import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 import { useTotalVariables } from '../hooks/useTotalVariables';
+import { TaxCreate } from './TaxCreate';
 
 export function InvoiceTotals() {
   const variables = useTotalVariables();
   const resolveVariable = useResolveTotalVariable();
   const company = useCurrentCompany();
   const handleChange = useSetCurrentInvoiceProperty();
-
+  const [isCreateTaxModalOpen, setIsCreateTaxModalOpen] =
+    useState<boolean>(false);
   const [t] = useTranslation();
 
   const invoice = useCurrentInvoice();
@@ -46,7 +48,14 @@ export function InvoiceTotals() {
               handleChange('tax_rate1', value.resource?.rate);
             }}
             value="rate"
+            actionLabel={t('create_tax_rate')}
+            onActionClick={() => setIsCreateTaxModalOpen(true)}
             defaultValue={invoice?.tax_rate1}
+            clearButton={Boolean(invoice?.tax_rate1)}
+            onClearButtonClick={() => {
+              handleChange('tax_name1', '');
+              handleChange('tax_rate1', 0);
+            }}
           />
         </Element>
       )}
@@ -61,8 +70,15 @@ export function InvoiceTotals() {
               handleChange('tax_name2', value.resource?.name);
               handleChange('tax_rate2', value.resource?.rate);
             }}
+            actionLabel={t('create_tax_rate')}
+            onActionClick={() => setIsCreateTaxModalOpen(true)}
             value="rate"
             defaultValue={invoice?.tax_rate2}
+            clearButton={Boolean(invoice?.tax_rate2)}
+            onClearButtonClick={() => {
+              handleChange('tax_name2', '');
+              handleChange('tax_rate2', 0);
+            }}
           />
         </Element>
       )}
@@ -77,11 +93,22 @@ export function InvoiceTotals() {
               handleChange('tax_name3', value.resource?.name);
               handleChange('tax_rate3', value.resource?.rate);
             }}
+            actionLabel={t('create_tax_rate')}
+            onActionClick={() => setIsCreateTaxModalOpen(true)}
             value="rate"
             defaultValue={invoice?.tax_rate3}
+            clearButton={Boolean(invoice?.tax_rate3)}
+            onClearButtonClick={() => {
+              handleChange('tax_name3', '');
+              handleChange('tax_rate3', 0);
+            }}
           />
         </Element>
       )}
+      <TaxCreate
+        isVisible={isCreateTaxModalOpen}
+        onClose={setIsCreateTaxModalOpen}
+      />
     </Card>
   );
 }
