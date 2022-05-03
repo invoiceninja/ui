@@ -235,6 +235,7 @@ export function Default(props: Props) {
                     </button>
                   </div>
                 </Transition.Child>
+
                 <div className="flex-shrink-0 flex items-center px-4">
                   <CompanySwitcher />
                 </div>
@@ -289,7 +290,10 @@ export function Default(props: Props) {
         </Transition.Root>
 
         {/* Static sidebar for desktop */}
-        <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r">
+        <div
+          className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r"
+          style={{ zIndex: 100 }}
+        >
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-col flex-grow border-gray-200 pt-5 bg-ninja-gray dark:bg-gray-800 dark:border-transparent overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
