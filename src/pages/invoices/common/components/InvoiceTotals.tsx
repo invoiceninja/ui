@@ -49,9 +49,7 @@ export function InvoiceTotals() {
             }}
             value="rate"
             actionLabel={t('create_tax_rate')}
-            onActionClick={() => {
-              setIsCreateTaxModalOpen(true);
-            }}
+            onActionClick={() => setIsCreateTaxModalOpen(true)}
             defaultValue={invoice?.tax_rate1}
             clearButton={Boolean(invoice?.tax_rate1)}
             onClearButtonClick={() => {
@@ -73,9 +71,7 @@ export function InvoiceTotals() {
               handleChange('tax_rate2', value.resource?.rate);
             }}
             actionLabel={t('create_tax_rate')}
-            onActionClick={() => {
-              setIsCreateTaxModalOpen(true);
-            }}
+            onActionClick={() => setIsCreateTaxModalOpen(true)}
             value="rate"
             defaultValue={invoice?.tax_rate2}
             clearButton={Boolean(invoice?.tax_rate2)}
@@ -98,9 +94,7 @@ export function InvoiceTotals() {
               handleChange('tax_rate3', value.resource?.rate);
             }}
             actionLabel={t('create_tax_rate')}
-            onActionClick={() => {
-              setIsCreateTaxModalOpen(true);
-            }}
+            onActionClick={() => setIsCreateTaxModalOpen(true)}
             value="rate"
             defaultValue={invoice?.tax_rate3}
             clearButton={Boolean(invoice?.tax_rate3)}
