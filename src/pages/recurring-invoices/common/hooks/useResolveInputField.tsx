@@ -26,6 +26,7 @@ import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-s
 
 const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
+
 interface Props {
   setIsTaxModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setIsProductModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
