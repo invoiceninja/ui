@@ -22,6 +22,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
 import { useTitle } from 'common/hooks/useTitle';
+import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 
 export interface CreateProductDto {
   product_key: string;
@@ -58,6 +59,12 @@ export function CreateProduct(props: Props) {
       custom_value2: props.product?.custom_value2 || '',
       custom_value3: props.product?.custom_value3 || '',
       custom_value4: props.product?.custom_value4 || '',
+      tax_name1: '',
+      tax_rate1: 0,
+      tax_name2: '',
+      tax_rate2: 0,
+      tax_name3: '',
+      tax_rate3: 0,
     },
     onSubmit: (values: CreateProductDto) => {
       axios
@@ -125,6 +132,66 @@ export function CreateProduct(props: Props) {
           onChange={formik.handleChange}
         />
       </Element>
+      {company && company.enabled_item_tax_rates > 0 && (
+        <Element leftSide={t('tax')}>
+          <DebouncedCombobox
+            endpoint="/api/v1/tax_rates"
+            label={t('tax')}
+            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+            onChange={(value) => {
+              formik.setFieldValue('tax_rate1', value.resource.rate);
+              formik.setFieldValue('tax_name1', value.resource.name);
+            }}
+            value="rate"
+            defaultValue={formik.values.tax_rate1}
+            clearButton={Boolean(formik.values.tax_rate1)}
+            onClearButtonClick={() => {
+              formik.setFieldValue('tax_rate1', 0);
+              formik.setFieldValue('tax_name1', '');
+            }}
+          />
+        </Element>
+      )}
+      {company && company.enabled_item_tax_rates > 1 && (
+        <Element leftSide={t('tax')}>
+          <DebouncedCombobox
+            endpoint="/api/v1/tax_rates"
+            label={t('tax')}
+            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+            onChange={(value) => {
+              formik.setFieldValue('tax_rate2', value.resource.rate);
+              formik.setFieldValue('tax_name2', value.resource.name);
+            }}
+            value="rate"
+            defaultValue={formik.values.tax_rate2}
+            clearButton={Boolean(formik.values.tax_rate2)}
+            onClearButtonClick={() => {
+              formik.setFieldValue('tax_rate2', 0);
+              formik.setFieldValue('tax_name2', '');
+            }}
+          />
+        </Element>
+      )}
+      {company && company.enabled_item_tax_rates > 2 && (
+        <Element leftSide={t('tax')}>
+          <DebouncedCombobox
+            endpoint="/api/v1/tax_rates"
+            label={t('tax')}
+            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+            onChange={(value) => {
+              formik.setFieldValue('tax_rate3', value.resource.rate);
+              formik.setFieldValue('tax_name3', value.resource.name);
+            }}
+            value="rate"
+            defaultValue={formik.values.tax_rate3}
+            clearButton={Boolean(formik.values.tax_rate3)}
+            onClearButtonClick={() => {
+              formik.setFieldValue('tax_rate3', 0);
+              formik.setFieldValue('tax_name3', '');
+            }}
+          />
+        </Element>
+      )}
       {company?.custom_fields?.product1 && (
         <CustomField
           field="custom_value1"
