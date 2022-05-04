@@ -157,7 +157,8 @@ export function ProductsTable() {
       <ProductCreate
         setIsModalOpen={setIsProductModalOpen}
         isModalOpen={isProductModalOpen}
-        onProductCreated={(product) =>
+        onProductCreated={(product) => {
+
           dispatch(
             setCurrentLineItemProperty({
               position: currentLineItemIndex,
@@ -165,6 +166,113 @@ export function ProductsTable() {
               value: product.product_key,
             })
           )
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'quantity',
+              value: product?.quantity || 1,
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'cost',
+              value: product?.cost || 0,
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'notes',
+              value: product?.notes || '',
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'tax_name1',
+              value: product?.tax_name1 || '',
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'tax_name2',
+              value: product?.tax_name2 || '',
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'tax_name3',
+              value: product?.tax_name3 || '',
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'tax_rate1',
+              value: product?.tax_rate1 || 0,
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'tax_rate2',
+              value: product?.tax_rate2 || 0,
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'tax_rate3',
+              value: product?.tax_rate3 || 0,
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'custom_value1',
+              value: product?.custom_value1 || '',
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'custom_value2',
+              value: product?.custom_value2 || '',
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'custom_value3',
+              value: product?.custom_value3 || '',
+            })
+          );
+
+          dispatch(
+            setCurrentLineItemProperty({
+              position: currentLineItemIndex,
+              property: 'custom_value4',
+              value: product?.custom_value4 || '',
+            })
+          );
+
+        }
+
         }
       />
     </div>
