@@ -15,8 +15,9 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  defaultValue?: string | number;
+  defaultValue?: string | number | boolean;
   clearButton?: boolean;
+  className?: string;
   onChange?: (value: Record<TaxRate>) => unknown;
   onClearButtonClick?: () => unknown;
   onTaxCreated?: (taxRate: TaxRate) => unknown;
@@ -44,6 +45,8 @@ export function TaxRateSelector(props: Props) {
         onClearButtonClick={props.onClearButtonClick}
         actionLabel={t('create_tax_rate')}
         onActionClick={() => setIsModalOpen(true)}
+        className={props.className}
+        onInputFocus={props.onInputFocus}
       />
 
       <TaxCreate
