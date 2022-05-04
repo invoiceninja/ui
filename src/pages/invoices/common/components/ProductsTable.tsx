@@ -34,86 +34,82 @@ export function ProductsTable() {
 
   const onDragEnd = useHandleSortingRows();
   return (
-    <div>
-      <Table>
-        <Thead>
-          {columns.map((column, index) => (
-            <Th key={index}>{resolveTranslation(column)}</Th>
-          ))}
-          <Th>{/* This is placeholder for "Remove" button. */}</Th>
-        </Thead>
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="invoice-product-table">
-            {(provided) => (
-              <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
-                {invoice?.client_id &&
-                  invoice.line_items.map((lineItem, lineItemIndex) => (
-                    <Draggable
-                      key={lineItemIndex}
-                      draggableId={lineItemIndex.toString()}
-                      index={lineItemIndex}
-                    >
-                      {(provided) => (
-                        <Tr
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          innerRef={provided.innerRef}
-                          key={lineItemIndex}
-                        >
-                          {columns.map((column, columnIndex) => (
-                            <Td
-                              width={resolveColumnWidth(column)}
-                              key={columnIndex}
-                            >
-                              {resolveInputField(column, lineItemIndex)}
-                            </Td>
-                          ))}
-
-                          <Td>
-                            {invoice &&
-                              (lineItem.product_key || lineItemIndex > 0) &&
-                              invoice.line_items.length > 0 && (
-                                <button
-                                  className="text-gray-600 hover:text-red-600"
-                                  onClick={() =>
-                                    dispatch(
-                                      deleteInvoiceLineItem(lineItemIndex)
-                                    )
-                                  }
-                                >
-                                  <Trash2 size={18} />
-                                </button>
-                              )}
-                          </Td>
-                        </Tr>
-                      )}
-                    </Draggable>
-                  ))}
-
-                {invoice?.client_id && (
-                  <Tr>
-                    <Td colSpan={100}>
-                      <button
-                        onClick={() => dispatch(injectBlankItemIntoCurrent())}
-                        className="w-full py-2 inline-flex justify-center items-center space-x-2"
+    <Table>
+      <Thead>
+        {columns.map((column, index) => (
+          <Th key={index}>{resolveTranslation(column)}</Th>
+        ))}
+        <Th>{/* This is placeholder for "Remove" button. */}</Th>
+      </Thead>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="invoice-product-table">
+          {(provided) => (
+            <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
+              {invoice?.client_id &&
+                invoice.line_items.map((lineItem, lineItemIndex) => (
+                  <Draggable
+                    key={lineItemIndex}
+                    draggableId={lineItemIndex.toString()}
+                    index={lineItemIndex}
+                  >
+                    {(provided) => (
+                      <Tr
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        innerRef={provided.innerRef}
+                        key={lineItemIndex}
                       >
-                        <Plus size={18} />
-                        <span>{t('add_item')}</span>
-                      </button>
-                    </Td>
-                  </Tr>
-                )}
+                        {columns.map((column, columnIndex) => (
+                          <Td
+                            width={resolveColumnWidth(column)}
+                            key={columnIndex}
+                          >
+                            {resolveInputField(column, lineItemIndex)}
+                          </Td>
+                        ))}
 
-                {!invoice?.client_id && (
-                  <Tr>
-                    <Td colSpan={100}>{t('no_client_selected')}.</Td>
-                  </Tr>
-                )}
-              </Tbody>
-            )}
-          </Droppable>
-        </DragDropContext>
-      </Table>
-    </div>
+                        <Td>
+                          {invoice &&
+                            (lineItem.product_key || lineItemIndex > 0) &&
+                            invoice.line_items.length > 0 && (
+                              <button
+                                className="text-gray-600 hover:text-red-600"
+                                onClick={() =>
+                                  dispatch(deleteInvoiceLineItem(lineItemIndex))
+                                }
+                              >
+                                <Trash2 size={18} />
+                              </button>
+                            )}
+                        </Td>
+                      </Tr>
+                    )}
+                  </Draggable>
+                ))}
+
+              {invoice?.client_id && (
+                <Tr>
+                  <Td colSpan={100}>
+                    <button
+                      onClick={() => dispatch(injectBlankItemIntoCurrent())}
+                      className="w-full py-2 inline-flex justify-center items-center space-x-2"
+                    >
+                      <Plus size={18} />
+                      <span>{t('add_item')}</span>
+                    </button>
+                  </Td>
+                </Tr>
+              )}
+
+              {!invoice?.client_id && (
+                <Tr>
+                  <Td colSpan={100}>{t('no_client_selected')}.</Td>
+                </Tr>
+              )}
+            </Tbody>
+          )}
+        </Droppable>
+      </DragDropContext>
+    </Table>
   );
 }
