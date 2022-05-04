@@ -18,6 +18,7 @@ interface Props {
   defaultValue?: string | number | boolean;
   clearButton?: boolean;
   className?: string;
+  inputLabel?: string;
   onChange?: (value: Record<TaxRate>) => unknown;
   onClearButtonClick?: () => unknown;
   onTaxCreated?: (taxRate: TaxRate) => unknown;
@@ -31,6 +32,7 @@ export function TaxRateSelector(props: Props) {
   return (
     <>
       <DebouncedCombobox
+        inputLabel={props.inputLabel}
         endpoint="/api/v1/tax_rates"
         label={t('tax')}
         formatLabel={(resource: TaxRate) =>
