@@ -15,7 +15,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
-  defaultValue?: string;
+  defaultValue?: string | number;
   clearButton?: boolean;
   onChange?: (value: Record<TaxRate>) => unknown;
   onClearButtonClick?: () => unknown;
