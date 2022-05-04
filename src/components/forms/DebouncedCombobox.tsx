@@ -170,7 +170,7 @@ export function DebouncedCombobox(props: Props) {
             />
 
             {props.clearButton && !props.disabled && (
-              <div className="absolute inset-y-0 right-0 mt-2.5 mr-0.5 cursor-pointer">
+              <div className="absolute inset-y-0 right-0 mt-2.5 mr-1 cursor-pointer">
                 <X
                   className="absolute inset-y-0 right-0 text-gray-400 h-4"
                   onClick={() => props.onClearButtonClick()}
@@ -179,7 +179,7 @@ export function DebouncedCombobox(props: Props) {
             )}
 
             {!props.clearButton && (
-              <div className="absolute inset-y-0 right-0 mt-2.5 mr-0.5 cursor-pointer">
+              <div className="absolute inset-y-0 right-0 mt-2.5 mr-1 cursor-pointer">
                 <ChevronDown
                   className="absolute inset-y-0 right-0 text-gray-400 h-4"
                   aria-hidden="true"
