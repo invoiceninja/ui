@@ -8,7 +8,7 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 export class InvoiceSum {
   protected taxMap = collect();
-  public invoiceItems = new InvoiceItemSum(this.invoice);
+  public invoiceItems = new InvoiceItemSum(this.invoice, this.currency);
   protected totalTaxMap: Record<string, unknown>[] = [];
 
   public totalDiscount = 0;
@@ -55,7 +55,7 @@ export class InvoiceSum {
   protected calculateInvoiceTaxes() {
     if (this.invoice.tax_name1.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate1);
-
+      console.log(tax);
       tax += this.getSurchargeTaxTotalForKey(
         this.invoice.tax_name1,
         this.invoice.tax_rate1
@@ -65,14 +65,14 @@ export class InvoiceSum {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name1} ${parseFloat(
-          this.invoice.tax_rate1.toFixed(2)
+          this.invoice.tax_rate1.toFixed(this.currency.precision)
         )} %`,
       });
     }
 
     if (this.invoice.tax_name2.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate2);
-
+      console.log(tax);
       tax += this.getSurchargeTaxTotalForKey(
         this.invoice.tax_name2,
         this.invoice.tax_rate2
@@ -82,14 +82,14 @@ export class InvoiceSum {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name2} ${parseFloat(
-          this.invoice.tax_rate2.toFixed(2)
+          this.invoice.tax_rate2.toFixed(this.currency.precision)
         )} %`,
       });
     }
 
     if (this.invoice.tax_name3.length >= 1) {
       let tax = this.taxer(this.total, this.invoice.tax_rate3);
-
+      console.log(tax);
       tax += this.getSurchargeTaxTotalForKey(
         this.invoice.tax_name3,
         this.invoice.tax_rate3
@@ -99,7 +99,7 @@ export class InvoiceSum {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name3} ${parseFloat(
-          this.invoice.tax_rate3.toFixed(2)
+          this.invoice.tax_rate3.toFixed(this.currency.precision)
         )} %`,
       });
     }
@@ -123,25 +123,25 @@ export class InvoiceSum {
 
     if (this.invoice.custom_surcharge_tax1) {
       taxComponent += parseFloat(
-        (this.invoice.custom_surcharge1 * (rate / 100)).toFixed(2)
+        (this.invoice.custom_surcharge1 * (rate / 100)).toFixed(this.currency.precision)
       );
     }
 
     if (this.invoice.custom_surcharge_tax2) {
       taxComponent += parseFloat(
-        (this.invoice.custom_surcharge2 * (rate / 100)).toFixed(2)
+        (this.invoice.custom_surcharge2 * (rate / 100)).toFixed(this.currency.precision)
       );
     }
 
     if (this.invoice.custom_surcharge_tax3) {
       taxComponent += parseFloat(
-        (this.invoice.custom_surcharge3 * (rate / 100)).toFixed(2)
+        (this.invoice.custom_surcharge3 * (rate / 100)).toFixed(this.currency.precision)
       );
     }
 
     if (this.invoice.custom_surcharge_tax4) {
       taxComponent += parseFloat(
-        (this.invoice.custom_surcharge4 * (rate / 100)).toFixed(2)
+        (this.invoice.custom_surcharge4 * (rate / 100)).toFixed(this.currency.precision)
       );
     }
 
@@ -189,10 +189,12 @@ export class InvoiceSum {
   protected calculateBalance() {
     this.setCalculatedAttributes();
 
+   
     return this;
   }
 
   protected setCalculatedAttributes() {
+
     if (this.invoice.status_id !== InvoiceStatus.Draft) {
       if (this.invoice.amount !== this.invoice.balance) {
         const paidToDate = this.invoice.amount - this.invoice.balance;
@@ -240,13 +242,13 @@ export class InvoiceSum {
       return this.invoice.discount;
     }
 
-    return parseFloat((amount * (this.invoice.discount / 100)).toFixed(2));
+    return parseFloat((amount * (this.invoice.discount / 100)).toFixed(this.currency.precision));
   }
 
   protected taxer(amount: number, tax_rate: number) {
     // This needs extraction in the taxer service/class.
+    return Number(Number((amount * ((tax_rate ?? 0) / 100)).toFixed(3)).toFixed(this.currency.precision));
 
-    return parseFloat((amount * ((tax_rate ?? 0) / 100)).toFixed(2));
   }
 
   protected valuer(customValue: number | undefined): number {

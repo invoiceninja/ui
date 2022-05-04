@@ -93,7 +93,7 @@ export function InvoiceTotals() {
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
             label={t('tax')}
-            formatLabel={(resource) => `${resource.name} (${resource.rate}%)`}
+            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name3', value.resource?.name);
               handleChange('tax_rate3', value.resource?.rate);

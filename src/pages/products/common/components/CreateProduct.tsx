@@ -33,6 +33,12 @@ export interface CreateProductDto {
   custom_value2: string;
   custom_value3: string;
   custom_value4: string;
+  tax_rate1: number;
+  tax_name1: string;
+  tax_rate2: number;
+  tax_name2: string;
+  tax_rate3: number;
+  tax_name3: string;
 }
 
 interface Props {
@@ -59,12 +65,12 @@ export function CreateProduct(props: Props) {
       custom_value2: props.product?.custom_value2 || '',
       custom_value3: props.product?.custom_value3 || '',
       custom_value4: props.product?.custom_value4 || '',
-      tax_name1: '',
-      tax_rate1: 0,
-      tax_name2: '',
-      tax_rate2: 0,
-      tax_name3: '',
-      tax_rate3: 0,
+      tax_name1: props.product?.tax_name1 || '',
+      tax_rate1: props.product?.tax_rate1 || 0,
+      tax_name2: props.product?.tax_name2 || '',
+      tax_rate2: props.product?.tax_rate2 || 0,
+      tax_name3: props.product?.tax_name3 || '',
+      tax_rate3: props.product?.tax_rate3 || 0,
     },
     onSubmit: (values: CreateProductDto) => {
       axios

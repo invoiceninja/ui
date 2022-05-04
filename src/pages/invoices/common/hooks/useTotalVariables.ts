@@ -19,18 +19,18 @@ export function useTotalVariables() {
   useEffect(() => {
     // We need to clone the product columns to local object,
     // because by default it's frozen.
-    let variables: string[] =
-      clone(company?.settings.pdf_variables.total_columns) || [];
+    let variables: string[] = ['$net_subtotal'];
+      // clone(company?.settings.pdf_variables.total_columns) || [];
 
     // In case we have `$line_taxes` or `$total_taxes` we want to remove them
     // if setting isn't enabled.
 
     const enabledTaxRates = company?.enabled_tax_rates || 0;
 
-    if (enabledTaxRates <= 0) {
-      variables = variables.filter((variable) => variable !== '$total_taxes');
-      variables = variables.filter((variable) => variable !== '$line_taxes');
-    }
+    // if (enabledTaxRates <= 0) {
+    //   variables = variables.filter((variable) => variable !== '$total_taxes');
+    //   variables = variables.filter((variable) => variable !== '$line_taxes');
+    // }
 
     if (!company?.custom_fields?.surcharge1) {
       variables = variables.filter(
@@ -55,6 +55,8 @@ export function useTotalVariables() {
         (variable) => variable !== '$custom_surcharge4'
       );
     }
+
+    variables.push('$total');
 
     setColumns(variables);
   }, [company]);

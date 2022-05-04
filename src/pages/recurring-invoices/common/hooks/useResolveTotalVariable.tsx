@@ -58,29 +58,29 @@ export function useResolveTotalVariable() {
       );
     }
 
-    if (variable == '$subtotal' && invoiceSum) {
-      return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
-          {formatMoney(invoiceSum.subTotal)}
-        </Element>
-      );
-    }
+    // if (variable == '$subtotal' && invoiceSum) {
+    //   return (
+    //     <Element leftSide={resolveTranslation(variable, '$')}>
+    //       {formatMoney(invoiceSum.subTotal)}
+    //     </Element>
+    //   );
+    // }
 
-    if (variable == '$total_taxes' && invoiceSum) {
-      return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
-          {formatMoney(invoiceSum.totalTaxes)}
-        </Element>
-      );
-    }
+    // if (variable == '$total_taxes' && invoiceSum) {
+    //   return (
+    //     <Element leftSide={resolveTranslation(variable, '$')}>
+    //       {formatMoney(invoiceSum.totalTaxes)}
+    //     </Element>
+    //   );
+    // }
 
-    if (variable == '$total' && invoiceSum) {
-      return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
-          {formatMoney(invoiceSum.total)}
-        </Element>
-      );
-    }
+    // if (variable == '$total' && invoiceSum) {
+    //   return (
+    //     <Element leftSide={resolveTranslation(variable, '$')}>
+    //       {formatMoney(invoiceSum.total)}
+    //     </Element>
+    //   );
+    // }
 
     if (variable === '$custom_surcharge1') {
       return (

@@ -2,10 +2,10 @@ import collect from 'collect.js';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { Currency } from 'common/interfaces/currency';
 
 export class InvoiceItemSum {
   public taxCollection = collect();
-  protected currency = 'USD'; // Needs fixes, obviously.
 
   public lineItems: InvoiceItem[] = [];
   protected items = new Map();
@@ -15,7 +15,7 @@ export class InvoiceItemSum {
   protected grossSubTotal = 0;
   public totalTaxes = 0;
 
-  constructor(protected invoice: Invoice | RecurringInvoice) {}
+  constructor(protected invoice: Invoice | RecurringInvoice, protected currency: Currency) {}
 
   public async process() {
     if (!this.invoice?.line_items || this.invoice.line_items?.length === 0) {
@@ -127,10 +127,9 @@ export class InvoiceItemSum {
   }
 
   protected calculateAmountLineTax(rate: number, amount: number) {
-    // This needs extraction, it's calling generic Taxer class.
-    // This also depends on Number class, previously mentioned.
+    
+    return Number(Number(((amount * rate) / 100).toFixed(3)).toFixed(this.currency.precision));
 
-    return (amount * rate) / 100;
   }
 
   protected push() {

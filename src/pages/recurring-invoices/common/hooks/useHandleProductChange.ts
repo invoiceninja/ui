@@ -51,5 +51,86 @@ export function useHandleProductChange() {
         value: value.resource?.notes || '',
       })
     );
+
+    dispatch(
+      setCurrentLineItemProperty({
+        position: index,
+        property: 'tax_name1',
+        value: value.resource?.tax_name1 || '',
+      })
+    );
+
+    dispatch(
+      setCurrentLineItemProperty({
+        position: index,
+        property: 'tax_name2',
+        value: value.resource?.tax_name2 || '',
+      })
+    );
+
+    dispatch(
+      setCurrentLineItemProperty({
+        position: index,
+        property: 'tax_name3',
+        value: value.resource?.tax_name3 || '',
+      })
+    );
+
+    dispatch(
+      setCurrentLineItemProperty({
+        position: index,
+        property: 'tax_rate1',
+        value: value.resource?.tax_rate1 || 0,
+      })
+    );
+
+    dispatch(
+      setCurrentLineItemProperty({
+        position: index,
+        property: 'tax_rate2',
+        value: value.resource?.tax_rate2 || 0,
+      })
+    );
+
+    dispatch(
+      setCurrentLineItemProperty({
+        position: index,
+        property: 'tax_rate3',
+        value: value.resource?.tax_rate3 || 0,
+      })
+    );
+
+    dispatch(
+      setCurrentLineItemProperty({
+        position: index,
+        property: 'custom_value1',
+        value: value.resource?.custom_value1 || '',
+      })
+    );
+
+    dispatch(
+      setCurrentLineItemProperty({
+        position: index,
+        property: 'custom_value2',
+        value: value.resource?.custom_value2 || '',
+      })
+    );
+
+    dispatch(
+      setCurrentLineItemProperty({
+        position: index,
+        property: 'custom_value3',
+        value: value.resource?.custom_value3 || '',
+      })
+    );
+
+    dispatch(
+      setCurrentLineItemProperty({
+        position: index,
+        property: 'custom_value4',
+        value: value.resource?.custom_value4 || '',
+      })
+    );
+
   };
 }
