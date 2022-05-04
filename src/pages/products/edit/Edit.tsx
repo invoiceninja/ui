@@ -27,7 +27,6 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 
 export function Edit() {
