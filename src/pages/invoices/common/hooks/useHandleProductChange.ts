@@ -9,129 +9,41 @@
  */
 
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
-import { Record } from 'components/forms/DebouncedCombobox';
+import { Invoice } from 'common/interfaces/invoice';
+import { Product } from 'common/interfaces/product';
+import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
 import { useDispatch } from 'react-redux';
 
 export function useHandleProductChange() {
   const dispatch = useDispatch();
-  const invoice = useCurrentInvoice();
+  const invoice = useCurrentInvoice() as Invoice;
 
-  return (index: number, value: Record) => {
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'product_key',
-        value: value.label,
-      })
-    );
+  return (index: number, product: Product) => {
+    const lineItem = { ...invoice.line_items[index] };
 
-    if (invoice && invoice.line_items[index].quantity < 1)
-      dispatch(
-        setCurrentLineItemProperty({
-          position: index,
-          property: 'quantity',
-          value: 1,
-        })
-      );
+    lineItem.product_key = product.product_key;
+    lineItem.quantity = product.quantity || 1;
+    lineItem.cost = product.cost || 0;
+    lineItem.notes = product.notes || '';
 
-    if (!value.internal && value.resource) {
-      dispatch(
-        setCurrentLineItemProperty({
-          position: index,
-          property: 'cost',
-          value: value.resource?.cost || 0,
-        })
-      );
-    }
+    lineItem.tax_name1 = product.tax_name1 || '';
+    lineItem.tax_name2 = product.tax_name2 || '';
+    lineItem.tax_name3 = product.tax_name3 || '';
+
+    lineItem.tax_rate1 = product.tax_rate1 || 0;
+    lineItem.tax_rate2 = product.tax_rate2 || 0;
+    lineItem.tax_rate3 = product.tax_rate3 || 0;
+
+    lineItem.custom_value1 = product.custom_value1 || '';
+    lineItem.custom_value2 = product.custom_value2 || '';
+    lineItem.custom_value3 = product.custom_value3 || '';
+    lineItem.custom_value4 = product.custom_value4 || '';
 
     dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'notes',
-        value: value.resource?.notes || '',
+      setCurrentInvoiceLineItem({
+        index,
+        lineItem,
       })
     );
-
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'tax_name1',
-        value: value.resource?.tax_name1 || '',
-      })
-    );
-
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'tax_name2',
-        value: value.resource?.tax_name2 || '',
-      })
-    );
-
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'tax_name3',
-        value: value.resource?.tax_name3 || '',
-      })
-    );
-
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'tax_rate1',
-        value: value.resource?.tax_rate1 || 0,
-      })
-    );
-
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'tax_rate2',
-        value: value.resource?.tax_rate2 || 0,
-      })
-    );
-
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'tax_rate3',
-        value: value.resource?.tax_rate3 || 0,
-      })
-    );
-
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'custom_value1',
-        value: value.resource?.custom_value1 || '',
-      })
-    );
-
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'custom_value2',
-        value: value.resource?.custom_value2 || '',
-      })
-    );
-
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'custom_value3',
-        value: value.resource?.custom_value3 || '',
-      })
-    );
-
-    dispatch(
-      setCurrentLineItemProperty({
-        position: index,
-        property: 'custom_value4',
-        value: value.resource?.custom_value4 || '',
-      })
-    );
-
   };
 }

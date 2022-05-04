@@ -25,6 +25,7 @@ import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { useDispatch } from 'react-redux';
 import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { ProductSelector } from 'components/products/ProductSelector';
+import { Product } from 'common/interfaces/product';
 
 const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
@@ -55,123 +56,13 @@ export function useResolveInputField() {
     if (property === 'product_key') {
       return (
         <ProductSelector
-          onChange={(value) => handleProductChange(index, value)}
+          onChange={(value) =>
+            handleProductChange(index, value.resource as Product)
+          }
           className="w-auto"
           onInputFocus={() => setCurrentLineItemIndex(index)}
           defaultValue={invoice?.line_items[index][property]}
-          onProductCreated={(product) => {
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'product_key',
-                value: product.product_key,
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'quantity',
-                value: product?.quantity || 1,
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'cost',
-                value: product?.cost || 0,
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'notes',
-                value: product?.notes || '',
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'tax_name1',
-                value: product?.tax_name1 || '',
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'tax_name2',
-                value: product?.tax_name2 || '',
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'tax_name3',
-                value: product?.tax_name3 || '',
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'tax_rate1',
-                value: product?.tax_rate1 || 0,
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'tax_rate2',
-                value: product?.tax_rate2 || 0,
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'tax_rate3',
-                value: product?.tax_rate3 || 0,
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'custom_value1',
-                value: product?.custom_value1 || '',
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'custom_value2',
-                value: product?.custom_value2 || '',
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'custom_value3',
-                value: product?.custom_value3 || '',
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: 'custom_value4',
-                value: product?.custom_value4 || '',
-              })
-            );
-          }}
+          onProductCreated={(product) => handleProductChange(index, product)}
         />
       );
     }

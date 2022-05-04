@@ -17,6 +17,7 @@ import { blankInvitation } from './invoices/constants/blank-invitation';
 import { blankLineItem } from './invoices/constants/blank-line-item';
 import { deleteInvoiceLineItem } from './invoices/extra-reducers/delete-invoice-item';
 import { setCurrentInvoice } from './invoices/extra-reducers/set-current-invoice';
+import { setCurrentInvoiceLineItem } from './invoices/extra-reducers/set-current-invoice-line-item';
 import { setCurrentInvoiceProperty } from './invoices/extra-reducers/set-current-invoice-property';
 import { setCurrentLineItemProperty } from './invoices/extra-reducers/set-current-line-item-property';
 interface InvoiceState {
@@ -137,6 +138,25 @@ export const invoiceSlice = createSlice({
           payload.payload.payload.property,
           payload.payload.payload.value
         );
+
+        if (payload.payload.client && payload.payload.currency) {
+          state.invoiceSum = new InvoiceSum(
+            cloneDeep(state.current),
+            cloneDeep(payload.payload.currency)
+          ).build();
+
+          state.current = state.invoiceSum.invoice as Invoice;
+        }
+      }
+    });
+
+    builder.addCase(setCurrentInvoiceLineItem.fulfilled, (state, payload) => {
+      if (state.current) {
+        const current = cloneDeep(state.current);
+
+        current.line_items[payload.payload.index] = payload.payload.lineItem;
+
+        state.current = current;
 
         if (payload.payload.client && payload.payload.currency) {
           state.invoiceSum = new InvoiceSum(
