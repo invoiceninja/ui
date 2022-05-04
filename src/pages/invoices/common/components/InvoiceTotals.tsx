@@ -1,9 +1,9 @@
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -45,7 +45,7 @@ export function InvoiceTotals() {
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
             label={t('tax')}
-            formatLabel={(resource) => `${resource.name} (${resource.rate}%)`}
+            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name1', value.resource?.name);
               handleChange('tax_rate1', value.resource?.rate);
@@ -69,7 +69,7 @@ export function InvoiceTotals() {
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
             label={t('tax')}
-            formatLabel={(resource) => `${resource.name} (${resource.rate}%)`}
+            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name2', value.resource?.name);
               handleChange('tax_rate2', value.resource?.rate);
@@ -93,7 +93,7 @@ export function InvoiceTotals() {
           <DebouncedCombobox
             endpoint="/api/v1/tax_rates"
             label={t('tax')}
-            formatLabel={(resource) => `${resource.name} (${resource.rate}%)`}
+            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name3', value.resource?.name);
               handleChange('tax_rate3', value.resource?.rate);

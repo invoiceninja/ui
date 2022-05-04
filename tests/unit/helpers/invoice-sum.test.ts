@@ -19,7 +19,7 @@ describe('InvoiceSum test', () => {
 
 describe('InvoiceSum test invoice calculation', () => {
   it('Calculate Line Items', () => {
-    const invoiceItems = new InvoiceItemSum(invoice);
+    const invoiceItems = new InvoiceItemSum(invoice, USD);
     invoiceItems.process();
 
     expect(invoiceItems.subTotal).toEqual(2628);

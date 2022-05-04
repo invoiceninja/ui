@@ -3,7 +3,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -38,9 +38,8 @@ export function Invoices() {
           <Field key={field} field={field} placeholder={t('invoice_field')} />
         ))}
       </Card>
-
       <Card>
-        {['surchage1', 'surchage2', 'surchage3', 'surchage4'].map(
+        {['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
           (field, index) => (
             <Element
               key={index}

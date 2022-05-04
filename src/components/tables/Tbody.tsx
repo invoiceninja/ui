@@ -3,7 +3,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -30,7 +30,6 @@ export function Tbody(props: Props) {
           </Td>
         </Tr>
       )}
-
       {props.data &&
         props.showHelperPlaceholders &&
         props.data.data.meta.pagination.total === 0 && (
@@ -40,7 +39,6 @@ export function Tbody(props: Props) {
             </Td>
           </Tr>
         )}
-
       {props.children}
     </tbody>
   );

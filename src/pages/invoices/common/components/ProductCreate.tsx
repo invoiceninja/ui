@@ -1,9 +1,9 @@
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -23,6 +23,8 @@ import { useTranslation } from 'react-i18next';
 import { CustomField } from 'components/CustomField';
 import { CreateProductDto } from 'pages/products/common/components/CreateProduct';
 import { Product } from 'common/interfaces/product';
+import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
+import { Element } from '@invoiceninja/cards';
 
 interface Props {
   isModalOpen: boolean;
@@ -45,6 +47,12 @@ export function ProductCreate(props: Props) {
       notes: product?.data.datanotes || '',
       cost: product?.data.data.cost || '',
       quantity: product?.data.data.quantity || 1,
+      tax_name1: product?.data.data.tax_name1 || '',
+      tax_name2: product?.data.data.tax_name2 || '',
+      tax_name3: product?.data.data.tax_name3 || '',
+      tax_rate1: product?.data.data.tax_rate1 || 0,
+      tax_rate2: product?.data.data.tax_rate2 || 0,
+      tax_rate3: product?.data.data.tax_rate3 || 0,
       custom_value1: product?.data.data.custom_value1 || '',
       custom_value2: product?.data.data.custom_value2 || '',
       custom_value3: product?.data.data.custom_value3 || '',
@@ -74,7 +82,11 @@ export function ProductCreate(props: Props) {
             ? setErrors(error.response.data.errors)
             : toast.error(t('error_title'))
         )
-        .finally(() => formik.setSubmitting(false));
+        .finally(() => {
+          formik.setSubmitting(false);
+          formik.resetForm();
+          }
+        );
     },
   });
 
@@ -119,6 +131,66 @@ export function ProductCreate(props: Props) {
         errorMessage={errors?.quantity}
       />
 
+      {company && company.enabled_item_tax_rates > 0 && (
+        <Element leftSide={t('tax')}>
+          <DebouncedCombobox
+            endpoint="/api/v1/tax_rates"
+            label={t('tax')}
+            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+            onChange={(value) => {
+              formik.setFieldValue('tax_rate1', value.resource.rate);
+              formik.setFieldValue('tax_name1', value.resource.name);
+            }}
+            value="rate"
+            defaultValue={formik.values.tax_rate1}
+            clearButton={Boolean(formik.values.tax_rate1)}
+            onClearButtonClick={() => {
+              formik.setFieldValue('tax_rate1', 0);
+              formik.setFieldValue('tax_name1', '');
+            }}
+          />
+        </Element>
+      )}
+      {company && company.enabled_item_tax_rates > 1 && (
+        <Element leftSide={t('tax')}>
+          <DebouncedCombobox
+            endpoint="/api/v1/tax_rates"
+            label={t('tax')}
+            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+            onChange={(value) => {
+              formik.setFieldValue('tax_rate2', value.resource.rate);
+              formik.setFieldValue('tax_name2', value.resource.name);
+            }}
+            value="rate"
+            defaultValue={formik.values.tax_rate2}
+            clearButton={Boolean(formik.values.tax_rate2)}
+            onClearButtonClick={() => {
+              formik.setFieldValue('tax_rate2', 0);
+              formik.setFieldValue('tax_name2', '');
+            }}
+          />
+        </Element>
+      )}
+      {company && company.enabled_item_tax_rates > 2 && (
+        <Element leftSide={t('tax')}>
+          <DebouncedCombobox
+            endpoint="/api/v1/tax_rates"
+            label={t('tax')}
+            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+            onChange={(value) => {
+              formik.setFieldValue('tax_rate3', value.resource.rate);
+              formik.setFieldValue('tax_name3', value.resource.name);
+            }}
+            value="rate"
+            defaultValue={formik.values.tax_rate3}
+            clearButton={Boolean(formik.values.tax_rate3)}
+            onClearButtonClick={() => {
+              formik.setFieldValue('tax_rate3', 0);
+              formik.setFieldValue('tax_name3', '');
+            }}
+          />
+        </Element>
+      )}
       {company?.custom_fields?.product1 && (
         <CustomField
           field="custom_value1"
@@ -127,7 +199,6 @@ export function ProductCreate(props: Props) {
           onChange={(value) => formik.setFieldValue('custom_value1', value)}
         />
       )}
-
       {company?.custom_fields?.product2 && (
         <CustomField
           field="custom_value2"
@@ -136,7 +207,6 @@ export function ProductCreate(props: Props) {
           onChange={(value) => formik.setFieldValue('custom_value2', value)}
         />
       )}
-
       {company?.custom_fields?.product3 && (
         <CustomField
           field="custom_value3"
@@ -145,7 +215,6 @@ export function ProductCreate(props: Props) {
           onChange={(value) => formik.setFieldValue('custom_value3', value)}
         />
       )}
-
       {company?.custom_fields?.product4 && (
         <CustomField
           field="custom_value4"
@@ -154,7 +223,6 @@ export function ProductCreate(props: Props) {
           onChange={(value) => formik.setFieldValue('custom_value4', value)}
         />
       )}
-
       <Button
         type="primary"
         behavior="button"

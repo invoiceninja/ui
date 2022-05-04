@@ -3,9 +3,9 @@
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -58,29 +58,29 @@ export function useResolveTotalVariable() {
       );
     }
 
-    if (variable == '$subtotal' && invoiceSum) {
-      return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
-          {formatMoney(invoiceSum.subTotal)}
-        </Element>
-      );
-    }
+    // if (variable == '$subtotal' && invoiceSum) {
+    //   return (
+    //     <Element leftSide={resolveTranslation(variable, '$')}>
+    //       {formatMoney(invoiceSum.subTotal)}
+    //     </Element>
+    //   );
+    // }
 
-    if (variable == '$total_taxes' && invoiceSum) {
-      return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
-          {formatMoney(invoiceSum.totalTaxes)}
-        </Element>
-      );
-    }
+    // if (variable == '$total_taxes' && invoiceSum) {
+    //   return (
+    //     <Element leftSide={resolveTranslation(variable, '$')}>
+    //       {formatMoney(invoiceSum.totalTaxes)}
+    //     </Element>
+    //   );
+    // }
 
-    if (variable == '$total' && invoiceSum) {
-      return (
-        <Element leftSide={resolveTranslation(variable, '$')}>
-          {formatMoney(invoiceSum.total)}
-        </Element>
-      );
-    }
+    // if (variable == '$total' && invoiceSum) {
+    //   return (
+    //     <Element leftSide={resolveTranslation(variable, '$')}>
+    //       {formatMoney(invoiceSum.total)}
+    //     </Element>
+    //   );
+    // }
 
     if (variable === '$custom_surcharge1') {
       return (

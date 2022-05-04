@@ -3,6 +3,9 @@ import invoice from '../../helpers/data/invoice';
 import invoice_item from '../../helpers/data/invoice_item';
 import { InvoiceItemSum } from '../../../src/common/helpers/invoices/invoice-item-sum';
 import { InvoiceItem } from '../../../src/common/interfaces/invoice-item';
+import currencies from '../../helpers/data/currencies';
+
+const USD = currencies[0];
 
 describe('InvoiceSumInclusive test', () => {
   test('correct instance', () => {
@@ -18,7 +21,7 @@ describe('InvoiceSumInclusive test', () => {
 
 describe('InvoiceSum test invoice calculation', () => {
   it('Calculate Line Items', async () => {
-    const invoiceItems = new InvoiceItemSum(invoice);
+    const invoiceItems = new InvoiceItemSum(invoice, USD);
 
     await invoiceItems.process();
 

@@ -3,7 +3,7 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
@@ -27,6 +27,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
+import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -43,6 +44,12 @@ export function Edit() {
       notes: product?.data.data.notes || '',
       cost: product?.data.data.cost || 0,
       quantity: product?.data.data.quantity || 1,
+      tax_name1: product?.data.data.tax_name1 || '',
+      tax_rate1: product?.data.data.tax_rate1 || 0,
+      tax_name2: product?.data.data.tax_name2 || '',
+      tax_rate2: product?.data.data.tax_rate2 || 0,
+      tax_name3: product?.data.data.tax_name3 || '',
+      tax_rate3: product?.data.data.tax_rate3 || 0,
     },
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
@@ -142,6 +149,70 @@ export function Edit() {
               errorMessage={errors?.errors.quantity}
             />
           </Element>
+
+          {company && company.enabled_item_tax_rates > 0 && (
+            <Element leftSide={t('tax')}>
+              <TaxRateSelector
+                onChange={(value) => {
+                  formik.setFieldValue('tax_rate1', value.resource?.rate);
+                  formik.setFieldValue('tax_name1', value.resource?.name);
+                }}
+                defaultValue={formik.values.tax_rate1}
+                clearButton={Boolean(formik.values.tax_rate1)}
+                onClearButtonClick={() => {
+                  formik.setFieldValue('tax_rate1', 0);
+                  formik.setFieldValue('tax_name1', '');
+                }}
+                onTaxCreated={(taxRate) => {
+                  formik.setFieldValue('tax_rate1', taxRate.rate);
+                  formik.setFieldValue('tax_name1', taxRate.name);
+                }}
+              />
+            </Element>
+          )}
+
+          {company && company.enabled_item_tax_rates > 1 && (
+            <Element leftSide={t('tax')}>
+              <TaxRateSelector
+                onChange={(value) => {
+                  formik.setFieldValue('tax_rate2', value.resource?.rate);
+                  formik.setFieldValue('tax_name2', value.resource?.name);
+                }}
+                defaultValue={formik.values.tax_rate2}
+                clearButton={Boolean(formik.values.tax_rate2)}
+                onClearButtonClick={() => {
+                  formik.setFieldValue('tax_rate2', 0);
+                  formik.setFieldValue('tax_name2', '');
+                }}
+                onTaxCreated={(taxRate) => {
+                  formik.setFieldValue('tax_rate2', taxRate.rate);
+                  formik.setFieldValue('tax_name2', taxRate.name);
+                }}
+              />
+            </Element>
+          )}
+
+          {company && company.enabled_item_tax_rates > 2 && (
+            <Element leftSide={t('tax')}>
+              <TaxRateSelector
+                onChange={(value) => {
+                  formik.setFieldValue('tax_rate3', value.resource?.rate);
+                  formik.setFieldValue('tax_name3', value.resource?.name);
+                }}
+                defaultValue={formik.values.tax_rate3}
+                clearButton={Boolean(formik.values.tax_rate3)}
+                onClearButtonClick={() => {
+                  formik.setFieldValue('tax_rate3', 0);
+                  formik.setFieldValue('tax_name3', '');
+                }}
+                onTaxCreated={(taxRate) => {
+                  formik.setFieldValue('tax_rate3', taxRate.rate);
+                  formik.setFieldValue('tax_name3', taxRate.name);
+                }}
+              />
+            </Element>
+          )}
+
           {company?.custom_fields?.product1 && (
             <CustomField
               field="custom_value1"
@@ -150,7 +221,6 @@ export function Edit() {
               onChange={(value) => formik.setFieldValue('custom_value1', value)}
             />
           )}
-
           {company?.custom_fields?.product2 && (
             <CustomField
               field="custom_value2"

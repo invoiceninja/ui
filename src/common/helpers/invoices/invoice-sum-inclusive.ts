@@ -1,3 +1,12 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
 import { InvoiceItemSumInclusive } from './invoice-item-sum-inclusive';
 import { Invoice } from 'common/interfaces/invoice';
 import collect from 'collect.js';
@@ -170,7 +179,6 @@ export class InvoiceSumInclusive {
   }
 
   protected async calculateTotals() {
-    // this.total += this.totalTaxes;
 
     this.totalTaxes = Number(this.totalTaxes.toFixed(2));
 
