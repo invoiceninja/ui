@@ -12,18 +12,14 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { injectBlankItemIntoCurrent } from 'common/stores/slices/invoices';
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 import { RootState } from 'common/stores/store';
-import { useState } from 'react';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useProductColumns } from '../hooks/useProductColumns';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
-import { TaxCreate } from './TaxCreate';
-import { ProductCreate } from './ProductCreate';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
-import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { resolveColumnWidth } from '../helpers/resolve-column-width';
 
 export function ProductsTable() {
@@ -31,23 +27,12 @@ export function ProductsTable() {
 
   const invoice = useSelector((state: RootState) => state.invoices.current);
   const columns = useProductColumns();
-  const resolveTranslation = useResolveTranslation();
   const dispatch = useDispatch();
 
-  const [isTaxModalOpen, setIsTaxModalOpen] = useState(false);
-  const [isProductModalOpen, setIsProductModalOpen] = useState(false);
-  const [currentLineItemIndex, setCurrentLineItemIndex] = useState(0);
-  const [currentTaxRate, setCurrentTaxRate] = useState('tax_rate1');
-
-  const resolveInputField = useResolveInputField({
-    setIsTaxModalOpen,
-    setIsProductModalOpen,
-    setCurrentLineItemIndex,
-    setCurrentTaxRate,
-  });
+  const resolveTranslation = useResolveTranslation();
+  const resolveInputField = useResolveInputField();
 
   const onDragEnd = useHandleSortingRows();
-
   return (
     <div>
       <Table>
@@ -129,150 +114,6 @@ export function ProductsTable() {
           </Droppable>
         </DragDropContext>
       </Table>
-
-      <TaxCreate
-        isVisible={isTaxModalOpen}
-        onClose={setIsTaxModalOpen}
-        onTaxCreated={(taxRate) => {
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: currentTaxRate,
-              value: taxRate.rate,
-            })
-          );
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: currentTaxRate.replace('rate', 'name'),
-              value: taxRate.name,
-            })
-          );
-        }}
-      />
-
-      <ProductCreate
-        setIsModalOpen={setIsProductModalOpen}
-        isModalOpen={isProductModalOpen}
-        onProductCreated={(product) => {
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'product_key',
-              value: product.product_key,
-            })
-          )
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'quantity',
-              value: product?.quantity || 1,
-            })
-          );
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'cost',
-              value: product?.cost || 0,
-            })
-          );
-          
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'notes',
-              value: product?.notes || '',
-            })
-          );
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'tax_name1',
-              value: product?.tax_name1 || '',
-            })
-          );
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'tax_name2',
-              value: product?.tax_name2 || '',
-            })
-          );
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'tax_name3',
-              value: product?.tax_name3 || '',
-            })
-          );
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'tax_rate1',
-              value: product?.tax_rate1 || 0,
-            })
-          );
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'tax_rate2',
-              value: product?.tax_rate2 || 0,
-            })
-          );
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'tax_rate3',
-              value: product?.tax_rate3 || 0,
-            })
-          );
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'custom_value1',
-              value: product?.custom_value1 || '',
-            })
-          );
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'custom_value2',
-              value: product?.custom_value2 || '',
-            })
-          );
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'custom_value3',
-              value: product?.custom_value3 || '',
-            })
-          );
-
-          dispatch(
-            setCurrentLineItemProperty({
-              position: currentLineItemIndex,
-              property: 'custom_value4',
-              value: product?.custom_value4 || '',
-            })
-          );
-
-        }
-
-      }
-      />
     </div>
   );
 }

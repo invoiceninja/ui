@@ -22,29 +22,24 @@ import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
 import { useGetCurrencySeparators } from 'common/hooks/useGetCurrencySeparators';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
+import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
+import { useDispatch } from 'react-redux';
+import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
+import { ProductSelector } from 'components/products/ProductSelector';
 
 const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 
-interface Props {
-  setIsTaxModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsProductModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  setCurrentLineItemIndex: React.Dispatch<React.SetStateAction<number>>;
-  setCurrentTaxRate: React.Dispatch<React.SetStateAction<string>>;
-}
+export function useResolveInputField() {
+  const dispatch = useDispatch();
 
-export function useResolveInputField(props: Props) {
   const [t] = useTranslation();
-
-  const {
-    setIsTaxModalOpen,
-    setIsProductModalOpen,
-    setCurrentLineItemIndex,
-    setCurrentTaxRate,
-  } = props;
-
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
+
+  const [currentLineItemIndex, setCurrentLineItemIndex] = useState(0);
+  const [currentTaxRate, setCurrentTaxRate] = useState('tax_rate1');
+
   const handleProductChange = useHandleProductChange();
   const onChange = useHandleLineItemPropertyChange();
 
@@ -61,20 +56,125 @@ export function useResolveInputField(props: Props) {
 
     if (property === 'product_key') {
       return (
-        <>
-          <DebouncedCombobox
-            endpoint="/api/v1/products"
-            label="product_key"
-            onChange={(value) => handleProductChange(index, value)}
-            className="w-auto"
-            onActionClick={() => {
-              setIsProductModalOpen(true);
-              setCurrentLineItemIndex(index);
-            }}
-            actionLabel={t('new_product')}
-            defaultValue={invoice?.line_items[index][property]}
-          />
-        </>
+        <ProductSelector
+          onChange={(value) => handleProductChange(index, value)}
+          className="w-auto"
+          onInputFocus={() => setCurrentLineItemIndex(index)}
+          defaultValue={invoice?.line_items[index][property]}
+          onProductCreated={(product) => {
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'product_key',
+                value: product.product_key,
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'quantity',
+                value: product?.quantity || 1,
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'cost',
+                value: product?.cost || 0,
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'notes',
+                value: product?.notes || '',
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'tax_name1',
+                value: product?.tax_name1 || '',
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'tax_name2',
+                value: product?.tax_name2 || '',
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'tax_name3',
+                value: product?.tax_name3 || '',
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'tax_rate1',
+                value: product?.tax_rate1 || 0,
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'tax_rate2',
+                value: product?.tax_rate2 || 0,
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'tax_rate3',
+                value: product?.tax_rate3 || 0,
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'custom_value1',
+                value: product?.custom_value1 || '',
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'custom_value2',
+                value: product?.custom_value2 || '',
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'custom_value3',
+                value: product?.custom_value3 || '',
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: 'custom_value4',
+                value: product?.custom_value4 || '',
+              })
+            );
+          }}
+        />
       );
     }
 
@@ -112,13 +212,9 @@ export function useResolveInputField(props: Props) {
 
     if (taxInputs.includes(property)) {
       return (
-        <DebouncedCombobox
-          endpoint="/api/v1/tax_rates"
-          label={property}
-          value="rate"
+        <TaxRateSelector
           onChange={(value) => {
-            value.resource &&
-              onChange(property, parseFloat(value.resource.rate), index);
+            value.resource && onChange(property, value.resource.rate, index);
             value.resource &&
               onChange(
                 property.replace('rate', 'name') as keyof InvoiceItem,
@@ -127,23 +223,38 @@ export function useResolveInputField(props: Props) {
               );
           }}
           className="w-auto"
-          formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
-          onActionClick={() => setIsTaxModalOpen(true)}
-          actionLabel={t('create_tax_rate')}
           defaultValue={invoice?.line_items[index][property]}
           onInputFocus={() => {
             setCurrentLineItemIndex(index);
             setCurrentTaxRate(property);
           }}
-          onClearButtonClick={() =>{
+          onClearButtonClick={() => {
             onChange(property, '', index);
 
             onChange(
-              property.replace('rate','name') as keyof InvoiceItem,
+              property.replace('rate', 'name') as keyof InvoiceItem,
               '',
-              index);
+              index
+            );
           }}
           clearButton={Boolean(invoice?.line_items[index][property])}
+          onTaxCreated={(taxRate) => {
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: currentTaxRate,
+                value: taxRate.rate,
+              })
+            );
+
+            dispatch(
+              setCurrentLineItemProperty({
+                position: currentLineItemIndex,
+                property: currentTaxRate.replace('rate', 'name'),
+                value: taxRate.name,
+              })
+            );
+          }}
         />
       );
     }
