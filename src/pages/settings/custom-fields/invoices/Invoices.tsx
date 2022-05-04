@@ -38,9 +38,8 @@ export function Invoices() {
           <Field key={field} field={field} placeholder={t('invoice_field')} />
         ))}
       </Card>
-
       <Card>
-        {['surchage1', 'surchage2', 'surchage3', 'surchage4'].map(
+        {['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
           (field, index) => (
             <Element
               key={index}

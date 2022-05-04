@@ -30,7 +30,6 @@ export function Tbody(props: Props) {
           </Td>
         </Tr>
       )}
-
       {props.data &&
         props.showHelperPlaceholders &&
         props.data.data.meta.pagination.total === 0 && (
@@ -40,7 +39,6 @@ export function Tbody(props: Props) {
             </Td>
           </Tr>
         )}
-
       {props.children}
     </tbody>
   );
