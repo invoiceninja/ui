@@ -194,7 +194,7 @@ export function Edit() {
               />
             </Element>
           )}
-          {console.log(company)}
+          
           {company && company.enabled_item_tax_rates > 2 && (
             <Element leftSide={t('tax')}>
               <DebouncedCombobox
