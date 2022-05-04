@@ -9,7 +9,6 @@
  */
 
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { clone } from 'lodash';
 import { useEffect, useState } from 'react';
 
 export function useTotalVariables() {
@@ -25,7 +24,7 @@ export function useTotalVariables() {
     // In case we have `$line_taxes` or `$total_taxes` we want to remove them
     // if setting isn't enabled.
 
-    const enabledTaxRates = company?.enabled_tax_rates || 0;
+    // const enabledTaxRates = company?.enabled_tax_rates || 0;
 
     // if (enabledTaxRates <= 0) {
     //   variables = variables.filter((variable) => variable !== '$total_taxes');
