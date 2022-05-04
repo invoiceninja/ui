@@ -9,10 +9,9 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import { resolveProperty } from 'pages/invoices/common/helpers/resolve-property';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { useHandleProductChange } from './useHandleProductChange';
-import { useTranslation } from 'react-i18next';
 import { InputField } from '@invoiceninja/forms';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { ChangeEvent, useEffect, useState } from 'react';
@@ -33,7 +32,6 @@ const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 export function useResolveInputField() {
   const dispatch = useDispatch();
 
-  const [t] = useTranslation();
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
 

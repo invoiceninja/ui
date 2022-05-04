@@ -11,7 +11,6 @@
  */
 
 import { resolveProperty } from 'pages/invoices/common/helpers/resolve-property';
-import { useTranslation } from 'react-i18next';
 import { InputField } from '@invoiceninja/forms';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
@@ -31,7 +30,6 @@ const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 
 export function useResolveInputField() {
-  const [t] = useTranslation();
   const [currentLineItemIndex, setCurrentLineItemIndex] = useState(0);
   const [currentTaxRate, setCurrentTaxRate] = useState('tax_rate1');
   const [inputCurrencySeparators, setInputCurrencySeparators] =
