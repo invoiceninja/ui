@@ -1,3 +1,12 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
 import collect from 'collect.js';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
@@ -51,11 +60,11 @@ export class InvoiceItemSum {
 
   protected setDiscount() {
     if (this.invoice.is_amount_discount) {
-      this.item.line_total = this.item.line_total - this.item.discount; // We don't have definitive number formatter, need to implement that & then replace this with propert formatted value.
+      this.item.line_total = this.item.line_total - this.item.discount; 
     } else {
       const discount = this.item.line_total * (this.item.discount / 100);
 
-      this.item.line_total = this.item.line_total - discount; // We need formatter here also.
+      this.item.line_total = this.item.line_total - discount; 
     }
 
     this.item.is_amount_discount = this.invoice.is_amount_discount;

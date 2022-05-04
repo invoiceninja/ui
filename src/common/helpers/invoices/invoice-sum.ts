@@ -1,3 +1,12 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
 import { InvoiceItemSum } from './invoice-item-sum';
 import { Invoice } from 'common/interfaces/invoice';
 import collect from 'collect.js';
