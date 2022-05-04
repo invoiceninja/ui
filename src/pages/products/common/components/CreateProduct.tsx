@@ -17,12 +17,11 @@ import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router';
 import { InputField } from '@invoiceninja/forms';
 import { endpoint } from 'common/helpers';
-import { Alert } from 'components/Alert';
 import { Card, Element } from '@invoiceninja/cards';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
 import { useTitle } from 'common/hooks/useTitle';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
+import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 
 export interface CreateProductDto {
   product_key: string;
@@ -109,95 +108,101 @@ export function CreateProduct(props: Props) {
           value={formik.initialValues.product_key}
           required
           onChange={formik.handleChange}
+          errorMessage={errors?.product_key}
         />
-        {errors?.product_key && (
-          <Alert type="danger">{errors.product_key}</Alert>
-        )}
       </Element>
+
       <Element leftSide={t('notes')}>
         <InputField
           id="notes"
           element="textarea"
           value={formik.initialValues.notes}
           onChange={formik.handleChange}
+          errorMessage={errors?.notes}
         />
-        {errors?.notes && <Alert type="danger">{errors.notes}</Alert>}
       </Element>
+
       <Element leftSide={t('cost')}>
         <InputField
           id="cost"
           value={formik.initialValues.cost}
           onChange={formik.handleChange}
+          errorMessage={errors?.cost}
         />
-        {errors?.cost && <Alert type="danger">{errors.cost}</Alert>}
       </Element>
+
       <Element leftSide={t('quantity')}>
         <InputField
           id="quantity"
           value={formik.initialValues.quantity}
           onChange={formik.handleChange}
+          errorMessage={errors?.quantity}
         />
       </Element>
+
       {company && company.enabled_item_tax_rates > 0 && (
         <Element leftSide={t('tax')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/tax_rates"
-            label={t('tax')}
-            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+          <TaxRateSelector
             onChange={(value) => {
-              formik.setFieldValue('tax_rate1', value.resource.rate);
-              formik.setFieldValue('tax_name1', value.resource.name);
+              formik.setFieldValue('tax_rate1', value.resource?.rate);
+              formik.setFieldValue('tax_name1', value.resource?.name);
             }}
-            value="rate"
             defaultValue={formik.values.tax_rate1}
             clearButton={Boolean(formik.values.tax_rate1)}
             onClearButtonClick={() => {
               formik.setFieldValue('tax_rate1', 0);
               formik.setFieldValue('tax_name1', '');
             }}
+            onTaxCreated={(taxRate) => {
+              formik.setFieldValue('tax_rate1', taxRate.rate);
+              formik.setFieldValue('tax_name1', taxRate.name);
+            }}
           />
         </Element>
       )}
+
       {company && company.enabled_item_tax_rates > 1 && (
         <Element leftSide={t('tax')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/tax_rates"
-            label={t('tax')}
-            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+          <TaxRateSelector
             onChange={(value) => {
-              formik.setFieldValue('tax_rate2', value.resource.rate);
-              formik.setFieldValue('tax_name2', value.resource.name);
+              formik.setFieldValue('tax_rate2', value.resource?.rate);
+              formik.setFieldValue('tax_name2', value.resource?.name);
             }}
-            value="rate"
             defaultValue={formik.values.tax_rate2}
             clearButton={Boolean(formik.values.tax_rate2)}
             onClearButtonClick={() => {
               formik.setFieldValue('tax_rate2', 0);
               formik.setFieldValue('tax_name2', '');
             }}
+            onTaxCreated={(taxRate) => {
+              formik.setFieldValue('tax_rate2', taxRate.rate);
+              formik.setFieldValue('tax_name2', taxRate.name);
+            }}
           />
         </Element>
       )}
+
       {company && company.enabled_item_tax_rates > 2 && (
         <Element leftSide={t('tax')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/tax_rates"
-            label={t('tax')}
-            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+          <TaxRateSelector
             onChange={(value) => {
-              formik.setFieldValue('tax_rate3', value.resource.rate);
-              formik.setFieldValue('tax_name3', value.resource.name);
+              formik.setFieldValue('tax_rate3', value.resource?.rate);
+              formik.setFieldValue('tax_name3', value.resource?.name);
             }}
-            value="rate"
             defaultValue={formik.values.tax_rate3}
             clearButton={Boolean(formik.values.tax_rate3)}
             onClearButtonClick={() => {
               formik.setFieldValue('tax_rate3', 0);
               formik.setFieldValue('tax_name3', '');
             }}
+            onTaxCreated={(taxRate) => {
+              formik.setFieldValue('tax_rate3', taxRate.rate);
+              formik.setFieldValue('tax_name3', taxRate.name);
+            }}
           />
         </Element>
       )}
+      
       {company?.custom_fields?.product1 && (
         <CustomField
           field="custom_value1"
