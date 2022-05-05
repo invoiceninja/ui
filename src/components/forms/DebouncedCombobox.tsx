@@ -40,13 +40,17 @@ interface Props {
   onClearButtonClick?: any;
   inputLabel?: string;
   onInputFocus?: () => unknown;
-  exclude?: string[] | number[];
+  exclude?: (string | number)[];
+  clearInputAfterSelection?: boolean;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
 
 export function DebouncedCombobox(props: Props) {
   const [records, setRecords] = useState<Record[]>([internalRecord]);
+  const [filteredRecords, setFilteredRecords] = useState<Record[]>([
+    internalRecord,
+  ]);
 
   const [selectedOption, setSelectedOption] = useState({
     record: records[0],
@@ -115,11 +119,23 @@ export function DebouncedCombobox(props: Props) {
     setSelectedOption({ record, withoutEvents: false });
   }, 500);
 
-  useEffect(() => request(''), []);
+  const filter = () => {
+    setFilteredRecords(
+      records.filter((record) =>
+        props.exclude ? !props.exclude.includes(record.value) : true
+      )
+    );
+  };
 
   useEffect(() => {
     if (!props.disabled && selectedOption.withoutEvents === false) {
+      filter();
+
       props.onChange(selectedOption.record);
+
+      if (props.clearInputAfterSelection) {
+        setSelectedOption({ record: internalRecord, withoutEvents: true });
+      }
     }
   }, [selectedOption]);
 
@@ -134,20 +150,12 @@ export function DebouncedCombobox(props: Props) {
       setSelectedOption({ record: potential, withoutEvents: true });
     }
 
-    if (props.exclude) {
-      setRecords((current) =>
-        current.filter(
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          (element) => props.exclude && !props.exclude.includes(element.value)
-        )
-      );
-    }
+    filter();
   }, [records, defaultValueProperty]);
 
-  useEffect(() => {
-    request('');
-  }, [props.endpoint]);
+  useEffect(() => request(''), []);
+  useEffect(() => request(''), [props.endpoint]);
+  useEffect(() => filter(), [props.exclude]);
 
   useEffect(() => {
     window.addEventListener('invalidate.combobox.queries', (event: any) => {
@@ -223,7 +231,7 @@ export function DebouncedCombobox(props: Props) {
             </button>
           )}
 
-          {records
+          {filteredRecords
             .filter((record) => !record.internal)
             .map((record, index) => (
               <Combobox.Option
