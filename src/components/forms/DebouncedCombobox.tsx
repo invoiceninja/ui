@@ -18,6 +18,7 @@ import { useQueryClient } from 'react-query';
 import { InputLabel } from './InputLabel';
 import { Spinner } from 'components/Spinner';
 import { useTranslation } from 'react-i18next';
+import { Alert } from 'components/Alert';
 
 export interface Record<T = any> {
   value: string | number;
@@ -45,6 +46,7 @@ interface Props {
   exclude?: (string | number)[];
   clearInputAfterSelection?: boolean;
   withShadowRecord?: boolean;
+  errorMessage?: string | string[];
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -272,6 +274,12 @@ export function DebouncedCombobox(props: Props) {
           </Combobox.Options>
         )}
       </Combobox>
+
+      {props.errorMessage && (
+        <Alert className="mt-2" type="danger">
+          {props.errorMessage}
+        </Alert>
+      )}
     </div>
   );
 }
