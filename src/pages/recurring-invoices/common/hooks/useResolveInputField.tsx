@@ -55,12 +55,14 @@ export function useResolveInputField() {
       return (
         <ProductSelector
           onChange={(value) =>
-            handleProductChange(index, value.resource as Product)
+            handleProductChange(index, value.label, value.resource)
           }
           className="w-auto"
           onInputFocus={() => setCurrentLineItemIndex(index)}
           defaultValue={invoice?.line_items[index][property]}
-          onProductCreated={(product) => handleProductChange(index, product)}
+          onProductCreated={(product) =>
+            handleProductChange(index, product.product_key, product)
+          }
         />
       );
     }
