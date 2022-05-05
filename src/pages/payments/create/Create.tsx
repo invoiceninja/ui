@@ -126,6 +126,7 @@ export function Create() {
         invoice_id: id,
       },
     ]);
+
   };
 
   const handleRemovingInvoice = (id: string) => {
@@ -230,7 +231,7 @@ export function Create() {
 
               <Element leftSide={t('invoices')}>
                 <DebouncedCombobox
-                  endpoint={generatePath('/api/v1/invoices?payable=:clientId', {
+                  endpoint={generatePath('/api/v1/invoices?payable=:clientId&per_page=10000', {
                     clientId: formik.values.client_id,
                   })}
                   label="number"
