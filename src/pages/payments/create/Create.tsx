@@ -91,6 +91,7 @@ export function Create() {
         .catch((error: AxiosError) => {
           console.error(error);
           toast.error(t('error_title'), { id: toastId });
+
           if (error.response?.status === 422) {
             setErrors(error.response.data);
           }
@@ -159,10 +160,8 @@ export function Create() {
                 )
               }
               defaultValue={formik.values.client_id}
+              errorMessage={errors?.errors.client_id}
             />
-            {errors?.errors.client_id && (
-              <Alert type="danger">{errors.errors.client_id}</Alert>
-            )}
           </Element>
 
           <Element leftSide={t('amount')}>
@@ -260,6 +259,7 @@ export function Create() {
               id="date"
               value={formik.values.date}
               onChange={formik.handleChange}
+              errorMessage={errors?.errors.date}
             />
           </Element>
 
@@ -268,6 +268,7 @@ export function Create() {
               id="type_id"
               defaultValue={formik.values.type_id}
               onChange={formik.handleChange}
+              errorMessage={errors?.errors.type_id}
             >
               <option value=""></option>
               {Object.entries(paymentType).map(([id, type], index) => (
@@ -282,6 +283,7 @@ export function Create() {
             <InputField
               id="transaction_reference"
               onChange={formik.handleChange}
+              errorMessage={errors?.errors.transaction_reference}
             />
           </Element>
 
@@ -290,6 +292,7 @@ export function Create() {
               element="textarea"
               id="private_notes"
               onChange={formik.handleChange}
+              errorMessage={errors?.errors.private_notes}
             />
           </Element>
 
