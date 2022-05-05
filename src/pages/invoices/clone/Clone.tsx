@@ -34,9 +34,12 @@ export function Clone() {
   const { id } = useParams();
   const { data: invoice } = useInvoiceQuery({ id });
   const [t] = useTranslation();
-  const dispatch = useDispatch();
+
   const [errors, setErrors] = useState<ValidationBag>();
+
+  const dispatch = useDispatch();
   const handleCreate = useHandleCreate(setErrors);
+
   const currentInvoice = useCurrentInvoice();
 
   const pages: BreadcrumRecord[] = [
@@ -49,10 +52,12 @@ export function Clone() {
 
   useEffect(() => {
     if (invoice?.data.data) {
-      dispatch(setCurrentInvoice({
-        ...invoice.data.data,
-        number: ''})
-        );
+      dispatch(
+        setCurrentInvoice({
+          ...invoice.data.data,
+          number: '',
+        })
+      );
     }
   }, [invoice]);
 
