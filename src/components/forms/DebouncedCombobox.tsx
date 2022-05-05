@@ -44,6 +44,7 @@ interface Props {
   onInputFocus?: () => unknown;
   exclude?: (string | number)[];
   clearInputAfterSelection?: boolean;
+  withShadowRecord?: boolean;
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -138,7 +139,11 @@ export function DebouncedCombobox(props: Props) {
     if (!props.disabled && selectedOption.withoutEvents === false) {
       filter();
 
-      props.onChange(selectedOption.record);
+      if (!selectedOption.record.internal) {
+        props.onChange(selectedOption.record);
+      } else if (selectedOption.record.internal && props.withShadowRecord) {
+        props.onChange(selectedOption.record);
+      }
 
       if (props.clearInputAfterSelection) {
         setSelectedOption({ record: internalRecord, withoutEvents: true });
