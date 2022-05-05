@@ -30,15 +30,17 @@ import { generatePath, useParams } from 'react-router-dom';
 
 export function Edit() {
   const [t] = useTranslation();
-  const { id } = useParams();
+  const [errors, setErrors] = useState<ValidationBag>();
+
   const company = useCurrentCompany();
+
+  const { id } = useParams();
   const { data: payment } = usePaymentQuery({ id });
   const [convertCurrency, setconvertCurrency] = useConvertCurrencyToggle({
     id,
   });
 
   const queryClient = useQueryClient();
-  const [errors, setErrors] = useState<ValidationBag>();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -93,19 +95,23 @@ export function Edit() {
           errorMessage={errors?.errors.payment_amount}
         />
       </Element>
+
       <Element leftSide={t('payment_date')}>
         <InputField
           id="date"
           type="date"
           value={formik.values.date}
           onChange={formik.handleChange}
+          errorMessage={errors?.errors.date}
         />
       </Element>
+
       <Element leftSide={t('payment_type')}>
         <SelectField
           id="type_id"
           value={payment?.data.data.type_id}
           onChange={formik.handleChange}
+          errorMessage={errors?.errors.type_id}
         >
           <option value=""></option>
           {Object.entries(paymentType).map((value: any, index: any) => {
@@ -117,20 +123,26 @@ export function Edit() {
           })}
         </SelectField>
       </Element>
+
       <Element leftSide={t('transaction_reference')}>
         <InputField
           id="transaction_reference"
           onChange={formik.handleChange}
           value={formik.values.transaction_reference}
+          errorMessage={errors?.errors.transaction_reference}
         ></InputField>
       </Element>
+
       <Element leftSide={t('private_notes')}>
-        <Textarea
+        <InputField
+          element="textarea"
           id="private_notes"
           value={formik.values.private_notes}
           onChange={formik.handleChange}
+          errorMessage={errors?.errors.private_notes}
         />
       </Element>
+
       {company?.custom_fields?.payment1 && (
         <CustomField
           field="payment1"
@@ -139,6 +151,7 @@ export function Edit() {
           onChange={(value) => formik.setFieldValue('custom_value1', value)}
         />
       )}
+
       {company?.custom_fields?.payment2 && (
         <CustomField
           field="custom_value2"
@@ -165,6 +178,7 @@ export function Edit() {
           onChange={(value) => formik.setFieldValue('custom_value4', value)}
         />
       )}
+
       <Element leftSide={t('convert_currency')}>
         <Toggle
           checked={formik.values.exchange_currency_id}
@@ -175,6 +189,7 @@ export function Edit() {
           }}
         />
       </Element>
+
       {convertCurrency && (
         <ConvertCurrency
           currency_id={payment?.data.data.currency_id}
