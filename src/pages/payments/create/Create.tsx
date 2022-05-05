@@ -204,7 +204,7 @@ export function Create() {
                   >
                     <div className="flex items-center space-x-2">
                       <InputField
-                        label={t('applied')}
+                        label={t('amount')}
                         onChange={(event: ChangeEvent<HTMLInputElement>) => {
                           formik.setFieldValue('amount', event.target.value);
 
