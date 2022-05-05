@@ -49,7 +49,10 @@ export function Clone() {
 
   useEffect(() => {
     if (invoice?.data.data) {
-      dispatch(setCurrentInvoice(invoice.data.data));
+      dispatch(setCurrentInvoice({
+        ...invoice.data.data,
+        number: ''})
+        );
     }
   }, [invoice]);
 
