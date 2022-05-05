@@ -145,7 +145,7 @@ export function Edit() {
 
       {company?.custom_fields?.payment1 && (
         <CustomField
-          field="payment1"
+          field="custom_value1"
           defaultValue={payment?.data.data.custom_value1}
           value={company?.custom_fields?.payment1}
           onChange={(value) => formik.setFieldValue('custom_value1', value)}
