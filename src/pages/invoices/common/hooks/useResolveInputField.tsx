@@ -25,7 +25,6 @@ import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { useDispatch } from 'react-redux';
 import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { ProductSelector } from 'components/products/ProductSelector';
-import { Product } from 'common/interfaces/product';
 
 const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
