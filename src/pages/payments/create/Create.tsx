@@ -21,7 +21,6 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useClientsQuery } from 'common/queries/clients';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useBlankPaymentQuery } from 'common/queries/payments';
-import { Alert } from 'components/Alert';
 import { Divider } from 'components/cards/Divider';
 import { Container } from 'components/Container';
 import { ConvertCurrency } from 'components/ConvertCurrency';

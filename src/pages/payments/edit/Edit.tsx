@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField, Textarea } from '@invoiceninja/forms';
+import { InputField, SelectField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import paymentType from 'common/constants/payment-type';
 import { endpoint } from 'common/helpers';
