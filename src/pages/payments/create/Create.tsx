@@ -84,7 +84,9 @@ export function Create() {
         )
         .then((data) => {
           toast.success(t('created_payment'), { id: toastId });
-          navigate(generatePath('/payments/:id/edit', { id: data.data.data.id }));
+          navigate(
+            generatePath('/payments/:id/edit', { id: data.data.data.id })
+          );
         })
         .catch((error: AxiosError) => {
           console.error(error);
@@ -234,6 +236,7 @@ export function Create() {
                     clientId: formik.values.client_id,
                   })}
                   label="number"
+                  clearInputAfterSelection
                   onChange={(value: Record<Invoice>) =>
                     handleInvoiceChange(
                       value.resource?.id as string,
@@ -241,6 +244,9 @@ export function Create() {
                       value.resource?.balance as number
                     )
                   }
+                  exclude={collect(formik.values.invoices)
+                    .pluck('invoice_id')
+                    .toArray()}
                 />
               </Element>
             </>
