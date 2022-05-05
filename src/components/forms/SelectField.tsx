@@ -9,6 +9,7 @@
  */
 
 import classNames from 'classnames';
+import { Alert } from 'components/Alert';
 import { InputLabel } from '.';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
@@ -18,6 +19,7 @@ interface Props extends CommonProps {
   required?: boolean;
   withBlank?: boolean;
   onValueChange?: (value: string) => unknown;
+  errorMessage?: string | string[];
 }
 
 export function SelectField(props: Props) {
@@ -46,6 +48,12 @@ export function SelectField(props: Props) {
         {props.withBlank && <option value=""></option>}
         {props.children}
       </select>
+
+      {props.errorMessage && (
+        <Alert className="mt-2" type="danger">
+          {props.errorMessage}
+        </Alert>
+      )}
     </section>
   );
 }
