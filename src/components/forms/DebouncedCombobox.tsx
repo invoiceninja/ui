@@ -16,6 +16,8 @@ import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useQueryClient } from 'react-query';
 import { InputLabel } from './InputLabel';
+import { Spinner } from 'components/Spinner';
+import { useTranslation } from 'react-i18next';
 
 export interface Record<T = any> {
   value: string | number;
@@ -47,10 +49,12 @@ interface Props {
 const internalRecord = { value: '', label: '', internal: true };
 
 export function DebouncedCombobox(props: Props) {
+  const [t] = useTranslation();
   const [records, setRecords] = useState<Record[]>([internalRecord]);
   const [filteredRecords, setFilteredRecords] = useState<Record[]>([
     internalRecord,
   ]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const [selectedOption, setSelectedOption] = useState({
     record: records[0],
@@ -66,6 +70,8 @@ export function DebouncedCombobox(props: Props) {
   }, [props.defaultValue]);
 
   const request = (query: string, staleTime = Infinity) => {
+    setIsLoading(true);
+
     const url = new URL(endpoint(props.endpoint));
 
     if (query) {
@@ -99,6 +105,7 @@ export function DebouncedCombobox(props: Props) {
         );
 
         setRecords(array);
+        setIsLoading(false);
       });
   };
 
@@ -188,7 +195,7 @@ export function DebouncedCombobox(props: Props) {
               onFocus={props.onInputFocus}
             />
 
-            {props.clearButton && !props.disabled && (
+            {props.clearButton && !props.disabled && !isLoading && (
               <div className="absolute inset-y-0 right-0 mt-2.5 mr-1 cursor-pointer">
                 <X
                   className="absolute inset-y-0 right-0 text-gray-400 h-4"
@@ -197,13 +204,19 @@ export function DebouncedCombobox(props: Props) {
               </div>
             )}
 
-            {!props.clearButton && (
+            {!props.clearButton && !isLoading && (
               <div className="absolute inset-y-0 right-0 mt-2.5 mr-1 cursor-pointer">
                 <ChevronDown
                   className="absolute inset-y-0 right-0 text-gray-400 h-4"
                   aria-hidden="true"
                   onClick={() => openDropdownButton.current?.click()}
                 />
+              </div>
+            )}
+
+            {isLoading && (
+              <div className="absolute inset-y-0 right-0 mt-2 mr-1.5 cursor-pointer">
+                <Spinner />
               </div>
             )}
 
@@ -220,29 +233,39 @@ export function DebouncedCombobox(props: Props) {
             </Combobox.Button>
           </div>
         </div>
-        <Combobox.Options className="absolute z-10 w-80 py-1 mt-2.5 overflow-auto text-base bg-white rounded-md shadow-xl max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-          {props.onActionClick && props.actionLabel && (
-            <button
-              className="w-full bg-gray-100 -mt-1 border-b cursor-pointer select-none relative py-2 px-3 text-gray-900"
-              type="button"
-              onClick={props.onActionClick}
-            >
-              {props.actionLabel}
-            </button>
-          )}
 
-          {filteredRecords
-            .filter((record) => !record.internal)
-            .map((record, index) => (
-              <Combobox.Option
-                className="cursor-pointer select-none relative py-2 px-3 text-gray-900 hover:bg-gray-100"
-                key={index}
-                value={record}
+        {!isLoading && (
+          <Combobox.Options className="absolute z-10 w-80 py-1 mt-2.5 overflow-auto text-base bg-white rounded-md shadow-xl max-h-60 ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
+            {props.onActionClick && props.actionLabel && (
+              <button
+                className="w-full bg-gray-100 -mt-1 border-b cursor-pointer select-none relative py-2 px-3 text-gray-900"
+                type="button"
+                onClick={props.onActionClick}
               >
-                {record.label}
-              </Combobox.Option>
-            ))}
-        </Combobox.Options>
+                {props.actionLabel}
+              </button>
+            )}
+
+            {filteredRecords
+              .filter((record) => !record.internal)
+              .map((record, index) => (
+                <Combobox.Option
+                  className="cursor-pointer select-none relative py-2 px-3 text-gray-900 hover:bg-gray-100"
+                  key={index}
+                  value={record}
+                >
+                  {record.label}
+                </Combobox.Option>
+              ))}
+
+            {filteredRecords.filter((record) => !record.internal).length ===
+              0 && (
+              <div className="select-none relative py-2 px-3 text-gray-700 hover:bg-gray-100">
+                {t('no_records_found')}.
+              </div>
+            )}
+          </Combobox.Options>
+        )}
       </Combobox>
     </div>
   );
