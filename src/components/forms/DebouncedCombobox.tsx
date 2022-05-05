@@ -40,6 +40,7 @@ interface Props {
   onClearButtonClick?: any;
   inputLabel?: string;
   onInputFocus?: () => unknown;
+  exclude?: string[] | number[];
 }
 
 const internalRecord = { value: '', label: '', internal: true };
@@ -131,6 +132,16 @@ export function DebouncedCombobox(props: Props) {
 
     if (potential) {
       setSelectedOption({ record: potential, withoutEvents: true });
+    }
+
+    if (props.exclude) {
+      setRecords((current) =>
+        current.filter(
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          (element) => props.exclude && !props.exclude.includes(element.value)
+        )
+      );
     }
   }, [records, defaultValueProperty]);
 
