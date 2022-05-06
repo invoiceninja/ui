@@ -24,32 +24,34 @@ import { Card } from '@invoiceninja/cards';
 import { InputLabel, InputField } from '@invoiceninja/forms';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { TabGroup } from 'components/TabGroup';
-import { Field } from 'pages/settings/custom-fields/components'; 
+import { Field } from 'pages/settings/custom-fields/components';
 import { Element } from '@invoiceninja/cards';
 import { useHandleCustomSurchargeFieldChange } from 'common/hooks/useHandleCustomSurchargeFieldChange';
+import { Divider } from 'components/cards/Divider';
 
 export function InvoiceFooter() {
   const [t] = useTranslation();
-  const handleChange = useSetCurrentInvoiceProperty();
-  const company = useCurrentCompany();
-  const handleCustomFieldChange = useHandleCustomFieldChange();
-  const handleCustomSurchargeFieldChange = useHandleCustomSurchargeFieldChange();
+
   const dispatch = useDispatch();
+  const company = useCurrentCompany();
   const invoice = useCurrentInvoice();
 
-  const surchargeValue = (index: number) => {
+  const handleChange = useSetCurrentInvoiceProperty();
+  const handleCustomFieldChange = useHandleCustomFieldChange();
+  const handleCustomSurchargeFieldChange =
+    useHandleCustomSurchargeFieldChange();
 
+  const surchargeValue = (index: number) => {
     switch (index) {
       case 0:
-        return company?.custom_surcharge_taxes1;        
+        return company?.custom_surcharge_taxes1;
       case 1:
-        return company?.custom_surcharge_taxes2;  
+        return company?.custom_surcharge_taxes2;
       case 2:
-        return company?.custom_surcharge_taxes3;  
+        return company?.custom_surcharge_taxes3;
       case 3:
-        return company?.custom_surcharge_taxes4;  
+        return company?.custom_surcharge_taxes4;
     }
-
   };
 
   const setSurchargeTaxValue = (index: number) => {
@@ -59,7 +61,7 @@ export function InvoiceFooter() {
           updateChanges({
             object: 'company',
             property: 'custom_surcharge_taxes1',
-            value: !company?.custom_surcharge_taxes1
+            value: !company?.custom_surcharge_taxes1,
           })
         );
         break;
@@ -68,7 +70,7 @@ export function InvoiceFooter() {
           updateChanges({
             object: 'company',
             property: 'custom_surcharge_taxes2',
-            value: !company?.custom_surcharge_taxes2
+            value: !company?.custom_surcharge_taxes2,
           })
         );
         break;
@@ -77,7 +79,7 @@ export function InvoiceFooter() {
           updateChanges({
             object: 'company',
             property: 'custom_surcharge_taxes3',
-            value: !company?.custom_surcharge_taxes3
+            value: !company?.custom_surcharge_taxes3,
           })
         );
         break;
@@ -86,12 +88,12 @@ export function InvoiceFooter() {
           updateChanges({
             object: 'company',
             property: 'custom_surcharge_taxes4',
-            value: !company?.custom_surcharge_taxes4
+            value: !company?.custom_surcharge_taxes4,
           })
         );
         break;
     }
-  }
+  };
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
@@ -226,27 +228,34 @@ export function InvoiceFooter() {
                 noExternalPadding
               />
             ))}
-            <hr></hr>
+
+          <Divider />
+
           {company &&
-            ['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map((field, index) => (
-              <>
-                <InputField
-                  id={field}
-                  value={company.custom_fields[field]}
-                  placeholder={t('surcharge_field')}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) => handleCustomSurchargeFieldChange(field, event.target.value)}
-                  className="w-1/2 mt-5"
-                />
-                <Element leftSide={t('charge_taxes')} className="float-right">
+            ['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
+              (field, index) => (
+                <Element
+                  noExternalPadding
+                  key={index}
+                  leftSide={
+                    <InputField
+                      id={field}
+                      value={company.custom_fields[field]}
+                      placeholder={t('surcharge_field')}
+                      onValueChange={(value) =>
+                        handleCustomSurchargeFieldChange(field, value)
+                      }
+                    />
+                  }
+                >
                   <Toggle
+                    label={t('charge_taxes')}
                     checked={surchargeValue(index)}
-                    onChange={() => {
-                      setSurchargeTaxValue(index);
-                    }}
+                    onChange={() => setSurchargeTaxValue(index)}
                   />
                 </Element>
-              </>
-            ))}
+              )
+            )}
         </Tab.Panel>
       </TabGroup>
     </Card>
