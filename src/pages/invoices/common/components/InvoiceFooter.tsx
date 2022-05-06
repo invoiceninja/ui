@@ -8,28 +8,51 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Tab } from '@headlessui/react';
-import { Card } from '@invoiceninja/cards';
-import { InputField, InputLabel } from '@invoiceninja/forms';
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
-import { TabGroup } from 'components/TabGroup';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InvoiceDocuments } from './InvoiceDocuments';
 import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
-import { Field } from 'pages/settings/custom-fields/components';
 import { MarkdownEditor } from 'components/forms/MarkdownEditor';
+import { Tab } from '@headlessui/react';
+import { Card } from '@invoiceninja/cards';
+import { InputLabel, InputField } from '@invoiceninja/forms';
+import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
+import { TabGroup } from 'components/TabGroup';
+import { Field } from 'pages/settings/custom-fields/components';
+import { Element } from '@invoiceninja/cards';
+import { useHandleCustomSurchargeFieldChange } from 'common/hooks/useHandleCustomSurchargeFieldChange';
+import { Divider } from 'components/cards/Divider';
+import { useSetSurchageTaxValue } from '../hooks/useSetSurchargeTaxValue';
 
 export function InvoiceFooter() {
   const [t] = useTranslation();
-  const invoice = useCurrentInvoice();
-  const handleChange = useSetCurrentInvoiceProperty();
+
   const company = useCurrentCompany();
+  const invoice = useCurrentInvoice();
+
+  const handleChange = useSetCurrentInvoiceProperty();
   const handleCustomFieldChange = useHandleCustomFieldChange();
+  const handleCustomSurchargeFieldChange =
+    useHandleCustomSurchargeFieldChange();
+
+  const surchargeValue = (index: number) => {
+    switch (index) {
+      case 0:
+        return company?.custom_surcharge_taxes1;
+      case 1:
+        return company?.custom_surcharge_taxes2;
+      case 2:
+        return company?.custom_surcharge_taxes3;
+      case 3:
+        return company?.custom_surcharge_taxes4;
+    }
+  };
+
+  const setSurchargeTaxValue = useSetSurchageTaxValue();
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
@@ -160,10 +183,38 @@ export function InvoiceFooter() {
                 initialValue={company.custom_fields[field]}
                 field={field}
                 placeholder={t('invoice_field')}
-                onChange={(value) => handleCustomFieldChange(field, value)}
+                onChange={(value: any) => handleCustomFieldChange(field, value)}
                 noExternalPadding
               />
             ))}
+
+          <Divider />
+
+          {company &&
+            ['surcharge1', 'surcharge2', 'surcharge3', 'surcharge4'].map(
+              (field, index) => (
+                <Element
+                  noExternalPadding
+                  key={index}
+                  leftSide={
+                    <InputField
+                      id={field}
+                      value={company.custom_fields[field]}
+                      placeholder={t('surcharge_field')}
+                      onValueChange={(value) =>
+                        handleCustomSurchargeFieldChange(field, value)
+                      }
+                    />
+                  }
+                >
+                  <Toggle
+                    label={t('charge_taxes')}
+                    checked={surchargeValue(index)}
+                    onChange={() => setSurchargeTaxValue(index)}
+                  />
+                </Element>
+              )
+            )}
         </Tab.Panel>
       </TabGroup>
     </Card>

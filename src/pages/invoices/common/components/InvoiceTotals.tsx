@@ -20,6 +20,7 @@ import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
 import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 import { useTotalVariables } from '../hooks/useTotalVariables';
 import { TaxCreate } from './TaxCreate';
+import { CustomField } from 'components/CustomField';
 
 export function InvoiceTotals() {
   const variables = useTotalVariables();
@@ -40,6 +41,42 @@ export function InvoiceTotals() {
         <Fragment key={index}>{resolveVariable(variable)}</Fragment>
       ))}
 
+      {company && company?.custom_fields?.surcharge1 && (
+        <CustomField
+          field="surcharge1"
+          defaultValue={invoice?.custom_surcharge1}
+          value={invoice?.custom_surcharge1.toString() || ''}
+          onChange={(value) => handleChange('custom_surcharge1', value)}
+        />
+      )}
+
+      {company && company?.custom_fields?.surcharge2 && (
+        <CustomField
+          field="surcharge2"
+          defaultValue={invoice?.custom_surcharge2}
+          value={invoice?.custom_surcharge2.toString() || ''}
+          onChange={(value) => handleChange('custom_surcharge2', value)}
+        />
+      )}
+
+      {company && company?.custom_fields?.surcharge3 && (
+        <CustomField
+          field="surcharge3"
+          defaultValue={invoice?.custom_surcharge3}
+          value={invoice?.custom_surcharge3.toString() || ''}
+          onChange={(value) => handleChange('custom_surcharge3', value)}
+        />
+      )}
+
+      {company && company?.custom_fields?.surcharge4 && (
+        <CustomField
+          field="surcharge4"
+          defaultValue={invoice?.custom_surcharge4}
+          value={invoice?.custom_surcharge4.toString() || ''}
+          onChange={(value) => handleChange('custom_surcharge4', value)}
+        />
+      )}
+      
       {company && company.enabled_tax_rates > 0 && (
         <Element leftSide={t('tax')}>
           <DebouncedCombobox
