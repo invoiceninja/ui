@@ -88,7 +88,7 @@ export function ProductsTable() {
                 ))}
 
               {invoice?.client_id && (
-                <Tr>
+                <Tr className='bg-slate-100 hover:bg-slate-200'>
                   <Td colSpan={100}>
                     <button
                       onClick={() => dispatch(injectBlankItemIntoCurrent())}

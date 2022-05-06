@@ -136,8 +136,8 @@ export class InvoiceItemSum {
   }
 
   protected calculateAmountLineTax(rate: number, amount: number) {
-    
-    return Number(Number(((amount * rate) / 100).toFixed(3)).toFixed(this.currency.precision));
+   
+    return  Math.round( (((amount * rate) / 100) * 1000) / 10) / 100;
 
   }
 

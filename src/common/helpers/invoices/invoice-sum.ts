@@ -192,6 +192,8 @@ export class InvoiceSum {
   protected calculateTotals() {
     this.total += this.totalTaxes;
 
+    this.total.toFixed(this.currency.precision);
+
     return this;
   }
 
@@ -255,8 +257,8 @@ export class InvoiceSum {
   }
 
   protected taxer(amount: number, tax_rate: number) {
-    // This needs extraction in the taxer service/class.
-    return Number(Number((amount * ((tax_rate ?? 0) / 100)).toFixed(3)).toFixed(this.currency.precision));
+    
+    return Math.round((amount * ((tax_rate ?? 0) / 100) * 1000) / 10) / 100;
 
   }
 
