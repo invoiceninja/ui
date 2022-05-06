@@ -137,9 +137,8 @@ export class InvoiceItemSum {
 
   protected calculateAmountLineTax(rate: number, amount: number) {
    
-    let tax = Math.round( (((amount * rate) / 100) * 1000) / 10) / 100;
+    return  Math.round( (((amount * rate) / 100) * 1000) / 10) / 100;
 
-    return tax;
   }
 
   protected push() {

@@ -258,9 +258,7 @@ export class InvoiceSum {
 
   protected taxer(amount: number, tax_rate: number) {
     
-    let tax = Math.round((amount * ((tax_rate ?? 0) / 100) * 1000) / 10) / 100;
-
-    return tax;
+    return Math.round((amount * ((tax_rate ?? 0) / 100) * 1000) / 10) / 100;
 
   }
 
