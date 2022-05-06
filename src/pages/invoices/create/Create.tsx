@@ -30,6 +30,10 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import { ValidationAlert } from 'components/ValidationAlert';
 import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoiceProperty';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { cloneDeep } from 'lodash';
+import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
+import { setCurrentInvoicePropertySync } from 'common/stores/slices/invoices';
 
 export function Create() {
   const { documentTitle } = useTitle('new_invoice');
@@ -47,6 +51,7 @@ export function Create() {
 
   const currentInvoice = useCurrentInvoice();
   const company = useCurrentCompany();
+  const clientResolver = useClientResolver();
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -64,16 +69,45 @@ export function Create() {
         handleChange('tax_name1', company.settings?.tax_name1);
         handleChange('tax_rate1', company.settings?.tax_rate1);
       }
+
       if (company && company.enabled_tax_rates > 1) {
         handleChange('tax_name2', company.settings?.tax_name2);
         handleChange('tax_rate2', company.settings?.tax_rate2);
       }
+
       if (company && company.enabled_tax_rates > 2) {
         handleChange('tax_name3', company.settings?.tax_name3);
         handleChange('tax_rate3', company.settings?.tax_rate3);
       }
     }
   }, [invoice]);
+
+  useEffect(() => {
+    if (currentInvoice?.client_id) {
+      clientResolver
+        .find(currentInvoice.client_id)
+        .then((client) => {
+          const invitations: Record<string, unknown>[] = [];
+
+          client.contacts.map((contact) => {
+            if (contact.send_email) {
+              const invitation = cloneDeep(blankInvitation);
+
+              invitation.client_contact_id = contact.id;
+              invitations.push(invitation);
+            }
+          });
+
+          dispatch(
+            setCurrentInvoicePropertySync({
+              property: 'invitations',
+              value: invitations,
+            })
+          );
+        })
+        .catch((error) => console.error(error));
+    }
+  }, [currentInvoice?.client_id]);
 
   useEffect(() => {
     if (searchParams.has('client') && !hasClientSet && currentInvoice) {
