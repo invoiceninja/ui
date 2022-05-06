@@ -17,8 +17,6 @@ import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoicePrope
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { MarkdownEditor } from 'components/forms/MarkdownEditor';
-import { updateChanges } from 'common/stores/slices/company-users';
-import { useDispatch } from 'react-redux';
 import { Tab } from '@headlessui/react';
 import { Card } from '@invoiceninja/cards';
 import { InputLabel, InputField } from '@invoiceninja/forms';
@@ -28,11 +26,11 @@ import { Field } from 'pages/settings/custom-fields/components';
 import { Element } from '@invoiceninja/cards';
 import { useHandleCustomSurchargeFieldChange } from 'common/hooks/useHandleCustomSurchargeFieldChange';
 import { Divider } from 'components/cards/Divider';
+import { useSetSurchageTaxValue } from '../hooks/useSetSurchargeTaxValue';
 
 export function InvoiceFooter() {
   const [t] = useTranslation();
 
-  const dispatch = useDispatch();
   const company = useCurrentCompany();
   const invoice = useCurrentInvoice();
 
@@ -54,46 +52,7 @@ export function InvoiceFooter() {
     }
   };
 
-  const setSurchargeTaxValue = (index: number) => {
-    switch (index) {
-      case 0:
-        dispatch(
-          updateChanges({
-            object: 'company',
-            property: 'custom_surcharge_taxes1',
-            value: !company?.custom_surcharge_taxes1,
-          })
-        );
-        break;
-      case 1:
-        dispatch(
-          updateChanges({
-            object: 'company',
-            property: 'custom_surcharge_taxes2',
-            value: !company?.custom_surcharge_taxes2,
-          })
-        );
-        break;
-      case 2:
-        dispatch(
-          updateChanges({
-            object: 'company',
-            property: 'custom_surcharge_taxes3',
-            value: !company?.custom_surcharge_taxes3,
-          })
-        );
-        break;
-      case 3:
-        dispatch(
-          updateChanges({
-            object: 'company',
-            property: 'custom_surcharge_taxes4',
-            value: !company?.custom_surcharge_taxes4,
-          })
-        );
-        break;
-    }
-  };
+  const setSurchargeTaxValue = useSetSurchageTaxValue();
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
