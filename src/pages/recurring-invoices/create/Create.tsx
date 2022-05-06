@@ -8,15 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
+import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
+import { setCurrentRecurringInvoicePropertySync } from 'common/stores/slices/recurring-invoices';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { ValidationAlert } from 'components/ValidationAlert';
+import { cloneDeep } from 'lodash';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,6 +49,7 @@ export function Create() {
 
   const currentRecurringInvoice = useCurrentRecurringInvoice();
   const company = useCurrentCompany();
+  const clientResolver = useClientResolver();
 
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
@@ -72,6 +77,33 @@ export function Create() {
       }
     }
   }, [recurringInvoice]);
+
+  useEffect(() => {
+    if (currentRecurringInvoice?.client_id) {
+      clientResolver
+        .find(currentRecurringInvoice.client_id)
+        .then((client) => {
+          const invitations: Record<string, unknown>[] = [];
+
+          client.contacts.map((contact) => {
+            if (contact.send_email) {
+              const invitation = cloneDeep(blankInvitation);
+
+              invitation.client_contact_id = contact.id;
+              invitations.push(invitation);
+            }
+          });
+
+          dispatch(
+            setCurrentRecurringInvoicePropertySync({
+              property: 'invitations',
+              value: invitations,
+            })
+          );
+        })
+        .catch((error) => console.error(error));
+    }
+  }, [currentRecurringInvoice?.client_id]);
 
   return (
     <Default
