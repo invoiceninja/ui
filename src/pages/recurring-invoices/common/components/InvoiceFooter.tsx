@@ -41,7 +41,6 @@ export function InvoiceFooter() {
           t('footer'),
           t('documents'),
           t('settings'),
-          t('custom_fields'),
         ]}
       >
         <Tab.Panel>
@@ -138,19 +137,6 @@ export function InvoiceFooter() {
           </div>
         </Tab.Panel>
 
-        <Tab.Panel>
-          {company &&
-            ['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
-              <Field
-                key={field}
-                initialValue={company.custom_fields[field]}
-                field={field}
-                placeholder={t('invoice_field')}
-                onChange={(value) => handleCustomFieldChange(field, value)}
-                noExternalPadding
-              />
-            ))}
-        </Tab.Panel>
       </TabGroup>
     </Card>
   );
