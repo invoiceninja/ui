@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { BooleanArraySupportOption } from "prettier";
 
 export interface Company {
   id: string;
