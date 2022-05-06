@@ -40,6 +40,7 @@ export function InvoiceTotals() {
       {variables.map((variable, index) => (
         <Fragment key={index}>{resolveVariable(variable)}</Fragment>
       ))}
+
       {company && company?.custom_fields?.surcharge1 && (
         <CustomField
           field="surcharge1"
@@ -48,6 +49,7 @@ export function InvoiceTotals() {
           onChange={(value) => handleChange('custom_surcharge1', value)}
         />
       )}
+
       {company && company?.custom_fields?.surcharge2 && (
         <CustomField
           field="surcharge2"
@@ -56,6 +58,7 @@ export function InvoiceTotals() {
           onChange={(value) => handleChange('custom_surcharge2', value)}
         />
       )}
+
       {company && company?.custom_fields?.surcharge3 && (
         <CustomField
           field="surcharge3"
@@ -64,6 +67,7 @@ export function InvoiceTotals() {
           onChange={(value) => handleChange('custom_surcharge3', value)}
         />
       )}
+
       {company && company?.custom_fields?.surcharge4 && (
         <CustomField
           field="surcharge4"
@@ -72,6 +76,7 @@ export function InvoiceTotals() {
           onChange={(value) => handleChange('custom_surcharge4', value)}
         />
       )}
+      
       {company && company.enabled_tax_rates > 0 && (
         <Element leftSide={t('tax')}>
           <DebouncedCombobox
