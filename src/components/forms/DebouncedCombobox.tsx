@@ -49,9 +49,9 @@ interface Props {
   errorMessage?: string | string[];
 }
 
-const internalRecord = { value: '', label: '', internal: true };
-
 export function DebouncedCombobox(props: Props) {
+  const internalRecord = { value: '', label: '', internal: true };
+
   const [t] = useTranslation();
   const [records, setRecords] = useState<Record[]>([internalRecord]);
   const [filteredRecords, setFilteredRecords] = useState<Record[]>([
