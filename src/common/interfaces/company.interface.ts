@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { BooleanArraySupportOption } from "prettier";
+
 export interface Company {
   id: string;
   size_id: string;
@@ -52,4 +54,8 @@ export interface Company {
   enabled_tax_rates: number;
   enabled_item_tax_rates: number;
   enable_product_discount: boolean;
+  custom_surcharge_taxes1: boolean;
+  custom_surcharge_taxes2: boolean;
+  custom_surcharge_taxes3: boolean;
+  custom_surcharge_taxes4: boolean;
 }
