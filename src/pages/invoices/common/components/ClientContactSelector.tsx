@@ -9,12 +9,10 @@
  */
 
 import { Checkbox } from '@invoiceninja/forms';
-import { ClientResolver } from 'common/helpers/clients/client-resolver';
+import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Client } from 'common/interfaces/client';
 import { toggleCurrentInvoiceInvitation } from 'common/stores/slices/invoices';
-import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
-import { cloneDeep } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -22,7 +20,7 @@ import { useDispatch } from 'react-redux';
 export function ClientContactSelector() {
   const [client, setClient] = useState<Client>();
   const invoice = useCurrentInvoice();
-  const clientResolver = new ClientResolver();
+  const clientResolver = useClientResolver();
   const dispatch = useDispatch();
   const [t] = useTranslation();
 
@@ -39,25 +37,10 @@ export function ClientContactSelector() {
   };
 
   useEffect(() => {
-    if (invoice?.client_id) {
+    invoice?.client_id &&
       clientResolver
         .find(invoice.client_id)
-        .then((client) => {
-          setClient(client);
-
-          const invitations: Record<string, unknown>[] = [];
-
-          client.contacts.map((contact) => {
-            if (contact.send_email) {
-              const invitation = cloneDeep(blankInvitation);
-
-              invitation.client_contact_id = contact.id;
-              invitations.push(invitation);
-            }
-          });
-        })
-        .catch((error) => console.error(error));
-    }
+        .then((client) => setClient(client));
   }, [invoice?.client_id]);
 
   return (
