@@ -18,7 +18,6 @@ import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldCha
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
-import { Field } from 'pages/settings/custom-fields/components';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSetCurrentRecurringInvoiceProperty } from '../hooks/useSetCurrentRecurringInvoiceProperty';
@@ -28,8 +27,6 @@ export function InvoiceFooter() {
   const [t] = useTranslation();
   const invoice = useCurrentRecurringInvoice();
   const handleChange = useSetCurrentRecurringInvoiceProperty();
-  const company = useCurrentCompany();
-  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
