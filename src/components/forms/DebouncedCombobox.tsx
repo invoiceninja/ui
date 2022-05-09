@@ -167,7 +167,21 @@ export function DebouncedCombobox(props: Props) {
     filter();
   }, [records, defaultValueProperty]);
 
-  useEffect(() => request(''), []);
+  useEffect(() => {
+    request('');
+
+    if (props.defaultValue && props.withShadowRecord) {
+      setSelectedOption({
+        record: {
+          value: props.defaultValue as string,
+          label: props.defaultValue as string,
+          internal: true,
+        },
+        withoutEvents: true,
+      });
+    }
+  }, []);
+
   useEffect(() => request(''), [props.endpoint]);
   useEffect(() => filter(), [props.exclude]);
 
