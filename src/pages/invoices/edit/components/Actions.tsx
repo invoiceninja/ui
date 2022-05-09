@@ -76,6 +76,17 @@ export function Actions() {
             {t('client_portal')}
           </DropdownElement>
 
+          {invoice && parseInt(invoice.status_id) < 4 && (
+            <DropdownElement
+              to={generatePath(
+                '/payments/create?invoice=:invoiceId&client=:clientId',
+                { invoiceId: invoice.id, clientId: invoice.client_id }
+              )}
+            >
+              {t('apply_payment')}
+            </DropdownElement>
+          )}
+
           {invoice && <Divider withoutPadding />}
 
           <DropdownElement
