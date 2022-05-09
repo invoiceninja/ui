@@ -14,6 +14,7 @@ import axios, { AxiosError } from 'axios';
 import collect from 'collect.js';
 import paymentType from 'common/constants/payment-type';
 import { endpoint } from 'common/helpers';
+import { useInvoiceResolver } from 'common/hooks/invoices/useInvoiceResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Client } from 'common/interfaces/client';
 import { Invoice } from 'common/interfaces/invoice';
@@ -34,7 +35,12 @@ import { X } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import {
+  generatePath,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from 'react-router-dom';
 import { v4 } from 'uuid';
 
 export function Create() {
@@ -47,10 +53,12 @@ export function Create() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const company = useCurrentCompany();
+  const invoiceResolver = useInvoiceResolver();
 
   const [errors, setErrors] = useState<ValidationBag>();
   const [convertCurrency, setConvertCurrency] = useState(false);
   const [emailInvoice, setEmailInvoice] = useState(false);
+  const [searchParams] = useSearchParams();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -138,6 +146,21 @@ export function Create() {
       )
     );
   };
+
+  useEffect(() => {
+    if (searchParams.has('client')) {
+      formik.setFieldValue('client_id', searchParams.get('client'));
+    }
+
+    if (searchParams.has('invoice')) {
+      invoiceResolver
+        .find(searchParams.get('invoice') || '')
+        .then((invoice) =>
+          handleInvoiceChange(invoice.id, invoice.amount, invoice.balance)
+        )
+        .catch((error) => console.error(error));
+    }
+  }, []);
 
   return (
     <Default title={t('new_payment')}>
