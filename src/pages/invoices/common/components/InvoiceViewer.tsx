@@ -9,6 +9,7 @@
  */
 
 import axios from 'axios';
+import { request } from 'common/helpers/request';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useEffect, useRef } from 'react';
 import { useQueryClient } from 'react-query';
@@ -27,11 +28,7 @@ export function InvoiceViewer(props: Props) {
   useEffect(() => {
     queryClient
       .fetchQuery(props.link, () =>
-        axios({
-          method: props.method,
-          url: props.link,
-          data: props.resource,
-          headers: defaultHeaders(),
+        request(props.method, props.link, props.resource, {
           responseType: 'arraybuffer',
         })
       )
