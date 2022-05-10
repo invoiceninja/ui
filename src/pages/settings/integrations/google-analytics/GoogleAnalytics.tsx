@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField, Link } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
@@ -66,12 +67,11 @@ export function GoogleAnalytics() {
   const onSave = () => {
     const toastId = toast.loading(t('processing'));
 
-    axios
-      .put(
-        endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
-        companyChanges,
-        { headers: defaultHeaders() }
-      )
+    request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
+      companyChanges
+    )
       .then((response) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
 

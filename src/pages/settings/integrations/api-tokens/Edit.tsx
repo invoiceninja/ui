@@ -27,6 +27,7 @@ import { Badge } from 'components/Badge';
 import { Restore } from './components/Restore';
 import { Delete } from './components/Delete';
 import { useTitle } from 'common/hooks/useTitle';
+import { request } from 'common/helpers/request';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -61,10 +62,7 @@ export function Edit() {
       setErrors({});
       const toastId = toast.loading(t('processing'));
 
-      axios
-        .put(endpoint('/api/v1/tokens/:id', { id }), values, {
-          headers: { 'X-Api-Password': password, ...defaultHeaders() },
-        })
+      request('PUT', endpoint('/api/v1/tokens/:id', { id }), values)
         .then(() => {
           toast.success(t('updated_token'), { id: toastId });
         })

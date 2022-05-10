@@ -9,6 +9,7 @@
  */
 
 import axios from 'axios';
+import { request } from 'common/helpers/request';
 import { Invoice } from 'common/interfaces/invoice';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useQueryClient } from 'react-query';
@@ -23,11 +24,7 @@ export function useDownloadPdf() {
 
     if (downloadableUrl) {
       queryClient.fetchQuery(downloadableUrl, () =>
-        axios
-          .get(downloadableUrl, {
-            headers: defaultHeaders(),
-            responseType: 'arraybuffer',
-          })
+        request('GET', downloadableUrl, {}, { responseType: 'arraybuffer' })
           .then((response) => {
             const blob = new Blob([response.data], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);

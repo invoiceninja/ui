@@ -12,6 +12,7 @@ import { ActionCard, Card, CardContainer, Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { bulk, usePaymentTermQuery } from 'common/queries/payment-terms';
@@ -62,12 +63,11 @@ export function Edit() {
     onSubmit: (values: Partial<PaymentTerm>) => {
       toast.loading(t('processing'));
 
-      axios
-        .put(
-          endpoint('/api/v1/payment_terms/:id', { id: data?.data.data.id }),
-          values,
-          { headers: defaultHeaders() }
-        )
+      request(
+        'PUT',
+        endpoint('/api/v1/payment_terms/:id', { id: data?.data.data.id }),
+        values
+      )
         .then(() => {
           toast.dismiss();
           toast.success(t('updated_payment_term'));

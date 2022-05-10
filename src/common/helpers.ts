@@ -8,10 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosResponse, Method } from 'axios';
+import axios, { AxiosRequestHeaders, AxiosResponse, Method } from 'axios';
 import dayjs from 'dayjs';
 import { generatePath } from 'react-router';
 import entityState from './constants/entity-state';
+import { request } from './helpers/request';
 
 export function endpoint(endpoint: string, params = {}): string {
   return import.meta.env.VITE_API_URL + generatePath(endpoint, params);
@@ -33,23 +34,10 @@ export function handleCheckboxChange(id: string, set: any) {
 
 export function fetcher(
   url: string,
-  headers?: object,
+  headers?: AxiosRequestHeaders,
   method: Method = 'GET'
 ): Promise<AxiosResponse> {
-  return axios
-    .request({
-      method,
-      url,
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'Content-Type': 'application/json',
-        'X-Api-Token': localStorage.getItem(
-          'X-NINJA-TOKEN'
-        ) as unknown as string,
-        ...headers,
-      },
-    })
-    .then((response) => response);
+  return request(method, url, {}, { headers });
 }
 
 export function classNames(...classes: any) {

@@ -10,6 +10,7 @@
 
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { defaultHeaders } from 'common/queries/common/headers';
 import toast from 'react-hot-toast';
@@ -28,14 +29,11 @@ export function useHandleUpdate(companyGateway: CompanyGateway | undefined) {
 
     const toastId = toast.loading(t('processing'));
 
-    axios
-      .put(
-        endpoint('/api/v1/company_gateways/:id', { id: companyGateway.id }),
-        companyGateway,
-        {
-          headers: defaultHeaders(),
-        }
-      )
+    request(
+      'PUT',
+      endpoint('/api/v1/company_gateways/:id', { id: companyGateway.id }),
+      companyGateway
+    )
       .then(() => toast.success(t('updated_company_gateway'), { id: toastId }))
       .catch((error) => {
         console.error(error);

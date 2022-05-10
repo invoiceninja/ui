@@ -12,6 +12,7 @@ import { Card, CardContainer } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
@@ -50,10 +51,7 @@ export function Create() {
     onSubmit: (values) => {
       setErrors({});
 
-      axios
-        .post(endpoint('/api/v1/tax_rates'), values, {
-          headers: defaultHeaders(),
-        })
+      request('POST', endpoint('/api/v1/tax_rates'), values)
         .then((response) => {
           toast.success(t('created_tax_rate'));
 

@@ -10,6 +10,7 @@
 
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
@@ -34,18 +35,13 @@ export function useResolveTemplate(
 
   useEffect(() => {
     queryClient.fetchQuery(templateId, () =>
-      axios
-        .post(
-          endpoint('/api/v1/templates'),
-          {
-            body,
-            entity,
-            entity_id: entityId,
-            subject,
-            template: templateId,
-          },
-          { headers: defaultHeaders() }
-        )
+      request('POST', endpoint('/api/v1/templates'), {
+        body,
+        entity,
+        entity_id: entityId,
+        subject,
+        template: templateId,
+      })
         .then((response) => setTemplate(response.data))
         .catch((error) => console.error(error))
     );

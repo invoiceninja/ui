@@ -11,6 +11,7 @@ import { Card, CardContainer, Element } from '@invoiceninja/cards';
 import { InputField, InputLabel } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useExpenseCategoryQuery } from 'common/queries/expense-categories';
 import { Badge } from 'components/Badge';
@@ -62,10 +63,7 @@ export function Edit() {
       setErrors({});
       toast.loading(t('processing'));
 
-      axios
-        .put(endpoint('/api/v1/expense_categories/:id', { id }), values, {
-          headers: defaultHeaders(),
-        })
+      request('PUT', endpoint('/api/v1/expense_categories/:id', { id }), values)
         .then(() => {
           toast.dismiss();
           toast.success(t('updated_expense_category'));

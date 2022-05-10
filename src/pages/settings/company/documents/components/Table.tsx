@@ -19,6 +19,7 @@ import {
 } from '@invoiceninja/tables';
 import axios from 'axios';
 import { date, endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { Document } from 'common/interfaces/document.interface';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -48,10 +49,13 @@ export function Table() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const destroy = (password: string, isRequired = true) => {
     toast.loading(t('processing'));
-    axios
-      .delete(endpoint('/api/v1/documents/:id', { id: document }), {
-        headers: { 'X-Api-Password': password, ...defaultHeaders() },
-      })
+
+    request(
+      'delete',
+      endpoint('/api/v1/documents/:id', { id: document }),
+      {},
+      { headers: { 'X-Api-Password': password } }
+    )
       .then(() => {
         toast.dismiss();
         toast.success(t('deleted_payment_term'));

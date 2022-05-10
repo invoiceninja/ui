@@ -11,6 +11,7 @@
 import { Button, InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { Divider } from 'components/cards/Divider';
 import { Modal } from 'components/Modal';
@@ -33,14 +34,12 @@ export function License() {
     onSubmit: (values) => {
       toast.loading(t('processing'));
 
-      axios
-        .post(
-          endpoint('/api/v1/claim_license?license_key=:key', {
-            key: values.license,
-          }),
-          {},
-          { headers: defaultHeaders() }
-        )
+      request(
+        'POST',
+        endpoint('/api/v1/claim_license?license_key=:key', {
+          key: values.license,
+        })
+      )
         .then(() => {
           toast.dismiss();
           toast.success(t('bought_white_label'));

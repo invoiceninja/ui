@@ -14,6 +14,7 @@ import axios, { AxiosError } from 'axios';
 import collect from 'collect.js';
 import paymentType from 'common/constants/payment-type';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useInvoiceResolver } from 'common/hooks/invoices/useInvoiceResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Client } from 'common/interfaces/client';
@@ -79,16 +80,14 @@ export function Create() {
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
-      axios
-        .post(
-          endpoint('/api/v1/payments?email_receipt=:email', {
-            email: emailInvoice,
-          }),
-          values,
-          {
-            headers: defaultHeaders(),
-          }
-        )
+      
+      request(
+        'POST',
+        endpoint('/api/v1/payments?email_receipt=:email', {
+          email: emailInvoice,
+        }),
+        values
+      )
         .then((data) => {
           toast.success(t('created_payment'), { id: toastId });
           navigate(

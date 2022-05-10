@@ -23,6 +23,7 @@ import { Contacts } from '../components/Contacts';
 import { Details } from '../components/Details';
 import toast from 'react-hot-toast';
 import { useQueryClient } from 'react-query';
+import { request } from 'common/helpers/request';
 
 export function Create() {
   const [t] = useTranslation();
@@ -55,10 +56,8 @@ export function Create() {
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
-      axios
-        .post(endpoint('/api/v1/vendors/'), values, {
-          headers: defaultHeaders(),
-        })
+
+      request('POST', endpoint('/api/v1/vendors/'), values)
         .then(() => {
           toast.success(t('new_vendor'), { id: toastId });
         })

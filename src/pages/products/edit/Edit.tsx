@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
+import { request } from 'common/helpers/request';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -55,10 +56,7 @@ export function Edit() {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
 
-      axios
-        .put(endpoint('/api/v1/products/:id', { id }), values, {
-          headers: defaultHeaders(),
-        })
+      request('PUT', endpoint('/api/v1/products/:id', { id }), values)
         .then(() => toast.success(t('updated_product'), { id: toastId }))
         .catch((error: AxiosError) => {
           console.error(error);

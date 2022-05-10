@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useTitle } from 'common/hooks/useTitle';
 import { useApiWebhookQuery } from 'common/queries/api-webhooks';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -131,10 +132,7 @@ export function Edit() {
 
       values.headers = headers;
 
-      axios
-        .put(endpoint('/api/v1/webhooks/:id', { id }), values, {
-          headers: defaultHeaders(),
-        })
+      request('PUT', endpoint('/api/v1/webhooks/:id', { id }), values)
         .then(() => toast.success(t('updated_webhook'), { id: toastId }))
         .catch((error: AxiosError) => {
           toast.dismiss();

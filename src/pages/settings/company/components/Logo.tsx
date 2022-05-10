@@ -23,6 +23,7 @@ import { defaultHeaders } from 'common/queries/common/headers';
 import { useLogo } from 'common/hooks/useLogo';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { DeleteLogo } from './DeleteLogo';
+import { request } from 'common/helpers/request';
 
 export function Logo() {
   const [t] = useTranslation();
@@ -36,13 +37,12 @@ export function Logo() {
     onSubmit: () => {
       toast.loading(t('processing'));
 
-      axios
-        .post(endpoint('/api/v1/companies/:id', { id: company.id }), formData, {
-          headers: {
-            ...defaultHeaders(),
-            'Content-Type': 'multipart/form-data',
-          },
-        })
+      request(
+        'POST',
+        endpoint('/api/v1/companies/:id', { id: company.id }),
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      )
         .then((response: AxiosResponse) => {
           dispatch(
             updateRecord({ object: 'company', data: response.data.data })

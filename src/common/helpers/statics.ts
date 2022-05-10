@@ -12,6 +12,7 @@ import axios from 'axios';
 import { defaultHeaders } from './../queries/common/headers';
 import { endpoint } from 'common/helpers';
 import { Statics as IStatics } from './../interfaces/statics';
+import { request } from './request';
 
 export class Statics {
   protected static cache: IStatics;
@@ -21,8 +22,7 @@ export class Statics {
       return new Promise((resolve) => resolve(this.cache));
     }
 
-    return axios
-      .get(endpoint('/api/v1/statics'), { headers: defaultHeaders() })
+    return request('GET', endpoint('/api/v1/statics'))
       .then((response) => (this.cache = response.data))
       .then(() => this.cache);
   }

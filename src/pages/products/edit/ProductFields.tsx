@@ -11,6 +11,7 @@
 import { Card, Element } from '@invoiceninja/cards';
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -30,17 +31,15 @@ export function ProductFields() {
   const onSave = () => {
     const toastId = toast.loading(t('processing'));
 
-    axios
-      .put(endpoint('/api/v1/companies/:id', { id: company?.id }), company, {
-        headers: defaultHeaders(),
-      })
-      .then((response) => {
-        dispatch(
-          updateRecord({ object: 'company', data: response?.data.data })
-        );
+    request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: company?.id }),
+      company
+    ).then((response) => {
+      dispatch(updateRecord({ object: 'company', data: response?.data.data }));
 
-        toast.success(t('updated_product'), { id: toastId });
-      });
+      toast.success(t('updated_product'), { id: toastId });
+    });
   };
 
   return (

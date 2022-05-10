@@ -21,6 +21,7 @@ import { defaultHeaders } from 'common/queries/common/headers';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useTitle } from 'common/hooks/useTitle';
+import { request } from 'common/helpers/request';
 
 export function Create() {
   const [t] = useTranslation();
@@ -51,10 +52,9 @@ export function Create() {
       setErrors({});
       const toastId = toast.loading(t('processing'));
 
-      axios
-        .post(endpoint('/api/v1/tokens'), values, {
-          headers: { 'X-Api-Password': password, ...defaultHeaders() },
-        })
+      request('POST', endpoint('/api/v1/tokens'), values, {
+        headers: { 'X-Api-Password': password },
+      })
         .then((response) => {
           toast.success(t('created_token'), { id: toastId });
 

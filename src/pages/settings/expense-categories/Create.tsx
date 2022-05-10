@@ -12,6 +12,7 @@ import { Card, CardContainer } from '@invoiceninja/cards';
 import { InputField, InputLabel } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useTitle } from 'common/hooks/useTitle';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { Breadcrumbs } from 'components/Breadcrumbs';
@@ -49,10 +50,7 @@ export function Create() {
       setErrors({});
       toast.loading(t('processing'));
 
-      axios
-        .post(endpoint('/api/v1/expense_categories'), values, {
-          headers: defaultHeaders(),
-        })
+      request('POST', endpoint('/api/v1/expense_categories'), values)
         .then((response) => {
           toast.dismiss();
           toast.success(t('created_expense_category'));

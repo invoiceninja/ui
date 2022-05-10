@@ -12,6 +12,7 @@ import { Card, CardContainer, Element } from '@invoiceninja/cards';
 import { InputField, InputLabel } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useTaskStatusQuery } from 'common/queries/task-statuses';
 import { Badge } from 'components/Badge';
@@ -68,10 +69,7 @@ export function Edit() {
     onSubmit: (values) => {
       setErrors({});
 
-      axios
-        .put(endpoint('/api/v1/task_statuses/:id', { id }), values, {
-          headers: defaultHeaders(),
-        })
+      request('PUT', endpoint('/api/v1/task_statuses/:id', { id }), values)
         .then(() => {
           toast.dismiss();
           toast.success(t('updated_task_status'));

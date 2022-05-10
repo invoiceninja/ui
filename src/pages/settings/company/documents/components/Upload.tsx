@@ -22,6 +22,7 @@ import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
+import { request } from 'common/helpers/request';
 
 export function Upload({ apiEndpoint }: { apiEndpoint: string }) {
   const [t] = useTranslation();
@@ -36,13 +37,9 @@ export function Upload({ apiEndpoint }: { apiEndpoint: string }) {
     onSubmit: () => {
       toast.loading(t('processing'));
 
-      axios
-        .post(endpoint(apiEndpoint, { id: company.id }), formData, {
-          headers: {
-            ...defaultHeaders(),
-            'Content-Type': 'multipart/form-data',
-          },
-        })
+      request('POST', endpoint(apiEndpoint, { id: company.id }), formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
         .then((response) => {
           dispatch(
             updateRecord({ object: 'company', data: response.data.data })

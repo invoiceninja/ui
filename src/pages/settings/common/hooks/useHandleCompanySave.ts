@@ -16,6 +16,7 @@ import { defaultHeaders } from 'common/queries/common/headers';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { request } from 'common/helpers/request';
 
 export function useHandleCompanySave() {
   const [t] = useTranslation();
@@ -25,12 +26,11 @@ export function useHandleCompanySave() {
   return () => {
     const toastId = toast.loading(t('processing'));
 
-    axios
-      .put(
-        endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
-        companyChanges,
-        { headers: defaultHeaders() }
-      )
+    request(
+      'PUT',
+      endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
+      companyChanges
+    )
       .then((response) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
 

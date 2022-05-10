@@ -24,6 +24,7 @@ import { Details } from '../components/Details';
 import toast from 'react-hot-toast';
 import { useQueryClient } from 'react-query';
 import { ValidationAlert } from 'components/ValidationAlert';
+import { request } from 'common/helpers/request';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -62,10 +63,8 @@ export function Edit() {
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
-      axios
-        .put(endpoint('/api/v1/vendors/:id', { id }), values, {
-          headers: defaultHeaders(),
-        })
+
+      request('PUT', endpoint('/api/v1/vendors/:id', { id }), values)
         .then(() => {
           toast.success(t('updated_vendor'), { id: toastId });
         })

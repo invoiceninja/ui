@@ -25,6 +25,7 @@ import { CreateProductDto } from 'pages/products/common/components/CreateProduct
 import { Product } from 'common/interfaces/product';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
+import { request } from 'common/helpers/request';
 
 interface Props {
   isModalOpen: boolean;
@@ -59,10 +60,7 @@ export function ProductCreate(props: Props) {
       custom_value4: product?.data.data.custom_value4 || '',
     },
     onSubmit: (values: CreateProductDto) => {
-      axios
-        .post(endpoint('/api/v1/products'), values, {
-          headers: defaultHeaders(),
-        })
+      request('POST', endpoint('/api/v1/products'), values)
         .then((response) => {
           toast.success(t('created_product'));
           props.setIsModalOpen(!props.isModalOpen);

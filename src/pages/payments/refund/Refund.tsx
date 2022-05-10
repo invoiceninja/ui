@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { Invoice } from 'common/interfaces/invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -50,14 +51,12 @@ export function Refund() {
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
-      axios
-        .post(
-          endpoint('/api/v1/payments/refund?&email_receipt=:email', { email }),
-          values,
-          {
-            headers: defaultHeaders(),
-          }
-        )
+
+      request(
+        'POST',
+        endpoint('/api/v1/payments/refund?&email_receipt=:email', { email }),
+        values
+      )
         .then(() => {
           toast.success(t('refunded_payment'), { id: toastId });
           navigate('/payments');

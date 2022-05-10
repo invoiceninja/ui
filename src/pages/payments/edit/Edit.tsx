@@ -13,6 +13,7 @@ import { InputField, SelectField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import paymentType from 'common/constants/payment-type';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useConvertCurrencyToggle } from 'common/hooks/useConvertCurrancy';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -57,10 +58,7 @@ export function Edit() {
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
-      axios
-        .put(endpoint('/api/v1/payments/:id', { id }), values, {
-          headers: defaultHeaders(),
-        })
+      request('PUT', endpoint('/api/v1/payments/:id', { id }), values)
         .then(() => {
           toast.success(t('updated_payment'), { id: toastId });
         })

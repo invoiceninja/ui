@@ -10,6 +10,7 @@
 
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
@@ -29,10 +30,7 @@ export function useToggleStartStop() {
         ? '/api/v1/recurring_invoices/:id?start=true'
         : '/api/v1/recurring_invoices/:id?stop=true';
 
-    axios
-      .put(endpoint(url, { id: recurringInvoice.id }), recurringInvoice, {
-        headers: defaultHeaders(),
-      })
+    request('PUT', endpoint(url, { id: recurringInvoice.id }), recurringInvoice)
       .then((response) => {
         dispatch(setCurrentRecurringInvoice(response.data.data));
 

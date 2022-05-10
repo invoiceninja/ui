@@ -9,6 +9,7 @@
  */
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { defaultHeaders } from 'common/queries/common/headers';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -22,14 +23,7 @@ export function usePurgeClient(clientId: string | undefined) {
   return (password: string, passwordIsRequired: boolean) => {
     const toastId = toast.loading(t('processing'));
 
-    axios
-      .post(
-        endpoint('/api/v1/clients/:id/purge', { id: clientId }),
-        {},
-        {
-          headers: { 'X-Api-Password': password, ...defaultHeaders() },
-        }
-      )
+    request('POST', endpoint('/api/v1/clients/:id/purge', { id: clientId }))
       .then(() => {
         toast.success(t('purged_client'), { id: toastId });
         navigate('/clients');

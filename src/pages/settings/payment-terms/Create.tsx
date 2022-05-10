@@ -12,6 +12,7 @@ import { Card, CardContainer } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { Breadcrumbs } from 'components/Breadcrumbs';
@@ -49,10 +50,7 @@ export function Create() {
     onSubmit: (values: Partial<PaymentTerm>) => {
       toast.loading(t('processing'));
 
-      axios
-        .post(endpoint('/api/v1/payment_terms'), values, {
-          headers: defaultHeaders(),
-        })
+      request('POST', endpoint('/api/v1/payment_terms'), values)
         .then((response: AxiosResponse) => {
           toast.dismiss();
           toast.success(t('created_payment_term'));

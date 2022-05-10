@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, Link } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { updateUser } from 'common/stores/slices/user';
@@ -40,10 +41,7 @@ export function TwoFactorAuthentication() {
   const requestQrCode = () => {
     toast.loading(t('processing'));
 
-    axios
-      .get(endpoint('/api/v1/settings/enable_two_factor'), {
-        headers: defaultHeaders(),
-      })
+    request('GET', endpoint('/api/v1/settings/enable_two_factor'))
       .then((response) => {
         toast.dismiss();
 
@@ -65,15 +63,10 @@ export function TwoFactorAuthentication() {
   const enableTwoFactor = () => {
     toast.loading(t('processing'));
 
-    axios
-      .post(
-        endpoint('/api/v1/settings/enable_two_factor'),
-        {
-          secret: qrCodeSecret,
-          one_time_password: oneTimePassword,
-        },
-        { headers: defaultHeaders() }
-      )
+    request('POST', endpoint('/api/v1/settings/enable_two_factor'), {
+      secret: qrCodeSecret,
+      one_time_password: oneTimePassword,
+    })
       .then((response) => {
         toast.dismiss();
         toast.success(response.data.message);
@@ -95,12 +88,7 @@ export function TwoFactorAuthentication() {
   const disableTwoFactor = () => {
     toast.loading(t('processing'));
 
-    axios
-      .post(
-        endpoint('/api/v1/settings/disable_two_factor'),
-        {},
-        { headers: defaultHeaders() }
-      )
+    request('POST', endpoint('/api/v1/settings/disable_two_factor'))
       .then(() => {
         toast.dismiss();
         toast.success(t('disabled_two_factor'));

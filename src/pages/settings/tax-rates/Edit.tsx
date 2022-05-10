@@ -25,6 +25,7 @@ import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Breadcrumbs } from 'components/Breadcrumbs';
+import { request } from 'common/helpers/request';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -65,10 +66,7 @@ export function Edit() {
       setErrors({});
       toast.loading(t('processing'));
 
-      axios
-        .put(endpoint('/api/v1/tax_rates/:id', { id }), value, {
-          headers: defaultHeaders(),
-        })
+      request('PUT', endpoint('/api/v1/tax_rates/:id', { id }), value)
         .then(() => {
           toast.dismiss();
           toast.success(t('updated_tax_rate'));

@@ -11,6 +11,7 @@
 import { Button, InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { TaxRate } from 'common/interfaces/tax-rate';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -38,10 +39,7 @@ export function TaxCreate(props: Props) {
     onSubmit: (values) => {
       setErrors(undefined);
 
-      axios
-        .post(endpoint('/api/v1/tax_rates'), values, {
-          headers: defaultHeaders(),
-        })
+      request('POST', endpoint('/api/v1/tax_rates'), values)
         .then((response) => {
           toast.success(t('created_tax_rate'));
           props.onClose(false);

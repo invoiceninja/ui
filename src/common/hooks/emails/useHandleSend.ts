@@ -10,6 +10,7 @@
 
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { defaultHeaders } from 'common/queries/common/headers';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -26,18 +27,13 @@ export function useHandleSend() {
   ) => {
     const toastId = toast.loading(t('processing'));
 
-    axios
-      .post(
-        endpoint('/api/v1/emails'),
-        {
-          body,
-          entity,
-          entity_id: entityId,
-          subject,
-          template,
-        },
-        { headers: defaultHeaders() }
-      )
+    request('POST', endpoint('/api/v1/emails'), {
+      body,
+      entity,
+      entity_id: entityId,
+      subject,
+      template,
+    })
       .then(() => toast.success(t(`emailed_${entity}`), { id: toastId }))
       .catch((error) => {
         console.error(error);

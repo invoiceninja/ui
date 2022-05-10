@@ -22,6 +22,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
 import { useTitle } from 'common/hooks/useTitle';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
+import { request } from 'common/helpers/request';
 
 export interface CreateProductDto {
   product_key: string;
@@ -72,10 +73,7 @@ export function CreateProduct(props: Props) {
       tax_rate3: props.product?.tax_rate3 || 0,
     },
     onSubmit: (values: CreateProductDto) => {
-      axios
-        .post(endpoint('/api/v1/products'), values, {
-          headers: defaultHeaders(),
-        })
+      request('POST', endpoint('/api/v1/products'), values)
         .then((response: AxiosResponse) => {
           toast.success(t('created_product'));
 
@@ -202,7 +200,7 @@ export function CreateProduct(props: Props) {
           />
         </Element>
       )}
-      
+
       {company?.custom_fields?.product1 && (
         <CustomField
           field="custom_value1"

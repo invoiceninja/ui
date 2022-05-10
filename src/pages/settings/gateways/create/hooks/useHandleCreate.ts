@@ -10,6 +10,7 @@
 
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { defaultHeaders } from 'common/queries/common/headers';
 import toast from 'react-hot-toast';
@@ -23,10 +24,7 @@ export function useHandleCreate(companyGateway: CompanyGateway | undefined) {
   return () => {
     const toastId = toast.loading(t('processing'));
 
-    axios
-      .post(endpoint('/api/v1/company_gateways'), companyGateway, {
-        headers: defaultHeaders(),
-      })
+    request('POST', endpoint('/api/v1/company_gateways'), companyGateway)
       .then(() => {
         toast.success(t('created_company_gateway'), { id: toastId });
         navigate('/settings/online_payments');

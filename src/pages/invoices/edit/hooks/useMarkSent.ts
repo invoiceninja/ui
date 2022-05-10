@@ -10,6 +10,7 @@
 
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { Invoice } from 'common/interfaces/invoice';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
@@ -24,12 +25,11 @@ export function useMarkSent() {
   return (invoice: Invoice) => {
     const toastId = toast.loading(t('processing'));
 
-    axios
-      .put(
-        endpoint('/api/v1/invoices/:id?mark_sent=true', { id: invoice.id }),
-        invoice,
-        { headers: defaultHeaders() }
-      )
+    request(
+      'PUT',
+      endpoint('/api/v1/invoices/:id?mark_sent=true', { id: invoice.id }),
+      invoice
+    )
       .then((response) => {
         toast.success(t('notification_invoice_sent'), { id: toastId });
 

@@ -12,6 +12,7 @@ import { Element } from '@invoiceninja/cards';
 import { Button } from '@invoiceninja/forms';
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
@@ -20,12 +21,7 @@ export function WePay() {
   const [t] = useTranslation();
 
   const handleSetup = () => {
-    axios
-      .post(
-        endpoint('/api/v1/one_time_token'),
-        { context: 'wepay' },
-        { headers: defaultHeaders() }
-      )
+    request('POST', endpoint('/api/v1/one_time_token'), { context: 'wepay' })
       .then((response) =>
         window
           .open(

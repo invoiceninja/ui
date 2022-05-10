@@ -11,6 +11,7 @@ import { Card, ClickableElement } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { Modal } from 'components/Modal';
@@ -35,14 +36,14 @@ export function DangerZone() {
   const purge = () => {
     const toastId = toast.loading(t('processing'));
 
-    axios
-      .post(
-        endpoint('/api/v1/companies/purge_save_settings/:id', {
-          id: company.id,
-        }),
-        { cancellation_message: feedback },
-        { headers: { 'X-Api-Password': password, ...defaultHeaders() } }
-      )
+    request(
+      'POST',
+      endpoint('/api/v1/companies/purge_save_settings/:id', {
+        id: company.id,
+      }),
+      { cancellation_message: feedback },
+      { headers: { 'X-Api-Password': password } }
+    )
       .then(() => toast.success(t('purge_successful'), { id: toastId }))
       .catch((error) => {
         console.error(error);
@@ -55,13 +56,14 @@ export function DangerZone() {
   const destroy = () => {
     const toastId = toast.loading(t('processing'));
 
-    axios
-      .delete(
-        endpoint('/api/v1/companies/:id', {
-          id: company.id,
-        }),
-        { headers: { 'X-Api-Password': password, ...defaultHeaders() } }
-      )
+    request(
+      'DELETE',
+      endpoint('/api/v1/companies/:id', {
+        id: company.id,
+      }),
+      {},
+      { headers: { 'X-Api-Password': password } }
+    )
       .then(() => window.location.reload())
       .catch((error) => {
         console.error(error);

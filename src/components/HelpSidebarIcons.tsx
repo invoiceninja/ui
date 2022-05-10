@@ -11,6 +11,7 @@
 import Tippy from '@tippyjs/react';
 import axios, { AxiosError } from 'axios';
 import { endpoint, isSelfHosted } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -58,10 +59,7 @@ export function HelpSidebarIcons(props: Props) {
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
 
-      axios
-        .post(endpoint('/api/v1/support/messages/send'), values, {
-          headers: defaultHeaders(),
-        })
+      request('POST', endpoint('/api/v1/support/messages/send'), values)
         .then(() =>
           toast.success(t('your_message_has_been_received'), { id: toastId })
         )
@@ -76,16 +74,17 @@ export function HelpSidebarIcons(props: Props) {
         });
     },
   });
+
   const refreshData = () => {
     setDisabledButton(true);
-    axios
-      .post(endpoint('/api/v1/refresh'), {}, { headers: defaultHeaders() })
-      .then((data) => {
-        dispatch(updateCompanyUsers(data.data.data));
-        setDisabledButton(false);
-        setCronsNotEnabledModal(false);
-      });
+
+    request('POST', endpoint('/api/v1/refresh')).then((data) => {
+      dispatch(updateCompanyUsers(data.data.data));
+      setDisabledButton(false);
+      setCronsNotEnabledModal(false);
+    });
   };
+  
   return (
     <>
       <Modal

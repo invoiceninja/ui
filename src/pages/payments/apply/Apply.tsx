@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { Invoice } from 'common/interfaces/invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -42,10 +43,8 @@ export function Apply() {
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
-      axios
-        .put(endpoint('/api/v1/payments/:id', { id }), values, {
-          headers: defaultHeaders(),
-        })
+
+      request('PUT', endpoint('/api/v1/payments/:id', { id }), values)
         .then(() => {
           toast.success(t('updated_payment'), { id: toastId });
         })

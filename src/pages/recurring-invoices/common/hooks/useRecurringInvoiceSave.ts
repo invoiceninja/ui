@@ -10,6 +10,7 @@
 
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
@@ -27,14 +28,11 @@ export function useRecurringInvoiceSave() {
   return (id: string, recurringInvoice: RecurringInvoice) => {
     const toastId = toast.loading(t('processing'));
 
-    axios
-      .put(
-        endpoint('/api/v1/recurring_invoices/:id', { id }),
-        recurringInvoice,
-        {
-          headers: defaultHeaders(),
-        }
-      )
+    request(
+      'PUT',
+      endpoint('/api/v1/recurring_invoices/:id', { id }),
+      recurringInvoice
+    )
       .then((response) => {
         toast.success(t('updated_recurring_invoice'), { id: toastId });
         dispatch(setCurrentRecurringInvoice(response.data.data));

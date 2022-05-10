@@ -10,6 +10,7 @@
 
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -27,10 +28,7 @@ export function useHandleCreate(
     const toastId = toast.loading(t('processing'));
     setErrors(undefined);
 
-    axios
-      .post(endpoint('/api/v1/recurring_invoices'), recurringInvoice, {
-        headers: defaultHeaders(),
-      })
+    request('POST', endpoint('/api/v1/recurring_invoices'), recurringInvoice)
       .then((response) => {
         toast.success(t('created_recurring_invoice'), { id: toastId });
 

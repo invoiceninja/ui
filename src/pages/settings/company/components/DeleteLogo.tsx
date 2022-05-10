@@ -19,6 +19,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Element } from '@invoiceninja/cards';
+import { request } from 'common/helpers/request';
 
 export function DeleteLogo() {
   const [t] = useTranslation();
@@ -33,14 +34,11 @@ export function DeleteLogo() {
     onSubmit: () => {
       const toastId = toast.loading(t('processing'));
 
-      axios
-        .put(
-          endpoint('/api/v1/companies/:id', { id: company.id }),
-          formik.values,
-          {
-            headers: defaultHeaders(),
-          }
-        )
+      request(
+        'PUT',
+        endpoint('/api/v1/companies/:id', { id: company.id }),
+        formik.values
+      )
         .then((response: AxiosResponse) => {
           dispatch(
             updateRecord({ object: 'company', data: response.data.data })

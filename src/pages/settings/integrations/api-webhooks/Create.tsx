@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useTitle } from 'common/hooks/useTitle';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { Divider } from 'components/cards/Divider';
@@ -115,10 +116,7 @@ export function Create() {
 
       values.headers = headers;
 
-      axios
-        .post(endpoint('/api/v1/webhooks'), values, {
-          headers: defaultHeaders(),
-        })
+      request('POST', endpoint('/api/v1/webhooks'), values)
         .then((response) => {
           toast.success(t('created_webhook'), { id: toastId });
 

@@ -9,6 +9,7 @@
  */
 
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { request } from 'common/helpers/request';
 import { CompanyUser } from 'common/interfaces/company-user';
 import {
   changeCurrentIndex,
@@ -31,18 +32,7 @@ export function useAuthenticated(): boolean {
   if (token === null) return false;
   if (user.authenticated) return true;
 
-  axios
-    .post(
-      endpoint('/api/v1/refresh'),
-      {},
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Requested-With': 'XMLHttpRequest',
-          'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
-        },
-      }
-    )
+  request('POST', endpoint('/api/v1/refresh'))
     .then((response: AxiosResponse) => {
       if (response.status === 200) {
         let currentIndex = 0;

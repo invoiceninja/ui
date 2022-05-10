@@ -10,6 +10,7 @@
 
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTitle } from 'common/hooks/useTitle';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -50,14 +51,12 @@ export function UserDetails() {
   const onSave = (password: string, passwordIsRequired: boolean) => {
     toast.loading(t('processing'));
 
-    axios
-      .put(
-        endpoint('/api/v1/users/:id?include=company_user', { id: user.id }),
-        userState.changes,
-        {
-          headers: { 'X-Api-Password': password, ...defaultHeaders() },
-        }
-      )
+    request(
+      'PUT',
+      endpoint('/api/v1/users/:id?include=company_user', { id: user.id }),
+      userState.changes,
+      { headers: { 'X-Api-Password': password } }
+    )
       .then((response) => {
         toast.dismiss();
         toast.success(t('updated_settings'));

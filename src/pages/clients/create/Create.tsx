@@ -10,6 +10,7 @@
 
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
@@ -82,10 +83,8 @@ export function Create() {
 
       return onSave;
     }
-    axios
-      .post(endpoint('/api/v1/clients'), client, {
-        headers: defaultHeaders(),
-      })
+
+    request('POST', endpoint('/api/v1/clients'), client)
       .then((response) => {
         toast.success(t('created_client'), { id: toastId });
 
