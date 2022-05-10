@@ -79,7 +79,7 @@ export function Create() {
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
-      
+
       request(
         'POST',
         endpoint('/api/v1/payments?email_receipt=:email', {
@@ -199,10 +199,10 @@ export function Create() {
             <>
               {formik.values.invoices.map(
                 (record: { _id: string; amount: number }, index) => (
-                  <Element
-                    key={index}
-                    leftSide={
+                  <Element key={index}>
+                    <div className="flex items-center space-x-2">
                       <DebouncedCombobox
+                        className="w-1/2"
                         inputLabel={t('invoice')}
                         endpoint={generatePath(
                           '/api/v1/invoices?payable=:clientId',
@@ -221,9 +221,7 @@ export function Create() {
                         // @ts-ignore
                         defaultValue={formik.values.invoices[index].amount}
                       />
-                    }
-                  >
-                    <div className="flex items-center space-x-2">
+
                       <InputField
                         label={t('applied')}
                         onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -234,12 +232,14 @@ export function Create() {
                             event.target.value
                           );
                         }}
+                        className="w-full"
                         value={record.amount}
                       />
 
                       <Button
                         behavior="button"
                         type="minimal"
+                        className="mt-6"
                         onClick={() => handleRemovingInvoice(record._id)}
                       >
                         <X />
@@ -248,27 +248,29 @@ export function Create() {
                   </Element>
                 )
               )}
-
-              <Element leftSide={t('invoices')}>
-                <DebouncedCombobox
-                  endpoint={generatePath('/api/v1/invoices?payable=:clientId', {
-                    clientId: formik.values.client_id,
-                  })}
-                  label="number"
-                  clearInputAfterSelection
-                  onChange={(value: Record<Invoice>) =>
-                    handleInvoiceChange(
-                      value.resource?.id as string,
-                      value.resource?.amount as number,
-                      value.resource?.balance as number
-                    )
-                  }
-                  exclude={collect(formik.values.invoices)
-                    .pluck('invoice_id')
-                    .toArray()}
-                />
-              </Element>
             </>
+          )}
+
+          {formik.values.client_id && (
+            <Element leftSide={t('invoices')}>
+              <DebouncedCombobox
+                endpoint={generatePath('/api/v1/invoices?payable=:clientId', {
+                  clientId: formik.values.client_id,
+                })}
+                label="number"
+                clearInputAfterSelection
+                onChange={(value: Record<Invoice>) =>
+                  handleInvoiceChange(
+                    value.resource?.id as string,
+                    value.resource?.amount as number,
+                    value.resource?.balance as number
+                  )
+                }
+                exclude={collect(formik.values.invoices)
+                  .pluck('invoice_id')
+                  .toArray()}
+              />
+            </Element>
           )}
 
           {formik.values.client_id && <Divider />}
