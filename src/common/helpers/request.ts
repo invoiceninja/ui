@@ -39,7 +39,7 @@ export function request(
 ) {
   return client({
     method,
-    url: endpoint(url),
+    url,
     data,
     headers: { ...defaultHeaders(), ...config?.headers },
   });
