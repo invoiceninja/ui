@@ -10,13 +10,12 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, Link } from '@invoiceninja/forms';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
-import { defaultHeaders } from 'common/queries/common/headers';
 import {
   injectInChanges,
   resetChanges,

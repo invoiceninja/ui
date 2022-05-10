@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { request } from 'common/helpers/request';
 import { CompanyUser } from 'common/interfaces/company-user';
 import {

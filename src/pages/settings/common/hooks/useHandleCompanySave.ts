@@ -8,11 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import toast from 'react-hot-toast';
 import { endpoint } from 'common/helpers';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';

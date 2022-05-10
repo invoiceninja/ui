@@ -7,10 +7,9 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { useBlankVendorQuery } from 'common/queries/vendor';
 import { Default } from 'components/layouts/Default';
 import { useFormik } from 'formik';

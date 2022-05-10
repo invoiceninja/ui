@@ -8,12 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTitle } from 'common/hooks/useTitle';
-import { defaultHeaders } from 'common/queries/common/headers';
 import {
   deletePassword,
   resetChanges,

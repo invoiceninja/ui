@@ -18,8 +18,6 @@ import { ChangeEvent } from 'react';
 import MDEditor from '@uiw/react-md-editor';
 import { endpoint } from 'common/helpers';
 import { useQuery } from 'react-query';
-import axios from 'axios';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { RootState } from 'common/stores/store';
 import { updateChanges } from 'common/stores/slices/company-users';
 import { PaymentTerm } from '../../../../common/interfaces/payment-term';

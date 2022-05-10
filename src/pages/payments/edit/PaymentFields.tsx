@@ -9,12 +9,10 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { Field } from 'pages/settings/custom-fields/components';
 import toast from 'react-hot-toast';

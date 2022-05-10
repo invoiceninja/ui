@@ -8,10 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
 import { request } from 'common/helpers/request';
 import { Invoice } from 'common/interfaces/invoice';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { useQueryClient } from 'react-query';
 import { useGeneratePdfUrl } from './useGeneratePdfUrl';
 

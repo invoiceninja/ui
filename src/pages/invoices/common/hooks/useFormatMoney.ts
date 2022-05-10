@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { Number } from 'common/helpers/number';
 import { request } from 'common/helpers/request';
@@ -18,7 +17,6 @@ import { useResolveCountry } from 'common/hooks/useResolveCountry';
 import { Client } from 'common/interfaces/client';
 import { Country } from 'common/interfaces/country';
 import { Currency } from 'common/interfaces/currency';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { generatePath } from 'react-router-dom';

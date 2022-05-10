@@ -9,12 +9,11 @@
  */
 
 import Tippy from '@tippyjs/react';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint, isSelfHosted } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { updateCompanyUsers } from 'common/stores/slices/company-users';
 import { useFormik } from 'formik';
 import { useState } from 'react';

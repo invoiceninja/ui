@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import { Card, Element } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { Settings } from 'components/layouts/Settings';
@@ -14,9 +15,8 @@ import { InputField } from '@invoiceninja/forms';
 import { useState } from 'react';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { date, endpoint } from 'common/helpers';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { generatePath, useParams } from 'react-router-dom';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useApiTokenQuery } from 'common/queries/api-tokens';
@@ -48,7 +48,6 @@ export function Edit() {
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState(false);
-  const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Record<string, any>>({});
   const queryClient = useQueryClient();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -92,10 +91,7 @@ export function Edit() {
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setIsPasswordConfirmModalOpen}
-        onSave={(password) => {
-          setPassword(password);
-          formik.submitForm();
-        }}
+        onSave={() => formik.submitForm()}
       />
 
       <Settings title={t('new_token')} breadcrumbs={pages}>

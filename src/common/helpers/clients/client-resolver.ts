@@ -8,10 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { Client } from 'common/interfaces/client';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { request } from '../request';
 
 export class ClientResolver {

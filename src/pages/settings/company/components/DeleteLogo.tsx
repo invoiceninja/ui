@@ -7,11 +7,10 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { Button } from 'components/forms/Button';
 import { useFormik } from 'formik';

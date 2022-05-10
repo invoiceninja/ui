@@ -10,10 +10,9 @@
 
 import { Card, CardContainer, Element } from '@invoiceninja/cards';
 import { InputField, InputLabel } from '@invoiceninja/forms';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { useTaskStatusQuery } from 'common/queries/task-statuses';
 import { Badge } from 'components/Badge';
 import { Breadcrumbs } from 'components/Breadcrumbs';

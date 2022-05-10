@@ -10,11 +10,10 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useTitle } from 'common/hooks/useTitle';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { Divider } from 'components/cards/Divider';
 import { Settings } from 'components/layouts/Settings';
 import { useFormik } from 'formik';

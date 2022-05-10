@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosRequestHeaders, AxiosResponse, Method } from 'axios';
+import { AxiosRequestHeaders, AxiosResponse, Method } from 'axios';
 import dayjs from 'dayjs';
 import { generatePath } from 'react-router';
 import entityState from './constants/entity-state';

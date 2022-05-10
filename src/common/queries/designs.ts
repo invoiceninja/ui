@@ -8,11 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
-import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 
 export function useDesignsQuery(params: Params) {

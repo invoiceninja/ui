@@ -12,7 +12,6 @@ import { AxiosError } from 'axios';
 import classNames from 'classnames';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { ReactNode, RefObject } from 'react';
 import { toast } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';

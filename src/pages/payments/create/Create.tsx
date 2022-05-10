@@ -10,7 +10,7 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import collect from 'collect.js';
 import paymentType from 'common/constants/payment-type';
 import { endpoint } from 'common/helpers';
@@ -21,7 +21,6 @@ import { Client } from 'common/interfaces/client';
 import { Invoice } from 'common/interfaces/invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useClientsQuery } from 'common/queries/clients';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { useBlankPaymentQuery } from 'common/queries/payments';
 import { Divider } from 'components/cards/Divider';
 import { Container } from 'components/Container';

@@ -10,12 +10,11 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { EntityState } from 'common/enums/entity-state';
 import { endpoint, getEntityState } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { bulk, useProductQuery } from 'common/queries/products';
 import { CustomField } from 'components/CustomField';
 import { Dropdown } from 'components/dropdown/Dropdown';

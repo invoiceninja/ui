@@ -11,7 +11,6 @@
 import { Button } from '@invoiceninja/forms';
 import { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { Chart } from 'components/totals/Chart';
 import { useEffect, useState } from 'react';
 import { Spinner } from 'components/Spinner';

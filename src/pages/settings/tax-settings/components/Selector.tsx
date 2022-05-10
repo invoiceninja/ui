@@ -10,12 +10,10 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { SelectField } from '@invoiceninja/forms';
-import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { TaxRate } from 'common/interfaces/tax-rate';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { updateChanges } from 'common/stores/slices/company-users';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';

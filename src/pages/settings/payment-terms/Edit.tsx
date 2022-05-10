@@ -10,11 +10,10 @@
 
 import { ActionCard, Card, CardContainer, Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { PaymentTerm } from 'common/interfaces/payment-term';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { bulk, usePaymentTermQuery } from 'common/queries/payment-terms';
 import { Badge } from 'components/Badge';
 import { Breadcrumbs } from 'components/Breadcrumbs';

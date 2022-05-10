@@ -10,11 +10,10 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, Link } from '@invoiceninja/forms';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { updateUser } from 'common/stores/slices/user';
 import { Modal } from 'components/Modal';
 import { merge } from 'lodash';

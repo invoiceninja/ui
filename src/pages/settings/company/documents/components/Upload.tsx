@@ -8,12 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
 import toast from 'react-hot-toast';
 import { Card, Element } from '@invoiceninja/cards';
 import { endpoint } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { useFormik } from 'formik';
 import { useState } from 'react';

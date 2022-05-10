@@ -11,7 +11,6 @@
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { Invoice } from 'common/interfaces/invoice';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';

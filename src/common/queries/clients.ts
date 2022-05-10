@@ -8,12 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosResponse } from 'axios';
+import { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
-import { defaultHeaders } from './common/headers';
 
 export function useClientsQuery() {
   return useQuery(['/api/v1/clients'], () =>

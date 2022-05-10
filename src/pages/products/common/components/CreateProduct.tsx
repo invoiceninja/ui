@@ -8,8 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError, AxiosResponse } from 'axios';
-import { defaultHeaders } from 'common/queries/common/headers';
+import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import toast from 'react-hot-toast';

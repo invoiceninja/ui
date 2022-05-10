@@ -8,12 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { endpoint } from '../helpers';
-import { defaultHeaders } from './common/headers';
 
 export function useVendorQuery(params: { id: string | undefined }) {
   return useQuery(

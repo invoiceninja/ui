@@ -9,11 +9,10 @@
  */
 
 import { Button, InputField } from '@invoiceninja/forms';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { useBlankProductQuery } from 'common/queries/products';
 import { Modal } from 'components/Modal';
 import { useFormik } from 'formik';

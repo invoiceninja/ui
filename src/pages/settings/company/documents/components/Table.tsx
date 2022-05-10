@@ -17,12 +17,10 @@ import {
   Thead,
   Tr,
 } from '@invoiceninja/tables';
-import axios from 'axios';
 import { date, endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { Document } from 'common/interfaces/document.interface';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { useDocumentsQuery } from 'common/queries/documents';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';

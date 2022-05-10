@@ -10,9 +10,8 @@
 
 import { ActionCard, Card, CardContainer, Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { bulk, useTaxRateQuery } from 'common/queries/tax-rates';
 import { Badge } from 'components/Badge';
 import { Container } from 'components/Container';

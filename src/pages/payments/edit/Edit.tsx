@@ -10,14 +10,13 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import paymentType from 'common/constants/payment-type';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useConvertCurrencyToggle } from 'common/hooks/useConvertCurrancy';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { usePaymentQuery } from 'common/queries/payments';
 import { ConvertCurrency } from 'components/ConvertCurrency';
 import { CustomField } from 'components/CustomField';

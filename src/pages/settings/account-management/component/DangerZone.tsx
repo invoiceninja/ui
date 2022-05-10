@@ -9,11 +9,9 @@
  */
 import { Card, ClickableElement } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
-import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { Modal } from 'components/Modal';
 import { ChangeEvent, useState } from 'react';
 import toast from 'react-hot-toast';

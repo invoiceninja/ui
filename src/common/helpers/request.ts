@@ -9,7 +9,6 @@
  */
 
 import axios, { AxiosError, AxiosRequestConfig, Method } from 'axios';
-import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 
 const client = axios.create();

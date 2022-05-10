@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
-import { defaultHeaders } from './../queries/common/headers';
 import { endpoint } from 'common/helpers';
 import { Statics as IStatics } from './../interfaces/statics';
 import { request } from './request';

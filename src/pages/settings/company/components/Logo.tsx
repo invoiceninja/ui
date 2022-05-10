@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import axios, { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useFormik } from 'formik';
@@ -19,7 +19,6 @@ import { Image } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { useLogo } from 'common/hooks/useLogo';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { DeleteLogo } from './DeleteLogo';

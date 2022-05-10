@@ -8,14 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';

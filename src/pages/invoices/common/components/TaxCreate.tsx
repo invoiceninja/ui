@@ -9,12 +9,11 @@
  */
 
 import { Button, InputField } from '@invoiceninja/forms';
-import axios, { AxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { TaxRate } from 'common/interfaces/tax-rate';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { defaultHeaders } from 'common/queries/common/headers';
 import { Modal } from 'components/Modal';
 import { useFormik } from 'formik';
 import { useState } from 'react';
