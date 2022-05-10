@@ -23,6 +23,7 @@ import { defaultHeaders } from 'common/queries/common/headers';
 import { RootState } from 'common/stores/store';
 import { updateChanges } from 'common/stores/slices/company-users';
 import { PaymentTerm } from '../../../../common/interfaces/payment-term';
+import { request } from 'common/helpers/request';
 
 export function Defaults() {
   const [t] = useTranslation();
@@ -30,7 +31,7 @@ export function Defaults() {
   const statics = useStaticsQuery();
 
   const { data: terms } = useQuery('/api/v1/payment_terms', () =>
-    axios.get(endpoint('/api/v1/payment_terms'), { headers: defaultHeaders() })
+    request('GET', endpoint('/api/v1/payment_terms'))
   );
 
   const companyChanges = useSelector(

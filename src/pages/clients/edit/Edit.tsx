@@ -9,6 +9,7 @@
  */
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
@@ -83,13 +84,11 @@ export function Edit() {
 
     axios
       .all([
-        axios.put(endpoint('/api/v1/clients/:id', { id }), client, {
-          headers: defaultHeaders(),
-        }),
-        axios.put(
+        request('PUT', endpoint('/api/v1/clients/:id', { id }), client),
+        request(
+          'PUT',
           endpoint('/api/v1/companies/:id', { id: company?.id }),
-          company,
-          { headers: defaultHeaders() }
+          company
         ),
       ])
       .then((response) => {

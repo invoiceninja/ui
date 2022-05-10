@@ -11,6 +11,7 @@
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { Number } from 'common/helpers/number';
+import { request } from 'common/helpers/request';
 import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvoice';
 import { useResolveClientCurrency } from 'common/hooks/useResolveClientCurrency';
 import { useResolveCountry } from 'common/hooks/useResolveCountry';
@@ -39,11 +40,9 @@ export function useFormatMoney() {
         .fetchQuery(
           generatePath('/api/v1/clients/:id', { id: invoice.client_id }),
           () =>
-            axios.get(
-              endpoint('/api/v1/clients/:id', { id: invoice.client_id }),
-              {
-                headers: defaultHeaders(),
-              }
+            request(
+              'GET',
+              endpoint('/api/v1/clients/:id', { id: invoice.client_id })
             ),
           { staleTime: Infinity }
         )

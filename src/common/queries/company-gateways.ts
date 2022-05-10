@@ -10,15 +10,14 @@
 
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { defaultHeaders } from './common/headers';
 
 export function useCompanyGatewaysQuery() {
   return useQuery(generatePath('/api/v1/company_gateways'), () =>
-    axios.get(endpoint('/api/v1/company_gateways'), {
-      headers: defaultHeaders(),
-    })
+    request('GET', endpoint('/api/v1/company_gateways'))
   );
 }
 
@@ -26,9 +25,10 @@ export function useCompanyGatewayQuery(params: { id: string | undefined }) {
   return useQuery(
     generatePath('/api/v1/company_gateways/:id', { id: params.id }),
     () =>
-      axios.get(endpoint('/api/v1/company_gateways/:id', { id: params.id }), {
-        headers: defaultHeaders(),
-      }),
+      request(
+        'GET',
+        endpoint('/api/v1/company_gateways/:id', { id: params.id })
+      ),
     { staleTime: Infinity }
   );
 }
@@ -36,10 +36,7 @@ export function useCompanyGatewayQuery(params: { id: string | undefined }) {
 export function useBlankCompanyGatewayQuery() {
   return useQuery(
     generatePath('/api/v1/company_gateways/create'),
-    () =>
-      axios.get(endpoint('/api/v1/company_gateways/create'), {
-        headers: defaultHeaders(),
-      }),
+    () => request('GET', endpoint('/api/v1/company_gateways/create')),
     { staleTime: Infinity }
   );
 }

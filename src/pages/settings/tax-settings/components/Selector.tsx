@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { SelectField } from '@invoiceninja/forms';
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { TaxRate } from 'common/interfaces/tax-rate';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -27,7 +28,7 @@ export function Selector() {
   const dispatch = useDispatch();
 
   const { data } = useQuery('/api/v1/tax_rates', () =>
-    axios.get(endpoint('/api/v1/tax_rates'), { headers: defaultHeaders() })
+    request('GET', endpoint('/api/v1/tax_rates'))
   );
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {

@@ -21,13 +21,11 @@ export function usePaymentQuery(params: { id: string | undefined }) {
       id: params.id,
     }),
     () =>
-      axios.get(
+      request(
+        'GET',
         endpoint('/api/v1/payments/:id?include=client,invoices', {
           id: params.id,
-        }),
-        {
-          headers: defaultHeaders(),
-        }
+        })
       ),
     { staleTime: Infinity }
   );
@@ -36,10 +34,7 @@ export function usePaymentQuery(params: { id: string | undefined }) {
 export function useBlankPaymentQuery() {
   return useQuery(
     generatePath('/api/v1/payments/create'),
-    () =>
-      axios.get(endpoint('/api/v1/payments/create'), {
-        headers: defaultHeaders(),
-      }),
+    () => request('GET', endpoint('/api/v1/payments/create')),
     { staleTime: Infinity }
   );
 }

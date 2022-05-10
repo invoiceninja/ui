@@ -10,6 +10,7 @@
 
 import axios, { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { defaultHeaders } from './common/headers';
@@ -20,10 +21,7 @@ export function useInvoiceQuery(
 ) {
   return useQuery(
     generatePath('/api/v1/invoices/:id', { id: params.id }),
-    () =>
-      axios.get(endpoint('/api/v1/invoices/:id', { id: params.id }), {
-        headers: defaultHeaders(),
-      }),
+    () => request('GET', endpoint('/api/v1/invoices/:id', { id: params.id })),
     { ...options, staleTime: Infinity }
   );
 }
@@ -31,10 +29,7 @@ export function useInvoiceQuery(
 export function useBlankInvoiceQuery(options: Record<string, any> = {}) {
   return useQuery(
     generatePath('/api/v1/invoices/create'),
-    () =>
-      axios.get(endpoint('/api/v1/invoices/create'), {
-        headers: defaultHeaders(),
-      }),
+    () => request('GET', endpoint('/api/v1/invoices/create')),
     { ...options, staleTime: Infinity }
   );
 }
@@ -43,12 +38,8 @@ export function bulk(
   id: string[],
   action: 'archive' | 'restore' | 'delete'
 ): Promise<AxiosResponse> {
-  return axios.post(
-    endpoint('/api/v1/invoices/bulk'),
-    {
-      action,
-      ids: Array.from(id),
-    },
-    { headers: defaultHeaders() }
-  );
+  return request('POST', endpoint('/api/v1/invoices/bulk'), {
+    action,
+    ids: Array.from(id),
+  });
 }

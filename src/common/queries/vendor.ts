@@ -9,6 +9,7 @@
  */
 
 import axios from 'axios';
+import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { endpoint } from '../helpers';
@@ -17,10 +18,7 @@ import { defaultHeaders } from './common/headers';
 export function useVendorQuery(params: { id: string | undefined }) {
   return useQuery(
     generatePath('/api/v1/vendors/:id', { id: params.id }),
-    () =>
-      axios.get(endpoint('/api/v1/vendors/:id', { id: params.id }), {
-        headers: defaultHeaders(),
-      }),
+    () => request('GET', endpoint('/api/v1/vendors/:id', { id: params.id })),
     { staleTime: Infinity }
   );
 }
@@ -28,10 +26,7 @@ export function useVendorQuery(params: { id: string | undefined }) {
 export function useBlankVendorQuery() {
   return useQuery(
     endpoint('/api/v1/vendors/create'),
-    () =>
-      axios.get(endpoint('/api/v1/vendors/create'), {
-        headers: defaultHeaders(),
-      }),
+    () => request('GET', endpoint('/api/v1/vendors/create')),
     { staleTime: Infinity }
   );
 }

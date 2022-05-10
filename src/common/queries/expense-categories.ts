@@ -10,6 +10,7 @@
 
 import axios, { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { defaultHeaders } from './common/headers';
@@ -17,7 +18,8 @@ import { Params } from './common/params.interface';
 
 export function useExpenseCategoriesQuery(params: Params) {
   return useQuery(['/api/v1/expense_categories', params], () =>
-    axios.get(
+    request(
+      'GET',
       endpoint(
         '/api/v1/expense_categories?per_page=:perPage&page=:currentPage&sort=:sort',
         {
@@ -25,8 +27,7 @@ export function useExpenseCategoriesQuery(params: Params) {
           currentPage: params.currentPage,
           sort: params.sort ?? 'id|asc',
         }
-      ),
-      { headers: defaultHeaders() }
+      )
     )
   );
 }
@@ -34,10 +35,7 @@ export function useExpenseCategoriesQuery(params: Params) {
 export function useExpenseCategoryQuery(params: { id: string | undefined }) {
   return useQuery(
     generatePath('/api/v1/expense_categories/:id', params),
-    () =>
-      axios.get(endpoint('/api/v1/expense_categories/:id', params), {
-        headers: defaultHeaders(),
-      }),
+    () => request('GET', endpoint('/api/v1/expense_categories/:id', params)),
     { staleTime: Infinity }
   );
 }
@@ -46,12 +44,8 @@ export function bulk(
   id: string[],
   action: 'archive' | 'restore' | 'delete'
 ): Promise<AxiosResponse> {
-  return axios.post(
-    endpoint('/api/v1/expense_categories/bulk'),
-    {
-      action,
-      ids: id,
-    },
-    { headers: { ...defaultHeaders() } }
-  );
+  return request('POST', endpoint('/api/v1/expense_categories/bulk'), {
+    action,
+    ids: id,
+  });
 }

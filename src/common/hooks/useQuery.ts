@@ -10,13 +10,14 @@
 
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useQuery as useQueryHook } from 'react-query';
 
 export function useQuery(apiEndpoint: string, options = {}) {
   return useQueryHook(
     apiEndpoint,
-    () => axios.get(endpoint(apiEndpoint), { headers: defaultHeaders() }),
+    () => request('GET', endpoint(apiEndpoint)),
     options
   );
 }

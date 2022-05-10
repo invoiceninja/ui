@@ -10,6 +10,7 @@
 
 import axios, { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { defaultHeaders } from './common/headers';
@@ -17,7 +18,8 @@ import { Params } from './common/params.interface';
 
 export function useTaxRatesQuery(params: Params) {
   return useQuery(['/api/v1/tax_rates', params], () =>
-    axios.get(
+    request(
+      'GET',
       endpoint(
         '/api/v1/tax_rates?per_page=:perPage&page=:currentPage&sort=:sort',
         {
@@ -25,8 +27,7 @@ export function useTaxRatesQuery(params: Params) {
           currentPage: params.currentPage,
           sort: params.sort ?? 'id|asc',
         }
-      ),
-      { headers: defaultHeaders() }
+      )
     )
   );
 }
@@ -34,10 +35,7 @@ export function useTaxRatesQuery(params: Params) {
 export function useTaxRateQuery(params: { id: string | undefined }) {
   return useQuery(
     generatePath('/api/v1/tax_rates/:id', { id: params.id }),
-    () =>
-      axios.get(endpoint('/api/v1/tax_rates/:id', { id: params.id }), {
-        headers: defaultHeaders(),
-      }),
+    () => request('GET', endpoint('/api/v1/tax_rates/:id', { id: params.id })),
     { staleTime: Infinity }
   );
 }
@@ -46,12 +44,8 @@ export function bulk(
   id: string[],
   action: 'archive' | 'restore' | 'delete'
 ): Promise<AxiosResponse> {
-  return axios.post(
-    endpoint('/api/v1/tax_rates/bulk'),
-    {
-      action,
-      ids: id,
-    },
-    { headers: { ...defaultHeaders() } }
-  );
+  return request('POST', endpoint('/api/v1/tax_rates/bulk'), {
+    action,
+    ids: id,
+  });
 }

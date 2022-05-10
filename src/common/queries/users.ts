@@ -10,24 +10,21 @@
 
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { defaultHeaders } from './common/headers';
 
 export function useUsersQuery() {
-  return useQuery('/api/v1/users', () => {
-    return axios.get(endpoint('/api/v1/users'), { headers: defaultHeaders() });
-  });
+  return useQuery('/api/v1/users', () =>
+    request('GET', endpoint('/api/v1/users'))
+  );
 }
 
 export function useUserQuery(params: { id: string }) {
   return useQuery(
     generatePath('/api/v1/users/:id', params),
-    () => {
-      axios.get(endpoint('/api/v1/users/:id', params), {
-        headers: defaultHeaders(),
-      });
-    },
+    () => request('GET', endpoint('/api/v1/users/:id', params)),
     { staleTime: Infinity }
   );
 }

@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import { useEffect, useRef, useState } from 'react';
 import { Combobox } from '@headlessui/react';
 import { ChevronDown, X } from 'react-feather';
@@ -19,6 +20,7 @@ import { InputLabel } from './InputLabel';
 import { Spinner } from 'components/Spinner';
 import { useTranslation } from 'react-i18next';
 import { Alert } from 'components/Alert';
+import { request as httpRequest } from 'common/helpers/request';
 
 export interface Record<T = any> {
   value: string | number;
@@ -85,14 +87,7 @@ export function DebouncedCombobox(props: Props) {
     url.searchParams.set('is_deleted', 'false');
 
     queryClient
-      .fetchQuery(
-        url.href,
-        () =>
-          axios.get(url.href, {
-            headers: defaultHeaders(),
-          }),
-        { staleTime }
-      )
+      .fetchQuery(url.href, () => httpRequest('GET', url.href), { staleTime })
       .then((response) => {
         const array: Record[] = [internalRecord];
 

@@ -14,6 +14,7 @@ import { Currency } from 'common/interfaces/currency';
 import { Statics } from 'common/interfaces/statics';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { QueryClient } from 'react-query';
+import { request } from '../request';
 
 export class CurrencyResolver {
   protected declare statics: Statics;
@@ -32,7 +33,7 @@ export class CurrencyResolver {
   public find(id: string): Promise<Currency | undefined> {
     return this.queryClient
       .fetchQuery(endpoint('/api/v1/statics'), () =>
-        axios.get(endpoint('/api/v1/statics'), { headers: defaultHeaders() })
+        request('GET', endpoint('/api/v1/statics'))
       )
       .then((data) =>
         data.data.currencies.find((currency: Currency) => currency.id === id)

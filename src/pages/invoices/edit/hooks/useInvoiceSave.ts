@@ -20,6 +20,7 @@ import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { updateRecord } from 'common/stores/slices/company-users';
+import { request } from 'common/helpers/request';
 
 export function useInvoiceSave() {
   const [t] = useTranslation();
@@ -30,16 +31,16 @@ export function useInvoiceSave() {
   return (id: string, invoice: Invoice) => {
     const toastId = toast.loading(t('processing'));
 
-    axios.all([
-      axios.put(endpoint('/api/v1/invoices/:id', { id }), invoice, {
-      headers: defaultHeaders(),
-    }),
-      axios.put(
-        endpoint('/api/v1/companies/:id', { id: company?.id }),
-        company,
-        { headers: defaultHeaders() }
-      ),
-    ]).then((response) => {
+    axios
+      .all([
+        request('PUT', endpoint('/api/v1/invoices/:id', { id }), invoice),
+        request(
+          'PUT',
+          endpoint('/api/v1/companies/:id', { id: company?.id }),
+          company
+        ),
+      ])
+      .then((response) => {
         toast.success(t('updated_invoice'), { id: toastId });
         dispatch(setCurrentInvoice(response[0].data.data));
 

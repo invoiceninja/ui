@@ -10,13 +10,12 @@
 
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { defaultHeaders } from './common/headers';
 
 export function useGroupSettingsQuery() {
   return useQuery('/api/v1/group_settings', () => {
-    return axios.get(endpoint('/api/v1/group_settings'), {
-      headers: defaultHeaders(),
-    });
+    return request('GET', endpoint('/api/v1/group_settings'));
   });
 }
