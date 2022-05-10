@@ -13,7 +13,7 @@ import { AxiosError, AxiosResponse } from 'axios';
 import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { ForgotPasswordForm } from '../../common/dtos/authentication';
-import { endpoint, isHosted, request } from '../../common/helpers';
+import { endpoint, isHosted } from '../../common/helpers';
 import { ForgotPasswordValidation } from './common/ValidationInterface';
 import { InputField } from '../../components/forms/InputField';
 import { Alert } from '../../components/Alert';
@@ -21,6 +21,7 @@ import { Button } from '../../components/forms/Button';
 import { HostedLinks } from './components/HostedLinks';
 import { Link } from '../../components/forms/Link';
 import { Header } from './components/Header';
+import { request } from 'common/helpers/request';
 
 interface Response {
   message: string;

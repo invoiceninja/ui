@@ -7,9 +7,11 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import { AxiosError } from 'axios';
 import classNames from 'classnames';
-import { endpoint, request } from 'common/helpers';
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { ReactNode, RefObject } from 'react';
 import { toast } from 'react-hot-toast';
@@ -42,15 +44,10 @@ export default function ResourcefulActions(props: Props) {
   const bulk = (action: 'archive' | 'restore' | 'delete') => {
     const toastId = toast.loading(t('processing'));
 
-    request(
-      'POST',
-      endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`),
-      {
-        action,
-        ids: Array.from(props.selected),
-      },
-      defaultHeaders()
-    )
+    request('POST', endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`), {
+      action,
+      ids: Array.from(props.selected),
+    })
       .then(() => {
         toast.success(t(`${action}d_${props.resourceType}`), {
           id: toastId,

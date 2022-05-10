@@ -15,7 +15,7 @@ import {
   AuthenticationTypes,
   LoginForm,
 } from '../../common/dtos/authentication';
-import { endpoint, isHosted, request } from '../../common/helpers';
+import { endpoint, isHosted } from '../../common/helpers';
 import { authenticate } from '../../common/stores/slices/user';
 import { AxiosError, AxiosResponse } from 'axios';
 import { LoginValidation } from './common/ValidationInterface';
@@ -33,6 +33,7 @@ import {
 } from 'common/stores/slices/company-users';
 import { useTitle } from 'common/hooks/useTitle';
 import { CompanyUser } from 'common/interfaces/company-user';
+import { request } from 'common/helpers/request';
 
 export function Login() {
   useTitle('login');

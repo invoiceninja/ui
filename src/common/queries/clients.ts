@@ -9,7 +9,8 @@
  */
 
 import axios, { AxiosResponse } from 'axios';
-import { endpoint, request } from 'common/helpers';
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 import { defaultHeaders } from './common/headers';
@@ -37,13 +38,8 @@ export function bulk(
   id: string[],
   action: 'archive' | 'delete'
 ): Promise<AxiosResponse> {
-  return request(
-    'POST',
-    endpoint('/api/v1/clients/bulk'),
-    {
-      action,
-      ids: Array.from(id),
-    },
-    defaultHeaders()
-  );
+  return request('POST', endpoint('/api/v1/clients/bulk'), {
+    action,
+    ids: Array.from(id),
+  });
 }

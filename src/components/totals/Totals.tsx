@@ -10,7 +10,7 @@
 
 import { Button } from '@invoiceninja/forms';
 import { AxiosResponse } from 'axios';
-import { endpoint, request } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { Chart } from 'components/totals/Chart';
 import { useEffect, useState } from 'react';
@@ -20,6 +20,7 @@ import { Card } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { InfoCard } from 'components/InfoCard';
 import Select from 'react-select';
+import { request } from 'common/helpers/request';
 
 export function Totals() {
   const [t] = useTranslation();
@@ -77,30 +78,24 @@ export function Totals() {
   };
 
   const getTotals = () => {
-    request(
-      'POST',
-      endpoint('/api/v1/charts/totals'),
-      body,
-      defaultHeaders()
-    ).then((response: AxiosResponse) => {
-      setTotals(response.data);
-      const currencies: { value: string; label: unknown }[] = [];
-      Object.entries(response.data.currencies).map(([id, name]) => {
-        currencies.push({ value: id, label: name });
-      });
-      setCurrencies(currencies);
+    request('POST', endpoint('/api/v1/charts/totals'), body).then(
+      (response: AxiosResponse) => {
+        setTotals(response.data);
+        const currencies: { value: string; label: unknown }[] = [];
+        Object.entries(response.data.currencies).map(([id, name]) => {
+          currencies.push({ value: id, label: name });
+        });
+        setCurrencies(currencies);
 
-      settotalsIsLoading(false);
-    });
+        settotalsIsLoading(false);
+      }
+    );
   };
 
   const getChartData = () => {
-    request(
-      'POST',
-      endpoint('/api/v1/charts/chart_summary'),
-      body,
-      defaultHeaders()
-    ).then((response: AxiosResponse) => setChartData(response.data));
+    request('POST', endpoint('/api/v1/charts/chart_summary'), body).then(
+      (response: AxiosResponse) => setChartData(response.data)
+    );
   };
 
   useEffect(() => {

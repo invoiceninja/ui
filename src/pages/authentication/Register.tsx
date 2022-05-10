@@ -14,7 +14,7 @@ import { useFormik } from 'formik';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { RegisterForm } from '../../common/dtos/authentication';
-import { endpoint, isHosted, request } from '../../common/helpers';
+import { endpoint, isHosted } from '../../common/helpers';
 import { register } from '../../common/stores/slices/user';
 import { RegisterValidation } from './common/ValidationInterface';
 import { Header } from './components/Header';
@@ -23,6 +23,7 @@ import { Alert } from '../../components/Alert';
 import { Button } from '../../components/forms/Button';
 import { HostedLinks } from './components/HostedLinks';
 import { Link } from '../../components/forms/Link';
+import { request } from 'common/helpers/request';
 
 export function Register() {
   const [t] = useTranslation();

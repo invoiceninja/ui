@@ -9,9 +9,10 @@
  */
 
 import axios, { AxiosResponse } from 'axios';
+import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
-import { endpoint, request } from '../helpers';
+import { endpoint } from '../helpers';
 import { defaultHeaders } from './common/headers';
 
 export function usePaymentQuery(params: { id: string | undefined }) {
@@ -47,13 +48,8 @@ export function bulk(
   id: string[],
   action: 'archive' | 'restore' | 'delete' | 'email'
 ): Promise<AxiosResponse> {
-  return request(
-    'POST',
-    endpoint('/api/v1/payments/bulk'),
-    {
-      action,
-      ids: Array.from(id),
-    },
-    defaultHeaders()
-  );
+  return request('POST', endpoint('/api/v1/payments/bulk'), {
+    action,
+    ids: Array.from(id),
+  });
 }
