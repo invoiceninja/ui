@@ -17,24 +17,6 @@ export function endpoint(endpoint: string, params = {}): string {
   return import.meta.env.VITE_API_URL + generatePath(endpoint, params);
 }
 
-export function request(
-  method: Method = 'GET',
-  route: string,
-  data?: object,
-  headers?: object
-) {
-  return axios.request({
-    url: route,
-    method,
-    headers: {
-      'X-Requested-With': 'XMLHttpRequest',
-      'Content-Type': 'application/json',
-      ...headers,
-    },
-    data,
-  });
-}
-
 export function isHosted(): boolean {
   return import.meta.env.VITE_IS_HOSTED === 'true';
 }
