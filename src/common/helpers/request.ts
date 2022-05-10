@@ -8,13 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios, { AxiosError } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import { endpoint } from 'common/helpers';
 import { defaultHeaders } from 'common/queries/common/headers';
-
-interface Options {
-  headers?: Record<string, unknown>;
-}
 
 const client = axios.create();
 
@@ -35,12 +31,13 @@ export function request(
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
   url: string,
   data?: any,
-  config?: Options
+  config?: AxiosRequestConfig
 ) {
   return client({
     method,
     url,
     data,
+    ...config,
     headers: { ...defaultHeaders(), ...config?.headers },
   });
 }
