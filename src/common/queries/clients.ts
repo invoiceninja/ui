@@ -30,6 +30,7 @@ export function useClientQuery(
     { ...options, staleTime: Infinity }
   );
 }
+
 export function bulk(
   id: string[],
   action: 'archive' | 'delete'
