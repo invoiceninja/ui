@@ -3,24 +3,22 @@
  *
  * @link https://github.com/invoiceninja/invoiceninja source repository
  *
- * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ * @copyright Copyright (c) 2021. Invoice Ninja LLC (https://invoiceninja.com)
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
-import { AxiosError } from 'axios';
 import collect from 'collect.js';
 import paymentType from 'common/constants/payment-type';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
 import { useInvoiceResolver } from 'common/hooks/invoices/useInvoiceResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { Invoice } from 'common/interfaces/invoice';
+import { Payment } from 'common/interfaces/payment';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useClientsQuery } from 'common/queries/clients';
 import { useBlankPaymentQuery } from 'common/queries/payments';
 import { Divider } from 'components/cards/Divider';
 import { Container } from 'components/Container';
@@ -29,157 +27,162 @@ import { CustomField } from 'components/CustomField';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
-import { useFormik } from 'formik';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
-import {
-  generatePath,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from 'react-router-dom';
+import { generatePath, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { useSave } from './hooks/useSave';
+
+interface PaymentOnCreation extends Payment {
+  invoices: PaymentInvoice[];
+}
+
+interface PaymentInvoice {
+  _id: string;
+  amount: number;
+  credit_id: string;
+  invoice_id: string;
+}
 
 export function Create() {
+  const { documentTitle } = useTitle('create_payment');
+
   const [t] = useTranslation();
+  const [searchParams] = useSearchParams();
 
-  const { client_id } = useParams();
-  const { data: payment } = useBlankPaymentQuery();
-  const { data: clients } = useClientsQuery();
-
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const company = useCurrentCompany();
   const invoiceResolver = useInvoiceResolver();
 
+  const [payment, setPayment] = useState<PaymentOnCreation>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [sendEmail, setSendEmail] = useState(false);
   const [convertCurrency, setConvertCurrency] = useState(false);
-  const [emailInvoice, setEmailInvoice] = useState(false);
-  const [searchParams] = useSearchParams();
 
-  const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      amount: 0,
-      client_id: client_id || '',
-      date: payment?.data.data.date,
-      transaction_reference: '',
-      type_id: company?.settings?.payment_type_id,
-      private_notes: '',
-      currency_id: clients?.data.data.find(
-        (client: any) => client.id == client_id
-      )?.settings.currency_id,
-      exchange_rate: 1,
-      exchange_currency_id: payment?.data.data.exchange_currency_id,
-      invoices: [],
-    },
-    onSubmit: (values) => {
-      const toastId = toast.loading(t('processing'));
-      setErrors(undefined);
+  const { data: blankPayment } = useBlankPaymentQuery();
 
-      request(
-        'POST',
-        endpoint('/api/v1/payments?email_receipt=:email', {
-          email: emailInvoice,
-        }),
-        values
-      )
-        .then((data) => {
-          toast.success(t('created_payment'), { id: toastId });
-          navigate(
-            generatePath('/payments/:id/edit', { id: data.data.data.id })
+  useEffect(() => {
+    if (blankPayment?.data.data) {
+      setPayment({ ...blankPayment.data.data, invoices: [] });
+
+      if (searchParams.has('client')) {
+        setPayment(
+          (current) =>
+            current && {
+              ...current,
+              client_id: searchParams.get('client') as string,
+            }
+        );
+      }
+
+      if (searchParams.has('invoice')) {
+        invoiceResolver
+          .find(searchParams.get('invoice') as string)
+          .then((invoice) =>
+            setPayment(
+              (current) =>
+                current && {
+                  ...current,
+                  invoices: [
+                    {
+                      _id: v4(),
+                      invoice_id: invoice.id,
+                      amount:
+                        invoice.balance > 0 ? invoice.balance : invoice.amount,
+                      credit_id: '',
+                    },
+                  ],
+                }
+            )
           );
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
-          toast.error(t('error_title'), { id: toastId });
-
-          if (error.response?.status === 422) {
-            setErrors(error.response.data);
-          }
-        })
-        .finally(() => {
-          formik.setSubmitting(false);
-          queryClient.invalidateQueries(generatePath('/api/v1/payments'));
-        });
-    },
-  });
+      }
+    }
+  }, [blankPayment]);
 
   useEffect(() => {
-    formik.setFieldValue('invoices', []);
-  }, [formik.values.client_id]);
-
-  useEffect(() => {
-    formik.setFieldValue(
-      'amount',
-      collect(formik.values.invoices).sum('amount')
+    setPayment(
+      (current) =>
+        current && {
+          ...current,
+          amount: collect(payment?.invoices).sum('amount') as number,
+        }
     );
-  }, [formik.values.invoices]);
+  }, [payment?.invoices]);
 
-  const handleClientChange = (clientId: string, currencyId: string) => {
-    formik.setFieldValue('client_id', clientId);
-    formik.setFieldValue('currency_id', currencyId);
+  const handleChange = <
+    TField extends keyof PaymentOnCreation,
+    TValue extends PaymentOnCreation[TField]
+  >(
+    field: TField,
+    value: TValue
+  ) => {
+    setPayment((current) => current && { ...current, [field]: value });
   };
 
-  const handleInvoiceChange = (id: string, amount: number, balance: number) => {
-    formik.setFieldValue('invoices', [
-      ...formik.values.invoices,
-      {
-        _id: v4(),
-        amount: balance > 0 ? balance : amount,
-        credit_id: '',
-        invoice_id: id,
-      },
-    ]);
-  };
-
-  const handleRemovingInvoice = (id: string) => {
-    formik.setFieldValue(
-      'invoices',
-      formik.values.invoices.filter(
-        (record: { _id: string }) => record._id !== id
-      )
+  const handleInvoiceChange = (invoice: Invoice) => {
+    setPayment(
+      (current) =>
+        current && {
+          ...current,
+          invoices: [
+            ...current.invoices,
+            {
+              _id: v4(),
+              amount: invoice.balance > 0 ? invoice.balance : invoice.amount,
+              credit_id: '',
+              invoice_id: invoice.id,
+            },
+          ],
+        }
     );
   };
 
-  useEffect(() => {
-    if (searchParams.has('client')) {
-      formik.setFieldValue('client_id', searchParams.get('client'));
-    }
+  const handleInvoiceInputChange = (index: number, amount: number) => {
+    console.log(index, amount);
 
-    if (searchParams.has('invoice')) {
-      invoiceResolver
-        .find(searchParams.get('invoice') || '')
-        .then((invoice) =>
-          handleInvoiceChange(invoice.id, invoice.amount, invoice.balance)
-        )
-        .catch((error) => console.error(error));
-    }
-  }, []);
+    const cloned = { ...payment } as PaymentOnCreation;
+
+    cloned.invoices[index].amount = amount;
+
+    setPayment({
+      ...cloned,
+      amount: collect(cloned.invoices).sum('amount') as number,
+    });
+  };
+
+  const handleDeletingInvoice = (id: string) => {
+    setPayment(
+      (current) =>
+        current && {
+          ...current,
+          invoices: current.invoices.filter((invoice) => invoice._id !== id),
+        }
+    );
+  };
+
+  const onSubmit = useSave(setErrors);
 
   return (
-    <Default title={t('new_payment')}>
+    <Default title={documentTitle}>
       <Container>
         <Card
-          title={t('new_payment')}
-          disableSubmitButton={formik.isSubmitting}
-          onFormSubmit={formik.handleSubmit}
+          title={t('enter_payment')}
+          onSaveClick={() => payment && onSubmit(payment, sendEmail)}
           withSaveButton
         >
           <Element leftSide={t('client')}>
             <DebouncedCombobox
               endpoint="/api/v1/clients"
               label="name"
-              onChange={(value: Record<Client>) =>
-                handleClientChange(
-                  value.resource?.id as string,
+              onChange={(value: Record<Client>) => {
+                handleChange('client_id', value.resource?.id as string);
+
+                handleChange(
+                  'currency_id',
                   value.resource?.settings.currency_id
-                )
-              }
-              defaultValue={formik.values.client_id}
+                );
+              }}
+              defaultValue={payment?.client_id}
               errorMessage={errors?.errors.client_id}
             />
           </Element>
@@ -187,100 +190,83 @@ export function Create() {
           <Element leftSide={t('amount')}>
             <InputField
               id="amount"
-              value={formik.values.amount}
-              onChange={formik.handleChange}
+              value={payment?.amount}
+              onValueChange={(value) =>
+                handleChange('amount', parseFloat(value))
+              }
               errorMessage={errors?.errors.payment_amount}
             />
           </Element>
 
-          {formik.values.client_id && <Divider />}
+          {payment?.client_id && <Divider />}
 
-          {formik.values.client_id && (
-            <>
-              {formik.values.invoices.map(
-                (record: { _id: string; amount: number }, index) => (
-                  <Element key={index}>
-                    <div className="flex items-center space-x-2">
-                      <DebouncedCombobox
-                        className="w-1/2"
-                        inputLabel={t('invoice')}
-                        endpoint={generatePath(
-                          '/api/v1/invoices?payable=:clientId',
-                          { clientId: formik.values.client_id }
-                        )}
-                        label="number"
-                        onChange={(value: Record<Invoice>) =>
-                          handleInvoiceChange(
-                            value.resource?.id as string,
-                            value.resource?.amount as number,
-                            value.resource?.balance as number
-                          )
-                        }
-                        value="amount"
-                        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                        // @ts-ignore
-                        defaultValue={formik.values.invoices[index].amount}
-                      />
+          {payment &&
+            payment.invoices.length > 0 &&
+            payment.invoices.map((invoice, index) => (
+              <Element key={index}>
+                <div className="flex items-center space-x-2">
+                  <DebouncedCombobox
+                    className="w-1/2"
+                    inputLabel={t('invoice')}
+                    endpoint={generatePath(
+                      '/api/v1/invoices?payable=:clientId',
+                      { clientId: payment.client_id }
+                    )}
+                    label="number"
+                    onChange={(value: Record<Invoice>) =>
+                      value.resource && handleInvoiceChange(value.resource)
+                    }
+                    value="amount"
+                    defaultValue={payment.invoices[index].amount}
+                  />
 
-                      <InputField
-                        label={t('applied')}
-                        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                          formik.setFieldValue('amount', event.target.value);
+                  <InputField
+                    label={t('applied')}
+                    onValueChange={(value) =>
+                      handleInvoiceInputChange(index, parseFloat(value))
+                    }
+                    className="w-full"
+                    value={invoice.amount}
+                  />
 
-                          formik.setFieldValue(
-                            `invoices[${index}].amount`,
-                            event.target.value
-                          );
-                        }}
-                        className="w-full"
-                        value={record.amount}
-                      />
+                  <Button
+                    behavior="button"
+                    type="minimal"
+                    className="mt-6"
+                    onClick={() => handleDeletingInvoice(invoice._id)}
+                  >
+                    <X />
+                  </Button>
+                </div>
+              </Element>
+            ))}
 
-                      <Button
-                        behavior="button"
-                        type="minimal"
-                        className="mt-6"
-                        onClick={() => handleRemovingInvoice(record._id)}
-                      >
-                        <X />
-                      </Button>
-                    </div>
-                  </Element>
-                )
-              )}
-            </>
-          )}
-
-          {formik.values.client_id && (
+          {payment?.client_id && (
             <Element leftSide={t('invoices')}>
               <DebouncedCombobox
                 endpoint={generatePath('/api/v1/invoices?payable=:clientId', {
-                  clientId: formik.values.client_id,
+                  clientId: payment.client_id,
                 })}
                 label="number"
                 clearInputAfterSelection
                 onChange={(value: Record<Invoice>) =>
-                  handleInvoiceChange(
-                    value.resource?.id as string,
-                    value.resource?.amount as number,
-                    value.resource?.balance as number
-                  )
+                  value.resource && handleInvoiceChange(value.resource)
                 }
-                exclude={collect(formik.values.invoices)
+                exclude={collect(payment.invoices)
                   .pluck('invoice_id')
                   .toArray()}
               />
             </Element>
           )}
 
-          {formik.values.client_id && <Divider />}
+          {payment?.client_id && <Divider />}
 
           <Element leftSide={t('payment_date')}>
             <InputField
               type="date"
               id="date"
-              value={formik.values.date}
-              onChange={formik.handleChange}
+              value={payment?.date}
+              onValueChange={(value) => handleChange('date', value)}
               errorMessage={errors?.errors.date}
             />
           </Element>
@@ -288,11 +274,11 @@ export function Create() {
           <Element leftSide={t('payment_type')}>
             <SelectField
               id="type_id"
-              defaultValue={formik.values.type_id}
-              onChange={formik.handleChange}
+              defaultValue={payment?.type_id}
+              onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
+              withBlank
             >
-              <option value=""></option>
               {Object.entries(paymentType).map(([id, type], index) => (
                 <option value={id} key={index}>
                   {t(type)}
@@ -304,7 +290,9 @@ export function Create() {
           <Element leftSide={t('transaction_reference')}>
             <InputField
               id="transaction_reference"
-              onChange={formik.handleChange}
+              onValueChange={(value) =>
+                handleChange('transaction_reference', value)
+              }
               errorMessage={errors?.errors.transaction_reference}
             />
           </Element>
@@ -313,7 +301,7 @@ export function Create() {
             <InputField
               element="textarea"
               id="private_notes"
-              onChange={formik.handleChange}
+              onValueChange={(value) => handleChange('private_notes', value)}
               errorMessage={errors?.errors.private_notes}
             />
           </Element>
@@ -321,66 +309,76 @@ export function Create() {
           {company?.custom_fields?.payment1 && (
             <CustomField
               field="payment1"
-              defaultValue={payment?.data.data.custom_value1}
+              defaultValue={payment?.custom_value1}
               value={company?.custom_fields?.payment1}
-              onChange={(value) => formik.setFieldValue('custom_value1', value)}
+              onChange={(value) =>
+                handleChange('custom_value1', value.toString())
+              }
             />
           )}
 
           {company?.custom_fields?.payment2 && (
             <CustomField
-              field="custom_value2"
-              defaultValue={payment?.data.data.custom_value2}
+              field="payment2"
+              defaultValue={payment?.custom_value2}
               value={company?.custom_fields?.payment2}
-              onChange={(value) => formik.setFieldValue('custom_value2', value)}
+              onChange={(value) =>
+                handleChange('custom_value2', value.toString())
+              }
             />
           )}
 
           {company?.custom_fields?.payment3 && (
             <CustomField
-              field="custom_value3"
-              defaultValue={payment?.data.data.custom_value3}
+              field="payment3"
+              defaultValue={payment?.custom_value3}
               value={company?.custom_fields?.payment3}
-              onChange={(value) => formik.setFieldValue('custom_value3', value)}
+              onChange={(value) =>
+                handleChange('custom_value3', value.toString())
+              }
             />
           )}
 
           {company?.custom_fields?.payment4 && (
             <CustomField
-              field="custom_value4"
-              defaultValue={payment?.data.data.custom_value4}
+              field="payment4"
+              defaultValue={payment?.custom_value4}
               value={company?.custom_fields?.payment4}
-              onChange={(value) => formik.setFieldValue('custom_value4', value)}
+              onChange={(value) =>
+                handleChange('custom_value4', value.toString())
+              }
             />
           )}
 
           <Element leftSide={t('send_email')}>
-            <Toggle
-              checked={emailInvoice}
-              onChange={() => {
-                setEmailInvoice(!emailInvoice);
-              }}
-            />
+            <Toggle checked={sendEmail} onChange={setSendEmail} />
           </Element>
 
           <Element leftSide={t('convert_currency')}>
             <Toggle
-              checked={formik.values.exchange_currency_id}
-              onChange={() => {
-                setConvertCurrency(!convertCurrency);
-                formik.setFieldValue('exchange_currency_id', '');
-                formik.setFieldValue('exchange_rate', 1);
+              checked={Boolean(payment?.exchange_currency_id)}
+              onChange={(value) => {
+                setConvertCurrency(value);
+
+                handleChange('exchange_currency_id', '');
+                handleChange('exchange_rate', 1);
               }}
             />
           </Element>
 
-          {convertCurrency && (
+          {convertCurrency && payment && (
             <ConvertCurrency
-              setFieldValue={formik.setFieldValue}
-              exchange_currency_id={formik.values.exchange_currency_id}
-              currency_id={formik.values.currency_id}
-              amount={formik.values.amount}
-              exchange_rate={formik.values.exchange_rate}
+              exchangeRate={payment.exchange_rate.toString() || '1'}
+              exchangeCurrencyId={payment.exchange_currency_id || '1'}
+              currencyId={payment.currency_id || '1'}
+              amount={payment?.amount}
+              onChange={(exchangeRate, exchangeCurrencyId) => {
+                handleChange('exchange_rate', exchangeRate);
+                handleChange('exchange_currency_id', exchangeCurrencyId);
+              }}
+              onExchangeRateChange={(value) =>
+                handleChange('exchange_rate', value)
+              }
             />
           )}
         </Card>
