@@ -15,49 +15,52 @@ import { Element } from './cards';
 import { InputField, SelectField } from './forms';
 
 interface Props {
-  setFieldValue: any;
-  amount: any;
-  exchange_rate: any;
-  exchange_currency_id: any;
-  currency_id: any;
+  amount: number;
+  exchangeRate: string;
+  exchangeCurrencyId: string;
+  currencyId: string;
+  onChange: (exchangeRate: number, exchangeCurrencyId: string) => unknown;
+  onExchangeRateChange: (value: number) => unknown;
 }
+
 export function ConvertCurrency(props: Props) {
   const { data: statics } = useStaticsQuery();
   const [t] = useTranslation();
+
+  const handleChange = (value: string) => {
+    return props.onChange(
+      getExchangeRate(props.currencyId, value, statics),
+      value
+    );
+  };
+
   return (
     <>
       <Element leftSide={t('currency')}>
         <SelectField
-          value={props.exchange_currency_id}
-          onChange={(event: any) => {
-            props.setFieldValue(
-              'exchange_rate',
-              getExchangeRate(props.currency_id, event.target.value, statics)
-            );
-
-            props.setFieldValue('exchange_currency_id', event.target.value);
-          }}
+          withBlank
+          value={props.exchangeCurrencyId}
+          onValueChange={handleChange}
         >
-          <option value=""></option>
-          {statics?.data.currencies.map((element: any, index: any) => {
-            return (
-              <option value={element.id} key={index}>
-                {element.name}
-              </option>
-            );
-          })}
+          {statics?.data.currencies.map((element: any, index: any) => (
+            <option value={element.id} key={index}>
+              {element.name}
+            </option>
+          ))}
         </SelectField>
       </Element>
+
       <Element leftSide={t('exchange_rate')}>
         <InputField
-          onChange={(event: any) => {
-            props.setFieldValue('exchange_rate', event.target.valeu);
-          }}
-          value={props.exchange_rate}
+          onValueChange={(value) =>
+            props.onExchangeRateChange(parseFloat(value))
+          }
+          value={props.exchangeRate}
         />
       </Element>
+
       <Element leftSide={t('converted_amount')}>
-        <InputField value={props.amount * props.exchange_rate} />
+        <InputField value={props.amount * parseFloat(props.exchangeRate)} />
       </Element>
     </>
   );
