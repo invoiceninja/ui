@@ -13,19 +13,19 @@ import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
+import { Client } from 'common/interfaces/client';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
 
 export function Clients() {
   useTitle('clients');
 
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
   const formatMoney = useFormatMoney();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -71,22 +71,18 @@ export function Clients() {
   ];
 
   const actions = [
-    (resource: any) => (
+    (resource: Client) => (
       <DropdownElement
         key={'client portal'}
-        onClick={() => {
-          window.open(resource.contacts[0].link, '__blank');
-        }}
+        onClick={() => window.open(resource.contacts[0].link, '__blank')}
       >
         {t('client_portal')}
       </DropdownElement>
     ),
-    (resource: any) => (
+    (resource: Client) => (
       <DropdownElement
         key={'new_payment'}
-        onClick={() => {
-          navigate(`/payments/create/client/${resource.id}`);
-        }}
+        to={generatePath('/payments/create?client=:id', { id: resource.id })}
       >
         {t('new_payment')}
       </DropdownElement>
