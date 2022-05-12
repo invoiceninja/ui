@@ -138,8 +138,6 @@ export function Create() {
   };
 
   const handleInvoiceInputChange = (index: number, amount: number) => {
-    console.log(index, amount);
-
     const cloned = { ...payment } as PaymentOnCreation;
 
     cloned.invoices[index].amount = amount;
