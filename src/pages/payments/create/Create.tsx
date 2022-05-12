@@ -223,8 +223,8 @@ export function Create() {
                     onChange={(value: Record<Invoice>) =>
                       value.resource && handleInvoiceChange(value.resource)
                     }
-                    value="amount"
-                    defaultValue={payment.invoices[index].amount}
+                    defaultValue={invoice.invoice_id}
+                    queryAdditional
                   />
 
                   <InputField
