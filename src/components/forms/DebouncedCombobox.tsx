@@ -47,6 +47,7 @@ interface Props {
   clearInputAfterSelection?: boolean;
   withShadowRecord?: boolean;
   errorMessage?: string | string[];
+  queryAdditional?: boolean;
 }
 
 export function DebouncedCombobox(props: Props) {
@@ -147,17 +148,52 @@ export function DebouncedCombobox(props: Props) {
   }, [selectedOption]);
 
   useEffect(() => {
-    const potential = records.find(
-      (record) =>
-        record.value == defaultValueProperty ||
-        record.label == defaultValueProperty
-    );
+    const organiseResults = async () => {
+      const potential = records.find(
+        (record) =>
+          record.value == defaultValueProperty ||
+          record.label == defaultValueProperty
+      );
 
-    if (potential) {
-      setSelectedOption({ record: potential, withoutEvents: true });
-    }
+      if (potential) {
+        setSelectedOption({ record: potential, withoutEvents: true });
+      } else if (!potential && props.defaultValue && props.queryAdditional) {
+        // Try to query the result to get the possible record.
+        const url = new URL(endpoint(props.endpoint));
+        const withoutQueryParams = url.href.replace(url.search, '');
 
-    filter();
+        const resource = await httpRequest(
+          'GET',
+          `${withoutQueryParams}/${props.defaultValue}`
+        );
+
+        setRecords((current) => {
+          const currentPossible = current.find(
+            (record) =>
+              record.value === defaultValueProperty ||
+              record.label === defaultValueProperty
+          );
+
+          return !currentPossible
+            ? [
+                ...current,
+                {
+                  value: resource.data.data[props.value ?? 'id'],
+                  label: props.formatLabel
+                    ? props.formatLabel(resource.data.data)
+                    : resource.data.data[props.label],
+                  internal: false,
+                  resource: resource.data.data,
+                },
+              ]
+            : [...current];
+        });
+      }
+
+      filter();
+    };
+
+    organiseResults();
   }, [records, defaultValueProperty]);
 
   useEffect(() => {
