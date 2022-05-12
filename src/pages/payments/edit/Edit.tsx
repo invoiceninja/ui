@@ -10,85 +10,66 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
-import { AxiosError } from 'axios';
 import paymentType from 'common/constants/payment-type';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { useConvertCurrencyToggle } from 'common/hooks/useConvertCurrancy';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useTitle } from 'common/hooks/useTitle';
+import { Payment } from 'common/interfaces/payment';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { usePaymentQuery } from 'common/queries/payments';
 import { ConvertCurrency } from 'components/ConvertCurrency';
 import { CustomField } from 'components/CustomField';
 import Toggle from 'components/forms/Toggle';
-import { useFormik } from 'formik';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useSave } from './hooks/useSave';
 
 export function Edit() {
+  const { documentTitle } = useTitle('edit_payment');
+
   const [t] = useTranslation();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [payment, setPayment] = useState<Payment>();
+  const [convertCurrency, setConvertCurrency] = useState(false);
+
+  const { id } = useParams();
+  const { data } = usePaymentQuery({ id });
 
   const company = useCurrentCompany();
 
-  const { id } = useParams();
-  const { data: payment } = usePaymentQuery({ id });
-  const [convertCurrency, setconvertCurrency] = useConvertCurrencyToggle({
-    id,
-  });
+  useEffect(() => {
+    if (data?.data.data) {
+      setPayment(data.data.data);
+    }
+  }, [data]);
 
-  const queryClient = useQueryClient();
+  const handleChange = <
+    TField extends keyof Payment,
+    TValue extends Payment[TField]
+  >(
+    field: TField,
+    value: TValue
+  ) => {
+    setPayment((current) => current && { ...current, [field]: value });
+  };
 
-  const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      number: payment?.data.data.number || '',
-      amount: payment?.data.data.amount || 0,
-      date: payment?.data.data.date || '',
-      type_id: payment?.data.data.type_id || '',
-      transaction_reference: payment?.data.data.transaction_reference || '',
-      private_notes: payment?.data.data.private_notes || '',
-      exchange_currency_id: payment?.data.data.exchange_currency_id || '',
-      exchange_rate: payment?.data.data.exchange_rate,
-    },
-    onSubmit: (values) => {
-      const toastId = toast.loading(t('processing'));
-      setErrors(undefined);
-      request('PUT', endpoint('/api/v1/payments/:id', { id }), values)
-        .then(() => {
-          toast.success(t('updated_payment'), { id: toastId });
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
-          toast.error(t('error_title'), { id: toastId });
-          if (error.response?.status === 422) {
-            setErrors(error.response.data);
-          }
-        })
-        .finally(() => {
-          formik.setSubmitting(false);
-          queryClient.invalidateQueries(
-            generatePath('/api/v1/payments/:id', { id })
-          );
-        });
-    },
-  });
+  const onSave = useSave(setErrors);
 
   return (
     <Card
-      title={t('edit_payment')}
-      disableSubmitButton={formik.isSubmitting}
-      onFormSubmit={formik.handleSubmit}
+      title={documentTitle}
       withSaveButton
+      onFormSubmit={(event) => {
+        event.preventDefault();
+
+        payment && onSave(payment);
+      }}
     >
       <Element leftSide={t('payment_number')}>
         <InputField
           id="number"
-          value={formik.values.number}
-          onChange={formik.handleChange}
+          value={payment?.number}
+          onValueChange={(value) => handleChange('number', value)}
           errorMessage={errors?.errors.payment_amount}
         />
       </Element>
@@ -97,8 +78,8 @@ export function Edit() {
         <InputField
           id="date"
           type="date"
-          value={formik.values.date}
-          onChange={formik.handleChange}
+          value={payment?.date}
+          onValueChange={(value) => handleChange('date', value)}
           errorMessage={errors?.errors.date}
         />
       </Element>
@@ -106,11 +87,11 @@ export function Edit() {
       <Element leftSide={t('payment_type')}>
         <SelectField
           id="type_id"
-          value={payment?.data.data.type_id}
-          onChange={formik.handleChange}
+          value={payment?.type_id}
+          onValueChange={(value) => handleChange('type_id', value)}
           errorMessage={errors?.errors.type_id}
+          withBlank
         >
-          <option value=""></option>
           {Object.entries(paymentType).map((value: any, index: any) => {
             return (
               <option key={index} value={String(value[0])}>
@@ -124,18 +105,20 @@ export function Edit() {
       <Element leftSide={t('transaction_reference')}>
         <InputField
           id="transaction_reference"
-          onChange={formik.handleChange}
-          value={formik.values.transaction_reference}
+          onValueChange={(value) =>
+            handleChange('transaction_reference', value)
+          }
+          value={payment?.transaction_reference}
           errorMessage={errors?.errors.transaction_reference}
-        ></InputField>
+        />
       </Element>
 
       <Element leftSide={t('private_notes')}>
         <InputField
           element="textarea"
           id="private_notes"
-          value={formik.values.private_notes}
-          onChange={formik.handleChange}
+          value={payment?.private_notes}
+          onValueChange={(value) => handleChange('private_notes', value)}
           errorMessage={errors?.errors.private_notes}
         />
       </Element>
@@ -143,57 +126,62 @@ export function Edit() {
       {company?.custom_fields?.payment1 && (
         <CustomField
           field="custom_value1"
-          defaultValue={payment?.data.data.custom_value1}
+          defaultValue={payment?.custom_value1}
           value={company?.custom_fields?.payment1}
-          onChange={(value) => formik.setFieldValue('custom_value1', value)}
+          onChange={(value) => handleChange('custom_value1', value.toString())}
         />
       )}
 
       {company?.custom_fields?.payment2 && (
         <CustomField
           field="custom_value2"
-          defaultValue={payment?.data.data.custom_value2}
+          defaultValue={payment?.custom_value2}
           value={company?.custom_fields?.payment2}
-          onChange={(value) => formik.setFieldValue('custom_value2', value)}
+          onChange={(value) => handleChange('custom_value2', value.toString())}
         />
       )}
 
       {company?.custom_fields?.payment3 && (
         <CustomField
           field="custom_value3"
-          defaultValue={payment?.data.data.custom_value3}
+          defaultValue={payment?.custom_value3}
           value={company?.custom_fields?.payment3}
-          onChange={(value) => formik.setFieldValue('custom_value3', value)}
+          onChange={(value) => handleChange('custom_value3', value.toString())}
         />
       )}
 
       {company?.custom_fields?.payment4 && (
         <CustomField
           field="custom_value4"
-          defaultValue={payment?.data.data.custom_value4}
+          defaultValue={payment?.custom_value4}
           value={company?.custom_fields?.payment4}
-          onChange={(value) => formik.setFieldValue('custom_value4', value)}
+          onChange={(value) => handleChange('custom_value4', value.toString())}
         />
       )}
 
       <Element leftSide={t('convert_currency')}>
         <Toggle
-          checked={formik.values.exchange_currency_id}
-          onChange={() => {
-            setconvertCurrency(!convertCurrency);
-            formik.setFieldValue('exchange_currency_id', '');
-            formik.setFieldValue('exchange_rate', '');
+          checked={Boolean(payment?.exchange_currency_id)}
+          onChange={(value) => {
+            setConvertCurrency(value);
+
+            handleChange('exchange_currency_id', '');
+            handleChange('exchange_rate', 1);
           }}
         />
       </Element>
 
-      {convertCurrency && (
+      {convertCurrency && payment && (
         <ConvertCurrency
-          currency_id={payment?.data.data.currency_id}
-          setFieldValue={formik.setFieldValue}
-          exchange_currency_id={formik.values.exchange_currency_id}
-          amount={formik.values.amount}
-          exchange_rate={formik.values.exchange_rate}
+          exchangeRate={payment.exchange_rate.toString() || '1'}
+          exchangeCurrencyId={payment.exchange_currency_id || '1'}
+          currencyId={payment.currency_id || '1'}
+          amount={payment?.amount}
+          onChange={(exchangeRate, exchangeCurrencyId) => {
+            handleChange('exchange_rate', exchangeRate);
+            handleChange('exchange_currency_id', exchangeCurrencyId);
+          }}
+          onExchangeRateChange={(value) => handleChange('exchange_rate', value)}
         />
       )}
     </Card>
