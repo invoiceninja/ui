@@ -51,6 +51,11 @@ export function Create() {
   const [t] = useTranslation();
   const [searchParams] = useSearchParams();
 
+  const pages = [
+    { name: t('payments'), href: '/payments' },
+    { name: t('new_payment'), href: '/payments/create' },
+  ];
+
   const company = useCurrentCompany();
   const invoiceResolver = useInvoiceResolver();
 
@@ -63,7 +68,7 @@ export function Create() {
 
   useEffect(() => {
     if (blankPayment?.data.data) {
-      setPayment({ ...blankPayment.data.data, invoices: [], client_id: "" });
+      setPayment({ ...blankPayment.data.data, invoices: [], client_id: '' });
 
       if (searchParams.has('client')) {
         setPayment(
@@ -161,7 +166,7 @@ export function Create() {
   const onSubmit = useSave(setErrors);
 
   return (
-    <Default title={documentTitle}>
+    <Default title={documentTitle} breadcrumbs={pages}>
       <Container>
         <Card
           title={t('enter_payment')}
