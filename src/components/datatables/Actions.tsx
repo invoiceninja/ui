@@ -92,6 +92,7 @@ export function Actions(props: Props) {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             props.onFilterChange(event.target.value)
           }
+          debounceTimeout={800}
         />
         {props.rightSide}
       </div>

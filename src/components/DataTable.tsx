@@ -64,11 +64,11 @@ export function DataTable(props: Props) {
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    apiEndpoint.searchParams.append('per_page', perPage);
-    apiEndpoint.searchParams.append('page', currentPage.toString());
-    apiEndpoint.searchParams.append('filter', filter);
-    apiEndpoint.searchParams.append('sort', sort);
-    apiEndpoint.searchParams.append('status', status as unknown as string);
+    apiEndpoint.searchParams.set('per_page', perPage);
+    apiEndpoint.searchParams.set('page', currentPage.toString());
+    apiEndpoint.searchParams.set('filter', filter);
+    apiEndpoint.searchParams.set('sort', sort);
+    apiEndpoint.searchParams.set('status', status as unknown as string);
 
     setApiEndpoint(apiEndpoint);
   }, [perPage, currentPage, filter, sort, status]);
