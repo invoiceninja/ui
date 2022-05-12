@@ -170,7 +170,11 @@ export function Create() {
       <Container>
         <Card
           title={t('enter_payment')}
-          onSaveClick={() => payment && onSubmit(payment, sendEmail)}
+          onFormSubmit={(event) => {
+            event.preventDefault();
+
+            payment && onSubmit(payment, sendEmail);
+          }}
           withSaveButton
         >
           <Element leftSide={t('client')}>
