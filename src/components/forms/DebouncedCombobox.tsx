@@ -121,7 +121,7 @@ export function DebouncedCombobox(props: Props) {
     const record = clone(records[0]);
 
     setSelectedOption({ record, withoutEvents: false });
-  }, 500);
+  }, 1500);
 
   const filter = () => {
     setFilteredRecords(
