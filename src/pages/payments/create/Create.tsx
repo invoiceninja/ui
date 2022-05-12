@@ -63,7 +63,7 @@ export function Create() {
 
   useEffect(() => {
     if (blankPayment?.data.data) {
-      setPayment({ ...blankPayment.data.data, invoices: [] });
+      setPayment({ ...blankPayment.data.data, invoices: [], client_id: "" });
 
       if (searchParams.has('client')) {
         setPayment(
