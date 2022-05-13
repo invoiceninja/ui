@@ -42,7 +42,6 @@ export function ProductsTable() {
         {columns.map((column, index) => (
           <Th key={index}>{resolveTranslation(column)}</Th>
         ))}
-        <Th>{/* This is placeholder for "Remove" button. */}</Th>
       </Thead>
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="recurring-invoice-product-table">
@@ -62,31 +61,38 @@ export function ProductsTable() {
                         innerRef={provided.innerRef}
                         key={lineItemIndex}
                       >
-                        {columns.map((column, columnIndex) => (
+                        {columns.map((column, columnIndex, { length }) => (
                           <Td
                             width={resolveColumnWidth(column)}
                             key={columnIndex}
                           >
-                            {resolveInputField(column, lineItemIndex)}
+                            {length - 1 !== columnIndex &&
+                              resolveInputField(column, lineItemIndex)}
+
+                            {length - 1 === columnIndex && (
+                              <div className="flex justify-between items-center">
+                                {resolveInputField(column, lineItemIndex)}
+
+                                {invoice &&
+                                  (lineItem.product_key || lineItemIndex > 0) &&
+                                  invoice.line_items.length > 0 && (
+                                    <button
+                                      className="ml-2 text-gray-600 hover:text-red-600"
+                                      onClick={() =>
+                                        dispatch(
+                                          deleteRecurringInvoiceItem(
+                                            lineItemIndex
+                                          )
+                                        )
+                                      }
+                                    >
+                                      <Trash2 size={18} />
+                                    </button>
+                                  )}
+                              </div>
+                            )}
                           </Td>
                         ))}
-
-                        <Td>
-                          {invoice &&
-                            (lineItem.product_key || lineItemIndex > 0) &&
-                            invoice.line_items.length > 0 && (
-                              <button
-                                className="text-gray-600 hover:text-red-600"
-                                onClick={() =>
-                                  dispatch(
-                                    deleteRecurringInvoiceItem(lineItemIndex)
-                                  )
-                                }
-                              >
-                                <Trash2 size={18} />
-                              </button>
-                            )}
-                        </Td>
                       </Tr>
                     )}
                   </Draggable>
