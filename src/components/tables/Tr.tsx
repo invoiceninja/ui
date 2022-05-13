@@ -24,7 +24,13 @@ export function Tr(props: Props) {
       className={classNames('bg-white dark:bg-gray-800 hover:bg-gray-50', {
         'cursor-pointer': onClick,
       })}
-      onClick={onClick}
+      onClick={(event) =>
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        props.onClick && event.target?.nodeName === 'TD'
+          ? props.onClick()
+          : null
+      }
       ref={innerRef}
       {...otherProps}
     >
