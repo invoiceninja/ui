@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint, handleCheckboxChange } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { ChangeEvent, ReactNode, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';

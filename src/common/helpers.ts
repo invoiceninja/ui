@@ -26,12 +26,6 @@ export function isSelfHosted(): boolean {
   return !isHosted();
 }
 
-export function handleCheckboxChange(id: string, set: any) {
-  set.has(id) ? set.delete(id) : set.add(id);
-
-  return set;
-}
-
 export function fetcher(
   url: string,
   headers?: AxiosRequestHeaders,
