@@ -24,8 +24,8 @@ type Props = {
   type: 'default' | 'bulk';
   label: string;
   resource?: any;
-  setSelected: React.Dispatch<React.SetStateAction<Set<string>>>;
-  selected: Set<string>;
+  setSelected: React.Dispatch<React.SetStateAction<string[]>>;
+  selected: string[];
   resourceType: string;
   linkToEdit?: string | undefined;
   endpoint: string;
@@ -53,7 +53,7 @@ export default function ResourcefulActions(props: Props) {
           id: toastId,
         });
 
-        props.selected.clear();
+        props.setSelected([]);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         /** @ts-ignore: Unreachable, if element is null/undefined. */
@@ -90,8 +90,11 @@ export default function ResourcefulActions(props: Props) {
             {props.resource?.archived_at === 0 && (
               <DropdownElement
                 onClick={() => {
-                  props.setSelected(new Set());
-                  props.setSelected(props.selected.add(props.resource?.id));
+                  props.setSelected([]);
+                  props.setSelected((current) => [
+                    ...current,
+                    props.resource?.id,
+                  ]);
 
                   bulk('archive');
 
@@ -105,8 +108,11 @@ export default function ResourcefulActions(props: Props) {
             {props.resource?.archived_at > 0 && (
               <DropdownElement
                 onClick={() => {
-                  props.setSelected(new Set());
-                  props.setSelected(props.selected.add(props.resource?.id));
+                  props.setSelected([]);
+                  props.setSelected((current) => [
+                    ...current,
+                    props.resource?.id,
+                  ]);
 
                   bulk('restore');
 
@@ -120,8 +126,11 @@ export default function ResourcefulActions(props: Props) {
             {!props.resource?.is_deleted && (
               <DropdownElement
                 onClick={() => {
-                  props.setSelected(new Set());
-                  props.setSelected(props.selected.add(props.resource?.id));
+                  props.setSelected([]);
+                  props.setSelected((current) => [
+                    ...current,
+                    props.resource?.id,
+                  ]);
 
                   bulk('delete');
 
