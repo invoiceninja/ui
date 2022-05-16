@@ -18,4 +18,5 @@ export default interface CommonProps {
   value?: any;
   onClick?: any;
   innerRef?: any;
+  disabled?: boolean;
 }
