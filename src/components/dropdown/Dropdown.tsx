@@ -24,6 +24,7 @@ export function Dropdown(props: Props) {
   return (
     <div>
       <Tippy
+        disabled={props.disabled}
         placement="bottom"
         interactive={true}
         render={() => (
@@ -42,8 +43,9 @@ export function Dropdown(props: Props) {
         visible={visible}
       >
         <button
+          disabled={props.disabled}
           onClick={() => setVisible(!visible)}
-          className="hover:bg-white inline-flex text-gray-900 border border-transparent hover:border-gray-300 dark:border-transparent items-center space-x-2 justify-center py-1.5 px-3 rounded text-sm  dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+          className="hover:bg-white inline-flex text-gray-900 border border-transparent hover:border-gray-300 dark:border-transparent items-center space-x-2 justify-center py-1.5 px-3 rounded text-sm  dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 disabled:cursor-not-allowed"
         >
           <span>{props.label}</span>
           <ChevronDown size={14} />
