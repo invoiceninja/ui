@@ -34,6 +34,7 @@ type Props = {
   children?: ReactNode;
   mainCheckbox: RefObject<HTMLInputElement>;
   onClick?: (action: string, payload?: unknown) => unknown;
+  disabled?: boolean;
 };
 
 export default function ResourcefulActions(props: Props) {
@@ -72,6 +73,7 @@ export default function ResourcefulActions(props: Props) {
     <>
       {props.type === 'default' && (
         <Dropdown
+          disabled={props.disabled}
           className={classNames({ 'divide-y': props.children })}
           label={props.label}
         >
@@ -134,8 +136,9 @@ export default function ResourcefulActions(props: Props) {
           <div>{props.children}</div>
         </Dropdown>
       )}
+
       {props.type === 'bulk' && (
-        <Dropdown label={t('actions')}>
+        <Dropdown label={t('actions')} disabled={props.disabled}>
           <DropdownElement
             onClick={() => {
               bulk('archive');
