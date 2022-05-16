@@ -59,7 +59,7 @@ export function DataTable(props: Props) {
   const [sort, setSort] = useState('id|asc');
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState(['active']);
-  const [selected, setSelected] = useState(new Set<string>());
+  const [selected, setSelected] = useState<string[]>([]);
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
 
@@ -132,8 +132,9 @@ export function DataTable(props: Props) {
               (element: any) => (element.checked = false)
             );
 
-            setSelected(new Set());
+            setSelected([]);
           }}
+          disabled={selected.length == 0}
         >
           {props.customBulkActions &&
             props.customBulkActions?.map((action: any) => {
@@ -153,8 +154,10 @@ export function DataTable(props: Props) {
                   checkbox.checked = event.target.checked;
 
                   event.target.checked
-                    ? selected.add(checkbox.id)
-                    : selected.delete(checkbox.id);
+                    ? setSelected((current) => [...current, checkbox.id])
+                    : setSelected((current) =>
+                        current.filter((value) => value !== checkbox.id)
+                      );
                 });
               }}
             />
@@ -210,10 +213,12 @@ export function DataTable(props: Props) {
                     className="child-checkbox"
                     value={resource.id}
                     id={resource.id}
-                    onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                      setSelected(
-                        handleCheckboxChange(event.target.id, selected)
-                      )
+                    onValueChange={(value) =>
+                      selected.includes(value)
+                        ? setSelected((current) =>
+                            current.filter((v) => v !== value)
+                          )
+                        : setSelected((current) => [...current, value])
                     }
                   />
                 </Td>
