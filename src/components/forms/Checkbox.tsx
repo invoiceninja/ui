@@ -14,6 +14,7 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 interface Props extends CommonProps {
   label?: string;
   checked?: boolean;
+  onValueChange?: (value: string) => unknown;
 }
 
 export function Checkbox(props: Props) {
@@ -30,7 +31,10 @@ export function Checkbox(props: Props) {
           type="checkbox"
           className={`focus:ring-gray-300 h-4 w-4 border-gray-300 rounded dark:bg-gray-700 dark:border-transparent cursor-pointer ${props.className}`}
           style={{ color: accentColor }}
-          onChange={props.onChange}
+          onChange={(event) => {
+            props.onChange && props.onChange(event);
+            props.onValueChange && props.onValueChange(event.target.value);
+          }}
           checked={props.checked}
         />
       </div>
