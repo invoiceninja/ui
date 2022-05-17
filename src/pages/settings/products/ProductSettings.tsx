@@ -8,25 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import {
-  injectInChanges,
-  resetChanges,
-  updateChanges,
-  updateRecord,
-} from 'common/stores/slices/company-users';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useTitle } from 'common/hooks/useTitle';
+import { updateChanges } from 'common/stores/slices/company-users';
 import { Divider } from 'components/cards/Divider';
-import { useEffect } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../components/cards';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 
 export function ProductSettings() {
   const [t] = useTranslation();
@@ -36,18 +29,12 @@ export function ProductSettings() {
     { name: t('product_settings'), href: '/settings/product_settings' },
   ];
 
+  useInjectCompanyChanges();
+  useTitle('product_settings');
+
   const dispatch = useDispatch();
 
-  const company = useCurrentCompany();
   const companyChanges = useCompanyChanges();
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'product_settings'
-    )}`;
-
-    dispatch(injectInChanges({ object: 'company', data: company }));
-  }, [company]);
 
   const handleToggleChange = (id: string, value: boolean) => {
     dispatch(
@@ -59,32 +46,13 @@ export function ProductSettings() {
     );
   };
 
-  const onSave = () => {
-    toast.loading(t('processing'));
-
-    request(
-      'PUT',
-      endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
-      companyChanges
-    )
-      .then((response: AxiosResponse) => {
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
-
-        toast.dismiss();
-        toast.success(t('updated_settings'));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.error(t('error_title'));
-      });
-  };
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
 
   return (
     <Settings
       onSaveClick={onSave}
-      onCancelClick={() => dispatch(resetChanges('company'))}
+      onCancelClick={onCancel}
       title={t('product_settings')}
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#product_settings"
