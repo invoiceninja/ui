@@ -16,11 +16,8 @@ import { updateRecord } from 'common/stores/slices/company-users';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { request } from 'common/helpers/request';
-import { ValidationBag } from 'common/interfaces/validation-bag';
 
-export function useHandleCompanySave(
-  setErrors?: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
-) {
+export function useHandleCompanySave() {
   const [t] = useTranslation();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
@@ -43,7 +40,23 @@ export function useHandleCompanySave(
 
         toast.error(t('error_title'), { id: toastId });
 
-        setErrors && setErrors(error.response?.data);
+        console.log(error.response?.data);
+
+        if (error.response?.status === 422) {
+          const message = (
+            <div>
+              {error.response.data.message}
+
+              {Object.keys(error.response?.data.errors).map((key, index) => (
+                <p className="text-sm" key={index}>
+                  {error.response?.data.errors[key]}
+                </p>
+              ))}
+            </div>
+          );
+
+          toast.error(message, { id: toastId });
+        }
       });
   };
 }
