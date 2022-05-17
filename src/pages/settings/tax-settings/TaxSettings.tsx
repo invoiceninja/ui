@@ -8,19 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import {
-  injectInChanges,
-  resetChanges,
-  updateChanges,
-  updateRecord,
-} from 'common/stores/slices/company-users';
-import { ChangeEvent, useEffect } from 'react';
-import toast from 'react-hot-toast';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useTitle } from 'common/hooks/useTitle';
+import { updateChanges } from 'common/stores/slices/company-users';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { TaxRates } from '..';
@@ -28,6 +20,8 @@ import { Card, Element } from '../../../components/cards';
 import { SelectField } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { Selector } from './components';
 
 export function TaxSettings() {
@@ -38,15 +32,10 @@ export function TaxSettings() {
     { name: t('tax_settings'), href: '/settings/tax_settings' },
   ];
 
-  const company = useCurrentCompany();
+  useInjectCompanyChanges();
+  useTitle('tax_settings');
+
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('tax_settings')}`;
-
-    dispatch(injectInChanges({ object: 'company', data: company }));
-  }, [company]);
-
   const companyChanges = useCompanyChanges();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -69,32 +58,13 @@ export function TaxSettings() {
     );
   };
 
-  const onSave = () => {
-    toast.loading(t('processing'));
-
-    request(
-      'PUT',
-      endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
-      companyChanges
-    )
-      .then((response: AxiosResponse) => {
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
-
-        toast.dismiss();
-        toast.success(t('updated_settings'));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      });
-  };
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
 
   return (
     <Settings
       onSaveClick={onSave}
-      onCancelClick={() => dispatch(resetChanges('company'))}
+      onCancelClick={onCancel}
       title={t('tax_settings')}
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#tax_settings"

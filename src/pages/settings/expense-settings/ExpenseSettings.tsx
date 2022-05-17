@@ -8,26 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useTitle } from 'common/hooks/useTitle';
 import {
-  injectInChanges,
-  resetChanges,
   updateChanges,
-  updateRecord,
 } from 'common/stores/slices/company-users';
 import { Divider } from 'components/cards/Divider';
-import { ChangeEvent, useEffect } from 'react';
-import toast from 'react-hot-toast';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../components/cards';
 import { Radio } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { ExpenseCategories } from '../expense-categories';
 
 export function ExpenseSettings() {
@@ -39,15 +35,9 @@ export function ExpenseSettings() {
   ];
 
   const dispatch = useDispatch();
-  const company = useCurrentCompany();
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'expense_settings'
-    )}`;
-
-    dispatch(injectInChanges({ object: 'company', data: company }));
-  }, [company]);
+  useTitle('expense_settings');
+  useInjectCompanyChanges();
 
   const companyChanges = useCompanyChanges();
 
@@ -60,31 +50,8 @@ export function ExpenseSettings() {
       })
     );
 
-  const onSave = () => {
-    toast.loading(t('processing'));
-
-    request(
-      'PUT',
-      endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
-      companyChanges
-    )
-      .then((response) => {
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
-
-        toast.dismiss();
-        toast.success(t('updated_settings'));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      });
-  };
-
-  const onCancel = () => {
-    dispatch(resetChanges('company'));
-  };
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
 
   return (
     <Settings

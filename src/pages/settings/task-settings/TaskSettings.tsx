@@ -8,21 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useTitle } from 'common/hooks/useTitle';
 import {
-  injectInChanges,
-  resetChanges,
   updateChanges,
-  updateRecord,
 } from 'common/stores/slices/company-users';
-import { Alert } from 'components/Alert';
 import { Divider } from 'components/cards/Divider';
-import { ChangeEvent, useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { TaskStatuses } from '..';
@@ -30,6 +23,8 @@ import { Card, Element } from '../../../components/cards';
 import { InputField } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 
 export function TaskSettings() {
   const [t] = useTranslation();
@@ -39,18 +34,11 @@ export function TaskSettings() {
     { name: t('task_settings'), href: '/settings/task_settings' },
   ];
 
+  useTitle('task_settings');
+  useInjectCompanyChanges();
+
   const dispatch = useDispatch();
-
-  const [errors, setErrors] = useState<any>(undefined);
-
-  const company = useCurrentCompany();
   const companyChanges = useCompanyChanges();
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('task_settings')}`;
-
-    dispatch(injectInChanges({ object: 'company', data: company }));
-  }, [company]);
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
     dispatch(
@@ -70,47 +58,17 @@ export function TaskSettings() {
       })
     );
 
-  const onSave = () => {
-    toast.loading(t('processing'));
-    setErrors(undefined);
-
-    request(
-      'PUT',
-      endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
-      companyChanges
-    )
-      .then((response: AxiosResponse) => {
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
-
-        toast.dismiss();
-        toast.success(t('updated_settings'));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.dismiss();
-
-        error.response?.status === 422
-          ? setErrors(error.response.data)
-          : toast.error(t('error_title'));
-      });
-  };
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
 
   return (
     <Settings
       onSaveClick={onSave}
-      onCancelClick={() => dispatch(resetChanges('company'))}
+      onCancelClick={onCancel}
       title={t('task_settings')}
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#task_settings"
     >
-      {errors?.errors?.settings && (
-        <Alert type="danger">
-          {errors?.errors?.settings.map((element: string, index: number) => (
-            <p key={index}>{element}</p>
-          ))}
-        </Alert>
-      )}
-
       <Card title={t('settings')}>
         <Element leftSide={t('default_task_rate')}>
           <InputField

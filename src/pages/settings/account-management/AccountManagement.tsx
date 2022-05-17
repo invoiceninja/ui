@@ -8,21 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import {
-  injectInChanges,
-  resetChanges,
-  updateRecord,
-} from 'common/stores/slices/company-users';
-import { useEffect } from 'react';
-import toast from 'react-hot-toast';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useTitle } from 'common/hooks/useTitle';
+
+
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import {
   EnabledModules,
   Integrations,
@@ -40,44 +33,16 @@ export function AccountManagement() {
     { name: t('account_management'), href: '/settings/account_management' },
   ];
 
-  const company = useCurrentCompany();
-  const companyChanges = useCompanyChanges();
-  const dispatch = useDispatch();
+  useTitle('account_management');
+  useInjectCompanyChanges();
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'account_management'
-    )}`;
-
-    dispatch(injectInChanges({ object: 'company', data: company }));
-  }, [company]);
-
-  const onSave = () => {
-    toast.loading(t('processing'));
-
-    request(
-      'PUT',
-      endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
-      companyChanges
-    )
-      .then((response) => {
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
-
-        toast.dismiss();
-        toast.success(t('updated_settings'));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      });
-  };
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
 
   return (
     <Settings
       onSaveClick={onSave}
-      onCancelClick={() => dispatch(resetChanges('company'))}
+      onCancelClick={onCancel}
       title={t('account_management')}
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#account_management"

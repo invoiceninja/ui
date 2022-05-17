@@ -38,7 +38,25 @@ export function useHandleCompanySave() {
       .catch((error: AxiosError) => {
         console.error(error);
 
-        toast.success(t('error_title'), { id: toastId });
+        toast.error(t('error_title'), { id: toastId });
+
+        console.log(error.response?.data);
+
+        if (error.response?.status === 422) {
+          const message = (
+            <div>
+              {error.response.data.message}
+
+              {Object.keys(error.response?.data.errors).map((key, index) => (
+                <p className="text-sm" key={index}>
+                  {error.response?.data.errors[key]}
+                </p>
+              ))}
+            </div>
+          );
+
+          toast.error(message, { id: toastId });
+        }
       });
   };
 }

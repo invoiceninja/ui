@@ -100,7 +100,7 @@ export function Edit() {
     <>
       {product && (
         <Card
-          title={product.data.data.product_key}
+          title={product.data.data.product_key || t('edit_product')}
           disableSubmitButton={formik.isSubmitting}
           onFormSubmit={formik.handleSubmit}
           withSaveButton
