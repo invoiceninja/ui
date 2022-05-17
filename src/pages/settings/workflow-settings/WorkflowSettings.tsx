@@ -13,6 +13,8 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useTitle } from 'common/hooks/useTitle';
 import {
   injectInChanges,
   resetChanges,
@@ -23,6 +25,8 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { Invoices, Quotes } from './components';
 
 export function WorkflowSettings() {
@@ -33,43 +37,11 @@ export function WorkflowSettings() {
     { name: t('workflow_settings'), href: '/settings/workflow_settings' },
   ];
 
-  const dispatch = useDispatch();
-  const company = useCurrentCompany();
-  const companyChanges = useCompanyChanges();
+  useTitle('workflow_settings');
+  useInjectCompanyChanges();
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'workflow_settings'
-    )}`;
-
-    dispatch(injectInChanges({ object: 'company', data: company }));
-  }, [company]);
-
-  const onSave = () => {
-    toast.loading(t('processing'));
-
-    request(
-      'PUT',
-      endpoint('/api/v1/companies/:id', { id: companyChanges.id }),
-      companyChanges
-    )
-      .then((response) => {
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
-
-        toast.dismiss();
-        toast.success(t('updated_settings'));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      });
-  };
-
-  const onCancel = () => {
-    dispatch(resetChanges('company'));
-  };
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
 
   return (
     <Settings
