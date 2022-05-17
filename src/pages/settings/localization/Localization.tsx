@@ -8,20 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
-import { resetChanges, updateRecord } from 'common/stores/slices/company-users';
-import toast from 'react-hot-toast';
+import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { Settings } from '../../../components/layouts/Settings';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { CustomLabels, Settings as SettingsComponent } from './components';
 
 export function Localization() {
   const [t] = useTranslation();
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -30,34 +28,8 @@ export function Localization() {
 
   useTitle('localization');
 
-  const companyChanges = useInjectCompanyChanges();
-  const dispatch = useDispatch();
-
-  const onSave = () => {
-    toast.loading(t('processing'));
-
-    request(
-      'PUT',
-      endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
-      companyChanges
-    )
-      .then((response: AxiosResponse) => {
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
-
-        toast.dismiss();
-        toast.success(t('updated_settings'));
-      })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      });
-  };
-
-  const onCancel = () => {
-    dispatch(resetChanges('company'));
-  };
+  const onSave = useHandleCompanySave(setErrors);
+  const onCancel = useDiscardChanges();
 
   return (
     <Settings
@@ -67,7 +39,7 @@ export function Localization() {
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#localization"
     >
-      <SettingsComponent />
+      <SettingsComponent errors={errors} />
       <CustomLabels />
     </Settings>
   );
