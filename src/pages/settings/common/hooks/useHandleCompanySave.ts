@@ -16,8 +16,11 @@ import { updateRecord } from 'common/stores/slices/company-users';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { request } from 'common/helpers/request';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
-export function useHandleCompanySave() {
+export function useHandleCompanySave(
+  setErrors?: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
+) {
   const [t] = useTranslation();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
@@ -38,7 +41,9 @@ export function useHandleCompanySave() {
       .catch((error: AxiosError) => {
         console.error(error);
 
-        toast.success(t('error_title'), { id: toastId });
+        toast.error(t('error_title'), { id: toastId });
+
+        setErrors && setErrors(error.response?.data);
       });
   };
 }
