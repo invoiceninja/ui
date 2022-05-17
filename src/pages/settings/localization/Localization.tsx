@@ -9,8 +9,6 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
@@ -19,7 +17,6 @@ import { CustomLabels, Settings as SettingsComponent } from './components';
 
 export function Localization() {
   const [t] = useTranslation();
-  const [, setErrors] = useState<ValidationBag>();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -28,7 +25,7 @@ export function Localization() {
 
   useTitle('localization');
 
-  const onSave = useHandleCompanySave(setErrors);
+  const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
 
   return (
