@@ -19,7 +19,7 @@ import { CustomLabels, Settings as SettingsComponent } from './components';
 
 export function Localization() {
   const [t] = useTranslation();
-  const [errors, setErrors] = useState<ValidationBag>();
+  const [, setErrors] = useState<ValidationBag>();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -39,7 +39,7 @@ export function Localization() {
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#localization"
     >
-      <SettingsComponent errors={errors} />
+      <SettingsComponent />
       <CustomLabels />
     </Settings>
   );
