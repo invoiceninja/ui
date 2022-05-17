@@ -9,12 +9,10 @@
  */
 
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import {
-  injectInChanges,
-  updateChanges,
-} from 'common/stores/slices/company-users';
-import { ChangeEvent, useEffect } from 'react';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useTitle } from 'common/hooks/useTitle';
+import { updateChanges } from 'common/stores/slices/company-users';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { TaxRates } from '..';
@@ -34,15 +32,10 @@ export function TaxSettings() {
     { name: t('tax_settings'), href: '/settings/tax_settings' },
   ];
 
-  const company = useCurrentCompany();
+  useInjectCompanyChanges();
+  useTitle('tax_settings');
+
   const dispatch = useDispatch();
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('tax_settings')}`;
-
-    dispatch(injectInChanges({ object: 'company', data: company }));
-  }, [company]);
-
   const companyChanges = useCompanyChanges();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
