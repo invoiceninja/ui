@@ -8,22 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import {
-  injectInChanges,
-  resetChanges,
   updateChanges,
-  updateRecord,
 } from 'common/stores/slices/company-users';
 import { Divider } from 'components/cards/Divider';
-import { ChangeEvent, useEffect } from 'react';
-import toast from 'react-hot-toast';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../components/cards';
