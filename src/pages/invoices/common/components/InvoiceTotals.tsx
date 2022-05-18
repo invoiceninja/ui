@@ -20,7 +20,7 @@ import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
 import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 import { useTotalVariables } from '../hooks/useTotalVariables';
 import { TaxCreate } from './TaxCreate';
-import { CustomField } from 'components/CustomField';
+import { CustomSurchargeField } from 'components/CustomSurchargeField';
 
 export function InvoiceTotals() {
   const variables = useTotalVariables();
@@ -42,7 +42,7 @@ export function InvoiceTotals() {
       ))}
 
       {company && company?.custom_fields?.surcharge1 && (
-        <CustomField
+        <CustomSurchargeField
           field="surcharge1"
           defaultValue={invoice?.custom_surcharge1}
           value={invoice?.custom_surcharge1.toString() || ''}
@@ -51,7 +51,7 @@ export function InvoiceTotals() {
       )}
 
       {company && company?.custom_fields?.surcharge2 && (
-        <CustomField
+        <CustomSurchargeField
           field="surcharge2"
           defaultValue={invoice?.custom_surcharge2}
           value={invoice?.custom_surcharge2.toString() || ''}
@@ -60,7 +60,7 @@ export function InvoiceTotals() {
       )}
 
       {company && company?.custom_fields?.surcharge3 && (
-        <CustomField
+        <CustomSurchargeField
           field="surcharge3"
           defaultValue={invoice?.custom_surcharge3}
           value={invoice?.custom_surcharge3.toString() || ''}
@@ -69,7 +69,7 @@ export function InvoiceTotals() {
       )}
 
       {company && company?.custom_fields?.surcharge4 && (
-        <CustomField
+        <CustomSurchargeField
           field="surcharge4"
           defaultValue={invoice?.custom_surcharge4}
           value={invoice?.custom_surcharge4.toString() || ''}
