@@ -113,6 +113,7 @@ export function Create() {
       onSaveClick={() =>
         handleCreate(currentRecurringInvoice as RecurringInvoice)
       }
+      disableSaveButton={currentRecurringInvoice?.client_id.length === 0}
     >
       {errors && <ValidationAlert errors={errors} />}
 
