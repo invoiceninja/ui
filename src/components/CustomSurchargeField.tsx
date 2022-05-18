@@ -10,7 +10,7 @@
 
 import { useEffect, useState } from 'react';
 import { Element } from './cards';
-import { InputCustomField, Props } from './forms/InputCustomField';
+import { Props } from './forms/InputCustomField';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { InputField } from './forms';
 
