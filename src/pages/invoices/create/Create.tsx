@@ -122,6 +122,7 @@ export function Create() {
       breadcrumbs={pages}
       onBackClick={generatePath('/invoices')}
       onSaveClick={() => handleCreate(currentInvoice as Invoice)}
+      disableSaveButton={currentInvoice?.client_id.length === 0}
     >
       {errors && <ValidationAlert errors={errors} />}
 
