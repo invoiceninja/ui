@@ -15,18 +15,17 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { InputField } from './forms';
 
 export function CustomSurchargeField(props: Props) {
-    const [label, setLabel] = useState('');
-    const company = useCurrentCompany();
+  const [label, setLabel] = useState('');
+  const company = useCurrentCompany();
 
-    useEffect(() => {
-        console.log(props);
-        const [fieldLabel] = [company.custom_fields[props.field], ''];
-        setLabel(fieldLabel || '');
-    }, []);
+  useEffect(() => {
+    const [fieldLabel] = [company.custom_fields[props.field], ''];
+    setLabel(fieldLabel || '');
+  }, []);
 
-    return (
-        <Element leftSide={label}>
-            <InputField {...props} />
-        </Element>
-    );
+  return (
+    <Element leftSide={label}>
+      <InputField {...props} />
+    </Element>
+  );
 }
