@@ -46,7 +46,7 @@ export function Table() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const destroy = (password: string, isRequired = true) => {
-    toast.loading(t('processing'));
+    const toastId = toast.loading(t('processing'));
 
     request(
       'delete',
@@ -54,15 +54,11 @@ export function Table() {
       {},
       { headers: { 'X-Api-Password': password } }
     )
-      .then(() => {
-        toast.dismiss();
-        toast.success(t('deleted_payment_term'));
-      })
+      .then(() => toast.success(t('deleted_document'), { id: toastId }))
       .catch((error) => {
         console.error(error);
 
-        toast.dismiss();
-        toast.error(t('error_title'));
+        toast.error(t('error_title'), { id: toastId });
       })
       .finally(() => queryClient.invalidateQueries('/api/v1/documents'));
   };
