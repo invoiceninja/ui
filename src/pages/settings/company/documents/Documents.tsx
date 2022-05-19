@@ -34,7 +34,7 @@ export function Documents() {
     <Settings title={t('documents')}>
       <Breadcrumbs pages={pages} />
 
-      <Upload apiEndpoint={apiEndpoint} />
+      {/* <Upload apiEndpoint={apiEndpoint} /> */}
       <DocumentsTable />
     </Settings>
   );
