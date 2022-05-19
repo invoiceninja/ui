@@ -14,8 +14,16 @@ import { generatePath } from 'react-router';
 import entityState from './constants/entity-state';
 import { request } from './helpers/request';
 
+export function apiEndpoint(): string {
+  return (
+    import.meta.env.VITE_API_URL ||
+    window.location.origin ||
+    'https://invoicing.co'
+  );
+}
+
 export function endpoint(endpoint: string, params = {}): string {
-  return import.meta.env.VITE_API_URL + generatePath(endpoint, params);
+  return apiEndpoint() + generatePath(endpoint, params);
 }
 
 export function isHosted(): boolean {
