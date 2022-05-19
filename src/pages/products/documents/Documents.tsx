@@ -8,26 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Table, Tbody, Th, Thead } from '@invoiceninja/tables';
+import { useProductQuery } from 'common/queries/products';
+import { DocumentsTable } from 'components/DocumentsTable';
 import { Upload } from 'pages/settings/company/documents/components';
-import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router-dom';
 
 export function Documents() {
-  const [t] = useTranslation();
+  const { id } = useParams();
+  const { data: product } = useProductQuery({ id });
 
   return (
     <>
       <Upload apiEndpoint="/api/v1/projects/:id/upload" />
 
-      <Table>
-        <Thead>
-          <Th>{t('name')}</Th>
-          <Th>{t('date')}</Th>
-          <Th>{t('type')}</Th>
-          <Th>{t('size')}</Th>
-        </Thead>
-        <Tbody></Tbody>
-      </Table>
+      {product?.data.data && (
+        <DocumentsTable documents={product.data.data.documents} />
+      )}
     </>
   );
 }
