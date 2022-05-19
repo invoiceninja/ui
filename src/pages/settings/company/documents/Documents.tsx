@@ -8,13 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { endpoint } from 'common/helpers';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useTitle } from 'common/hooks/useTitle';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Settings } from 'components/layouts/Settings';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Table as DocumentsTable } from './components';
+import { useQueryClient } from 'react-query';
+import { Table as DocumentsTable, Upload } from './components';
 
 export function Documents() {
+  useTitle('documents');
+
   const [t] = useTranslation();
 
   const pages = [
@@ -23,17 +28,27 @@ export function Documents() {
     { name: t('documents'), href: '/settings/company_details/documents' },
   ];
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('company')}: ${t(
-      'documents'
-    )}`;
-  });
+  const queryClient = useQueryClient();
+
+  const onSuccess = () => {
+    queryClient.invalidateQueries('/api/v1/documents');
+  };
+
+  const company = useCurrentCompany();
 
   return (
     <Settings title={t('documents')}>
       <Breadcrumbs pages={pages} />
 
-      {/* <Upload apiEndpoint={apiEndpoint} /> */}
+      {company && (
+        <Upload
+          endpoint={endpoint('/api/v1/companies/:id/upload', {
+            id: company.id,
+          })}
+          onSuccess={onSuccess}
+        />
+      )}
+
       <DocumentsTable />
     </Settings>
   );
