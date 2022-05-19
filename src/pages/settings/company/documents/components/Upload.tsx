@@ -10,51 +10,42 @@
 
 import toast from 'react-hot-toast';
 import { Card, Element } from '@invoiceninja/cards';
-import { endpoint } from 'common/helpers';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { updateRecord } from 'common/stores/slices/company-users';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
 import { request } from 'common/helpers/request';
 
-export function Upload({ apiEndpoint }: { apiEndpoint: string }) {
+interface Props {
+  endpoint: string;
+  onSuccess?: () => unknown;
+}
+
+export function Upload(props: Props) {
   const [t] = useTranslation();
   const [formData, setFormData] = useState(new FormData());
-  const company = useCurrentCompany();
-  const dispatch = useDispatch();
-  const queryClient = useQueryClient();
 
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {},
     onSubmit: () => {
-      toast.loading(t('processing'));
+      const toastId = toast.loading(t('processing'));
 
-      request('POST', endpoint(apiEndpoint, { id: company.id }), formData, {
+      request('POST', props.endpoint, formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-        .then((response) => {
-          dispatch(
-            updateRecord({ object: 'company', data: response.data.data })
-          );
-
-          toast.dismiss();
-          toast.success(t('successfully_uploaded_documents'));
-
-          queryClient.invalidateQueries('/api/v1/documents');
+        .then(() => {
+          toast.success(t('successfully_uploaded_documents'), { id: toastId });
 
           setFormData(new FormData());
+
+          props.onSuccess?.();
         })
         .catch((error) => {
           console.error(error);
 
-          toast.dismiss();
-          toast.error(t('error_title'));
+          toast.error(t('error_title'), { id: toastId });
         });
     },
   });

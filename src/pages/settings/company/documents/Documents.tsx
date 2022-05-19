@@ -12,10 +12,9 @@ import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Settings } from 'components/layouts/Settings';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Upload, Table as DocumentsTable } from './components';
+import { Table as DocumentsTable } from './components';
 
 export function Documents() {
-  const apiEndpoint = '/api/v1/companies/:id/upload';
   const [t] = useTranslation();
 
   const pages = [
@@ -34,7 +33,7 @@ export function Documents() {
     <Settings title={t('documents')}>
       <Breadcrumbs pages={pages} />
 
-      <Upload apiEndpoint={apiEndpoint} />
+      {/* <Upload apiEndpoint={apiEndpoint} /> */}
       <DocumentsTable />
     </Settings>
   );

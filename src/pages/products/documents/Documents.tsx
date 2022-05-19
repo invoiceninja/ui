@@ -8,18 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import {
-  Upload,
-  Table as DocumentsTable,
-} from 'pages/settings/company/documents/components';
+import { endpoint } from 'common/helpers';
+import { useProductQuery } from 'common/queries/products';
+import { DocumentsTable } from 'components/DocumentsTable';
+import { Upload } from 'pages/settings/company/documents/components';
+import { useQueryClient } from 'react-query';
+import { generatePath, useParams } from 'react-router-dom';
 
 export function Documents() {
-  const apiEndpoint = 'api/v1/projects/:id/upload';
+  const { id } = useParams();
+  const { data: product } = useProductQuery({ id });
+
+  const queryClient = useQueryClient();
+
+  const onSuccess = () => {
+    queryClient.invalidateQueries(generatePath('/api/v1/products/:id', { id }));
+  };
 
   return (
     <>
-      <Upload apiEndpoint={apiEndpoint} />
-      <DocumentsTable />
+      <Upload
+        endpoint={endpoint('/api/v1/products/:id/upload', { id })}
+        onSuccess={onSuccess}
+      />
+
+      {product?.data.data && (
+        <DocumentsTable documents={product.data.data.documents} />
+      )}
     </>
   );
 }
