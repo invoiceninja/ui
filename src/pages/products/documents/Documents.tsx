@@ -8,18 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import {
-  Upload,
-  Table as DocumentsTable,
-} from 'pages/settings/company/documents/components';
+import { Upload } from 'pages/settings/company/documents/components';
 
 export function Documents() {
-  const apiEndpoint = 'api/v1/projects/:id/upload';
-
   return (
     <>
-      <Upload apiEndpoint={apiEndpoint} />
-      <DocumentsTable />
+      <Upload apiEndpoint="/api/v1/projects/:id/upload" />
     </>
   );
 }
