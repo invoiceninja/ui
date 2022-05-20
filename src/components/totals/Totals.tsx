@@ -179,7 +179,7 @@ export function Totals() {
                   ? new Intl.NumberFormat().format(
                       Number(totalsData[currency].revenue.paid_to_date)
                     )
-                  : ''}
+                  : '0'}
               </Card>
             }
           />
@@ -201,7 +201,7 @@ export function Totals() {
 
           <InfoCard
             className="col-span-12 lg:col-span-4"
-            title={`${t('outstanding')}`}
+            title={`${t('total')} ${t('outstanding')}`}
             value={
               <Card>
                 {totalsData[currency].outstanding.code}{' '}

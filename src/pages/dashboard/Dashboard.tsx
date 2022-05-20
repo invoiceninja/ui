@@ -9,6 +9,8 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { Activity } from 'components/totals/Activity';
+import { RecentPayments } from 'components/totals/RecentPayments';
 import { Totals } from 'components/totals/Totals';
 import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';
@@ -23,6 +25,13 @@ export function Dashboard() {
   return (
     <Default title={t('dashboard')} breadcrumbs={pages}>
       <Totals />
+
+      <div className="flex grid grid-cols-2 gap-4 mt-4">
+        <Activity />
+        
+        <RecentPayments />
+      </div>
+      
     </Default>
   );
 }
