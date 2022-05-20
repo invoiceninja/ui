@@ -24,15 +24,6 @@ export function Activity() {
     const { data, isLoading, isError } = useQuery('/api/v1/activities', () =>
         request('GET', endpoint('/api/v1/activities'))
     );
-
-    const columns: DataTableColumns = [
-
-        {
-            id: 'created_at',
-            label: t('activity'),
-            format: (value) => date(value, dateFormat),
-        }
-    ];
     
     return (
         <div className="bg-white shadow sm:rounded-lg">
