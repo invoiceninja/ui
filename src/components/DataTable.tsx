@@ -44,6 +44,7 @@ interface Props {
   bulkRoute?: string;
   customActions?: any;
   customBulkActions?: any;
+  withoutActions?: boolean;
 }
 
 export function DataTable(props: Props) {
@@ -101,47 +102,50 @@ export function DataTable(props: Props) {
 
   return (
     <>
-      <Actions
-        onFilterChange={setFilter}
-        optionsMultiSelect={true}
-        options={options}
-        defaultOption={options[0]}
-        onStatusChange={setStatus}
-        rightSide={
-          props.linkToCreate && (
-            <Button to={props.linkToCreate}>
-              <span>{t(`new_${props.resource}`)}</span>
-            </Button>
-          )
-        }
-      >
-        <span className="text-sm">{t('with_selected')}</span>
-        <ResourcefulActions
-          type="bulk"
-          mainCheckbox={mainCheckbox}
-          endpoint={props.endpoint}
-          bulkRoute={props.bulkRoute}
-          apiEndpoint={apiEndpoint}
-          setSelected={setSelected}
-          selected={selected}
-          resourceType={props.resource}
-          linkToEdit={props.linkToEdit}
-          label={`${t('actions')}`}
-          onClick={() => {
-            [...document.getElementsByClassName('child-checkbox')].forEach(
-              (element: any) => (element.checked = false)
-            );
-
-            setSelected([]);
-          }}
-          disabled={selected.length == 0}
+      {!props.withoutActions && (
+        <Actions
+          onFilterChange={setFilter}
+          optionsMultiSelect={true}
+          options={options}
+          defaultOption={options[0]}
+          onStatusChange={setStatus}
+          rightSide={
+            props.linkToCreate && (
+              <Button to={props.linkToCreate}>
+                <span>{t(`new_${props.resource}`)}</span>
+              </Button>
+            )
+          }
         >
-          {props.customBulkActions &&
-            props.customBulkActions?.map((action: any) => {
-              return action(selected);
-            })}
-        </ResourcefulActions>
-      </Actions>
+          <span className="text-sm">{t('with_selected')}</span>
+          <ResourcefulActions
+            type="bulk"
+            mainCheckbox={mainCheckbox}
+            endpoint={props.endpoint}
+            bulkRoute={props.bulkRoute}
+            apiEndpoint={apiEndpoint}
+            setSelected={setSelected}
+            selected={selected}
+            resourceType={props.resource}
+            linkToEdit={props.linkToEdit}
+            label={`${t('actions')}`}
+            onClick={() => {
+              [...document.getElementsByClassName('child-checkbox')].forEach(
+                (element: any) => (element.checked = false)
+              );
+
+              setSelected([]);
+            }}
+            disabled={selected.length == 0}
+          >
+            {props.customBulkActions &&
+              props.customBulkActions?.map((action: any) => {
+                return action(selected);
+              })}
+          </ResourcefulActions>
+        </Actions>
+      )}
+      
       <Table>
         <Thead>
           <Th>
