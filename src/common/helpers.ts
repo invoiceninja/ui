@@ -73,8 +73,7 @@ export function getEntityState(entity: any) {
   }
 }
 
-export function trans(key :string, replace :any){
-
+export function trans(key: string, replace: Record<string, string>) {
   let translation = t(key);
 
   for (const placeholder in replace) {
