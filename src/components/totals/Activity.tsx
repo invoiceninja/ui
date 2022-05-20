@@ -11,7 +11,6 @@
 import { Table, Tbody, Tr, Td } from "@invoiceninja/tables";
 import { date, endpoint, trans } from "common/helpers";
 import { useCurrentCompanyDateFormats } from "common/hooks/useCurrentCompanyDateFormats";
-import { DataTableColumns } from "components/DataTable";
 import { Spinner } from "components/Spinner";
 import { request } from 'common/helpers/request';
 import { t } from "i18next";
@@ -24,7 +23,7 @@ export function Activity() {
     const { data, isLoading, isError } = useQuery('/api/v1/activities', () =>
         request('GET', endpoint('/api/v1/activities'))
     );
-    
+
     return (
         <div className="bg-white shadow sm:rounded-lg">
             <div className="divide-y divide-gray-200">
