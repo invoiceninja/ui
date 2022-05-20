@@ -30,6 +30,7 @@ export function DropdownElement(props: Props) {
 
   return (
     <button
+      type="button"
       onClick={(event) => {
         props.onClick?.(event);
         props.setVisible?.(false);
