@@ -77,7 +77,7 @@ export function trans(key :string, replace :any){
 
   let translation = t(key);
 
-  for (let placeholder in replace) {
+  for (const placeholder in replace) {
     translation = translation.replace(`:${placeholder}`, replace[placeholder]);
   }
 
