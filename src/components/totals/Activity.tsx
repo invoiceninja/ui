@@ -10,7 +10,6 @@
 
 import { Table, Thead, Th, Tbody, Tr, Td } from "@invoiceninja/tables";
 import { date, endpoint, trans } from "common/helpers";
-import { useFormatMoney } from "common/hooks/money/useFormatMoney";
 import { useCurrentCompanyDateFormats } from "common/hooks/useCurrentCompanyDateFormats";
 import { DataTableColumns } from "components/DataTable";
 import { Spinner } from "components/Spinner";
@@ -21,7 +20,6 @@ import { useQuery } from "react-query";
 export function Activity() {
     
     const { dateFormat } = useCurrentCompanyDateFormats();
-    const formatMoney = useFormatMoney();
 
     const { data, isLoading, isError } = useQuery('/api/v1/activities', () =>
         request('GET', endpoint('/api/v1/activities'))
@@ -85,7 +83,6 @@ export function Activity() {
                                         key={index}
                                         onClick={() => document.getElementById(resource.id)?.click()}
                                     >
-                                        {columns.map((column, index) => (
 
                                             
                                             <td className='px-2 lg:px-2.5 xl:px-4 py-2 whitespace-nowrap text-sm text-gray-900'>
@@ -101,7 +98,7 @@ export function Activity() {
                                                     }
                                                 )}
                                             </td>
-                                        ))}
+                                    
 
                                     </Tr>
                                 ))}
