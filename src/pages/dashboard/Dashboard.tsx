@@ -28,18 +28,23 @@ export function Dashboard() {
     <Default title={t('dashboard')} breadcrumbs={pages}>
       <Totals />
 
-      <div className="flex grid grid-cols-2 gap-4 mt-4">
-        <Activity />
-        
-        <RecentPayments />
+      <div className="grid grid-cols-12 gap-4 my-6">
+        <div className="col-span-12 lg:col-span-6">
+          <Activity />
+        </div>
 
-        <UpcomingInvoices />      
+        <div className="col-span-12 lg:gap-4 lg:col-span-6">
+          <RecentPayments />
+        </div>
 
-        <PastDueInvoices />
-        
+        <div className="col-span-12 lg:col-span-6">
+          <UpcomingInvoices />
+        </div>
+
+        <div className="col-span-12 lg:col-span-6">
+          <PastDueInvoices />
+        </div>
       </div>
     </Default>
-
-
   );
 }
