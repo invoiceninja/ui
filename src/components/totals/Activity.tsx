@@ -27,7 +27,7 @@ export function Activity() {
   );
 
   return (
-    <Card title={t('activity')}>
+    <Card title={t('activity')} className="h-96" withScrollableBody>
       {isLoading && (
         <NonClickableElement>
           <Spinner />
