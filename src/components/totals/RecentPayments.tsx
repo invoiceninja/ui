@@ -76,7 +76,7 @@ export function RecentPayments() {
             
             <div className="bg-white shadow sm:rounded-lg sm:overflow-hidden">
                 <div className="divide-y divide-gray-200">
-                    <div className="px-4 py-5 sm:px-6">
+                    <div className="px-2 py-2 sm:px-6">
                         <h2 id="notes-title" className="text-lg font-medium text-gray-900">{t('recent_payments')}</h2>
                     </div>
                     <div className="">
