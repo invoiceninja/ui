@@ -75,9 +75,9 @@ export function getEntityState(entity: any) {
 
 export function trans(key :string, replace :any){
 
-  var translation = t(key);
+  let translation = t(key);
 
-  for (var placeholder in replace) {
+  for (let placeholder in replace) {
     translation = translation.replace(`:${placeholder}`, replace[placeholder]);
   }
 
