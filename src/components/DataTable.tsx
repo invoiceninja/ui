@@ -10,7 +10,13 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
-import { ChangeEvent, ReactNode, useEffect, useRef, useState } from 'react';
+import React, {
+  ChangeEvent,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { Actions, SelectOption } from './datatables/Actions';
@@ -232,7 +238,7 @@ export function DataTable(props: Props) {
                     />
                   </Td>
                 )}
-                
+
                 {props.columns.map((column, index) => (
                   <Td key={index}>
                     {column.format
@@ -257,9 +263,13 @@ export function DataTable(props: Props) {
                       label={`${t('more_actions')}`}
                     >
                       {props.customActions &&
-                        props.customActions?.map((action: any) => {
-                          return action(resource);
-                        })}
+                        props.customActions?.map(
+                          (action: any, index: number) => (
+                            <React.Fragment key={index}>
+                              {action(resource)}
+                            </React.Fragment>
+                          )
+                        )}
                     </ResourcefulActions>
                   </Td>
                 )}

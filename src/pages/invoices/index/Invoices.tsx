@@ -34,6 +34,7 @@ export function Invoices() {
   const downloadPdf = useDownloadPdf();
 
   const pages = [{ name: t('invoices'), href: '/invoices' }];
+
   const columns: DataTableColumns = [
     {
       id: 'status_id',
