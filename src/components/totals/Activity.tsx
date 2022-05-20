@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Table, Thead, Th, Tbody, Tr, Td } from "@invoiceninja/tables";
+import { Table, Tbody, Tr, Td } from "@invoiceninja/tables";
 import { date, endpoint, trans } from "common/helpers";
 import { useCurrentCompanyDateFormats } from "common/hooks/useCurrentCompanyDateFormats";
 import { DataTableColumns } from "components/DataTable";
