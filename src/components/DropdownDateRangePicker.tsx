@@ -131,7 +131,7 @@ export function DropdownDateRangePicker(props: Props) {
             new Date(now.getFullYear(), 11, 31).toISOString().split('T')[0],
           ]}
         >
-          Current Year needs translation
+          {t('this_year')}
         </option>
         <option
           value={[

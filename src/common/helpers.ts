@@ -10,6 +10,7 @@
 
 import { AxiosRequestHeaders, AxiosResponse, Method } from 'axios';
 import dayjs from 'dayjs';
+import { t } from 'i18next';
 import { generatePath } from 'react-router';
 import entityState from './constants/entity-state';
 import { request } from './helpers/request';
@@ -70,4 +71,17 @@ export function getEntityState(entity: any) {
   if (entity.is_deleted) {
     return entityState.deleted;
   }
+}
+
+export function trans(key: string, replace: Record<string, unknown>) {
+  let translation = t(key);
+
+  for (const placeholder in replace) {
+    translation = translation.replace(
+      `:${placeholder}`,
+      replace[placeholder] as unknown as string
+    );
+  }
+
+  return translation;
 }

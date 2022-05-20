@@ -44,6 +44,8 @@ interface Props {
   bulkRoute?: string;
   customActions?: any;
   customBulkActions?: any;
+  withoutActions?: boolean;
+  withoutPagination?: boolean;
 }
 
 export function DataTable(props: Props) {
@@ -101,67 +103,73 @@ export function DataTable(props: Props) {
 
   return (
     <>
-      <Actions
-        onFilterChange={setFilter}
-        optionsMultiSelect={true}
-        options={options}
-        defaultOption={options[0]}
-        onStatusChange={setStatus}
-        rightSide={
-          props.linkToCreate && (
-            <Button to={props.linkToCreate}>
-              <span>{t(`new_${props.resource}`)}</span>
-            </Button>
-          )
-        }
-      >
-        <span className="text-sm">{t('with_selected')}</span>
-        <ResourcefulActions
-          type="bulk"
-          mainCheckbox={mainCheckbox}
-          endpoint={props.endpoint}
-          bulkRoute={props.bulkRoute}
-          apiEndpoint={apiEndpoint}
-          setSelected={setSelected}
-          selected={selected}
-          resourceType={props.resource}
-          linkToEdit={props.linkToEdit}
-          label={`${t('actions')}`}
-          onClick={() => {
-            [...document.getElementsByClassName('child-checkbox')].forEach(
-              (element: any) => (element.checked = false)
-            );
-
-            setSelected([]);
-          }}
-          disabled={selected.length == 0}
+      {!props.withoutActions && (
+        <Actions
+          onFilterChange={setFilter}
+          optionsMultiSelect={true}
+          options={options}
+          defaultOption={options[0]}
+          onStatusChange={setStatus}
+          rightSide={
+            props.linkToCreate && (
+              <Button to={props.linkToCreate}>
+                <span>{t(`new_${props.resource}`)}</span>
+              </Button>
+            )
+          }
         >
-          {props.customBulkActions &&
-            props.customBulkActions?.map((action: any) => {
-              return action(selected);
-            })}
-        </ResourcefulActions>
-      </Actions>
+          <span className="text-sm">{t('with_selected')}</span>
+          <ResourcefulActions
+            type="bulk"
+            mainCheckbox={mainCheckbox}
+            endpoint={props.endpoint}
+            bulkRoute={props.bulkRoute}
+            apiEndpoint={apiEndpoint}
+            setSelected={setSelected}
+            selected={selected}
+            resourceType={props.resource}
+            linkToEdit={props.linkToEdit}
+            label={`${t('actions')}`}
+            onClick={() => {
+              [...document.getElementsByClassName('child-checkbox')].forEach(
+                (element: any) => (element.checked = false)
+              );
+
+              setSelected([]);
+            }}
+            disabled={selected.length == 0}
+          >
+            {props.customBulkActions &&
+              props.customBulkActions?.map((action: any) => {
+                return action(selected);
+              })}
+          </ResourcefulActions>
+        </Actions>
+      )}
+
       <Table>
         <Thead>
-          <Th>
-            <Checkbox
-              innerRef={mainCheckbox}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                Array.from(
-                  document.querySelectorAll('.child-checkbox')
-                ).forEach((checkbox: HTMLInputElement | any) => {
-                  checkbox.checked = event.target.checked;
+          {!props.withoutActions && (
+            <Th>
+              <Checkbox
+                innerRef={mainCheckbox}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  Array.from(
+                    document.querySelectorAll('.child-checkbox')
+                  ).forEach((checkbox: HTMLInputElement | any) => {
+                    checkbox.checked = event.target.checked;
 
-                  event.target.checked
-                    ? setSelected((current) => [...current, checkbox.id])
-                    : setSelected((current) =>
-                        current.filter((value) => value !== checkbox.id)
-                      );
-                });
-              }}
-            />
-          </Th>
+                    event.target.checked
+                      ? setSelected((current) => [...current, checkbox.id])
+                      : setSelected((current) =>
+                          current.filter((value) => value !== checkbox.id)
+                        );
+                  });
+                }}
+              />
+            </Th>
+          )}
+
           {props.columns.map((column, index) => (
             <Th
               id={column.id}
@@ -208,20 +216,23 @@ export function DataTable(props: Props) {
                 key={index}
                 onClick={() => document.getElementById(resource.id)?.click()}
               >
-                <Td>
-                  <Checkbox
-                    className="child-checkbox"
-                    value={resource.id}
-                    id={resource.id}
-                    onValueChange={(value) =>
-                      selected.includes(value)
-                        ? setSelected((current) =>
-                            current.filter((v) => v !== value)
-                          )
-                        : setSelected((current) => [...current, value])
-                    }
-                  />
-                </Td>
+                {!props.withoutActions && (
+                  <Td>
+                    <Checkbox
+                      className="child-checkbox"
+                      value={resource.id}
+                      id={resource.id}
+                      onValueChange={(value) =>
+                        selected.includes(value)
+                          ? setSelected((current) =>
+                              current.filter((v) => v !== value)
+                            )
+                          : setSelected((current) => [...current, value])
+                      }
+                    />
+                  </Td>
+                )}
+                
                 {props.columns.map((column, index) => (
                   <Td key={index}>
                     {column.format
@@ -257,7 +268,7 @@ export function DataTable(props: Props) {
         </Tbody>
       </Table>
 
-      {data && (
+      {data && !props.withoutPagination && (
         <Pagination
           currentPage={currentPage}
           onPageChange={setCurrentPage}
