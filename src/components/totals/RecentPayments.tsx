@@ -8,15 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Checkbox } from "@invoiceninja/forms";
-import { Table, Thead, Th, ColumnSortPayload, Tbody, Tr, Td } from "@invoiceninja/tables";
+import { Table, Thead, Th, Tbody, Tr, Td } from "@invoiceninja/tables";
 import { date, endpoint } from "common/helpers";
 import { useFormatMoney } from "common/hooks/money/useFormatMoney";
 import { useCurrentCompanyDateFormats } from "common/hooks/useCurrentCompanyDateFormats";
-import { DataTableColumns, DataTable } from "components/DataTable";
+import { DataTableColumns } from "components/DataTable";
 import { Spinner } from "components/Spinner";
 import { t } from "i18next";
-import { isError } from "lodash";
 import { useQuery } from "react-query";
 import { Link, generatePath } from "react-router-dom";
 import { request } from 'common/helpers/request';
