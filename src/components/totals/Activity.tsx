@@ -35,25 +35,13 @@ export function Activity() {
     ];
     
     return (
-        <div className="bg-white shadow sm:rounded-lg sm:overflow-hidden">
+        <div className="bg-white shadow sm:rounded-lg">
             <div className="divide-y divide-gray-200">
                 <div className="px-2 py-2 sm:px-6">
-                    <h2 id="notes-title" className="text-lg font-medium text-gray-900">{t('recent_payments')}</h2>
+                    <h2 id="notes-title" className="text-lg font-medium text-gray-900">{t('activity')}</h2>
                 </div>
                 <div className="">
-
                     <Table>
-                        <Thead>
-                            {columns.map((column, index) => (
-                                <Th
-                                    id={column.id}
-                                    key={index}
-                                >
-                                    {column.label} 
-                                </Th>
-                            ))}
-                        </Thead>
-
                         <Tbody>
                             {isLoading && (
                                 <Tr>
@@ -83,34 +71,25 @@ export function Activity() {
                                         key={index}
                                         onClick={() => document.getElementById(resource.id)?.click()}
                                     >
-
-                                            
-                                            <td className='px-2 lg:px-2.5 xl:px-4 py-2 whitespace-nowrap text-sm text-gray-900'>
-                                                {date(resource.created_at, dateFormat)}  {trans(`activity_${resource.activity_type_id}`,
-                                                    {
-                                                    'client':resource.client_id, 
-                                                    'contact':resource.client_contact_id, 
-                                                    'quote':resource.quote_id,
-                                                    'user':resource.user_id,
-                                                    'expense':resource.expense_id,
-                                                    'invoice':resource.invoice_id,
-                                                    'recurring_invoice':resource.recurring_invoice_id,
-                                                    }
-                                                )}
-                                            </td>
-                                    
-
+                                        <td className='px-2 lg:px-2.5 xl:px-4 py-2 whitespace-nowrap text-sm text-gray-900'>
+                                            {date(resource.created_at, dateFormat)}  {trans(`activity_${resource.activity_type_id}`,
+                                                {
+                                                'client':resource.client_id, 
+                                                'contact':resource.client_contact_id, 
+                                                'quote':resource.quote_id,
+                                                'user':resource.user_id,
+                                                'expense':resource.expense_id,
+                                                'invoice':resource.invoice_id,
+                                                'recurring_invoice':resource.recurring_invoice_id,
+                                                }
+                                            )}
+                                        </td>
                                     </Tr>
                                 ))}
                         </Tbody>
                     </Table>
-
-
-
                 </div>
             </div>
-
         </div>
-
     );
 }

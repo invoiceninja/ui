@@ -16,8 +16,9 @@ import { DataTableColumns } from "components/DataTable";
 import { Spinner } from "components/Spinner";
 import { t } from "i18next";
 import { useQuery } from "react-query";
-import { Link, generatePath } from "react-router-dom";
+import { generatePath } from "react-router-dom";
 import { request } from 'common/helpers/request';
+import { Link } from 'components/forms/Link';
 
 
 export function RecentPayments() {
@@ -74,7 +75,7 @@ export function RecentPayments() {
 
     return (
             
-            <div className="bg-white shadow sm:rounded-lg sm:overflow-hidden">
+            <div className="bg-white shadow sm:rounded-lg">
                 <div className="divide-y divide-gray-200">
                     <div className="px-2 py-2 sm:px-6">
                         <h2 id="notes-title" className="text-lg font-medium text-gray-900">{t('recent_payments')}</h2>

@@ -10,8 +10,10 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { Activity } from 'components/totals/Activity';
+import { PastDueInvoices } from 'components/totals/PastDueInvoices';
 import { RecentPayments } from 'components/totals/RecentPayments';
 import { Totals } from 'components/totals/Totals';
+import { UpcomingInvoices } from 'components/totals/UpcomingInvoices';
 import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';
 
@@ -30,8 +32,14 @@ export function Dashboard() {
         <Activity />
         
         <RecentPayments />
+
+        <UpcomingInvoices />      
+
+        <PastDueInvoices />
+        
       </div>
-      
     </Default>
+
+
   );
 }
