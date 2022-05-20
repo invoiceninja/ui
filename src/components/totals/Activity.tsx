@@ -16,9 +16,7 @@ import { DataTableColumns } from "components/DataTable";
 import { Spinner } from "components/Spinner";
 import { request } from 'common/helpers/request';
 import { t } from "i18next";
-import { isError } from "lodash";
 import { useQuery } from "react-query";
-import { Link, generatePath } from "react-router-dom";
 
 export function Activity() {
     
