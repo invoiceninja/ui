@@ -76,6 +76,10 @@ export function Edit() {
       name: documentTitle,
       href: generatePath('/clients/:id', { id }),
     },
+    {
+      name: t('edit'),
+      href: generatePath('/clients/:id', { id }),
+    },
   ];
 
   const onSave = () => {

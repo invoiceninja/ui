@@ -12,6 +12,7 @@ import { Tab } from '@headlessui/react';
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import MDEditor from '@uiw/react-md-editor';
+import { endpoint } from 'common/helpers';
 import { useCurrencies } from 'common/hooks/useCurrencies';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
@@ -20,12 +21,16 @@ import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { useStaticsQuery } from 'common/queries/statics';
+import { DocumentsTable } from 'components/DocumentsTable';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
 import { set } from 'lodash';
+import { Upload } from 'pages/settings/company/documents/components';
 import { Field } from 'pages/settings/custom-fields/components';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
+import { generatePath, useParams } from 'react-router-dom';
 
 interface Props {
   client: Client | undefined;
@@ -34,11 +39,14 @@ interface Props {
 
 export function AdditionalInfo(props: Props) {
   const [t] = useTranslation();
+
   const currencies = useCurrencies();
   const languages = useLanguages();
+  const queryClient = useQueryClient();
 
   const { data: paymentTerms } = useQuery('/api/v1/payment_terms');
   const { data: statics } = useStaticsQuery();
+  const { id } = useParams();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const client = { ...props.client };
@@ -49,18 +57,28 @@ export function AdditionalInfo(props: Props) {
   const company = useInjectCompanyChanges();
   const handleCustomFieldChange = useHandleCustomFieldChange();
 
+  const [tabs, setTabs] = useState([
+    t('settings'),
+    t('notes'),
+    t('classify'),
+    t('client_fields'),
+    t('contact_fields'),
+    t('documents'),
+  ]);
+
+  useEffect(() => {
+    if (!id) {
+      setTabs((current) => current.filter((tab) => tab !== t('documents')));
+    }
+  }, []);
+
+  const onSuccess = () => {
+    queryClient.invalidateQueries(generatePath('/api/v1/clients/:id', { id }));
+  };
+
   return (
     <Card className="mt-4" title={t('additional_info')}>
-      <TabGroup
-        className="px-5"
-        tabs={[
-          t('settings'),
-          t('notes'),
-          t('classify'),
-          t('client_fields'),
-          t('contact_fields'),
-        ]}
-      >
+      <TabGroup className="px-5" tabs={tabs}>
         <Tab.Panel>
           {currencies.length > 1 && (
             <Element leftSide={t('currency')}>
@@ -272,6 +290,22 @@ export function AdditionalInfo(props: Props) {
               />
             ))}
         </Tab.Panel>
+
+        {id ? (
+          <Tab.Panel>
+            <div className="px-6">
+              <Upload
+                widgetOnly
+                endpoint={endpoint('/api/v1/clients/:id/upload', { id })}
+                onSuccess={onSuccess}
+              />
+
+              <DocumentsTable documents={props.client?.documents || []} onDocumentDelete={onSuccess} />
+            </div>
+          </Tab.Panel>
+        ) : (
+          <></>
+        )}
       </TabGroup>
     </Card>
   );
