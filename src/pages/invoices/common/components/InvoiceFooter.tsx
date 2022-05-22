@@ -10,7 +10,7 @@
 
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InvoiceDocuments } from './InvoiceDocuments';
 import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
@@ -28,7 +28,11 @@ import { useHandleCustomSurchargeFieldChange } from 'common/hooks/useHandleCusto
 import { Divider } from 'components/cards/Divider';
 import { useSetSurchageTaxValue } from '../hooks/useSetSurchargeTaxValue';
 
-export function InvoiceFooter() {
+interface Props {
+  page: 'create' | 'edit';
+}
+
+export function InvoiceFooter(props: Props) {
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
@@ -54,19 +58,25 @@ export function InvoiceFooter() {
 
   const setSurchargeTaxValue = useSetSurchageTaxValue();
 
+  const [tabs, setTabs] = useState([
+    t('public_notes'),
+    t('private_notes'),
+    t('terms'),
+    t('footer'),
+    t('documents'),
+    t('settings'),
+    t('custom_fields'),
+  ]);
+
+  useEffect(() => {
+    if (props.page === 'create') {
+      setTabs((current) => current.filter((tab) => tab !== t('documents')));
+    }
+  }, []);
+
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup
-        tabs={[
-          t('public_notes'),
-          t('private_notes'),
-          t('terms'),
-          t('footer'),
-          t('documents'),
-          t('settings'),
-          t('custom_fields'),
-        ]}
-      >
+      <TabGroup tabs={tabs}>
         <Tab.Panel>
           <MarkdownEditor
             value={invoice?.public_notes || ''}
@@ -95,9 +105,13 @@ export function InvoiceFooter() {
           />
         </Tab.Panel>
 
-        <Tab.Panel>
-          <InvoiceDocuments />
-        </Tab.Panel>
+        {props.page === 'edit' ? (
+          <Tab.Panel>
+            <InvoiceDocuments />
+          </Tab.Panel>
+        ) : (
+          <></>
+        )}
 
         <Tab.Panel>
           <div className="grid grid-cols-12 gap-4">
