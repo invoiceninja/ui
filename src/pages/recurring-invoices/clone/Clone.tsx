@@ -79,7 +79,7 @@ export function Clone() {
           <ProductsTable />
         </div>
 
-        <InvoiceFooter />
+        <InvoiceFooter page="create" />
         <InvoiceTotals />
       </div>
 

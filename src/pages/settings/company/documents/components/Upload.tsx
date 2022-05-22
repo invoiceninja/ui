@@ -20,6 +20,7 @@ import { request } from 'common/helpers/request';
 interface Props {
   endpoint: string;
   onSuccess?: () => unknown;
+  widgetOnly?: boolean;
 }
 
 export function Upload(props: Props) {
@@ -61,6 +62,25 @@ export function Upload(props: Props) {
       formik.submitForm();
     },
   });
+
+  if (props.widgetOnly) {
+    return (
+      <div
+        {...getRootProps()}
+        className="flex flex-col md:flex-row md:items-center"
+      >
+        <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <input {...getInputProps()} />
+          <Image className="mx-auto h-12 w-12 text-gray-400" />
+          <span className="mt-2 block text-sm font-medium text-gray-900">
+            {isDragActive
+              ? 'drop_your_files_here'
+              : t('dropzone_default_message')}
+          </span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <Card title={t('upload')}>
