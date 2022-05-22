@@ -21,7 +21,7 @@ export function Documents() {
 
   const queryClient = useQueryClient();
 
-  const onSuccess = () => {
+  const invalidateQuery = () => {
     queryClient.invalidateQueries(generatePath('/api/v1/products/:id', { id }));
   };
 
@@ -29,11 +29,14 @@ export function Documents() {
     <>
       <Upload
         endpoint={endpoint('/api/v1/products/:id/upload', { id })}
-        onSuccess={onSuccess}
+        onSuccess={invalidateQuery}
       />
 
       {product?.data.data && (
-        <DocumentsTable documents={product.data.data.documents} />
+        <DocumentsTable
+          documents={product.data.data.documents}
+          onDocumentDelete={invalidateQuery}
+        />
       )}
     </>
   );

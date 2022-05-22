@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { trans } from 'common/helpers';
 import { ChevronLeft, ChevronRight } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -71,7 +72,7 @@ export function Pagination(props: Props) {
       </div>
 
       <p className="hidden lg:block text-sm font-medium text-gray-700">
-        {t('pdf_page_info', {
+        {trans('pdf_page_info', {
           current: props.currentPage,
           total: props.totalPages,
         })}

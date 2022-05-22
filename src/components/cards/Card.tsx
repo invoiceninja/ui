@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer } from '.';
@@ -25,6 +26,7 @@ interface Props {
   className?: string;
   withContainer?: boolean;
   style?: React.CSSProperties;
+  withScrollableBody?: boolean;
 }
 
 export function Card(props: Props) {
@@ -32,12 +34,20 @@ export function Card(props: Props) {
 
   return (
     <div
-      className={`bg-white shadow overflow-hidden rounded ${props.className}`}
+      className={classNames(
+        `bg-white shadow overflow-hidden rounded ${props.className}`,
+        { 'overflow-y-auto': props.withScrollableBody }
+      )}
       style={props.style}
     >
       <form onSubmit={props.onFormSubmit}>
         {props.title && (
-          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
+          <div
+            className={classNames(
+              'px-4 py-5 sm:px-6 border-b border-gray-200',
+              { 'bg-white sticky top-0': props.withScrollableBody }
+            )}
+          >
             <h3 className="text-lg leading-6 font-medium text-gray-900">
               {props.title}
             </h3>

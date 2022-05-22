@@ -134,7 +134,7 @@ export function Create() {
           <ProductsTable />
         </div>
 
-        <InvoiceFooter />
+        <InvoiceFooter page="create" />
         <InvoiceTotals />
       </div>
 
