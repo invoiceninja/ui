@@ -36,6 +36,9 @@ import { Button } from '@invoiceninja/forms';
 import { CompanySwitcher } from 'components/CompanySwitcher';
 import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
 import { HelpSidebarIcons } from 'components/HelpSidebarIcons';
+import { useLogo } from 'common/hooks/useLogo';
+import { useSelector } from 'react-redux';
+import { RootState } from 'common/stores/store';
 
 function classNames(...classes: any) {
   return classes.filter(Boolean).join(' ');
@@ -57,8 +60,15 @@ interface Props extends CommonProps {
 
 export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const isMiniSidebar = useSelector(
+    (state: RootState) => state.settings.isMiniSidebar
+  );
+
   const [t] = useTranslation();
+
   const location = useLocation();
+  const logo = useLogo();
 
   const navigation = [
     {
@@ -291,13 +301,19 @@ export function Default(props: Props) {
 
         {/* Static sidebar for desktop */}
         <div
-          className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0 border-r"
+          className={`hidden md:flex ${
+            isMiniSidebar ? 'md:w-16' : 'md:w-64'
+          } md:flex-col md:fixed md:inset-y-0 border-r`}
           style={{ zIndex: 100 }}
         >
           {/* Sidebar component, swap this element with another sidebar if you like */}
           <div className="flex flex-col flex-grow border-gray-200 pt-5 bg-ninja-gray dark:bg-gray-800 dark:border-transparent overflow-y-auto">
             <div className="flex items-center flex-shrink-0 px-4">
-              <CompanySwitcher />
+              {isMiniSidebar ? (
+                <img className="w-8" src={logo} alt="Company logo" />
+              ) : (
+                <CompanySwitcher />
+              )}
             </div>
 
             <div className="mt-5 flex-grow flex flex-col">
@@ -324,11 +340,11 @@ export function Default(props: Props) {
                           )}
                           aria-hidden="true"
                         />
-                        {item.name}
+                        {!isMiniSidebar && item.name}
                       </div>
                     </Link>
 
-                    {item.rightButton && (
+                    {item.rightButton && !isMiniSidebar && (
                       <Link
                         to={item.rightButton.to}
                         title={item.rightButton.label}
@@ -345,7 +361,11 @@ export function Default(props: Props) {
             </div>
           </div>
         </div>
-        <div className="md:pl-64 flex flex-col flex-1">
+        <div
+          className={`${
+            isMiniSidebar ? 'md:pl-16' : 'md:pl-64'
+          } flex flex-col flex-1`}
+        >
           <div className="sticky top-0 z-10 flex-shrink-0 flex h-16 bg-white dark:bg-gray-800 shadow">
             <button
               type="button"

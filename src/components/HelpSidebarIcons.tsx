@@ -15,6 +15,8 @@ import { request } from 'common/helpers/request';
 import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { updateCompanyUsers } from 'common/stores/slices/company-users';
+import { setIsMiniSidebar } from 'common/stores/slices/settings';
+import { RootState } from 'common/stores/store';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import {
@@ -28,10 +30,12 @@ import {
   Twitter,
   Youtube,
   AlertCircle,
+  ChevronLeft,
+  ChevronRight,
 } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button, InputField } from './forms';
 import Toggle from './forms/Toggle';
 import { Modal } from './Modal';
@@ -44,11 +48,18 @@ export function HelpSidebarIcons(props: Props) {
   const [t] = useTranslation();
   const user = useCurrentUser();
   const account = useCurrentAccount();
+
   const dispatch = useDispatch();
+
   const [isContactVisible, setIsContactVisible] = useState(false);
   const [isAboutVisible, setIsAboutVisible] = useState(false);
   const [cronsNotEnabledModal, setCronsNotEnabledModal] = useState(false);
   const [disabledButton, setDisabledButton] = useState(false);
+
+  const isMiniSidebar = useSelector(
+    (state: RootState) => state.settings.isMiniSidebar
+  );
+
   const formik = useFormik({
     initialValues: {
       message: '',
@@ -83,7 +94,7 @@ export function HelpSidebarIcons(props: Props) {
       setCronsNotEnabledModal(false);
     });
   };
-  
+
   return (
     <>
       <Modal
@@ -201,78 +212,95 @@ export function HelpSidebarIcons(props: Props) {
       </Modal>
 
       <nav className="flex p-2 justify-around text-white">
-        {isSelfHosted() && account && !account.is_scheduler_running && (
-          <button
-            className="p-2 hover:bg-ninja-gray-darker rounded-full"
-            onClick={() => setCronsNotEnabledModal(true)}
-          >
-            <Tippy
-              duration={0}
-              content={t('error')}
-              className="text-white rounded text-xs mb-2"
+        {!isMiniSidebar && (
+          <>
+            {isSelfHosted() && account && !account.is_scheduler_running && (
+              <button
+                className="p-2 hover:bg-ninja-gray-darker rounded-full"
+                onClick={() => setCronsNotEnabledModal(true)}
+              >
+                <Tippy
+                  duration={0}
+                  content={t('error')}
+                  className="text-white rounded text-xs mb-2"
+                >
+                  <AlertCircle />
+                </Tippy>
+              </button>
+            )}
+
+            <button
+              className="p-2 hover:bg-ninja-gray-darker rounded-full"
+              onClick={() => setIsContactVisible(true)}
             >
-              <AlertCircle />
-            </Tippy>
-          </button>
+              <Tippy
+                duration={0}
+                content={t('contact_us')}
+                className="text-white rounded text-xs mb-2"
+              >
+                <Mail />
+              </Tippy>
+            </button>
+
+            <a
+              href="https://forum.invoiceninja.com"
+              target="_blank"
+              className="p-2 hover:bg-ninja-gray-darker rounded-full"
+              rel="noreferrer"
+            >
+              <Tippy
+                duration={0}
+                content={t('support_forum')}
+                className="text-white rounded text-xs mb-2"
+              >
+                <MessageSquare />
+              </Tippy>
+            </a>
+
+            <a
+              href={
+                (props.docsLink &&
+                  `https://invoiceninja.github.io/${props.docsLink}`) ||
+                'https://invoiceninja.github.io'
+              }
+              target="_blank"
+              className="p-2 hover:bg-ninja-gray-darker rounded-full"
+              rel="noreferrer"
+            >
+              <Tippy
+                duration={0}
+                content={t('user_guide')}
+                className="text-white rounded text-xs mb-2"
+              >
+                <HelpCircle />
+              </Tippy>
+            </a>
+
+            <button
+              className="p-2 hover:bg-ninja-gray-darker rounded-full"
+              onClick={() => setIsAboutVisible(true)}
+            >
+              <Tippy
+                duration={0}
+                content={t('about')}
+                className="text-white rounded text-xs mb-2"
+              >
+                <Info />
+              </Tippy>
+            </button>
+          </>
         )}
 
         <button
           className="p-2 hover:bg-ninja-gray-darker rounded-full"
-          onClick={() => setIsContactVisible(true)}
+          onClick={() => dispatch(setIsMiniSidebar({ status: !isMiniSidebar }))}
         >
           <Tippy
             duration={0}
-            content={t('contact_us')}
+            content={isMiniSidebar ? t('show_menue') : t('hide_menu')}
             className="text-white rounded text-xs mb-2"
           >
-            <Mail />
-          </Tippy>
-        </button>
-
-        <a
-          href="https://forum.invoiceninja.com"
-          target="_blank"
-          className="p-2 hover:bg-ninja-gray-darker rounded-full"
-          rel="noreferrer"
-        >
-          <Tippy
-            duration={0}
-            content={t('support_forum')}
-            className="text-white rounded text-xs mb-2"
-          >
-            <MessageSquare />
-          </Tippy>
-        </a>
-
-        <a
-          href={
-            (props.docsLink &&
-              `https://invoiceninja.github.io/${props.docsLink}`) ||
-            'https://invoiceninja.github.io'
-          }
-          target="_blank"
-          className="p-2 hover:bg-ninja-gray-darker rounded-full"
-          rel="noreferrer"
-        >
-          <Tippy
-            duration={0}
-            content={t('user_guide')}
-            className="text-white rounded text-xs mb-2"
-          >
-            <HelpCircle />
-          </Tippy>
-        </a>
-
-        <button
-          className="p-2 hover:bg-ninja-gray-darker rounded-full"
-          onClick={() => setIsAboutVisible(true)}
-        >
-          <Tippy
-            duration={0}
-            content={t('about')}
-            className="text-white rounded text-xs mb-2"
-          >
-            <Info />
+            {isMiniSidebar ? <ChevronRight /> : <ChevronLeft />}
           </Tippy>
         </button>
       </nav>
