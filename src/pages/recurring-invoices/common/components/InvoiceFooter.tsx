@@ -16,28 +16,38 @@ import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvo
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSetCurrentRecurringInvoiceProperty } from '../hooks/useSetCurrentRecurringInvoiceProperty';
 import { InvoiceDocuments } from './InvoiceDocuments';
 
-export function InvoiceFooter() {
+interface Props {
+  page: 'create' | 'edit';
+}
+
+export function InvoiceFooter(props: Props) {
   const [t] = useTranslation();
   const invoice = useCurrentRecurringInvoice();
   const handleChange = useSetCurrentRecurringInvoiceProperty();
 
+  const [tabs, setTabs] = useState([
+    t('public_notes'),
+    t('private_notes'),
+    t('terms'),
+    t('footer'),
+    t('documents'),
+    t('settings'),
+  ]);
+
+  useEffect(() => {
+    if (props.page === 'create') {
+      setTabs((current) => current.filter((tab) => tab !== t('documents')));
+    }
+  }, []);
+
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
-      <TabGroup
-        tabs={[
-          t('public_notes'),
-          t('private_notes'),
-          t('terms'),
-          t('footer'),
-          t('documents'),
-          t('settings'),
-        ]}
-      >
+      <TabGroup tabs={tabs}>
         <Tab.Panel>
           <MDEditor
             value={invoice?.public_notes || ''}
@@ -66,9 +76,13 @@ export function InvoiceFooter() {
           />
         </Tab.Panel>
 
-        <Tab.Panel>
-          <InvoiceDocuments />
-        </Tab.Panel>
+        {props.page === 'edit' ? (
+          <Tab.Panel>
+            <InvoiceDocuments />
+          </Tab.Panel>
+        ) : (
+          <></>
+        )}
 
         <Tab.Panel>
           <div className="grid grid-cols-12 gap-4">
@@ -131,7 +145,6 @@ export function InvoiceFooter() {
             </div>
           </div>
         </Tab.Panel>
-
       </TabGroup>
     </Card>
   );
