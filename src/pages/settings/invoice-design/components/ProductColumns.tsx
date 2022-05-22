@@ -21,10 +21,10 @@ export function ProductColumns() {
     { value: '$product.tax', label: t('tax') },
     { value: '$product.discount', label: t('discount') },
     { value: '$product.line_total', label: t('line_total') },
-    { value: '$product.custom1', label: t('custom1') },
-    { value: '$product.custom2', label: t('custom2') },
-    { value: '$product.custom3', label: t('custom3') },
-    { value: '$product.custom4', label: t('custom4') },
+    { value: '$product.product1', label: t('custom1') },
+    { value: '$product.product2', label: t('custom2') },
+    { value: '$product.product3', label: t('custom3') },
+    { value: '$product.product4', label: t('custom4') },
     { value: '$product.gross_line_total', label: t('gross_line_total') },
   ];
 
