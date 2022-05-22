@@ -22,10 +22,10 @@ export function TaskColumns() {
     { value: '$task.tax', label: t('tax') },
     { value: '$task.discount', label: t('discount') },
     { value: '$task.line_total', label: t('line_total') },
-    { value: '$task.custom1', label: t('custom1') },
-    { value: '$task.custom2', label: t('custom2') },
-    { value: '$task.custom3', label: t('custom3') },
-    { value: '$task.custom4', label: t('custom4') },
+    { value: '$task.task1', label: t('custom1') },
+    { value: '$task.task2', label: t('custom2') },
+    { value: '$task.task3', label: t('custom3') },
+    { value: '$task.task4', label: t('custom4') },
     { value: '$task.gross_line_total', label: t('gross_line_total') },
   ];
 
