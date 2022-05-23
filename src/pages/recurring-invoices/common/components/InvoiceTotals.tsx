@@ -11,7 +11,8 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { TaxRate } from 'common/interfaces/tax-rate';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
+import { Record } from 'components/forms/DebouncedCombobox';
+import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { useTotalVariables } from 'pages/invoices/common/hooks/useTotalVariables';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,48 +37,51 @@ export function InvoiceTotals() {
 
       {company && company.enabled_tax_rates > 0 && (
         <Element leftSide={t('tax')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/tax_rates"
-            label={t('tax')}
-            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+          <TaxRateSelector
+            defaultValue={recurringInvoice?.tax_rate1}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name1', value.resource?.name);
               handleChange('tax_rate1', value.resource?.rate);
             }}
-            value="rate"
-            defaultValue={recurringInvoice?.tax_rate1}
+            clearButton={Boolean(recurringInvoice?.tax_rate1)}
+            onClearButtonClick={() => {
+              handleChange('tax_name1', '');
+              handleChange('tax_rate1', 0);
+            }}
           />
         </Element>
       )}
 
       {company && company.enabled_tax_rates > 1 && (
         <Element leftSide={t('tax')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/tax_rates"
-            label={t('tax')}
-            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+          <TaxRateSelector
+            defaultValue={recurringInvoice?.tax_rate2}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name2', value.resource?.name);
               handleChange('tax_rate2', value.resource?.rate);
             }}
-            value="rate"
-            defaultValue={recurringInvoice?.tax_rate2}
+            clearButton={Boolean(recurringInvoice?.tax_rate2)}
+            onClearButtonClick={() => {
+              handleChange('tax_name2', '');
+              handleChange('tax_rate2', 0);
+            }}
           />
         </Element>
       )}
 
       {company && company.enabled_tax_rates > 2 && (
         <Element leftSide={t('tax')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/tax_rates"
-            label={t('tax')}
-            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+          <TaxRateSelector
+            defaultValue={recurringInvoice?.tax_rate3}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name3', value.resource?.name);
               handleChange('tax_rate3', value.resource?.rate);
             }}
-            value="rate"
-            defaultValue={recurringInvoice?.tax_rate3}
+            clearButton={Boolean(recurringInvoice?.tax_rate3)}
+            onClearButtonClick={() => {
+              handleChange('tax_name3', '');
+              handleChange('tax_rate3', 0);
+            }}
           />
         </Element>
       )}
