@@ -10,7 +10,14 @@
 
 import { useEffect, useState } from 'react';
 import { Element } from './cards';
-import { InputCustomField, Props } from './forms/InputCustomField';
+import {
+  InputCustomField,
+  Props as InputCustomFieldProps,
+} from './forms/InputCustomField';
+
+interface Props extends InputCustomFieldProps {
+  fieldOnly?: boolean;
+}
 
 export function CustomField(props: Props) {
   const [label, setLabel] = useState('');
@@ -21,6 +28,10 @@ export function CustomField(props: Props) {
       : [props.value, ''];
     setLabel(fieldLabel || '');
   }, []);
+
+  if (props.fieldOnly) {
+    return <InputCustomField {...props} />;
+  }
 
   return (
     <Element leftSide={label}>
