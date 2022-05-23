@@ -25,6 +25,8 @@ import { ProductSelector } from 'components/products/ProductSelector';
 import { useDispatch } from 'react-redux';
 import { setCurrentLineItemProperty } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-line-item-property';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
+import { CustomField } from 'components/CustomField';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 
 const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
@@ -35,6 +37,7 @@ export function useResolveInputField() {
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
 
+  const company = useCurrentCompany();
   const invoice = useCurrentRecurringInvoice();
   const dispatch = useDispatch();
 
@@ -149,6 +152,31 @@ export function useResolveInputField() {
 
     if (['line_total'].includes(property)) {
       return formatMoney(invoice?.line_items[index][property] as number);
+    }
+
+    if (['product1', 'product2', 'product3', 'product4'].includes(property)) {
+      const field = property.replace(
+        'product',
+        'custom_value'
+      ) as keyof InvoiceItem;
+
+      return company.custom_fields?.[property] ? (
+        <CustomField
+          field={property}
+          defaultValue={invoice?.line_items[index][field]}
+          value={company.custom_fields?.[property]}
+          onChange={(value) => onChange(field, value, index)}
+          fieldOnly
+        />
+      ) : (
+        <InputField
+          id={property}
+          value={invoice?.line_items[index][property]}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            onChange(property, event.target.value, index)
+          }
+        />
+      );
     }
 
     return (
