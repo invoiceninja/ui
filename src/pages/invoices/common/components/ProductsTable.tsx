@@ -33,6 +33,7 @@ export function ProductsTable() {
   const resolveInputField = useResolveInputField();
 
   const onDragEnd = useHandleSortingRows();
+  
   return (
     <Table>
       <Thead>

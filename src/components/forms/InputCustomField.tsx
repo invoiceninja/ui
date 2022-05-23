@@ -24,8 +24,7 @@ export function InputCustomField(props: Props) {
   const [type, setType] = useState('single_line_text');
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [fieldLabel, fieldType] = props.value.includes('|')
+    const [, fieldType] = props.value.includes('|')
       ? props.value.split('|')
       : [props.value, 'multi_line_text'];
 

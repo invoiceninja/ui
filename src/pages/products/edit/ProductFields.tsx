@@ -26,7 +26,9 @@ export function ProductFields() {
   const [t] = useTranslation();
   const handleCustomFieldChange = useHandleCustomFieldChange();
 
-  const onSave = () => {
+  const onSave = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
     const toastId = toast.loading(t('processing'));
 
     request(
