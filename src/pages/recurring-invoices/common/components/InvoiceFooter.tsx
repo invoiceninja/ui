@@ -14,7 +14,6 @@ import { InputField, InputLabel } from '@invoiceninja/forms';
 import MDEditor from '@uiw/react-md-editor';
 import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvoice';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
-import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -104,12 +103,6 @@ export function InvoiceFooter(props: Props) {
                   handleChange('exchange_rate', parseFloat(event.target.value))
                 }
               />
-
-              <Toggle
-                label={t('auto_bill_enabled')}
-                checked={invoice?.auto_bill_enabled || false}
-                onChange={(value) => handleChange('auto_bill_enabled', value)}
-              />
             </div>
 
             <div className="col-span-12 lg:col-span-6 space-y-6">
@@ -134,14 +127,6 @@ export function InvoiceFooter(props: Props) {
                   defaultValue={invoice?.vendor_id}
                 />
               </div>
-
-              <Toggle
-                label={t('inclusive_taxes')}
-                checked={invoice?.uses_inclusive_taxes || false}
-                onChange={(value) =>
-                  handleChange('uses_inclusive_taxes', value)
-                }
-              />
             </div>
           </div>
         </Tab.Panel>
