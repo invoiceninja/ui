@@ -13,14 +13,14 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
 import { TaxRate } from 'common/interfaces/tax-rate';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
+import { Record } from 'components/forms/DebouncedCombobox';
 import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
 import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 import { useTotalVariables } from '../hooks/useTotalVariables';
-import { TaxCreate } from './TaxCreate';
 import { CustomSurchargeField } from 'components/CustomSurchargeField';
+import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 
 export function InvoiceTotals() {
   const variables = useTotalVariables();
@@ -31,8 +31,6 @@ export function InvoiceTotals() {
   const handleChange = useSetCurrentInvoiceProperty();
 
   const [currentTaxRateInput, setCurrentTaxRateInput] = useState(1);
-  const [isCreateTaxModalOpen, setIsCreateTaxModalOpen] =
-    useState<boolean>(false);
   const [t] = useTranslation();
 
   return (
@@ -76,25 +74,30 @@ export function InvoiceTotals() {
           onChange={(value) => handleChange('custom_surcharge4', value)}
         />
       )}
-      
+
       {company && company.enabled_tax_rates > 0 && (
         <Element leftSide={t('tax')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/tax_rates"
-            label={t('tax')}
-            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+          <TaxRateSelector
+            defaultValue={invoice?.tax_rate1}
+            clearButton={Boolean(invoice?.tax_rate1)}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name1', value.resource?.name);
               handleChange('tax_rate1', value.resource?.rate);
             }}
-            value="rate"
-            actionLabel={t('create_tax_rate')}
-            onActionClick={() => setIsCreateTaxModalOpen(true)}
-            defaultValue={invoice?.tax_rate1}
-            clearButton={Boolean(invoice?.tax_rate1)}
             onClearButtonClick={() => {
               handleChange('tax_name1', '');
               handleChange('tax_rate1', 0);
+            }}
+            onTaxCreated={(taxRate) => {
+              handleChange(
+                `tax_name${currentTaxRateInput}` as keyof Invoice,
+                taxRate.name
+              );
+
+              handleChange(
+                `tax_rate${currentTaxRateInput}` as keyof Invoice,
+                taxRate.rate
+              );
             }}
             onInputFocus={() => setCurrentTaxRateInput(1)}
           />
@@ -103,22 +106,27 @@ export function InvoiceTotals() {
 
       {company && company.enabled_tax_rates > 1 && (
         <Element leftSide={t('tax')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/tax_rates"
-            label={t('tax')}
-            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+          <TaxRateSelector
+            defaultValue={invoice?.tax_rate2}
+            clearButton={Boolean(invoice?.tax_rate2)}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name2', value.resource?.name);
               handleChange('tax_rate2', value.resource?.rate);
             }}
-            actionLabel={t('create_tax_rate')}
-            onActionClick={() => setIsCreateTaxModalOpen(true)}
-            value="rate"
-            defaultValue={invoice?.tax_rate2}
-            clearButton={Boolean(invoice?.tax_rate2)}
             onClearButtonClick={() => {
               handleChange('tax_name2', '');
               handleChange('tax_rate2', 0);
+            }}
+            onTaxCreated={(taxRate) => {
+              handleChange(
+                `tax_name${currentTaxRateInput}` as keyof Invoice,
+                taxRate.name
+              );
+
+              handleChange(
+                `tax_rate${currentTaxRateInput}` as keyof Invoice,
+                taxRate.rate
+              );
             }}
             onInputFocus={() => setCurrentTaxRateInput(2)}
           />
@@ -127,43 +135,32 @@ export function InvoiceTotals() {
 
       {company && company.enabled_tax_rates > 2 && (
         <Element leftSide={t('tax')}>
-          <DebouncedCombobox
-            endpoint="/api/v1/tax_rates"
-            label={t('tax')}
-            formatLabel={(resource) => `${resource.name} ${resource.rate}%`}
+          <TaxRateSelector
+            defaultValue={invoice?.tax_rate3}
+            clearButton={Boolean(invoice?.tax_rate3)}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name3', value.resource?.name);
               handleChange('tax_rate3', value.resource?.rate);
             }}
-            actionLabel={t('create_tax_rate')}
-            onActionClick={() => setIsCreateTaxModalOpen(true)}
-            value="rate"
-            defaultValue={invoice?.tax_rate3}
-            clearButton={Boolean(invoice?.tax_rate3)}
             onClearButtonClick={() => {
               handleChange('tax_name3', '');
               handleChange('tax_rate3', 0);
+            }}
+            onTaxCreated={(taxRate) => {
+              handleChange(
+                `tax_name${currentTaxRateInput}` as keyof Invoice,
+                taxRate.name
+              );
+
+              handleChange(
+                `tax_rate${currentTaxRateInput}` as keyof Invoice,
+                taxRate.rate
+              );
             }}
             onInputFocus={() => setCurrentTaxRateInput(3)}
           />
         </Element>
       )}
-
-      <TaxCreate
-        isVisible={isCreateTaxModalOpen}
-        onClose={setIsCreateTaxModalOpen}
-        onTaxCreated={(taxRate) => {
-          handleChange(
-            `tax_name${currentTaxRateInput}` as keyof Invoice,
-            taxRate.name
-          );
-
-          handleChange(
-            `tax_rate${currentTaxRateInput}` as keyof Invoice,
-            taxRate.rate
-          );
-        }}
-      />
     </Card>
   );
 }
