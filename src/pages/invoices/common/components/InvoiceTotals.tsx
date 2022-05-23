@@ -13,13 +13,12 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
 import { TaxRate } from 'common/interfaces/tax-rate';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
+import { Record } from 'components/forms/DebouncedCombobox';
 import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
 import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 import { useTotalVariables } from '../hooks/useTotalVariables';
-import { TaxCreate } from './TaxCreate';
 import { CustomSurchargeField } from 'components/CustomSurchargeField';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 
