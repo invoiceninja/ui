@@ -11,7 +11,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Combobox } from '@headlessui/react';
 import { ChevronDown, X } from 'react-feather';
-import { clone, debounce } from 'lodash';
+import { debounce } from 'lodash';
 import { endpoint } from 'common/helpers';
 import { useQueryClient } from 'react-query';
 import { InputLabel } from './InputLabel';
