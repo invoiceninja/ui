@@ -34,6 +34,9 @@ export const recurringInvoiceSlice = createSlice({
   name: 'recurringInvoice',
   initialState,
   reducers: {
+    dismissCurrentRecurringInvoice: (state) => {
+      state.current = undefined;
+    },
     injectBlankItemIntoCurrent: (state) => {
       state.current?.line_items.push(blankLineItem);
     },
@@ -174,6 +177,7 @@ export const recurringInvoiceSlice = createSlice({
 });
 
 export const {
+  dismissCurrentRecurringInvoice,
   injectBlankItemIntoCurrent,
   setCurrentRecurringInvoicePropertySync,
   toggleCurrentRecurringInvoiceInvitation,
