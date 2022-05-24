@@ -20,6 +20,7 @@ import { setCurrentInvoice } from './invoices/extra-reducers/set-current-invoice
 import { setCurrentInvoiceLineItem } from './invoices/extra-reducers/set-current-invoice-line-item';
 import { setCurrentInvoiceProperty } from './invoices/extra-reducers/set-current-invoice-property';
 import { setCurrentLineItemProperty } from './invoices/extra-reducers/set-current-line-item-property';
+
 interface InvoiceState {
   api?: any;
   current?: Invoice;
@@ -34,6 +35,9 @@ export const invoiceSlice = createSlice({
   name: 'invoices',
   initialState,
   reducers: {
+    dismissCurrentInvoice: (state) => {
+      state.current = undefined;
+    },
     injectBlankItemIntoCurrent: (state) => {
       state.current?.line_items.push(blankLineItem);
     },
@@ -172,6 +176,7 @@ export const invoiceSlice = createSlice({
 });
 
 export const {
+  dismissCurrentInvoice,
   injectBlankItemIntoCurrent,
   injectProductItemIntoCurrent,
   toggleCurrentInvoiceInvitation,
