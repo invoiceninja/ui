@@ -87,7 +87,7 @@ export function Edit() {
           <ProductsTable />
         </div>
 
-        {/* <InvoiceFooter page="edit" /> */}
+        <InvoiceFooter page="edit" />
         <InvoiceTotals />
       </div>
 
