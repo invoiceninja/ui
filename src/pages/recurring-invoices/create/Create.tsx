@@ -15,7 +15,10 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
 import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
-import { setCurrentRecurringInvoicePropertySync } from 'common/stores/slices/recurring-invoices';
+import {
+  dismissCurrentRecurringInvoice,
+  setCurrentRecurringInvoicePropertySync,
+} from 'common/stores/slices/recurring-invoices';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
@@ -76,6 +79,10 @@ export function Create() {
         handleChange('tax_rate3', company.settings?.tax_rate3);
       }
     }
+
+    return () => {
+      dispatch(dismissCurrentRecurringInvoice());
+    };
   }, [recurringInvoice]);
 
   useEffect(() => {

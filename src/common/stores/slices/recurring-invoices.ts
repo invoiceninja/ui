@@ -20,6 +20,7 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { blankInvitation } from './invoices/constants/blank-invitation';
 import { deleteRecurringInvoiceItem } from './recurring-invoices/extra-reducers/delete-recurring-invoice-item';
 import { setCurrentRecurringInvoiceLineItem } from './recurring-invoices/extra-reducers/set-current-recurring-invoice-line-item';
+
 interface RecurringInvoiceState {
   api?: any;
   current?: RecurringInvoice;

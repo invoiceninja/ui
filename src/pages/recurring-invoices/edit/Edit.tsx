@@ -10,6 +10,7 @@
 import { useTitle } from 'common/hooks/useTitle';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { useRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
+import { dismissCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
@@ -48,6 +49,10 @@ export function Edit() {
     if (recurringInvoice?.data.data) {
       dispatch(setCurrentRecurringInvoice(recurringInvoice.data.data));
     }
+
+    return () => {
+      dispatch(dismissCurrentRecurringInvoice());
+    };
   }, [recurringInvoice]);
 
   return (
