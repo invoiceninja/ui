@@ -214,7 +214,9 @@ export function DebouncedCombobox(props: Props) {
     }
   }, []);
 
-  useEffect(() => request(''), [props.endpoint]);
+  useEffect(() => {
+    request('');
+  }, [props.endpoint]);
   useEffect(() => filter(), [props.exclude]);
 
   useEffect(() => {
