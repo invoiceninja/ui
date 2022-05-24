@@ -156,7 +156,10 @@ export function DebouncedCombobox(props: Props) {
       );
 
       if (potential) {
-        setSelectedOption({ record: potential, withoutEvents: false });
+        setSelectedOption({
+          record: potential,
+          withoutEvents: props.withShadowRecord ? false : true,
+        });
       } else if (!potential && props.defaultValue && props.queryAdditional) {
         // Try to query the result to get the possible record.
         const url = new URL(endpoint(props.endpoint));
