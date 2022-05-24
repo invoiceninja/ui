@@ -53,6 +53,7 @@ interface Props {
 export function DebouncedCombobox(props: Props) {
   const internalRecord = { value: '', label: '', internal: true };
 
+  const [isInitial, setIsInitial] = useState(true);
   const [t] = useTranslation();
   const [records, setRecords] = useState<Record[]>([internalRecord]);
   const [filteredRecords, setFilteredRecords] = useState<Record[]>([
@@ -73,7 +74,7 @@ export function DebouncedCombobox(props: Props) {
     setDefaultValueProperty(props.defaultValue as string);
   }, [props.defaultValue]);
 
-  const request = (query: string, staleTime = Infinity) => {
+  const request = async (query: string, staleTime = Infinity) => {
     setIsLoading(true);
 
     const url = new URL(endpoint(props.endpoint));
@@ -85,43 +86,42 @@ export function DebouncedCombobox(props: Props) {
     url.searchParams.set('sort', 'created_at|desc');
     url.searchParams.set('is_deleted', 'false');
 
-    queryClient
-      .fetchQuery(url.href, () => httpRequest('GET', url.href), { staleTime })
-      .then((response) => {
-        const array: Record[] = [internalRecord];
+    const array: Record[] = [];
 
-        response?.data?.data?.map((resource: any) =>
-          array.push({
-            value: resource[props.value ?? 'id'],
-            label: props.formatLabel
-              ? props.formatLabel(resource)
-              : resource[props.label],
-            internal: false,
-            resource,
-          })
-        );
+    const response = await queryClient.fetchQuery(
+      url.href,
+      () => httpRequest('GET', url.href),
+      { staleTime }
+    );
 
-        setRecords(array);
-        setIsLoading(false);
-      });
+    response?.data?.data?.map((resource: any) =>
+      array.push({
+        value: resource[props.value ?? 'id'],
+        label: props.formatLabel
+          ? props.formatLabel(resource)
+          : resource[props.label],
+        internal: false,
+        resource,
+      })
+    );
+
+    if (props.withShadowRecord) {
+      const record = {
+        value: query,
+        label: query,
+        internal: true,
+      };
+
+      array.push(record);
+      setSelectedOption({ record, withoutEvents: isInitial });
+    }
+
+    setRecords(() => [...array]);
+    setIsLoading(false);
+    setIsInitial(false);
   };
 
-  const debouncedSearch = debounce((query) => {
-    const internal = records.findIndex((record) => record.internal);
-
-    request(query);
-
-    setRecords((current) => {
-      current[internal].label = query;
-      current[internal].value = query;
-
-      return current;
-    });
-
-    const record = clone(records[0]);
-
-    setSelectedOption({ record, withoutEvents: false });
-  }, 1500);
+  const debouncedSearch = debounce(async (query) => await request(query), 1500);
 
   const filter = () => {
     setFilteredRecords(
@@ -158,7 +158,7 @@ export function DebouncedCombobox(props: Props) {
       if (potential) {
         setSelectedOption({
           record: potential,
-          withoutEvents: props.withShadowRecord ? false : true,
+          withoutEvents: true,
         });
       } else if (!potential && props.defaultValue && props.queryAdditional) {
         // Try to query the result to get the possible record.
