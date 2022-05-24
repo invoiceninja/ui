@@ -33,7 +33,10 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { cloneDeep } from 'lodash';
 import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
-import { setCurrentInvoicePropertySync } from 'common/stores/slices/invoices';
+import {
+  dismissCurrentInvoice,
+  setCurrentInvoicePropertySync,
+} from 'common/stores/slices/invoices';
 
 export function Create() {
   const { documentTitle } = useTitle('new_invoice');
@@ -80,6 +83,10 @@ export function Create() {
         handleChange('tax_rate3', company.settings?.tax_rate3);
       }
     }
+
+    return () => {
+      dispatch(dismissCurrentInvoice());
+    };
   }, [invoice]);
 
   useEffect(() => {

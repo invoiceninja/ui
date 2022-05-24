@@ -28,6 +28,7 @@ import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
 import { Actions } from './components/Actions';
 import { InvoiceStatus } from 'common/enums/invoice-status';
+import { dismissCurrentInvoice } from 'common/stores/slices/invoices';
 
 export function Edit() {
   const { id } = useParams();
@@ -50,6 +51,10 @@ export function Edit() {
     if (invoice?.data.data) {
       dispatch(setCurrentInvoice(invoice.data.data));
     }
+
+    return () => {
+      dispatch(dismissCurrentInvoice());
+    };
   }, [invoice]);
 
   return (

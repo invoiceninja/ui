@@ -20,6 +20,7 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { blankInvitation } from './invoices/constants/blank-invitation';
 import { deleteRecurringInvoiceItem } from './recurring-invoices/extra-reducers/delete-recurring-invoice-item';
 import { setCurrentRecurringInvoiceLineItem } from './recurring-invoices/extra-reducers/set-current-recurring-invoice-line-item';
+
 interface RecurringInvoiceState {
   api?: any;
   current?: RecurringInvoice;
@@ -34,6 +35,9 @@ export const recurringInvoiceSlice = createSlice({
   name: 'recurringInvoice',
   initialState,
   reducers: {
+    dismissCurrentRecurringInvoice: (state) => {
+      state.current = undefined;
+    },
     injectBlankItemIntoCurrent: (state) => {
       state.current?.line_items.push(blankLineItem);
     },
@@ -174,6 +178,7 @@ export const recurringInvoiceSlice = createSlice({
 });
 
 export const {
+  dismissCurrentRecurringInvoice,
   injectBlankItemIntoCurrent,
   setCurrentRecurringInvoicePropertySync,
   toggleCurrentRecurringInvoiceInvitation,
