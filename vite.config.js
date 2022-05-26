@@ -5,6 +5,7 @@ import tsconfigPaths from 'vite-tsconfig-paths';
 export default defineConfig({
   plugins: [tsconfigPaths(), react()],
   build: {
+    assetsDir: 'react',
     chunkSizeWarningLimit: 1500,
     rollupOptions: {
       output: {
