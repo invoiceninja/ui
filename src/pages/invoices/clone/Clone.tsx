@@ -56,6 +56,7 @@ export function Clone() {
         setCurrentInvoice({
           ...invoice.data.data,
           number: '',
+          documents: []
         })
       );
     }
