@@ -48,6 +48,7 @@ export function Login() {
     initialValues: {
       email: '',
       password: '',
+      one_time_password: '',
     },
     onSubmit: (values: LoginForm) => {
       setMessage(undefined);
@@ -97,37 +98,37 @@ export function Login() {
         <div className="bg-white mx-4 max-w-md w-full p-8 rounded md:shadow-lg">
           <h2 className="text-2xl">{t('login')}</h2>
 
-          <form onSubmit={form.handleSubmit} className="my-6">
+          <form onSubmit={form.handleSubmit} className="my-6 space-y-4">
             <InputField
               type="email"
               label={t('email_address')}
               id="email"
               onChange={form.handleChange}
+              errorMessage={errors?.email}
             />
 
-            {errors?.email && (
-              <Alert className="mt-2" type="danger">
-                {errors.email}
-              </Alert>
-            )}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <InputLabel>{t('password')}</InputLabel>
+                <Link to="/recover_password">{t('forgot_password')}</Link>
+              </div>
 
-            <div className="flex items-center justify-between mt-4">
-              <InputLabel>{t('password')}</InputLabel>
-              <Link to="/recover_password">{t('forgot_password')}</Link>
+              <InputField
+                type="password"
+                id="password"
+                onChange={form.handleChange}
+                errorMessage={errors?.password}
+              />
             </div>
 
             <InputField
-              type="password"
-              className="mt-2"
-              id="password"
+              type="text"
+              label={`2FA - ${t('one_time_password')}`}
+              id="one_time_password"
               onChange={form.handleChange}
+              placeholder={t('plaid_optional')}
+              errorMessage={errors?.one_time_password}
             />
-
-            {errors?.password && (
-              <Alert className="mt-2" type="danger">
-                {errors.password}
-              </Alert>
-            )}
 
             {message && (
               <Alert className="mt-4" type="danger">
