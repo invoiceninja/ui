@@ -48,6 +48,7 @@ export function Login() {
     initialValues: {
       email: '',
       password: '',
+      one_time_password: '',
     },
     onSubmit: (values: LoginForm) => {
       setMessage(undefined);
