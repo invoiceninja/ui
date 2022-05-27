@@ -118,9 +118,18 @@ export function Login() {
 
             <InputField
               type="password"
-              className="mt-2"
+              className="mt-2 mb-2"
               id="password"
               onChange={form.handleChange}
+            />
+            
+            <InputField
+              type="text"
+              className="mt-0"
+              label={`2FA - ${t('one_time_password')}`}
+              id="one_time_password"
+              onChange={form.handleChange}
+              placeholder={t('plaid_optional')}
             />
 
             {errors?.password && (
