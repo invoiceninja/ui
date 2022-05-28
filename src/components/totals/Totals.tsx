@@ -21,33 +21,42 @@ import { InfoCard } from 'components/InfoCard';
 import Select from 'react-select';
 import { request } from 'common/helpers/request';
 
+interface TotalsRecord {
+  revenue: { paid_to_date: string; code: string };
+  expenses: { amount: string; code: string };
+  outstanding: { amount: string; code: string };
+}
+
+interface Currency {
+  value: string;
+  label: unknown;
+}
+
+interface ChartData {
+  invoices: {
+    total: string;
+    date: string;
+    currency: string;
+  }[];
+  payments: {
+    total: string;
+    date: string;
+    currency: string;
+  }[];
+  expenses: {
+    total: string;
+    date: string;
+    currency: string;
+  }[];
+}
+
 export function Totals() {
   const [t] = useTranslation();
 
   const [isLoadingTotals, setIsLoadingTotals] = useState(true);
-  const [totalsData, setTotals] = useState<
-    {
-      revenue: { paid_to_date: string; code: string };
-      expenses: { amount: string; code: string };
-      outstanding: { amount: string; code: string };
-    }[]
-  >([]);
-
-  const [currencies, setCurrencies] = useState<
-    { value: string; label: unknown }[]
-  >([]);
-
-  const [chartData, setChartData] = useState<
-    {
-      invoices: { total: string; date: string; currency: string }[];
-      payments: { total: string; date: string; currency: string }[];
-      expenses: {
-        total: string;
-        date: string;
-        currency: string;
-      }[];
-    }[]
-  >([]);
+  const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [chartData, setChartData] = useState<ChartData[]>([]);
 
   const [currency, setCurrency] = useState(1);
   const [chartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
@@ -79,7 +88,7 @@ export function Totals() {
   const getTotals = () => {
     request('POST', endpoint('/api/v1/charts/totals'), body).then(
       (response: AxiosResponse) => {
-        setTotals(response.data);
+        setTotalsData(response.data);
         const currencies: { value: string; label: unknown }[] = [];
         Object.entries(response.data.currencies).map(([id, name]) => {
           currencies.push({ value: id, label: name });
