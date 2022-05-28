@@ -186,14 +186,14 @@ export function Chart(props: Props) {
           fillOpacity={1}
         />
         <Area
-          name="Payments"
+          name={t('payments')}
           dataKey="payments"
           stroke="#15803d"
           fill="url(#colorpayments)"
           fillOpacity={1}
         />
         <Area
-          name="Expenses"
+          name={t('expenses')}
           dataKey="expenses"
           stroke="#4b5563"
           fill="url(#colorexpenses)"
