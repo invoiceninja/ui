@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
+import { Button, SelectField } from '@invoiceninja/forms';
 import { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { Chart } from 'components/totals/Chart';
@@ -18,7 +18,6 @@ import { DropdownDateRangePicker } from '../DropdownDateRangePicker';
 import { Card } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { InfoCard } from 'components/InfoCard';
-import Select from 'react-select';
 import { request } from 'common/helpers/request';
 
 interface TotalsRecord {
@@ -29,7 +28,7 @@ interface TotalsRecord {
 
 interface Currency {
   value: string;
-  label: unknown;
+  label: string;
 }
 
 interface ChartData {
@@ -89,12 +88,14 @@ export function Totals() {
     request('POST', endpoint('/api/v1/charts/totals'), body).then(
       (response: AxiosResponse) => {
         setTotalsData(response.data);
-        const currencies: { value: string; label: unknown }[] = [];
-        Object.entries(response.data.currencies).map(([id, name]) => {
-          currencies.push({ value: id, label: name });
-        });
-        setCurrencies(currencies);
 
+        const currencies: Currency[] = [];
+
+        Object.entries(response.data.currencies).map(([id, name]) => {
+          currencies.push({ value: id, label: name as unknown as string });
+        });
+
+        setCurrencies(currencies);
         setIsLoadingTotals(false);
       }
     );
@@ -122,15 +123,13 @@ export function Totals() {
       {/* Quick date, currency & date picker. */}
       <div className="flex justify-end space-x-2">
         {currencies && (
-          <Select
-            onChange={(key) => {
-              setCurrency(Number(key?.value));
-            }}
-            defaultValue={currencies[0]}
-            placeholder={t('currency')}
-            options={currencies}
-            isMulti={false}
-          />
+          <SelectField className="w-24" defaultValue={currencies[0]}>
+            {currencies.map((currency, index) => (
+              <option key={index} value={currency.value}>
+                {currency.label}
+              </option>
+            ))}
+          </SelectField>
         )}
 
         <Button
