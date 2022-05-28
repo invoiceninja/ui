@@ -49,7 +49,7 @@ export function MobileSidebar(props: Props) {
           leaveFrom="translate-x-0"
           leaveTo="-translate-x-full"
         >
-          <div className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-ninja-gray dark:bg-gray-900">
+          <div className="relative flex-1 flex flex-col max-w-xs w-full pb-4 bg-ninja-gray dark:bg-gray-900">
             <Transition.Child
               as={Fragment}
               enter="ease-in-out duration-300"
@@ -71,7 +71,7 @@ export function MobileSidebar(props: Props) {
               </div>
             </Transition.Child>
 
-            <div className="flex-shrink-0 flex items-center px-4">
+            <div className="flex-shrink-0 flex items-center px-4 bg-white py-3">
               <CompanySwitcher />
             </div>
 
