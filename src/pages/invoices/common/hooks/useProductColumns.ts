@@ -53,7 +53,7 @@ export function useProductColumns() {
         );
       }
 
-      variables.filter((variable) => variable !== '$product.tax');
+      variables = variables.filter((variable) => variable !== '$product.tax');
     }
 
     setColumns(variables);
