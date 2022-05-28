@@ -19,6 +19,8 @@ import { Card } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { InfoCard } from 'components/InfoCard';
 import { request } from 'common/helpers/request';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -52,12 +54,16 @@ interface ChartData {
 export function Totals() {
   const [t] = useTranslation();
 
+  const formatMoney = useFormatMoney();
+  const company = useCurrentCompany();
+
   const [isLoadingTotals, setIsLoadingTotals] = useState(true);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
-  const [currencies, setCurrencies] = useState<Currency[]>([]);
-  const [chartData, setChartData] = useState<ChartData[]>([]);
 
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [currency, setCurrency] = useState(1);
+
+  const [chartData, setChartData] = useState<ChartData[]>([]);
   const [chartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
 
   const [body, setBody] = useState<{ start_date: string; end_date: string }>({
@@ -123,7 +129,11 @@ export function Totals() {
       {/* Quick date, currency & date picker. */}
       <div className="flex justify-end space-x-2">
         {currencies && (
-          <SelectField className="w-24" defaultValue={currencies[0]}>
+          <SelectField
+            className="w-24"
+            defaultValue={currencies[0]}
+            onValueChange={(value) => setCurrency(parseInt(value))}
+          >
             {currencies.map((currency, index) => (
               <option key={index} value={currency.value}>
                 {currency.label}
@@ -133,34 +143,28 @@ export function Totals() {
         )}
 
         <Button
-          key={`day-btn`}
-          className={'mx-0.5'}
+          key="day-btn"
+          className="mx-0.5"
           type="secondary"
-          onClick={() => {
-            setChartScale('day');
-          }}
+          onClick={() => setChartScale('day')}
         >
           {t('day')}
         </Button>
 
         <Button
-          key={`week-btn`}
-          className={'mx-0.5 '}
+          key="week-btn"
+          className="mx-0.5"
           type="secondary"
-          onClick={() => {
-            setChartScale('week');
-          }}
+          onClick={() => setChartScale('week')}
         >
           {t('week')}
         </Button>
 
         <Button
-          key={`month-btn`}
-          className={'mx-0.5'}
+          key="month-btn"
+          className="mx-0.5"
           type="secondary"
-          onClick={() => {
-            setChartScale('month');
-          }}
+          onClick={() => setChartScale('month')}
         >
           {t('month')}
         </Button>
@@ -174,52 +178,36 @@ export function Totals() {
         </div>
       </div>
 
-      {/* Info cards. */}
-      {totalsData[currency] && (
+      {totalsData[currency] && company && (
         <div className="grid grid-cols-12 gap-4 mt-4">
           <InfoCard
             className="col-span-12 lg:col-span-4"
             title={`${t('total')} ${t('revenue')}`}
-            value={
-              <Card>
-                {totalsData[currency].revenue.code}{' '}
-                {totalsData[currency].revenue.paid_to_date
-                  ? new Intl.NumberFormat().format(
-                      Number(totalsData[currency].revenue.paid_to_date)
-                    )
-                  : '0'}
-              </Card>
-            }
+            value={formatMoney(
+              totalsData[currency].revenue.paid_to_date || 0,
+              company.settings.country_id,
+              currency.toString()
+            )}
           />
 
           <InfoCard
             className="col-span-12 lg:col-span-4"
             title={`${t('total')} ${t('expenses')}`}
-            value={
-              <Card>
-                {totalsData[currency].expenses.code}{' '}
-                {totalsData[currency].expenses.amount
-                  ? new Intl.NumberFormat().format(
-                      Number(totalsData[currency].expenses.amount)
-                    )
-                  : '0'}
-              </Card>
-            }
+            value={formatMoney(
+              totalsData[currency].expenses.amount || 0,
+              company.settings.country_id,
+              currency.toString()
+            )}
           />
 
           <InfoCard
             className="col-span-12 lg:col-span-4"
             title={`${t('total')} ${t('outstanding')}`}
-            value={
-              <Card>
-                {totalsData[currency].outstanding.code}{' '}
-                {totalsData[currency].outstanding.amount
-                  ? new Intl.NumberFormat().format(
-                      Number(totalsData[currency].outstanding.amount)
-                    )
-                  : '0'}
-              </Card>
-            }
+            value={formatMoney(
+              totalsData[currency].outstanding.amount || 0,
+              company.settings.country_id,
+              currency.toString()
+            )}
           />
         </div>
       )}
