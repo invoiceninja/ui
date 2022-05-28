@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -20,6 +21,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import { date as formatDate } from 'common/helpers';
 
 type Props = {
   data: {
@@ -39,6 +41,8 @@ export function Chart(props: Props) {
   const [t] = useTranslation();
   const [chartData, setchartData] = useState<unknown[]>([]);
 
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
   useEffect(() => {
     const completeChartData: {
       name: string;
@@ -55,7 +59,7 @@ export function Chart(props: Props) {
           date.setDate(date.getDate() + 1)
         ) {
           completeChartData.push({
-            name: date.toISOString().split('T')[0],
+            name: formatDate(date.toString(), dateFormat),
             invoices: '0',
             expenses: '0',
             payments: '0',
@@ -70,7 +74,7 @@ export function Chart(props: Props) {
           date.setDate(date.getDate() + 7)
         ) {
           completeChartData.push({
-            name: date.toISOString().split('T')[0],
+            name: formatDate(date.toString(), dateFormat),
             invoices: '0',
             expenses: '0',
             payments: '0',
@@ -85,7 +89,7 @@ export function Chart(props: Props) {
           date.setDate(date.getDate() + 30)
         ) {
           completeChartData.push({
-            name: date.toISOString().split('T')[0],
+            name: formatDate(date.toString(), dateFormat),
             invoices: '0',
             expenses: '0',
             payments: '0',
