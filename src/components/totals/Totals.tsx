@@ -24,7 +24,7 @@ import { request } from 'common/helpers/request';
 export function Totals() {
   const [t] = useTranslation();
 
-  const [totalsIsLoading, settotalsIsLoading] = useState(true);
+  const [isLoadingTotals, setIsLoadingTotals] = useState(true);
   const [totalsData, setTotals] = useState<
     {
       revenue: { paid_to_date: string; code: string };
@@ -52,7 +52,7 @@ export function Totals() {
   const [currency, setCurrency] = useState(1);
   const [chartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
 
-  const [body, setbody] = useState<{ start_date: string; end_date: string }>({
+  const [body, setBody] = useState<{ start_date: string; end_date: string }>({
     start_date: new Date(
       new Date().getFullYear(),
       new Date().getMonth(),
@@ -67,12 +67,12 @@ export function Totals() {
     const [startDate, endDate] = DateSet.split(',');
 
     if (new Date(startDate) > new Date(endDate)) {
-      setbody({
+      setBody({
         start_date: endDate,
         end_date: startDate,
       });
     } else {
-      setbody({ start_date: startDate, end_date: endDate });
+      setBody({ start_date: startDate, end_date: endDate });
     }
   };
 
@@ -86,7 +86,7 @@ export function Totals() {
         });
         setCurrencies(currencies);
 
-        settotalsIsLoading(false);
+        setIsLoadingTotals(false);
       }
     );
   };
@@ -104,7 +104,7 @@ export function Totals() {
 
   return (
     <>
-      {totalsIsLoading && (
+      {isLoadingTotals && (
         <div className="w-full flex justify-center">
           <Spinner />
         </div>
