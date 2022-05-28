@@ -9,6 +9,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Area,
   AreaChart,
@@ -35,6 +36,7 @@ type Props = {
 };
 
 export function Chart(props: Props) {
+  const [t] = useTranslation();
   const [chartData, setchartData] = useState<unknown[]>([]);
 
   useEffect(() => {
@@ -159,16 +161,16 @@ export function Chart(props: Props) {
         <Legend></Legend>
         <defs>
           <linearGradient id="colorpayments" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#131317" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#131317" stopOpacity={0} />
+            <stop offset="5%" stopColor="#15803d" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#15803d" stopOpacity={0} />
           </linearGradient>
           <linearGradient id="colorexpenses" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#82ca9d" stopOpacity={0} />
+            <stop offset="5%" stopColor="#4b5563" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#4b5563" stopOpacity={0} />
           </linearGradient>
           <linearGradient id="colorincoices" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor="#58585c" stopOpacity={0.8} />
-            <stop offset="95%" stopColor="#58585c" stopOpacity={0} />
+            <stop offset="5%" stopColor="#000000" stopOpacity={0.8} />
+            <stop offset="95%" stopColor="#000000" stopOpacity={0} />
           </linearGradient>
         </defs>
         <CartesianGrid strokeDasharray="3 3" />
@@ -177,23 +179,23 @@ export function Chart(props: Props) {
         <XAxis height={50} dataKey="name" />
         <YAxis />
         <Area
-          name="Invoices"
+          name={t('invoices')}
           dataKey="invoices"
-          stroke="#58585c"
+          stroke="#000000"
           fill="url(#colorinvoices)"
           fillOpacity={1}
         />
         <Area
           name="Payments"
           dataKey="payments"
-          stroke="#131317"
+          stroke="#15803d"
           fill="url(#colorpayments)"
           fillOpacity={1}
         />
         <Area
           name="Expenses"
           dataKey="expenses"
-          stroke="#82ca9d"
+          stroke="#4b5563"
           fill="url(#colorexpenses)"
           fillOpacity={1}
         />
