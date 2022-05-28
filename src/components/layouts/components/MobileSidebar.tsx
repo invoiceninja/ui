@@ -75,7 +75,7 @@ export function MobileSidebar(props: Props) {
               <CompanySwitcher />
             </div>
 
-            <div className="mt-5 flex-1 h-0 overflow-y-auto">
+            <div className="flex-1 h-0 overflow-y-auto">
               <nav className="space-y-1">
                 {props.navigation.map((item, index) => (
                   <SidebarItem key={index} item={item} />
