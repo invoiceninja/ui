@@ -156,9 +156,9 @@ export function Chart(props: Props) {
   }, [props]);
 
   return (
-    <ResponsiveContainer width={'100%'} height={250}>
+    <ResponsiveContainer width="100%" height={250}>
       <AreaChart height={200} data={chartData}>
-        <Legend></Legend>
+        <Legend />
         <defs>
           <linearGradient id="colorpayments" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#15803d" stopOpacity={0.8} />
