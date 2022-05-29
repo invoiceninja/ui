@@ -47,7 +47,7 @@ export function Activity() {
               client: record?.client?.display_name,
               contact: `${record?.contact?.first_name} ${record?.contact?.last_name}`,
               quote: record?.quote?.number,
-              user: `${record?.user?.first_name} ${record?.user?.last_name}`,
+              user: record?.user ? `${record?.user?.first_name} ${record?.user?.last_name}` : 'System',
               expense: record?.expense?.number,
               invoice: record?.invoice?.number,
               recurring_invoice: record?.recurring_invoice?.number,
