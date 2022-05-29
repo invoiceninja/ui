@@ -53,8 +53,10 @@ export function useProductColumns() {
         );
       }
 
-      setColumns(variables.filter((variable) => variable !== '$product.tax'));
+      variables = variables.filter((variable) => variable !== '$product.tax');
     }
+
+    setColumns(variables);
   }, [company]);
 
   return columns;

@@ -53,8 +53,8 @@ export function CompanySwitcher() {
       <div>
         <Menu.Button className="flex items-center space-x-3 justify-center w-full rounded text-sm font-medium text-gray-700 border border-transparent">
           <img className="w-8" src={logo} alt="Company logo" />
-          <span className="text-white text-sm">{companyName}</span>
-          <ChevronDown size={18} color="white" />
+          <span className="text-gray-900 text-sm">{companyName}</span>
+          <ChevronDown size={18} className="text-gray-900" />
         </Menu.Button>
       </div>
 

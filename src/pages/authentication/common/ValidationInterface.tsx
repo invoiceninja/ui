@@ -11,6 +11,7 @@
 export interface LoginValidation {
   email?: string[];
   password?: string[];
+  one_time_password?: string[];
 }
 
 export interface RegisterValidation {
