@@ -8,8 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date, endpoint, trans } from 'common/helpers';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { endpoint } from 'common/helpers';
 import { Spinner } from 'components/Spinner';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
@@ -17,14 +16,18 @@ import { Card } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { NonClickableElement } from 'components/cards/NonClickableElement';
 import { ActivityRecord } from 'common/interfaces/activity-record';
+import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
+import React from 'react';
 
 export function Activity() {
   const [t] = useTranslation();
-  const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const { data, isLoading, isError } = useQuery('/api/v1/activities', () =>
-    request('GET', endpoint('/api/v1/activities'))
+  const { data, isLoading, isError } = useQuery(
+    '/api/v1/activities?react',
+    () => request('GET', endpoint('/api/v1/activities?react'))
   );
+
+  const activityElement = useGenerateActivityElement();
 
   return (
     <Card title={t('activity')} className="h-96" withScrollableBody>
@@ -40,19 +43,7 @@ export function Activity() {
 
       {data?.data.data &&
         data.data.data.map((record: ActivityRecord, index: number) => (
-          <NonClickableElement key={index}>
-            <span className="mr-1">{date(record.created_at, dateFormat)}:</span>
-
-            {trans(`activity_${record.activity_type_id}`, {
-              client: record.client_id,
-              contact: record.contact_id,
-              quote: record.quote_id,
-              user: record.user_id,
-              expense: record.expense_id,
-              invoice: record.invoice_id,
-              recurring_invoice: record.recurring_invoice_id,
-            })}
-          </NonClickableElement>
+          <React.Fragment key={index}>{activityElement(record)}</React.Fragment>
         ))}
     </Card>
   );

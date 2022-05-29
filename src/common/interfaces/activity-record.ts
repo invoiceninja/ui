@@ -8,6 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { User } from "@sentry/react";
+import { Client } from "./client";
+import { ClientContact } from "./client-contact";
+import { Expense } from "./expense";
+import { Invoice } from "./invoice";
+import { Credit } from "./credit";
+import { Payment } from "./payment";
+import { Quote } from "./quote";
+import { RecurringInvoice } from "./recurring-invoice";
+import { Task } from "./task";
+
 export interface ActivityRecord {
   id: string;
   activity_type_id: string;
@@ -29,4 +40,14 @@ export interface ActivityRecord {
   token_id: string;
   notes: string;
   ip: string;
+  client: Client;
+  task: Task;
+  contact: ClientContact;
+  user: User;
+  expense: Expense;
+  invoice: Invoice;
+  recurring_invoice: RecurringInvoice;
+  payment: Payment;
+  credit: Credit;
+  quote: Quote;
 }
