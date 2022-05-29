@@ -23,6 +23,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useSave } from './hooks/useSave';
+import { PaymentOverview } from './PaymentOverview';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_payment');
@@ -65,6 +66,8 @@ export function Edit() {
         payment && onSave(payment);
       }}
     >
+      <PaymentOverview payment={payment}></PaymentOverview>
+
       <Element leftSide={t('payment_number')}>
         <InputField
           id="number"
