@@ -29,7 +29,6 @@ export function useGenerateActivityElement() {
           id: activity[resource]?.hashed_id ?? '',
         })}
       >
-        <span className="mr-1">{date(activity.created_at, dateFormat)}:</span>
         {trans(`activity_${activity.activity_type_id}`, {
           client: activity?.client?.name,
           contact: `${activity?.contact?.first_name} ${activity?.contact?.last_name}`,
@@ -44,6 +43,10 @@ export function useGenerateActivityElement() {
           credit: activity?.credit?.number,
           task: activity?.task?.number,
         })}
+
+        <p className="text-gray-500 text-xs">
+          {date(activity.created_at, dateFormat)} &#183; {activity.ip}
+        </p>
       </ClickableElement>
     );
   };
