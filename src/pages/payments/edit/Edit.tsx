@@ -16,6 +16,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Payment } from 'common/interfaces/payment';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { usePaymentQuery } from 'common/queries/payments';
+import { Divider } from 'components/cards/Divider';
 import { ConvertCurrency } from 'components/ConvertCurrency';
 import { CustomField } from 'components/CustomField';
 import Toggle from 'components/forms/Toggle';
@@ -23,6 +24,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useSave } from './hooks/useSave';
+import { PaymentOverview } from './PaymentOverview';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_payment');
@@ -65,6 +67,10 @@ export function Edit() {
         payment && onSave(payment);
       }}
     >
+      {payment && <PaymentOverview payment={payment} />}
+
+      <Divider />
+
       <Element leftSide={t('payment_number')}>
         <InputField
           id="number"
