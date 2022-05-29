@@ -11,7 +11,6 @@
 import { Card } from '@invoiceninja/cards';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Payment } from 'common/interfaces/payment';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import paymentStatus from 'common/constants/payment-status';
