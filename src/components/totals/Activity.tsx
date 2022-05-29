@@ -22,8 +22,8 @@ export function Activity() {
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const { data, isLoading, isError } = useQuery('/api/v1/activities', () =>
-    request('GET', endpoint('/api/v1/activities'))
+  const { data, isLoading, isError } = useQuery('/api/v1/activities?react', () =>
+    request('GET', endpoint('/api/v1/activities?react'))
   );
 
   return (
@@ -44,13 +44,16 @@ export function Activity() {
             <span className="mr-1">{date(record.created_at, dateFormat)}:</span>
 
             {trans(`activity_${record.activity_type_id}`, {
-              client: record.client_id,
-              contact: record.contact_id,
-              quote: record.quote_id,
-              user: record.user_id,
-              expense: record.expense_id,
-              invoice: record.invoice_id,
-              recurring_invoice: record.recurring_invoice_id,
+              client: record?.client?.display_name,
+              contact: `${record?.contact?.first_name} ${record?.contact?.last_name}`,
+              quote: record?.quote?.number,
+              user: `${record?.user?.first_name} ${record?.user?.last_name}`,
+              expense: record?.expense?.number,
+              invoice: record?.invoice?.number,
+              recurring_invoice: record?.recurring_invoice?.number,
+              payment: record?.payment?.number,
+              credit: record?.credit?.number,
+              task: record?.task?.number,
             })}
           </NonClickableElement>
         ))}
