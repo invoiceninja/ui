@@ -25,6 +25,10 @@ export function SidebarItem(props: Props) {
     (state: RootState) => state.settings.isMiniSidebar
   );
 
+  if (!item.visible) {
+    return <></>;
+  }
+
   return (
     <div
       key={item.name}
@@ -50,7 +54,7 @@ export function SidebarItem(props: Props) {
         </div>
       </Link>
 
-      {item.rightButton && !isMiniSidebar && (
+      {item.rightButton && !isMiniSidebar && item.rightButton.visible && (
         <Link
           to={item.rightButton.to}
           title={item.rightButton.label}
