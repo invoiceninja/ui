@@ -82,7 +82,7 @@ export function Details() {
             />
           </Element>
 
-          <Element leftSide={t('phone')}>
+          <Element leftSide={`${t('company')} ${t('phone')}`}>
             <InputField
               value={companyChanges?.settings?.phone || ''}
               onChange={handleChange}
