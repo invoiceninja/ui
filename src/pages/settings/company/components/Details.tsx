@@ -42,7 +42,7 @@ export function Details() {
     <>
       {companyChanges?.settings && (
         <Card title={t('details')}>
-          <Element leftSide={t('name')}>
+          <Element leftSide={t('company_name')}>
             <InputField
               value={companyChanges?.settings?.name || ''}
               onChange={handleChange}
