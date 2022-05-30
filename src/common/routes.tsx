@@ -29,10 +29,12 @@ import * as Projects from '../pages/projects';
 import * as Vendors from '../pages/vendors';
 import * as Expenses from '../pages/expenses';
 import * as RecurringExpenses from '../pages/recurring-expenses';
+import { Unauthorized } from 'pages/errors/401';
 
 export const routes = (
   <Routes>
     <Route path="/" element={<Index />} />
+    <Route path="/unauthorized" element={<Unauthorized />} />
     <Route element={<PublicRoute />}>
       <Route path="/login" element={<Authentication.Login />} />
       <Route

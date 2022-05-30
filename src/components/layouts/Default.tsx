@@ -27,8 +27,9 @@ import { Button } from '@invoiceninja/forms';
 import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
 import { useSelector } from 'react-redux';
 import { RootState } from 'common/stores/store';
-import { DesktopSidebar } from './components/DesktopSidebar';
+import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 interface Props extends CommonProps {
   title?: string;
@@ -53,24 +54,28 @@ export function Default(props: Props) {
 
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
   const location = useLocation();
 
-  const navigation = [
+  const navigation: NavigationItem[] = [
     {
       name: t('dashboard'),
       href: '/dashboard',
       icon: Home,
       current: location.pathname.startsWith('/dashboard'),
+      visible: true,
     },
     {
       name: t('clients'),
       href: '/clients',
       icon: Users,
       current: location.pathname.startsWith('/clients'),
+      visible: hasPermission('view_client'),
       rightButton: {
         icon: PlusCircle,
         to: '/clients/create',
         label: t('new_client'),
+        visible: hasPermission('create_client'),
       },
     },
     {
@@ -78,10 +83,12 @@ export function Default(props: Props) {
       href: '/products',
       icon: Box,
       current: location.pathname.startsWith('/products'),
+      visible: hasPermission('view_product'),
       rightButton: {
         icon: PlusCircle,
         to: '/products/create',
         label: t('new_product'),
+        visible: hasPermission('create_product'),
       },
     },
     {
@@ -89,10 +96,12 @@ export function Default(props: Props) {
       href: '/invoices',
       icon: FileText,
       current: location.pathname.startsWith('/invoices'),
+      visible: hasPermission('view_invoice'),
       rightButton: {
         icon: PlusCircle,
         to: '/invoices/create',
         label: t('new_invoice'),
+        visible: hasPermission('create_invoice'),
       },
     },
     {
@@ -100,10 +109,12 @@ export function Default(props: Props) {
       href: '/recurring_invoices',
       icon: Repeat,
       current: location.pathname.startsWith('/recurring_invoices'),
+      visible: hasPermission('view_recurring_invoice'),
       rightButton: {
         icon: PlusCircle,
         to: '/recurring_invoices/create',
         label: t('new_recurring_invoice'),
+        visible: hasPermission('create_recurring_invoice'),
       },
     },
     {
@@ -111,72 +122,20 @@ export function Default(props: Props) {
       href: '/payments',
       icon: CreditCard,
       current: location.pathname.startsWith('/payments'),
+      visible: hasPermission('view_payment'),
       rightButton: {
         icon: PlusCircle,
         to: '/payments/create',
         label: t('new_payment'),
+        visible: hasPermission('create_payment'),
       },
     },
-    // {
-    //   name: t('credits'),
-    //   href: '/credits',
-    //   icon: File,
-    //   current: location.pathname === '/credits',
-    //   rightButton: {
-    //     icon: PlusCircle,
-    //     to: '/credits/create',
-    //     label: t('new_credit'),
-    //   },
-    // },
-    // {
-    //   name: t('projects'),
-    //   href: '/projects',
-    //   icon: Briefcase,
-    //   current: location.pathname === '/projects',
-    //   rightButton: {
-    //     icon: PlusCircle,
-    //     to: '/projects/create',
-    //     label: t('new_project'),
-    //   },
-    // },
-    // {
-    //   name: t('vendors'),
-    //   href: '/vendors',
-    //   icon: Truck,
-    //   current: location.pathname === '/vendors',
-    //   rightButton: {
-    //     icon: PlusCircle,
-    //     to: '/vendors/create',
-    //     label: t('new_vendor'),
-    //   },
-    // },
-    // {
-    //   name: t('expenses'),
-    //   href: '/expenses',
-    //   icon: DollarSign,
-    //   current: location.pathname === '/expenses',
-    //   rightButton: {
-    //     icon: PlusCircle,
-    //     to: '/expenses/create',
-    //     label: t('new_expense'),
-    //   },
-    // },
-    // {
-    //   name: t('recurring_expenses'),
-    //   href: '/recurring_expenses',
-    //   icon: RefreshCcw,
-    //   current: location.pathname === '/recurring_expenses',
-    //   rightButton: {
-    //     icon: PlusCircle,
-    //     to: '/recurring_expenses/create',
-    //     label: t('new_recurring_expense'),
-    //   },
-    // },
     {
       name: t('settings'),
       href: '/settings/company_details',
       icon: Settings,
       current: location.pathname.startsWith('/settings'),
+      visible: true,
     },
   ];
 

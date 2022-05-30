@@ -21,10 +21,12 @@ export interface NavigationItem {
   href: string;
   icon: Icon;
   current: boolean;
+  visible: boolean;
   rightButton?: {
     icon: Icon;
     to: string;
     label: string;
+    visible: boolean;
   };
 }
 
