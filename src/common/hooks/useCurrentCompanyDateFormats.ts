@@ -23,7 +23,7 @@ export function useCurrentCompanyDateFormats() {
   useEffect(() => {
     if (statics?.data?.date_formats) {
       const result = statics.data.date_formats.find(
-        (format: any) => format.id === company?.settings?.date_format_id || '0'
+        (format: any) => format.id === company?.settings?.date_format_id ?? '0'
       );
 
       if (result) {

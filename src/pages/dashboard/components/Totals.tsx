@@ -8,51 +8,65 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
+import { Button, SelectField } from '@invoiceninja/forms';
 import { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
-import { Chart } from 'components/totals/Chart';
+import { Chart } from 'pages/dashboard/components/Chart';
 import { useEffect, useState } from 'react';
 import { Spinner } from 'components/Spinner';
-import { DropdownDateRangePicker } from '../DropdownDateRangePicker';
+import { DropdownDateRangePicker } from '../../../components/DropdownDateRangePicker';
 import { Card } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { InfoCard } from 'components/InfoCard';
-import Select from 'react-select';
 import { request } from 'common/helpers/request';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+
+interface TotalsRecord {
+  revenue: { paid_to_date: string; code: string };
+  expenses: { amount: string; code: string };
+  outstanding: { amount: string; code: string };
+}
+
+interface Currency {
+  value: string;
+  label: string;
+}
+
+interface ChartData {
+  invoices: {
+    total: string;
+    date: string;
+    currency: string;
+  }[];
+  payments: {
+    total: string;
+    date: string;
+    currency: string;
+  }[];
+  expenses: {
+    total: string;
+    date: string;
+    currency: string;
+  }[];
+}
 
 export function Totals() {
   const [t] = useTranslation();
 
-  const [totalsIsLoading, settotalsIsLoading] = useState(true);
-  const [totalsData, setTotals] = useState<
-    {
-      revenue: { paid_to_date: string; code: string };
-      expenses: { amount: string; code: string };
-      outstanding: { amount: string; code: string };
-    }[]
-  >([]);
+  const formatMoney = useFormatMoney();
+  const company = useCurrentCompany();
 
-  const [currencies, setCurrencies] = useState<
-    { value: string; label: unknown }[]
-  >([]);
+  const [isLoadingTotals, setIsLoadingTotals] = useState(true);
+  const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
 
-  const [chartData, setChartData] = useState<
-    {
-      invoices: { total: string; date: string; currency: string }[];
-      payments: { total: string; date: string; currency: string }[];
-      expenses: {
-        total: string;
-        date: string;
-        currency: string;
-      }[];
-    }[]
-  >([]);
-
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [currency, setCurrency] = useState(1);
+
+  const [chartData, setChartData] = useState<ChartData[]>([]);
   const [chartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
 
-  const [body, setbody] = useState<{ start_date: string; end_date: string }>({
+  const [body, setBody] = useState<{ start_date: string; end_date: string }>({
     start_date: new Date(
       new Date().getFullYear(),
       new Date().getMonth(),
@@ -67,26 +81,28 @@ export function Totals() {
     const [startDate, endDate] = DateSet.split(',');
 
     if (new Date(startDate) > new Date(endDate)) {
-      setbody({
+      setBody({
         start_date: endDate,
         end_date: startDate,
       });
     } else {
-      setbody({ start_date: startDate, end_date: endDate });
+      setBody({ start_date: startDate, end_date: endDate });
     }
   };
 
   const getTotals = () => {
     request('POST', endpoint('/api/v1/charts/totals'), body).then(
       (response: AxiosResponse) => {
-        setTotals(response.data);
-        const currencies: { value: string; label: unknown }[] = [];
-        Object.entries(response.data.currencies).map(([id, name]) => {
-          currencies.push({ value: id, label: name });
-        });
-        setCurrencies(currencies);
+        setTotalsData(response.data);
 
-        settotalsIsLoading(false);
+        const currencies: Currency[] = [];
+
+        Object.entries(response.data.currencies).map(([id, name]) => {
+          currencies.push({ value: id, label: name as unknown as string });
+        });
+
+        setCurrencies(currencies);
+        setIsLoadingTotals(false);
       }
     );
   };
@@ -104,7 +120,7 @@ export function Totals() {
 
   return (
     <>
-      {totalsIsLoading && (
+      {isLoadingTotals && (
         <div className="w-full flex justify-center">
           <Spinner />
         </div>
@@ -113,46 +129,42 @@ export function Totals() {
       {/* Quick date, currency & date picker. */}
       <div className="flex justify-end space-x-2">
         {currencies && (
-          <Select
-            onChange={(key) => {
-              setCurrency(Number(key?.value));
-            }}
+          <SelectField
+            className="w-24"
             defaultValue={currencies[0]}
-            placeholder={t('currency')}
-            options={currencies}
-            isMulti={false}
-          />
+            onValueChange={(value) => setCurrency(parseInt(value))}
+          >
+            {currencies.map((currency, index) => (
+              <option key={index} value={currency.value}>
+                {currency.label}
+              </option>
+            ))}
+          </SelectField>
         )}
 
         <Button
-          key={`day-btn`}
-          className={'mx-0.5'}
+          key="day-btn"
+          className="mx-0.5"
           type="secondary"
-          onClick={() => {
-            setChartScale('day');
-          }}
+          onClick={() => setChartScale('day')}
         >
           {t('day')}
         </Button>
 
         <Button
-          key={`week-btn`}
-          className={'mx-0.5 '}
+          key="week-btn"
+          className="mx-0.5"
           type="secondary"
-          onClick={() => {
-            setChartScale('week');
-          }}
+          onClick={() => setChartScale('week')}
         >
           {t('week')}
         </Button>
 
         <Button
-          key={`month-btn`}
-          className={'mx-0.5'}
+          key="month-btn"
+          className="mx-0.5"
           type="secondary"
-          onClick={() => {
-            setChartScale('month');
-          }}
+          onClick={() => setChartScale('month')}
         >
           {t('month')}
         </Button>
@@ -166,52 +178,36 @@ export function Totals() {
         </div>
       </div>
 
-      {/* Info cards. */}
-      {totalsData[currency] && (
+      {totalsData[currency] && company && (
         <div className="grid grid-cols-12 gap-4 mt-4">
           <InfoCard
             className="col-span-12 lg:col-span-4"
             title={`${t('total')} ${t('revenue')}`}
-            value={
-              <Card>
-                {totalsData[currency].revenue.code}{' '}
-                {totalsData[currency].revenue.paid_to_date
-                  ? new Intl.NumberFormat().format(
-                      Number(totalsData[currency].revenue.paid_to_date)
-                    )
-                  : '0'}
-              </Card>
-            }
+            value={formatMoney(
+              totalsData[currency].revenue.paid_to_date || 0,
+              company.settings.country_id,
+              currency.toString()
+            )}
           />
 
           <InfoCard
             className="col-span-12 lg:col-span-4"
             title={`${t('total')} ${t('expenses')}`}
-            value={
-              <Card>
-                {totalsData[currency].expenses.code}{' '}
-                {totalsData[currency].expenses.amount
-                  ? new Intl.NumberFormat().format(
-                      Number(totalsData[currency].expenses.amount)
-                    )
-                  : '0'}
-              </Card>
-            }
+            value={formatMoney(
+              totalsData[currency].expenses.amount || 0,
+              company.settings.country_id,
+              currency.toString()
+            )}
           />
 
           <InfoCard
             className="col-span-12 lg:col-span-4"
             title={`${t('total')} ${t('outstanding')}`}
-            value={
-              <Card>
-                {totalsData[currency].outstanding.code}{' '}
-                {totalsData[currency].outstanding.amount
-                  ? new Intl.NumberFormat().format(
-                      Number(totalsData[currency].outstanding.amount)
-                    )
-                  : '0'}
-              </Card>
-            }
+            value={formatMoney(
+              totalsData[currency].outstanding.amount || 0,
+              company.settings.country_id,
+              currency.toString()
+            )}
           />
         </div>
       )}

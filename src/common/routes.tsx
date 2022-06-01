@@ -29,10 +29,14 @@ import * as Projects from '../pages/projects';
 import * as Vendors from '../pages/vendors';
 import * as Expenses from '../pages/expenses';
 import * as RecurringExpenses from '../pages/recurring-expenses';
+import { Unauthorized } from 'pages/errors/401';
+import { Guard } from './guards/Guard';
+import { permission } from './guards/guards/permission';
 
 export const routes = (
   <Routes>
     <Route path="/" element={<Index />} />
+    <Route path="/unauthorized" element={<Unauthorized />} />
     <Route element={<PublicRoute />}>
       <Route path="/login" element={<Authentication.Login />} />
       <Route
@@ -80,7 +84,15 @@ export const routes = (
       </Route>
       <Route path="/invoices">
         <Route path="" element={<Invoices.Invoices />} />
-        <Route path="create" element={<Invoices.Create />} />
+        <Route
+          path="create"
+          element={
+            <Guard
+              guards={[() => permission('create_invoice')]}
+              component={<Invoices.Create />}
+            />
+          }
+        />
         <Route path=":id/edit" element={<Invoices.Edit />} />
         <Route path=":id/pdf" element={<Invoices.Pdf />} />
         <Route path=":id/email" element={<Invoices.Email />} />

@@ -79,7 +79,7 @@ export function Actions() {
             { invoiceId: invoice.id, clientId: invoice.client_id }
           )}
         >
-          {t('apply_payment')}
+          {t('enter_payment')}
         </DropdownElement>
       )}
 

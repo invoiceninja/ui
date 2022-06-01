@@ -9,11 +9,11 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { Activity } from 'components/totals/Activity';
-import { PastDueInvoices } from 'components/totals/PastDueInvoices';
-import { RecentPayments } from 'components/totals/RecentPayments';
-import { Totals } from 'components/totals/Totals';
-import { UpcomingInvoices } from 'components/totals/UpcomingInvoices';
+import { Activity } from 'pages/dashboard/components/Activity';
+import { PastDueInvoices } from 'pages/dashboard/components/PastDueInvoices';
+import { RecentPayments } from 'pages/dashboard/components/RecentPayments';
+import { Totals } from 'pages/dashboard/components/Totals';
+import { UpcomingInvoices } from 'pages/dashboard/components/UpcomingInvoices';
 import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';
 
