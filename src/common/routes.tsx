@@ -36,7 +36,6 @@ import { permission } from './guards/guards/permission';
 export const routes = (
   <Routes>
     <Route path="/" element={<Index />} />
-    <Route path="/unauthorized" element={<Unauthorized />} />
     <Route element={<PublicRoute />}>
       <Route path="/login" element={<Authentication.Login />} />
       <Route
