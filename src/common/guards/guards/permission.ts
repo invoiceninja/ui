@@ -15,6 +15,9 @@ import {
 
 export function permission(permission: Permissions) {
   const hasPermission = useHasPermission();
+  const [action] = permission.split('_'); // 'create_invoice' => 'create'
 
-  return hasPermission(permission);
+  return (
+    hasPermission(permission) || hasPermission(`${action}_all` as Permissions)
+  );
 }
