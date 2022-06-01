@@ -33,6 +33,7 @@ import { Unauthorized } from 'pages/errors/401';
 import { Guard } from './guards/Guard';
 import { permission } from './guards/guards/permission';
 import { invoiceRoutes } from 'pages/invoices/routes';
+import { clientRoutes } from 'pages/clients/routes';
 
 export const routes = (
   <Routes>
@@ -50,28 +51,7 @@ export const routes = (
     <Route element={<PrivateRoute />}>
       <Route path="/dashboard" element={<Dashboard />} />
       {invoiceRoutes}
-      <Route path="clients">
-        <Route path="" element={<Clients.Clients />} />
-        <Route path="create" element={<Clients.Create />} />
-        <Route path=":id/edit" element={<Clients.Edit />} />
-        <Route path=":id" element={<Clients.Client />}>
-          <Route path="" element={<Clients.Invoices />} />
-          <Route path="quotes" element={<Clients.Quotes />} />
-          <Route path="payments" element={<Clients.Payments />} />
-          <Route
-            path="recurring_invoices"
-            element={<Clients.RecurringInvoices />}
-          />
-          <Route path="credits" element={<Clients.Credits />} />
-          <Route path="projects" element={<Clients.Projects />} />
-          <Route path="tasks" element={<Clients.Tasks />} />
-          <Route path="expenses" element={<Clients.Expenses />} />
-          <Route
-            path="recurring_expenses"
-            element={<Clients.RecurringExpenses />}
-          />
-        </Route>
-      </Route>
+      {clientRoutes}
       <Route path="products">
         <Route path="" element={<Products.Products />} />
         <Route path="create" element={<Products.Create />} />
