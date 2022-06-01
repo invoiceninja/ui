@@ -34,6 +34,7 @@ import { Guard } from './guards/Guard';
 import { permission } from './guards/guards/permission';
 import { invoiceRoutes } from 'pages/invoices/routes';
 import { clientRoutes } from 'pages/clients/routes';
+import { productRoutes } from 'pages/products/routes';
 
 export const routes = (
   <Routes>
@@ -52,17 +53,7 @@ export const routes = (
       <Route path="/dashboard" element={<Dashboard />} />
       {invoiceRoutes}
       {clientRoutes}
-      <Route path="products">
-        <Route path="" element={<Products.Products />} />
-        <Route path="create" element={<Products.Create />} />
-        <Route path=":id" element={<Products.Product />}>
-          <Route path="product_fields" element={<Products.ProductFields />} />
-          <Route path="" element={<Products.Show />} />
-          <Route path="edit" element={<Products.Edit />} />
-          <Route path="clone" element={<Products.Clone />} />
-          <Route path="documents" element={<Products.Documents />} />
-        </Route>
-      </Route>
+      {productRoutes}
       <Route path="/recurring_invoices">
         <Route path="" element={<RecurringInvoices.RecurringInvoices />} />
         <Route path="create" element={<RecurringInvoices.Create />} />
