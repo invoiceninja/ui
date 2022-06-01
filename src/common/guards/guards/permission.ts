@@ -18,6 +18,7 @@ export function permission(permission: Permissions) {
   const [action] = permission.split('_'); // 'create_invoice' => 'create'
 
   return (
-    hasPermission(permission) || hasPermission(`${action}_all` as Permissions)
+    hasPermission(permission) ||
+    hasPermission(`${action}_all` as unknown as Permissions)
   );
 }
