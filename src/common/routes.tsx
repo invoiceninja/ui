@@ -36,6 +36,7 @@ import { invoiceRoutes } from 'pages/invoices/routes';
 import { clientRoutes } from 'pages/clients/routes';
 import { productRoutes } from 'pages/products/routes';
 import { recurringInvoiceRoutes } from 'pages/recurring-invoices/routes';
+import { paymentRoutes } from 'pages/payments/routes';
 
 export const routes = (
   <Routes>
@@ -56,16 +57,7 @@ export const routes = (
       {clientRoutes}
       {productRoutes}
       {recurringInvoiceRoutes}
-      <Route path="/payments">
-        <Route path="" element={<Payments.Payments />} />
-        <Route path="create" element={<Payments.Create />} />
-        <Route path=":id" element={<Payments.Payment />}>
-          <Route path="payment_fields" element={<Payments.PaymentFields />} />
-          <Route path="edit" element={<Payments.Edit />} />
-          <Route path="apply" element={<Payments.Apply />} />
-          <Route path="refund" element={<Payments.Refund />} />
-        </Route>
-      </Route>
+      {paymentRoutes}
       {/*       
       <Route path="/credits">
         <Route path="" element={<Credits.Credits />} />
