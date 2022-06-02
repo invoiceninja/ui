@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Guard } from 'common/guards/Guard';
+import { freePlan } from 'common/guards/guards/free-plan';
 import { Route } from 'react-router-dom';
 import * as Settings from './index';
 
@@ -28,7 +30,15 @@ export const settingsRoutes = (
     <Route path="workflow_settings" element={<Settings.WorkflowSettings />} />
     <Route path="import_export" element={<Settings.ImportExport />} />
     <Route path="account_management" element={<Settings.AccountManagement />} />
-    <Route path="invoice_design" element={<Settings.InvoiceDesign />} />
+    <Route
+      path="invoice_design"
+      element={
+        <Guard
+          guards={[() => !freePlan()]}
+          component={<Settings.InvoiceDesign />}
+        />
+      }
+    />
     <Route path="invoice_design/customize" element={<Settings.Customize />} />
     <Route path="custom_fields">
       <Route path="" element={<Settings.CustomFields />} />
