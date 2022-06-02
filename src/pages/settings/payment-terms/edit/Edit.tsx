@@ -8,26 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ActionCard, Card, CardContainer, Element } from '@invoiceninja/cards';
-import { Button, InputField } from '@invoiceninja/forms';
+import { Card, CardContainer, Element } from '@invoiceninja/cards';
+import { InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { useTitle } from 'common/hooks/useTitle';
 import { PaymentTerm } from 'common/interfaces/payment-term';
-import { bulk, usePaymentTermQuery } from 'common/queries/payment-terms';
+import { usePaymentTermQuery } from 'common/queries/payment-terms';
 import { Badge } from 'components/Badge';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
 import { useFormik } from 'formik';
-import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
+import { Actions } from './components/Actions';
 
 export function Edit() {
+  useTitle('payment_terms');
+
   const [t] = useTranslation();
   const { id } = useParams();
 
@@ -40,10 +43,6 @@ export function Edit() {
       href: generatePath('/settings/payment_terms/:id/edit', { id }),
     },
   ];
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('payment_terms')}`;
-  });
 
   const { data } = usePaymentTermQuery({ id });
   const queryClient = useQueryClient();
@@ -84,57 +83,6 @@ export function Edit() {
     },
   });
 
-  const archive = () => {
-    toast.loading(t('processing'));
-
-    bulk([data?.data.data.id], 'archive')
-      .then(() => {
-        toast.dismiss();
-        toast.success(t('archived_payment_term'));
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      })
-      .finally(() => invalidatePaymentTermCache());
-  };
-
-  const restore = () => {
-    toast.loading(t('processing'));
-
-    bulk([data?.data.data.id], 'restore')
-      .then(() => {
-        toast.dismiss();
-        toast.success(t('restored_payment_term'));
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      })
-      .finally(() => invalidatePaymentTermCache());
-  };
-
-  const _delete = () => {
-    toast.loading(t('processing'));
-
-    bulk([data?.data.data.id], 'delete')
-      .then(() => {
-        toast.dismiss();
-        toast.success(t('deleted_payment_term'));
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      })
-      .finally(() => invalidatePaymentTermCache());
-  };
-
   return (
     <Settings title={t('payment_terms')}>
       {!data && (
@@ -148,10 +96,11 @@ export function Edit() {
           <Breadcrumbs pages={pages} />
 
           <Card
-            withSaveButton
+            title={data.data.data.name}
             disableSubmitButton={formik.isSubmitting}
             onFormSubmit={formik.handleSubmit}
-            title={data.data.data.name}
+            additionalAction={<Actions paymentTerm={data.data.data} />}
+            withSaveButton
           >
             <Element leftSide="Status">
               {!data.data.data.is_deleted && !data.data.data.archived_at && (
@@ -166,6 +115,7 @@ export function Edit() {
                 <Badge variant="red">{t('deleted')}</Badge>
               )}
             </Element>
+
             <CardContainer>
               <InputField
                 value={formik.values.num_days}
@@ -176,24 +126,6 @@ export function Edit() {
               />
             </CardContainer>
           </Card>
-
-          {!data.data.data.archived_at && !data.data.data.is_deleted ? (
-            <ActionCard label={t('archive')} help="">
-              <Button onClick={archive}>{t('archive')}</Button>
-            </ActionCard>
-          ) : null}
-
-          {data.data.data.archived_at || data.data.data.is_deleted ? (
-            <ActionCard label={t('restore')} help="">
-              <Button onClick={restore}>{t('restore')}</Button>
-            </ActionCard>
-          ) : null}
-
-          {!data.data.data.is_deleted && (
-            <ActionCard label={t('delete')} help="">
-              <Button onClick={_delete}>{t('delete')}</Button>
-            </ActionCard>
-          )}
         </Container>
       )}
     </Settings>
