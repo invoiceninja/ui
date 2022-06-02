@@ -207,7 +207,7 @@ export function Default(props: Props) {
                   )}
                 </div>
 
-                {props.topRight && <div className="">{props.topRight}</div>}
+                {props.topRight && <div>{props.topRight}</div>}
               </div>
             )}
 
