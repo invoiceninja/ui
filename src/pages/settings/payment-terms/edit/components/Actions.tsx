@@ -13,6 +13,7 @@ import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useTranslation } from 'react-i18next';
 import { useHandleArchive } from '../hooks/useHandleArchive';
+import { useHandleRestore } from '../hooks/useHandleRestore';
 
 interface Props {
   paymentTerm: PaymentTerm;
@@ -22,6 +23,7 @@ export function Actions(props: Props) {
   const [t] = useTranslation();
 
   const archive = useHandleArchive();
+  const restore = useHandleRestore();
 
   return (
     <Dropdown label={t('more_actions')}>
@@ -31,10 +33,11 @@ export function Actions(props: Props) {
         </DropdownElement>
       )}
 
-      {props.paymentTerm.archived_at ||
-        (props.paymentTerm.is_deleted && (
-          <DropdownElement>{t('restore')}</DropdownElement>
-        ))}
+      {(props.paymentTerm.archived_at || props.paymentTerm.is_deleted) && (
+        <DropdownElement onClick={() => restore(props.paymentTerm.id)}>
+          {t('restore')}
+        </DropdownElement>
+      )}
 
       {!props.paymentTerm.is_deleted && (
         <DropdownElement>{t('delete')}</DropdownElement>
