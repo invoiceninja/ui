@@ -26,6 +26,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
+import { Actions } from './components/Actions';
 
 export function Edit() {
   useTitle('payment_terms');
@@ -146,10 +147,11 @@ export function Edit() {
           <Breadcrumbs pages={pages} />
 
           <Card
-            withSaveButton
+            title={data.data.data.name}
             disableSubmitButton={formik.isSubmitting}
             onFormSubmit={formik.handleSubmit}
-            title={data.data.data.name}
+            additionalAction={<Actions paymentTerm={data.data.data} />}
+            withSaveButton
           >
             <Element leftSide="Status">
               {!data.data.data.is_deleted && !data.data.data.archived_at && (
@@ -164,6 +166,7 @@ export function Edit() {
                 <Badge variant="red">{t('deleted')}</Badge>
               )}
             </Element>
+
             <CardContainer>
               <InputField
                 value={formik.values.num_days}
@@ -174,24 +177,6 @@ export function Edit() {
               />
             </CardContainer>
           </Card>
-
-          {!data.data.data.archived_at && !data.data.data.is_deleted ? (
-            <ActionCard label={t('archive')} help="">
-              <Button onClick={archive}>{t('archive')}</Button>
-            </ActionCard>
-          ) : null}
-
-          {data.data.data.archived_at || data.data.data.is_deleted ? (
-            <ActionCard label={t('restore')} help="">
-              <Button onClick={restore}>{t('restore')}</Button>
-            </ActionCard>
-          ) : null}
-
-          {!data.data.data.is_deleted && (
-            <ActionCard label={t('delete')} help="">
-              <Button onClick={_delete}>{t('delete')}</Button>
-            </ActionCard>
-          )}
         </Container>
       )}
     </Settings>
