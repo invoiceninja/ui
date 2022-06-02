@@ -27,6 +27,7 @@ interface Props {
   withContainer?: boolean;
   style?: React.CSSProperties;
   withScrollableBody?: boolean;
+  additionalAction?: ReactNode;
 }
 
 export function Card(props: Props) {
@@ -69,16 +70,20 @@ export function Card(props: Props) {
           </dl>
         </div>
 
-        {props.withSaveButton && (
+        {(props.withSaveButton || props.additionalAction) && (
           <div className="border-t border-gray-200 px-4 py-5 sm:p-0">
             <dl className="sm:divide-y sm:divide-gray-200">
-              <div className="sm:py-5 sm:px-6 flex justify-end">
-                <Button
-                  onClick={props.onSaveClick}
-                  disabled={props.disableSubmitButton}
-                >
-                  {props.saveButtonLabel ?? t('save')}
-                </Button>
+              <div className="sm:py-5 sm:px-6 flex justify-end space-x-4">
+                {props.additionalAction}
+
+                {props.withSaveButton && (
+                  <Button
+                    onClick={props.onSaveClick}
+                    disabled={props.disableSubmitButton}
+                  >
+                    {props.saveButtonLabel ?? t('save')}
+                  </Button>
+                )}
               </div>
             </dl>
           </div>
