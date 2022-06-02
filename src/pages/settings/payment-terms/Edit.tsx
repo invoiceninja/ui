@@ -13,6 +13,7 @@ import { Button, InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { useTitle } from 'common/hooks/useTitle';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { bulk, usePaymentTermQuery } from 'common/queries/payment-terms';
 import { Badge } from 'components/Badge';
@@ -21,13 +22,14 @@ import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
 import { useFormik } from 'formik';
-import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 
 export function Edit() {
+  useTitle('payment_terms');
+
   const [t] = useTranslation();
   const { id } = useParams();
 
@@ -40,10 +42,6 @@ export function Edit() {
       href: generatePath('/settings/payment_terms/:id/edit', { id }),
     },
   ];
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('payment_terms')}`;
-  });
 
   const { data } = usePaymentTermQuery({ id });
   const queryClient = useQueryClient();
