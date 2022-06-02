@@ -15,7 +15,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useTitle } from 'common/hooks/useTitle';
 import { PaymentTerm } from 'common/interfaces/payment-term';
-import { bulk, usePaymentTermQuery } from 'common/queries/payment-terms';
+import { usePaymentTermQuery } from 'common/queries/payment-terms';
 import { Badge } from 'components/Badge';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
@@ -82,57 +82,6 @@ export function Edit() {
         });
     },
   });
-
-  const archive = () => {
-    toast.loading(t('processing'));
-
-    bulk([data?.data.data.id], 'archive')
-      .then(() => {
-        toast.dismiss();
-        toast.success(t('archived_payment_term'));
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      })
-      .finally(() => invalidatePaymentTermCache());
-  };
-
-  const restore = () => {
-    toast.loading(t('processing'));
-
-    bulk([data?.data.data.id], 'restore')
-      .then(() => {
-        toast.dismiss();
-        toast.success(t('restored_payment_term'));
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      })
-      .finally(() => invalidatePaymentTermCache());
-  };
-
-  const _delete = () => {
-    toast.loading(t('processing'));
-
-    bulk([data?.data.data.id], 'delete')
-      .then(() => {
-        toast.dismiss();
-        toast.success(t('deleted_payment_term'));
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      })
-      .finally(() => invalidatePaymentTermCache());
-  };
 
   return (
     <Settings title={t('payment_terms')}>
