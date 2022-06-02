@@ -13,6 +13,7 @@ import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useTranslation } from 'react-i18next';
 import { useHandleArchive } from '../hooks/useHandleArchive';
+import { useHandleDelete } from '../hooks/useHandleDelete';
 import { useHandleRestore } from '../hooks/useHandleRestore';
 
 interface Props {
@@ -24,6 +25,7 @@ export function Actions(props: Props) {
 
   const archive = useHandleArchive();
   const restore = useHandleRestore();
+  const destroy = useHandleDelete();
 
   return (
     <Dropdown label={t('more_actions')}>
@@ -40,7 +42,9 @@ export function Actions(props: Props) {
       )}
 
       {!props.paymentTerm.is_deleted && (
-        <DropdownElement>{t('delete')}</DropdownElement>
+        <DropdownElement onClick={() => destroy(props.paymentTerm.id)}>
+          {t('delete')}
+        </DropdownElement>
       )}
     </Dropdown>
   );
