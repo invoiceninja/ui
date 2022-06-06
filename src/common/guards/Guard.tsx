@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Unauthorized } from 'pages/errors/401';
+import { useEffect, useState } from 'react';
 
 interface Props {
   guards: { (): boolean }[];
@@ -16,9 +18,20 @@ interface Props {
 }
 
 export function Guard(props: Props) {
-  let pass = true;
+  const [pass, setPass] = useState(true);
+  const user = useCurrentUser();
 
-  props.guards.forEach((guard) => (pass = guard()));
+  useEffect(() => {
+    props.guards.forEach((guard) => setPass(guard()));
+  }, [user]);
 
-  return pass ? props.component : <Unauthorized />;
+  useEffect(() => {
+    props.guards.forEach((guard) => setPass(guard()));
+  });
+
+  if (pass) {
+    return props.component;
+  }
+
+  return <Unauthorized />;
 }

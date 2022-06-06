@@ -59,9 +59,11 @@ export const productRoutes = (
       element={
         <Guard
           guards={[() => permission('edit_product')]}
-          component={<Edit />}
+          component={<Product />}
         />
       }
-    />
+    >
+      <Route path="" element={<Edit />} />
+    </Route>
   </Route>
 );

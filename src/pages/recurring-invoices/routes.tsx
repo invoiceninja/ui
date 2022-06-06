@@ -39,7 +39,7 @@ export const recurringInvoiceRoutes = (
     />
     <Route path=":id">
       <Route
-        path=":id/edit"
+        path="edit"
         element={
           <Guard
             guards={[() => permission('edit_recurring_invoice')]}
@@ -48,7 +48,7 @@ export const recurringInvoiceRoutes = (
         }
       />
       <Route
-        path=":id/clone"
+        path="clone"
         element={
           <Guard
             guards={[() => permission('view_recurring_invoice')]}
@@ -57,7 +57,7 @@ export const recurringInvoiceRoutes = (
         }
       />
       <Route
-        path=":id/pdf"
+        path="pdf"
         element={
           <Guard
             guards={[() => permission('view_recurring_invoice')]}
