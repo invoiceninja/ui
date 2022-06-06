@@ -25,7 +25,7 @@ export function Create() {
   ];
 
   return (
-    <Default breadcrumbs={pages}>
+    <Default title={t('new_product')} breadcrumbs={pages}>
       <Container>
         {product?.data.data ? (
           <CreateProduct product={product.data.data} />
