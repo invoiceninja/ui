@@ -19,6 +19,7 @@ import { recurringInvoiceRoutes } from 'pages/recurring-invoices/routes';
 import { paymentRoutes } from 'pages/payments/routes';
 import { settingsRoutes } from 'pages/settings/routes';
 import { authenticationRoutes } from 'pages/authentication/routes';
+import { quoteRoutes } from 'pages/quotes/routes';
 
 export const routes = (
   <Routes>
@@ -31,6 +32,7 @@ export const routes = (
       {productRoutes}
       {recurringInvoiceRoutes}
       {paymentRoutes}
+      {quoteRoutes}
       {settingsRoutes}
     </Route>
   </Routes>
