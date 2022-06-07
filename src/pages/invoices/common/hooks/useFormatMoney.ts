@@ -22,7 +22,7 @@ import { useQueryClient } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
 interface Props {
-  resource: Invoice;
+  resource: Invoice | undefined;
 }
 
 export function useFormatMoney(props: Props) {
