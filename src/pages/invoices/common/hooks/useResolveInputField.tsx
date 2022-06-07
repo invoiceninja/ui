@@ -26,12 +26,13 @@ import { ProductSelector } from 'components/products/ProductSelector';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
 import { Invoice } from 'common/interfaces/invoice';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 
 interface Props {
-  resource: Invoice;
+  resource: Invoice | RecurringInvoice;
   onProductChange: (index: number, lineItem: InvoiceItem) => unknown;
   onLineItemPropertyChange: (
     key: keyof InvoiceItem,
