@@ -18,9 +18,14 @@ import { useSetCurrentInvoiceProperty } from './useSetCurrentInvoiceProperty';
 import { Element } from '@invoiceninja/cards';
 import { useResolveTranslation } from './useResolveTranslation';
 import { useInvoiceSum } from './useInvoiceSum';
+import { Invoice } from 'common/interfaces/invoice';
 
-export function useResolveTotalVariable() {
-  const formatMoney = useFormatMoney();
+interface Props {
+  resource?: Invoice;
+}
+
+export function useResolveTotalVariable(props: Props) {
+  const formatMoney = useFormatMoney({ resource: props.resource });
   const invoice = useCurrentInvoice();
   const company = useCurrentCompany();
   const handleChange = useSetCurrentInvoiceProperty();
