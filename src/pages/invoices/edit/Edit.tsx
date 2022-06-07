@@ -28,16 +28,24 @@ import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
 import { Actions } from './components/Actions';
 import { InvoiceStatus } from 'common/enums/invoice-status';
-import { dismissCurrentInvoice } from 'common/stores/slices/invoices';
+import {
+  dismissCurrentInvoice,
+  toggleCurrentInvoiceInvitation,
+} from 'common/stores/slices/invoices';
+import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoiceProperty';
 
 export function Edit() {
   const { id } = useParams();
   const { documentTitle } = useTitle('edit_invoice');
   const { data: invoice } = useInvoiceQuery({ id });
+
   const [t] = useTranslation();
+
   const dispatch = useDispatch();
-  const handleInvoiceSave = useInvoiceSave();
   const currentInvoice = useCurrentInvoice();
+
+  const handleInvoiceSave = useInvoiceSave();
+  const handleChange = useSetCurrentInvoiceProperty();
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -80,7 +88,20 @@ export function Edit() {
       }
     >
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector readonly />
+        {currentInvoice && (
+          <ClientSelector
+            resource={currentInvoice}
+            readonly
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={(contactId, value) =>
+              dispatch(
+                toggleCurrentInvoiceInvitation({ contactId, checked: value })
+              )
+            }
+          />
+        )}
+
         <InvoiceDetails />
 
         <div className="col-span-12">

@@ -28,6 +28,8 @@ import { Invoice } from 'common/interfaces/invoice';
 import { useHandleCreate } from '../create/hooks/useHandleCreate';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { ValidationAlert } from 'components/ValidationAlert';
+import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoiceProperty';
+import { toggleCurrentInvoiceInvitation } from 'common/stores/slices/invoices';
 
 export function Clone() {
   const { documentTitle } = useTitle('new_invoice');
@@ -39,6 +41,7 @@ export function Clone() {
 
   const dispatch = useDispatch();
   const handleCreate = useHandleCreate(setErrors);
+  const handleChange = useSetCurrentInvoiceProperty();
 
   const currentInvoice = useCurrentInvoice();
 
@@ -56,7 +59,7 @@ export function Clone() {
         setCurrentInvoice({
           ...invoice.data.data,
           number: '',
-          documents: []
+          documents: [],
         })
       );
     }
@@ -72,7 +75,20 @@ export function Clone() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector />
+        {currentInvoice && (
+          <ClientSelector
+            resource={currentInvoice}
+            readonly
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={(contactId, value) =>
+              dispatch(
+                toggleCurrentInvoiceInvitation({ contactId, checked: value })
+              )
+            }
+          />
+        )}
+        
         <InvoiceDetails />
 
         <div className="col-span-12">

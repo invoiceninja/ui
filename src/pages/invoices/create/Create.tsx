@@ -36,6 +36,7 @@ import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-i
 import {
   dismissCurrentInvoice,
   setCurrentInvoicePropertySync,
+  toggleCurrentInvoiceInvitation,
 } from 'common/stores/slices/invoices';
 
 export function Create() {
@@ -134,7 +135,19 @@ export function Create() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector />
+        {currentInvoice && (
+          <ClientSelector
+            resource={currentInvoice}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={(contactId, value) =>
+              dispatch(
+                toggleCurrentInvoiceInvitation({ contactId, checked: value })
+              )
+            }
+          />
+        )}
+        
         <InvoiceDetails />
 
         <div className="col-span-12">
