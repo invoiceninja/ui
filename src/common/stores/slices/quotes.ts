@@ -11,7 +11,8 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { Quote } from 'common/interfaces/quote';
-import { invoiceSlice } from './invoices';
+import { cloneDeep } from 'lodash';
+import { setCurrentQuote } from './quotes/extra-reducers/set-current-quote';
 
 interface QuoteState {
   api?: any;
@@ -27,6 +28,24 @@ export const quoteSlice = createSlice({
   name: 'quotes',
   initialState,
   reducers: {},
+  extraReducers: (builder) => {
+    builder.addCase(setCurrentQuote.fulfilled, (state, payload) => {
+      state.current = payload.payload.quote;
+
+      // if (typeof state.current.line_items === 'string') {
+      //   state.current.line_items = [];
+      // }
+
+      if (payload.payload.client && payload.payload.currency) {
+        state.invoiceSum = new InvoiceSum(
+          cloneDeep(state.current),
+          cloneDeep(payload.payload.currency)
+        ).build();
+
+        state.current = state.invoiceSum.invoice as Quote;
+      }
+    });
+  },
 });
 
-export const {} = invoiceSlice.actions;
+// export const {} = invoiceSlice.actions;
