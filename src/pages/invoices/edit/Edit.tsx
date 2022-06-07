@@ -20,7 +20,6 @@ import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { ProductsTable } from '../common/components/ProductsTable';
-import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
 import { InvoicePreview } from '../common/components/InvoicePreview';
 import { useInvoiceSave } from './hooks/useInvoiceSave';
@@ -30,9 +29,13 @@ import { Actions } from './components/Actions';
 import { InvoiceStatus } from 'common/enums/invoice-status';
 import {
   dismissCurrentInvoice,
+  injectBlankItemIntoCurrent,
   toggleCurrentInvoiceInvitation,
 } from 'common/stores/slices/invoices';
 import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoiceProperty';
+import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
+import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
+import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 
 export function Edit() {
   const { id } = useParams();
@@ -105,11 +108,32 @@ export function Edit() {
         <InvoiceDetails />
 
         <div className="col-span-12">
-          <ProductsTable />
+          {currentInvoice && (
+            <ProductsTable
+              resource={currentInvoice}
+              onProductChange={(index, lineItem) =>
+                dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
+              }
+              onLineItemPropertyChange={(key, value, index) =>
+                dispatch(
+                  setCurrentLineItemProperty({
+                    position: index,
+                    property: key,
+                    value,
+                  })
+                )
+              }
+              onSort={(lineItems) => handleChange('line_items', lineItems)}
+              onDeleteRowClick={(index) =>
+                dispatch(deleteInvoiceLineItem(index))
+              }
+              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+            />
+          )}
         </div>
 
         <InvoiceFooter page="edit" />
-        <InvoiceTotals />
+        {/* <InvoiceTotals /> */}
       </div>
 
       <div className="my-4">
