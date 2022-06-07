@@ -13,9 +13,7 @@
 import { resolveProperty } from 'pages/invoices/common/helpers/resolve-property';
 import { useHandleProductChange } from './useHandleProductChange';
 import { InputField } from '@invoiceninja/forms';
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { ChangeEvent, useEffect, useState } from 'react';
-import { useHandleLineItemPropertyChange } from './useHandleLineItemPropertyChange';
 import { useFormatMoney } from './useFormatMoney';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
@@ -27,11 +25,22 @@ import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-
 import { ProductSelector } from 'components/products/ProductSelector';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
+import { Invoice } from 'common/interfaces/invoice';
 
 const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 
-export function useResolveInputField() {
+interface Props {
+  resource: Invoice;
+  onProductChange: (index: number, lineItem: InvoiceItem) => unknown;
+  onLineItemPropertyChange: (
+    key: keyof InvoiceItem,
+    value: unknown,
+    index: number
+  ) => unknown;
+}
+
+export function useResolveInputField(props: Props) {
   const dispatch = useDispatch();
 
   const [inputCurrencySeparators, setInputCurrencySeparators] =
@@ -40,17 +49,24 @@ export function useResolveInputField() {
   const [currentLineItemIndex, setCurrentLineItemIndex] = useState(0);
   const [currentTaxRate, setCurrentTaxRate] = useState('tax_rate1');
 
-  const handleProductChange = useHandleProductChange();
-  const onChange = useHandleLineItemPropertyChange();
+  const handleProductChange = useHandleProductChange({
+    resource: props.resource,
+    onChange: props.onProductChange,
+  });
+
+  const onChange = (key: keyof InvoiceItem, value: unknown, index: number) =>
+    props.onLineItemPropertyChange(key, value, index);
 
   const company = useCurrentCompany();
-  const invoice = useCurrentInvoice();
-  const formatMoney = useFormatMoney();
+  const resource = props.resource;
+  const formatMoney = useFormatMoney({ resource: props.resource });
   const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators);
 
   useEffect(() => {
-    if (invoice?.client_id) getCurrency(invoice?.client_id);
-  }, [invoice?.client_id]);
+    if (resource?.client_id) {
+      getCurrency(resource?.client_id);
+    }
+  }, [resource?.client_id]);
 
   return (key: string, index: number) => {
     const property = resolveProperty(key);
@@ -63,7 +79,7 @@ export function useResolveInputField() {
           }
           className="w-auto"
           onInputFocus={() => setCurrentLineItemIndex(index)}
-          defaultValue={invoice?.line_items[index][property]}
+          defaultValue={resource?.line_items[index][property]}
           onProductCreated={(product) =>
             handleProductChange(index, product.product_key, product)
           }
@@ -76,7 +92,7 @@ export function useResolveInputField() {
         <InputField
           id={property}
           element="textarea"
-          value={invoice?.line_items[index][property]}
+          value={resource?.line_items[index][property]}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, event.target.value, index)
           }
@@ -93,7 +109,7 @@ export function useResolveInputField() {
             }
             id={property}
             currency={inputCurrencySeparators}
-            initialValue={invoice?.line_items[index][property] as string}
+            initialValue={resource?.line_items[index][property] as string}
             className="auto"
             onChange={(value: string) => {
               onChange(property, parseFloat(value), index);
@@ -116,7 +132,7 @@ export function useResolveInputField() {
               );
           }}
           className="w-auto"
-          defaultValue={invoice?.line_items[index][property]}
+          defaultValue={resource?.line_items[index][property]}
           onInputFocus={() => {
             setCurrentLineItemIndex(index);
             setCurrentTaxRate(property);
@@ -130,7 +146,7 @@ export function useResolveInputField() {
               index
             );
           }}
-          clearButton={Boolean(invoice?.line_items[index][property])}
+          clearButton={Boolean(resource?.line_items[index][property])}
           onTaxCreated={(taxRate) => {
             dispatch(
               setCurrentLineItemProperty({
@@ -153,7 +169,7 @@ export function useResolveInputField() {
     }
 
     if (['line_total'].includes(property)) {
-      return formatMoney(invoice?.line_items[index][property] as number);
+      return formatMoney(resource?.line_items[index][property] as number);
     }
 
     if (['product1', 'product2', 'product3', 'product4'].includes(property)) {
@@ -165,7 +181,7 @@ export function useResolveInputField() {
       return company.custom_fields?.[property] ? (
         <CustomField
           field={property}
-          defaultValue={invoice?.line_items[index][field]}
+          defaultValue={resource?.line_items[index][field]}
           value={company.custom_fields?.[property]}
           onChange={(value) => onChange(field, value, index)}
           fieldOnly
@@ -173,7 +189,7 @@ export function useResolveInputField() {
       ) : (
         <InputField
           id={property}
-          value={invoice?.line_items[index][property]}
+          value={resource?.line_items[index][property]}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             onChange(property, event.target.value, index)
           }
@@ -184,7 +200,7 @@ export function useResolveInputField() {
     return (
       <InputField
         id={property}
-        value={invoice?.line_items[index][property]}
+        value={resource?.line_items[index][property]}
         onChange={(event: ChangeEvent<HTMLInputElement>) =>
           onChange(property, event.target.value, index)
         }

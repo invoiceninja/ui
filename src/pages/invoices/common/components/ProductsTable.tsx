@@ -9,31 +9,49 @@
  */
 
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
-import { injectBlankItemIntoCurrent } from 'common/stores/slices/invoices';
-import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
-import { RootState } from 'common/stores/store';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
 import { useProductColumns } from '../hooks/useProductColumns';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
 import { resolveColumnWidth } from '../helpers/resolve-column-width';
+import { Invoice } from 'common/interfaces/invoice';
+import { InvoiceItem } from 'common/interfaces/invoice-item';
 
-export function ProductsTable() {
+interface Props {
+  resource: Invoice;
+  onProductChange: (index: number, lineItem: InvoiceItem) => unknown;
+  onSort: (lineItems: InvoiceItem[]) => unknown;
+  onLineItemPropertyChange: (
+    key: keyof InvoiceItem,
+    value: unknown,
+    index: number
+  ) => unknown;
+  onDeleteRowClick: (index: number) => unknown;
+  onCreateItemClick: () => unknown;
+}
+
+export function ProductsTable(props: Props) {
   const [t] = useTranslation();
 
-  const invoice = useSelector((state: RootState) => state.invoices.current);
+  const resource = props.resource;
   const columns = useProductColumns();
-  const dispatch = useDispatch();
 
   const resolveTranslation = useResolveTranslation();
-  const resolveInputField = useResolveInputField();
 
-  const onDragEnd = useHandleSortingRows();
-  
+  const resolveInputField = useResolveInputField({
+    resource: props.resource,
+    onProductChange: props.onProductChange,
+    onLineItemPropertyChange: props.onLineItemPropertyChange,
+  });
+
+  const onDragEnd = useHandleSortingRows({
+    resource: props.resource,
+    onSort: props.onSort,
+  });
+
   return (
     <Table>
       <Thead>
@@ -42,11 +60,11 @@ export function ProductsTable() {
         ))}
       </Thead>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Droppable droppableId="invoice-product-table">
+        <Droppable droppableId="product-table">
           {(provided) => (
             <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
-              {invoice?.client_id &&
-                invoice.line_items.map((lineItem, lineItemIndex) => (
+              {resource?.client_id &&
+                resource.line_items.map((lineItem, lineItemIndex) => (
                   <Draggable
                     key={lineItemIndex}
                     draggableId={lineItemIndex.toString()}
@@ -71,15 +89,13 @@ export function ProductsTable() {
                               <div className="flex justify-between items-center">
                                 {resolveInputField(column, lineItemIndex)}
 
-                                {invoice &&
+                                {resource &&
                                   (lineItem.product_key || lineItemIndex > 0) &&
-                                  invoice.line_items.length > 0 && (
+                                  resource.line_items.length > 0 && (
                                     <button
                                       className="ml-2 text-gray-600 hover:text-red-600"
                                       onClick={() =>
-                                        dispatch(
-                                          deleteInvoiceLineItem(lineItemIndex)
-                                        )
+                                        props.onDeleteRowClick(lineItemIndex)
                                       }
                                     >
                                       <Trash2 size={18} />
@@ -94,11 +110,11 @@ export function ProductsTable() {
                   </Draggable>
                 ))}
 
-              {invoice?.client_id && (
+              {resource?.client_id && (
                 <Tr className="bg-slate-100 hover:bg-slate-200">
                   <Td colSpan={100}>
                     <button
-                      onClick={() => dispatch(injectBlankItemIntoCurrent())}
+                      onClick={() => props.onCreateItemClick()}
                       className="w-full py-2 inline-flex justify-center items-center space-x-2"
                     >
                       <Plus size={18} />
@@ -108,7 +124,7 @@ export function ProductsTable() {
                 </Tr>
               )}
 
-              {!invoice?.client_id && (
+              {!resource?.client_id && (
                 <Tr>
                   <Td colSpan={100}>{t('no_client_selected')}.</Td>
                 </Tr>
