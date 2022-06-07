@@ -27,7 +27,7 @@ export function InvoiceTotals() {
   const company = useCurrentCompany();
   const invoice = useCurrentInvoice();
 
-  const resolveVariable = useResolveTotalVariable();
+  const resolveVariable = useResolveTotalVariable({ resource: invoice });
   const handleChange = useSetCurrentInvoiceProperty();
 
   const [currentTaxRateInput, setCurrentTaxRateInput] = useState(1);
