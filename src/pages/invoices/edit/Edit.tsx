@@ -14,7 +14,7 @@ import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
@@ -37,6 +37,8 @@ import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-r
 import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
+import { RootState } from 'common/stores/store';
+import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 
 export function Edit() {
   const { id } = useParams();
@@ -50,6 +52,8 @@ export function Edit() {
 
   const handleInvoiceSave = useInvoiceSave();
   const handleChange = useSetCurrentInvoiceProperty();
+
+  const invoiceSum = useInvoiceSum();
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -134,7 +138,14 @@ export function Edit() {
         </div>
 
         <InvoiceFooter page="edit" />
-        <InvoiceTotals />
+
+        {currentInvoice && (
+          <InvoiceTotals
+            resource={currentInvoice}
+            invoiceSum={invoiceSum}
+            onChange={(property, value) => handleChange(property, value)}
+          />
+        )}
       </div>
 
       <div className="my-4">

@@ -37,6 +37,7 @@ import {
 import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
 import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
+import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 
 export function Clone() {
   const { documentTitle } = useTitle('new_invoice');
@@ -49,6 +50,7 @@ export function Clone() {
   const dispatch = useDispatch();
   const handleCreate = useHandleCreate(setErrors);
   const handleChange = useSetCurrentInvoiceProperty();
+  const invoiceSum = useInvoiceSum();
 
   const currentInvoice = useCurrentInvoice();
 
@@ -128,7 +130,14 @@ export function Clone() {
         </div>
 
         <InvoiceFooter page="create" />
-        <InvoiceTotals />
+
+        {currentInvoice && (
+          <InvoiceTotals
+            resource={currentInvoice}
+            invoiceSum={invoiceSum}
+            onChange={(property, value) => handleChange(property, value)}
+          />
+        )}
       </div>
 
       <div className="my-4">
