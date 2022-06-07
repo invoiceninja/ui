@@ -12,11 +12,16 @@ import { useTitle } from 'common/hooks/useTitle';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
+import { injectBlankItemIntoCurrent } from 'common/stores/slices/recurring-invoices';
+import { deleteRecurringInvoiceItem } from 'common/stores/slices/recurring-invoices/extra-reducers/delete-recurring-invoice-item';
+import { setCurrentLineItemProperty } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-line-item-property';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
+import { setCurrentRecurringInvoiceLineItem } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice-line-item';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { ValidationAlert } from 'components/ValidationAlert';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
+import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -25,8 +30,8 @@ import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
-import { ProductsTable } from '../common/components/ProductsTable';
 import { useCurrentRecurringInvoice } from '../common/hooks/useCurrentRecurringInvoice';
+import { useSetCurrentRecurringInvoiceProperty } from '../common/hooks/useSetCurrentRecurringInvoiceProperty';
 import { useHandleCreate } from '../create/hooks/useHandleCreate';
 
 export function Clone() {
@@ -40,6 +45,7 @@ export function Clone() {
   const dispatch = useDispatch();
   const handleCreate = useHandleCreate(setErrors);
   const currentRecurringInvoice = useCurrentRecurringInvoice();
+  const handleChange = useSetCurrentRecurringInvoiceProperty();
 
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
@@ -76,7 +82,30 @@ export function Clone() {
         <InvoiceDetails />
 
         <div className="col-span-12">
-          <ProductsTable />
+          {currentRecurringInvoice && (
+            <ProductsTable
+              resource={currentRecurringInvoice}
+              onProductChange={(index, lineItem) =>
+                dispatch(
+                  setCurrentRecurringInvoiceLineItem({ index, lineItem })
+                )
+              }
+              onLineItemPropertyChange={(key, value, index) =>
+                dispatch(
+                  setCurrentLineItemProperty({
+                    position: index,
+                    property: key,
+                    value,
+                  })
+                )
+              }
+              onSort={(lineItems) => handleChange('line_items', lineItems)}
+              onDeleteRowClick={(index) =>
+                dispatch(deleteRecurringInvoiceItem(index))
+              }
+              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+            />
+          )}
         </div>
 
         <InvoiceFooter page="create" />
