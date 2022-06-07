@@ -11,9 +11,10 @@
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { Product } from 'common/interfaces/product';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 interface Props {
-  resource: Invoice;
+  resource: Invoice | RecurringInvoice;
   onChange: (index: number, lineItem: InvoiceItem) => unknown;
 }
 
