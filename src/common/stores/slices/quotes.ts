@@ -8,10 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { Quote } from 'common/interfaces/quote';
 import { cloneDeep } from 'lodash';
+import { blankInvitation } from './invoices/constants/blank-invitation';
 import { setCurrentQuote } from './quotes/extra-reducers/set-current-quote';
 
 interface QuoteState {
@@ -30,6 +31,36 @@ export const quoteSlice = createSlice({
   reducers: {
     dismissCurrentQuote: (state) => {
       state.current = undefined;
+    },
+    toggleCurrentQuoteInvitation: (
+      state,
+      payload: PayloadAction<{ contactId: string; checked: boolean }>
+    ) => {
+      const invitations = state.current?.invitations;
+
+      const potential =
+        invitations?.find(
+          (invitation) =>
+            invitation.client_contact_id === payload.payload.contactId
+        ) || -1;
+
+      if (
+        potential !== -1 &&
+        payload.payload.checked === false &&
+        state.current
+      ) {
+        state.current.invitations = state.current.invitations.filter(
+          (i) => i.client_contact_id !== payload.payload.contactId
+        );
+      }
+
+      if (potential === -1) {
+        const invitation = cloneDeep(blankInvitation);
+
+        invitation.client_contact_id = payload.payload.contactId;
+
+        state.current?.invitations.push(invitation);
+      }
     },
   },
   extraReducers: (builder) => {
@@ -52,4 +83,5 @@ export const quoteSlice = createSlice({
   },
 });
 
-export const { dismissCurrentQuote } = quoteSlice.actions;
+export const { dismissCurrentQuote, toggleCurrentQuoteInvitation } =
+  quoteSlice.actions;
