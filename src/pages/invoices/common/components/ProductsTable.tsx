@@ -19,9 +19,10 @@ import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
 import { resolveColumnWidth } from '../helpers/resolve-column-width';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 interface Props {
-  resource: Invoice;
+  resource: Invoice | RecurringInvoice;
   onProductChange: (index: number, lineItem: InvoiceItem) => unknown;
   onSort: (lineItems: InvoiceItem[]) => unknown;
   onLineItemPropertyChange: (
