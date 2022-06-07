@@ -27,7 +27,11 @@ const initialState: QuoteState = {
 export const quoteSlice = createSlice({
   name: 'quotes',
   initialState,
-  reducers: {},
+  reducers: {
+    dismissCurrentQuote: (state) => {
+      state.current = undefined;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(setCurrentQuote.fulfilled, (state, payload) => {
       state.current = payload.payload.quote;
@@ -48,4 +52,4 @@ export const quoteSlice = createSlice({
   },
 });
 
-// export const {} = invoiceSlice.actions;
+export const { dismissCurrentQuote } = quoteSlice.actions;
