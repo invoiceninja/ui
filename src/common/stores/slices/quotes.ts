@@ -11,9 +11,10 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { Quote } from 'common/interfaces/quote';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, set } from 'lodash';
 import { blankInvitation } from './invoices/constants/blank-invitation';
 import { setCurrentQuote } from './quotes/extra-reducers/set-current-quote';
+import { setCurrentQuoteProperty } from './quotes/extra-reducers/set-current-quote-property';
 
 interface QuoteState {
   api?: any;
@@ -78,6 +79,25 @@ export const quoteSlice = createSlice({
         ).build();
 
         state.current = state.invoiceSum.invoice as Quote;
+      }
+    });
+
+    builder.addCase(setCurrentQuoteProperty.fulfilled, (state, payload) => {
+      if (state.current) {
+        state.current = set(
+          state.current,
+          payload.payload.payload.property,
+          payload.payload.payload.value
+        );
+
+        if (payload.payload.client && payload.payload.currency) {
+          state.invoiceSum = new InvoiceSum(
+            cloneDeep(state.current),
+            cloneDeep(payload.payload.currency)
+          ).build();
+
+          state.current = state.invoiceSum.invoice as Quote;
+        }
       }
     });
   },
