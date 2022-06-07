@@ -9,40 +9,54 @@
  */
 
 import { Card } from '@invoiceninja/cards';
-import { InputLabel } from '@invoiceninja/forms';
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { injectBlankItemIntoCurrent } from 'common/stores/slices/invoices';
+import { Checkbox, InputLabel } from '@invoiceninja/forms';
+import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { Client } from 'common/interfaces/client';
+import { Invoice } from 'common/interfaces/invoice';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
-import { useEffect } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
-import { ClientContactSelector } from './ClientContactSelector';
 import { ClientCreate } from './ClientCreate';
 
 interface Props {
   readonly?: boolean;
+  resource: Invoice | RecurringInvoice;
+  onChange: (id: string) => unknown;
+  onClearButtonClick: () => unknown;
+  onContactCheckboxChange: (contactId: string, value: boolean) => unknown;
 }
 
 export function ClientSelector(props: Props) {
   const [t] = useTranslation();
-  const invoice = useCurrentInvoice();
-  const onChange = useSetCurrentInvoiceProperty();
-  const dispatch = useDispatch();
+  const [client, setClient] = useState<Client>();
+
+  const resource = props.resource;
+
+  const clientResolver = useClientResolver();
+
+  const handleCheckedState = (contactId: string) => {
+    const potential = resource?.invitations.find(
+      (i) => i.client_contact_id === contactId
+    );
+
+    return Boolean(potential);
+  };
 
   useEffect(() => {
-    if (invoice?.client_id && invoice?.line_items.length === 0) {
-      dispatch(injectBlankItemIntoCurrent());
-    }
-  }, [invoice]);
+    resource?.client_id &&
+      clientResolver
+        .find(resource.client_id)
+        .then((client) => setClient(client));
+  }, [resource?.client_id]);
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex items-center justify-between">
         <InputLabel>{t('client')}</InputLabel>
-        {!props.readonly && !invoice?.client_id && (
+        {!props.readonly && !resource?.client_id && (
           <ClientCreate
-            onClientCreated={(client) => onChange('client_id', client.id)}
+            onClientCreated={(client) => props.onChange(client.id)}
           />
         )}
       </div>
@@ -50,15 +64,38 @@ export function ClientSelector(props: Props) {
       <DebouncedCombobox
         endpoint="/api/v1/clients"
         label="display_name"
-        onChange={(value) => onChange('client_id', value.value)}
-        defaultValue={invoice?.client_id}
+        onChange={(value) => props.onChange(value.value?.toString())}
+        defaultValue={resource?.client_id}
         disabled={props.readonly}
-        clearButton={Boolean(invoice?.client_id)}
-        onClearButtonClick={() => onChange('client_id', '')}
+        clearButton={Boolean(resource?.client_id)}
+        onClearButtonClick={props.onClearButtonClick}
         queryAdditional
       />
 
-      <ClientContactSelector />
+      {resource?.client_id &&
+        client &&
+        client.contacts.map((contact, index) => (
+          <div key={index}>
+            <Checkbox
+              id={contact.id}
+              value={contact.id}
+              label={
+                contact.first_name.length >= 1
+                  ? `${contact.first_name} ${contact.last_name}`
+                  : t('blank_contact')
+              }
+              checked={handleCheckedState(contact.id)}
+              onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                props.onContactCheckboxChange(
+                  event.target.value,
+                  event.target.checked
+                )
+              }
+            />
+
+            <span className="text-sm text-gray-700">{contact.email}</span>
+          </div>
+        ))}
     </Card>
   );
 }
