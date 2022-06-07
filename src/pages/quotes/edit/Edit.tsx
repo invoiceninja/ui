@@ -18,6 +18,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
+import { ClientSelector } from '../common/components/ClientSelector';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -46,5 +47,15 @@ export function Edit() {
     };
   }, [quote]);
 
-  return <Default title={documentTitle} breadcrumbs={pages}></Default>;
+  return (
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onBackClick={generatePath('/quotes')}
+    >
+      <div className="grid grid-cols-12 gap-4">
+        <ClientSelector readonly />
+      </div>
+    </Default>
+  );
 }
