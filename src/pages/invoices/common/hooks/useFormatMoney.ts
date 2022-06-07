@@ -17,12 +17,13 @@ import { Client } from 'common/interfaces/client';
 import { Country } from 'common/interfaces/country';
 import { Currency } from 'common/interfaces/currency';
 import { Invoice } from 'common/interfaces/invoice';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
 interface Props {
-  resource: Invoice | undefined;
+  resource: Invoice | RecurringInvoice | undefined;
 }
 
 export function useFormatMoney(props: Props) {
