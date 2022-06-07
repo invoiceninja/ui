@@ -35,9 +35,13 @@ import { cloneDeep } from 'lodash';
 import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
 import {
   dismissCurrentInvoice,
+  injectBlankItemIntoCurrent,
   setCurrentInvoicePropertySync,
   toggleCurrentInvoiceInvitation,
 } from 'common/stores/slices/invoices';
+import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
+import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
+import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 
 export function Create() {
   const { documentTitle } = useTitle('new_invoice');
@@ -147,11 +151,32 @@ export function Create() {
             }
           />
         )}
-        
+
         <InvoiceDetails />
 
         <div className="col-span-12">
-          <ProductsTable />
+          {currentInvoice && (
+            <ProductsTable
+              resource={currentInvoice}
+              onProductChange={(index, lineItem) =>
+                dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
+              }
+              onLineItemPropertyChange={(key, value, index) =>
+                dispatch(
+                  setCurrentLineItemProperty({
+                    position: index,
+                    property: key,
+                    value,
+                  })
+                )
+              }
+              onSort={(lineItems) => handleChange('line_items', lineItems)}
+              onDeleteRowClick={(index) =>
+                dispatch(deleteInvoiceLineItem(index))
+              }
+              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+            />
+          )}
         </div>
 
         <InvoiceFooter page="create" />
