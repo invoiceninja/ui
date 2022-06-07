@@ -29,7 +29,14 @@ import { useHandleCreate } from '../create/hooks/useHandleCreate';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { ValidationAlert } from 'components/ValidationAlert';
 import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoiceProperty';
-import { toggleCurrentInvoiceInvitation } from 'common/stores/slices/invoices';
+import {
+  dismissCurrentInvoice,
+  injectBlankItemIntoCurrent,
+  toggleCurrentInvoiceInvitation,
+} from 'common/stores/slices/invoices';
+import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
+import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
+import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 
 export function Clone() {
   const { documentTitle } = useTitle('new_invoice');
@@ -63,6 +70,10 @@ export function Clone() {
         })
       );
     }
+
+    return () => {
+      dispatch(dismissCurrentInvoice());
+    };
   }, [invoice]);
 
   return (
@@ -88,11 +99,32 @@ export function Clone() {
             }
           />
         )}
-        
+
         <InvoiceDetails />
 
         <div className="col-span-12">
-          <ProductsTable />
+          {currentInvoice && (
+            <ProductsTable
+              resource={currentInvoice}
+              onProductChange={(index, lineItem) =>
+                dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
+              }
+              onLineItemPropertyChange={(key, value, index) =>
+                dispatch(
+                  setCurrentLineItemProperty({
+                    position: index,
+                    property: key,
+                    value,
+                  })
+                )
+              }
+              onSort={(lineItems) => handleChange('line_items', lineItems)}
+              onDeleteRowClick={(index) =>
+                dispatch(deleteInvoiceLineItem(index))
+              }
+              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+            />
+          )}
         </div>
 
         <InvoiceFooter page="create" />
