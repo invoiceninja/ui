@@ -36,6 +36,7 @@ import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoi
 import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
 import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
+import { InvoiceTotals } from '../common/components/InvoiceTotals';
 
 export function Edit() {
   const { id } = useParams();
@@ -133,7 +134,7 @@ export function Edit() {
         </div>
 
         <InvoiceFooter page="edit" />
-        {/* <InvoiceTotals /> */}
+        <InvoiceTotals />
       </div>
 
       <div className="my-4">
