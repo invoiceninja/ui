@@ -22,6 +22,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCurrentQuote } from '../hooks/useCurrentQuote';
 import { useSetCurrentQuoteProperty } from '../hooks/useSetCurrentQuoteProperty';
+import { QuoteDocuments } from './QuoteDocuments';
 
 interface Props {
   page: 'create' | 'edit';
@@ -83,7 +84,13 @@ export function QuoteFooter(props: Props) {
           />
         </Tab.Panel>
 
-        {props.page === 'edit' ? <Tab.Panel>Documents</Tab.Panel> : <></>}
+        {props.page === 'edit' ? (
+          <Tab.Panel>
+            <QuoteDocuments />
+          </Tab.Panel>
+        ) : (
+          <></>
+        )}
 
         <Tab.Panel>
           <div className="grid grid-cols-12 gap-4">
