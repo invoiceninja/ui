@@ -12,12 +12,17 @@ import { useTitle } from 'common/hooks/useTitle';
 import { useQuoteQuery } from 'common/queries/quotes';
 import {
   dismissCurrentQuote,
+  injectBlankItemIntoCurrent,
   toggleCurrentQuoteInvitation,
 } from 'common/stores/slices/quotes';
+import { deleteQuoteLineItem } from 'common/stores/slices/quotes/extra-reducers/delete-invoice-item copy';
+import { setCurrentLineItemProperty } from 'common/stores/slices/quotes/extra-reducers/set-current-line-item-property';
 import { setCurrentQuote } from 'common/stores/slices/quotes/extra-reducers/set-current-quote';
+import { setCurrentQuoteLineItem } from 'common/stores/slices/quotes/extra-reducers/set-current-quote-line-item';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
+import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -78,6 +83,29 @@ export function Edit() {
         )}
 
         <QuoteDetails />
+      </div>
+
+      <div className="col-span-12">
+        {currentQuote && (
+          <ProductsTable
+            resource={currentQuote}
+            onProductChange={(index, lineItem) =>
+              dispatch(setCurrentQuoteLineItem({ index, lineItem }))
+            }
+            onLineItemPropertyChange={(key, value, index) =>
+              dispatch(
+                setCurrentLineItemProperty({
+                  position: index,
+                  property: key,
+                  value,
+                })
+              )
+            }
+            onSort={(lineItems) => handleChange('line_items', lineItems)}
+            onDeleteRowClick={(index) => dispatch(deleteQuoteLineItem(index))}
+            onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+          />
+        )}
       </div>
     </Default>
   );
