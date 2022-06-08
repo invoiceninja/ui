@@ -187,7 +187,7 @@ export function Create() {
           <InvoiceTotals
             resource={currentInvoice}
             invoiceSum={invoiceSum}
-            onChange={(property, value) => handleChange(property, value)}
+            onChange={(property, value) => handleChange(property as keyof Invoice, value)}
           />
         )}
       </div>
