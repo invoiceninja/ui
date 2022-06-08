@@ -10,15 +10,21 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { useQuoteQuery } from 'common/queries/quotes';
-import { dismissCurrentQuote } from 'common/stores/slices/quotes';
+import {
+  dismissCurrentQuote,
+  toggleCurrentQuoteInvitation,
+} from 'common/stores/slices/quotes';
 import { setCurrentQuote } from 'common/stores/slices/quotes/extra-reducers/set-current-quote';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
 import { QuoteDetails } from '../common/components/QuoteDetails';
+import { useCurrentQuote } from '../common/hooks/useCurrentQuote';
+import { useSetCurrentQuoteProperty } from '../common/hooks/useSetCurrentQuoteProperty';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -28,6 +34,9 @@ export function Edit() {
   const [t] = useTranslation();
 
   const dispatch = useDispatch();
+  const handleChange = useSetCurrentQuoteProperty();
+
+  const currentQuote = useCurrentQuote();
 
   const pages: BreadcrumRecord[] = [
     { name: t('quotes'), href: '/quotes' },
@@ -54,6 +63,20 @@ export function Edit() {
       onBackClick={generatePath('/quotes')}
     >
       <div className="grid grid-cols-12 gap-4">
+        {currentQuote && (
+          <ClientSelector
+            resource={currentQuote}
+            readonly
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={(contactId, value) =>
+              dispatch(
+                toggleCurrentQuoteInvitation({ contactId, checked: value })
+              )
+            }
+          />
+        )}
+
         <QuoteDetails />
       </div>
     </Default>
