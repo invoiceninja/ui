@@ -35,8 +35,14 @@ import { cloneDeep } from 'lodash';
 import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
 import {
   dismissCurrentInvoice,
+  injectBlankItemIntoCurrent,
   setCurrentInvoicePropertySync,
+  toggleCurrentInvoiceInvitation,
 } from 'common/stores/slices/invoices';
+import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
+import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
+import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
+import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 
 export function Create() {
   const { documentTitle } = useTitle('new_invoice');
@@ -55,6 +61,7 @@ export function Create() {
   const currentInvoice = useCurrentInvoice();
   const company = useCurrentCompany();
   const clientResolver = useClientResolver();
+  const invoiceSum = useInvoiceSum()
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -134,15 +141,55 @@ export function Create() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector />
+        {currentInvoice && (
+          <ClientSelector
+            resource={currentInvoice}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={(contactId, value) =>
+              dispatch(
+                toggleCurrentInvoiceInvitation({ contactId, checked: value })
+              )
+            }
+          />
+        )}
+
         <InvoiceDetails />
 
         <div className="col-span-12">
-          <ProductsTable />
+          {currentInvoice && (
+            <ProductsTable
+              resource={currentInvoice}
+              onProductChange={(index, lineItem) =>
+                dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
+              }
+              onLineItemPropertyChange={(key, value, index) =>
+                dispatch(
+                  setCurrentLineItemProperty({
+                    position: index,
+                    property: key,
+                    value,
+                  })
+                )
+              }
+              onSort={(lineItems) => handleChange('line_items', lineItems)}
+              onDeleteRowClick={(index) =>
+                dispatch(deleteInvoiceLineItem(index))
+              }
+              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+            />
+          )}
         </div>
 
         <InvoiceFooter page="create" />
-        <InvoiceTotals />
+        
+        {currentInvoice && (
+          <InvoiceTotals
+            resource={currentInvoice}
+            invoiceSum={invoiceSum}
+            onChange={(property, value) => handleChange(property as keyof Invoice, value)}
+          />
+        )}
       </div>
 
       <div className="my-4">

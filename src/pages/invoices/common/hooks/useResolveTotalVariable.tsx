@@ -1,5 +1,3 @@
-/* eslint-disable react/display-name */
-
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -9,23 +7,36 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
+
 import { resolveTotalVariable } from '../helpers/resolve-total-variable';
 import { useFormatMoney } from './useFormatMoney';
 import { CustomField } from 'components/CustomField';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useSetCurrentInvoiceProperty } from './useSetCurrentInvoiceProperty';
 import { Element } from '@invoiceninja/cards';
 import { useResolveTranslation } from './useResolveTranslation';
-import { useInvoiceSum } from './useInvoiceSum';
+import { Invoice } from 'common/interfaces/invoice';
+import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
-export function useResolveTotalVariable() {
-  const formatMoney = useFormatMoney();
-  const invoice = useCurrentInvoice();
+interface Props {
+  resource?: Invoice | RecurringInvoice;
+  invoiceSum?: InvoiceSum;
+  onChange: (property: keyof Invoice, value: unknown) => unknown;
+}
+
+export function useResolveTotalVariable(props: Props) {
+  const formatMoney = useFormatMoney({
+    resource: props.resource as unknown as Invoice,
+  });
+
+  const resource = props.resource;
   const company = useCurrentCompany();
-  const handleChange = useSetCurrentInvoiceProperty();
+
+  const handleChange = (property: keyof Invoice, value: unknown) =>
+    props.onChange(property, value);
+
   const resolveTranslation = useResolveTranslation();
-  const invoiceSum = useInvoiceSum();
+  const invoiceSum = props.invoiceSum;
 
   // discount => invoice.discount,
   // paid_to_date => invoice.paid_to_date,
@@ -92,7 +103,7 @@ export function useResolveTotalVariable() {
       return (
         <CustomField
           field="surcharge1"
-          defaultValue={invoice?.custom_surcharge1 || ''}
+          defaultValue={resource?.custom_surcharge1 || ''}
           value={company?.custom_fields.surcharge1 || ''}
           onChange={(value) => handleChange('custom_surcharge1', value)}
         />
@@ -103,7 +114,7 @@ export function useResolveTotalVariable() {
       return (
         <CustomField
           field="surcharge2"
-          defaultValue={invoice?.custom_surcharge2 || ''}
+          defaultValue={resource?.custom_surcharge2 || ''}
           value={company?.custom_fields.surcharge2 || ''}
           onChange={(value) => handleChange('custom_surcharge2', value)}
         />
@@ -114,7 +125,7 @@ export function useResolveTotalVariable() {
       return (
         <CustomField
           field="surcharge3"
-          defaultValue={invoice?.custom_surcharge3 || ''}
+          defaultValue={resource?.custom_surcharge3 || ''}
           value={company?.custom_fields.surcharge3 || ''}
           onChange={(value) => handleChange('custom_surcharge3', value)}
         />
@@ -125,17 +136,17 @@ export function useResolveTotalVariable() {
       return (
         <CustomField
           field="surcharge4"
-          defaultValue={invoice?.custom_surcharge4 || ''}
+          defaultValue={resource?.custom_surcharge4 || ''}
           value={company?.custom_fields.surcharge4 || ''}
           onChange={(value) => handleChange('custom_surcharge4', value)}
         />
       );
     }
 
-    if (invoice) {
+    if (resource) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      value = invoice[identifier] ?? 0;
+      value = resource[identifier] ?? 0;
     }
 
     return (

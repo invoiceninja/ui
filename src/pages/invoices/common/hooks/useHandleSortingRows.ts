@@ -9,23 +9,28 @@
  */
 
 import { arrayMoveImmutable } from 'array-move';
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
+import { Invoice } from 'common/interfaces/invoice';
+import { InvoiceItem } from 'common/interfaces/invoice-item';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { DropResult } from 'react-beautiful-dnd';
-import { useSetCurrentInvoiceProperty } from './useSetCurrentInvoiceProperty';
 
-export function useHandleSortingRows() {
-  const invoice = useCurrentInvoice();
-  const handleChange = useSetCurrentInvoiceProperty();
+interface Props {
+  resource: Invoice | RecurringInvoice;
+  onSort: (lineItems: InvoiceItem[]) => unknown;
+}
+
+export function useHandleSortingRows(props: Props) {
+  const resource = props.resource;
 
   return (result: DropResult) => {
-    const sorted = invoice
+    const sorted = resource
       ? arrayMoveImmutable(
-          invoice.line_items,
+          resource.line_items,
           result.source.index,
           result.destination?.index as unknown as number
         )
       : [];
 
-    handleChange('line_items', sorted);
+    return props.onSort(sorted);
   };
 }
