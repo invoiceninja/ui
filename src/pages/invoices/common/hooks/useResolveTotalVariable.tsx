@@ -16,9 +16,10 @@ import { Element } from '@invoiceninja/cards';
 import { useResolveTranslation } from './useResolveTranslation';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 interface Props {
-  resource?: Invoice;
+  resource?: Invoice | RecurringInvoice;
   invoiceSum?: InvoiceSum;
   onChange: (property: keyof Invoice, value: unknown) => unknown;
 }
