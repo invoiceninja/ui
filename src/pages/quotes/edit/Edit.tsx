@@ -9,6 +9,7 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { Quote } from 'common/interfaces/quote';
 import { useQuoteQuery } from 'common/queries/quotes';
 import {
   dismissCurrentQuote,
@@ -22,6 +23,7 @@ import { setCurrentQuoteLineItem } from 'common/stores/slices/quotes/extra-reduc
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
+import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,6 +32,7 @@ import { generatePath, useParams } from 'react-router-dom';
 import { QuoteDetails } from '../common/components/QuoteDetails';
 import { QuoteFooter } from '../common/components/QuoteFooter';
 import { useCurrentQuote } from '../common/hooks/useCurrentQuote';
+import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useSetCurrentQuoteProperty } from '../common/hooks/useSetCurrentQuoteProperty';
 
 export function Edit() {
@@ -43,6 +46,7 @@ export function Edit() {
   const handleChange = useSetCurrentQuoteProperty();
 
   const currentQuote = useCurrentQuote();
+  const invoiceSum = useInvoiceSum();
 
   const pages: BreadcrumRecord[] = [
     { name: t('quotes'), href: '/quotes' },
@@ -109,6 +113,16 @@ export function Edit() {
         </div>
 
         <QuoteFooter page="edit" />
+
+        {currentQuote && (
+          <InvoiceTotals
+            resource={currentQuote}
+            invoiceSum={invoiceSum}
+            onChange={(property, value) =>
+              handleChange(property as keyof Quote, value)
+            }
+          />
+        )}
       </div>
     </Default>
   );
