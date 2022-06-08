@@ -28,6 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
 import { QuoteDetails } from '../common/components/QuoteDetails';
+import { QuoteFooter } from '../common/components/QuoteFooter';
 import { useCurrentQuote } from '../common/hooks/useCurrentQuote';
 import { useSetCurrentQuoteProperty } from '../common/hooks/useSetCurrentQuoteProperty';
 
@@ -83,29 +84,31 @@ export function Edit() {
         )}
 
         <QuoteDetails />
-      </div>
 
-      <div className="col-span-12">
-        {currentQuote && (
-          <ProductsTable
-            resource={currentQuote}
-            onProductChange={(index, lineItem) =>
-              dispatch(setCurrentQuoteLineItem({ index, lineItem }))
-            }
-            onLineItemPropertyChange={(key, value, index) =>
-              dispatch(
-                setCurrentLineItemProperty({
-                  position: index,
-                  property: key,
-                  value,
-                })
-              )
-            }
-            onSort={(lineItems) => handleChange('line_items', lineItems)}
-            onDeleteRowClick={(index) => dispatch(deleteQuoteLineItem(index))}
-            onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
-          />
-        )}
+        <div className="col-span-12">
+          {currentQuote && (
+            <ProductsTable
+              resource={currentQuote}
+              onProductChange={(index, lineItem) =>
+                dispatch(setCurrentQuoteLineItem({ index, lineItem }))
+              }
+              onLineItemPropertyChange={(key, value, index) =>
+                dispatch(
+                  setCurrentLineItemProperty({
+                    position: index,
+                    property: key,
+                    value,
+                  })
+                )
+              }
+              onSort={(lineItems) => handleChange('line_items', lineItems)}
+              onDeleteRowClick={(index) => dispatch(deleteQuoteLineItem(index))}
+              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+            />
+          )}
+        </div>
+
+        <QuoteFooter page="edit" />
       </div>
     </Default>
   );
