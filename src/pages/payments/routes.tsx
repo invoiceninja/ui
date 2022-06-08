@@ -52,14 +52,16 @@ export const paymentRoutes = (
       <Route path="apply" element={<Apply />} />
       <Route path="refund" element={<Refund />} />
     </Route>
-    <Route
-      path=":id/edit"
-      element={
-        <Guard
-          guards={[() => permission('edit_payment')]}
-          component={<Edit />}
-        />
-      }
-    />
+    <Route path=":id/edit" element={<Payment />}>
+      <Route
+        path=""
+        element={
+          <Guard
+            guards={[() => permission('edit_payment')]}
+            component={<Edit />}
+          />
+        }
+      />
+    </Route>
   </Route>
 );

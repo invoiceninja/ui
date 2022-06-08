@@ -7,35 +7,51 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import { useTitle } from 'common/hooks/useTitle';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { useRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
-import { dismissCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices';
+import {
+  dismissCurrentRecurringInvoice,
+  injectBlankItemIntoCurrent,
+  toggleCurrentRecurringInvoiceInvitation,
+} from 'common/stores/slices/recurring-invoices';
+import { deleteRecurringInvoiceItem } from 'common/stores/slices/recurring-invoices/extra-reducers/delete-recurring-invoice-item';
+import { setCurrentLineItemProperty } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-line-item-property';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
+import { setCurrentRecurringInvoiceLineItem } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice-line-item';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
+import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
+import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
-import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
-import { InvoiceTotals } from '../common/components/InvoiceTotals';
-import { ProductsTable } from '../common/components/ProductsTable';
 import { useCurrentRecurringInvoice } from '../common/hooks/useCurrentRecurringInvoice';
+import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useRecurringInvoiceSave } from '../common/hooks/useRecurringInvoiceSave';
+import { useSetCurrentRecurringInvoiceProperty } from '../common/hooks/useSetCurrentRecurringInvoiceProperty';
 import { Actions } from './components/Actions';
 
 export function Edit() {
-  const { documentTitle } = useTitle('edit_recurring_invoice');
   const [t] = useTranslation();
+
   const { id } = useParams();
+  const { documentTitle } = useTitle('edit_recurring_invoice');
   const { data: recurringInvoice } = useRecurringInvoiceQuery({ id });
+
   const dispatch = useDispatch();
   const handleSave = useRecurringInvoiceSave();
   const currentRecurringInvoice = useCurrentRecurringInvoice();
+
+  const invoiceSum = useInvoiceSum();
+
+  const handleChange = useSetCurrentRecurringInvoiceProperty();
 
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
@@ -69,15 +85,63 @@ export function Edit() {
       navigationTopRight={<Actions />}
     >
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector readonly />
+        {currentRecurringInvoice && (
+          <ClientSelector
+            resource={currentRecurringInvoice}
+            readonly
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={(contactId, value) =>
+              dispatch(
+                toggleCurrentRecurringInvoiceInvitation({
+                  contactId,
+                  checked: value,
+                })
+              )
+            }
+          />
+        )}
+
         <InvoiceDetails autoBill={currentRecurringInvoice?.auto_bill} />
 
         <div className="col-span-12">
-          <ProductsTable />
+          {currentRecurringInvoice && (
+            <ProductsTable
+              resource={currentRecurringInvoice}
+              onProductChange={(index, lineItem) =>
+                dispatch(
+                  setCurrentRecurringInvoiceLineItem({ index, lineItem })
+                )
+              }
+              onLineItemPropertyChange={(key, value, index) =>
+                dispatch(
+                  setCurrentLineItemProperty({
+                    position: index,
+                    property: key,
+                    value,
+                  })
+                )
+              }
+              onSort={(lineItems) => handleChange('line_items', lineItems)}
+              onDeleteRowClick={(index) =>
+                dispatch(deleteRecurringInvoiceItem(index))
+              }
+              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+            />
+          )}
         </div>
 
         <InvoiceFooter page="edit" />
-        <InvoiceTotals />
+
+        {currentRecurringInvoice && (
+          <InvoiceTotals
+            resource={currentRecurringInvoice}
+            invoiceSum={invoiceSum}
+            onChange={(property, value) =>
+              handleChange(property as keyof RecurringInvoice, value)
+            }
+          />
+        )}
       </div>
 
       <div className="my-4">
