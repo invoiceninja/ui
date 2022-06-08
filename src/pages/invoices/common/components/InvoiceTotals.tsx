@@ -20,11 +20,12 @@ import { useTotalVariables } from '../hooks/useTotalVariables';
 import { CustomSurchargeField } from 'components/CustomSurchargeField';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 interface Props {
-  resource: Invoice;
+  resource: Invoice | RecurringInvoice;
   invoiceSum?: InvoiceSum;
-  onChange: (property: keyof Invoice, value: unknown) => unknown;
+  onChange: (property: keyof Invoice | keyof RecurringInvoice, value: unknown) => unknown;
 }
 
 export function InvoiceTotals(props: Props) {
