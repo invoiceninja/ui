@@ -23,6 +23,7 @@ import { setCurrentQuoteLineItem } from 'common/stores/slices/quotes/extra-reduc
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
+import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useEffect } from 'react';
@@ -121,6 +122,16 @@ export function Edit() {
             onChange={(property, value) =>
               handleChange(property as keyof Quote, value)
             }
+          />
+        )}
+      </div>
+
+      <div className="my-4">
+        {currentQuote && (
+          <InvoicePreview
+            for="invoice"
+            resource={currentQuote}
+            entity="quote"
           />
         )}
       </div>
