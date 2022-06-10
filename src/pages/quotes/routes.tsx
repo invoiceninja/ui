@@ -14,6 +14,7 @@ import { Route } from 'react-router-dom';
 import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
+import { Email } from './email/Email';
 import { Quotes } from './index/Quotes';
 import { Pdf } from './pdf/Pdf';
 
@@ -50,5 +51,6 @@ export const quoteRoutes = (
         <Guard guards={[() => permission('view_quote')]} component={<Pdf />} />
       }
     />
+    <Route path=":id/email" element={<Email />} />
   </Route>
 );

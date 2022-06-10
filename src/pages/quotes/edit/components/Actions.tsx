@@ -35,6 +35,10 @@ export function Actions() {
           {t('download_pdf')}
         </DropdownElement>
       )}
+
+      <DropdownElement to={generatePath('/quotes/:id/email', { id })}>
+        {t('email_quote')}
+      </DropdownElement>
     </Dropdown>
   );
 }
