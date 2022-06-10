@@ -10,12 +10,19 @@
 
 import { endpoint } from 'common/helpers';
 import { Invoice } from 'common/interfaces/invoice';
+import { Quote } from 'common/interfaces/quote';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
-export function useGeneratePdfUrl() {
-  return (invoice: Invoice) => {
-    if (invoice.invitations.length > 0) {
-      return endpoint('/client/invoice/:invitation/download_pdf', {
-        invitation: invoice.invitations[0].key,
+interface Props {
+  resource: 'invoice' | 'recurring_invoic' | 'quote';
+}
+
+export function useGeneratePdfUrl(props: Props) {
+  return (resource: Invoice | RecurringInvoice | Quote) => {
+    if (resource.invitations.length > 0) {
+      return endpoint('/client/:resource/:invitation/download_pdf', {
+        resource: props.resource,
+        invitation: resource.invitations[0].key,
       });
     }
   };
