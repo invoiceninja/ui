@@ -19,7 +19,7 @@ export function useQuoteQuery(
 ) {
   return useQuery(
     generatePath('/api/v1/quotes/:id', { id: params.id }),
-    () => request('GET', endpoint('/api/v1/invoices/:id', { id: params.id })),
+    () => request('GET', endpoint('/api/v1/quotes/:id', { id: params.id })),
     { ...options, staleTime: Infinity }
   );
 }

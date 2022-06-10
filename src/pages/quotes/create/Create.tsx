@@ -10,6 +10,7 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { Quote } from 'common/interfaces/quote';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankQuoteQuery } from 'common/queries/quotes';
 import {
   dismissCurrentQuote,
@@ -22,11 +23,12 @@ import { setCurrentQuote } from 'common/stores/slices/quotes/extra-reducers/set-
 import { setCurrentQuoteLineItem } from 'common/stores/slices/quotes/extra-reducers/set-current-quote-line-item';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { ValidationAlert } from 'components/ValidationAlert';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath } from 'react-router-dom';
@@ -35,16 +37,21 @@ import { QuoteFooter } from '../common/components/QuoteFooter';
 import { useCurrentQuote } from '../common/hooks/useCurrentQuote';
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useSetCurrentQuoteProperty } from '../common/hooks/useSetCurrentQuoteProperty';
+import { useHandleCreate } from './hooks/useHandleCreate';
 
 export function Create() {
   const { documentTitle } = useTitle('new_quote');
   const { data: blankQuote } = useBlankQuoteQuery();
+
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const dispatch = useDispatch();
   const handleChange = useSetCurrentQuoteProperty();
 
   const currentQuote = useCurrentQuote();
   const invoiceSum = useInvoiceSum();
+
+  const handleCreate = useHandleCreate(setErrors);
 
   useEffect(() => {
     if (blankQuote?.data.data) {
@@ -67,7 +74,14 @@ export function Create() {
   ];
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onSaveClick={() => handleCreate(currentQuote as Quote)}
+      disableSaveButton={currentQuote?.client_id.length === 0}
+    >
+      {errors && <ValidationAlert errors={errors} />}
+
       <div className="grid grid-cols-12 gap-4">
         {currentQuote && (
           <ClientSelector
