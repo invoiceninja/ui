@@ -8,13 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
 import { endpoint } from 'common/helpers';
 import { Invoice } from 'common/interfaces/invoice';
+import { Dropdown } from 'components/dropdown/Dropdown';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import Toggle from 'components/forms/Toggle';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 
 interface Props {
   blobUrl: string;
@@ -25,7 +26,6 @@ interface Props {
 export function Actions(props: Props) {
   const [t] = useTranslation();
   const { id } = useParams();
-  const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
 
   const handleDeliveryNoteChange = (value: boolean) =>
@@ -47,23 +47,15 @@ export function Actions(props: Props) {
         />
       </span>
 
-      <Button
-        type="secondary"
-        onClick={() => navigate(generatePath('/invoices/:id/email', { id }))}
-      >
-        {t('email')}
-      </Button>
+      <Dropdown label={t('more_actions')}>
+        <DropdownElement to={generatePath('/invoices/:id/email', { id })}>
+          {t('email_invoice')}
+        </DropdownElement>
 
-      <Button type="secondary" onClick={() => downloadPdf(props.invoice)}>
-        {t('download')}
-      </Button>
-
-      <Button
-        onClick={() => navigate(generatePath('/invoices'))}
-        type="secondary"
-      >
-        {t('close')}
-      </Button>
+        <DropdownElement onClick={() => downloadPdf(props.invoice)}>
+          {t('download')}
+        </DropdownElement>
+      </Dropdown>
     </>
   );
 }

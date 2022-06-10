@@ -54,7 +54,7 @@ export function Email() {
     templateId
   );
 
-  const pdfUrl = useGeneratePdfUrl();
+  const pdfUrl = useGeneratePdfUrl({ resource: 'invoice' });
 
   const handleTemplateChange = (id: string) => {
     setSubject('');
