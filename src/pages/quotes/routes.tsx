@@ -15,6 +15,7 @@ import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Quotes } from './index/Quotes';
+import { Pdf } from './pdf/Pdf';
 
 export const quoteRoutes = (
   <Route path="/quotes">
@@ -43,5 +44,11 @@ export const quoteRoutes = (
       }
     />
     <Route path=":id/clone" element={<Clone />} />
+    <Route
+      path=":id/pdf"
+      element={
+        <Guard guards={[() => permission('view_quote')]} component={<Pdf />} />
+      }
+    />
   </Route>
 );
