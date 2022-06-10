@@ -11,6 +11,16 @@
 import { store } from 'common/stores/store';
 
 export function enterprisePlan() {
+  // For self-hosted we don't have a plan.
+
+  if (
+    store.getState().companyUsers.api?.[
+      store.getState().companyUsers.currentIndex
+    ]?.account.plan === ''
+  ) {
+    return true;
+  }
+
   return Boolean(
     store.getState().companyUsers.api?.[
       store.getState().companyUsers.currentIndex
