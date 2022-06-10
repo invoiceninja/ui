@@ -10,6 +10,7 @@
 
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useCurrentQuote } from 'pages/quotes/common/hooks/useCurrentQuote';
 import { useTranslation } from 'react-i18next';
@@ -25,20 +26,32 @@ export function Actions() {
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
 
   return (
-    <Dropdown label={t('more_actions')}>
-      <DropdownElement to={generatePath('/quotes/:id/pdf', { id })}>
-        {t('view_pdf')}
-      </DropdownElement>
-
-      {quote && (
-        <DropdownElement onClick={() => downloadPdf(quote)}>
-          {t('download_pdf')}
+    <Dropdown label={t('more_actions')} className="divide-y">
+      <div>
+        <DropdownElement to={generatePath('/quotes/:id/pdf', { id })}>
+          {t('view_pdf')}
         </DropdownElement>
-      )}
 
-      <DropdownElement to={generatePath('/quotes/:id/email', { id })}>
-        {t('email_quote')}
-      </DropdownElement>
+        {quote && (
+          <DropdownElement onClick={() => downloadPdf(quote)}>
+            {t('download_pdf')}
+          </DropdownElement>
+        )}
+
+        <DropdownElement to={generatePath('/quotes/:id/email', { id })}>
+          {t('email_quote')}
+        </DropdownElement>
+
+        <DropdownElement onClick={() => quote && openClientPortal(quote)}>
+          {t('client_portal')}
+        </DropdownElement>
+      </div>
+
+      <div>
+        <DropdownElement to={generatePath('/quotes/:id/clone', { id })}>
+          {t('clone_to_quote')}
+        </DropdownElement>
+      </div>
     </Dropdown>
   );
 }
