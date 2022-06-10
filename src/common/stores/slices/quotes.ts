@@ -76,9 +76,9 @@ export const quoteSlice = createSlice({
     builder.addCase(setCurrentQuote.fulfilled, (state, payload) => {
       state.current = payload.payload.quote;
 
-      // if (typeof state.current.line_items === 'string') {
-      //   state.current.line_items = [];
-      // }
+      if (typeof state.current.line_items === 'string') {
+        state.current.line_items = [];
+      }
 
       if (payload.payload.client && payload.payload.currency) {
         state.invoiceSum = new InvoiceSum(
