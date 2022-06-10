@@ -11,6 +11,7 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
+import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Quotes } from './index/Quotes';
 
@@ -29,6 +30,15 @@ export const quoteRoutes = (
       path=":id/edit"
       element={
         <Guard guards={[() => permission('edit_quote')]} component={<Edit />} />
+      }
+    />
+    <Route
+      path="create"
+      element={
+        <Guard
+          guards={[() => permission('create_quote')]}
+          component={<Create />}
+        />
       }
     />
   </Route>

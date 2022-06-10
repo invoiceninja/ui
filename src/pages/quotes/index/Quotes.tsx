@@ -79,6 +79,7 @@ export function Quotes() {
         columns={columns}
         endpoint="/api/v1/quotes?include=client"
         linkToEdit="/quotes/:id/edit"
+        linkToCreate="/quotes/create"
         withResourcefulActions
       />
     </Default>
