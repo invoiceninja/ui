@@ -23,3 +23,11 @@ export function useQuoteQuery(
     { ...options, staleTime: Infinity }
   );
 }
+
+export function useBlankQuoteQuery(options: Record<string, any> = {}) {
+  return useQuery(
+    generatePath('/api/v1/quotes/create'),
+    () => request('GET', endpoint('/api/v1/quotes/create')),
+    { ...options, staleTime: Infinity }
+  );
+}
