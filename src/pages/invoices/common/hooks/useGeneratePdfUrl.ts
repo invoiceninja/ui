@@ -19,6 +19,10 @@ interface Props {
 
 export function useGeneratePdfUrl(props: Props) {
   return (resource: Invoice | RecurringInvoice | Quote) => {
+    if (resource.invitations.length === 0) {
+      return;
+    }
+
     if (resource.invitations.length > 0) {
       return endpoint('/client/:resource/:invitation/download_pdf', {
         resource: props.resource,
