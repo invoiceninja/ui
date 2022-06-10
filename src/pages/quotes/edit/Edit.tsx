@@ -35,6 +35,7 @@ import { QuoteFooter } from '../common/components/QuoteFooter';
 import { useCurrentQuote } from '../common/hooks/useCurrentQuote';
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useSetCurrentQuoteProperty } from '../common/hooks/useSetCurrentQuoteProperty';
+import { useHandleSave } from './hooks/useHandleSave';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_quote');
@@ -45,6 +46,7 @@ export function Edit() {
 
   const dispatch = useDispatch();
   const handleChange = useSetCurrentQuoteProperty();
+  const handleSave = useHandleSave();
 
   const currentQuote = useCurrentQuote();
   const invoiceSum = useInvoiceSum();
@@ -71,6 +73,9 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
+      onSaveClick={() =>
+        handleSave(currentQuote?.id as string, currentQuote as Quote)
+      }
       onBackClick={generatePath('/quotes')}
     >
       <div className="grid grid-cols-12 gap-4">
