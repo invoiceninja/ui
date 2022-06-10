@@ -26,7 +26,7 @@ export function Actions(props: Props) {
   const [t] = useTranslation();
   const { id } = useParams();
   const navigate = useNavigate();
-  const downloadPdf = useDownloadPdf();
+  const downloadPdf = useDownloadPdf({ resource: 'invoice' });
 
   const handleDeliveryNoteChange = (value: boolean) =>
     value
