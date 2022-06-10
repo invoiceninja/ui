@@ -35,6 +35,7 @@ import { QuoteFooter } from '../common/components/QuoteFooter';
 import { useCurrentQuote } from '../common/hooks/useCurrentQuote';
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useSetCurrentQuoteProperty } from '../common/hooks/useSetCurrentQuoteProperty';
+import { Actions } from './components/Actions';
 import { useHandleSave } from './hooks/useHandleSave';
 
 export function Edit() {
@@ -75,6 +76,9 @@ export function Edit() {
       breadcrumbs={pages}
       onSaveClick={() =>
         handleSave(currentQuote?.id as string, currentQuote as Quote)
+      }
+      navigationTopRight={
+        currentQuote && !currentQuote.is_deleted && <Actions />
       }
       onBackClick={generatePath('/quotes')}
     >
