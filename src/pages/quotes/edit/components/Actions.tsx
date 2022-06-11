@@ -8,11 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { QuoteStatus } from 'common/enums/quote-status';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useCurrentQuote } from 'pages/quotes/common/hooks/useCurrentQuote';
+import { useMarkSent } from 'pages/quotes/common/hooks/useMarkSent';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
 
@@ -24,6 +26,7 @@ export function Actions() {
   const quote = useCurrentQuote();
 
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
+  const markSent = useMarkSent();
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
@@ -56,6 +59,14 @@ export function Actions() {
           {t('clone_to_invoice')}
         </DropdownElement>
       </div>
+
+      {quote && quote?.status_id === QuoteStatus.Draft && (
+        <div>
+          <DropdownElement onClick={() => markSent(quote)}>
+            {t('mark_sent')}
+          </DropdownElement>
+        </div>
+      )}
     </Dropdown>
   );
 }
