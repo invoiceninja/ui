@@ -51,6 +51,10 @@ export function Actions() {
         <DropdownElement to={generatePath('/quotes/:id/clone', { id })}>
           {t('clone_to_quote')}
         </DropdownElement>
+
+        <DropdownElement to={generatePath('/quotes/:id/clone/invoice', { id })}>
+          {t('clone_to_invoice')}
+        </DropdownElement>
       </div>
     </Dropdown>
   );
