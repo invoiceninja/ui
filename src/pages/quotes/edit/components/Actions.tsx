@@ -13,6 +13,7 @@ import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
+import { useApprove } from 'pages/quotes/common/hooks/useApprove';
 import { useCurrentQuote } from 'pages/quotes/common/hooks/useCurrentQuote';
 import { useMarkSent } from 'pages/quotes/common/hooks/useMarkSent';
 import { useTranslation } from 'react-i18next';
@@ -27,6 +28,7 @@ export function Actions() {
 
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
   const markSent = useMarkSent();
+  const approve = useApprove();
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
@@ -64,6 +66,10 @@ export function Actions() {
         <div>
           <DropdownElement onClick={() => markSent(quote)}>
             {t('mark_sent')}
+          </DropdownElement>
+
+          <DropdownElement onClick={() => approve(quote)}>
+            {t('approve')}
           </DropdownElement>
         </div>
       )}
