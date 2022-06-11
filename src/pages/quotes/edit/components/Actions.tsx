@@ -73,6 +73,14 @@ export function Actions() {
           </DropdownElement>
         </div>
       )}
+
+      {quote && quote.status_id === QuoteStatus.Sent && (
+        <div>
+          <DropdownElement onClick={() => approve(quote)}>
+            {t('approve')}
+          </DropdownElement>
+        </div>
+      )}
     </Dropdown>
   );
 }
