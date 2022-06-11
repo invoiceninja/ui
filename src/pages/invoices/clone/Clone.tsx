@@ -91,7 +91,6 @@ export function Clone() {
         {currentInvoice && (
           <ClientSelector
             resource={currentInvoice}
-            readonly
             onChange={(id) => handleChange('client_id', id)}
             onClearButtonClick={() => handleChange('client_id', '')}
             onContactCheckboxChange={(contactId, value) =>
