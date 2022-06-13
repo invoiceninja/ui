@@ -15,7 +15,7 @@ import { useGeneratePdfUrl } from './useGeneratePdfUrl';
 
 export function useDownloadPdf() {
   const queryClient = useQueryClient();
-  const url = useGeneratePdfUrl();
+  const url = useGeneratePdfUrl({ resource: 'invoice' });
 
   return (invoice: Invoice) => {
     const downloadableUrl = url(invoice);
