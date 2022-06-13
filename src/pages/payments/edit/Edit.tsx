@@ -41,7 +41,11 @@ export function Edit() {
 
   useEffect(() => {
     if (data?.data.data) {
-      setPayment(data.data.data);
+      const payment: Payment = data.data.data;
+
+      delete payment.documents;
+
+      setPayment(payment);
     }
   }, [data]);
 
