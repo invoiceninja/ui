@@ -287,23 +287,29 @@ export function DataTable(props: Props) {
 
                       {props.customActions && <Divider withoutPadding />}
 
-                      <DropdownElement
-                        onClick={() => bulk('archive', resource.id)}
-                      >
-                        {t('archive')}
-                      </DropdownElement>
+                      {resource?.archived_at === 0 && (
+                        <DropdownElement
+                          onClick={() => bulk('archive', resource.id)}
+                        >
+                          {t(`archive_${props.resource}`)}
+                        </DropdownElement>
+                      )}
 
-                      <DropdownElement
-                        onClick={() => bulk('restore', resource.id)}
-                      >
-                        {t('restore')}
-                      </DropdownElement>
+                      {resource?.archived_at > 0 && (
+                        <DropdownElement
+                          onClick={() => bulk('restore', resource.id)}
+                        >
+                          {t(`restore_${props.resource}`)}
+                        </DropdownElement>
+                      )}
 
-                      <DropdownElement
-                        onClick={() => bulk('delete', resource.id)}
-                      >
-                        {t('delete')}
-                      </DropdownElement>
+                      {!resource?.is_deleted && (
+                        <DropdownElement
+                          onClick={() => bulk('delete', resource.id)}
+                        >
+                          {t(`delete_${props.resource}`)}
+                        </DropdownElement>
+                      )}
                     </Dropdown>
                   </Td>
                 )}
