@@ -80,6 +80,7 @@ export function Quotes() {
         endpoint="/api/v1/quotes?include=client"
         linkToEdit="/quotes/:id/edit"
         linkToCreate="/quotes/create"
+        bulkRoute="/api/v1/quotes/bulk"
         withResourcefulActions
       />
     </Default>
