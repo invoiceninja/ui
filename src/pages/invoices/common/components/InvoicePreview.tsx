@@ -10,13 +10,14 @@
 
 import { endpoint } from 'common/helpers';
 import { Invoice } from 'common/interfaces/invoice';
+import { Quote } from 'common/interfaces/quote';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { InvoiceViewer } from './InvoiceViewer';
 
 interface Props {
   for: 'create' | 'invoice';
-  resource: Invoice | RecurringInvoice;
-  entity: 'invoice' | 'recurring_invoice';
+  resource: Invoice | RecurringInvoice | Quote;
+  entity: 'invoice' | 'recurring_invoice' | 'quote';
 }
 
 export function InvoicePreview(props: Props) {

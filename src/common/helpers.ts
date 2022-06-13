@@ -48,7 +48,7 @@ export function classNames(...classes: any) {
 }
 
 export function date(date: number | string, format: string) {
-  if (date === 0 || date === '') {
+  if (date === 0 || date === '' || date === undefined) {
     return '';
   }
 

@@ -21,6 +21,7 @@ import React, {
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from 'react-query';
+import { generatePath } from 'react-router-dom';
 import { Divider } from './cards/Divider';
 import { Actions, SelectOption } from './datatables/Actions';
 import { Dropdown } from './dropdown/Dropdown';
@@ -53,7 +54,6 @@ interface Props {
   withResourcefulActions?: ReactNode[] | boolean;
   bulkRoute?: string;
   customActions?: any;
-  customBulkActions?: any;
   withoutActions?: boolean;
   withoutPagination?: boolean;
 }
@@ -287,23 +287,39 @@ export function DataTable(props: Props) {
 
                       {props.customActions && <Divider withoutPadding />}
 
-                      <DropdownElement
-                        onClick={() => bulk('archive', resource.id)}
-                      >
-                        {t('archive')}
-                      </DropdownElement>
+                      {props.linkToEdit && (
+                        <DropdownElement
+                          to={generatePath(props.linkToEdit, {
+                            id: resource?.id,
+                          })}
+                        >
+                          {t(`edit_${props.resource}`)}
+                        </DropdownElement>
+                      )}
 
-                      <DropdownElement
-                        onClick={() => bulk('restore', resource.id)}
-                      >
-                        {t('restore')}
-                      </DropdownElement>
+                      {resource?.archived_at === 0 && (
+                        <DropdownElement
+                          onClick={() => bulk('archive', resource.id)}
+                        >
+                          {t(`archive_${props.resource}`)}
+                        </DropdownElement>
+                      )}
 
-                      <DropdownElement
-                        onClick={() => bulk('delete', resource.id)}
-                      >
-                        {t('delete')}
-                      </DropdownElement>
+                      {resource?.archived_at > 0 && (
+                        <DropdownElement
+                          onClick={() => bulk('restore', resource.id)}
+                        >
+                          {t(`restore_${props.resource}`)}
+                        </DropdownElement>
+                      )}
+
+                      {!resource?.is_deleted && (
+                        <DropdownElement
+                          onClick={() => bulk('delete', resource.id)}
+                        >
+                          {t(`delete_${props.resource}`)}
+                        </DropdownElement>
+                      )}
                     </Dropdown>
                   </Td>
                 )}

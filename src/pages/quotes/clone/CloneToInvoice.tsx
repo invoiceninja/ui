@@ -9,26 +9,17 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { useInvoiceQuery } from 'common/queries/invoices';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
-import { ClientSelector } from '../common/components/ClientSelector';
-import { InvoiceFooter } from '../common/components/InvoiceFooter';
-import { InvoiceDetails } from '../common/components/InvoiceDetails';
-import { ProductsTable } from '../common/components/ProductsTable';
-import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
-import { InvoicePreview } from '../common/components/InvoicePreview';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
-import { useHandleCreate } from '../create/hooks/useHandleCreate';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { ValidationAlert } from 'components/ValidationAlert';
-import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoiceProperty';
 import {
   dismissCurrentInvoice,
   injectBlankItemIntoCurrent,
@@ -37,12 +28,21 @@ import {
 import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
 import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
-import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
+import { useSetCurrentInvoiceProperty } from 'pages/invoices/common/hooks/useSetCurrentInvoiceProperty';
+import { useQuoteQuery } from 'common/queries/quotes';
+import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
+import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
+import { InvoiceFooter } from 'pages/invoices/common/components/InvoiceFooter';
+import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
+import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
+import { InvoiceDetails } from 'pages/invoices/common/components/InvoiceDetails';
+import { useHandleCreate } from 'pages/invoices/create/hooks/useHandleCreate';
+import { useInvoiceSum } from 'pages/invoices/common/hooks/useInvoiceSum';
 
-export function Clone() {
+export function CloneToInvoice() {
   const { documentTitle } = useTitle('new_invoice');
   const { id } = useParams();
-  const { data: invoice } = useInvoiceQuery({ id });
+  const { data: invoice } = useQuoteQuery({ id });
   const [t] = useTranslation();
 
   const [errors, setErrors] = useState<ValidationBag>();
@@ -134,7 +134,9 @@ export function Clone() {
           <InvoiceTotals
             resource={currentInvoice}
             invoiceSum={invoiceSum}
-            onChange={(property, value) => handleChange(property as keyof Invoice, value)}
+            onChange={(property, value) =>
+              handleChange(property as keyof Invoice, value)
+            }
           />
         )}
       </div>
