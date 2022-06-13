@@ -21,6 +21,7 @@ import React, {
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from 'react-query';
+import { generatePath } from 'react-router-dom';
 import { Divider } from './cards/Divider';
 import { Actions, SelectOption } from './datatables/Actions';
 import { Dropdown } from './dropdown/Dropdown';
@@ -286,6 +287,16 @@ export function DataTable(props: Props) {
                         )}
 
                       {props.customActions && <Divider withoutPadding />}
+
+                      {props.linkToEdit && (
+                        <DropdownElement
+                          to={generatePath(props.linkToEdit, {
+                            id: resource?.id,
+                          })}
+                        >
+                          {t(`edit_${props.resource}`)}
+                        </DropdownElement>
+                      )}
 
                       {resource?.archived_at === 0 && (
                         <DropdownElement
