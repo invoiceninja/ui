@@ -17,8 +17,11 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Quote } from 'common/interfaces/quote';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
+import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
+import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 
@@ -33,6 +36,7 @@ export function Quotes() {
   ];
 
   const formatMoney = useFormatMoney();
+  const downloadPdf = useDownloadPdf({ resource: 'quote' });
 
   const columns: DataTableColumns = [
     {
@@ -72,6 +76,29 @@ export function Quotes() {
     },
   ];
 
+  const actions = [
+    (quote: Quote) => (
+      <DropdownElement to={generatePath('/quotes/:id/pdf', { id: quote.id })}>
+        {t('view_pdf')}
+      </DropdownElement>
+    ),
+    (quote: Quote) => (
+      <DropdownElement onClick={() => downloadPdf(quote)}>
+        {t('download_pdf')}
+      </DropdownElement>
+    ),
+    (quote: Quote) => (
+      <DropdownElement to={generatePath('/quotes/:id/email', { id: quote.id })}>
+        {t('email_quote')}
+      </DropdownElement>
+    ),
+    (quote: Quote) => (
+      <DropdownElement onClick={() => openClientPortal(quote)}>
+        {t('client_portal')}
+      </DropdownElement>
+    ),
+  ];
+
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
@@ -81,6 +108,7 @@ export function Quotes() {
         linkToEdit="/quotes/:id/edit"
         linkToCreate="/quotes/create"
         bulkRoute="/api/v1/quotes/bulk"
+        customActions={actions}
         withResourcefulActions
       />
     </Default>
