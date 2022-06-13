@@ -13,6 +13,7 @@ import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Apply } from './apply/Apply';
 import { Create } from './create/Create';
+import { Documents } from './documents/Documents';
 import { Edit } from './edit/Edit';
 import { PaymentFields } from './edit/PaymentFields';
 import { Payments } from './index/Payments';
@@ -48,6 +49,7 @@ export const paymentRoutes = (
         />
       }
     >
+      <Route path="documents" element={<Documents />} />
       <Route path="payment_fields" element={<PaymentFields />} />
       <Route path="apply" element={<Apply />} />
       <Route path="refund" element={<Refund />} />
