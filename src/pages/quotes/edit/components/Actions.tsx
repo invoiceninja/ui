@@ -14,6 +14,7 @@ import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useApprove } from 'pages/quotes/common/hooks/useApprove';
+import { useBulkAction } from 'pages/quotes/common/hooks/useBulkAction';
 import { useCurrentQuote } from 'pages/quotes/common/hooks/useCurrentQuote';
 import { useMarkSent } from 'pages/quotes/common/hooks/useMarkSent';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +30,7 @@ export function Actions() {
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
   const markSent = useMarkSent();
   const approve = useApprove();
+  const bulk = useBulkAction();
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
@@ -81,6 +83,26 @@ export function Actions() {
           </DropdownElement>
         </div>
       )}
+
+      <div>
+        {quote && quote?.archived_at === 0 && (
+          <DropdownElement onClick={() => bulk(quote.id, 'archive')}>
+            {t('archive_quote')}
+          </DropdownElement>
+        )}
+
+        {quote && quote.archived_at > 0 && (
+          <DropdownElement onClick={() => bulk(quote.id, 'restore')}>
+            {t('restore_quote')}
+          </DropdownElement>
+        )}
+
+        {quote && !quote?.is_deleted && (
+          <DropdownElement onClick={() => bulk(quote.id, 'delete')}>
+            {t('delete_quote')}
+          </DropdownElement>
+        )}
+      </div>
     </Dropdown>
   );
 }
