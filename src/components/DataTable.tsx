@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import React, {
@@ -17,11 +18,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
+import { Divider } from './cards/Divider';
 import { Actions, SelectOption } from './datatables/Actions';
+import { Dropdown } from './dropdown/Dropdown';
+import { DropdownElement } from './dropdown/DropdownElement';
 import { Button, Checkbox } from './forms';
-import ResourcefulActions from './ResourcefulActions';
 import { Spinner } from './Spinner';
 import {
   ColumnSortPayload,
@@ -60,6 +64,8 @@ export function DataTable(props: Props) {
   const [apiEndpoint, setApiEndpoint] = useState(
     new URL(endpoint(props.endpoint))
   );
+
+  const queryClient = useQueryClient();
 
   const [filter, setFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -107,6 +113,36 @@ export function DataTable(props: Props) {
     },
   ];
 
+  const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {
+    const toastId = toast.loading(t('processing'));
+
+    request('POST', endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`), {
+      action,
+      ids: id ? [id] : Array.from(selected),
+    })
+      .then(() => {
+        toast.success(t(`${action}d_${props.resource}`), {
+          id: toastId,
+        });
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        /** @ts-ignore: Unreachable, if element is null/undefined. */
+        mainCheckbox.current.checked = false;
+      })
+      .catch((error: AxiosError) => {
+        console.log(error);
+        console.error(error.response?.data);
+
+        toast.error(t('error_title'), {
+          id: toastId,
+        });
+      })
+      .finally(() => {
+        queryClient.invalidateQueries(apiEndpoint.href);
+        setSelected([]);
+      });
+  };
+
   return (
     <>
       {!props.withoutActions && (
@@ -125,31 +161,20 @@ export function DataTable(props: Props) {
           }
         >
           <span className="text-sm">{t('with_selected')}</span>
-          <ResourcefulActions
-            type="bulk"
-            mainCheckbox={mainCheckbox}
-            endpoint={props.endpoint}
-            bulkRoute={props.bulkRoute}
-            apiEndpoint={apiEndpoint}
-            setSelected={setSelected}
-            selected={selected}
-            resourceType={props.resource}
-            linkToEdit={props.linkToEdit}
-            label={`${t('actions')}`}
-            onClick={() => {
-              [...document.getElementsByClassName('child-checkbox')].forEach(
-                (element: any) => (element.checked = false)
-              );
 
-              setSelected([]);
-            }}
-            disabled={selected.length == 0}
-          >
-            {props.customBulkActions &&
-              props.customBulkActions?.map((action: any) => {
-                return action(selected);
-              })}
-          </ResourcefulActions>
+          <Dropdown label={t('actions')}>
+            <DropdownElement onClick={() => bulk('archive')}>
+              {t('archive')}
+            </DropdownElement>
+
+            <DropdownElement onClick={() => bulk('restore')}>
+              {t('restore')}
+            </DropdownElement>
+
+            <DropdownElement onClick={() => bulk('delete')}>
+              {t('delete')}
+            </DropdownElement>
+          </Dropdown>
         </Actions>
       )}
 
@@ -225,6 +250,7 @@ export function DataTable(props: Props) {
                 {!props.withoutActions && (
                   <Td>
                     <Checkbox
+                      checked={selected.includes(resource.id)}
                       className="child-checkbox"
                       value={resource.id}
                       id={resource.id}
@@ -249,19 +275,7 @@ export function DataTable(props: Props) {
 
                 {props.withResourcefulActions && (
                   <Td>
-                    <ResourcefulActions
-                      type="default"
-                      mainCheckbox={mainCheckbox}
-                      endpoint={props.endpoint}
-                      bulkRoute={props.bulkRoute}
-                      apiEndpoint={apiEndpoint}
-                      setSelected={setSelected}
-                      selected={selected}
-                      resourceType={props.resource}
-                      resource={resource}
-                      linkToEdit={props.linkToEdit}
-                      label={`${t('more_actions')}`}
-                    >
+                    <Dropdown label={t('more_actions')}>
                       {props.customActions &&
                         props.customActions?.map(
                           (action: any, index: number) => (
@@ -270,7 +284,27 @@ export function DataTable(props: Props) {
                             </React.Fragment>
                           )
                         )}
-                    </ResourcefulActions>
+
+                      {props.customActions && <Divider withoutPadding />}
+
+                      <DropdownElement
+                        onClick={() => bulk('archive', resource.id)}
+                      >
+                        {t('archive')}
+                      </DropdownElement>
+
+                      <DropdownElement
+                        onClick={() => bulk('restore', resource.id)}
+                      >
+                        {t('restore')}
+                      </DropdownElement>
+
+                      <DropdownElement
+                        onClick={() => bulk('delete', resource.id)}
+                      >
+                        {t('delete')}
+                      </DropdownElement>
+                    </Dropdown>
                   </Td>
                 )}
               </Tr>
