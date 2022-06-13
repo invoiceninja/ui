@@ -122,14 +122,6 @@ export function Payments() {
     ),
   ];
 
-  const customBulkActions = [
-    (resource: Payment) => (
-      <DropdownElement onClick={() => emailPayment(resource)}>
-        {t('email_payment')}
-      </DropdownElement>
-    ),
-  ];
-
   return (
     <Default
       title={t('payments')}
@@ -145,7 +137,6 @@ export function Payments() {
         linkToEdit="/payments/:id/edit"
         withResourcefulActions
         customActions={actions}
-        customBulkActions={customBulkActions}
       />
     </Default>
   );
