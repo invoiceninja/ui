@@ -37,7 +37,7 @@ export function Upload(props: Props) {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
         .then(() => {
-          toast.success(t('successfully_uploaded_documents'), { id: toastId });
+          toast.success(t('uploaded_document'), { id: toastId });
 
           setFormData(new FormData());
 

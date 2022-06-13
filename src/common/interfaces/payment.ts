@@ -39,7 +39,7 @@ export interface Payment {
   exchange_rate: number;
   exchange_currency_id: string;
   paymentables: Paymentable[];
-  documents: any[];
+  documents?: any[];
 }
 
 export interface Paymentable {
