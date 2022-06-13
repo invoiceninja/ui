@@ -54,7 +54,6 @@ interface Props {
   withResourcefulActions?: ReactNode[] | boolean;
   bulkRoute?: string;
   customActions?: any;
-  customBulkActions?: any;
   withoutActions?: boolean;
   withoutPagination?: boolean;
 }
