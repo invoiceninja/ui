@@ -18,16 +18,52 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import GoogleLogin, {
-  GoogleLoginResponse,
-  GoogleLoginResponseOffline,
-} from 'react-google-login';
+import { AxiosResponse } from 'axios';
+import { AuthenticationTypes } from 'common/dtos/authentication';
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
+import { CompanyUser } from 'common/interfaces/company-user';
+import {
+  changeCurrentIndex,
+  updateCompanyUsers,
+} from 'common/stores/slices/company-users';
+import { authenticate } from 'common/stores/slices/user';
+import GoogleLogin from 'react-google-login';
+import { useDispatch } from 'react-redux';
 
 export function SignInProviders() {
-  const handleGoogle = (
-    response: GoogleLoginResponse | GoogleLoginResponseOffline
-  ) => {
-    console.log(response);
+  const dispatch = useDispatch();
+
+  const login = (response: AxiosResponse) => {
+    localStorage.removeItem('X-CURRENT-INDEX');
+
+    let currentIndex = 0;
+
+    const companyUsers: CompanyUser[] = response.data.data;
+    const defaultCompanyId = companyUsers[0].account.default_company_id;
+
+    currentIndex =
+      companyUsers.findIndex(
+        (companyUser) => companyUser.company.id === defaultCompanyId
+      ) || 0;
+
+    dispatch(
+      authenticate({
+        type: AuthenticationTypes.TOKEN,
+        user: response.data.data[currentIndex].user,
+        token: response.data.data[currentIndex].token.token,
+      })
+    );
+
+    dispatch(updateCompanyUsers(response.data.data));
+    dispatch(changeCurrentIndex(currentIndex));
+  };
+
+  const handleGoogle = (response: any) => {
+    request(
+      'GET',
+      endpoint('/auth/login?id_token=:token', { token: response.zc.id_token })
+    ).then((response) => login(response));
   };
 
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
