@@ -19,6 +19,7 @@ import {
   PlusCircle,
   Repeat,
   CreditCard,
+  File,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -131,6 +132,19 @@ export function Default(props: Props) {
       },
     },
     {
+      name: t('quotes'),
+      href: '/quotes',
+      icon: File,
+      current: location.pathname.startsWith('/quotes'),
+      visible: hasPermission('view_quote'),
+      rightButton: {
+        icon: PlusCircle,
+        to: '/quotes/create',
+        label: t('new_payment'),
+        visible: hasPermission('create_quote'),
+      },
+    },
+    {
       name: t('settings'),
       href: '/settings/company_details',
       icon: Settings,
@@ -207,7 +221,7 @@ export function Default(props: Props) {
                   )}
                 </div>
 
-                {props.topRight && <div className="">{props.topRight}</div>}
+                {props.topRight && <div>{props.topRight}</div>}
               </div>
             )}
 

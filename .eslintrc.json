@@ -26,7 +26,8 @@
     "@typescript-eslint/no-explicit-any": "off",
     "no-loss-of-precision": "off",
     "@typescript-eslint/no-loss-of-precision": ["off"],
-    "react/display-name": "off"
+    "react/display-name": "off",
+    "react/prop-types": "off"
   },
   "settings": {
     "react": {

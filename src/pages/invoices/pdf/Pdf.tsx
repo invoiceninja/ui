@@ -20,13 +20,15 @@ import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { Actions } from './components/Actions';
 
 export function Pdf() {
-  const [t] = useTranslation();
   const { id } = useParams();
   const { data } = useInvoiceQuery({ id });
+  
+  const [t] = useTranslation();
   const [pdfUrl, setPdfUrl] = useState<string>();
   const [blobUrl, setBlobUrl] = useState('');
   const [invoice, setInvoice] = useState<Invoice>();
-  const url = useGeneratePdfUrl();
+
+  const url = useGeneratePdfUrl({ resource: 'invoice' });
 
   useEffect(() => {
     if (data?.data.data) {

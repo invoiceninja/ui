@@ -8,8 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
+import { proPlan } from 'common/guards/guards/pro-plan';
 import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { classNames } from '../../common/helpers';
@@ -30,6 +32,7 @@ interface AdvanceSetting {
   href: string;
   current: boolean;
   children?: AdvanceSetting[];
+  visible: boolean;
 }
 
 export function Settings(props: Props) {
@@ -82,11 +85,6 @@ export function Settings(props: Props) {
       href: '/settings/workflow_settings',
       current: location.pathname === '/settings/workflow_settings',
     },
-    // {
-    //   name: t('import_export'),
-    //   href: '/settings/import_export',
-    //   current: location.pathname === '/settings/import_export',
-    // },
     {
       name: t('account_management'),
       href: '/settings/account_management',
@@ -99,160 +97,8 @@ export function Settings(props: Props) {
       name: t('invoice_design'),
       href: '/settings/invoice_design',
       current: location.pathname === '/settings/invoice_design',
+      visible: proPlan() || enterprisePlan(),
     },
-    // {
-    //   name: t('custom_fields'),
-    //   href: '/settings/custom_fields',
-    //   current: location.pathname.startsWith('/settings/custom_fields'),
-    //   children: [
-    //     {
-    //       name: t('company'),
-    //       href: '/settings/custom_fields/company',
-    //       current: location.pathname === '/settings/custom_fields/company',
-    //     },
-    //     {
-    //       name: t('clients'),
-    //       href: '/settings/custom_fields/clients',
-    //       current: location.pathname === '/settings/custom_fields/clients',
-    //     },
-    //     {
-    //       name: t('products'),
-    //       href: '/settings/custom_fields/products',
-    //       current: location.pathname === '/settings/custom_fields/products',
-    //     },
-    //     {
-    //       name: t('invoices'),
-    //       href: '/settings/custom_fields/invoices',
-    //       current: location.pathname === '/settings/custom_fields/invoices',
-    //     },
-    //     {
-    //       name: t('payments'),
-    //       href: '/settings/custom_fields/payments',
-    //       current: location.pathname === '/settings/custom_fields/payments',
-    //     },
-    //     {
-    //       name: t('projects'),
-    //       href: '/settings/custom_fields/projects',
-    //       current: location.pathname === '/settings/custom_fields/projects',
-    //     },
-    //     {
-    //       name: t('tasks'),
-    //       href: '/settings/custom_fields/tasks',
-    //       current: location.pathname === '/settings/custom_fields/tasks',
-    //     },
-    //     {
-    //       name: t('vendors'),
-    //       href: '/settings/custom_fields/vendors',
-    //       current: location.pathname === '/settings/custom_fields/vendors',
-    //     },
-    //     {
-    //       name: t('expenses'),
-    //       href: '/settings/custom_fields/expenses',
-    //       current: location.pathname === '/settings/custom_fields/expenses',
-    //     },
-    //     {
-    //       name: t('users'),
-    //       href: '/settings/custom_fields/users',
-    //       current: location.pathname === '/settings/custom_fields/users',
-    //     },
-    //   ],
-    // },
-    // {
-    //   name: t('generated_numbers'),
-    //   href: '/settings/generated_numbers',
-    //   current: location.pathname.startsWith('/settings/generated_numbers'),
-    //   children: [
-    //     {
-    //       name: t('clients'),
-    //       href: '/settings/generated_numbers/clients',
-    //       current: location.pathname === '/settings/generated_numbers/clients',
-    //     },
-    //     {
-    //       name: t('invoices'),
-    //       href: '/settings/generated_numbers/invoices',
-    //       current: location.pathname === '/settings/generated_numbers/invoices',
-    //     },
-    //     {
-    //       name: t('recurring_invoices'),
-    //       href: '/settings/generated_numbers/recurring_invoices',
-    //       current:
-    //         location.pathname ===
-    //         '/settings/generated_numbers/recurring_invoices',
-    //     },
-    //     {
-    //       name: t('payments'),
-    //       href: '/settings/generated_numbers/payments',
-    //       current: location.pathname === '/settings/generated_numbers/payments',
-    //     },
-    //     {
-    //       name: t('quotes'),
-    //       href: '/settings/generated_numbers/quotes',
-    //       current: location.pathname === '/settings/generated_numbers/quotes',
-    //     },
-    //     {
-    //       name: t('credits'),
-    //       href: '/settings/generated_numbers/credits',
-    //       current: location.pathname === '/settings/generated_numbers/credits',
-    //     },
-    //     {
-    //       name: t('projects'),
-    //       href: '/settings/generated_numbers/projects',
-    //       current: location.pathname === '/settings/generated_numbers/projects',
-    //     },
-    //     {
-    //       name: t('tasks'),
-    //       href: '/settings/generated_numbers/tasks',
-    //       current: location.pathname === '/settings/generated_numbers/tasks',
-    //     },
-    //     {
-    //       name: t('vendors'),
-    //       href: '/settings/generated_numbers/vendors',
-    //       current: location.pathname === '/settings/generated_numbers/vendors',
-    //     },
-    //     {
-    //       name: t('expenses'),
-    //       href: '/settings/generated_numbers/expenses',
-    //       current: location.pathname === '/settings/generated_numbers/expenses',
-    //     },
-    //     {
-    //       name: t('recurring_expenses'),
-    //       href: '/settings/generated_numbers/recurring_expenses',
-    //       current:
-    //         location.pathname ===
-    //         '/settings/generated_numbers/recurring_expenses',
-    //     },
-    //   ],
-    // },
-    // {
-    //   name: t('email_settings'),
-    //   href: '/settings/email_settings',
-    //   current: location.pathname === '/settings/email_settings',
-    // },
-    // {
-    //   name: t('client_portal'),
-    //   href: '/settings/client_portal',
-    //   current: location.pathname === '/settings/client_portal',
-    // },
-    // {
-    //   name: t('templates_and_reminders'),
-    //   href: '/settings/templates_and_reminders',
-    //   current: location.pathname === '/settings/templates_and_reminders',
-    // },
-    // {
-    //   name: t('group_settings'),
-    //   href: '/settings/group_settings',
-    //   current: location.pathname === '/settings/group_settings',
-    // },
-    // {
-    //   name: t('subscriptions'),
-    //   href: '/settings/subscriptions',
-    //   current: location.pathname === '/settings/subscriptions',
-    // },
-    // {
-    //   name: t('user_management'),
-    //   href: '/settings/user_management',
-    //   current: location.pathname === '/settings/user_management',
-    // },
   ];
 
   return (
@@ -309,60 +155,68 @@ export function Settings(props: Props) {
           </a>
 
           <SelectField className="lg:hidden">
-            {advanced.map((item) => (
-              <option
-                key={item.name}
-                value={item.href}
-                className={classNames(
-                  item.current
-                    ? 'bg-gray-200 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                  'flex items-center px-3 py-2 text-sm font-medium rounded'
-                )}
-                aria-current={item.current ? 'page' : undefined}
-              >
-                {item.name}
-              </option>
-            ))}
+            {advanced.map(
+              (item) =>
+                item.visible && (
+                  <option
+                    key={item.name}
+                    value={item.href}
+                    className={classNames(
+                      item.current
+                        ? 'bg-gray-200 text-gray-900'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                      'flex items-center px-3 py-2 text-sm font-medium rounded'
+                    )}
+                    aria-current={item.current ? 'page' : undefined}
+                  >
+                    {item.name}
+                  </option>
+                )
+            )}
           </SelectField>
 
           <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
-            {advanced.map((item, index) => (
-              <div key={index}>
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={classNames(
-                    item.current
-                      ? 'bg-gray-200 text-gray-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                    item.children ? 'rounded-t' : 'rounded',
-                    'flex items-center px-3 py-2 text-sm font-medium'
-                  )}
-                  aria-current={item.current ? 'page' : undefined}
-                >
-                  <span className="truncate">{item.name}</span>
-                </Link>
+            {advanced.map(
+              (item, index) =>
+                item.visible && (
+                  <div key={index}>
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className={classNames(
+                        item.current
+                          ? 'bg-gray-200 text-gray-900'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                        item.children ? 'rounded-t' : 'rounded',
+                        'flex items-center px-3 py-2 text-sm font-medium'
+                      )}
+                      aria-current={item.current ? 'page' : undefined}
+                    >
+                      <span className="truncate">{item.name}</span>
+                    </Link>
 
-                {item.children && item.current && (
-                  <div className="bg-gray-100 space-y-4 py-3 rounded-b">
-                    {item.children &&
-                      item.children.map((item, index) => (
-                        <Link
-                          key={index}
-                          to={item.href}
-                          className={classNames(
-                            item.current ? 'text-gray-900 font-semibold' : '',
-                            'ml-4 px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
-                          )}
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
+                    {item.children && item.current && (
+                      <div className="bg-gray-100 space-y-4 py-3 rounded-b">
+                        {item.children &&
+                          item.children.map((item, index) => (
+                            <Link
+                              key={index}
+                              to={item.href}
+                              className={classNames(
+                                item.current
+                                  ? 'text-gray-900 font-semibold'
+                                  : '',
+                                'ml-4 px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
+                              )}
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
+                )
+            )}
           </nav>
         </div>
 

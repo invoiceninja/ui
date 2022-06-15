@@ -14,8 +14,8 @@ import { useRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
-import { generatePath, useParams } from 'react-router-dom';
-import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
+import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
+import { useParams } from 'react-router-dom';
 
 export function Pdf() {
   const { documentTitle } = useTitle('view_pdf');
@@ -23,13 +23,11 @@ export function Pdf() {
   const { data: recurringInvoice, isLoading } = useRecurringInvoiceQuery({
     id,
   });
-  const url = useGeneratePdfUrl();
+
+  const url = useGeneratePdfUrl({ resource: 'recurring_invoice' });
 
   return (
-    <Default
-      title={documentTitle}
-      onBackClick={generatePath('/recurring_invoices')}
-    >
+    <Default title={documentTitle}>
       {isLoading && <Spinner />}
 
       {recurringInvoice && (

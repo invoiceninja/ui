@@ -33,6 +33,10 @@ export function Payment() {
       href: generatePath('/payments/:id/edit', { id }),
     },
     {
+      name: t('documents'),
+      href: generatePath('/payments/:id/documents', { id }),
+    },
+    {
       name: t('custom_fields'),
       href: generatePath('/payments/:id/payment_fields', { id }),
     },
@@ -42,6 +46,7 @@ export function Payment() {
     <Default title={t('payment')} breadcrumbs={pages}>
       <Container>
         <Tabs tabs={tabs} />
+
         <Outlet />
       </Container>
     </Default>

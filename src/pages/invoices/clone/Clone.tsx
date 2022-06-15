@@ -28,6 +28,16 @@ import { Invoice } from 'common/interfaces/invoice';
 import { useHandleCreate } from '../create/hooks/useHandleCreate';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { ValidationAlert } from 'components/ValidationAlert';
+import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoiceProperty';
+import {
+  dismissCurrentInvoice,
+  injectBlankItemIntoCurrent,
+  toggleCurrentInvoiceInvitation,
+} from 'common/stores/slices/invoices';
+import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
+import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
+import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
+import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 
 export function Clone() {
   const { documentTitle } = useTitle('new_invoice');
@@ -39,6 +49,8 @@ export function Clone() {
 
   const dispatch = useDispatch();
   const handleCreate = useHandleCreate(setErrors);
+  const handleChange = useSetCurrentInvoiceProperty();
+  const invoiceSum = useInvoiceSum();
 
   const currentInvoice = useCurrentInvoice();
 
@@ -56,10 +68,14 @@ export function Clone() {
         setCurrentInvoice({
           ...invoice.data.data,
           number: '',
-          documents: []
+          documents: [],
         })
       );
     }
+
+    return () => {
+      dispatch(dismissCurrentInvoice());
+    };
   }, [invoice]);
 
   return (
@@ -72,15 +88,55 @@ export function Clone() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        <ClientSelector />
+        {currentInvoice && (
+          <ClientSelector
+            resource={currentInvoice}
+            onChange={(id) => handleChange('client_id', id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+            onContactCheckboxChange={(contactId, value) =>
+              dispatch(
+                toggleCurrentInvoiceInvitation({ contactId, checked: value })
+              )
+            }
+          />
+        )}
+
         <InvoiceDetails />
 
         <div className="col-span-12">
-          <ProductsTable />
+          {currentInvoice && (
+            <ProductsTable
+              resource={currentInvoice}
+              onProductChange={(index, lineItem) =>
+                dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
+              }
+              onLineItemPropertyChange={(key, value, index) =>
+                dispatch(
+                  setCurrentLineItemProperty({
+                    position: index,
+                    property: key,
+                    value,
+                  })
+                )
+              }
+              onSort={(lineItems) => handleChange('line_items', lineItems)}
+              onDeleteRowClick={(index) =>
+                dispatch(deleteInvoiceLineItem(index))
+              }
+              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+            />
+          )}
         </div>
 
         <InvoiceFooter page="create" />
-        <InvoiceTotals />
+
+        {currentInvoice && (
+          <InvoiceTotals
+            resource={currentInvoice}
+            invoiceSum={invoiceSum}
+            onChange={(property, value) => handleChange(property as keyof Invoice, value)}
+          />
+        )}
       </div>
 
       <div className="my-4">

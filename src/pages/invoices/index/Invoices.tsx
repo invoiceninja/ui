@@ -31,7 +31,7 @@ export function Invoices() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-  const downloadPdf = useDownloadPdf();
+  const downloadPdf = useDownloadPdf({ resource: 'invoice' });
 
   const pages = [{ name: t('invoices'), href: '/invoices' }];
 

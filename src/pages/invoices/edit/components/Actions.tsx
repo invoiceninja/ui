@@ -28,7 +28,7 @@ export function Actions() {
   const [t] = useTranslation();
   const { id } = useParams();
   const invoice = useCurrentInvoice();
-  const downloadPdf = useDownloadPdf();
+  const downloadPdf = useDownloadPdf({resource: 'invoice'});
 
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();

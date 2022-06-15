@@ -10,15 +10,21 @@
 
 import { request } from 'common/helpers/request';
 import { Invoice } from 'common/interfaces/invoice';
+import { Quote } from 'common/interfaces/quote';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { useQueryClient } from 'react-query';
 import { useGeneratePdfUrl } from './useGeneratePdfUrl';
 
-export function useDownloadPdf() {
-  const queryClient = useQueryClient();
-  const url = useGeneratePdfUrl();
+interface Props {
+  resource: 'invoice' | 'recurring_invoice' | 'quote';
+}
 
-  return (invoice: Invoice) => {
-    const downloadableUrl = url(invoice);
+export function useDownloadPdf(props: Props) {
+  const queryClient = useQueryClient();
+  const url = useGeneratePdfUrl({ resource: props.resource });
+
+  return (resource: Invoice | RecurringInvoice | Quote) => {
+    const downloadableUrl = url(resource);
 
     if (downloadableUrl) {
       queryClient.fetchQuery(downloadableUrl, () =>
@@ -29,7 +35,7 @@ export function useDownloadPdf() {
 
             const link = document.createElement('a');
 
-            link.download = 'invoice.pdf';
+            link.download = `${props.resource}.pdf`;
             link.href = url;
             link.target = '_blank';
 

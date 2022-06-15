@@ -72,6 +72,10 @@ export function DebouncedCombobox(props: Props) {
 
   useEffect(() => {
     setDefaultValueProperty(props.defaultValue as string);
+
+    return () => {
+      setDefaultValueProperty('')
+    }
   }, [props.defaultValue]);
 
   const request = async (query: string, staleTime = Infinity) => {

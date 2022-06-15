@@ -8,13 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import {
-  Permissions,
-  useHasPermission,
-} from 'common/hooks/permissions/useHasPermission';
+import { Permissions } from 'common/hooks/permissions/useHasPermission';
+import { store } from 'common/stores/store';
 
 export function permission(permission: Permissions) {
-  const hasPermission = useHasPermission();
+  const state = store.getState();
+  const user = state.companyUsers.api[state.companyUsers.currentIndex];
 
-  return hasPermission(permission);
+  const permissions = user?.permissions ?? '';
+  const [action] = permission.split('_');
+
+  return (
+    user?.is_admin ||
+    user?.is_owner ||
+    permissions.includes(permission) ||
+    permission.includes(action)
+  );
 }

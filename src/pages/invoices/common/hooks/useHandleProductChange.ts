@@ -8,18 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
+import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { Product } from 'common/interfaces/product';
-import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
-import { useDispatch } from 'react-redux';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
-export function useHandleProductChange() {
-  const dispatch = useDispatch();
-  const invoice = useCurrentInvoice() as Invoice;
+interface Props {
+  resource: Invoice | RecurringInvoice;
+  onChange: (index: number, lineItem: InvoiceItem) => unknown;
+}
+
+export function useHandleProductChange(props: Props) {
+  const resource = props.resource;
 
   return (index: number, product_key: string, product?: Product) => {
-    const lineItem = { ...invoice.line_items[index] };
+    const lineItem = { ...resource.line_items[index] };
 
     lineItem.product_key = product?.product_key || product_key;
     lineItem.quantity = product?.quantity || 1;
@@ -39,11 +42,6 @@ export function useHandleProductChange() {
     lineItem.custom_value3 = product?.custom_value3 || '';
     lineItem.custom_value4 = product?.custom_value4 || '';
 
-    dispatch(
-      setCurrentInvoiceLineItem({
-        index,
-        lineItem,
-      })
-    );
+    return props.onChange(index, lineItem);
   };
 }

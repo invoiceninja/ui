@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 export { Create as CreatePaymentTerm } from './Create';
-export { Edit as EditPaymentTerm } from './Edit';
+export { Edit as EditPaymentTerm } from './edit/Edit';
 export * from './PaymentTerms';
