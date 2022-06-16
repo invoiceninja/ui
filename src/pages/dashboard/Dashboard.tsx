@@ -9,6 +9,7 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { SwitchToFlutter } from 'components/SwitchToFlutter';
 import { Activity } from 'pages/dashboard/components/Activity';
 import { PastDueInvoices } from 'pages/dashboard/components/PastDueInvoices';
 import { RecentPayments } from 'pages/dashboard/components/RecentPayments';
@@ -25,7 +26,11 @@ export function Dashboard() {
   const pages = [{ name: t('dashboard'), href: '/dashboard' }];
 
   return (
-    <Default title={t('dashboard')} breadcrumbs={pages}>
+    <Default
+      title={t('dashboard')}
+      breadcrumbs={pages}
+      navigationTopRight={<SwitchToFlutter />}
+    >
       <Totals />
 
       <div className="grid grid-cols-12 gap-4 my-6">
