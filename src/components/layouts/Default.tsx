@@ -182,6 +182,7 @@ export function Default(props: Props) {
               <h2 className="text-sm md:text-xl dark:text-gray-100">
                 {props.title}
               </h2>
+
               <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
                 {props.onCancelClick && (
                   <Button onClick={props.onCancelClick} type="secondary">
