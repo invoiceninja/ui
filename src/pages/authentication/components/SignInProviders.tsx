@@ -63,7 +63,7 @@ export function SignInProviders() {
     console.log(response);
     request(
       'POST',
-      endpoint('api/v1/auth/oauth_login?provider=google&id_token=:token', { token: response.tokenId })
+      endpoint('/api/v1/auth/oauth_login?provider=google&id_token=:token', { token: response.tokenId })
     ).then((response) => login(response));
   };
 
