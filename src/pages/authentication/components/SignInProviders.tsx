@@ -62,7 +62,7 @@ export function SignInProviders() {
   const handleGoogle = (response: any) => {
     request(
       'POST',
-      endpoint('api/v1/auth/oauth_login?id_token=:token&provider=google', { token: response.zc.id_token })
+      endpoint('api/v1/auth/oauth_login?id_token=:token&provider=google', { token: response.id_token })
     ).then((response) => login(response));
   };
 
