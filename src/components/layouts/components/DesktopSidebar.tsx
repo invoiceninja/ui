@@ -44,10 +44,9 @@ export function DesktopSidebar(props: Props) {
 
   return (
     <div
-      className={`hidden md:flex ${
+      className={`hidden md:flex z-10 ${
         isMiniSidebar ? 'md:w-16' : 'md:w-64'
       } md:flex-col md:fixed md:inset-y-0`}
-      style={{ zIndex: 100 }}
     >
       <div className="flex flex-col flex-grow border-gray-100 bg-ninja-gray dark:bg-gray-800 dark:border-transparent overflow-y-auto border-r">
         <div className="flex items-center flex-shrink-0 px-4 bg-white h-16">
