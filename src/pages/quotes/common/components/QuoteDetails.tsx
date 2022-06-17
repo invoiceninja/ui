@@ -66,7 +66,7 @@ export function QuoteDetails() {
           <CustomField
             field="quote1"
             defaultValue={quote?.custom_value1 || ''}
-            value={company.custom_fields.quote2}
+            value={company.custom_fields.quote1}
             onChange={(value) => handleChange('custom_value1', value)}
           />
         )}
