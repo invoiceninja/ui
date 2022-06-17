@@ -15,14 +15,13 @@ import { request } from 'common/helpers/request';
 import { CompanyUser } from 'common/interfaces/company-user';
 import {
   changeCurrentIndex,
-  updateCompanyUsers
+  updateCompanyUsers,
 } from 'common/stores/slices/company-users';
 import { setMsal } from 'common/stores/slices/user';
 import { authenticate } from 'common/stores/slices/user';
 import GoogleLogin from 'react-google-login';
 import { useDispatch } from 'react-redux';
-import MicrosoftLogin from "react-microsoft-login";
-import Logo from 'resources/images/btn_google_signin_dark_normal_web@2x.png';
+import MicrosoftLogin from 'react-microsoft-login';
 
 export function SignInProviders() {
   const dispatch = useDispatch();
@@ -54,49 +53,39 @@ export function SignInProviders() {
   const handleGoogle = (response: any) => {
     request(
       'POST',
-      endpoint('/api/v1/oauth_login?provider=google&id_token=:token', { token: response.tokenId })
+      endpoint('/api/v1/oauth_login?provider=google&id_token=:token', {
+        token: response.tokenId,
+      })
     ).then((response) => login(response));
   };
 
-  const authHandler = (err: any, data:any, msal: any) => {
-
+  const authHandler = (err: any, data: any, msal: any) => {
     dispatch(setMsal(msal));
 
     request(
       'POST',
-      endpoint('/api/v1/oauth_login?provider=microsoft'), data
+      endpoint('/api/v1/oauth_login?provider=microsoft'),
+      data
     ).then((response) => login(response));
-
   };
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-  const googleMicrosoftId: string = (import.meta.env.VITE_MICROSOFT_CLIENT_ID as string);
-  // const googleAppleId = import.meta.env.VITE_APPLE_CLIENT_ID;
+  const googleMicrosoftId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
 
   return (
-    <div className="grid grid-cols-3 text-sm">
-      <div className="col-span-3 md:col-span-3">
+    <div className="grid grid-cols-3 text-sm my-4">
+      <div className="col-span-3 flex flex-col space-y-3">
         <GoogleLogin
           clientId={googleClientId}
-          render={(renderProps) => (
-            <button
-              onClick={renderProps.onClick}
-              disabled={renderProps.disabled}
-              className="py-3 w-full hover:bg-gray-100 px-2 inline-flex justify-center items-center"
-            >
-              <span className="m-1"><img src={Logo} alt="Sign in with Google" className="h-12" /></span>
-            </button>
-          )}
-          buttonText="Login"
+          buttonText="Sign in with Google"
           onSuccess={handleGoogle}
           onFailure={handleGoogle}
           cookiePolicy={'single_host_origin'}
         />
-      </div>
-      <div className="col-span-3 md:col-span-3 inline-flex justify-center items-center">
+
         <MicrosoftLogin
           clientId={googleMicrosoftId}
-          authCallback={authHandler} 
+          authCallback={authHandler}
           redirectUri={'https://react.invoicing.co/'}
         />
       </div>
