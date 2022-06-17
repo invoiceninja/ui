@@ -57,10 +57,11 @@ export function SignInProviders() {
   };
 
   const authHandler = (err: any, data:any) => {
-    console.log(err, data);
+    console.log(data);
+    console.log(err);
     request(
       'POST',
-      endpoint('/api/v1/oauth_login?provider=microsoft', { data })
+      endpoint('/api/v1/oauth_login?provider=microsoft', data)
     ).then((response) => login(response));
   };
 
