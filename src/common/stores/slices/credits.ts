@@ -22,11 +22,11 @@ const initialState: CreditState = {
   api: {},
 };
 
-export const quoteSlice = createSlice({
+export const creditSlice = createSlice({
   name: 'quotes',
   initialState,
   reducers: {},
   extraReducers: (builder) => {},
 });
 
-export const {} = quoteSlice.actions;
+export const {} = creditSlice.actions;
