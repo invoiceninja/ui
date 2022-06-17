@@ -22,6 +22,7 @@ import { authenticate } from 'common/stores/slices/user';
 import GoogleLogin from 'react-google-login';
 import { useDispatch } from 'react-redux';
 import MicrosoftLogin from "react-microsoft-login";
+import Logo from 'resources/images/btn_google_signin_dark_normal_web@2x.png';
 
 export function SignInProviders() {
   const dispatch = useDispatch();
@@ -83,7 +84,7 @@ export function SignInProviders() {
               disabled={renderProps.disabled}
               className="py-3 w-full hover:bg-gray-100 px-2 inline-flex justify-center items-center"
             >
-              <span className="m-1">Sign in with Google</span>
+              <span className="m-1"><img src={Logo} alt="Sign in with Google" className="h-12" /></span>
             </button>
           )}
           buttonText="Login"
