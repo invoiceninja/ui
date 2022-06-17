@@ -34,6 +34,7 @@ import {
 import { useTitle } from 'common/hooks/useTitle';
 import { CompanyUser } from 'common/interfaces/company-user';
 import { request } from 'common/helpers/request';
+import { SignInProviders } from './components/SignInProviders';
 
 export function Login() {
   useTitle('login');
@@ -147,9 +148,13 @@ export function Login() {
         </div>
 
         {isHosted() && (
-          <div className="bg-white mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
-            <HostedLinks />
-          </div>
+          <>
+            <SignInProviders />
+
+            <div className="bg-white mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
+              <HostedLinks />
+            </div>
+          </>
         )}
       </div>
     </div>
