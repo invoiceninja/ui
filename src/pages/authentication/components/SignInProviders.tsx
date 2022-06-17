@@ -70,7 +70,7 @@ export function SignInProviders() {
   };
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
-  const googleMicrosoftId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
+  const microsoftClientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
 
   return (
     <div className="grid grid-cols-3 text-sm my-4">
@@ -84,7 +84,7 @@ export function SignInProviders() {
         />
 
         <MicrosoftLogin
-          clientId={googleMicrosoftId}
+          clientId={microsoftClientId}
           authCallback={authHandler}
           redirectUri={'https://react.invoicing.co/'}
         />
