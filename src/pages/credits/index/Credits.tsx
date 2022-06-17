@@ -18,10 +18,14 @@ import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 
 export function Credits() {
-  const [t] = useTranslation();
-  const { dateFormat } = useCurrentCompanyDateFormats();
-  const pages = [{ name: t('credits'), href: '/credits' }];
   useTitle('credits');
+  
+  const [t] = useTranslation();
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const pages = [{ name: t('credits'), href: '/credits' }];
+
   const columns: DataTableColumns = [
     {
       id: 'status_id',
@@ -46,6 +50,7 @@ export function Credits() {
       },
     },
   ];
+
   return (
     <Default title={t('credits')} breadcrumbs={pages} docsLink="docs/credits/">
       <DataTable

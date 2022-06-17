@@ -7,5 +7,5 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 export * from './index/Credits';
-export * from './email/Email';
