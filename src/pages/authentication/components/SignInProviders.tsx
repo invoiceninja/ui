@@ -20,6 +20,7 @@ import {
 import { authenticate } from 'common/stores/slices/user';
 import GoogleLogin from 'react-google-login';
 import { useDispatch } from 'react-redux';
+import MicrosoftLogin from "react-microsoft-login";
 
 export function SignInProviders() {
   const dispatch = useDispatch();
@@ -55,13 +56,19 @@ export function SignInProviders() {
     ).then((response) => login(response));
   };
 
-  const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const authHandler = (err: any, data:any) => {
+    console.log(err, data);
+  };
+
+  const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  const googleMicrosoftId: string = (import.meta.env.VITE_MICROSOFT_CLIENT_ID as string);
+  const googleAppleId = import.meta.env.VITE_APPLE_CLIENT_ID;
 
   return (
     <div className="grid grid-cols-3 text-sm">
       <div className="col-span-3 md:col-span-3">
         <GoogleLogin
-          clientId={clientId}
+          clientId={googleClientId}
           render={(renderProps) => (
             <button
               onClick={renderProps.onClick}
@@ -75,6 +82,12 @@ export function SignInProviders() {
           onSuccess={handleGoogle}
           onFailure={handleGoogle}
           cookiePolicy={'single_host_origin'}
+        />
+      </div>
+      <div className="col-span-3 md:col-span-3">
+        <MicrosoftLogin
+          clientId={googleMicrosoftId}
+          authCallback={authHandler} 
         />
       </div>
     </div>
