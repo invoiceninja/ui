@@ -29,7 +29,6 @@ import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
 import { CreditDetails } from '../common/components/CreditDetails';
 import { useCurrentCredit } from '../common/hooks/useCurrentCredit';
-import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useSetCurrentCreditProperty } from '../common/hooks/useSetCurrentCreditProperty';
 
 export function Edit() {
@@ -41,10 +40,10 @@ export function Edit() {
   const dispatch = useDispatch();
   const handleChange = useSetCurrentCreditProperty();
 
-  const handleSave = () => {};
+  // const handleSave = () => {};
 
   const currentCredit = useCurrentCredit();
-  const invoiceSum = useInvoiceSum();
+  // const invoiceSum = useInvoiceSum();
 
   const pages: BreadcrumRecord[] = [
     { name: t('credits'), href: '/credits' },
