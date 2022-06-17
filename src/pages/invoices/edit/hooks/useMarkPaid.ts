@@ -8,17 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceStatus } from 'common/enums/invoice-status';
+import { endpoint } from 'common/helpers';
 import { Invoice } from 'common/interfaces/invoice';
-import { useInvoiceSave } from './useInvoiceSave';
+import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
+import { request } from 'common/helpers/request';
+import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 export function useMarkPaid() {
-  const handleSave = useInvoiceSave();
+  const [t] = useTranslation();
+  const dispatch = useDispatch();
 
   return (invoice: Invoice) => {
-    const copy = { ...invoice };
-    copy.status_id = InvoiceStatus.Paid;
+    const toastId = toast.loading(t('processing'));
 
-    handleSave(copy.id, copy);
+    request(
+      'PUT',
+      endpoint('/api/v1/invoices/:id?mark_paid=true', { id: invoice.id }),
+      invoice
+    )
+      .then((response) => {
+        toast.success(t('notification_invoice_sent'), { id: toastId });
+
+        dispatch(setCurrentInvoice(response.data.data));
+      })
+      .catch((error) => {
+        toast.error(t('error_title'), { id: toastId });
+
+        console.error(error);
+      });
   };
 }
