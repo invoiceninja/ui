@@ -32,6 +32,7 @@ export function useMarkPaid() {
         toast.success(t('paid'), { id: toastId });
 
         dispatch(setCurrentInvoice(response.data.data));
+        
       })
       .catch((error) => {
         toast.error(t('error_title'), { id: toastId });
