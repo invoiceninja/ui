@@ -24,6 +24,7 @@ import { Button } from '../../components/forms/Button';
 import { HostedLinks } from './components/HostedLinks';
 import { Link } from '../../components/forms/Link';
 import { request } from 'common/helpers/request';
+import { SignInProviders } from './components/SignInProviders';
 
 export function Register() {
   const [t] = useTranslation();
@@ -152,11 +153,18 @@ export function Register() {
           </div>
         </div>
 
-        {isHosted() && (
-          <div className="bg-white mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
-            <HostedLinks />
-          </div>
+        {(
+          <>
+            <div className="bg-white mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
+              <SignInProviders />
+            </div>
+
+            <div className="bg-white mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
+              <HostedLinks />
+            </div>
+          </>
         )}
+        
       </div>
     </div>
   );
