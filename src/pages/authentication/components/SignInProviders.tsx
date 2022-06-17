@@ -8,16 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-/**
- * Invoice Ninja (https://invoiceninja.com).
- *
- * @link https://github.com/invoiceninja/invoiceninja source repository
- *
- * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
- *
- * @license https://www.elastic.co/licensing/elastic-license
- */
-
 import { AxiosResponse } from 'axios';
 import { AuthenticationTypes } from 'common/dtos/authentication';
 import { endpoint } from 'common/helpers';
@@ -28,12 +18,14 @@ import {
   updateCompanyUsers,
 } from 'common/stores/slices/company-users';
 import { authenticate } from 'common/stores/slices/user';
+import { t } from 'i18next';
+import { useState } from 'react';
 import GoogleLogin from 'react-google-login';
 import { useDispatch } from 'react-redux';
 
 export function SignInProviders() {
   const dispatch = useDispatch();
-
+  const [message, setMessage] = useState<string | undefined>(undefined);
   const login = (response: AxiosResponse) => {
     localStorage.removeItem('X-CURRENT-INDEX');
 
@@ -66,6 +58,12 @@ export function SignInProviders() {
     ).then((response) => login(response));
   };
 
+  const handleGoogleFailure = (response: any) => {
+    setMessage(
+      response?.data.message ?? t('invalid_credentials')
+    )
+  }
+
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
   return (
@@ -84,7 +82,7 @@ export function SignInProviders() {
           )}
           buttonText="Login"
           onSuccess={handleGoogle}
-          onFailure={handleGoogle}
+          onFailure={handleGoogleFailure}
           cookiePolicy={'single_host_origin'}
         />
       </div>
