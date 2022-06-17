@@ -140,8 +140,21 @@ export function Default(props: Props) {
       rightButton: {
         icon: PlusCircle,
         to: '/quotes/create',
-        label: t('new_payment'),
+        label: t('new_quote'),
         visible: hasPermission('create_quote'),
+      },
+    },
+    {
+      name: t('credits'),
+      href: '/credits',
+      icon: FileText,
+      current: location.pathname.startsWith('/credits'),
+      visible: hasPermission('view_credit'),
+      rightButton: {
+        icon: PlusCircle,
+        to: '/credits/create',
+        label: t('new_credit'),
+        visible: hasPermission('create_credit'),
       },
     },
     {
