@@ -62,7 +62,7 @@ export function SignInProviders() {
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   const googleMicrosoftId: string = (import.meta.env.VITE_MICROSOFT_CLIENT_ID as string);
-  const googleAppleId = import.meta.env.VITE_APPLE_CLIENT_ID;
+  // const googleAppleId = import.meta.env.VITE_APPLE_CLIENT_ID;
 
   return (
     <div className="grid grid-cols-3 text-sm">
