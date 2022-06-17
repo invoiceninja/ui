@@ -15,20 +15,25 @@ import { useNavigate } from 'react-router';
 import { endpoint } from '../../common/helpers';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useGoogleLogout } from 'react-google-login'
+import { RootState } from 'common/stores/store';
+import { useSelector } from 'react-redux';
 
 export function Logout() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const user = useCurrentUser();
-  const [msalInstance, onMsalInstanceChange] = useState();
-  
+  const msalInstance = useSelector((state: RootState) => state.user.msal);
+
   useEffect(() => {
     request('POST', endpoint('/api/v1/logout'), {}).then(() => {
       localStorage.removeItem('X-NINJA-TOKEN');
       localStorage.removeItem('X-CURRENT-INDEX');
 
       if (user.oauth_provider_id == 'microsoft'){
-          onMsalInstanceChange(msalInstance);
+
+        if(msalInstance)
+          msalInstance.logout();
+
       }
       else if (user.oauth_provider_id == 'google'){
 

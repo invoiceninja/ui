@@ -16,18 +16,23 @@ interface UserState {
   authenticated: boolean;
   user: any;
   changes: any;
+  msal: any;
 }
 
 const initialState: UserState = {
   authenticated: false,
   user: {},
   changes: {},
+  msal: {},
 };
 
 export const userSlice = createSlice({
   name: 'user',
   initialState,
   reducers: {
+    setMsal: (state, action) =>{
+      state.user.msal = action;
+    },
     updateUser: (state, action) => {
       state.user = action.payload;
     },

@@ -15,15 +15,18 @@ import { request } from 'common/helpers/request';
 import { CompanyUser } from 'common/interfaces/company-user';
 import {
   changeCurrentIndex,
-  updateCompanyUsers,
+  updateCompanyUsers
 } from 'common/stores/slices/company-users';
+import { setMsal } from 'common/stores/slices/user';
 import { authenticate } from 'common/stores/slices/user';
 import GoogleLogin from 'react-google-login';
 import { useDispatch } from 'react-redux';
 import MicrosoftLogin from "react-microsoft-login";
+import { useState } from 'react';
 
 export function SignInProviders() {
   const dispatch = useDispatch();
+  const [msalInstance, onMsalInstanceChange] = useState();
   const login = (response: AxiosResponse) => {
     localStorage.removeItem('X-CURRENT-INDEX');
 
@@ -56,13 +59,15 @@ export function SignInProviders() {
     ).then((response) => login(response));
   };
 
-  const authHandler = (err: any, data:any) => {
-    console.log(data);
-    console.log(err);
+  const authHandler = (err: any, data:any, msal: any) => {
+
+    dispatch(setMsal(msal));
+
     request(
       'POST',
       endpoint('/api/v1/oauth_login?provider=microsoft'), data
     ).then((response) => login(response));
+
   };
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
