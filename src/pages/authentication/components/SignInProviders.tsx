@@ -25,7 +25,6 @@ import { useDispatch } from 'react-redux';
 
 export function SignInProviders() {
   const dispatch = useDispatch();
-  const [message, setMessage] = useState<string | undefined>(undefined);
   const login = (response: AxiosResponse) => {
     localStorage.removeItem('X-CURRENT-INDEX');
 
@@ -58,12 +57,6 @@ export function SignInProviders() {
     ).then((response) => login(response));
   };
 
-  const handleGoogleFailure = (response: any) => {
-    setMessage(
-      response?.data.message ?? t('invalid_credentials')
-    )
-  }
-
   const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
 
   return (
@@ -82,7 +75,7 @@ export function SignInProviders() {
           )}
           buttonText="Login"
           onSuccess={handleGoogle}
-          onFailure={handleGoogleFailure}
+          onFailure={handleGoogle}
           cookiePolicy={'single_host_origin'}
         />
       </div>
