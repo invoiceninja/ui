@@ -61,7 +61,7 @@ export function SignInProviders() {
     console.log(err);
     request(
       'POST',
-      endpoint('/api/v1/oauth_login?provider=microsoft', data)
+      endpoint('/api/v1/oauth_login?provider=microsoft'), data
     ).then((response) => login(response));
   };
 
