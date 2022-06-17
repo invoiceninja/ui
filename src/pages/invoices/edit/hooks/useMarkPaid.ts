@@ -25,11 +25,11 @@ export function useMarkPaid() {
 
     request(
       'PUT',
-      endpoint('/api/v1/invoices/:id?mark_paid=true', { id: invoice.id }),
+      endpoint('/api/v1/invoices/:id?paid=true', { id: invoice.id }),
       invoice
     )
       .then((response) => {
-        toast.success(t('notification_invoice_sent'), { id: toastId });
+        toast.success(t('paid'), { id: toastId });
 
         dispatch(setCurrentInvoice(response.data.data));
       })
