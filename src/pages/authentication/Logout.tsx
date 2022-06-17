@@ -14,6 +14,7 @@ import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router';
 import { endpoint } from '../../common/helpers';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useGoogleLogout } from 'react-google-login'
 
 export function Logout() {
   const navigate = useNavigate();
@@ -28,6 +29,15 @@ export function Logout() {
 
       if (user.oauth_provider_id == 'microsoft'){
           onMsalInstanceChange(msalInstance);
+      }
+      else if (user.oauth_provider_id == 'google'){
+
+        const { signOut, loaded } = useGoogleLogout({
+          clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        })
+
+        signOut() 
+
       }
 
       queryClient.invalidateQueries();
