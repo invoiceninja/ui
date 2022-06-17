@@ -32,7 +32,7 @@ export function Logout() {
       }
       else if (user.oauth_provider_id == 'google'){
 
-        const { signOut, loaded } = useGoogleLogout({
+        const { signOut } = useGoogleLogout({
           clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         })
 
