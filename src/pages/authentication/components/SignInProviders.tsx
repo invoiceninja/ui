@@ -58,6 +58,10 @@ export function SignInProviders() {
 
   const authHandler = (err: any, data:any) => {
     console.log(err, data);
+    request(
+      'POST',
+      endpoint('/api/v1/oauth_login?provider=microsoft', { data })
+    ).then((response) => login(response));
   };
 
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
@@ -84,7 +88,7 @@ export function SignInProviders() {
           cookiePolicy={'single_host_origin'}
         />
       </div>
-      <div className="col-span-3 md:col-span-3">
+      <div className="col-span-3 md:col-span-3 inline-flex justify-center items-center">
         <MicrosoftLogin
           clientId={googleMicrosoftId}
           authCallback={authHandler} 
