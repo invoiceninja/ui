@@ -31,6 +31,7 @@ export function Logout() {
 
       if (user.oauth_provider_id == 'microsoft'){
 
+          console.log(msalInstance);
         if(msalInstance)
           msalInstance.logout();
 

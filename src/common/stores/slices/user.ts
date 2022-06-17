@@ -31,7 +31,7 @@ export const userSlice = createSlice({
   initialState,
   reducers: {
     setMsal: (state, action) =>{
-      state.user.msal = action;
+      state.msal = action.payload;
     },
     updateUser: (state, action) => {
       state.user = action.payload;
