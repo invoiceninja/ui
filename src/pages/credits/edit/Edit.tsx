@@ -22,6 +22,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
+import { CreditDetails } from '../common/components/CreditDetails';
 import { useCurrentCredit } from '../common/hooks/useCurrentCredit';
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useSetCurrentCreditProperty } from '../common/hooks/useSetCurrentCreditProperty';
@@ -74,6 +75,8 @@ export function Edit() {
             }
           />
         )}
+
+        <CreditDetails />
       </div>
     </Default>
   );
