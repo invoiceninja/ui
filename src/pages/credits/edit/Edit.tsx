@@ -12,12 +12,17 @@ import { useTitle } from 'common/hooks/useTitle';
 import { useCreditQuery } from 'common/queries/credits';
 import {
   dismissCurrentCredit,
+  injectBlankItemIntoCurrent,
   toggleCurrentCreditInvitation,
 } from 'common/stores/slices/credits';
+import { deleteCreditLineItem } from 'common/stores/slices/credits/extra-reducers/delete-credit-line-item';
 import { setCurrentCredit } from 'common/stores/slices/credits/extra-reducers/set-current-credit';
+import { setCurrentCreditLineItem } from 'common/stores/slices/credits/extra-reducers/set-current-credit-line-item';
+import { setCurrentLineItemProperty } from 'common/stores/slices/credits/extra-reducers/set-current-line-item-property';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
+import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -77,6 +82,29 @@ export function Edit() {
         )}
 
         <CreditDetails />
+      </div>
+
+      <div className="col-span-12">
+        {currentCredit && (
+          <ProductsTable
+            resource={currentCredit}
+            onProductChange={(index, lineItem) =>
+              dispatch(setCurrentCreditLineItem({ index, lineItem }))
+            }
+            onLineItemPropertyChange={(key, value, index) =>
+              dispatch(
+                setCurrentLineItemProperty({
+                  position: index,
+                  property: key,
+                  value,
+                })
+              )
+            }
+            onSort={(lineItems) => handleChange('line_items', lineItems)}
+            onDeleteRowClick={(index) => dispatch(deleteCreditLineItem(index))}
+            onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+          />
+        )}
       </div>
     </Default>
   );
