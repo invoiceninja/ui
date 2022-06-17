@@ -18,8 +18,6 @@ import {
   updateCompanyUsers,
 } from 'common/stores/slices/company-users';
 import { authenticate } from 'common/stores/slices/user';
-import { t } from 'i18next';
-import { useState } from 'react';
 import GoogleLogin from 'react-google-login';
 import { useDispatch } from 'react-redux';
 
