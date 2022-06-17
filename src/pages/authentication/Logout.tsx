@@ -23,6 +23,9 @@ export function Logout() {
   const queryClient = useQueryClient();
   const user = useCurrentUser();
   const msalInstance = useSelector((state: RootState) => state.user.msal);
+  const { signOut } = useGoogleLogout({
+    clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+  });
 
   useEffect(() => {
     request('POST', endpoint('/api/v1/logout'), {}).then(() => {
@@ -31,16 +34,11 @@ export function Logout() {
 
       if (user.oauth_provider_id == 'microsoft'){
 
-          console.log(msalInstance);
         if(msalInstance)
           msalInstance.logout();
 
       }
       else if (user.oauth_provider_id == 'google'){
-
-        const { signOut } = useGoogleLogout({
-          clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-        })
 
         signOut() 
 
