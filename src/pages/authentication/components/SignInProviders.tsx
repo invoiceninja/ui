@@ -22,11 +22,9 @@ import { authenticate } from 'common/stores/slices/user';
 import GoogleLogin from 'react-google-login';
 import { useDispatch } from 'react-redux';
 import MicrosoftLogin from "react-microsoft-login";
-import { useState } from 'react';
 
 export function SignInProviders() {
   const dispatch = useDispatch();
-  const [msalInstance, onMsalInstanceChange] = useState();
   const login = (response: AxiosResponse) => {
     localStorage.removeItem('X-CURRENT-INDEX');
 

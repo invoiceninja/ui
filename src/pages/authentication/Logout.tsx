@@ -9,7 +9,7 @@
  */
 
 import { request } from 'common/helpers/request';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router';
 import { endpoint } from '../../common/helpers';
