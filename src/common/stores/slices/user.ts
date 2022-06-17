@@ -71,6 +71,7 @@ export const userSlice = createSlice({
 });
 
 export const {
+  setMsal,
   updateUser,
   injectInChanges,
   injectInChangesWithData,
