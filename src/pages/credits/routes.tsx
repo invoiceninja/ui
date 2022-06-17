@@ -11,16 +11,26 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
+import { Edit } from './edit/Edit';
 import { Credits } from './index/Credits';
 
 export const creditRoutes = (
-  <Route>
+  <Route path="/credits">
     <Route
-      path="/credits"
+      path=""
       element={
         <Guard
           guards={[() => permission('view_credit')]}
           component={<Credits />}
+        />
+      }
+    />
+    <Route
+      path=":id/edit"
+      element={
+        <Guard
+          guards={[() => permission('edit_credit')]}
+          component={<Edit />}
         />
       }
     />
