@@ -30,7 +30,7 @@ export function SwitchToFlutter() {
     request('PUT', endpoint('/api/v1/accounts/:id', { id: account.id }), {
       set_react_as_default_ap: false,
     })
-      .then(() => window.location.reload())
+      .then(() => (window.location.href = window.location.origin))
       .catch((error: AxiosError) => {
         console.error(error);
 
