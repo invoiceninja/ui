@@ -11,6 +11,7 @@
 import invoiceStatus from 'common/constants/invoice-status';
 import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Invoice } from 'common/interfaces/invoice';
@@ -32,6 +33,7 @@ export function Invoices() {
 
   const formatMoney = useFormatMoney();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
+  const company = useCurrentCompany();
 
   const pages = [{ name: t('invoices'), href: '/invoices' }];
 
@@ -66,7 +68,7 @@ export function Invoices() {
         formatMoney(
           value,
           resource?.client.country_id,
-          resource?.client.settings.currency_id
+          resource?.client.settings.currency_id ? resource?.client.settings.currency_id : company.settings.currency_id
         ),
     },
     {

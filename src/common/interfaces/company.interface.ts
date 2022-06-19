@@ -14,6 +14,7 @@ export interface Company {
   size_id: string;
   industry_id: string;
   settings: {
+    show_currency_code: boolean;
     name: string;
     auto_bill: string;
     payment_type_id: string;
