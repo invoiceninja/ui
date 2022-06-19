@@ -44,6 +44,11 @@ export function Invoices() {
     {
       id: 'number',
       label: t('number'),
+      format: (value, resource) => (
+        <Link to={generatePath('/invoices/:id/edit', { id: resource.id })}>
+          {resource.number}
+        </Link>
+      ),
     },
     {
       id: 'client_id',
