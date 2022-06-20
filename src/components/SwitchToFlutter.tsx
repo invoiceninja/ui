@@ -12,19 +12,16 @@ import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
-import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Flutter } from './icons';
-import { PasswordConfirmation } from './PasswordConfirmation';
 
 export function SwitchToFlutter() {
   const [t] = useTranslation();
-  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const account = useCurrentAccount();
 
-  const onSubmit = () => {
+  const onClick = () => {
     const toastId = toast.loading(t('processing'));
 
     request('PUT', endpoint('/api/v1/accounts/:id', { id: account.id }), {
@@ -42,15 +39,9 @@ export function SwitchToFlutter() {
 
   return (
     <>
-      <button onClick={() => setIsModalVisible(true)}>
+      <button onClick={onClick}>
         <Flutter width={32} height={32} />
       </button>
-
-      <PasswordConfirmation
-        show={isModalVisible}
-        onClose={setIsModalVisible}
-        onSave={() => onSubmit()}
-      />
     </>
   );
 }
