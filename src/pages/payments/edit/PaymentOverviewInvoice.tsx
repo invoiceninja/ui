@@ -14,6 +14,7 @@
  import { Payment, Paymentable } from 'common/interfaces/payment';
  import { Invoice } from 'common/interfaces/invoice';
  import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+ import { date as formatDate } from 'common/helpers';
 
  
  interface Props {
