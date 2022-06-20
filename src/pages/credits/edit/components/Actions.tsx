@@ -11,6 +11,7 @@
 import { CreditStatus } from 'common/enums/credit-status';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { useBulkAction } from 'pages/credits/common/hooks/useBulkAction';
 import { useCurrentCredit } from 'pages/credits/common/hooks/useCurrentCredit';
 import { useMarkSent } from 'pages/credits/common/hooks/useMarkSent';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
@@ -27,6 +28,7 @@ export function Actions() {
 
   const downloadPdf = useDownloadPdf({ resource: 'credit' });
   const markSent = useMarkSent();
+  const bulk = useBulkAction();
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
@@ -63,6 +65,26 @@ export function Actions() {
           </DropdownElement>
         </div>
       )}
+
+      <div>
+        {credit && credit?.archived_at === 0 && (
+          <DropdownElement onClick={() => bulk(credit.id, 'archive')}>
+            {t('archive_credit')}
+          </DropdownElement>
+        )}
+
+        {credit && credit.archived_at > 0 && (
+          <DropdownElement onClick={() => bulk(credit.id, 'restore')}>
+            {t('restore_credit')}
+          </DropdownElement>
+        )}
+
+        {credit && !credit?.is_deleted && (
+          <DropdownElement onClick={() => bulk(credit.id, 'delete')}>
+            {t('delete_credit')}
+          </DropdownElement>
+        )}
+      </div>
     </Dropdown>
   );
 }
