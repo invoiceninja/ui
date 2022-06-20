@@ -61,7 +61,7 @@ export function PaymentOverview(props: Props) {
         </span>
       </div>
 
-      {props.payment.paymentables.map((value) => (
+      {props.payment.paymentables.map((value, index) => (
         <PaymentOverviewInvoice
           payment={props.payment}
           paymentable={value}

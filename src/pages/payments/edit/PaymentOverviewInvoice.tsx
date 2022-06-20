@@ -14,7 +14,6 @@
  import { Payment, Paymentable } from 'common/interfaces/payment';
  import { Invoice } from 'common/interfaces/invoice';
  import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
- import { date, date as formatDate } from 'common/helpers';
 
  
  interface Props {
@@ -24,8 +23,6 @@
  
 
  export function setLabel(payment: Payment, paymentable: Paymentable):string  {
-    const [t] = useTranslation();
-
     console.log(paymentable.created_at);
 
      const invoice: any = payment?.invoices?.filter(
