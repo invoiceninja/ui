@@ -82,7 +82,7 @@ export function CreditDetails() {
       </Card>
 
       <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
-        <Element leftSide={t('credit_number_short')}>
+        <Element leftSide={t('credit_number')}>
           <InputField
             id="number"
             onValueChange={(value) => handleChange('number', value)}

@@ -9,6 +9,7 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { Credit } from 'common/interfaces/credit';
 import { useCreditQuery } from 'common/queries/credits';
 import {
   dismissCurrentCredit,
@@ -22,13 +23,16 @@ import { setCurrentLineItemProperty } from 'common/stores/slices/credits/extra-r
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
+import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { generatePath, useParams } from 'react-router-dom';
 import { CreditDetails } from '../common/components/CreditDetails';
+import { CreditFooter } from '../common/components/CreditFooter';
 import { useCurrentCredit } from '../common/hooks/useCurrentCredit';
+import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useSetCurrentCreditProperty } from '../common/hooks/useSetCurrentCreditProperty';
 
 export function Edit() {
@@ -43,7 +47,7 @@ export function Edit() {
   // const handleSave = () => {};
 
   const currentCredit = useCurrentCredit();
-  // const invoiceSum = useInvoiceSum();
+  const invoiceSum = useInvoiceSum();
 
   const pages: BreadcrumRecord[] = [
     { name: t('credits'), href: '/credits' },
@@ -81,27 +85,41 @@ export function Edit() {
         )}
 
         <CreditDetails />
-      </div>
 
-      <div className="col-span-12">
+        <div className="col-span-12">
+          {currentCredit && (
+            <ProductsTable
+              resource={currentCredit}
+              onProductChange={(index, lineItem) =>
+                dispatch(setCurrentCreditLineItem({ index, lineItem }))
+              }
+              onLineItemPropertyChange={(key, value, index) =>
+                dispatch(
+                  setCurrentLineItemProperty({
+                    position: index,
+                    property: key,
+                    value,
+                  })
+                )
+              }
+              onSort={(lineItems) => handleChange('line_items', lineItems)}
+              onDeleteRowClick={(index) =>
+                dispatch(deleteCreditLineItem(index))
+              }
+              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+            />
+          )}
+        </div>
+
+        <CreditFooter page="edit" />
+
         {currentCredit && (
-          <ProductsTable
+          <InvoiceTotals
             resource={currentCredit}
-            onProductChange={(index, lineItem) =>
-              dispatch(setCurrentCreditLineItem({ index, lineItem }))
+            invoiceSum={invoiceSum}
+            onChange={(property, value) =>
+              handleChange(property as keyof Credit, value)
             }
-            onLineItemPropertyChange={(key, value, index) =>
-              dispatch(
-                setCurrentLineItemProperty({
-                  position: index,
-                  property: key,
-                  value,
-                })
-              )
-            }
-            onSort={(lineItems) => handleChange('line_items', lineItems)}
-            onDeleteRowClick={(index) => dispatch(deleteCreditLineItem(index))}
-            onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
           />
         )}
       </div>
