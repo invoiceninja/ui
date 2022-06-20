@@ -7,6 +7,9 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
+import { Invoice } from './invoice';
+
 export interface Payment {
   id: string;
   user_id: string;
@@ -40,6 +43,7 @@ export interface Payment {
   exchange_currency_id: string;
   paymentables: Paymentable[];
   documents?: any[];
+  invoices?: Invoice[];
 }
 
 export interface Paymentable {

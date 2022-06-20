@@ -16,13 +16,13 @@ import { endpoint } from '../helpers';
 
 export function usePaymentQuery(params: { id: string | undefined }) {
   return useQuery(
-    generatePath('/api/v1/payments/:id?include=client,invoices', {
+    generatePath('/api/v1/payments/:id?include=client,invoices,paymentables', {
       id: params.id,
     }),
     () =>
       request(
         'GET',
-        endpoint('/api/v1/payments/:id?include=client,invoices', {
+        endpoint('/api/v1/payments/:id?include=client,invoices,paymentables', {
           id: params.id,
         })
       ),
