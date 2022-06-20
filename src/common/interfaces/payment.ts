@@ -40,6 +40,7 @@ export interface Payment {
   exchange_currency_id: string;
   paymentables: Paymentable[];
   documents?: any[];
+  invoices?: any[];
 }
 
 export interface Paymentable {

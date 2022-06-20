@@ -14,6 +14,7 @@ import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import paymentStatus from 'common/constants/payment-status';
 import { Payment } from 'common/interfaces/payment';
+import { PaymentOverviewInvoice } from './PaymentOverviewInvoice';
 
 interface Props {
   payment: Payment;
@@ -59,6 +60,13 @@ export function PaymentOverview(props: Props) {
           )}`}
         </span>
       </div>
+
+      {props.payment.paymentables.map((value) => (
+        <PaymentOverviewInvoice
+          payment={props.payment}
+          paymentable={value}
+        />
+      ))}
     </div>
   );
 }
