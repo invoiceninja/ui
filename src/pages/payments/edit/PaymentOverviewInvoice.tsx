@@ -24,7 +24,6 @@
  
 
  export function setLabel(payment: Payment, paymentable: Paymentable):string  {
-    console.log(paymentable.created_at);
 
      const invoice: any = payment?.invoices?.filter(
         (invoice: Invoice) => invoice.id == paymentable.invoice_id
@@ -41,7 +40,7 @@
 
 
    return (
-     <div className="grid grid-cols-2 gap-4 my-4 border border-x-5">
+     <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
         <div className="flex items-center justify-center">
         <span className="text-gray-800">
           {`${t('invoice')} ${setLabel(props.payment, props.paymentable)}`}
@@ -50,7 +49,7 @@
       <div className="flex items-center justify-center">
         <span className='text-gray-400'>{formatMoney(props?.payment?.amount || 0,
             company.settings.country_id,
-            props.payment?.currency_id)} {formatDate(new Date(props.paymentable.created_at*1000).toString(), dateFormat) } 
+            props.payment?.currency_id)} - {formatDate(new Date(props.paymentable.created_at*1000).toString(), dateFormat) } 
         </span>
         </div>
     </div> 
