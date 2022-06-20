@@ -31,10 +31,11 @@ import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useSearchParams } from 'react-router-dom';
+import { UnknownFunction } from 'reselect/es/types';
 import { v4 } from 'uuid';
 import { useSave } from './hooks/useSave';
 
-interface PaymentOnCreation extends Payment {
+interface PaymentOnCreation extends Omit<Payment, 'invoices'> {
   invoices: PaymentInvoice[];
 }
 
@@ -173,7 +174,7 @@ export function Create() {
           onFormSubmit={(event) => {
             event.preventDefault();
 
-            payment && onSubmit(payment, sendEmail);
+            payment && onSubmit(payment as unknown as Payment, sendEmail);
           }}
           withSaveButton
         >
