@@ -36,6 +36,7 @@ import { useCurrentCredit } from '../common/hooks/useCurrentCredit';
 import { useHandleSave } from '../common/hooks/useHandleSave';
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useSetCurrentCreditProperty } from '../common/hooks/useSetCurrentCreditProperty';
+import { Actions } from './components/Actions';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_credit');
@@ -76,6 +77,7 @@ export function Edit() {
       onSaveClick={() =>
         handleSave(currentCredit?.id as string, currentCredit as Credit)
       }
+      navigationTopRight={currentCredit && <Actions />}
     >
       <div className="grid grid-cols-12 gap-4">
         {currentCredit && (

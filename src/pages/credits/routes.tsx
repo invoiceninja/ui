@@ -13,6 +13,7 @@ import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Edit } from './edit/Edit';
 import { Credits } from './index/Credits';
+import { Pdf } from './pdf/Pdf';
 
 export const creditRoutes = (
   <Route path="/credits">
@@ -32,6 +33,12 @@ export const creditRoutes = (
           guards={[() => permission('edit_credit')]}
           component={<Edit />}
         />
+      }
+    />
+    <Route
+      path=":id/pdf"
+      element={
+        <Guard guards={[() => permission('view_credit')]} component={<Pdf />} />
       }
     />
   </Route>
