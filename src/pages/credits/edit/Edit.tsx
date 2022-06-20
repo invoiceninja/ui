@@ -33,6 +33,7 @@ import { generatePath, useParams } from 'react-router-dom';
 import { CreditDetails } from '../common/components/CreditDetails';
 import { CreditFooter } from '../common/components/CreditFooter';
 import { useCurrentCredit } from '../common/hooks/useCurrentCredit';
+import { useHandleSave } from '../common/hooks/useHandleSave';
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useSetCurrentCreditProperty } from '../common/hooks/useSetCurrentCreditProperty';
 
@@ -45,7 +46,7 @@ export function Edit() {
   const dispatch = useDispatch();
   const handleChange = useSetCurrentCreditProperty();
 
-  // const handleSave = () => {};
+  const handleSave = useHandleSave();
 
   const currentCredit = useCurrentCredit();
   const invoiceSum = useInvoiceSum();
@@ -69,7 +70,13 @@ export function Edit() {
   }, [credit]);
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onSaveClick={() =>
+        handleSave(currentCredit?.id as string, currentCredit as Credit)
+      }
+    >
       <div className="grid grid-cols-12 gap-4">
         {currentCredit && (
           <ClientSelector
