@@ -12,6 +12,7 @@ import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Clone } from './clone/Clone';
+import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Email } from './email/Email';
 import { Credits } from './index/Credits';
@@ -25,6 +26,15 @@ export const creditRoutes = (
         <Guard
           guards={[() => permission('view_credit')]}
           component={<Credits />}
+        />
+      }
+    />
+    <Route
+      path="create"
+      element={
+        <Guard
+          guards={[() => permission('create_credit')]}
+          component={<Create />}
         />
       }
     />

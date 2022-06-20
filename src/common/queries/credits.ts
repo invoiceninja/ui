@@ -23,3 +23,11 @@ export function useCreditQuery(
     { ...options, staleTime: Infinity }
   );
 }
+
+export function useBlankCreditQuery(options: Record<string, any> = {}) {
+  return useQuery(
+    generatePath('/api/v1/credits/create'),
+    () => request('GET', endpoint('/api/v1/credits/create')),
+    { ...options, staleTime: Infinity }
+  );
+}
