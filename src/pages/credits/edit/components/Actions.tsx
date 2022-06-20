@@ -47,7 +47,11 @@ export function Actions() {
         </DropdownElement>
       </div>
 
-      <div></div>
+      <div>
+        <DropdownElement to={generatePath('/credits/:id/clone', { id })}>
+          {t('clone_to_credit')}
+        </DropdownElement>
+      </div>
     </Dropdown>
   );
 }

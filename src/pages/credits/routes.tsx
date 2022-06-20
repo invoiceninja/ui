@@ -11,6 +11,7 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
+import { Clone } from './clone/Clone';
 import { Edit } from './edit/Edit';
 import { Email } from './email/Email';
 import { Credits } from './index/Credits';
@@ -36,6 +37,7 @@ export const creditRoutes = (
         />
       }
     />
+    <Route path=":id/clone" element={<Clone />} />
     <Route
       path=":id/pdf"
       element={
