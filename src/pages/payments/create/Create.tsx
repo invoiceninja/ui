@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import collect from 'collect.js';
 import paymentType from 'common/constants/payment-type';
+import { useCreditResolver } from 'common/hooks/credits/useCreditResolver';
 import { useInvoiceResolver } from 'common/hooks/invoices/useInvoiceResolver';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
@@ -63,6 +64,7 @@ export function Create() {
 
   const company = useCurrentCompany();
   const invoiceResolver = useInvoiceResolver();
+  const creditResolver = useCreditResolver();
   const formatMoney = useFormatMoney();
 
   const [payment, setPayment] = useState<PaymentOnCreation>();
@@ -91,7 +93,7 @@ export function Create() {
         );
       }
 
-      if (searchParams.has('invoice')) {
+      if (searchParams.has('client') && searchParams.has('invoice')) {
         invoiceResolver
           .find(searchParams.get('invoice') as string)
           .then((invoice) =>
@@ -106,6 +108,28 @@ export function Create() {
                       amount:
                         invoice.balance > 0 ? invoice.balance : invoice.amount,
                       credit_id: '',
+                    },
+                  ],
+                }
+            )
+          );
+      }
+
+      if (searchParams.has('client') && searchParams.has('credit')) {
+        creditResolver
+          .find(searchParams.get('credit') as string)
+          .then((credit) =>
+            setPayment(
+              (current) =>
+                current && {
+                  ...current,
+                  credits: [
+                    {
+                      _id: v4(),
+                      credit_id: credit.id,
+                      amount:
+                        credit.balance > 0 ? credit.balance : credit.amount,
+                      invoice_id: '',
                     },
                   ],
                 }
