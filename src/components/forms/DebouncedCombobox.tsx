@@ -74,8 +74,8 @@ export function DebouncedCombobox(props: Props) {
     setDefaultValueProperty(props.defaultValue as string);
 
     return () => {
-      setDefaultValueProperty('')
-    }
+      setDefaultValueProperty('');
+    };
   }, [props.defaultValue]);
 
   const request = async (query: string, staleTime = Infinity) => {
@@ -246,6 +246,7 @@ export function DebouncedCombobox(props: Props) {
         <div className="relative mt-1">
           <div className="relative w-full cursor-default overflow-hidden rounded border border-gray-300 bg-white text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 sm:text-sm">
             <Combobox.Input
+              autoComplete="off"
               placeholder={props.placeholder || ''}
               className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
               onChange={(event) => debouncedSearch(event.target.value)}
