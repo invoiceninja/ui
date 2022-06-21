@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
 
 export interface Invoice {
@@ -73,4 +74,5 @@ export interface Invoice {
   auto_bill_enabled: boolean;
   invitations: any[];
   documents: any[];
+  client?: Client;
 }
