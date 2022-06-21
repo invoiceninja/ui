@@ -41,6 +41,21 @@ export function useHandleInvoice(props: Props) {
           }
       );
     },
+    handleExistingInvoiceChange: (invoice: Invoice, index: number) => {
+      const cloned = { ...payment } as PaymentOnCreation;
+
+      cloned.invoices[index] = {
+        _id: v4(),
+        amount: invoice.balance > 0 ? invoice.balance : invoice.amount,
+        credit_id: '',
+        invoice_id: invoice.id,
+      };
+
+      setPayment({
+        ...cloned,
+        amount: collect(cloned.invoices).sum('amount') as number,
+      });
+    },
     handleInvoiceInputChange: (index: number, amount: number) => {
       const cloned = { ...payment } as PaymentOnCreation;
 

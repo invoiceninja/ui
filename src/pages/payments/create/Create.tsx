@@ -117,6 +117,7 @@ export function Create() {
 
   const {
     handleInvoiceChange,
+    handleExistingInvoiceChange,
     handleInvoiceInputChange,
     handleDeletingInvoice,
   } = useHandleInvoice({ payment, setPayment });
@@ -189,7 +190,8 @@ export function Create() {
                     )}
                     label="number"
                     onChange={(value: Record<Invoice>) =>
-                      value.resource && handleInvoiceChange(value.resource)
+                      value.resource &&
+                      handleExistingInvoiceChange(value.resource, index)
                     }
                     defaultValue={invoice.invoice_id}
                     queryAdditional
