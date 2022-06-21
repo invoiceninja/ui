@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTitle } from 'common/hooks/useTitle';
 import { SwitchToFlutter } from 'components/SwitchToFlutter';
 import { Activity } from 'pages/dashboard/components/Activity';
@@ -24,12 +25,17 @@ export function Dashboard() {
   useTitle('dashboard');
 
   const pages = [{ name: t('dashboard'), href: '/dashboard' }];
+  const user = useCurrentUser();
 
   return (
     <Default
       title={t('dashboard')}
       breadcrumbs={pages}
-      navigationTopRight={<SwitchToFlutter />}
+      navigationTopRight={
+        (user?.company_user?.is_admin || user?.company_user?.is_owner) && (
+          <SwitchToFlutter />
+        )
+      }
     >
       <Totals />
 
