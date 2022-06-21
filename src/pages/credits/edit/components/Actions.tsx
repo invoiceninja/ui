@@ -50,6 +50,17 @@ export function Actions() {
         <DropdownElement onClick={() => credit && openClientPortal(credit)}>
           {t('client_portal')}
         </DropdownElement>
+
+        {credit && credit?.client_id && credit.amount > 0 && (
+          <DropdownElement
+            to={generatePath(
+              '/payments/create?client=:clientId&credit=:creditId&type=1',
+              { clientId: credit.client_id, creditId: credit.id }
+            )}
+          >
+            {t('apply_credit')}
+          </DropdownElement>
+        )}
       </div>
 
       <div>
