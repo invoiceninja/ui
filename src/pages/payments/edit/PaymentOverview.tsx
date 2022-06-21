@@ -63,7 +63,7 @@ export function PaymentOverview(props: Props) {
         </div>
       </div>
 
-      <div className="">
+      <div>
         {props.payment.paymentables.map((value) => (
           <PaymentOverviewInvoice
             key={props.payment.id}
