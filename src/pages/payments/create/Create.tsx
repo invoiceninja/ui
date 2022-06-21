@@ -32,9 +32,10 @@ import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { useHandleInvoice } from './hooks/useHandleInvoice';
 import { useSave } from './hooks/useSave';
 
-interface PaymentOnCreation extends Omit<Payment, 'invoices'> {
+export interface PaymentOnCreation extends Omit<Payment, 'invoices'> {
   invoices: PaymentInvoice[];
 }
 
@@ -114,6 +115,12 @@ export function Create() {
     );
   }, [payment?.invoices]);
 
+  const {
+    handleInvoiceChange,
+    handleInvoiceInputChange,
+    handleDeletingInvoice,
+  } = useHandleInvoice({ payment, setPayment });
+
   const handleChange = <
     TField extends keyof PaymentOnCreation,
     TValue extends PaymentOnCreation[TField]
@@ -122,45 +129,6 @@ export function Create() {
     value: TValue
   ) => {
     setPayment((current) => current && { ...current, [field]: value });
-  };
-
-  const handleInvoiceChange = (invoice: Invoice) => {
-    setPayment(
-      (current) =>
-        current && {
-          ...current,
-          invoices: [
-            ...current.invoices,
-            {
-              _id: v4(),
-              amount: invoice.balance > 0 ? invoice.balance : invoice.amount,
-              credit_id: '',
-              invoice_id: invoice.id,
-            },
-          ],
-        }
-    );
-  };
-
-  const handleInvoiceInputChange = (index: number, amount: number) => {
-    const cloned = { ...payment } as PaymentOnCreation;
-
-    cloned.invoices[index].amount = amount;
-
-    setPayment({
-      ...cloned,
-      amount: collect(cloned.invoices).sum('amount') as number,
-    });
-  };
-
-  const handleDeletingInvoice = (id: string) => {
-    setPayment(
-      (current) =>
-        current && {
-          ...current,
-          invoices: current.invoices.filter((invoice) => invoice._id !== id),
-        }
-    );
   };
 
   const onSubmit = useSave(setErrors);
