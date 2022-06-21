@@ -13,9 +13,11 @@ import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import collect from 'collect.js';
 import paymentType from 'common/constants/payment-type';
 import { useInvoiceResolver } from 'common/hooks/invoices/useInvoiceResolver';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
+import { Credit } from 'common/interfaces/credit';
 import { Invoice } from 'common/interfaces/invoice';
 import { Payment } from 'common/interfaces/payment';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -32,14 +34,16 @@ import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { useHandleCredit } from './hooks/useHandleCredit';
 import { useHandleInvoice } from './hooks/useHandleInvoice';
 import { useSave } from './hooks/useSave';
 
 export interface PaymentOnCreation extends Omit<Payment, 'invoices'> {
-  invoices: PaymentInvoice[];
+  invoices: Paymentable[];
+  credits: Paymentable[];
 }
 
-interface PaymentInvoice {
+interface Paymentable {
   _id: string;
   amount: number;
   credit_id: string;
@@ -59,6 +63,7 @@ export function Create() {
 
   const company = useCurrentCompany();
   const invoiceResolver = useInvoiceResolver();
+  const formatMoney = useFormatMoney();
 
   const [payment, setPayment] = useState<PaymentOnCreation>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -69,7 +74,12 @@ export function Create() {
 
   useEffect(() => {
     if (blankPayment?.data.data) {
-      setPayment({ ...blankPayment.data.data, invoices: [], client_id: '' });
+      setPayment({
+        ...blankPayment.data.data,
+        invoices: [],
+        credits: [],
+        client_id: '',
+      });
 
       if (searchParams.has('client')) {
         setPayment(
@@ -121,6 +131,16 @@ export function Create() {
     handleInvoiceInputChange,
     handleDeletingInvoice,
   } = useHandleInvoice({ payment, setPayment });
+
+  const {
+    handleCreditChange,
+    handleExistingCreditChange,
+    handleCreditInputChange,
+    handleDeletingCredit,
+  } = useHandleCredit({
+    payment,
+    setPayment,
+  });
 
   const handleChange = <
     TField extends keyof PaymentOnCreation,
@@ -229,9 +249,83 @@ export function Create() {
                 onChange={(value: Record<Invoice>) =>
                   value.resource && handleInvoiceChange(value.resource)
                 }
+                formatLabel={(resource: Invoice) =>
+                  `${resource.number} (${formatMoney(
+                    resource.amount,
+                    resource?.client?.country_id ?? '1',
+                    resource?.client?.settings.currency_id
+                  )})`
+                }
                 exclude={collect(payment.invoices)
                   .pluck('invoice_id')
                   .toArray()}
+              />
+            </Element>
+          )}
+
+          {payment?.client_id && <Divider />}
+
+          {payment &&
+            payment.credits.length > 0 &&
+            payment.credits.map((credit, index) => (
+              <Element key={index}>
+                <div className="flex items-center space-x-2">
+                  <DebouncedCombobox
+                    className="w-1/2"
+                    inputLabel={t('credit')}
+                    endpoint={generatePath(
+                      '/api/v1/credits?client_id=:clientId',
+                      { clientId: payment.client_id }
+                    )}
+                    label="number"
+                    onChange={(value: Record<Credit>) =>
+                      value.resource &&
+                      handleExistingCreditChange(value.resource, index)
+                    }
+                    defaultValue={credit.credit_id}
+                    queryAdditional
+                  />
+
+                  <InputField
+                    label={t('applied')}
+                    onValueChange={(value) =>
+                      handleCreditInputChange(index, parseFloat(value))
+                    }
+                    className="w-full"
+                    value={credit.amount}
+                  />
+
+                  <Button
+                    behavior="button"
+                    type="minimal"
+                    className="mt-6"
+                    onClick={() => handleDeletingCredit(credit._id)}
+                  >
+                    <X />
+                  </Button>
+                </div>
+              </Element>
+            ))}
+
+          {payment?.client_id && (
+            <Element leftSide={t('credits')}>
+              <DebouncedCombobox
+                endpoint={generatePath('/api/v1/credits?client_id=:clientId', {
+                  clientId: payment.client_id,
+                })}
+                label="number"
+                clearInputAfterSelection
+                onChange={(value: Record<Credit>) =>
+                  value.resource && handleCreditChange(value.resource)
+                }
+                formatLabel={(resource: Credit) =>
+                  `${resource.number} (${formatMoney(
+                    resource.amount,
+                    resource?.client?.country_id ?? '1',
+                    resource?.client?.settings.currency_id
+                  )})`
+                }
+                exclude={collect(payment.credits).pluck('credit_id').toArray()}
               />
             </Element>
           )}
