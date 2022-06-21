@@ -136,6 +136,13 @@ export function Create() {
             )
           );
       }
+
+      if (searchParams.has('type')) {
+        setPayment(
+          (current) =>
+            current && { ...current, type_id: searchParams.get('type') ?? '' }
+        );
+      }
     }
   }, [blankPayment]);
 
@@ -369,7 +376,7 @@ export function Create() {
           <Element leftSide={t('payment_type')}>
             <SelectField
               id="type_id"
-              defaultValue={payment?.type_id}
+              value={payment?.type_id}
               onValueChange={(value) => handleChange('type_id', value)}
               errorMessage={errors?.errors.type_id}
               withBlank
