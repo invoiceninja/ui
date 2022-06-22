@@ -13,25 +13,25 @@ import { InputField, SelectField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
 import { useTranslation } from 'react-i18next';
-import { useCurrentQuote } from '../hooks/useCurrentQuote';
-import { useSetCurrentQuoteProperty } from '../hooks/useSetCurrentQuoteProperty';
+import { useCurrentCredit } from '../hooks/useCurrentCredit';
+import { useSetCurrentCreditProperty } from '../hooks/useSetCurrentCreditProperty';
 
-export function QuoteDetails() {
+export function CreditDetails() {
   const [t] = useTranslation();
 
-  const quote = useCurrentQuote();
+  const credits = useCurrentCredit();
   const company = useCurrentCompany();
 
-  const handleChange = useSetCurrentQuoteProperty();
+  const handleChange = useSetCurrentCreditProperty();
 
   return (
     <>
       <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
-        <Element leftSide={t('quote_date')}>
+        <Element leftSide={t('credit_date')}>
           <InputField
             type="date"
             onValueChange={(value) => handleChange('date', value)}
-            value={quote?.date || ''}
+            value={credits?.date || ''}
           />
         </Element>
 
@@ -39,7 +39,7 @@ export function QuoteDetails() {
           <InputField
             type="date"
             onValueChange={(value) => handleChange('due_date', value)}
-            value={quote?.due_date || ''}
+            value={credits?.due_date || ''}
           />
         </Element>
 
@@ -48,45 +48,45 @@ export function QuoteDetails() {
             id="partial"
             type="number"
             onValueChange={(value) => handleChange('partial', value)}
-            value={quote?.partial || ''}
+            value={credits?.partial || ''}
           />
         </Element>
 
-        {quote && quote.partial > 0 && (
+        {credits && credits.partial > 0 && (
           <Element leftSide={t('partial_due_date')}>
             <InputField
               type="date"
               onValueChange={(value) => handleChange('partial_due_date', value)}
-              value={quote?.partial_due_date || ''}
+              value={credits?.partial_due_date || ''}
             />
           </Element>
         )}
 
-        {quote && company?.custom_fields?.quote1 && (
+        {credits && company?.custom_fields?.credit1 && (
           <CustomField
-            field="quote1"
-            defaultValue={quote?.custom_value1 || ''}
-            value={company.custom_fields.quote1}
+            field="credit1"
+            defaultValue={credits?.custom_value1 || ''}
+            value={company.custom_fields.credit1}
             onChange={(value) => handleChange('custom_value1', value)}
           />
         )}
 
-        {quote && company?.custom_fields?.quote2 && (
+        {credits && company?.custom_fields?.credit2 && (
           <CustomField
-            field="quote2"
-            defaultValue={quote?.custom_value2 || ''}
-            value={company.custom_fields.quote2}
+            field="credit2"
+            defaultValue={credits?.custom_value2 || ''}
+            value={company.custom_fields.credit2}
             onChange={(value) => handleChange('custom_value2', value)}
           />
         )}
       </Card>
 
       <Card className="col-span-12 lg:col-span-6 xl:col-span-4 h-max">
-        <Element leftSide={t('quote_number_short')}>
+        <Element leftSide={t('credit_number')}>
           <InputField
             id="number"
             onValueChange={(value) => handleChange('number', value)}
-            value={quote?.number || ''}
+            value={credits?.number || ''}
           />
         </Element>
 
@@ -94,7 +94,7 @@ export function QuoteDetails() {
           <InputField
             id="po_number"
             onValueChange={(value) => handleChange('po_number', value)}
-            value={quote?.po_number || ''}
+            value={credits?.po_number || ''}
           />
         </Element>
 
@@ -106,7 +106,7 @@ export function QuoteDetails() {
                 onValueChange={(value) =>
                   handleChange('discount', parseFloat(value))
                 }
-                value={quote?.discount || ''}
+                value={credits?.discount || ''}
               />
             </div>
 
@@ -115,7 +115,7 @@ export function QuoteDetails() {
                 onValueChange={(value) =>
                   handleChange('is_amount_discount', value)
                 }
-                value={quote?.is_amount_discount.toString()}
+                value={credits?.is_amount_discount.toString()}
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
@@ -124,20 +124,20 @@ export function QuoteDetails() {
           </div>
         </Element>
 
-        {quote && company?.custom_fields?.quote3 && (
+        {credits && company?.custom_fields?.credit3 && (
           <CustomField
-            field="quote3"
-            defaultValue={quote?.custom_value3 || ''}
-            value={company.custom_fields.quote3}
+            field="credit3"
+            defaultValue={credits?.custom_value3 || ''}
+            value={company.custom_fields.credit3}
             onChange={(value) => handleChange('custom_value3', value)}
           />
         )}
 
-        {quote && company?.custom_fields?.quote4 && (
+        {credits && company?.custom_fields?.credit4 && (
           <CustomField
-            field="quote4"
-            defaultValue={quote?.custom_value4 || ''}
-            value={company.custom_fields.quote4}
+            field="credit4"
+            defaultValue={credits?.custom_value4 || ''}
+            value={company.custom_fields.credit4}
             onChange={(value) => handleChange('custom_value4', value)}
           />
         )}

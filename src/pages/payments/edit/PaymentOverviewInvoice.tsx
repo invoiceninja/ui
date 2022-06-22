@@ -24,9 +24,9 @@ interface Props {
 export function setLabel(payment: Payment, paymentable: Paymentable): string {
   const invoice = payment?.invoices?.find(
     (invoice: Invoice) => invoice.id == paymentable.invoice_id
-  ) as Invoice;
+  );
 
-  return invoice.number;
+  return invoice?.number || '';
 }
 
 export function PaymentOverviewInvoice(props: Props) {

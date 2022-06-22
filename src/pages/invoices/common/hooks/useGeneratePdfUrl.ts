@@ -14,7 +14,7 @@ import { Quote } from 'common/interfaces/quote';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 interface Props {
-  resource: 'invoice' | 'recurring_invoice' | 'quote';
+  resource: 'invoice' | 'recurring_invoice' | 'quote' | 'credit';
 }
 
 export function useGeneratePdfUrl(props: Props) {

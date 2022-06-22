@@ -44,7 +44,15 @@ export function Quotes() {
       label: t('status'),
       format: (value) => <StatusBadge for={quoteStatus} code={value} />,
     },
-    { id: 'number', label: t('number') },
+    {
+      id: 'number',
+      label: t('number'),
+      format: (field, resource: Quote) => (
+        <Link to={generatePath('/quotes/:id/edit', { id: resource.id })}>
+          {field}
+        </Link>
+      ),
+    },
     {
       id: 'client_id',
       label: t('client'),

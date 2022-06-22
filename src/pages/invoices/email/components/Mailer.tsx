@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 
 interface Props {
   resource: Invoice | RecurringInvoice | Quote;
-  resourceType: 'invoice' | 'recurring_invoice' | 'quote';
+  resourceType: 'invoice' | 'recurring_invoice' | 'quote' | 'credit';
   list: Record<string, string>;
   defaultEmail: string;
 }

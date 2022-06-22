@@ -8,4 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export * from './index/Credits';
+import { RootState } from 'common/stores/store';
+import { useSelector } from 'react-redux';
+
+export function useInvoiceSum() {
+  return useSelector((state: RootState) => state.credits.invoiceSum);
+}

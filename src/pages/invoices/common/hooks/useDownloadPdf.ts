@@ -16,7 +16,7 @@ import { useQueryClient } from 'react-query';
 import { useGeneratePdfUrl } from './useGeneratePdfUrl';
 
 interface Props {
-  resource: 'invoice' | 'recurring_invoice' | 'quote';
+  resource: 'invoice' | 'recurring_invoice' | 'quote' | 'credit';
 }
 
 export function useDownloadPdf(props: Props) {

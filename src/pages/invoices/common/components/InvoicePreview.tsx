@@ -9,6 +9,7 @@
  */
 
 import { endpoint } from 'common/helpers';
+import { Credit } from 'common/interfaces/credit';
 import { Invoice } from 'common/interfaces/invoice';
 import { Quote } from 'common/interfaces/quote';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
@@ -16,8 +17,8 @@ import { InvoiceViewer } from './InvoiceViewer';
 
 interface Props {
   for: 'create' | 'invoice';
-  resource: Invoice | RecurringInvoice | Quote;
-  entity: 'invoice' | 'recurring_invoice' | 'quote';
+  resource: Invoice | RecurringInvoice | Quote | Credit;
+  entity: 'invoice' | 'recurring_invoice' | 'quote' | 'credit';
 }
 
 export function InvoicePreview(props: Props) {

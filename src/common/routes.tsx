@@ -20,6 +20,7 @@ import { paymentRoutes } from 'pages/payments/routes';
 import { settingsRoutes } from 'pages/settings/routes';
 import { authenticationRoutes } from 'pages/authentication/routes';
 import { quoteRoutes } from 'pages/quotes/routes';
+import { creditRoutes } from 'pages/credits/routes';
 
 export const routes = (
   <Routes>
@@ -33,6 +34,7 @@ export const routes = (
       {recurringInvoiceRoutes}
       {paymentRoutes}
       {quoteRoutes}
+      {creditRoutes}
       {settingsRoutes}
     </Route>
   </Routes>
