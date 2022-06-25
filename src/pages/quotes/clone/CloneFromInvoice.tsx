@@ -39,7 +39,7 @@ import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useSetCurrentQuoteProperty } from '../common/hooks/useSetCurrentQuoteProperty';
 import { useHandleCreate } from '../create/hooks/useHandleCreate';
 
-export function CloneFromInvoice() {
+export function CloneInvoiceToQuote() {
   const { documentTitle } = useTitle('clone_to_quote');
   const { id } = useParams();
   const { data: invoice } = useInvoiceQuery({ id });

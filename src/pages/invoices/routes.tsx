@@ -10,7 +10,7 @@
 
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
-import { CloneFromInvoice } from 'pages/quotes/clone/CloneFromInvoice';
+import { CloneInvoiceToQuote } from 'pages/quotes/clone/CloneFromInvoice';
 import { Route } from 'react-router-dom';
 import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
@@ -62,6 +62,6 @@ export const invoiceRoutes = (
     />
     <Route path=":id/email" element={<Email />} />
     <Route path=":id/clone" element={<Clone />} />
-    <Route path=":id/clone/quote" element={<CloneFromInvoice />} />
+    <Route path=":id/clone/quote" element={<CloneInvoiceToQuote />} />
   </Route>
 );
