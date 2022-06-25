@@ -19,6 +19,7 @@ import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
 import { useHandleArchive } from '../hooks/useHandleArchive';
+import { useHandleCancel } from '../hooks/useHandleCancel';
 import { useHandleDelete } from '../hooks/useHandleDelete';
 import { useHandleRestore } from '../hooks/useHandleRestore';
 import { useMarkPaid } from '../hooks/useMarkPaid';
@@ -36,6 +37,7 @@ export function Actions() {
   const archive = useHandleArchive();
   const restore = useHandleRestore();
   const destroy = useHandleDelete();
+  const cancel = useHandleCancel();
 
   if (!invoice) {
     return <Spinner />;
@@ -112,6 +114,12 @@ export function Actions() {
       </DropdownElement>
 
       <Divider withoutPadding />
+
+      {invoice.status_id === InvoiceStatus.Sent && (
+        <DropdownElement onClick={() => cancel(invoice)}>
+          {t('cancel')}
+        </DropdownElement>
+      )}
 
       {invoice.archived_at === 0 && (
         <DropdownElement onClick={() => archive(invoice)}>

@@ -35,7 +35,7 @@ export function useBlankInvoiceQuery(options: Record<string, any> = {}) {
 
 export function bulk(
   id: string[],
-  action: 'archive' | 'restore' | 'delete'
+  action: 'archive' | 'restore' | 'delete' | 'cancel'
 ): Promise<AxiosResponse> {
   return request('POST', endpoint('/api/v1/invoices/bulk'), {
     action,
