@@ -103,6 +103,14 @@ export function Actions() {
         {t('clone_to_credit')}
       </DropdownElement>
 
+      <DropdownElement
+        to={generatePath('/invoices/:id/clone/recurring_invoice', {
+          id: invoice.id,
+        })}
+      >
+        {t('clone_to_recurring')}
+      </DropdownElement>
+
       <Divider withoutPadding />
 
       {invoice.archived_at === 0 && (
