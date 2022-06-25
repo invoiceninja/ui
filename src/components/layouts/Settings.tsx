@@ -99,6 +99,12 @@ export function Settings(props: Props) {
       current: location.pathname === '/settings/invoice_design',
       visible: proPlan() || enterprisePlan(),
     },
+    {
+      name: t('client_portal'),
+      href: '/settings/client_portal',
+      current: location.pathname === '/settings/client_portal',
+      visible: proPlan() || enterprisePlan(),
+    },
   ];
 
   return (
