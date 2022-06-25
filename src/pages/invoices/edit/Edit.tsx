@@ -76,7 +76,6 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick={generatePath('/invoices')}
       onSaveClick={() =>
         handleInvoiceSave(
           currentInvoice?.id as string,
