@@ -11,6 +11,8 @@
 import reccuringInvoice from 'common/constants/reccuring-invoice';
 import recurringInvoicesFrequency from 'common/constants/recurring-invoices-frequency';
 import { date } from 'common/helpers';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
@@ -20,12 +22,18 @@ import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 
 export function RecurringInvoices() {
+  useTitle('recurring_invoices');
+
   const [t] = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
-  useTitle('recurring_invoices');
+
+  const formatMoney = useFormatMoney();
+  const company = useCurrentCompany();
+
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
   ];
+
   const columns: DataTableColumns = [
     {
       id: 'status_id',
@@ -39,6 +47,14 @@ export function RecurringInvoices() {
     {
       id: 'amount',
       label: t('amount'),
+      format: (value, resource) =>
+        formatMoney(
+          value,
+          resource?.client.country_id,
+          resource?.client.settings.currency_id
+            ? resource?.client.settings.currency_id
+            : company.settings.currency_id
+        ),
     },
     {
       id: 'remaining_cycles',
@@ -76,6 +92,7 @@ export function RecurringInvoices() {
       format: (value) => t(String(value)),
     },
   ];
+
   return (
     <Default
       title={t('recurring_invoices')}
@@ -85,9 +102,10 @@ export function RecurringInvoices() {
       <DataTable
         resource="recurring_invoice"
         columns={columns}
-        endpoint="/api/v1/recurring_invoices"
+        endpoint="/api/v1/recurring_invoices?include=client"
         linkToCreate="/recurring_invoices/create"
         linkToEdit="/recurring_invoices/:id/edit"
+        bulkRoute="/api/v1/recurring_invoices/bulk"
         withResourcefulActions
       />
     </Default>
