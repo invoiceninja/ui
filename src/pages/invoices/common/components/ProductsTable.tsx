@@ -20,6 +20,7 @@ import { resolveColumnWidth } from '../helpers/resolve-column-width';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { Fragment } from 'react';
 
 interface Props {
   resource: Invoice | RecurringInvoice;
@@ -64,7 +65,7 @@ export function ProductsTable(props: Props) {
         <Droppable droppableId="product-table">
           {(provided) => (
             <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
-              {resource?.client_id &&
+              {resource?.client_id ? (
                 resource.line_items.map((lineItem, lineItemIndex) => (
                   <Draggable
                     key={lineItemIndex}
@@ -109,9 +110,12 @@ export function ProductsTable(props: Props) {
                       </Tr>
                     )}
                   </Draggable>
-                ))}
+                ))
+              ) : (
+                <Fragment />
+              )}
 
-              {resource?.client_id && (
+              {resource?.client_id ? (
                 <Tr className="bg-slate-100 hover:bg-slate-200">
                   <Td colSpan={100}>
                     <button
@@ -123,12 +127,16 @@ export function ProductsTable(props: Props) {
                     </button>
                   </Td>
                 </Tr>
+              ) : (
+                <Fragment />
               )}
 
-              {!resource?.client_id && (
+              {!resource?.client_id ? (
                 <Tr>
                   <Td colSpan={100}>{t('no_client_selected')}.</Td>
                 </Tr>
+              ) : (
+                <Fragment />
               )}
             </Tbody>
           )}
