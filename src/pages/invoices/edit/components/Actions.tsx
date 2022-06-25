@@ -28,7 +28,7 @@ export function Actions() {
   const [t] = useTranslation();
   const { id } = useParams();
   const invoice = useCurrentInvoice();
-  const downloadPdf = useDownloadPdf({resource: 'invoice'});
+  const downloadPdf = useDownloadPdf({ resource: 'invoice' });
 
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
@@ -43,16 +43,16 @@ export function Actions() {
 
   return (
     <Dropdown label={t('more_actions')}>
+      <DropdownElement to={generatePath('/invoices/:id/email', { id })}>
+        {t('email_invoice')}
+      </DropdownElement>
+
       <DropdownElement to={generatePath('/invoices/:id/pdf', { id })}>
         {t('view_pdf')}
       </DropdownElement>
 
       <DropdownElement onClick={() => downloadPdf(invoice)}>
         {t('download')}
-      </DropdownElement>
-
-      <DropdownElement to={generatePath('/invoices/:id/email', { id })}>
-        {t('email_invoice')}
       </DropdownElement>
 
       {invoice.status_id === InvoiceStatus.Draft && !invoice.is_deleted && (
@@ -68,10 +68,6 @@ export function Actions() {
           </DropdownElement>
         )}
 
-      <DropdownElement onClick={() => invoice && openClientPortal(invoice)}>
-        {t('client_portal')}
-      </DropdownElement>
-
       {invoice && parseInt(invoice.status_id) < 4 && (
         <DropdownElement
           to={generatePath(
@@ -82,6 +78,10 @@ export function Actions() {
           {t('enter_payment')}
         </DropdownElement>
       )}
+
+      <DropdownElement onClick={() => invoice && openClientPortal(invoice)}>
+        {t('client_portal')}
+      </DropdownElement>
 
       {invoice && <Divider withoutPadding />}
 
