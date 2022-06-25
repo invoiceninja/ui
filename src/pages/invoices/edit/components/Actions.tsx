@@ -91,6 +91,12 @@ export function Actions() {
         {t('clone_to_invoice')}
       </DropdownElement>
 
+      <DropdownElement
+        to={generatePath('/invoices/:id/clone/quote', { id: invoice.id })}
+      >
+        {t('clone_to_quote')}
+      </DropdownElement>
+
       <Divider withoutPadding />
 
       {invoice.archived_at === 0 && (
