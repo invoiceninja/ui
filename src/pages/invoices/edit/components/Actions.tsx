@@ -119,11 +119,12 @@ export function Actions() {
         </DropdownElement>
       )}
 
-      {invoice.archived_at > 0 && (
-        <DropdownElement onClick={() => restore(invoice)}>
-          {t('restore')}
-        </DropdownElement>
-      )}
+      {invoice.archived_at > 0 &&
+        invoice.status_id !== InvoiceStatus.Cancelled && (
+          <DropdownElement onClick={() => restore(invoice)}>
+            {t('restore')}
+          </DropdownElement>
+        )}
 
       {!invoice.is_deleted && (
         <DropdownElement onClick={() => destroy(invoice)}>
