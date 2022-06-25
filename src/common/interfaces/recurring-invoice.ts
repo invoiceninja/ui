@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
 
 export interface RecurringInvoice {
@@ -74,4 +75,5 @@ export interface RecurringInvoice {
   subscription_id: string;
   invitations: any[];
   documents: any[];
+  client?: Client;
 }
