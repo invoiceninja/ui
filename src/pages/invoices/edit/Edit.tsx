@@ -76,18 +76,13 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick={generatePath('/invoices')}
       onSaveClick={() =>
         handleInvoiceSave(
           currentInvoice?.id as string,
           currentInvoice as Invoice
         )
       }
-      navigationTopRight={
-        currentInvoice &&
-        currentInvoice.status_id !== InvoiceStatus.Cancelled &&
-        !currentInvoice.is_deleted && <Actions />
-      }
+      navigationTopRight={currentInvoice && <Actions />}
       disableSaveButton={
         currentInvoice &&
         (currentInvoice.status_id === InvoiceStatus.Cancelled ||

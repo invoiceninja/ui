@@ -19,6 +19,7 @@ import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
 import { useHandleArchive } from '../hooks/useHandleArchive';
+import { useHandleCancel } from '../hooks/useHandleCancel';
 import { useHandleDelete } from '../hooks/useHandleDelete';
 import { useHandleRestore } from '../hooks/useHandleRestore';
 import { useMarkPaid } from '../hooks/useMarkPaid';
@@ -28,7 +29,7 @@ export function Actions() {
   const [t] = useTranslation();
   const { id } = useParams();
   const invoice = useCurrentInvoice();
-  const downloadPdf = useDownloadPdf({resource: 'invoice'});
+  const downloadPdf = useDownloadPdf({ resource: 'invoice' });
 
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
@@ -36,6 +37,7 @@ export function Actions() {
   const archive = useHandleArchive();
   const restore = useHandleRestore();
   const destroy = useHandleDelete();
+  const cancel = useHandleCancel();
 
   if (!invoice) {
     return <Spinner />;
@@ -43,16 +45,16 @@ export function Actions() {
 
   return (
     <Dropdown label={t('more_actions')}>
+      <DropdownElement to={generatePath('/invoices/:id/email', { id })}>
+        {t('email_invoice')}
+      </DropdownElement>
+
       <DropdownElement to={generatePath('/invoices/:id/pdf', { id })}>
         {t('view_pdf')}
       </DropdownElement>
 
       <DropdownElement onClick={() => downloadPdf(invoice)}>
         {t('download')}
-      </DropdownElement>
-
-      <DropdownElement to={generatePath('/invoices/:id/email', { id })}>
-        {t('email_invoice')}
       </DropdownElement>
 
       {invoice.status_id === InvoiceStatus.Draft && !invoice.is_deleted && (
@@ -68,10 +70,6 @@ export function Actions() {
           </DropdownElement>
         )}
 
-      <DropdownElement onClick={() => invoice && openClientPortal(invoice)}>
-        {t('client_portal')}
-      </DropdownElement>
-
       {invoice && parseInt(invoice.status_id) < 4 && (
         <DropdownElement
           to={generatePath(
@@ -83,6 +81,10 @@ export function Actions() {
         </DropdownElement>
       )}
 
+      <DropdownElement onClick={() => invoice && openClientPortal(invoice)}>
+        {t('client_portal')}
+      </DropdownElement>
+
       {invoice && <Divider withoutPadding />}
 
       <DropdownElement
@@ -91,7 +93,33 @@ export function Actions() {
         {t('clone_to_invoice')}
       </DropdownElement>
 
+      <DropdownElement
+        to={generatePath('/invoices/:id/clone/quote', { id: invoice.id })}
+      >
+        {t('clone_to_quote')}
+      </DropdownElement>
+
+      <DropdownElement
+        to={generatePath('/invoices/:id/clone/credit', { id: invoice.id })}
+      >
+        {t('clone_to_credit')}
+      </DropdownElement>
+
+      <DropdownElement
+        to={generatePath('/invoices/:id/clone/recurring_invoice', {
+          id: invoice.id,
+        })}
+      >
+        {t('clone_to_recurring')}
+      </DropdownElement>
+
       <Divider withoutPadding />
+
+      {invoice.status_id === InvoiceStatus.Sent && (
+        <DropdownElement onClick={() => cancel(invoice)}>
+          {t('cancel')}
+        </DropdownElement>
+      )}
 
       {invoice.archived_at === 0 && (
         <DropdownElement onClick={() => archive(invoice)}>
@@ -99,11 +127,12 @@ export function Actions() {
         </DropdownElement>
       )}
 
-      {invoice.archived_at > 0 && (
-        <DropdownElement onClick={() => restore(invoice)}>
-          {t('restore')}
-        </DropdownElement>
-      )}
+      {invoice.archived_at > 0 &&
+        invoice.status_id !== InvoiceStatus.Cancelled && (
+          <DropdownElement onClick={() => restore(invoice)}>
+            {t('restore')}
+          </DropdownElement>
+        )}
 
       {!invoice.is_deleted && (
         <DropdownElement onClick={() => destroy(invoice)}>

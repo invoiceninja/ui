@@ -68,7 +68,9 @@ export function Invoices() {
         formatMoney(
           value,
           resource?.client.country_id,
-          resource?.client.settings.currency_id ? resource?.client.settings.currency_id : company.settings.currency_id
+          resource?.client.settings.currency_id
+            ? resource?.client.settings.currency_id
+            : company.settings.currency_id
         ),
     },
     {
@@ -116,6 +118,36 @@ export function Invoices() {
     (invoice: Invoice) => (
       <DropdownElement onClick={() => openClientPortal(invoice)}>
         {t('client_portal')}
+      </DropdownElement>
+    ),
+    (invoice: Invoice) => (
+      <DropdownElement
+        to={generatePath('/invoices/:id/clone', { id: invoice.id })}
+      >
+        {t('clone_to_invoice')}
+      </DropdownElement>
+    ),
+    (invoice: Invoice) => (
+      <DropdownElement
+        to={generatePath('/invoices/:id/clone/quote', { id: invoice.id })}
+      >
+        {t('clone_to_quote')}
+      </DropdownElement>
+    ),
+    (invoice: Invoice) => (
+      <DropdownElement
+        to={generatePath('/invoices/:id/clone/credit', { id: invoice.id })}
+      >
+        {t('clone_to_credit')}
+      </DropdownElement>
+    ),
+    (invoice: Invoice) => (
+      <DropdownElement
+        to={generatePath('/invoices/:id/clone/recurring_invoice', {
+          id: invoice.id,
+        })}
+      >
+        {t('clone_to_recurring')}
       </DropdownElement>
     ),
   ];
