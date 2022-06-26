@@ -12,6 +12,8 @@ import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import {
   Authorization,
   Customize,
@@ -31,11 +33,16 @@ export function ClientPortal() {
     { name: t('client_portal'), href: '/settings/client_portal' },
   ];
 
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
+
   return (
     <Settings
       title={t('client_portal')}
       breadcrumbs={pages}
       docsLink="docs/advanced-settings/#client_portal"
+      onSaveClick={onSave}
+      onCancelClick={onCancel}
     >
       <SettingsComponent />
       <Registration />
