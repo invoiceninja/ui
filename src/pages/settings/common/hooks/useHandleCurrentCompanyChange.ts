@@ -29,7 +29,7 @@ export function useHandleCurrentCompanyChange() {
 export function useHandleCurrentCompanyChangeProperty() {
   const dispatch = useDispatch();
 
-  return (property: string, value: number | string | boolean) => {
+  return (property: string, value: unknown) => {
     dispatch(
       updateChanges({
         object: 'company',
