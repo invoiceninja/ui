@@ -16,7 +16,7 @@ import { Copy } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
-import { InputField, Textarea } from '../../../../components/forms';
+import { InputField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 
 export function Settings() {
