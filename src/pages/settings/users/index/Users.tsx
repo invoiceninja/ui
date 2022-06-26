@@ -19,7 +19,7 @@ export function Users() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('user_managment'), href: '/settings/users' },
+    { name: t('user_management'), href: '/settings/users' },
   ];
 
   return (
