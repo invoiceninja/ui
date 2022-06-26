@@ -8,7 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect } from 'react';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useTitle } from 'common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import {
@@ -20,14 +21,15 @@ import {
 } from './components';
 
 export function ClientPortal() {
+  useTitle('client_portal');
+  useInjectCompanyChanges();
+
   const [t] = useTranslation();
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('client_portal'), href: '/settings/client_portal' },
   ];
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('client_portal')}`;
-  });
 
   return (
     <Settings
