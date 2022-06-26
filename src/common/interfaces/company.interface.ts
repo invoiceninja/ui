@@ -8,48 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-
 export interface Company {
   id: string;
   size_id: string;
   industry_id: string;
-  settings: {
-    show_currency_code: boolean;
-    name: string;
-    auto_bill: string;
-    payment_type_id: string;
-    id_number: string;
-    vat_number: string;
-    website: string;
-    email: string;
-    phone: string;
-    date_format_id: string;
-    company_logo: string;
-    country_id: string;
-    pdf_variables: {
-      product_columns: string[];
-      total_columns: string[];
-    };
-    tax_name1: string;
-    tax_name2: string;
-    tax_name3: string;
-    tax_rate1: number;
-    tax_rate2: number;
-    tax_rate3: number;
-    currency_id: string;
-    invoice_design_id: string;
-    email_template_custom1: string;
-    email_template_custom2: string;
-    email_template_custom3: string;
-    email_subject_custom1: string;
-    email_subject_custom2: string;
-    email_subject_custom3: string;
-    auto_bill_date: 'on_send_date' | 'on_due_date';
-    use_credits_payment: 'always' | 'option' | 'off';
-    client_portal_allow_over_payment: boolean;
-    client_portal_allow_under_payment: boolean;
-    client_portal_under_payment_minimum: string;
-  };
+  settings: Settings;
   custom_fields: Record<string, string>;
   enabled_tax_rates: number;
   enabled_item_tax_rates: number;
@@ -58,4 +21,45 @@ export interface Company {
   custom_surcharge_taxes2: boolean;
   custom_surcharge_taxes3: boolean;
   custom_surcharge_taxes4: boolean;
+  portal_domain: string;
+}
+
+interface Settings {
+  show_currency_code: boolean;
+  name: string;
+  auto_bill: string;
+  payment_type_id: string;
+  id_number: string;
+  vat_number: string;
+  website: string;
+  email: string;
+  phone: string;
+  date_format_id: string;
+  company_logo: string;
+  country_id: string;
+  pdf_variables: {
+    product_columns: string[];
+    total_columns: string[];
+  };
+  tax_name1: string;
+  tax_name2: string;
+  tax_name3: string;
+  tax_rate1: number;
+  tax_rate2: number;
+  tax_rate3: number;
+  currency_id: string;
+  invoice_design_id: string;
+  email_template_custom1: string;
+  email_template_custom2: string;
+  email_template_custom3: string;
+  email_subject_custom1: string;
+  email_subject_custom2: string;
+  email_subject_custom3: string;
+  auto_bill_date: 'on_send_date' | 'on_due_date';
+  use_credits_payment: 'always' | 'option' | 'off';
+  client_portal_allow_over_payment: boolean;
+  client_portal_allow_under_payment: boolean;
+  client_portal_under_payment_minimum: string;
+  enable_client_portal: boolean;
+  client_portal_enable_uploads: boolean;
 }
