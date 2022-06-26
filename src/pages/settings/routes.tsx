@@ -83,6 +83,7 @@ export const settingsRoutes = (
     <Route path="subscriptions" element={<Settings.Subscriptions />} />
     <Route path="users">
       <Route path="" element={<Settings.Users />} />
+      <Route path=":id/edit" element={<Settings.EditUser />} />
     </Route>
     <Route path="payment_terms">
       <Route path="" element={<Settings.PaymentTerms />} />

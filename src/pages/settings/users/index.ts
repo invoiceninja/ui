@@ -9,3 +9,4 @@
  */
 
 export * from './index/Users';
+export { Edit as EditUser } from './edit/Edit';
