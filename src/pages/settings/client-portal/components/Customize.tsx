@@ -9,24 +9,56 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { Textarea } from '@invoiceninja/forms';
+import { InputField } from '@invoiceninja/forms';
+import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { useHandleCurrentCompanyChangeProperty } from 'pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 
 export function Customize() {
   const [t] = useTranslation();
+  const company = useCompanyChanges();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   return (
     <Card title={t('customize')}>
       <Element leftSide={t('header')}>
-        <Textarea />
+        <InputField
+          element="textarea"
+          value={company?.settings.portal_custom_head}
+          onValueChange={(value) =>
+            handleChange('settings.portal_custom_head', value)
+          }
+        />
       </Element>
 
       <Element leftSide={t('footer')}>
-        <Textarea />
+        <InputField
+          element="textarea"
+          value={company?.settings.portal_custom_footer}
+          onValueChange={(value) =>
+            handleChange('settings.portal_custom_footer', value)
+          }
+        />
       </Element>
 
       <Element leftSide={t('custom_css')}>
-        <Textarea />
+        <InputField
+          element="textarea"
+          value={company?.settings.portal_custom_css}
+          onValueChange={(value) =>
+            handleChange('settings.portal_custom_css', value)
+          }
+        />
+      </Element>
+
+      <Element leftSide={t('custom_javascript')}>
+        <InputField
+          element="textarea"
+          value={company?.settings.portal_custom_js}
+          onValueChange={(value) =>
+            handleChange('settings.portal_custom_js', value)
+          }
+        />
       </Element>
     </Card>
   );
