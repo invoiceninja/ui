@@ -12,8 +12,10 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useTitle } from 'common/hooks/useTitle';
 import { User } from 'common/interfaces/user';
+import { defaultHeaders } from 'common/queries/common/headers';
 import { useBlankUserQuery } from 'common/queries/users';
 import { Settings } from 'components/layouts/Settings';
+import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -35,6 +37,8 @@ export function Create() {
 
   const { data: response } = useBlankUserQuery();
   const [user, setUser] = useState<User>();
+  const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
+    useState(false);
 
   const navigate = useNavigate();
 
@@ -65,10 +69,14 @@ export function Create() {
     });
   }, [response?.data.data]);
 
-  const onSave = () => {
+  const onSave = (password: string) => {
     const toastId = toast.loading(t('processing'));
 
-    request('POST', endpoint('/api/v1/users?include=company_user'), user)
+    setIsPasswordConfirmModalOpen(false);
+
+    request('POST', endpoint('/api/v1/users?include=company_user'), user, {
+      headers: { 'X-Api-Password': password, ...defaultHeaders() },
+    })
       .then((response) => {
         toast.success(t('created_user'), { id: toastId });
 
@@ -81,12 +89,24 @@ export function Create() {
       .catch((error) => {
         console.error(error);
 
-        toast.error(t('error_title'), { id: toastId });
+        error.response?.status === 412
+          ? toast.error(t('password_error_incorrect'), { id: toastId })
+          : toast.error(t('error_title'), { id: toastId });
       });
   };
 
   return (
-    <Settings title={t('new_user')} breadcrumbs={pages} onSaveClick={onSave}>
+    <Settings
+      title={t('new_user')}
+      breadcrumbs={pages}
+      onSaveClick={() => setIsPasswordConfirmModalOpen(true)}
+    >
+      <PasswordConfirmation
+        show={isPasswordConfirmModalOpen}
+        onSave={onSave}
+        onClose={setIsPasswordConfirmModalOpen}
+      />
+
       {user && <Details user={user} setUser={setUser} />}
       {user && <Notifications user={user} setUser={setUser} />}
       {user && <Permissions user={user} setUser={setUser} />}
