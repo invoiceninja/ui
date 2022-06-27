@@ -102,7 +102,7 @@ export function Settings(props: Props) {
     {
       name: t('user_management'),
       href: '/settings/users',
-      current: location.pathname === '/settings/users',
+      current: location.pathname.startsWith('/settings/users'),
       visible: enterprisePlan(),
     },
   ];
