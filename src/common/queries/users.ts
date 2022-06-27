@@ -34,7 +34,7 @@ export function useUserQuery(params: { id: string | undefined }) {
 export function useBlankUserQuery() {
   return useQuery(
     generatePath('/api/v1/users/create'),
-    () => request('GET', endpoint('/api/v1/users/create?include=company_user')),
+    () => request('GET', endpoint('/api/v1/users/create')),
     { staleTime: Infinity }
   );
 }
