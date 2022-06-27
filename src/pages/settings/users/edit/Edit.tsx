@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
+import { Checkbox, InputField, SelectField } from '@invoiceninja/forms';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
@@ -18,8 +18,8 @@ import { useUserQuery } from 'common/queries/users';
 import { Alert } from 'components/Alert';
 import Toggle from 'components/forms/Toggle';
 import { Settings } from 'components/layouts/Settings';
-import { cloneDeep } from 'lodash';
-import { useEffect, useState } from 'react';
+import { clone, cloneDeep } from 'lodash';
+import { ChangeEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
@@ -190,6 +190,47 @@ export function Edit() {
     );
   };
 
+  const permissions = [
+    'client',
+    'product',
+    'invoice',
+    'payment',
+    'recurring_invoice',
+    'quote',
+    'credit',
+    'project',
+    'task',
+    'vendor',
+    'expense',
+  ];
+
+  const handlePermissionChange = (permission: string, value: boolean) => {
+    let permissions = clone(user?.company_user?.permissions ?? '').split(',');
+
+    if (permissions.includes(permission) && !value) {
+      permissions = permissions.filter((value) => value !== permission);
+    }
+
+    if (!permissions.includes(permission) && value) {
+      permissions.push(permission);
+    }
+
+    if (permissions[0] === '') {
+      permissions.shift();
+    }
+
+    setUser(
+      (user) =>
+        user && {
+          ...user,
+          company_user: user.company_user && {
+            ...user.company_user,
+            permissions: permissions.join(','),
+          },
+        }
+    );
+  };
+
   return (
     <Settings breadcrumbs={pages} title={t('edit_user')} onSaveClick={onSave}>
       {user && user.email_verified_at === null && (
@@ -275,6 +316,74 @@ export function Edit() {
             onChange={(value) => handleAdministratorToggle(value)}
           />
         </Element>
+
+        <Element>
+          <div className="grid grid-cols-3 md:grid-cols-6">
+            <div className="col-1">{t('create')}</div>
+            <div className="col-1">{t('view')}</div>
+            <div className="col-1">{t('edit')}</div>
+          </div>
+        </Element>
+
+        <Element leftSide={t('all')}>
+          <div className="grid grid-cols-3  md:grid-cols-6">
+            <div className="col-1">
+              <Checkbox
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  handlePermissionChange('create_all', event.target.checked)
+                }
+              />
+            </div>
+            <div className="col-1">
+              <Checkbox
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  handlePermissionChange('view_all', event.target.checked)
+                }
+              />
+            </div>
+            <div className="col-1">
+              <Checkbox
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  handlePermissionChange('edit_all', event.target.checked)
+                }
+              />
+            </div>
+          </div>
+        </Element>
+
+        {permissions.map((permission, index) => (
+          <Element key={index} leftSide={t(permission)}>
+            <div className="grid grid-cols-3  md:grid-cols-6">
+              <div className="col-1">
+                <Checkbox
+                disabled
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    handlePermissionChange(
+                      `${permission}_create`,
+                      event.target.checked
+                    )
+                  }
+                />
+              </div>
+              <div className="col-1">
+                <Checkbox onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    handlePermissionChange(
+                      `${permission}_view`,
+                      event.target.checked
+                    )
+                  } />
+              </div>
+              <div className="col-1">
+                <Checkbox onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    handlePermissionChange(
+                      `${permission}_edit`,
+                      event.target.checked
+                    )
+                  } />
+              </div>
+            </div>
+          </Element>
+        ))}
       </Card>
     </Settings>
   );
