@@ -23,7 +23,7 @@ import { Notifications } from '../edit/components/Notifications';
 import { Permissions } from '../edit/components/Permissions';
 
 export function Create() {
-  useTitle('create_user');
+  useTitle('new_user');
 
   const [t] = useTranslation();
 
@@ -39,7 +39,30 @@ export function Create() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    setUser(response?.data.data);
+    setUser({
+      ...response?.data.data,
+      company_user: {
+        permissions: '',
+        notifications: {
+          email: [],
+        },
+        settings: {
+          table_columns: [],
+          report_settings: [],
+          number_years_active: 1,
+          include_deleted_clients: false,
+          accent_color: '#2F7DC3',
+        },
+        is_owner: false,
+        is_admin: false,
+        is_locked: false,
+        updated_at: +new Date(),
+        archived_at: +new Date(),
+        created_at: +new Date(),
+        permissions_updated_at: +new Date(),
+        ninja_portal_url: '',
+      },
+    });
   }, [response?.data.data]);
 
   const onSave = () => {
