@@ -25,6 +25,7 @@ interface Props {
   onCancelClick?: any;
   breadcrumbs?: BreadcrumRecord[];
   docsLink?: string;
+  navigationTopRight?: ReactNode;
 }
 
 interface AdvanceSetting {
@@ -113,6 +114,7 @@ export function Settings(props: Props) {
       onCancelClick={props.onCancelClick}
       title={props.title}
       docsLink={props.docsLink}
+      navigationTopRight={props.navigationTopRight}
     >
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 md:col-span-4 lg:col-span-3">

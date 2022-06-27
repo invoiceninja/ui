@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { Actions } from './components/Actions';
 import { Details } from './components/Details';
 import { Notifications } from './components/Notifications';
 import { Permissions } from './components/Permissions';
@@ -69,9 +70,14 @@ export function Edit() {
         toast.error(t('error_title'), { id: toastId });
       });
   };
-  
+
   return (
-    <Settings breadcrumbs={pages} title={t('edit_user')} onSaveClick={onSave}>
+    <Settings
+      breadcrumbs={pages}
+      title={t('edit_user')}
+      onSaveClick={onSave}
+      navigationTopRight={user && <Actions user={user} />}
+    >
       {user && user.email_verified_at === null && (
         <Alert type="warning">{t('email_sent_to_confirm_email')}.</Alert>
       )}
