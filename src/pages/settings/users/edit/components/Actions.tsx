@@ -38,6 +38,20 @@ export function Actions(props: Props) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  const invite = () => {
+    const toastId = toast.loading(t('processing'));
+
+    request('POST', endpoint('/api/v1/users/:id/invite', { id }))
+      .then(() =>
+        toast.success(t('email_sent_to_confirm_email'), { id: toastId })
+      )
+      .catch((error) => {
+        console.error(error);
+
+        toast.error(t('error_title'), { id: toastId });
+      });
+  };
+
   const remove = () => {
     const toastId = toast.loading(t('processing'));
 
@@ -91,7 +105,7 @@ export function Actions(props: Props) {
 
       <Dropdown label={t('more_actions')} className="divide-y">
         <div>
-          <DropdownElement onClick={() => {}}>
+          <DropdownElement onClick={() => invite()}>
             {t('resend_email')}
           </DropdownElement>
 
