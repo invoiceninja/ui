@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { CompanyUser } from './company-user';
 import { Timestamps } from './timestamps';
 
 export interface User extends Timestamps {
@@ -29,4 +30,5 @@ export interface User extends Timestamps {
   oauth_user_token: string;
   phone: string;
   signature: string;
+  company_user?: CompanyUser;
 }
