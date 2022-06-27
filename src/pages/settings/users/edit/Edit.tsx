@@ -205,13 +205,11 @@ export function Edit() {
   ];
 
   const handlePermissionChange = (permission: string, value: boolean) => {
-    let permissions = clone(user?.company_user?.permissions ?? '').split(',');
+    const permissions = clone(user?.company_user?.permissions ?? '')
+      .split(',')
+      .filter((value) => value !== permission);
 
-    if (permissions.includes(permission) && !value) {
-      permissions = permissions.filter((value) => value !== permission);
-    }
-
-    if (!permissions.includes(permission) && value) {
+    if (value) {
       permissions.push(permission);
     }
 
@@ -229,6 +227,21 @@ export function Edit() {
           },
         }
     );
+  };
+
+  const isPermissionChecked = (permission: string) => {
+    const permissions = user?.company_user?.permissions;
+    const [type] = permission.split('_');
+
+    if (permissions && permissions.includes(`${type}_all`)) {
+      return true;
+    }
+
+    if (permissions && permissions.includes(permission)) {
+      return true;
+    }
+
+    return false;
   };
 
   return (
@@ -329,6 +342,7 @@ export function Edit() {
           <div className="grid grid-cols-3  md:grid-cols-6">
             <div className="col-1">
               <Checkbox
+                checked={isPermissionChecked('create_all')}
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   handlePermissionChange('create_all', event.target.checked)
                 }
@@ -336,6 +350,7 @@ export function Edit() {
             </div>
             <div className="col-1">
               <Checkbox
+              checked={isPermissionChecked('view_all')}
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   handlePermissionChange('view_all', event.target.checked)
                 }
@@ -343,6 +358,7 @@ export function Edit() {
             </div>
             <div className="col-1">
               <Checkbox
+              checked={isPermissionChecked('edit_all')}
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   handlePermissionChange('edit_all', event.target.checked)
                 }
@@ -356,30 +372,36 @@ export function Edit() {
             <div className="grid grid-cols-3  md:grid-cols-6">
               <div className="col-1">
                 <Checkbox
-                disabled
+                  checked={isPermissionChecked(`create_${permission}`)}
                   onChange={(event: ChangeEvent<HTMLInputElement>) =>
                     handlePermissionChange(
-                      `${permission}_create`,
+                      `create_${permission}`,
                       event.target.checked
                     )
                   }
                 />
               </div>
               <div className="col-1">
-                <Checkbox onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                <Checkbox
+                  checked={isPermissionChecked(`view_${permission}`)}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
                     handlePermissionChange(
-                      `${permission}_view`,
+                      `view_${permission}`,
                       event.target.checked
                     )
-                  } />
+                  }
+                />
               </div>
               <div className="col-1">
-                <Checkbox onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                <Checkbox
+                  checked={isPermissionChecked(`edit_${permission}`)}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
                     handlePermissionChange(
-                      `${permission}_edit`,
+                      `edit_${permission}`,
                       event.target.checked
                     )
-                  } />
+                  }
+                />
               </div>
             </div>
           </Element>
