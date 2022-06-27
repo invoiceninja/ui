@@ -51,7 +51,7 @@ export function Users() {
         resource="user"
         columns={columns}
         endpoint="/api/v1/users"
-        withoutActions
+        linkToCreate="/settings/users/create"
       />
     </Settings>
   );
