@@ -8,18 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { Checkbox, InputField, SelectField } from '@invoiceninja/forms';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { User } from 'common/interfaces/user';
 import { useUserQuery } from 'common/queries/users';
 import { Alert } from 'components/Alert';
-import Toggle from 'components/forms/Toggle';
 import { Settings } from 'components/layouts/Settings';
-import { clone, cloneDeep } from 'lodash';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
