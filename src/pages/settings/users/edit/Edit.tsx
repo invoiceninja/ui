@@ -15,6 +15,7 @@ import { request } from 'common/helpers/request';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { User } from 'common/interfaces/user';
 import { useUserQuery } from 'common/queries/users';
+import { Alert } from 'components/Alert';
 import { Settings } from 'components/layouts/Settings';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
@@ -177,6 +178,10 @@ export function Edit() {
 
   return (
     <Settings breadcrumbs={pages} title={t('edit_user')} onSaveClick={onSave}>
+      {user && user.email_verified_at === null && (
+        <Alert type="warning">{t('email_sent_to_confirm_email')}.</Alert>
+      )}
+
       <Card title={t('details')}>
         <Element leftSide={t('first_name')}>
           <InputField
