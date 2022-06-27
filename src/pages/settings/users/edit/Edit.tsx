@@ -55,7 +55,11 @@ export function Edit() {
   const onSave = () => {
     const toastId = toast.loading(t('processing'));
 
-    request('PUT', endpoint('/api/v1/users/:id', { id }), user)
+    request(
+      'PUT',
+      endpoint('/api/v1/users/:id?include=company_user', { id }),
+      user
+    )
       .then((response) => {
         toast.success(t('updated_user'), { id: toastId });
 
