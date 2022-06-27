@@ -10,11 +10,14 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { User } from 'common/interfaces/user';
 import { useUserQuery } from 'common/queries/users';
 import { Settings } from 'components/layouts/Settings';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 
@@ -49,8 +52,24 @@ export function Edit() {
     setUser((user) => user && { ...user, [field]: value });
   };
 
+  const onSave = () => {
+    const toastId = toast.loading(t('processing'));
+
+    request('PUT', endpoint('/api/v1/users/:id', { id }), user)
+      .then((response) => {
+        toast.success(t('updated_user'), { id: toastId });
+
+        setUser(response.data.data);
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.error(t('error_title'), { id: toastId });
+      });
+  };
+
   return (
-    <Settings breadcrumbs={pages} title={t('edit_user')}>
+    <Settings breadcrumbs={pages} title={t('edit_user')} onSaveClick={onSave}>
       <Card title={t('details')}>
         <Element leftSide={t('first_name')}>
           <InputField
