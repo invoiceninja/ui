@@ -31,7 +31,7 @@ export interface CompanyUser {
 }
 
 export interface Notifications {
-  email: any[];
+  email: string[];
 }
 
 export interface Token {
