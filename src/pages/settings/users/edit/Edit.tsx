@@ -16,6 +16,7 @@ import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { User } from 'common/interfaces/user';
 import { useUserQuery } from 'common/queries/users';
 import { Alert } from 'components/Alert';
+import Toggle from 'components/forms/Toggle';
 import { Settings } from 'components/layouts/Settings';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
@@ -176,6 +177,19 @@ export function Edit() {
     setUser({ ...localUser });
   };
 
+  const handleAdministratorToggle = (value: boolean) => {
+    setUser(
+      (user) =>
+        user && {
+          ...user,
+          company_user: user.company_user && {
+            ...user.company_user,
+            is_admin: value,
+          },
+        }
+    );
+  };
+
   return (
     <Settings breadcrumbs={pages} title={t('edit_user')} onSaveClick={onSave}>
       {user && user.email_verified_at === null && (
@@ -249,6 +263,18 @@ export function Edit() {
             </SelectField>
           </Element>
         ))}
+      </Card>
+
+      <Card title={t('permissions')}>
+        <Element
+          leftSide={t('administrator')}
+          leftSideHelp={t('administrator_help')}
+        >
+          <Toggle
+            checked={user?.company_user?.is_admin}
+            onChange={(value) => handleAdministratorToggle(value)}
+          />
+        </Element>
       </Card>
     </Settings>
   );
