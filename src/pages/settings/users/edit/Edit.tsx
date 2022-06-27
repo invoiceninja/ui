@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { Details } from './components/Details';
 import { Notifications } from './components/Notifications';
+import { Permissions } from './components/Permissions';
 
 export function Edit() {
   const { id } = useParams();
@@ -72,74 +73,7 @@ export function Edit() {
         toast.error(t('error_title'), { id: toastId });
       });
   };
-
-  const handleAdministratorToggle = (value: boolean) => {
-    setUser(
-      (user) =>
-        user && {
-          ...user,
-          company_user: user.company_user && {
-            ...user.company_user,
-            is_admin: value,
-          },
-        }
-    );
-  };
-
-  const permissions = [
-    'client',
-    'product',
-    'invoice',
-    'payment',
-    'recurring_invoice',
-    'quote',
-    'credit',
-    'project',
-    'task',
-    'vendor',
-    'expense',
-  ];
-
-  const handlePermissionChange = (permission: string, value: boolean) => {
-    const permissions = clone(user?.company_user?.permissions ?? '')
-      .split(',')
-      .filter((value) => value !== permission);
-
-    if (value) {
-      permissions.push(permission);
-    }
-
-    if (permissions[0] === '') {
-      permissions.shift();
-    }
-
-    setUser(
-      (user) =>
-        user && {
-          ...user,
-          company_user: user.company_user && {
-            ...user.company_user,
-            permissions: permissions.join(','),
-          },
-        }
-    );
-  };
-
-  const isPermissionChecked = (permission: string) => {
-    const permissions = user?.company_user?.permissions;
-    const [type] = permission.split('_');
-
-    if (permissions && permissions.includes(`${type}_all`)) {
-      return true;
-    }
-
-    if (permissions && permissions.includes(permission)) {
-      return true;
-    }
-
-    return false;
-  };
-
+  
   return (
     <Settings breadcrumbs={pages} title={t('edit_user')} onSaveClick={onSave}>
       {user && user.email_verified_at === null && (
@@ -148,95 +82,7 @@ export function Edit() {
 
       {user && <Details user={user} setUser={setUser} />}
       {user && <Notifications user={user} setUser={setUser} />}
-
-      <Card title={t('permissions')}>
-        <Element
-          leftSide={t('administrator')}
-          leftSideHelp={t('administrator_help')}
-        >
-          <Toggle
-            checked={user?.company_user?.is_admin}
-            onChange={(value) => handleAdministratorToggle(value)}
-          />
-        </Element>
-
-        <Element>
-          <div className="grid grid-cols-3 md:grid-cols-6">
-            <div className="col-1">{t('create')}</div>
-            <div className="col-1">{t('view')}</div>
-            <div className="col-1">{t('edit')}</div>
-          </div>
-        </Element>
-
-        <Element leftSide={t('all')}>
-          <div className="grid grid-cols-3  md:grid-cols-6">
-            <div className="col-1">
-              <Checkbox
-                checked={isPermissionChecked('create_all')}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  handlePermissionChange('create_all', event.target.checked)
-                }
-              />
-            </div>
-            <div className="col-1">
-              <Checkbox
-                checked={isPermissionChecked('view_all')}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  handlePermissionChange('view_all', event.target.checked)
-                }
-              />
-            </div>
-            <div className="col-1">
-              <Checkbox
-                checked={isPermissionChecked('edit_all')}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  handlePermissionChange('edit_all', event.target.checked)
-                }
-              />
-            </div>
-          </div>
-        </Element>
-
-        {permissions.map((permission, index) => (
-          <Element key={index} leftSide={t(permission)}>
-            <div className="grid grid-cols-3  md:grid-cols-6">
-              <div className="col-1">
-                <Checkbox
-                  checked={isPermissionChecked(`create_${permission}`)}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                    handlePermissionChange(
-                      `create_${permission}`,
-                      event.target.checked
-                    )
-                  }
-                />
-              </div>
-              <div className="col-1">
-                <Checkbox
-                  checked={isPermissionChecked(`view_${permission}`)}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                    handlePermissionChange(
-                      `view_${permission}`,
-                      event.target.checked
-                    )
-                  }
-                />
-              </div>
-              <div className="col-1">
-                <Checkbox
-                  checked={isPermissionChecked(`edit_${permission}`)}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                    handlePermissionChange(
-                      `edit_${permission}`,
-                      event.target.checked
-                    )
-                  }
-                />
-              </div>
-            </div>
-          </Element>
-        ))}
-      </Card>
+      {user && <Permissions user={user} setUser={setUser} />}
     </Settings>
   );
 }
