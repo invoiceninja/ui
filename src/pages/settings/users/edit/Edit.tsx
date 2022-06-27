@@ -23,6 +23,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { Details } from './components/Details';
 
 export function Edit() {
   const { id } = useParams();
@@ -50,10 +51,6 @@ export function Edit() {
       setUser(response?.data.data);
     }
   }, [response?.data.data]);
-
-  const onChange = (field: keyof User, value: unknown) => {
-    setUser((user) => user && { ...user, [field]: value });
-  };
 
   const onSave = () => {
     const toastId = toast.loading(t('processing'));
@@ -250,36 +247,7 @@ export function Edit() {
         <Alert type="warning">{t('email_sent_to_confirm_email')}.</Alert>
       )}
 
-      <Card title={t('details')}>
-        <Element leftSide={t('first_name')}>
-          <InputField
-            value={user?.first_name}
-            onValueChange={(value) => onChange('first_name', value)}
-          />
-        </Element>
-
-        <Element leftSide={t('last_name')}>
-          <InputField
-            value={user?.last_name}
-            onValueChange={(value) => onChange('last_name', value)}
-          />
-        </Element>
-
-        <Element leftSide={t('email')}>
-          <InputField
-            type="email"
-            value={user?.email}
-            onValueChange={(value) => onChange('email', value)}
-          />
-        </Element>
-
-        <Element leftSide={t('phone')}>
-          <InputField
-            value={user?.phone}
-            onValueChange={(value) => onChange('phone', value)}
-          />
-        </Element>
-      </Card>
+      {user && <Details user={user} setUser={setUser} />}
 
       <Card title={t('notifications')}>
         <Element>{t('email')}</Element>
@@ -350,7 +318,7 @@ export function Edit() {
             </div>
             <div className="col-1">
               <Checkbox
-              checked={isPermissionChecked('view_all')}
+                checked={isPermissionChecked('view_all')}
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   handlePermissionChange('view_all', event.target.checked)
                 }
@@ -358,7 +326,7 @@ export function Edit() {
             </div>
             <div className="col-1">
               <Checkbox
-              checked={isPermissionChecked('edit_all')}
+                checked={isPermissionChecked('edit_all')}
                 onChange={(event: ChangeEvent<HTMLInputElement>) =>
                   handlePermissionChange('edit_all', event.target.checked)
                 }
