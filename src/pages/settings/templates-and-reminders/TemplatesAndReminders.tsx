@@ -134,6 +134,24 @@ export function TemplatesAndReminders() {
       '$client.shipping_state',
       '$client.vat_number',
     ],
+    contact: [
+      '$contact.email',
+      '$contact.first_name',
+      '$contact.last_name',
+      '$contact.phone',
+    ],
+    company: [
+      '$company.address1',
+      '$company.address2',
+      '$company.country',
+      '$company.email',
+      '$company.id_number',
+      '$company.name',
+      '$company.phone',
+      '$company.state',
+      '$company.vat_number',
+      '$company.website',
+    ],
   };
 
   return (
@@ -209,6 +227,22 @@ export function TemplatesAndReminders() {
         <Element leftSide={t('client')} className="flex-wrap">
           <div className="flex flex-wrap">
             {variables.client.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
+        </Element>
+
+        <Element leftSide={t('contact')} className="flex-wrap">
+          <div className="flex flex-wrap">
+            {variables.contact.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
+        </Element>
+
+        <Element leftSide={t('company')} className="flex-wrap">
+          <div className="flex flex-wrap">
+            {variables.company.map((variable, index) => (
               <Variable key={index}>{variable}</Variable>
             ))}
           </div>
