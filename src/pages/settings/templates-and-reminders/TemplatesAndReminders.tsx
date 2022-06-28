@@ -111,8 +111,28 @@ export function TemplatesAndReminders() {
       '$invoices',
       '$payment_button',
       '$payments',
-      'public_notes',
+      '$public_notes',
       '$view_button',
+    ],
+    client: [
+      '$client_address1',
+      '$client.city',
+      '$client.credit_balance',
+      '$client.name',
+      '$client.postal_code',
+      '$client.shipping_address1',
+      '$client.shipping_city',
+      '$client.shipping_postal_code',
+      '$client.state',
+      '$client.address2',
+      '$client.country',
+      '$client.id_number',
+      '$client.phone',
+      '$client.public_notes',
+      '$client.shipping_address2',
+      '$client.shipping_country',
+      '$client.shipping_state',
+      '$client.vat_number',
     ],
   };
 
@@ -166,16 +186,6 @@ export function TemplatesAndReminders() {
         </Element>
       </Card>
 
-      <Card title={t('variables')}>
-        <Element leftSide={t('invoice')} className="flex-wrap">
-          <div className="flex flex-wrap">
-            {variables.invoice.map((variable, index) => (
-              <Variable key={index}>{variable}</Variable>
-            ))}
-          </div>
-        </Element>
-      </Card>
-
       {preview && (
         <Card style={{ height: 800 }} title={preview.subject}>
           <iframe
@@ -186,6 +196,24 @@ export function TemplatesAndReminders() {
           />
         </Card>
       )}
+
+      <Card title={t('variables')}>
+        <Element leftSide={t('invoice')} className="flex-wrap">
+          <div className="flex flex-wrap">
+            {variables.invoice.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
+        </Element>
+
+        <Element leftSide={t('client')} className="flex-wrap">
+          <div className="flex flex-wrap">
+            {variables.client.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
+        </Element>
+      </Card>
     </Settings>
   );
 }
