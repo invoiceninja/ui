@@ -136,7 +136,7 @@ export function Settings() {
 
         <Element leftSide={t('decimal_comma')}>
           <Toggle
-            checked={company?.use_comma_as_decimal_place}
+            checked={company?.settings.use_comma_as_decimal_place}
             onChange={(value: boolean) =>
               dispatch(
                 updateChanges({
@@ -154,7 +154,7 @@ export function Settings() {
         <Element leftSide={t('first_month_of_the_year')}>
           <SelectField
             id="first_month_of_year"
-            value={company?.first_month_of_year || ''}
+            value={company?.settings?.first_month_of_year || ''}
             onChange={handleChange}
           >
             <option value="">{/*  */}</option>

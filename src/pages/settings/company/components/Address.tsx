@@ -19,7 +19,7 @@ import { InputField, SelectField } from '../../../../components/forms';
 
 export function Address() {
   const [t] = useTranslation();
-  const { data } = useStaticsQuery();
+  const { data: statics } = useStaticsQuery();
   const dispatch = useDispatch();
 
   const companyChanges = useSelector(
@@ -86,7 +86,7 @@ export function Address() {
               id="settings.country_id"
             >
               <option value=""></option>
-              {data?.data.countries.map(
+              {statics?.countries.map(
                 (size: { id: string; name: string }) => (
                   <option key={size.id} value={size.id}>
                     {size.name}

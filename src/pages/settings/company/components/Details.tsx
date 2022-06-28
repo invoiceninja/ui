@@ -23,7 +23,7 @@ export function Details() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
 
-  const { data } = useStaticsQuery();
+  const { data: statics } = useStaticsQuery();
 
   const companyChanges = useSelector(
     (state: RootState) => state.companyUsers.changes.company
@@ -96,7 +96,7 @@ export function Details() {
               onChange={handleChange}
               id="size_id"
             >
-              {data?.data.sizes.map((size: { id: string; name: string }) => (
+              {statics?.sizes.map((size: { id: string; name: string }) => (
                 <option key={size.id} value={size.id}>
                   {size.name}
                 </option>
@@ -110,7 +110,7 @@ export function Details() {
               onChange={handleChange}
               id="industry_id"
             >
-              {data?.data.industries.map(
+              {statics?.industries.map(
                 (industry: { id: string; name: string }) => (
                   <option key={industry.id} value={industry.id}>
                     {industry.name}

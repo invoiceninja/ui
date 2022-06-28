@@ -228,4 +228,6 @@ export interface Settings {
   hide_empty_columns_on_pdf: boolean;
   email_from_name: string;
   auto_archive_invoice_cancelled: boolean;
+  use_comma_as_decimal_place: boolean;
+  first_month_of_year: string;
 }
