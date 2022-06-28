@@ -10,11 +10,15 @@
 
 import { Card, ClickableElement, Element } from '@invoiceninja/cards';
 import { InputField, SelectField, Textarea } from '@invoiceninja/forms';
+import { useTitle } from 'common/hooks/useTitle';
 import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 
 export function TemplatesAndReminders() {
+  useTitle('templates_and_reminders');
+
   const [t] = useTranslation();
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     {
@@ -22,6 +26,7 @@ export function TemplatesAndReminders() {
       href: '/settings/templates_and_reminders',
     },
   ];
+
   return (
     <Settings
       title={t('templates_and_reminders')}
