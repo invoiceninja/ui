@@ -7,6 +7,10 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
+import { Country } from './country';
+import { Currency } from './currency';
+
 export interface Statics {
   banks: Bank[];
   countries: Country[];
@@ -28,39 +32,6 @@ export interface Bank {
   remote_id: string;
   bank_library_id: number;
   config: string;
-}
-
-export interface Country {
-  id: string;
-  capital: null | string;
-  citizenship: string;
-  country_code: string;
-  currency: null | string;
-  currency_code: null | string;
-  currency_sub_unit: null | string;
-  full_name: null | string;
-  iso_3166_2: string;
-  iso_3166_3: string;
-  name: string;
-  region_code: string;
-  sub_region_code: string;
-  eea: boolean;
-  swap_postal_code: boolean;
-  swap_currency_symbol: boolean;
-  thousand_separator: unknown;
-  decimal_separator: unknown;
-}
-
-export interface Currency {
-  id: string;
-  name: string;
-  symbol: string;
-  precision: number;
-  thousand_separator: unknown;
-  decimal_separator: unknown;
-  code: string;
-  swap_currency_symbol: boolean;
-  exchange_rate: number;
 }
 
 export interface DateeFormat {
