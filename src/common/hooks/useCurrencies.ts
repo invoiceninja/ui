@@ -17,8 +17,8 @@ export function useCurrencies(): Currency[] {
   const [currencies, setCurrencies] = useState<Currency[]>([]);
 
   useEffect(() => {
-    if (statics?.data?.currencies) {
-      setCurrencies(statics.data.currencies);
+    if (statics?.currencies) {
+      setCurrencies(statics.currencies);
     }
   }, [statics]);
 

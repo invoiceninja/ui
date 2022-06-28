@@ -42,7 +42,7 @@ export function ConvertCurrency(props: Props) {
           value={props.exchangeCurrencyId}
           onValueChange={handleChange}
         >
-          {statics?.data.currencies.map((element: any, index: any) => (
+          {statics?.currencies.map((element: any, index: any) => (
             <option value={element.id} key={index}>
               {element.name}
             </option>

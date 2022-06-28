@@ -17,8 +17,8 @@ export function useCountries(): Country[] {
   const [countries, setCountries] = useState<Country[]>([]);
 
   useEffect(() => {
-    if (statics?.data?.countries) {
-      setCountries(statics.data.countries);
+    if (statics?.countries) {
+      setCountries(statics.countries);
     }
   }, [statics]);
 

@@ -10,12 +10,16 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { Statics } from 'common/interfaces/statics';
 import { useQuery } from 'react-query';
 
 export function useStaticsQuery() {
-  return useQuery(
+  return useQuery<Statics>(
     '/api/v1/statics',
-    () => request('GET', endpoint('/api/v1/statics')),
+    () =>
+      request('GET', endpoint('/api/v1/statics')).then(
+        (response) => response.data
+      ),
     { staleTime: Infinity }
   );
 }

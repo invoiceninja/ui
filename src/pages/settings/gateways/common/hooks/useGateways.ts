@@ -17,11 +17,11 @@ export function useGateways() {
   const { data: statics } = useStaticsQuery();
 
   useEffect(() => {
-    if (statics?.data.gateways) {
+    if (statics?.gateways) {
       setGateways(() =>
-        statics.data.gateways
-          .filter((gateway: Gateway) => gateway.visible)
-          .sort((x: Gateway, y: Gateway) => x.sort_order > y.sort_order)
+        statics.gateways
+          .filter((gateway) => gateway.visible)
+          .sort((x, y) => (x.sort_order > y.sort_order ? 1 : -1))
       );
     }
   }, [statics]);

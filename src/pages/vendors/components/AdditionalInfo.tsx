@@ -30,7 +30,7 @@ export function AdditionalInfo(props: VendorProps) {
           }}
         >
           <option value=""></option>
-          {statics?.data.currencies.map((element: any, index: any) => {
+          {statics?.currencies.map((element: any, index: any) => {
             return (
               <option value={element.id} key={index}>
                 {element.name}

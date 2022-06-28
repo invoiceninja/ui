@@ -17,8 +17,8 @@ export function useLanguages(): Language[] {
   const [languages, setLanguages] = useState<Language[]>([]);
 
   useEffect(() => {
-    if (statics?.data?.languages) {
-      setLanguages(statics.data.languages);
+    if (statics?.languages) {
+      setLanguages(statics.languages);
     }
   }, [statics]);
 

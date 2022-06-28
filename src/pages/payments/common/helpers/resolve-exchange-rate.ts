@@ -15,13 +15,13 @@ export function getExchangeRate(
   if (fromCurrencyId == null || toCurrencyId == null) {
     return 1;
   }
-  const fromCurrency = statics?.data.currencies.find(
+  const fromCurrency = statics?.currencies.find(
     (data: any) => data.id === fromCurrencyId
   );
-  const toCurrency = statics?.data.currencies.find(
+  const toCurrency = statics?.currencies.find(
     (data: any) => data.id === toCurrencyId
   );
-  const baseCurrency = statics?.data.currencies.find(
+  const baseCurrency = statics?.currencies.find(
     (data: any) => data.id === '1'
   );
 
