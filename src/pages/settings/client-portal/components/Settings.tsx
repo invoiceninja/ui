@@ -8,59 +8,102 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { trans } from 'common/helpers';
+import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { Divider } from 'components/cards/Divider';
+import { useHandleCurrentCompanyChangeProperty } from 'pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { Copy } from 'react-feather';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
-import {
-  InputField,
-  SelectField,
-  Textarea,
-} from '../../../../components/forms';
+import { InputField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 
 export function Settings() {
   const [t] = useTranslation();
+  const company = useCompanyChanges();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   return (
     <Card title={t('settings')}>
-      <Element leftSide={t('portal_mode')}>
-        <SelectField>
-          <option value="subdomain">{t('subdomain')}</option>
-        </SelectField>
+      <Element leftSide={t('domain_url')}>
+        <InputField
+          value={company?.portal_domain}
+          onValueChange={(value) => handleChange('portal_domain', value)}
+        />
       </Element>
 
-      <Element leftSide={t('subdomain')}>
-        <InputField id="subdomain" />
+      <Element
+        leftSide={
+          <span>
+            {t('login')} {t('url')}
+          </span>
+        }
+      >
+        <div className="inline-flex space-x-2">
+          <span>{company?.portal_domain}/client/login</span>
+          <button
+            type="button"
+            onClick={() => {
+              navigator.clipboard.writeText(
+                `${company?.portal_domain}/client/login`
+              );
+
+              toast.success(trans('copied_to_clipboard', { value: t('url') }));
+            }}
+          >
+            <Copy size={16} />
+          </button>
+        </div>
       </Element>
 
-      <div className="pt-4 border-b"></div>
+      <Divider />
 
       <Element className="mt-4" leftSide={t('client_portal')}>
-        <Toggle />
-      </Element>
-
-      <Element leftSide={t('tasks')}>
-        <Toggle />
+        <Toggle
+          checked={company?.settings.enable_client_portal}
+          onValueChange={(value) =>
+            handleChange('settings.enable_client_portal', value)
+          }
+        />
       </Element>
 
       <Element
         leftSide={t('document_upload')}
         leftSideHelp={t('document_upload_help')}
       >
-        <Toggle />
+        <Toggle
+          checked={company?.settings.client_portal_enable_uploads}
+          onValueChange={(value) =>
+            handleChange('settings.client_portal_enable_uploads', value)
+          }
+        />
       </Element>
 
-      <Element leftSide={t('storefront')} leftSideHelp={t('storefront_help')}>
+      {/* <Element leftSide={t('storefront')} leftSideHelp={t('storefront_help')}>
         <Toggle />
-      </Element>
+      </Element> */}
 
-      <div className="pt-4 border-b"></div>
+      <Divider />
 
       <Element className="mt-4" leftSide={t('terms_of_service')}>
-        <Textarea />
+        <InputField
+          element="textarea"
+          onValueChange={(value) =>
+            handleChange('settings.client_portal_terms', value)
+          }
+          value={company?.settings.client_portal_terms}
+        />
       </Element>
 
       <Element leftSide={t('privacy_policy')}>
-        <Textarea />
+        <InputField
+          element="textarea"
+          onValueChange={(value) =>
+            handleChange('settings.client_portal_privacy_policy', value)
+          }
+          value={company?.settings.client_portal_privacy_policy}
+        />
       </Element>
     </Card>
   );
