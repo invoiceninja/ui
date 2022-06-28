@@ -22,12 +22,17 @@ export function Authorization() {
 
   return (
     <Card title={t('authorization')}>
-      {/* <Element
+      <Element
         leftSide={t('enable_portal_password')}
         leftSideHelp={t('enable_portal_password_help')}
       >
-        <Toggle />
-      </Element> */}
+        <Toggle
+          value={company?.settings.enable_client_portal_password}
+          onValueChange={(value) =>
+            handleChange('settings.enable_client_portal_password', value)
+          }
+        />
+      </Element>
 
       <Element
         leftSide={t('show_accept_invoice_terms')}
