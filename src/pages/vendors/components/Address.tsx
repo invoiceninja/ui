@@ -65,7 +65,7 @@ export function Address(props: VendorProps) {
           }}
         >
           <option value=""></option>
-          {statics?.data.countries.map((element: any, index: any) => {
+          {statics?.countries.map((element: any, index: any) => {
             return (
               <option value={element.id} key={index}>
                 {element.full_name}

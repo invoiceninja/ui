@@ -26,7 +26,7 @@ import { request } from 'common/helpers/request';
 export function Defaults() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
-  const statics = useStaticsQuery();
+  const { data: statics } = useStaticsQuery();
 
   const { data: terms } = useQuery('/api/v1/payment_terms', () =>
     request('GET', endpoint('/api/v1/payment_terms'))
@@ -70,7 +70,7 @@ export function Defaults() {
               id="settings.payment_type_id"
             >
               <option value="0"></option>
-              {statics.data?.data.payment_types.map(
+              {statics?.payment_types.map(
                 (type: { id: string; name: string }) => (
                   <option key={type.id} value={type.id}>
                     {type.name}

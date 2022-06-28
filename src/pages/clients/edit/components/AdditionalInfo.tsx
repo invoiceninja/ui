@@ -209,7 +209,7 @@ export function AdditionalInfo(props: Props) {
               >
                 <option value=""></option>
 
-                {statics.data.sizes.map(
+                {statics?.sizes.map(
                   (size: { id: string; name: string }, index: number) => (
                     <option key={index} value={size.id}>
                       {size.name}
@@ -229,7 +229,7 @@ export function AdditionalInfo(props: Props) {
               >
                 <option value=""></option>
 
-                {statics.data.industries.map(
+                {statics?.industries.map(
                   (size: { id: string; name: string }, index: number) => (
                     <option key={index} value={size.id}>
                       {size.name}
