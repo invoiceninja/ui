@@ -82,19 +82,19 @@ export interface PaymentType {
 }
 
 export interface Templates {
-  invoice: Credit;
-  quote: Credit;
-  payment: Credit;
-  payment_partial: Credit;
-  reminder1: Credit;
-  reminder2: Credit;
-  reminder3: Credit;
-  reminder_endless: Credit;
-  statement: Credit;
-  credit: Credit;
+  invoice: TemplateBody;
+  quote: TemplateBody;
+  payment: TemplateBody;
+  payment_partial: TemplateBody;
+  reminder1: TemplateBody;
+  reminder2: TemplateBody;
+  reminder3: TemplateBody;
+  reminder_endless: TemplateBody;
+  statement: TemplateBody;
+  credit: TemplateBody;
 }
 
-export interface Credit {
+export interface TemplateBody {
   subject: string;
   body: string;
 }
