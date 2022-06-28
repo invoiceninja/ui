@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { Currency } from 'common/interfaces/currency';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { DateFormat } from 'common/interfaces/date-format';
 import { Language } from 'common/interfaces/language';
 import { Timezone } from 'common/interfaces/timezone';
 import { useStaticsQuery } from 'common/queries/statics';
 import { updateChanges } from 'common/stores/slices/company-users';
+import { Divider } from 'components/cards/Divider';
 import dayjs from 'dayjs';
 import { useHandleCurrentCompanyChange } from 'pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { ChangeEvent } from 'react';
@@ -29,7 +29,8 @@ export function Settings() {
   const { data: statics } = useStaticsQuery();
 
   const dispatch = useDispatch();
-  const companyChanges = useCompanyChanges();
+  const company = useInjectCompanyChanges();
+
   const handleChange = useHandleCurrentCompanyChange();
 
   const currencyFormats = [
@@ -46,19 +47,19 @@ export function Settings() {
       <Card title={t('settings')}>
         <Element leftSide={t('currency')}>
           <SelectField
-            value={companyChanges?.settings?.currency_id || ''}
+            value={company?.settings?.currency_id || ''}
             id="settings.currency_id"
             onChange={handleChange}
           >
             <option value=""></option>
-            {statics &&
-              statics.data.currencies.map((currency: Currency) => (
-                <option value={currency.id} key={currency.id}>
-                  {currency.name}
-                </option>
-              ))}
+            {statics?.currencies.map((currency) => (
+              <option value={currency.id} key={currency.id}>
+                {currency.name}
+              </option>
+            ))}
           </SelectField>
         </Element>
+
         <Element leftSide={t('currency_format')}>
           <Radio
             onClick={(event: ChangeEvent<HTMLInputElement>) =>
@@ -72,54 +73,55 @@ export function Settings() {
             }
             name="show_currency_code"
             options={currencyFormats}
-            defaultSelected={companyChanges?.settings?.show_currency_code.toString()}
+            defaultSelected={company?.settings?.show_currency_code.toString()}
           />
         </Element>
+
         <Element leftSide={t('language')}>
           <SelectField
             onChange={handleChange}
             id="settings.language_id"
-            value={companyChanges?.settings?.language_id || '1'}
+            value={company?.settings?.language_id || '1'}
           >
-            {statics &&
-              statics.data.languages.map((language: Language) => (
-                <option value={language.id} key={language.id}>
-                  {language.name}
-                </option>
-              ))}
+            {statics?.languages.map((language: Language) => (
+              <option value={language.id} key={language.id}>
+                {language.name}
+              </option>
+            ))}
           </SelectField>
         </Element>
+
         <Element leftSide={t('timezone')}>
           <SelectField
             onChange={handleChange}
             id="settings.timezone_id"
-            value={companyChanges?.settings?.timezone_id || '1'}
+            value={company?.settings?.timezone_id || '1'}
           >
-            {statics &&
-              statics.data.timezones.map((timezone: Timezone) => (
-                <option value={timezone.id} key={timezone.id}>
-                  {timezone.name}
-                </option>
-              ))}
+            {statics?.timezones.map((timezone: Timezone) => (
+              <option value={timezone.id} key={timezone.id}>
+                {timezone.name}
+              </option>
+            ))}
           </SelectField>
         </Element>
+
         <Element leftSide={t('date_format')}>
           <SelectField
             onChange={handleChange}
             id="settings.date_format_id"
-            value={companyChanges?.settings?.date_format_id || '1'}
+            value={company?.settings?.date_format_id || '1'}
           >
-            {statics &&
-              statics.data.date_formats.map((dateFormat: DateFormat) => (
-                <option value={dateFormat.id} key={dateFormat.id}>
-                  {dayjs().format(dateFormat.format_moment)}
-                </option>
-              ))}
+            {statics?.date_formats.map((dateFormat: DateFormat) => (
+              <option value={dateFormat.id} key={dateFormat.id}>
+                {dayjs().format(dateFormat.format_moment)}
+              </option>
+            ))}
           </SelectField>
         </Element>
+
         <Element leftSide={t('military_time')}>
           <Toggle
-            checked={companyChanges?.settings?.military_time}
+            checked={company?.settings?.military_time}
             onChange={(value: boolean) =>
               dispatch(
                 updateChanges({
@@ -131,9 +133,10 @@ export function Settings() {
             }
           />
         </Element>
+
         <Element leftSide={t('decimal_comma')}>
           <Toggle
-            checked={companyChanges?.use_comma_as_decimal_place}
+            checked={company?.use_comma_as_decimal_place}
             onChange={(value: boolean) =>
               dispatch(
                 updateChanges({
@@ -146,12 +149,12 @@ export function Settings() {
           />
         </Element>
 
-        <div className="pt-6 border-b"></div>
+        <Divider />
 
-        <Element className="mt-4" leftSide={t('first_month_of_the_year')}>
+        <Element leftSide={t('first_month_of_the_year')}>
           <SelectField
             id="first_month_of_year"
-            value={companyChanges?.first_month_of_year || ''}
+            value={company?.first_month_of_year || ''}
             onChange={handleChange}
           >
             <option value="">{/*  */}</option>
