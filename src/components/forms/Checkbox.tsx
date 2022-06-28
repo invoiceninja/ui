@@ -29,13 +29,14 @@ export function Checkbox(props: Props) {
           id={props.id}
           aria-describedby="comments-description"
           type="checkbox"
-          className={`focus:ring-gray-300 h-4 w-4 border-gray-300 rounded dark:bg-gray-700 dark:border-transparent cursor-pointer ${props.className}`}
+          className={`focus:ring-gray-300 h-4 w-4 border-gray-300 rounded dark:bg-gray-700 dark:border-transparent cursor-pointer disabled:opacity-50 ${props.className}`}
           style={{ color: accentColor }}
           onChange={(event) => {
             props.onChange && props.onChange(event);
             props.onValueChange && props.onValueChange(event.target.value);
           }}
           checked={props.checked}
+          disabled={props.disabled}
         />
       </div>
       <div className="ml-3 text-sm">

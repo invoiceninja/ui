@@ -81,7 +81,11 @@ export const settingsRoutes = (
     />
     <Route path="group_settings" element={<Settings.GroupSettings />} />
     <Route path="subscriptions" element={<Settings.Subscriptions />} />
-    <Route path="user_management" element={<Settings.UserManagement />} />
+    <Route path="users">
+      <Route path="" element={<Settings.Users />} />
+      <Route path="create" element={<Settings.CreateUser />} />
+      <Route path=":id/edit" element={<Settings.EditUser />} />
+    </Route>
     <Route path="payment_terms">
       <Route path="" element={<Settings.PaymentTerms />} />
       <Route path=":id/edit" element={<Settings.EditPaymentTerm />} />

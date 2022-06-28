@@ -19,10 +19,22 @@ export function useUsersQuery() {
   );
 }
 
-export function useUserQuery(params: { id: string }) {
+export function useUserQuery(params: { id: string | undefined }) {
   return useQuery(
     generatePath('/api/v1/users/:id', params),
-    () => request('GET', endpoint('/api/v1/users/:id', params)),
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/users/:id?include=company_user', params)
+      ),
+    { staleTime: Infinity }
+  );
+}
+
+export function useBlankUserQuery() {
+  return useQuery(
+    generatePath('/api/v1/users/create'),
+    () => request('GET', endpoint('/api/v1/users/create')),
     { staleTime: Infinity }
   );
 }

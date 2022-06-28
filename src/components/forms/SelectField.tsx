@@ -44,6 +44,7 @@ export function SelectField(props: Props) {
         defaultValue={props.defaultValue}
         value={props.value}
         ref={props.innerRef}
+        disabled={props.disabled}
       >
         {props.withBlank && <option value=""></option>}
         {props.children}
