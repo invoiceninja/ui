@@ -25,6 +25,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { Variable } from './common/components/Variable';
 
 export function TemplatesAndReminders() {
   useTitle('templates_and_reminders');
@@ -91,6 +92,30 @@ export function TemplatesAndReminders() {
     }).then((response) => setPreview(response.data));
   }, [templateBody]);
 
+  const variables = {
+    invoice: [
+      '$amount',
+      '$balance',
+      '$date',
+      '$due_date',
+      '$footer',
+      '$number',
+      '$payment_url',
+      '$po_number',
+      '$terms',
+      '$view_url',
+      '$assigned_to_user',
+      '$created_by_user',
+      '$discount',
+      '$exchange_rate',
+      '$invoices',
+      '$payment_button',
+      '$payments',
+      'public_notes',
+      '$view_button',
+    ],
+  };
+
   return (
     <Settings
       title={t('templates_and_reminders')}
@@ -138,6 +163,16 @@ export function TemplatesAndReminders() {
               setTemplateBody(templateBody && { ...templateBody, body: value })
             }
           />
+        </Element>
+      </Card>
+
+      <Card title={t('variables')}>
+        <Element leftSide={t('invoice')} className="flex-wrap">
+          <div className="flex flex-wrap">
+            {variables.invoice.map((variable, index) => (
+              <Variable key={index}>{variable}</Variable>
+            ))}
+          </div>
         </Element>
       </Card>
 
