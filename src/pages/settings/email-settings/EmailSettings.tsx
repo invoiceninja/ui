@@ -10,11 +10,14 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import { trans } from 'common/helpers';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
+import { Divider } from 'components/cards/Divider';
 import { Settings } from 'components/layouts/Settings';
 import dayjs from 'dayjs';
 import { useHandleCancel } from 'pages/invoices/edit/hooks/useHandleCancel';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
@@ -34,6 +37,8 @@ export function EmailSettings() {
 
   const onSave = useHandleCompanySave();
   const onCancel = useHandleCancel();
+
+  console.log(company?.settings.email_style);
 
   return (
     <Settings
@@ -104,6 +109,48 @@ export function EmailSettings() {
               </option>
             ))}
           </SelectField>
+        </Element>
+
+        <Divider />
+
+        <Element leftSide={t('email_design')}>
+          <SelectField
+            value={company?.settings.email_style}
+            onValueChange={(value) =>
+              handleChange('settings.email_style', value)
+            }
+          >
+            <option value="plain">{t('plain')}</option>
+            <option value="light">{t('light')}</option>
+            <option value="dark">{t('dark')}</option>
+            <option value="custom">{t('custom')}</option>
+          </SelectField>
+        </Element>
+
+        {company?.settings.email_style === 'custom' && (
+          <Element leftSide={t('custom')}>
+            <InputField
+              element="textarea"
+              value={company?.settings.email_style_custom}
+              onValueChange={(value) =>
+                value.includes('$body')
+                  ? handleChange('settings.email_style_custom', value)
+                  : toast.error(
+                      trans('body_variable_missing', { body: '$body' })
+                    )
+              }
+            />
+          </Element>
+        )}
+
+        <Element leftSide={t('signature')}>
+          <InputField
+            element="textarea"
+            value={company?.settings.email_signature}
+            onValueChange={(value) =>
+              handleChange('settings.email_signature', value)
+            }
+          />
         </Element>
       </Card>
     </Settings>
