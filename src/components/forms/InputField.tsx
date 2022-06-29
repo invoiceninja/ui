@@ -30,6 +30,7 @@ interface Props extends CommonProps {
   list?: string;
   min?: string;
   onValueChange?: (value: string) => unknown;
+  textareaRows?: number;
 }
 
 export function InputField(props: Props) {
@@ -64,6 +65,7 @@ export function InputField(props: Props) {
         }}
         value={props.value}
         list={props.list}
+        rows={props.textareaRows || 5}
       />
 
       {props.errorMessage && (

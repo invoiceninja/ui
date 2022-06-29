@@ -8,64 +8,117 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect } from 'react';
+import { Card, Element } from '@invoiceninja/cards';
+import { InputField, SelectField } from '@invoiceninja/forms';
+import { trans } from 'common/helpers';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useTitle } from 'common/hooks/useTitle';
+import { Divider } from 'components/cards/Divider';
+import Toggle from 'components/forms/Toggle';
+import { Settings } from 'components/layouts/Settings';
+import dayjs from 'dayjs';
+import { useHandleCancel } from 'pages/invoices/edit/hooks/useHandleCancel';
+import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { Card, Element } from '../../../components/cards';
-import { InputField, SelectField, Textarea } from '../../../components/forms';
-import Toggle from '../../../components/forms/Toggle';
-import { Settings } from '../../../components/layouts/Settings';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
+import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 
 export function EmailSettings() {
+  useTitle('email_settings');
+
   const [t] = useTranslation();
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('email_settings'), href: '/settings/email_settings' },
   ];
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'email_settings'
-    )}`;
-  });
+
+  const company = useInjectCompanyChanges();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
+
+  const onSave = useHandleCompanySave();
+  const onCancel = useHandleCancel();
 
   return (
     <Settings
       title={t('email_settings')}
       breadcrumbs={pages}
       docsLink="docs/advanced-settings/#email_settings"
+      onSaveClick={onSave}
+      onCancelClick={onCancel}
     >
       <Card title={t('settings')}>
-        <Element leftSide={t('send_from_gmail')}>
-          <Toggle />
-        </Element>
-
-        <div className="pt-4 border-b"></div>
-
-        <Element className="mt-4" leftSide={t('from_name')}>
-          <InputField id="from_name" />
+        <Element leftSide={t('from_name')}>
+          <InputField
+            value={company?.settings.email_from_name}
+            onValueChange={(value) =>
+              handleChange('settings.email_from_name', value)
+            }
+          />
         </Element>
 
         <Element leftSide={t('reply_to_name')}>
-          <InputField id="reply_to_name" />
+          <InputField
+            value={company?.settings.reply_to_name}
+            onValueChange={(value) =>
+              handleChange('settings.reply_to_name', value)
+            }
+          />
         </Element>
 
         <Element leftSide={t('reply_to_email')}>
-          <InputField id="reply_to_email" />
+          <InputField
+            value={company?.settings.reply_to_email}
+            onValueChange={(value) =>
+              handleChange('settings.reply_to_email', value)
+            }
+          />
         </Element>
 
-        <Element leftSide={t('bcc_email')}>
-          <InputField id="bcc_email" />
+        <Element
+          leftSide={t('bcc_email')}
+          leftSideHelp={t('comma_sparated_list')}
+        >
+          <InputField
+            value={company?.settings.bcc_email}
+            onValueChange={(value) => handleChange('settings.bcc_email', value)}
+          />
         </Element>
 
-        <Element leftSide={t('send_time')}>
-          <SelectField>
-            <option value="7am">7 AM</option>
+        <Element
+          leftSide={t('send_time')}
+          leftSideHelp={t('comma_sparated_list')}
+        >
+          <SelectField
+            value={company?.settings.entity_send_time}
+            onValueChange={(value) =>
+              handleChange(
+                'settings.entity_send_time',
+                value.length > 0 ? value : 6
+              )
+            }
+            withBlank
+          >
+            {[...Array(24).keys()].map((number, index) => (
+              <option key={index} value={number + 1}>
+                {dayjs()
+                  .startOf('day')
+                  .add(number + 1, 'hour')
+                  .format('h:ss A')}
+              </option>
+            ))}
           </SelectField>
         </Element>
 
-        <div className="pt-4 border-b"></div>
+        <Divider />
 
-        <Element className="mt-4" leftSide={t('email_design')}>
-          <SelectField>
+        <Element leftSide={t('email_design')}>
+          <SelectField
+            value={company?.settings.email_style}
+            onValueChange={(value) =>
+              handleChange('settings.email_style', value)
+            }
+          >
             <option value="plain">{t('plain')}</option>
             <option value="light">{t('light')}</option>
             <option value="dark">{t('dark')}</option>
@@ -73,22 +126,59 @@ export function EmailSettings() {
           </SelectField>
         </Element>
 
+        {company?.settings.email_style === 'custom' && (
+          <Element leftSide={t('custom')}>
+            <InputField
+              element="textarea"
+              value={company?.settings.email_style_custom}
+              onValueChange={(value) =>
+                value.includes('$body')
+                  ? handleChange('settings.email_style_custom', value)
+                  : toast.error(
+                      trans('body_variable_missing', { body: '$body' })
+                    )
+              }
+            />
+          </Element>
+        )}
+
         <Element leftSide={t('signature')}>
-          <Textarea />
+          <InputField
+            element="textarea"
+            value={company?.settings.email_signature}
+            onValueChange={(value) =>
+              handleChange('settings.email_signature', value)
+            }
+          />
         </Element>
 
-        <div className="pt-4 border-b"></div>
+        <Divider />
 
-        <Element className="mt-4" leftSide={t('attach_pdf')}>
-          <Toggle />
+        <Element leftSide={t('attach_pdf')}>
+          <Toggle
+            checked={company?.settings.pdf_email_attachment}
+            onValueChange={(value) =>
+              handleChange('settings.pdf_email_attachment', value)
+            }
+          />
         </Element>
 
         <Element leftSide={t('attach_documents')}>
-          <Toggle />
+          <Toggle
+            checked={company?.settings.document_email_attachment}
+            onValueChange={(value) =>
+              handleChange('settings.document_email_attachment', value)
+            }
+          />
         </Element>
 
         <Element leftSide={t('attach_ubl')}>
-          <Toggle />
+          <Toggle
+            checked={company?.settings.ubl_email_attachment}
+            onValueChange={(value) =>
+              handleChange('settings.ubl_email_attachment', value)
+            }
+          />
         </Element>
       </Card>
     </Settings>

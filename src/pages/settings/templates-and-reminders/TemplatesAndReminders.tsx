@@ -61,7 +61,7 @@ export function TemplatesAndReminders() {
         ] as string,
       };
 
-      if (existing.subject.length > 0 || existing.body.length > 0) {
+      if (existing.subject?.length > 0 || existing.body?.length > 0) {
         setTemplateBody({ ...existing });
       } else {
         const template = statics.templates[templateId as keyof Templates] || {
