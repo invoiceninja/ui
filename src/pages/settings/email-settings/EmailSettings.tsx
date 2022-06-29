@@ -14,6 +14,7 @@ import { trans } from 'common/helpers';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Divider } from 'components/cards/Divider';
+import Toggle from 'components/forms/Toggle';
 import { Settings } from 'components/layouts/Settings';
 import dayjs from 'dayjs';
 import { useHandleCancel } from 'pages/invoices/edit/hooks/useHandleCancel';
@@ -37,8 +38,6 @@ export function EmailSettings() {
 
   const onSave = useHandleCompanySave();
   const onCancel = useHandleCancel();
-
-  console.log(company?.settings.email_style);
 
   return (
     <Settings
@@ -149,6 +148,35 @@ export function EmailSettings() {
             value={company?.settings.email_signature}
             onValueChange={(value) =>
               handleChange('settings.email_signature', value)
+            }
+          />
+        </Element>
+
+        <Divider />
+
+        <Element leftSide={t('attach_pdf')}>
+          <Toggle
+            checked={company?.settings.pdf_email_attachment}
+            onValueChange={(value) =>
+              handleChange('settings.pdf_email_attachment', value)
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('attach_documents')}>
+          <Toggle
+            checked={company?.settings.document_email_attachment}
+            onValueChange={(value) =>
+              handleChange('settings.document_email_attachment', value)
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('attach_ubl')}>
+          <Toggle
+            checked={company?.settings.ubl_email_attachment}
+            onValueChange={(value) =>
+              handleChange('settings.ubl_email_attachment', value)
             }
           />
         </Element>
