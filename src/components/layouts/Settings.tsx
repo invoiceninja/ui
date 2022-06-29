@@ -107,6 +107,12 @@ export function Settings(props: Props) {
       visible: proPlan() || enterprisePlan(),
     },
     {
+      name: t('email_settings'),
+      href: '/settings/email_settings',
+      current: location.pathname === '/settings/email_settings',
+      visible: proPlan() || enterprisePlan(),
+    },
+    {
       name: t('templates_and_reminders'),
       href: '/settings/templates_and_reminders',
       current: location.pathname === '/settings/templates_and_reminders',
