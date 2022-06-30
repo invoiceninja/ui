@@ -8,13 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Link } from '@invoiceninja/forms';
 import { date } from 'common/helpers';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
+import { generatePath } from 'react-router-dom';
 
 export function Projects() {
   useTitle('projects');
@@ -25,14 +29,28 @@ export function Projects() {
 
   const pages = [{ name: t('projects'), href: '/projects' }];
 
+  const company = useCurrentCompany();
+  const formatMoney = useFormatMoney();
+
   const columns: DataTableColumns = [
     {
       id: 'name',
       label: t('name'),
+      format: (value, resource) => (
+        <Link to={generatePath('/projects/:id', { id: resource.id })}>
+          {value}
+        </Link>
+      ),
     },
     {
       id: 'task_rate',
       label: t('task_rate'),
+      format: (value) =>
+        formatMoney(
+          value,
+          company?.settings.country_id,
+          company?.settings.currency_id
+        ),
     },
     {
       id: 'due_date',
@@ -53,6 +71,12 @@ export function Projects() {
     {
       id: 'budgeted_hours',
       label: t('budgeted_hours'),
+      format: (value) =>
+        formatMoney(
+          value,
+          company?.settings.country_id,
+          company?.settings.currency_id
+        ),
     },
     {
       id: 'entity_state',
