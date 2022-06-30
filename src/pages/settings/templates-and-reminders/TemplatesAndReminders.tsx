@@ -19,6 +19,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Settings as CompanySettings } from 'common/interfaces/company.interface';
 import { TemplateBody, Templates } from 'common/interfaces/statics';
 import { useStaticsQuery } from 'common/queries/statics';
+import { MarkdownEditor } from 'components/forms/MarkdownEditor';
 import { Settings } from 'components/layouts/Settings';
 import { useHandleCancel } from 'pages/invoices/edit/hooks/useHandleCancel';
 import { useEffect, useState } from 'react';
@@ -194,10 +195,9 @@ export function TemplatesAndReminders() {
         </Element>
 
         <Element leftSide={t('body')}>
-          <InputField
-            element="textarea"
+          <MarkdownEditor
             value={templateBody?.body}
-            onValueChange={(value) =>
+            onChange={(value) =>
               setTemplateBody(templateBody && { ...templateBody, body: value })
             }
           />
