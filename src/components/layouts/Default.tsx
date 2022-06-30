@@ -20,6 +20,7 @@ import {
   Repeat,
   CreditCard,
   File,
+  Briefcase,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -155,6 +156,19 @@ export function Default(props: Props) {
         to: '/credits/create',
         label: t('new_credit'),
         visible: hasPermission('create_credit'),
+      },
+    },
+    {
+      name: t('projects'),
+      href: '/projects',
+      icon: Briefcase,
+      current: location.pathname.startsWith('/projects'),
+      visible: hasPermission('view_project'),
+      rightButton: {
+        icon: PlusCircle,
+        to: '/projects/create',
+        label: t('new_project'),
+        visible: hasPermission('create_project'),
       },
     },
     {

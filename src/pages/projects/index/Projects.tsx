@@ -17,10 +17,14 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 
 export function Projects() {
-  const [t] = useTranslation();
-  const { dateFormat } = useCurrentCompanyDateFormats();
   useTitle('projects');
+
+  const [t] = useTranslation();
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
   const pages = [{ name: t('projects'), href: '/projects' }];
+
   const columns: DataTableColumns = [
     {
       id: 'name',
@@ -56,6 +60,7 @@ export function Projects() {
       format: (value, resource) => <EntityStatus entity={resource} />,
     },
   ];
+
   return (
     <Default
       title={t('projects')}
