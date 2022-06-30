@@ -37,7 +37,7 @@ export function Projects() {
       id: 'name',
       label: t('name'),
       format: (value, resource) => (
-        <Link to={generatePath('/projects/:id', { id: resource.id })}>
+        <Link to={generatePath('/projects/:id/edit', { id: resource.id })}>
           {value}
         </Link>
       ),
