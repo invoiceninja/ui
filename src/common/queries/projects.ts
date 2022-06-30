@@ -18,7 +18,7 @@ export function useBlankProjectQuery() {
     '/api/v1/projects/create',
     () =>
       request('GET', endpoint('/api/v1/projects/create')).then(
-        (response) => response.data
+        (response) => response.data.data
       ),
     { staleTime: Infinity }
   );
