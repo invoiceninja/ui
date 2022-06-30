@@ -20,6 +20,7 @@ export function Edit() {
   const { id } = useParams();
   const { data } = useProjectQuery({ id });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [project, setProject] = useState<Project>();
 
   useEffect(() => {
