@@ -12,12 +12,24 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { Project } from 'common/interfaces/project';
 import { useQuery } from 'react-query';
+import { generatePath } from 'react-router-dom';
 
 export function useBlankProjectQuery() {
   return useQuery<Project>(
     '/api/v1/projects/create',
     () =>
       request('GET', endpoint('/api/v1/projects/create')).then(
+        (response) => response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}
+
+export function useProjectQuery(params: { id: string | undefined }) {
+  return useQuery<Project>(
+    generatePath('/api/v1/projects/:id', { id: params.id }),
+    () =>
+      request('GET', endpoint('/api/v1/projects/:id', { id: params.id })).then(
         (response) => response.data.data
       ),
     { staleTime: Infinity }
