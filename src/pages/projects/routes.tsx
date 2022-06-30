@@ -11,6 +11,7 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
+import { Create } from './create/Create';
 import { Projects } from './index/Projects';
 
 export const projectRoutes = (
@@ -21,6 +22,15 @@ export const projectRoutes = (
         <Guard
           guards={[() => permission('view_product')]}
           component={<Projects />}
+        />
+      }
+    />
+    <Route
+      path="/projects/create"
+      element={
+        <Guard
+          guards={[() => permission('create_product')]}
+          component={<Create />}
         />
       }
     />
