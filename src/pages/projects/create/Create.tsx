@@ -61,7 +61,7 @@ export function Create() {
       .then((response) => {
         toast.success(t('created_project'), { id: toastId });
 
-        navigate(generatePath('/projects/:id', { id: response.data.data.id }));
+        navigate(generatePath('/projects/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError) => {
         console.error(error);
