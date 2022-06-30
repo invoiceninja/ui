@@ -12,7 +12,9 @@ import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
+import { Edit } from './edit/Edit';
 import { Projects } from './index/Projects';
+import { Project } from './Project';
 
 export const projectRoutes = (
   <Route>
@@ -20,7 +22,7 @@ export const projectRoutes = (
       path="/projects"
       element={
         <Guard
-          guards={[() => permission('view_product')]}
+          guards={[() => permission('view_project')]}
           component={<Projects />}
         />
       }
@@ -29,10 +31,21 @@ export const projectRoutes = (
       path="/projects/create"
       element={
         <Guard
-          guards={[() => permission('create_product')]}
+          guards={[() => permission('create_project')]}
           component={<Create />}
         />
       }
     />
+    <Route
+      path="/projects/:id"
+      element={
+        <Guard
+          guards={[() => permission('edit_project')]}
+          component={<Project />}
+        />
+      }
+    >
+      <Route path="edit" element={<Edit />} />
+    </Route>
   </Route>
 );
