@@ -13,6 +13,7 @@ import { InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
 import { Project } from 'common/interfaces/project';
@@ -42,8 +43,12 @@ export function Create() {
   const [errors, setErrors] = useState<ValidationBag>();
 
   const company = useCurrentCompany();
-
+  const clientResolver = useClientResolver();
   const navigate = useNavigate();
+
+  const handleChange = (property: keyof Project, value: unknown) => {
+    setProject((project) => project && { ...project, [property]: value });
+  };
 
   useEffect(() => {
     if (blankProject) {
@@ -54,9 +59,15 @@ export function Create() {
     }
   }, [blankProject]);
 
-  const handleChange = (property: keyof Project, value: unknown) => {
-    setProject((project) => project && { ...project, [property]: value });
-  };
+  useEffect(() => {
+    if (project?.client_id && project.client_id.length > 1) {
+      clientResolver.find(project.client_id).then((client) => {
+        if (client.settings.default_task_rate) {
+          handleChange('task_rate', client.settings.default_task_rate);
+        }
+      });
+    }
+  }, [project?.client_id]);
 
   const onSave = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
