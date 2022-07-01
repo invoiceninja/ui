@@ -13,6 +13,7 @@ import { InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
 import { Project } from 'common/interfaces/project';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -40,11 +41,16 @@ export function Create() {
   const [project, setProject] = useState<Project>();
   const [errors, setErrors] = useState<ValidationBag>();
 
+  const company = useCurrentCompany();
+
   const navigate = useNavigate();
 
   useEffect(() => {
     if (blankProject) {
-      setProject({ ...blankProject });
+      setProject({
+        ...blankProject,
+        task_rate: company?.settings.default_task_rate || 0,
+      });
     }
   }, [blankProject]);
 
@@ -61,7 +67,9 @@ export function Create() {
       .then((response) => {
         toast.success(t('created_project'), { id: toastId });
 
-        navigate(generatePath('/projects/:id/edit', { id: response.data.data.id }));
+        navigate(
+          generatePath('/projects/:id/edit', { id: response.data.data.id })
+        );
       })
       .catch((error: AxiosError) => {
         console.error(error);
