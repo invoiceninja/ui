@@ -156,7 +156,7 @@ export function Invoices() {
     <Default title={t('invoices')} breadcrumbs={pages} docsLink="docs/invoices">
       <DataTable
         resource="invoice"
-        endpoint="/api/v1/invoices?include=client"
+        endpoint="/api/v1/invoices?include=client&without_deleted_clients=true"
         columns={columns}
         bulkRoute="/api/v1/invoices/bulk"
         linkToCreate="/invoices/create"
