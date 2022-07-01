@@ -18,6 +18,7 @@ import { Settings } from 'components/layouts/Settings';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { Actions } from './components/Actions';
 import { Details } from './components/Details';
@@ -42,6 +43,7 @@ export function Edit() {
 
   const currentUser = useCurrentUser();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (response?.data.data && response.data.data.email === currentUser.email) {
@@ -59,10 +61,12 @@ export function Edit() {
       endpoint('/api/v1/users/:id?include=company_user', { id }),
       user
     )
-      .then((response) => {
+      .then(() => {
         toast.success(t('updated_user'), { id: toastId });
 
-        setUser(response.data.data);
+        queryClient.invalidateQueries(
+          generatePath('/api/v1/users/:id', { id })
+        );
       })
       .catch((error) => {
         console.error(error);
