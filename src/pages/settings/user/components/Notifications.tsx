@@ -71,7 +71,7 @@ export function Notifications() {
 
   const options: { label: string; field: string }[] = [
     { label: t('invoice_created'), field: 'invoice_created_all' },
-    { label: t('invoice_sent'), field: 'invoice_sent_all' },
+    { label: t('notification_invoice_sent'), field: 'invoice_sent_all' },
     { label: t('invoice_viewed'), field: 'invoice_viewed_all' },
     { label: t('invoice_late'), field: 'invoice_late_all' },
 
@@ -103,7 +103,7 @@ export function Notifications() {
       <div className="pt-6 border-b"></div>
 
       {options.map((notification, index) => (
-        <Element key={index} className="mt-4" leftSide={notification.label}>
+        <Element key={index} className="mt-0" leftSide={notification.label}>
           <Toggle
             checked={
               userChanges?.company_user?.notifications?.email?.includes(
