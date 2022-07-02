@@ -25,6 +25,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useSave } from './hooks/useSave';
 import { PaymentOverview } from './PaymentOverview';
+import { ClientCard } from 'pages/clients/show/components/ClientCard';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_payment');
@@ -42,7 +43,6 @@ export function Edit() {
   useEffect(() => {
     if (data?.data.data) {
       const payment: Payment = { ...data.data.data };
-
       delete payment.documents;
 
       setPayment(payment);
@@ -71,6 +71,7 @@ export function Edit() {
         payment && onSave(payment);
       }}
     >
+      {payment?.client && <ClientCard client={payment.client}/>}
       {payment && <PaymentOverview payment={payment} />}
 
       <Divider />

@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Client } from './client';
 import { Invoice } from './invoice';
 
 export interface Payment {
@@ -44,6 +45,7 @@ export interface Payment {
   paymentables: Paymentable[];
   documents?: any[];
   invoices?: Invoice[];
+  client?: Client;
 }
 
 export interface Paymentable {
