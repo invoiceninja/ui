@@ -16,7 +16,7 @@ export function SystemLog() {
     const [t] = useTranslation();
     const pages = [{ name: t('system_logs'), href: '/system_logs' }];
 
-    const company = useCurrentCompany();
+    // const company = useCurrentCompany();
 
 
     return (
