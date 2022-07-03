@@ -8,14 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Button } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { useRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
+import { t } from 'i18next';
 import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
-import { useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 
 export function Pdf() {
   const { documentTitle } = useTitle('view_pdf');
@@ -27,7 +29,13 @@ export function Pdf() {
   const url = useGeneratePdfUrl({ resource: 'recurring_invoice' });
 
   return (
-    <Default title={documentTitle}>
+    <Default title={documentTitle}
+      navigationTopRight={
+        <Button to={generatePath('/recurring_invoices/:id/edit', { id: id })} type="primary">
+          {t('back')}
+        </Button>
+      }
+      >
       {isLoading && <Spinner />}
 
       {recurringInvoice && (
@@ -39,3 +47,5 @@ export function Pdf() {
     </Default>
   );
 }
+
+

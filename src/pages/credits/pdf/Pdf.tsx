@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Button } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { useCreditQuery } from 'common/queries/credits';
 import { Dropdown } from 'components/dropdown/Dropdown';
@@ -37,6 +38,10 @@ export function Pdf() {
       title={documentTitle}
       navigationTopRight={
         credit && (
+          <>
+          <Button to={generatePath('/credits/:id/edit', { id: id })} type="primary">
+            {t('back')}
+          </Button>
           <Dropdown label={t('more_actions')}>
             <DropdownElement onClick={() => downloadPdf(credit.data.data)}>
               {t('download')}
@@ -50,6 +55,7 @@ export function Pdf() {
               {t('email_credit')}
             </DropdownElement>
           </Dropdown>
+          </>
         )
       }
     >
