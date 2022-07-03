@@ -52,7 +52,7 @@ export function Pdf() {
         
         invoice && (
           <>
-          <Button to={generatePath('/invoices/:id/edit', { id: invoice.id })} type="primary">
+            <Button to={generatePath('/invoices/:id/edit', { id: invoice.id })} type="secondary">
             {t('back')}
           </Button>
           <Actions

@@ -23,6 +23,7 @@ import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { generatePath } from 'react-router-dom';
 
 interface Props {
   resource: Invoice | RecurringInvoice | Quote;
@@ -46,6 +47,23 @@ export function Mailer(props: Props) {
     setTemplateId(id);
   };
 
+  const backPath = () =>{
+
+    switch (props.resourceType) {
+      case 'invoice':
+        return '/invoices/:id/edit';
+      case 'recurring_invoice':
+        return '/recurring_invoices/:id/edit';
+      case 'quote':
+        return '/quotes/:id/edit';
+      case 'credit':
+        return '/credits/:id/edit';
+      default:
+        return '';
+        break;
+    }
+  }
+
   const template = useResolveTemplate(
     body,
     props.resourceType,
@@ -61,6 +79,9 @@ export function Mailer(props: Props) {
   return (
     <>
       <div className="flex justify-end">
+        <Button className="mx-2" to={generatePath(backPath(), { id: props.resource.id })} type="secondary">
+          {t('back')}
+        </Button>
         <Button
           onClick={() =>
             handleSend(

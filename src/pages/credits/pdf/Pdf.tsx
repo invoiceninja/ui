@@ -39,7 +39,7 @@ export function Pdf() {
       navigationTopRight={
         credit && (
           <>
-          <Button to={generatePath('/credits/:id/edit', { id: id })} type="primary">
+            <Button to={generatePath('/credits/:id/edit', { id: id })} type="secondary">
             {t('back')}
           </Button>
           <Dropdown label={t('more_actions')}>
