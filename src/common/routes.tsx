@@ -21,6 +21,7 @@ import { settingsRoutes } from 'pages/settings/routes';
 import { authenticationRoutes } from 'pages/authentication/routes';
 import { quoteRoutes } from 'pages/quotes/routes';
 import { creditRoutes } from 'pages/credits/routes';
+import { systemlogRoutes } from 'pages/system-logs/routes';
 
 export const routes = (
   <Routes>
@@ -36,6 +37,7 @@ export const routes = (
       {quoteRoutes}
       {creditRoutes}
       {settingsRoutes}
+      {systemlogRoutes}
     </Route>
   </Routes>
 );
