@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+// import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 
