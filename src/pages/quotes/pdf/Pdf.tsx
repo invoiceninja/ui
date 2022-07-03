@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Button } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { useQuoteQuery } from 'common/queries/quotes';
 import { Dropdown } from 'components/dropdown/Dropdown';
@@ -37,6 +38,10 @@ export function Pdf() {
       title={documentTitle}
       navigationTopRight={
         quote && (
+          <>
+          <Button to={generatePath('/quotes/:id/edit', { id: id })} type="primary">
+            {t('back')}
+          </Button>
           <Dropdown label={t('more_actions')}>
             <DropdownElement onClick={() => downloadPdf(quote.data.data)}>
               {t('download')}
@@ -48,6 +53,7 @@ export function Pdf() {
               {t('email_quote')}
             </DropdownElement>
           </Dropdown>
+          </>
         )
       }
     >
