@@ -50,7 +50,7 @@ export function PaymentOverviewInvoice(props: Props) {
       <div className="flex items-center justify-center">
         <span className="text-gray-400">
           {formatMoney(
-            props?.payment?.amount || 0,
+            props?.paymentable?.amount || 0,
             company.settings.country_id,
             props.payment?.currency_id
           )}
