@@ -11,17 +11,21 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
+import { EntityState } from 'common/enums/entity-state';
+import { endpoint, getEntityState } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { Project } from 'common/interfaces/project';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useProjectQuery } from 'common/queries/projects';
+import { Dropdown } from 'components/dropdown/Dropdown';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
+import { useBulkAction } from '../common/hooks/useBulkAction';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -33,6 +37,7 @@ export function Edit() {
   const [errors, setErrors] = useState<ValidationBag>();
 
   const queryClient = useQueryClient();
+  const bulk = useBulkAction();
 
   useEffect(() => {
     if (data) {
@@ -71,82 +76,114 @@ export function Edit() {
   };
 
   return (
-    <Card title={t('edit_project')} withSaveButton onFormSubmit={onSave}>
-      <Element leftSide={t('project_name')}>
-        <InputField
-          value={project?.name}
-          onValueChange={(value) => handleChange('name', value)}
-          errorMessage={errors?.errors.name}
-        />
-      </Element>
+    <>
+      <Card title={t('edit_project')} withSaveButton onFormSubmit={onSave}>
+        <Element leftSide={t('project_name')}>
+          <InputField
+            value={project?.name}
+            onValueChange={(value) => handleChange('name', value)}
+            errorMessage={errors?.errors.name}
+          />
+        </Element>
 
-      <Element leftSide={t('project_number')}>
-        <InputField
-          value={project?.number}
-          onValueChange={(value) => handleChange('number', value)}
-          errorMessage={errors?.errors.number}
-        />
-      </Element>
+        <Element leftSide={t('project_number')}>
+          <InputField
+            value={project?.number}
+            onValueChange={(value) => handleChange('number', value)}
+            errorMessage={errors?.errors.number}
+          />
+        </Element>
 
-      <Element leftSide={t('user')}>
-        <DebouncedCombobox
-          defaultValue={project?.user_id}
-          endpoint="/api/v1/users"
-          label="first_name"
-          formatLabel={(resource) =>
-            `${resource.first_name} ${resource.last_name}`
-          }
-          onChange={(value) => handleChange('user_id', value.value)}
-          clearButton={Boolean(project?.user_id)}
-          onClearButtonClick={() => handleChange('user_id', '')}
-          errorMessage={errors?.errors.user_id}
-          queryAdditional
-          disabled
-        />
-      </Element>
+        <Element leftSide={t('user')}>
+          <DebouncedCombobox
+            defaultValue={project?.user_id}
+            endpoint="/api/v1/users"
+            label="first_name"
+            formatLabel={(resource) =>
+              `${resource.first_name} ${resource.last_name}`
+            }
+            onChange={(value) => handleChange('user_id', value.value)}
+            clearButton={Boolean(project?.user_id)}
+            onClearButtonClick={() => handleChange('user_id', '')}
+            errorMessage={errors?.errors.user_id}
+            queryAdditional
+            disabled
+          />
+        </Element>
 
-      <Element leftSide={t('due_date')}>
-        <InputField
-          type="date"
-          value={project?.due_date}
-          onValueChange={(value) => handleChange('due_date', value)}
-          errorMessage={errors?.errors.due_date}
-        />
-      </Element>
+        <Element leftSide={t('due_date')}>
+          <InputField
+            type="date"
+            value={project?.due_date}
+            onValueChange={(value) => handleChange('due_date', value)}
+            errorMessage={errors?.errors.due_date}
+          />
+        </Element>
 
-      <Element leftSide={t('budgeted_hours')}>
-        <InputField
-          value={project?.budgeted_hours}
-          onValueChange={(value) => handleChange('budgeted_hours', value)}
-          errorMessage={errors?.errors.budgeted_hours}
-        />
-      </Element>
+        <Element leftSide={t('budgeted_hours')}>
+          <InputField
+            value={project?.budgeted_hours}
+            onValueChange={(value) => handleChange('budgeted_hours', value)}
+            errorMessage={errors?.errors.budgeted_hours}
+          />
+        </Element>
 
-      <Element leftSide={t('task_rate')}>
-        <InputField
-          value={project?.task_rate}
-          onValueChange={(value) => handleChange('task_rate', value)}
-          errorMessage={errors?.errors.task_rate}
-        />
-      </Element>
+        <Element leftSide={t('task_rate')}>
+          <InputField
+            value={project?.task_rate}
+            onValueChange={(value) => handleChange('task_rate', value)}
+            errorMessage={errors?.errors.task_rate}
+          />
+        </Element>
 
-      <Element leftSide={t('public_notes')}>
-        <InputField
-          element="textarea"
-          value={project?.public_notes}
-          onValueChange={(value) => handleChange('public_notes', value)}
-          errorMessage={errors?.errors.public_notes}
-        />
-      </Element>
+        <Element leftSide={t('public_notes')}>
+          <InputField
+            element="textarea"
+            value={project?.public_notes}
+            onValueChange={(value) => handleChange('public_notes', value)}
+            errorMessage={errors?.errors.public_notes}
+          />
+        </Element>
 
-      <Element leftSide={t('private_notes')}>
-        <InputField
-          element="textarea"
-          value={project?.private_notes}
-          onValueChange={(value) => handleChange('private_notes', value)}
-          errorMessage={errors?.errors.private_notes}
-        />
-      </Element>
-    </Card>
+        <Element leftSide={t('private_notes')}>
+          <InputField
+            element="textarea"
+            value={project?.private_notes}
+            onValueChange={(value) => handleChange('private_notes', value)}
+            errorMessage={errors?.errors.private_notes}
+          />
+        </Element>
+      </Card>
+
+      {project && (
+        <div className="flex justify-end">
+          <Dropdown label={t('more_actions')}>
+            <DropdownElement to={generatePath('/projects/:id/clone', { id })}>
+              {t('clone')}
+            </DropdownElement>
+
+            {getEntityState(project) === EntityState.Active && (
+              <DropdownElement onClick={() => bulk(project.id, 'archive')}>
+                {t('archive_project')}
+              </DropdownElement>
+            )}
+
+            {(getEntityState(project) === EntityState.Archived ||
+              getEntityState(project) === EntityState.Deleted) && (
+              <DropdownElement onClick={() => bulk(project.id, 'restore')}>
+                {t('restore_project')}
+              </DropdownElement>
+            )}
+
+            {(getEntityState(project) === EntityState.Active ||
+              getEntityState(project) === EntityState.Archived) && (
+              <DropdownElement onClick={() => bulk(project.id, 'delete')}>
+                {t('delete_project')}
+              </DropdownElement>
+            )}
+          </Dropdown>
+        </div>
+      )}
+    </>
   );
 }
