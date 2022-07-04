@@ -11,6 +11,7 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
+import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
 import { Documents } from './documents/Documents';
 import { Edit } from './edit/Edit';
@@ -49,5 +50,6 @@ export const projectRoutes = (
       <Route path="edit" element={<Edit />} />
       <Route path="documents" element={<Documents />} />
     </Route>
+    <Route path="/projects/:id/clone" element={<Clone />} />
   </Route>
 );
