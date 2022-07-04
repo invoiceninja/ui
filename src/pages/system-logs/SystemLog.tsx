@@ -22,7 +22,7 @@ export function SystemLog() {
     const [t] = useTranslation();
     const pages = [{ name: t('system_logs'), href: '/system_logs' }];
 
-    const { data, isLoading, isError } = useQuery(
+    const { data, isLoading } = useQuery(
         '/api/v1/system_logs',
         () => request('GET', endpoint('/api/v1/system_logs'))
     );
@@ -43,8 +43,8 @@ export function SystemLog() {
 
             {/* Stacked list */}
             <ul role="list" className="mt-5 border-t border-gray-200 divide-y divide-gray-200 sm:mt-0 sm:border-t-0">
-                {data?.data?.data.map((system_log: SystemLog, index: number) => (
-                    <li key="x">
+                {data?.data?.data.map((system_log: SystemLog) => (
+                    <li key={system_log.id}>
                         <a href="#" className="group block">
                             <div className="flex items-center py-5 px-4 sm:py-6 sm:px-0">
                                 <div className="min-w-0 flex-1 flex items-center">
