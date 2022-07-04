@@ -22,6 +22,7 @@ import { authenticationRoutes } from 'pages/authentication/routes';
 import { quoteRoutes } from 'pages/quotes/routes';
 import { creditRoutes } from 'pages/credits/routes';
 import { projectRoutes } from 'pages/projects/routes';
+import { taskRoutes } from 'pages/tasks/routes';
 
 export const routes = (
   <Routes>
@@ -37,6 +38,7 @@ export const routes = (
       {quoteRoutes}
       {creditRoutes}
       {projectRoutes}
+      {taskRoutes}
       {settingsRoutes}
     </Route>
   </Routes>
