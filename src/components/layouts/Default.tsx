@@ -21,6 +21,7 @@ import {
   CreditCard,
   File,
   Briefcase,
+  Clock,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -169,6 +170,19 @@ export function Default(props: Props) {
         to: '/projects/create',
         label: t('new_project'),
         visible: hasPermission('create_project'),
+      },
+    },
+    {
+      name: t('tasks'),
+      href: '/tasks',
+      icon: Clock,
+      current: location.pathname.startsWith('/tasks'),
+      visible: hasPermission('view_task'),
+      rightButton: {
+        icon: PlusCircle,
+        to: '/tasks/create',
+        label: t('new_task'),
+        visible: hasPermission('create_task'),
       },
     },
     {
