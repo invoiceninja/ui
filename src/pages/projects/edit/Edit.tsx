@@ -96,16 +96,16 @@ export function Edit() {
 
         <Element leftSide={t('user')}>
           <DebouncedCombobox
-            defaultValue={project?.user_id}
+            defaultValue={project?.assigned_user_id}
             endpoint="/api/v1/users"
             label="first_name"
             formatLabel={(resource) =>
               `${resource.first_name} ${resource.last_name}`
             }
-            onChange={(value) => handleChange('user_id', value.value)}
-            clearButton={Boolean(project?.user_id)}
-            onClearButtonClick={() => handleChange('user_id', '')}
-            errorMessage={errors?.errors.user_id}
+            onChange={(value) => handleChange('assigned_user_id', value.value)}
+            clearButton={Boolean(project?.assigned_user_id)}
+            onClearButtonClick={() => handleChange('assigned_user_id', '')}
+            errorMessage={errors?.errors.assigned_user_id}
             queryAdditional
             disabled
           />
