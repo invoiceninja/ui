@@ -9,16 +9,20 @@
  */
 
 import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
+import { EntityState } from 'common/enums/entity-state';
+import { date, getEntityState } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
+import { Project } from 'common/interfaces/project';
 import { DataTable, DataTableColumns } from 'components/DataTable';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { useBulkAction } from '../common/hooks/useBulkAction';
 
 export function Projects() {
   useTitle('projects');
@@ -85,6 +89,16 @@ export function Projects() {
     },
   ];
 
+  const actions = [
+    (project: Project) => (
+      <DropdownElement
+        to={generatePath('/projects/:id/clone', { id: project.id })}
+      >
+        {t('clone')}
+      </DropdownElement>
+    ),
+  ];
+
   return (
     <Default
       title={t('projects')}
@@ -95,6 +109,7 @@ export function Projects() {
         resource="project"
         endpoint="/api/v1/projects"
         columns={columns}
+        customActions={actions}
         linkToCreate="/projects/create"
         linkToEdit="/projects/:id/edit"
         withResourcefulActions

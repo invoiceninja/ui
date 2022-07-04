@@ -25,6 +25,10 @@ export function Project() {
 
   const [t] = useTranslation();
 
+  useEffect(() => {
+    data?.name && setDocumentTitle(data.name);
+  }, [data]);
+
   const pages: BreadcrumRecord[] = [
     { name: t('projects'), href: '/projects' },
     {
@@ -43,10 +47,6 @@ export function Project() {
       href: generatePath('/projects/:id/documents', { id }),
     },
   ];
-
-  useEffect(() => {
-    data?.name && setDocumentTitle(data.name);
-  }, [data]);
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
