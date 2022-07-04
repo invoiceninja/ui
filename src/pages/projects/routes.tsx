@@ -12,6 +12,7 @@ import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
+import { Documents } from './documents/Documents';
 import { Edit } from './edit/Edit';
 import { Projects } from './index/Projects';
 import { Project } from './Project';
@@ -46,6 +47,7 @@ export const projectRoutes = (
       }
     >
       <Route path="edit" element={<Edit />} />
+      <Route path="documents" element={<Documents />} />
     </Route>
   </Route>
 );
