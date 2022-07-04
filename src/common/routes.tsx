@@ -21,6 +21,7 @@ import { settingsRoutes } from 'pages/settings/routes';
 import { authenticationRoutes } from 'pages/authentication/routes';
 import { quoteRoutes } from 'pages/quotes/routes';
 import { creditRoutes } from 'pages/credits/routes';
+import { projectRoutes } from 'pages/projects/routes';
 
 export const routes = (
   <Routes>
@@ -35,6 +36,7 @@ export const routes = (
       {paymentRoutes}
       {quoteRoutes}
       {creditRoutes}
+      {projectRoutes}
       {settingsRoutes}
     </Route>
   </Routes>
