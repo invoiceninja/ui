@@ -9,8 +9,7 @@
  */
 
 import { Link } from '@invoiceninja/forms';
-import { EntityState } from 'common/enums/entity-state';
-import { date, getEntityState } from 'common/helpers';
+import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
@@ -22,7 +21,6 @@ import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
-import { useBulkAction } from '../common/hooks/useBulkAction';
 
 export function Projects() {
   useTitle('projects');
