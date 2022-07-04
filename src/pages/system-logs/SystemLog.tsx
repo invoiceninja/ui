@@ -16,7 +16,7 @@ import { useQuery } from 'react-query';
 import { endpoint } from 'common/helpers';
 import { NonClickableElement } from 'components/cards/NonClickableElement';
 import { Spinner } from 'components/Spinner';
-import { SystemLog } from 'common/interfaces/system-log';
+import { SystemLogRecord } from 'common/interfaces/system-log';
 
 export function SystemLog() {
     const [t] = useTranslation();
@@ -43,7 +43,7 @@ export function SystemLog() {
 
             {/* Stacked list */}
             <ul role="list" className="mt-5 border-t border-gray-200 divide-y divide-gray-200 sm:mt-0 sm:border-t-0">
-                {data?.data?.data.map((system_log: SystemLog) => (
+                {data?.data?.data.map((system_log: SystemLogRecord) => (
                     <li key={system_log.id}>
                         <a href="#" className="group block">
                             <div className="flex items-center py-5 px-4 sm:py-6 sm:px-0">

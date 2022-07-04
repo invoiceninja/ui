@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export interface SystemLog {
+export interface SystemLogRecord {
     id: string;
     user_id: string;
     company_id: string;
