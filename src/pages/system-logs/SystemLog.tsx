@@ -29,6 +29,68 @@ export function SystemLog() {
 
     // const company = useCurrentCompany();
 
+    const categories = [
+        {id: 1, name: t('gateway_id')},
+        {id: 2, name: t('email')},
+        {id: 3, name: t('webhook')},
+        {id: 4, name: t('pdf')},
+        {id: 5, name: t('security')},  
+    ];
+
+    const events = [
+        {id: 10, name: t('payment_failure')},
+        {id: 11, name: t('payment_success')},
+        {id: 21, name: t('success')},
+        {id: 22, name: t('failure')},
+        {id: 23, name: t('error')},
+        {id: 30, name: t('email_send')},
+        {id: 31, name: t('email_retry_queue')},
+        {id: 32, name: t('email_bounced')},
+        {id: 33, name: t('email_spam_complaint')},
+        {id: 34, name: t('email_delivery')},
+        {id: 35, name: t('opened')},
+        {id: 40, name: t('webhook_response')},
+        {id: 41, name: t('webhook_success')},
+        {id: 50, name: t('pdf')},
+        {id: 60, name: t('login_failure')},
+        {id: 61, name: t('user')},
+    ];
+
+    const types = [
+        {id: 300, name: t('paypal')},
+        {id: 301, name: t('payment_type_stripe')},
+        {id: 302, name: t('ledger')},
+        {id: 303, name: t('failure')},
+        {id: 304, name: t('checkout_com')},
+        {id: 305, name: `auth.net`},
+        {id: 306, name: t('custom')},
+        {id: 307, name: `Braintree`},
+        {id: 309, name: t('wepay')},
+        {id: 310, name: `PayFast`},
+        {id: 311, name: `PayTrace`},
+        {id: 312, name: `Mollie`},
+        {id: 313, name: `eWay`},
+        {id: 320, name: `Square`},
+        {id: 321, name: t('gocardless')},
+        {id: 322, name: `Razorpay`},
+        {id: 400, name: `Quota exceeded`},
+        {id: 401, name: `Upstream failure`},
+        {id: 500, name: `Webhook response`},
+        {id: 600, name: `PDF Failure`},
+        {id: 601, name: `PDF Sucess`},
+        {id: 701, name: `Modified`},
+        {id: 702, name: `Deleted`},
+        {id: 800, name: `Login Success`},
+        {id: 801, name: `Login Failure`},
+    ];
+
+    const getCategory = (id: any) => {
+        
+        let category = categories.find((data: any) => data.id == id);
+
+        return category ? category.name : 'Undefined Category';
+
+    };
 
     return (
         <Default
@@ -57,7 +119,7 @@ export function SystemLog() {
                                     </div>
                                     <div className="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4">
                                         <div>
-                                            <p className="text-sm font-medium text-purple-600 truncate">name</p>
+                                            <p className="text-sm font-medium text-purple-600 truncate">{getCategory(system_log.category_id)}</p>
                                             <p className="mt-2 flex items-center text-sm text-gray-500">
                                                 <span className="truncate">email</span>
                                             </p>
