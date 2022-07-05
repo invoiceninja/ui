@@ -16,5 +16,6 @@ export interface SystemLogRecord {
     event_id?: number;
     category_id?: number;
     type_id?: number;
-    log?: object;
+    log: object;
+    created_at: number;
 }

@@ -17,17 +17,19 @@ import { endpoint } from 'common/helpers';
 import { NonClickableElement } from 'components/cards/NonClickableElement';
 import { Spinner } from 'components/Spinner';
 import { SystemLogRecord } from 'common/interfaces/system-log';
+import ReactJson from 'react-json-view'
+import { date as formatDate } from 'common/helpers';
+import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 
 export function SystemLog() {
     const [t] = useTranslation();
     const pages = [{ name: t('system_logs'), href: '/system_logs' }];
+    const { dateFormat }= useCurrentCompanyDateFormats();
 
     const { data, isLoading } = useQuery(
-        '/api/v1/system_logs',
-        () => request('GET', endpoint('/api/v1/system_logs'))
+        '/api/v1/system_logs?per_page=200&sort=created_at|DESC',
+        () => request('GET', endpoint('/api/v1/system_logs?per_page=200&sort=created_at|DESC'))
     );
-
-    // const company = useCurrentCompany();
 
     const categories = [
         {id: 1, name: t('gateway_id')},
@@ -86,11 +88,43 @@ export function SystemLog() {
 
     const getCategory = (id: any) => {
         
-        let category = categories.find((data: any) => data.id == id);
+        const category = categories.find((data: any) => data.id == id);
 
         return category ? category.name : 'Undefined Category';
 
     };
+
+    const getEvent = (id: any) => {
+        
+        const event = events.find((data: any) => data.id == id);
+
+        return event ? event.name : 'Undefined Event';
+
+    };
+
+    const getType = (id: any) => {
+        
+        const type = types.find((data: any) => data.id == id);
+
+        return type ? type.name : 'Undefined Type';
+
+    };
+
+    const getLog = (src: any) => {
+
+        try {
+            var o = JSON.parse(src);
+
+            if (o && typeof o === "object") {
+                return <ReactJson src={JSON.parse(src)} collapsed={true} />
+            }
+
+        } catch (e) {
+            return src;
+        }
+        return src;
+
+    }
 
     return (
         <Default
@@ -107,49 +141,29 @@ export function SystemLog() {
             <ul role="list" className="mt-5 border-t border-gray-200 divide-y divide-gray-200 sm:mt-0 sm:border-t-0">
                 {data?.data?.data.map((system_log: SystemLogRecord) => (
                     <li key={system_log.id}>
-                        <a href="#" className="group block">
-                            <div className="flex items-center py-5 px-4 sm:py-6 sm:px-0">
-                                <div className="min-w-0 flex-1 flex items-center">
-                                    <div className="flex-shrink-0">
-                                        <img
-                                            className="h-12 w-12 rounded-full group-hover:opacity-75"
-                                            src=""
-                                            alt=""
-                                        />
+                        <div className="flex items-center py-5 sm:py-6">
+                            <div className="min-w-0 flex-1">
+                                <div className="min-w-0 flex-1 px-4 md:grid md:grid-cols-3">
+                                    <div>
+                                        <p className="text-sm font-medium text-purple-600 truncate">{getCategory(system_log.category_id)} </p>
+                                        <p className="mt-2 flex items-center text-sm text-gray-500">
+                                            <span className="truncate">{getType(system_log.type_id)} - {formatDate(system_log.created_at, dateFormat)}</span>
+                                        </p>
                                     </div>
-                                    <div className="min-w-0 flex-1 px-4 md:grid md:grid-cols-2 md:gap-4">
+                                    <div className="hidden md:block">
                                         <div>
-                                            <p className="text-sm font-medium text-purple-600 truncate">{getCategory(system_log.category_id)}</p>
-                                            <p className="mt-2 flex items-center text-sm text-gray-500">
-                                                <span className="truncate">email</span>
+                                            <p className="text-sm text-gray-900">
+                                                {getEvent(system_log.event_id)} 
                                             </p>
-                                        </div>
-                                        <div className="hidden md:block">
-                                            <div>
-                                                <p className="text-sm text-gray-900">
-                                                    Applied on 
-                                                </p>
-                                                <p className="mt-2 flex items-center text-sm text-gray-500">
-                                                    candidate.status
-                                                </p>
-                                            </div>
+                                            {getLog(system_log.log)}
                                         </div>
                                     </div>
-                                </div>
-                                <div>
-                                    {/* <ChevronRightIcon
-                                        className="h-5 w-5 text-gray-400 group-hover:text-gray-700"
-                                        aria-hidden="true"
-                                    /> */}
                                 </div>
                             </div>
-                        </a>
+                        </div>
                     </li>
                 ))}
             </ul>
-
-
-
         </Default>
     );
 }
