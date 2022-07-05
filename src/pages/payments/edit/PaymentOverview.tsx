@@ -72,7 +72,6 @@ export function PaymentOverview(props: Props) {
           />
         ))}
       </div>
-
     </div>
   );
 }

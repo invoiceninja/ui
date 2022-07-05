@@ -39,7 +39,7 @@ import { Details } from './components/Details';
 export function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
   const { id } = useParams();
-  
+
   const [t] = useTranslation();
 
   const navigate = useNavigate();

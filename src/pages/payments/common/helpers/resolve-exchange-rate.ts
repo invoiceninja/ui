@@ -21,9 +21,7 @@ export function getExchangeRate(
   const toCurrency = statics?.currencies.find(
     (data: any) => data.id === toCurrencyId
   );
-  const baseCurrency = statics?.currencies.find(
-    (data: any) => data.id === '1'
-  );
+  const baseCurrency = statics?.currencies.find((data: any) => data.id === '1');
 
   if (fromCurrency == baseCurrency) {
     return toCurrency.exchange_rate;

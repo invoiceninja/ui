@@ -14,7 +14,7 @@ import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router';
 import { endpoint } from '../../common/helpers';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { useGoogleLogout } from 'react-google-login'
+import { useGoogleLogout } from 'react-google-login';
 import { RootState } from 'common/stores/store';
 import { useSelector } from 'react-redux';
 
@@ -32,16 +32,10 @@ export function Logout() {
       localStorage.removeItem('X-NINJA-TOKEN');
       localStorage.removeItem('X-CURRENT-INDEX');
 
-      if (user.oauth_provider_id == 'microsoft'){
-
-        if(msalInstance)
-          msalInstance.logout();
-
-      }
-      else if (user.oauth_provider_id == 'google'){
-
-        signOut() 
-
+      if (user.oauth_provider_id == 'microsoft') {
+        if (msalInstance) msalInstance.logout();
+      } else if (user.oauth_provider_id == 'google') {
+        signOut();
       }
 
       queryClient.invalidateQueries();

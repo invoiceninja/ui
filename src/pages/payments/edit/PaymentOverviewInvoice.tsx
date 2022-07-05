@@ -40,11 +40,14 @@ export function PaymentOverviewInvoice(props: Props) {
     <div className="grid grid-cols-1 gap-2 my-2 border border-x-5 py-4">
       <div className="flex items-center justify-center">
         <span className="text-gray-800">
-          {`${t('invoice')} ` } 
-          <Link to={generatePath('/invoices/:id/edit', { id: props.paymentable.invoice_id })}>
-            { setLabel(props.payment, props.paymentable)}
+          {`${t('invoice')} `}
+          <Link
+            to={generatePath('/invoices/:id/edit', {
+              id: props.paymentable.invoice_id,
+            })}
+          >
+            {setLabel(props.payment, props.paymentable)}
           </Link>
-          
         </span>
       </div>
       <div className="flex items-center justify-center">
@@ -55,7 +58,7 @@ export function PaymentOverviewInvoice(props: Props) {
             props.payment?.currency_id
           )}
         </span>
-        <span className='text-gray-400 mx-5'>
+        <span className="text-gray-400 mx-5">
           {formatDate(
             new Date(props.paymentable.created_at * 1000).toString(),
             dateFormat

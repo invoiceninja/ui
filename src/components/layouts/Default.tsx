@@ -21,7 +21,7 @@ import {
   CreditCard,
   File,
   ShieldOff,
-  Briefcase
+  Briefcase,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';

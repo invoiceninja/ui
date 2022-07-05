@@ -25,7 +25,10 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 interface Props {
   resource: Invoice | RecurringInvoice;
   invoiceSum?: InvoiceSum;
-  onChange: (property: keyof Invoice | keyof RecurringInvoice, value: unknown) => unknown;
+  onChange: (
+    property: keyof Invoice | keyof RecurringInvoice,
+    value: unknown
+  ) => unknown;
 }
 
 export function InvoiceTotals(props: Props) {

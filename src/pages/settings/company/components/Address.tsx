@@ -86,13 +86,11 @@ export function Address() {
               id="settings.country_id"
             >
               <option value=""></option>
-              {statics?.countries.map(
-                (size: { id: string; name: string }) => (
-                  <option key={size.id} value={size.id}>
-                    {size.name}
-                  </option>
-                )
-              )}
+              {statics?.countries.map((size: { id: string; name: string }) => (
+                <option key={size.id} value={size.id}>
+                  {size.name}
+                </option>
+              ))}
             </SelectField>
           </Element>
         </Card>

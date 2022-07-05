@@ -37,19 +37,21 @@ export function Pdf() {
       title={documentTitle}
       onBackClick={generatePath('/credits/:id/edit', { id })}
       navigationTopRight={
-          credit && <Dropdown label={t('more_actions')}>
-          <DropdownElement onClick={() => downloadPdf(credit.data.data)}>
-            {t('download')}
-          </DropdownElement>
+        credit && (
+          <Dropdown label={t('more_actions')}>
+            <DropdownElement onClick={() => downloadPdf(credit.data.data)}>
+              {t('download')}
+            </DropdownElement>
 
-          <DropdownElement
-            to={generatePath('/credits/:id/email', {
-              id: credit.data.data.id,
-            })}
-          >
-            {t('email_credit')}
-          </DropdownElement>
-        </Dropdown>
+            <DropdownElement
+              to={generatePath('/credits/:id/email', {
+                id: credit.data.data.id,
+              })}
+            >
+              {t('email_credit')}
+            </DropdownElement>
+          </Dropdown>
+        )
       }
     >
       {isLoading && <Spinner />}

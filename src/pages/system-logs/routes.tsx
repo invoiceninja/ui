@@ -12,7 +12,7 @@ import { Route } from 'react-router-dom';
 import { SystemLog } from './SystemLog';
 
 export const systemlogRoutes = (
-    <Route path="/system_logs">
-        <Route path="" element={<SystemLog />} />
-    </Route>
+  <Route path="/system_logs">
+    <Route path="" element={<SystemLog />} />
+  </Route>
 );

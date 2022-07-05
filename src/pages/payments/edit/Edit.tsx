@@ -71,7 +71,7 @@ export function Edit() {
         payment && onSave(payment);
       }}
     >
-      {payment?.client && <ClientCard client={payment.client}/>}
+      {payment?.client && <ClientCard client={payment.client} />}
       {payment && <PaymentOverview payment={payment} />}
 
       <Divider />

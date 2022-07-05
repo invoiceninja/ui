@@ -41,7 +41,7 @@ export function Chart(props: Props) {
   const [t] = useTranslation();
   const [chartData, setchartData] = useState<unknown[]>([]);
 
-  const { dateFormat }= useCurrentCompanyDateFormats();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   useEffect(() => {
     const completeChartData: {

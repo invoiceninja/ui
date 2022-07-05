@@ -127,7 +127,9 @@ export function Clone() {
               formatLabel={(resource) =>
                 `${resource.first_name} ${resource.last_name}`
               }
-              onChange={(value) => handleChange('assigned_user_id', value.value)}
+              onChange={(value) =>
+                handleChange('assigned_user_id', value.value)
+              }
               clearButton={Boolean(project?.assigned_user_id)}
               onClearButtonClick={() => handleChange('assigned_user_id', '')}
               errorMessage={errors?.errors.assigned_user_id}

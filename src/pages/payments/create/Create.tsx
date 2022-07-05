@@ -281,7 +281,9 @@ export function Create() {
                   value.resource && handleInvoiceChange(value.resource)
                 }
                 formatLabel={(resource: Invoice) =>
-                  `${t('invoice_number_short')} ${resource.number} (${formatMoney(
+                  `${t('invoice_number_short')} ${
+                    resource.number
+                  } (${formatMoney(
                     resource.amount,
                     resource?.client?.country_id ?? '1',
                     resource?.client?.settings.currency_id

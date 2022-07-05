@@ -24,7 +24,10 @@ export class InvoiceItemSum {
   protected grossSubTotal = 0;
   public totalTaxes = 0;
 
-  constructor(protected invoice: Invoice | RecurringInvoice, protected currency: Currency) {}
+  constructor(
+    protected invoice: Invoice | RecurringInvoice,
+    protected currency: Currency
+  ) {}
 
   public async process() {
     if (!this.invoice?.line_items || this.invoice.line_items?.length === 0) {
@@ -60,11 +63,11 @@ export class InvoiceItemSum {
 
   protected setDiscount() {
     if (this.invoice.is_amount_discount) {
-      this.item.line_total = this.item.line_total - this.item.discount; 
+      this.item.line_total = this.item.line_total - this.item.discount;
     } else {
       const discount = this.item.line_total * (this.item.discount / 100);
 
-      this.item.line_total = this.item.line_total - discount; 
+      this.item.line_total = this.item.line_total - discount;
     }
 
     this.item.is_amount_discount = this.invoice.is_amount_discount;
@@ -136,9 +139,7 @@ export class InvoiceItemSum {
   }
 
   protected calculateAmountLineTax(rate: number, amount: number) {
-   
-    return  Math.round( (((amount * rate) / 100) * 1000) / 10) / 100;
-
+    return Math.round((((amount * rate) / 100) * 1000) / 10) / 100;
   }
 
   protected push() {

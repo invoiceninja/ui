@@ -22,9 +22,7 @@ export function Variable(props: Props) {
       onClick={() => {
         navigator.clipboard.writeText(props.children);
 
-        toast.success(
-          trans('copied_to_clipboard', { value: props.children })
-        );
+        toast.success(trans('copied_to_clipboard', { value: props.children }));
       }}
     >
       {props.children}

@@ -47,8 +47,7 @@ export function Mailer(props: Props) {
     setTemplateId(id);
   };
 
-  const backPath = () =>{
-
+  const backPath = () => {
     switch (props.resourceType) {
       case 'invoice':
         return '/invoices/:id/edit';
@@ -62,7 +61,7 @@ export function Mailer(props: Props) {
         return '';
         break;
     }
-  }
+  };
 
   const template = useResolveTemplate(
     body,
@@ -79,7 +78,11 @@ export function Mailer(props: Props) {
   return (
     <>
       <div className="flex justify-end">
-        <Button className="mx-2" to={generatePath(backPath(), { id: props.resource.id })} type="secondary">
+        <Button
+          className="mx-2"
+          to={generatePath(backPath(), { id: props.resource.id })}
+          type="secondary"
+        >
           {t('back')}
         </Button>
         <Button
