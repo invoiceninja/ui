@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-// import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { request } from 'common/helpers/request';
@@ -20,6 +19,13 @@ import { SystemLogRecord } from 'common/interfaces/system-log';
 import ReactJson from 'react-json-view'
 import { date as formatDate } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { Card, Element } from '@invoiceninja/cards';
+import { Divider } from 'components/cards/Divider';
+
+interface Category {
+    id: number,
+    name: string,
+}
 
 export function SystemLog() {
     const [t] = useTranslation();
@@ -31,7 +37,7 @@ export function SystemLog() {
         () => request('GET', endpoint('/api/v1/system_logs?per_page=200&sort=created_at|DESC'))
     );
 
-    const categories = [
+    const categories: Category[] = [
         {id: 1, name: t('gateway_id')},
         {id: 2, name: t('email')},
         {id: 3, name: t('webhook')},
@@ -39,7 +45,7 @@ export function SystemLog() {
         {id: 5, name: t('security')},  
     ];
 
-    const events = [
+    const events: Category[] = [
         {id: 10, name: t('payment_failure')},
         {id: 11, name: t('payment_success')},
         {id: 21, name: t('success')},
@@ -58,7 +64,7 @@ export function SystemLog() {
         {id: 61, name: t('user')},
     ];
 
-    const types = [
+    const types: Category[] = [
         {id: 300, name: t('paypal')},
         {id: 301, name: t('payment_type_stripe')},
         {id: 302, name: t('ledger')},
@@ -86,36 +92,35 @@ export function SystemLog() {
         {id: 801, name: `Login Failure`},
     ];
 
-    const getCategory = (id: any) => {
+    const getCategory = (id: number | undefined) => {
         
-        const category = categories.find((data: any) => data.id == id);
+        const category = categories.find((category: Category) => category.id === id);
 
         return category ? category.name : 'Undefined Category';
 
     };
 
-    const getEvent = (id: any) => {
+    const getEvent = (id: number | undefined) => {
         
-        const event = events.find((data: any) => data.id == id);
+        const event = events.find((event: Category) => event.id === id);
 
         return event ? event.name : 'Undefined Event';
 
     };
 
-    const getType = (id: any) => {
+    const getType = (id: number | undefined) => {
         
-        const type = types.find((data: any) => data.id == id);
+        const type = types.find((type: any) => type.id === id);
 
         return type ? type.name : 'Undefined Type';
 
     };
 
-    const getLog = (src: any) => {
-
+    const getLog = (src: string) => {
         try {
-            const o = JSON.parse(src);
+            const logs = JSON.parse(src);
 
-            if (o && typeof o === "object") {
+            if (logs && typeof logs === "object") {
                 return <ReactJson src={JSON.parse(src)} collapsed={true} />
             }
 
@@ -137,33 +142,23 @@ export function SystemLog() {
                 </NonClickableElement>
             )}
 
-            {/* Stacked list */}
-            <ul role="list" className="mt-5 border-t border-gray-200 divide-y divide-gray-200 sm:mt-0 sm:border-t-0">
-                {data?.data?.data.map((system_log: SystemLogRecord) => (
-                    <li key={system_log.id}>
-                        <div className="flex items-center py-5 sm:py-6">
-                            <div className="min-w-0 flex-1">
-                                <div className="min-w-0 flex-1 px-4 md:grid md:grid-cols-3">
-                                    <div>
-                                        <p className="text-sm font-medium text-purple-600 truncate">{getCategory(system_log.category_id)} </p>
-                                        <p className="mt-2 flex items-center text-sm text-gray-500">
-                                            <span className="truncate">{getType(system_log.type_id)} - {formatDate(system_log.created_at, dateFormat)}</span>
-                                        </p>
-                                    </div>
-                                    <div className="hidden md:block">
-                                        <div>
-                                            <p className="text-sm text-gray-900">
-                                                {getEvent(system_log.event_id)} 
-                                            </p>
-                                            {getLog(system_log.log)}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                ))}
-            </ul>
+            <Card>
+            {data?.data.data.map((systemLog: SystemLogRecord, index: number, {length}) => 
+                <>
+                <Element key={index} leftSide={getCategory(systemLog.category_id)} leftSideHelp={`${getType(systemLog.type_id)} ${formatDate(systemLog.created_at, dateFormat)}`}>
+                    <div>
+                        <p className="text-sm text-gray-900">
+                            {getEvent(systemLog.event_id)}
+                        </p>
+
+                        {getLog(systemLog.log)}
+                    </div>
+                </Element>
+                
+                {index + 1 !== length && <Divider />}
+                </>
+            )}
+            </Card>
         </Default>
     );
 }
