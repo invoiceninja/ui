@@ -29,13 +29,10 @@ export function Pdf() {
   const url = useGeneratePdfUrl({ resource: 'recurring_invoice' });
 
   return (
-    <Default title={documentTitle}
-      navigationTopRight={
-        <Button to={generatePath('/recurring_invoices/:id/edit', { id: id })} type="secondary">
-          {t('back')}
-        </Button>
-      }
-      >
+    <Default
+      title={documentTitle}
+      onBackClick={generatePath('/recurring_invoices/:id/edit', { id })}
+    >
       {isLoading && <Spinner />}
 
       {recurringInvoice && (
@@ -47,5 +44,3 @@ export function Pdf() {
     </Default>
   );
 }
-
-
