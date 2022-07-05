@@ -113,7 +113,7 @@ export function SystemLog() {
     const getLog = (src: any) => {
 
         try {
-            var o = JSON.parse(src);
+            const o = JSON.parse(src);
 
             if (o && typeof o === "object") {
                 return <ReactJson src={JSON.parse(src)} collapsed={true} />
