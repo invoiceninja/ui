@@ -36,12 +36,9 @@ export function Pdf() {
   return (
     <Default
       title={documentTitle}
+      onBackClick={generatePath('/quotes/:id/edit', { id })}
       navigationTopRight={
         quote && (
-          <>
-            <Button to={generatePath('/quotes/:id/edit', { id: id })} type="secondary">
-            {t('back')}
-          </Button>
           <Dropdown label={t('more_actions')}>
             <DropdownElement onClick={() => downloadPdf(quote.data.data)}>
               {t('download')}
@@ -53,7 +50,6 @@ export function Pdf() {
               {t('email_quote')}
             </DropdownElement>
           </Dropdown>
-          </>
         )
       }
     >
