@@ -39,20 +39,26 @@ import { Details } from './components/Details';
 export function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
   const { id } = useParams();
+  
   const [t] = useTranslation();
+
   const navigate = useNavigate();
   const company = useInjectCompanyChanges();
   const dispatch = useDispatch();
-  const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
-    useState(false);
+
   const { data, isLoading } = useClientQuery(
     { id },
     { refetchOnWindowFocus: false }
   );
+
   const queryClient = useQueryClient();
+
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([]);
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
+    useState(false);
+
   const onPasswordConformation = usePurgeClient(id);
 
   useEffect(() => {
@@ -100,6 +106,10 @@ export function Edit() {
         );
 
         toast.success(t('updated_client'), { id: toastId });
+
+        queryClient.invalidateQueries(
+          generatePath('/api/v1/clients/:id', { id })
+        );
 
         navigate(generatePath('/clients/:id', { id }));
       })
