@@ -14,7 +14,7 @@
 import { Link, generatePath } from 'react-router-dom';
  
  interface Props {
-    client: Client;
+    client: Client | undefined;
    }
    
  export function ClientCard(props: Props) {
