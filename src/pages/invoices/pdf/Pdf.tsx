@@ -23,7 +23,7 @@ import { Actions } from './components/Actions';
 export function Pdf() {
   const { id } = useParams();
   const { data } = useInvoiceQuery({ id });
-  
+
   const [t] = useTranslation();
   const [pdfUrl, setPdfUrl] = useState<string>();
   const [blobUrl, setBlobUrl] = useState('');
@@ -48,13 +48,11 @@ export function Pdf() {
   return (
     <Default
       title={t('view_pdf')}
+      onBackClick={
+        invoice && generatePath('/invoices/:id/edit', { id: invoice.id })
+      }
       navigationTopRight={
-        
         invoice && (
-          <>
-            <Button to={generatePath('/invoices/:id/edit', { id: invoice.id })} type="secondary">
-            {t('back')}
-          </Button>
           <Actions
             invoice={invoice}
             blobUrl={blobUrl}
@@ -64,7 +62,6 @@ export function Pdf() {
                 : setPdfUrl(url(invoice as Invoice))
             }
           />
-          </>
         )
       }
     >
