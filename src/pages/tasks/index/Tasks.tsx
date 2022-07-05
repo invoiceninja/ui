@@ -15,6 +15,7 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { calculateEntityState } from '../common/helpers/calculate-entity-state';
 import { calculateTime } from '../common/helpers/calculate-time';
 
 export function Tasks() {
@@ -49,6 +50,11 @@ export function Tasks() {
       id: 'time_log',
       label: t('duration'),
       format: (value) => calculateTime(value.toString()),
+    },
+    {
+      id: 'id', // This is calculated column, so real mapping doesn't matter.
+      label: t('entity_state'),
+      format: (value, resource: Task) => t(calculateEntityState(resource)),
     },
   ];
 
