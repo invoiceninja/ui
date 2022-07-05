@@ -14,7 +14,7 @@
 import { Link, generatePath } from 'react-router-dom';
  
  interface Props {
-    client: Client | undefined;
+    client: Client;
    }
    
  export function ClientCard(props: Props) {
@@ -22,13 +22,13 @@ import { Link, generatePath } from 'react-router-dom';
 
    return (
      <>
-       {props?.client && (
+       {props.client && (
          <div className="col-span-12 lg:col-span-3">
            <InfoCard
              title={t('client')}
              value={
                 <Link to={generatePath('/clients/:id', { id: props.client.id })}>
-                    {props?.client?.display_name}
+                    {props.client.display_name}
                 </Link>
              }
              className="h-full"
