@@ -139,7 +139,11 @@ export function SystemLog() {
 
       <Card>
         {data?.data.data.map(
-          (systemLog: SystemLogRecord, index: number, { length }) => (
+          (
+            systemLog: SystemLogRecord,
+            index: number,
+            { length }: { length: number }
+          ) => (
             <>
               <Element
                 key={index}
