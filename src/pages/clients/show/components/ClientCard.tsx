@@ -27,11 +27,9 @@ import { Link, generatePath } from 'react-router-dom';
            <InfoCard
              title={t('client')}
              value={
-               <>
                 <Link to={generatePath('/clients/:id', { id: props.client.id })}>
                     {props?.client?.display_name}
                 </Link>
-               </>
              }
              className="h-full"
            />
