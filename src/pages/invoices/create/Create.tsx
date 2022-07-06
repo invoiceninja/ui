@@ -61,7 +61,7 @@ export function Create() {
   const currentInvoice = useCurrentInvoice();
   const company = useCurrentCompany();
   const clientResolver = useClientResolver();
-  const invoiceSum = useInvoiceSum()
+  const invoiceSum = useInvoiceSum();
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -182,12 +182,14 @@ export function Create() {
         </div>
 
         <InvoiceFooter page="create" />
-        
+
         {currentInvoice && (
           <InvoiceTotals
             resource={currentInvoice}
             invoiceSum={invoiceSum}
-            onChange={(property, value) => handleChange(property as keyof Invoice, value)}
+            onChange={(property, value) =>
+              handleChange(property as keyof Invoice, value)
+            }
           />
         )}
       </div>

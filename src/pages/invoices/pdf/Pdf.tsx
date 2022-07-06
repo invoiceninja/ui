@@ -14,7 +14,7 @@ import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { generatePath, useParams } from 'react-router-dom';
 import { InvoiceViewer } from '../common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { Actions } from './components/Actions';
@@ -22,7 +22,7 @@ import { Actions } from './components/Actions';
 export function Pdf() {
   const { id } = useParams();
   const { data } = useInvoiceQuery({ id });
-  
+
   const [t] = useTranslation();
   const [pdfUrl, setPdfUrl] = useState<string>();
   const [blobUrl, setBlobUrl] = useState('');
@@ -47,6 +47,9 @@ export function Pdf() {
   return (
     <Default
       title={t('view_pdf')}
+      onBackClick={
+        invoice && generatePath('/invoices/:id/edit', { id: invoice.id })
+      }
       navigationTopRight={
         invoice && (
           <Actions

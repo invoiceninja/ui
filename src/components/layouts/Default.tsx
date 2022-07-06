@@ -20,6 +20,7 @@ import {
   Repeat,
   CreditCard,
   File,
+  ShieldOff,
   Briefcase,
   Clock,
 } from 'react-feather';
@@ -190,6 +191,13 @@ export function Default(props: Props) {
       href: '/settings/company_details',
       icon: Settings,
       current: location.pathname.startsWith('/settings'),
+      visible: true,
+    },
+    {
+      name: t('system_logs'),
+      href: '/system_logs',
+      icon: ShieldOff,
+      current: location.pathname.startsWith('/system_logs'),
       visible: true,
     },
   ];

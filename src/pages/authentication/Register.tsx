@@ -153,7 +153,7 @@ export function Register() {
           </div>
         </div>
 
-        {(
+        {
           <>
             <div className="bg-white mx-4 max-w-md w-full rounded md:shadow-lg mt-4">
               <SignInProviders />
@@ -163,8 +163,7 @@ export function Register() {
               <HostedLinks />
             </div>
           </>
-        )}
-        
+        }
       </div>
     </div>
   );

@@ -40,7 +40,7 @@ export function Actions(props: Props) {
 
   return (
     <>
-      <span className="inline-flex items-center mr-4">
+      <span className="inline-flex items-center">
         <Toggle
           label={t('delivery_note')}
           onChange={handleDeliveryNoteChange}

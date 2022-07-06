@@ -62,7 +62,9 @@ export function Invoices() {
         leftSideHelp={t('auto_archive_invoice_cancelled_help')}
       >
         <Toggle
-          checked={companyChanges?.settings?.auto_archive_invoice_cancelled || false}
+          checked={
+            companyChanges?.settings?.auto_archive_invoice_cancelled || false
+          }
           onChange={(value: boolean) =>
             handleToggleChange('settings.auto_archive_invoice_cancelled', value)
           }

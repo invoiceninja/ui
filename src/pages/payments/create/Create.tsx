@@ -214,7 +214,7 @@ export function Create() {
             />
           </Element>
 
-          <Element leftSide={t('amount')}>
+          <Element leftSide={t('amount_received')}>
             <InputField
               id="amount"
               value={payment?.amount}
@@ -249,7 +249,7 @@ export function Create() {
                   />
 
                   <InputField
-                    label={t('applied')}
+                    label={t('amount_received')}
                     onValueChange={(value) =>
                       handleInvoiceInputChange(index, parseFloat(value))
                     }
@@ -281,7 +281,9 @@ export function Create() {
                   value.resource && handleInvoiceChange(value.resource)
                 }
                 formatLabel={(resource: Invoice) =>
-                  `${resource.number} (${formatMoney(
+                  `${t('invoice_number_short')} ${
+                    resource.number
+                  } (${formatMoney(
                     resource.amount,
                     resource?.client?.country_id ?? '1',
                     resource?.client?.settings.currency_id
@@ -318,7 +320,7 @@ export function Create() {
                   />
 
                   <InputField
-                    label={t('applied')}
+                    label={t('amount')}
                     onValueChange={(value) =>
                       handleCreditInputChange(index, parseFloat(value))
                     }

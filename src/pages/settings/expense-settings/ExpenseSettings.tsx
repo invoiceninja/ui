@@ -11,9 +11,7 @@
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
-import {
-  updateChanges,
-} from 'common/stores/slices/company-users';
+import { updateChanges } from 'common/stores/slices/company-users';
 import { Divider } from 'components/cards/Divider';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';

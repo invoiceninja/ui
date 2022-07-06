@@ -21,8 +21,7 @@ export function useHandleCustomSurchargeFieldChange() {
   const dispatch = useDispatch();
 
   return (field: string, value: string) => {
-
-      if (value === '') {
+    if (value === '') {
       // If we don't have a content, we will remove the field from the company.custom_fields.
 
       const _company = cloneDeep(company);

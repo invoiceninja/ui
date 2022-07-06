@@ -23,7 +23,7 @@ export const setCurrentRecurringInvoiceLineItem = createAsyncThunk(
     const client = await clientResolver.find(
       state.recurringInvoices.current.client_id
     );
-    
+
     const currency = await currencyResolver.find(client.settings.currency_id); // or company currency
 
     payload.client = client;

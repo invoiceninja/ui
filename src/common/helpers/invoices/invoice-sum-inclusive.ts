@@ -179,7 +179,6 @@ export class InvoiceSumInclusive {
   }
 
   protected async calculateTotals() {
-
     this.totalTaxes = Number(this.totalTaxes.toFixed(2));
 
     return this;

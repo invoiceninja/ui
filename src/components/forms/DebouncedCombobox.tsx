@@ -48,6 +48,7 @@ interface Props {
   withShadowRecord?: boolean;
   errorMessage?: string | string[];
   queryAdditional?: boolean;
+  initiallyVisible?: boolean;
 }
 
 export function DebouncedCombobox(props: Props) {
@@ -215,6 +216,10 @@ export function DebouncedCombobox(props: Props) {
         },
         withoutEvents: true,
       });
+    }
+
+    if (props.initiallyVisible) {
+      openDropdownButton.current?.click();
     }
   }, []);
 

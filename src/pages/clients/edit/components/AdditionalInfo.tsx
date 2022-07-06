@@ -300,7 +300,10 @@ export function AdditionalInfo(props: Props) {
                 onSuccess={onSuccess}
               />
 
-              <DocumentsTable documents={props.client?.documents || []} onDocumentDelete={onSuccess} />
+              <DocumentsTable
+                documents={props.client?.documents || []}
+                onDocumentDelete={onSuccess}
+              />
             </div>
           </Tab.Panel>
         ) : (
