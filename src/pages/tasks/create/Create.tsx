@@ -118,6 +118,35 @@ export function Create() {
             />
           )}
         </Card>
+
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          <InputField
+            label={t('description')}
+            element="textarea"
+            value={task?.description}
+            onValueChange={(value) => handleChange('description', value)}
+          />
+
+          {task && company?.custom_fields?.task3 && (
+            <CustomField
+              field="task3"
+              defaultValue={task?.custom_value3 || ''}
+              value={company.custom_fields.task3}
+              onChange={(value) => handleChange('custom_value3', value)}
+              noExternalPadding
+            />
+          )}
+
+          {task && company?.custom_fields?.task4 && (
+            <CustomField
+              field="task4"
+              defaultValue={task?.custom_value4 || ''}
+              value={company.custom_fields.task4}
+              onChange={(value) => handleChange('custom_value4', value)}
+              noExternalPadding
+            />
+          )}
+        </Card>
       </div>
     </Default>
   );
