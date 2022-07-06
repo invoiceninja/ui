@@ -11,8 +11,10 @@
 import { Card } from '@invoiceninja/cards';
 import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
+import { User } from 'common/interfaces/user';
 import { useBlankTaskQuery } from 'common/queries/tasks';
 import { ClientSelector } from 'components/clients/ClientSelector';
+import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import { Default } from 'components/layouts/Default';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { useEffect, useState } from 'react';
@@ -49,6 +51,21 @@ export function Create() {
             value={task?.project_id}
             clearButton={Boolean(task?.project_id)}
             onClearButtonClick={() => handleChange('project_id', '')}
+          />
+
+          <DebouncedCombobox
+            inputLabel={t('user')}
+            endpoint="/api/v1/users"
+            label={'first_name'}
+            clearButton={Boolean(task?.assigned_user_id)}
+            formatLabel={(resource) =>
+              `${resource.first_name} ${resource.last_name}`
+            }
+            onChange={(user: Record<User>) =>
+              user.resource &&
+              handleChange('assigned_user_id', user.resource.id)
+            }
+            onClearButtonClick={() => handleChange('assigned_user_id', '')}
           />
         </Card>
       </div>
