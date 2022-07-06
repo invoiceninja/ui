@@ -66,6 +66,7 @@ export function Tasks() {
         endpoint="/api/v1/tasks?include=client"
         bulkRoute="/api/v1/tasks/bulk"
         linkToEdit="/tasks/:id/edit"
+        linkToCreate="/tasks/create"
         withResourcefulActions
       />
     </Default>

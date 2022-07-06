@@ -11,6 +11,7 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
+import { Create } from './create/Create';
 import { Tasks } from './index/Tasks';
 
 export const taskRoutes = (
@@ -19,6 +20,15 @@ export const taskRoutes = (
       path=""
       element={
         <Guard guards={[() => permission('view_task')]} component={<Tasks />} />
+      }
+    />
+    <Route
+      path="create"
+      element={
+        <Guard
+          guards={[() => permission('create_task')]}
+          component={<Create />}
+        />
       }
     />
   </Route>
