@@ -28,12 +28,13 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 
 interface Props {
+  isModalOpen: boolean;
+  setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
   onClientCreated?: (client: Client) => unknown;
 }
 
 export function ClientCreate(props: Props) {
   const [t] = useTranslation();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [client, setClient] = useState<Client | undefined>();
   const [errors, setErrors] = useState<ValidationBag>();
   const [contacts, setContacts] = useState<Partial<ClientContact>[]>([
@@ -59,10 +60,10 @@ export function ClientCreate(props: Props) {
   }, [blankClient]);
 
   useEffect(() => {
-    if (!isModalOpen) {
+    if (!props.isModalOpen) {
       queryClient.invalidateQueries('/api/v1/clients/create');
     }
-  }, [isModalOpen]);
+  }, [props.isModalOpen]);
 
   const onSave = () => {
     set(client as Client, 'contacts', contacts);
@@ -88,7 +89,7 @@ export function ClientCreate(props: Props) {
     request('POST', endpoint('/api/v1/clients'), client)
       .then((response) => {
         toast.success(t('created_client'), { id: toastId });
-        setIsModalOpen(false);
+        props.setIsModalOpen(false);
 
         props.onClientCreated && props.onClientCreated(response.data.data);
 
@@ -112,49 +113,39 @@ export function ClientCreate(props: Props) {
   };
 
   return (
-    <>
-      <Modal
-        title={t('new_client')}
-        visible={isModalOpen}
-        onClose={(value) => {
-          setIsModalOpen(value);
-          setErrors(undefined);
-        }}
-        size="large"
-        backgroundColor="gray"
-      >
-        <div className="flex flex-col xl:flex-row xl:gap-4">
-          <div className="w-full xl:w-1/2">
-            <Details client={client} setClient={setClient} errors={errors} />
-            <Address client={client} setClient={setClient} />
-          </div>
-
-          <div className="w-full xl:w-1/2">
-            <Contacts
-              contacts={contacts}
-              setContacts={setContacts}
-              errors={errors}
-            />
-            <AdditionalInfo client={client} setClient={setClient} />
-          </div>
+    <Modal
+      title={t('new_client')}
+      visible={props.isModalOpen}
+      onClose={(value) => {
+        props.setIsModalOpen(value);
+        setErrors(undefined);
+      }}
+      size="large"
+      backgroundColor="gray"
+    >
+      <div className="flex flex-col xl:flex-row xl:gap-4">
+        <div className="w-full xl:w-1/2">
+          <Details client={client} setClient={setClient} errors={errors} />
+          <Address client={client} setClient={setClient} />
         </div>
 
-        <div className="flex justify-end space-x-4">
-          <Button type="minimal" onClick={() => setIsModalOpen(false)}>
-            {t('cancel')}
-          </Button>
-
-          <Button onClick={onSave}>{t('save')}</Button>
+        <div className="w-full xl:w-1/2">
+          <Contacts
+            contacts={contacts}
+            setContacts={setContacts}
+            errors={errors}
+          />
+          <AdditionalInfo client={client} setClient={setClient} />
         </div>
-      </Modal>
+      </div>
 
-      <Button
-        behavior="button"
-        type="minimal"
-        onClick={() => setIsModalOpen(true)}
-      >
-        {t('new_client')}
-      </Button>
-    </>
+      <div className="flex justify-end space-x-4">
+        <Button type="minimal" onClick={() => props.setIsModalOpen(false)}>
+          {t('cancel')}
+        </Button>
+
+        <Button onClick={onSave}>{t('save')}</Button>
+      </div>
+    </Modal>
   );
 }

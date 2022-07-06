@@ -9,15 +9,14 @@
  */
 
 import { Card } from '@invoiceninja/cards';
-import { Checkbox, InputLabel } from '@invoiceninja/forms';
+import { Checkbox } from '@invoiceninja/forms';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { Client } from 'common/interfaces/client';
 import { Invoice } from 'common/interfaces/invoice';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClientCreate } from './ClientCreate';
+import { ClientSelector as Selector } from 'components/clients/ClientSelector';
 
 interface Props {
   readonly?: boolean;
@@ -53,25 +52,15 @@ export function ClientSelector(props: Props) {
   return (
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex items-center justify-between">
-        <InputLabel>{t('client')}</InputLabel>
-        {!props.readonly && !resource?.client_id && (
-          <ClientCreate
-            onClientCreated={(client) => props.onChange(client.id)}
-          />
-        )}
+        <Selector
+          onChange={(client) => props.onChange(client.id)}
+          value={resource.client_id}
+          readonly={props.readonly}
+          clearButton={Boolean(resource.client_id)}
+          onClearButtonClick={props.onClearButtonClick}
+        />
       </div>
-
-      <DebouncedCombobox
-        endpoint="/api/v1/clients"
-        label="display_name"
-        onChange={(value) => props.onChange(value.value?.toString())}
-        defaultValue={resource?.client_id}
-        disabled={props.readonly}
-        clearButton={Boolean(resource?.client_id)}
-        onClearButtonClick={props.onClearButtonClick}
-        queryAdditional
-      />
-
+      
       {resource?.client_id &&
         client &&
         client.contacts.map((contact, index) => (
