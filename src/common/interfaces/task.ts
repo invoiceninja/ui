@@ -22,6 +22,7 @@ export interface Task {
   custom_value3: string;
   custom_value4: string;
   duration: number;
+  description: string;
   is_running: boolean;
   time_log: string;
   number: string;
