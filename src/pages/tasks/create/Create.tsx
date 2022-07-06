@@ -14,6 +14,7 @@ import { Task } from 'common/interfaces/task';
 import { useBlankTaskQuery } from 'common/queries/tasks';
 import { ClientSelector } from 'components/clients/ClientSelector';
 import { Default } from 'components/layouts/Default';
+import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -37,10 +38,17 @@ export function Create() {
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
           <ClientSelector
-            onChange={(client) => handleChange('client_id', client)}
+            onChange={(client) => handleChange('client_id', client.id)}
             value={task?.client_id}
             clearButton={Boolean(task?.client_id)}
             onClearButtonClick={() => handleChange('client_id', '')}
+          />
+
+          <ProjectSelector
+            onChange={(project) => handleChange('project_id', project.id)}
+            value={task?.project_id}
+            clearButton={Boolean(task?.project_id)}
+            onClearButtonClick={() => handleChange('project_id', '')}
           />
         </Card>
       </div>
