@@ -65,6 +65,8 @@ export function Tasks() {
         columns={columns}
         endpoint="/api/v1/tasks?include=client"
         bulkRoute="/api/v1/tasks/bulk"
+        linkToEdit="/tasks/:id/edit"
+        withResourcefulActions
       />
     </Default>
   );
