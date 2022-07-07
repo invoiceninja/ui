@@ -14,6 +14,17 @@ import { Task } from 'common/interfaces/task';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
+export function useTaskQuery(params: { id: string | undefined }) {
+  return useQuery<Task>(
+    generatePath('/api/v1/tasks/:id', { id: params.id }),
+    () =>
+      request('GET', endpoint('/api/v1/tasks/:id', { id: params.id })).then(
+        (response) => response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}
+
 export function useBlankTaskQuery() {
   return useQuery<Task>(generatePath('/api/v1/tasks/create'), () =>
     request('GET', endpoint('/api/v1/tasks/create')).then(
