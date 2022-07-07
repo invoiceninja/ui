@@ -51,6 +51,26 @@ export function TaskTable(props: Props) {
     return new Date(diff * 1000).toISOString().slice(11, 19);
   };
 
+  const handleTimeChange = (
+    unix: number,
+    time: string,
+    position: number,
+    index: number
+  ) => {
+    const date = parseTimeToDate(unix);
+
+    const unixTimestamp = dayjs(
+      `${date} ${time}`,
+      'YYYY-MM-DD hh:mm:ss'
+    ).unix();
+
+    const logs = JSON.parse(task.time_log);
+
+    logs[index][position] = unixTimestamp;
+
+    handleChange('time_log', JSON.stringify(logs));
+  };
+
   return (
     <Table>
       <Thead>
@@ -62,18 +82,43 @@ export function TaskTable(props: Props) {
       <Tbody>
         {task.time_log &&
           (JSON.parse(task.time_log) as number[][]).map(
-            ([start, stop], index) => (
+            ([start, stop], index, { length }) => (
               <Tr key={index}>
                 <Td>
                   <InputField type="date" value={parseTimeToDate(start)} />
                 </Td>
                 <Td>
-                  <InputField type="time" value={parseTime(start)} />
+                  <InputField
+                    type="time"
+                    value={parseTime(start)}
+                    onValueChange={(value) =>
+                      handleTimeChange(start, value, 0, index)
+                    }
+                    step="1"
+                  />
                 </Td>
                 <Td>
-                  <InputField type="time" value={parseTime(stop || 0)} />
+                  <InputField
+                    type="time"
+                    value={parseTime(stop || 0)}
+                    onValueChange={(value) =>
+                      handleTimeChange(start, value, 1, index)
+                    }
+                    step="1"
+                  />
                 </Td>
-                <Td>{difference(start, stop)}</Td>
+                <Td>
+                  {difference(start, stop)}
+
+                  {/* {length - 1 === index && (
+                    <button
+                      className="ml-2 text-gray-600 hover:text-red-600"
+                      // onClick={() => props.onDeleteRowClick(lineItemIndex)}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )} */}
+                </Td>
               </Tr>
             )
           )}
