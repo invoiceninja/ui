@@ -41,8 +41,10 @@ export function TaskTable(props: Props) {
     return dayjs.unix(timestamp).format('hh:mm:ss');
   };
 
-  const difference = (start: number, stop: number) => {
+  const duration = (start: number, stop: number) => {
     const diff = dayjs.unix(stop).diff(dayjs.unix(start), 'seconds');
+
+    console.log(start, stop, diff);
 
     if (diff < 0) {
       return;
@@ -132,7 +134,7 @@ export function TaskTable(props: Props) {
                   />
                 </Td>
                 <Td>
-                  {difference(start, stop)}
+                  {duration(start, stop)}
 
                   {/* {length - 1 === index && (
                     <button
