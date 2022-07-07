@@ -33,6 +33,14 @@ export function TaskTable(props: Props) {
     handleChange('time_log', JSON.stringify(logs));
   };
 
+  const deleteTableRow = (index: number) => {
+    const logs: number[][] = JSON.parse(task.time_log);
+
+    logs.splice(index, 1);
+
+    handleChange('time_log', JSON.stringify(logs));
+  };
+
   const parseTimeToDate = (timestamp: number) => {
     return dayjs.unix(timestamp).format('YYYY-MM-DD');
   };
@@ -170,12 +178,12 @@ export function TaskTable(props: Props) {
                       }
                     />
 
-                    {/* <button
+                    <button
                       className="ml-2 text-gray-600 hover:text-red-600"
-                      // onClick={() => props.onDeleteRowClick(lineItemIndex)}
+                      onClick={() => deleteTableRow(index)}
                     >
                       <Trash2 size={18} />
-                    </button> */}
+                    </button>
                   </div>
                 </Td>
               </Tr>
