@@ -26,7 +26,11 @@ export function TaskTable(props: Props) {
   const [t] = useTranslation();
 
   const createTableRow = () => {
-    console.log('Click!');
+    const logs = JSON.parse(task.time_log);
+
+    logs.push([dayjs().unix(), 0]);
+
+    handleChange('time_log', JSON.stringify(logs));
   };
 
   const parseTimeToDate = (timestamp: number) => {
