@@ -44,8 +44,6 @@ export function TaskTable(props: Props) {
   const duration = (start: number, stop: number) => {
     const diff = dayjs.unix(stop).diff(dayjs.unix(start), 'seconds');
 
-    console.log(start, stop, diff);
-
     if (diff < 0) {
       return;
     }
