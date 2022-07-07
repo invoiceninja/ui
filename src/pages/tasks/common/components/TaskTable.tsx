@@ -137,7 +137,7 @@ export function TaskTable(props: Props) {
       <Tbody>
         {task.time_log &&
           (JSON.parse(task.time_log) as number[][]).map(
-            ([start, stop], index, { length }) => (
+            ([start, stop], index) => (
               <Tr key={index}>
                 <Td>
                   <InputField

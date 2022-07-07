@@ -13,7 +13,6 @@ import { Task } from 'common/interfaces/task';
 import { useTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
@@ -24,7 +23,6 @@ export function Edit() {
   const { id } = useParams();
   const { data } = useTaskQuery({ id });
 
-  const [t] = useTranslation();
   const [task, setTask] = useState<Task>();
 
   useEffect(() => {
