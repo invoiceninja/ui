@@ -71,6 +71,24 @@ export function TaskTable(props: Props) {
     handleChange('time_log', JSON.stringify(logs));
   };
 
+  const handleDateChange = (unix: number, value: string, index: number) => {
+    console.log(unix, value, index);
+
+    const date = parseTimeToDate(unix);
+    const time = parseTime(unix);
+
+    const unixTimestamp = dayjs(
+      `${date} ${time}`,
+      'YYYY-MM-DD hh:mm:ss'
+    ).unix();
+
+    const logs = JSON.parse(task.time_log);
+
+    logs[index][0] = unixTimestamp;
+
+    handleChange('time_log', JSON.stringify(logs));
+  };
+
   return (
     <Table>
       <Thead>
@@ -85,7 +103,13 @@ export function TaskTable(props: Props) {
             ([start, stop], index, { length }) => (
               <Tr key={index}>
                 <Td>
-                  <InputField type="date" value={parseTimeToDate(start)} />
+                  <InputField
+                    type="date"
+                    value={parseTimeToDate(start)}
+                    onValueChange={(value) =>
+                      handleDateChange(start, value, index)
+                    }
+                  />
                 </Td>
                 <Td>
                   <InputField
