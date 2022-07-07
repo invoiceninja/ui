@@ -12,7 +12,7 @@ import { InputField } from '@invoiceninja/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { Task } from 'common/interfaces/task';
 import dayjs from 'dayjs';
-import { Plus } from 'react-feather';
+import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -76,8 +76,6 @@ export function TaskTable(props: Props) {
   };
 
   const handleDateChange = (unix: number, value: string, index: number) => {
-    console.log(unix, value, index);
-
     const date = parseTimeToDate(unix);
     const time = parseTime(unix);
 
@@ -89,6 +87,33 @@ export function TaskTable(props: Props) {
     const logs = JSON.parse(task.time_log);
 
     logs[index][0] = unixTimestamp;
+
+    handleChange('time_log', JSON.stringify(logs));
+  };
+
+  const handleDurationChange = (
+    value: string,
+    start: number,
+    index: number
+  ) => {
+    let date = dayjs.unix(start);
+    const parts = value.split(':');
+
+    if (parts[0]) {
+      date = date.add(parseFloat(parts[0]), 'hour');
+    }
+
+    if (parts[1]) {
+      date = date.add(parseFloat(parts[1]), 'minute');
+    }
+
+    if (parts[2]) {
+      date = date.add(parseFloat(parts[2]), 'second');
+    }
+
+    const logs = JSON.parse(task.time_log);
+
+    logs[index][1] = date.unix();
 
     handleChange('time_log', JSON.stringify(logs));
   };
@@ -135,17 +160,23 @@ export function TaskTable(props: Props) {
                     step="1"
                   />
                 </Td>
-                <Td>
-                  {duration(start, stop)}
+                <Td width="15%">
+                  <div className="flex items-center space-x-4">
+                    <InputField
+                      debounceTimeout={1000}
+                      value={duration(start, stop)}
+                      onValueChange={(value) =>
+                        handleDurationChange(value, start, index)
+                      }
+                    />
 
-                  {/* {length - 1 === index && (
-                    <button
+                    {/* <button
                       className="ml-2 text-gray-600 hover:text-red-600"
                       // onClick={() => props.onDeleteRowClick(lineItemIndex)}
                     >
                       <Trash2 size={18} />
-                    </button>
-                  )} */}
+                    </button> */}
+                  </div>
                 </Td>
               </Tr>
             )
