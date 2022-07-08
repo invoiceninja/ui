@@ -8,9 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isSelfHosted } from 'common/helpers';
 import { store } from 'common/stores/store';
 
 export function freePlan() {
+  if (isSelfHosted()) {
+    return true;
+  }
+
   const plans = ['pro', 'enterprise', 'white_label'];
 
   return !plans.includes(
