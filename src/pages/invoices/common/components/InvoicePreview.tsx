@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
+import { previewEndpoint } from 'common/helpers';
 import { Credit } from 'common/interfaces/credit';
 import { Invoice } from 'common/interfaces/invoice';
 import { Quote } from 'common/interfaces/quote';
@@ -25,7 +25,7 @@ export function InvoicePreview(props: Props) {
   if (props.resource?.client_id && props.for === 'create') {
     return (
       <InvoiceViewer
-        link={endpoint('/api/v1/live_preview?entity=:entity', {
+        link={previewEndpoint('/api/v1/live_preview?entity=:entity', {
           entity: props.entity,
         })}
         resource={props.resource}
@@ -41,7 +41,7 @@ export function InvoicePreview(props: Props) {
   ) {
     return (
       <InvoiceViewer
-        link={endpoint('/api/v1/live_preview?entity=:entity&entity_id=:id', {
+        link={previewEndpoint('/api/v1/live_preview?entity=:entity&entity_id=:id', {
           entity: props.entity,
           id: props.resource?.id,
         })}
