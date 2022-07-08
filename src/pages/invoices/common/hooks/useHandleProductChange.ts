@@ -26,7 +26,7 @@ export function useHandleProductChange(props: Props) {
 
     lineItem.product_key = product?.product_key || product_key;
     lineItem.quantity = product?.quantity || 1;
-    lineItem.cost = product?.cost || 0;
+    lineItem.cost = product?.price || 0;
     lineItem.notes = product?.notes || '';
 
     lineItem.tax_name1 = product?.tax_name1 || '';
