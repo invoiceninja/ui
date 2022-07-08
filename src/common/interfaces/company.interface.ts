@@ -22,6 +22,8 @@ export interface Company {
   custom_surcharge_taxes3: boolean;
   custom_surcharge_taxes4: boolean;
   portal_domain: string;
+  enable_product_cost: boolean;
+  enable_product_quantity: boolean;
 }
 
 export interface Settings {
