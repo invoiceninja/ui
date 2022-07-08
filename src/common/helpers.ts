@@ -85,3 +85,11 @@ export function trans(key: string, replace: Record<string, unknown>) {
 
   return translation;
 }
+
+export function previewEndpoint(endpoint: string, params = {}): string {
+  if (isHosted()) {
+    return 'https://preview.invoicing.co' + generatePath(endpoint, params);
+  }
+
+  return apiEndpoint() + generatePath(endpoint, params);
+}
