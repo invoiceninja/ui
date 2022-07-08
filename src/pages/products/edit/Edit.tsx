@@ -30,11 +30,14 @@ import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { request } from 'common/helpers/request';
 
 export function Edit() {
-  const [t] = useTranslation();
   const { id } = useParams();
   const { data: product } = useProductQuery({ id });
+
   const queryClient = useQueryClient();
+
+  const [t] = useTranslation();
   const [errors, setErrors] = useState<ValidationBag>();
+
   const company = useCurrentCompany();
 
   const formik = useFormik({
@@ -50,6 +53,7 @@ export function Edit() {
       tax_rate2: product?.data.data.tax_rate2 || 0,
       tax_name3: product?.data.data.tax_name3 || '',
       tax_rate3: product?.data.data.tax_rate3 || 0,
+      price: product?.data.data.price || 0,
     },
     onSubmit: (values) => {
       const toastId = toast.loading(t('processing'));
@@ -131,21 +135,33 @@ export function Edit() {
           <Element leftSide={t('price')}>
             <InputField
               id="price"
-              value={formik.values.cost}
+              value={formik.values.price}
               onChange={formik.handleChange}
               errorMessage={errors?.errors.price}
             />
           </Element>
 
-          <Element leftSide={t('default_quantity')}>
-            <InputField
-              type="number"
-              id="quantity"
-              value={formik.values.quantity}
-              onChange={formik.handleChange}
-              errorMessage={errors?.errors.quantity}
-            />
-          </Element>
+          {company?.enable_product_cost && (
+            <Element leftSide={t('cost')}>
+              <InputField
+                id="cost"
+                value={formik.values.cost}
+                onChange={formik.handleChange}
+                errorMessage={errors?.errors.cost}
+              />
+            </Element>
+          )}
+
+          {company?.enable_product_quantity && (
+            <Element leftSide={t('quantity')}>
+              <InputField
+                id="quantity"
+                value={formik.values.quantity}
+                onChange={formik.handleChange}
+                errorMessage={errors?.errors.quantity}
+              />
+            </Element>
+          )}
 
           {company && company.enabled_item_tax_rates > 0 && (
             <Element leftSide={t('tax')}>
