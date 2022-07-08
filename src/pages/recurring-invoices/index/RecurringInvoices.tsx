@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Link } from '@invoiceninja/forms';
 import reccuringInvoice from 'common/constants/reccuring-invoice';
 import recurringInvoicesFrequency from 'common/constants/recurring-invoices-frequency';
 import { date } from 'common/helpers';
@@ -20,6 +21,7 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
+import { generatePath } from 'react-router-dom';
 
 export function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -43,6 +45,13 @@ export function RecurringInvoices() {
     {
       id: 'number',
       label: t('number'),
+      format: (value, resource) => (
+        <Link
+          to={generatePath('/recurring_invoices/:id/edit', { id: resource.id })}
+        >
+          {value}
+        </Link>
+      ),
     },
     {
       id: 'amount',
