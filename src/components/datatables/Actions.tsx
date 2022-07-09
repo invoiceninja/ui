@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
+import { ReactNode, ChangeEvent } from 'react';
 
 
 export interface SelectOption {
