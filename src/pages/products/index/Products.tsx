@@ -46,8 +46,8 @@ export function Products() {
       label: t('notes'),
     },
     {
-      id: 'cost',
-      label: t('cost'),
+      id: 'price',
+      label: t('price'),
       format: (value, resource) =>
         formatMoney(
           value,

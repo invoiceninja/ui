@@ -24,7 +24,7 @@ export function Quotes() {
       id: 'number',
       label: t('quote_number'),
       format: (value, resource) => (
-        <Link to={generatePath('/quotes/:id', { id: resource.id })}>
+        <Link to={generatePath('/quotes/:id/edit', { id: resource.id })}>
           {value}
         </Link>
       ),

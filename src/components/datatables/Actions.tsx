@@ -13,6 +13,8 @@ import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
+import { Button } from '@invoiceninja/forms';
+import { generatePath } from 'react-router-dom';
 
 export interface SelectOption {
   value: string;
@@ -86,6 +88,13 @@ export function Actions(props: Props) {
         )}
       </div>
       <div className="mt-2 lg:mt-0 flex items-center space-x-4">
+        
+        <div className="inline-flex items-center space-x-2">
+        <Button to={generatePath('/clients/edit')}>
+          {t('new_invoice')}
+        </Button>
+        </div>
+
         <InputField
           id="filter"
           placeholder={t('filter')}
