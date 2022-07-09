@@ -88,12 +88,6 @@ export function Actions(props: Props) {
         )}
       </div>
       <div className="mt-2 lg:mt-0 flex items-center space-x-4">
-        
-        <div className="inline-flex items-center space-x-2">
-        <Button to={generatePath('/clients/edit')}>
-          {t('new_invoice')}
-        </Button>
-        </div>
 
         <InputField
           id="filter"

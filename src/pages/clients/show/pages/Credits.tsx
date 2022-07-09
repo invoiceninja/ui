@@ -60,6 +60,7 @@ export function Credits() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/credits/bulk"
+      linkToCreate={generatePath('/credits/create?client=:id', {id: id})}
     />
   );
 }

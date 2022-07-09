@@ -66,6 +66,8 @@ export function RecurringInvoices() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/recurring_invoices/bulk"
+      linkToCreate={generatePath('/recurring_invoices/create?client=:id', { id: id })}
+
     />
   );
 }
