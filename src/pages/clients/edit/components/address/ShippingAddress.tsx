@@ -31,7 +31,7 @@ export function ShippingAddress(props: Props) {
     );
   };
 
-  const copyBilling = (event: ChangeEvent<HTMLInputElement>) => {
+  const copyBilling = () => {
 
     props.setClient(
       (client) =>
