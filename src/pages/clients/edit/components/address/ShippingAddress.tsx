@@ -9,7 +9,7 @@
  */
 
 import { Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
+import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import { useCountries } from 'common/hooks/useCountries';
 import { Client } from 'common/interfaces/client';
 import { set } from 'lodash';
@@ -31,8 +31,28 @@ export function ShippingAddress(props: Props) {
     );
   };
 
+  const copyBilling = (event: ChangeEvent<HTMLInputElement>) => {
+
+    props.setClient(
+      (client) =>
+        client && {
+          ...client,
+          shipping_address1: client?.address1,
+          shipping_address2: client?.address2,
+          shipping_city: client?.city,
+          shipping_state: client?.state,
+          shipping_postal_code: client?.postal_code,
+          shipping_country_id: client?.country_id
+        }
+    );
+
+  };
+
   return (
     <>
+      <Button onClick={copyBilling} type="secondary" behavior="button" className='mx-4 rounded-md bg-grey h-6'>
+        {t('copy_billing')}
+      </Button>
       <Element leftSide={t('billing_address1')}>
         <InputField
           id="shipping_address1"
@@ -77,7 +97,7 @@ export function ShippingAddress(props: Props) {
         <Element leftSide={t('country')}>
           <SelectField
             id="shipping_country_id"
-            defaultValue={props.client?.shipping_country_id}
+            value={props.client?.shipping_country_id}
             onChange={handleChange}
           >
             <option value=""></option>
