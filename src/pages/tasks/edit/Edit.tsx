@@ -16,7 +16,6 @@ import { Task } from 'common/interfaces/task';
 import { useTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
@@ -29,7 +28,6 @@ export function Edit() {
   const { id } = useParams();
   const { data } = useTaskQuery({ id });
 
-  const [t] = useTranslation();
   const [task, setTask] = useState<Task>();
 
   const queryClient = useQueryClient();

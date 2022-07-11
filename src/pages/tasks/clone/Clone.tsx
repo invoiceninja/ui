@@ -13,16 +13,18 @@ import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
-import { useBlankTaskQuery } from 'common/queries/tasks';
+import { useTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
 
-export function Create() {
-  const { documentTitle } = useTitle('edit_task');
-  const { data } = useBlankTaskQuery();
+export function Clone() {
+  const { documentTitle } = useTitle('new_task');
+
+  const { id } = useParams();
+  const { data } = useTaskQuery({ id });
 
   const [task, setTask] = useState<Task>();
 
@@ -30,7 +32,7 @@ export function Create() {
 
   useEffect(() => {
     if (data) {
-      setTask(data);
+      setTask({ ...data, number: '' });
     }
   }, [data]);
 

@@ -16,6 +16,7 @@ import { useBulkAction } from 'pages/tasks/common/hooks/useBulk';
 import { useStart } from 'pages/tasks/common/hooks/useStart';
 import { useStop } from 'pages/tasks/common/hooks/useStop';
 import { useTranslation } from 'react-i18next';
+import { generatePath } from 'react-router-dom';
 
 interface Props {
   task: Task;
@@ -43,6 +44,10 @@ export function Actions(props: Props) {
             {t('stop')}
           </DropdownElement>
         )}
+
+        <DropdownElement to={generatePath('/tasks/:id/clone', { id: task.id })}>
+          {t('clone')}
+        </DropdownElement>
 
         {/* <DropdownElement>{t('invoice_task')}</DropdownElement> */}
       </div>
