@@ -32,15 +32,15 @@ export function Tasks() {
         </Link>
       ),
     },
-    {
-      id: 'client_id',
-      label: t('client'),
-      format: (value, resource) => (
-        <Link to={generatePath('/clients/:id', { id: resource.client.id })}>
-          {resource.client.display_name}
-        </Link>
-      ),
-    },
+    // {
+    //   id: 'client_id',
+    //   label: t('client'),
+    //   format: (value, resource) => (
+    //     <Link to={generatePath('/clients/:id', { id: resource.client.id })}>
+    //       {resource.client.display_name}
+    //     </Link>
+    //   ),
+    // },
     {
       id: 'description',
       label: t('description'),
