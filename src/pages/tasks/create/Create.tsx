@@ -8,146 +8,63 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
-import { User } from 'common/interfaces/user';
-import { useBlankTaskQuery } from 'common/queries/tasks';
-import { ClientSelector } from 'components/clients/ClientSelector';
-import { CustomField } from 'components/CustomField';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
+import { useBlankTaskQuery, useTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
-import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { TaskDetails } from '../common/components/TaskDetails';
+import { TaskTable } from '../common/components/TaskTable';
 
 export function Create() {
-  const { documentTitle } = useTitle('new_task');
-  const { data: blankTask } = useBlankTaskQuery();
+  const { documentTitle } = useTitle('edit_task');
+  const { data } = useBlankTaskQuery();
 
-  const [t] = useTranslation();
   const [task, setTask] = useState<Task>();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (data) {
+      setTask(data);
+    }
+  }, [data]);
 
   const handleChange = (property: keyof Task, value: unknown) => {
     setTask((current) => current && { ...current, [property]: value });
   };
 
-  const company = useCurrentCompany();
+  const handleSave = (task: Task) => {
+    toast.processing();
 
-  useEffect(() => {
-    blankTask && setTask(blankTask);
-  }, [blankTask]);
+    request('POST', endpoint('/api/v1/tasks'), task)
+      .then((response) => {
+        toast.success('created_task');
+
+        navigate(
+          generatePath('/tasks/:id/edit', { id: response.data.data.id })
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.error();
+      });
+  };
 
   return (
-    <Default title={documentTitle}>
-      <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          <ClientSelector
-            onChange={(client) => handleChange('client_id', client.id)}
-            value={task?.client_id}
-            clearButton={Boolean(task?.client_id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-          />
-
-          <ProjectSelector
-            onChange={(project) => handleChange('project_id', project.id)}
-            value={task?.project_id}
-            clearButton={Boolean(task?.project_id)}
-            onClearButtonClick={() => handleChange('project_id', '')}
-          />
-
-          <DebouncedCombobox
-            inputLabel={t('user')}
-            endpoint="/api/v1/users"
-            label={'first_name'}
-            clearButton={Boolean(task?.assigned_user_id)}
-            formatLabel={(resource) =>
-              `${resource.first_name} ${resource.last_name}`
-            }
-            onChange={(user: Record<User>) =>
-              user.resource &&
-              handleChange('assigned_user_id', user.resource.id)
-            }
-            onClearButtonClick={() => handleChange('assigned_user_id', '')}
-          />
-        </Card>
-
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          <InputField
-            label={t('task_number')}
-            value={task?.number}
-            onValueChange={(value) => handleChange('number', value)}
-          />
-
-          <InputField
-            label={t('rate')}
-            value={task?.rate}
-            onValueChange={(value) => handleChange('rate', value)}
-          />
-
-          <SelectField
-            label={t('status')}
-            value={task?.status_id}
-            onValueChange={(value) => handleChange('status_id', value)}
-          >
-            <option value="">{t('backlog')}</option>
-            <option value="">{t('ready_to_do')}</option>
-            <option value="">{t('in_progress')}</option>
-            <option value="">{t('done')}</option>
-          </SelectField>
-
-          {task && company?.custom_fields?.task1 && (
-            <CustomField
-              field="task1"
-              defaultValue={task?.custom_value1 || ''}
-              value={company.custom_fields.task1}
-              onChange={(value) => handleChange('custom_value1', value)}
-              noExternalPadding
-            />
-          )}
-
-          {task && company?.custom_fields?.task2 && (
-            <CustomField
-              field="task2"
-              defaultValue={task?.custom_value2 || ''}
-              value={company.custom_fields.task2}
-              onChange={(value) => handleChange('custom_value2', value)}
-              noExternalPadding
-            />
-          )}
-        </Card>
-
-        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-          <InputField
-            label={t('description')}
-            element="textarea"
-            value={task?.description}
-            onValueChange={(value) => handleChange('description', value)}
-          />
-
-          {task && company?.custom_fields?.task3 && (
-            <CustomField
-              field="task3"
-              defaultValue={task?.custom_value3 || ''}
-              value={company.custom_fields.task3}
-              onChange={(value) => handleChange('custom_value3', value)}
-              noExternalPadding
-            />
-          )}
-
-          {task && company?.custom_fields?.task4 && (
-            <CustomField
-              field="task4"
-              defaultValue={task?.custom_value4 || ''}
-              value={company.custom_fields.task4}
-              onChange={(value) => handleChange('custom_value4', value)}
-              noExternalPadding
-            />
-          )}
-        </Card>
-      </div>
+    <Default
+      title={documentTitle}
+      onBackClick={generatePath('/tasks')}
+      onSaveClick={() => task && handleSave(task)}
+    >
+      {task && <TaskDetails task={task} handleChange={handleChange} />}
+      {task && <TaskTable task={task} handleChange={handleChange} />}
     </Default>
   );
 }
