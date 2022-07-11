@@ -49,6 +49,7 @@ export function TaskDetails(props: Props) {
         />
 
         <DebouncedCombobox
+          value={task?.assigned_user_id}
           inputLabel={t('user')}
           endpoint="/api/v1/users"
           label={'first_name'}
@@ -60,6 +61,7 @@ export function TaskDetails(props: Props) {
             user.resource && handleChange('assigned_user_id', user.resource.id)
           }
           onClearButtonClick={() => handleChange('assigned_user_id', '')}
+          queryAdditional
         />
       </Card>
 
