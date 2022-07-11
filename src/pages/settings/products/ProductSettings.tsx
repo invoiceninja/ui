@@ -71,7 +71,7 @@ export function ProductSettings() {
         </Element>
         <Element
           leftSide={t('show_product_cost')}
-          leftSideHelp={t('show_product_cost_help')}
+          leftSideHelp={t('show_cost_help')}
         >
           <Toggle
             checked={companyChanges?.enable_product_cost}

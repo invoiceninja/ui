@@ -76,6 +76,29 @@ export function CustomResourcefulActions(props: Props) {
         >
           {t('new_invoice')}
         </DropdownElement>
+  
+        <DropdownElement
+          to={generatePath('/payments/create?client=:id', {
+            id: props.clientId,
+          })}
+        >
+          {t('new_payment')}
+        </DropdownElement>
+
+        <DropdownElement
+          to={generatePath('/quotes/create?client=:id', {
+            id: props.clientId,
+          })}
+        >
+          {t('new_quote')}
+        </DropdownElement>
+        <DropdownElement
+          to={generatePath('/credits/create?client=:id', {
+            id: props.clientId,
+          })}
+        >
+          {t('new_credit')}
+        </DropdownElement>
       </div>
     </Dropdown>
   );

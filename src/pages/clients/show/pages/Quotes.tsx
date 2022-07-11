@@ -24,7 +24,7 @@ export function Quotes() {
       id: 'number',
       label: t('quote_number'),
       format: (value, resource) => (
-        <Link to={generatePath('/quotes/:id', { id: resource.id })}>
+        <Link to={generatePath('/quotes/:id/edit', { id: resource.id })}>
           {value}
         </Link>
       ),
@@ -46,6 +46,8 @@ export function Quotes() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/quotes/bulk"
+      linkToCreate={generatePath('/quotes/create?client=:id', { id: id })}
+
     />
   );
 }

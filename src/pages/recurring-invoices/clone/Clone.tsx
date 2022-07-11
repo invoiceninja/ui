@@ -67,6 +67,7 @@ export function Clone() {
         setCurrentRecurringInvoice({
           ...recurringInvoice.data.data,
           number: '',
+          documents: []
         })
       );
     }
