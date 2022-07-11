@@ -65,7 +65,7 @@ export function Edit() {
     <Default
       title={documentTitle}
       onBackClick={generatePath('/tasks')}
-      // navigationTopRight={task && <Actions task={task} />}
+      navigationTopRight={task && <Actions task={task} />}
       onSaveClick={() => task && handleSave(task)}
     >
       {task && <TaskDetails task={task} handleChange={handleChange} />}
