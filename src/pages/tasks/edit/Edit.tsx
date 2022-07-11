@@ -10,12 +10,12 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
 import { useTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
@@ -45,14 +45,14 @@ export function Edit() {
   };
 
   const handleSave = (task: Task) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task)
-      .then(() => toast.success(t('updated_task'), { id: toastId }))
+      .then(() => toast.success('updated_task'))
       .catch((error) => {
         console.error(error);
 
-        toast.error(t('error_title'), { id: toastId });
+        toast.error();
       })
       .finally(() =>
         queryClient.invalidateQueries(
