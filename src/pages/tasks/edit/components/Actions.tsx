@@ -12,6 +12,7 @@ import { Task } from 'common/interfaces/task';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { isTaskRunning } from 'pages/tasks/common/helpers/calculate-entity-state';
+import { useBulkAction } from 'pages/tasks/common/hooks/useBulk';
 import { useStart } from 'pages/tasks/common/hooks/useStart';
 import { useStop } from 'pages/tasks/common/hooks/useStop';
 import { useTranslation } from 'react-i18next';
@@ -26,23 +27,45 @@ export function Actions(props: Props) {
 
   const start = useStart();
   const stop = useStop();
+  const bulk = useBulkAction();
 
   return (
-    <Dropdown label={t('more_actions')}>
-      {!isTaskRunning(task) && (
-        <DropdownElement onClick={() => start(task)}>
-          {t('start')}
-        </DropdownElement>
-      )}
+    <Dropdown label={t('more_actions')} className="divide-y">
+      <div>
+        {!isTaskRunning(task) && (
+          <DropdownElement onClick={() => start(task)}>
+            {t('start')}
+          </DropdownElement>
+        )}
 
-      {isTaskRunning(task) && (
-        <DropdownElement onClick={() => stop(task)}>
-          {t('stop')}
-        </DropdownElement>
-      )}
+        {isTaskRunning(task) && (
+          <DropdownElement onClick={() => stop(task)}>
+            {t('stop')}
+          </DropdownElement>
+        )}
 
-      <DropdownElement>{t('change_status')}</DropdownElement>
-      <DropdownElement>{t('invoice_task')}</DropdownElement>
+        {/* <DropdownElement>{t('invoice_task')}</DropdownElement> */}
+      </div>
+
+      <div>
+        {task.archived_at === 0 && (
+          <DropdownElement onClick={() => bulk(task.id, 'archive')}>
+            {t('archive_task')}
+          </DropdownElement>
+        )}
+
+        {task.archived_at > 0 && (
+          <DropdownElement onClick={() => bulk(task.id, 'restore')}>
+            {t('restore_task')}
+          </DropdownElement>
+        )}
+
+        {!task.is_deleted && (
+          <DropdownElement onClick={() => bulk(task.id, 'delete')}>
+            {t('delete_task')}
+          </DropdownElement>
+        )}
+      </div>
     </Dropdown>
   );
 }
