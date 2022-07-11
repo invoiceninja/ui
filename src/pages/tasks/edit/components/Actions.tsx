@@ -13,6 +13,7 @@ import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { isTaskRunning } from 'pages/tasks/common/helpers/calculate-entity-state';
 import { useStart } from 'pages/tasks/common/hooks/useStart';
+import { useStop } from 'pages/tasks/common/hooks/useStop';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -24,12 +25,19 @@ export function Actions(props: Props) {
   const [t] = useTranslation();
 
   const start = useStart();
+  const stop = useStop();
 
   return (
     <Dropdown label={t('more_actions')}>
       {!isTaskRunning(task) && (
         <DropdownElement onClick={() => start(task)}>
           {t('start')}
+        </DropdownElement>
+      )}
+
+      {isTaskRunning(task) && (
+        <DropdownElement onClick={() => stop(task)}>
+          {t('stop')}
         </DropdownElement>
       )}
 
