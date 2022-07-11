@@ -9,9 +9,10 @@
  */
 
 import { Card } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
+import { InputField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Task } from 'common/interfaces/task';
+import { TaskStatus } from 'common/interfaces/task-status';
 import { User } from 'common/interfaces/user';
 import { ClientSelector } from 'components/clients/ClientSelector';
 import { CustomField } from 'components/CustomField';
@@ -36,24 +37,24 @@ export function TaskDetails(props: Props) {
       <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
         <ClientSelector
           onChange={(client) => handleChange('client_id', client.id)}
-          value={task?.client_id}
-          clearButton={Boolean(task?.client_id)}
+          value={task.client_id}
+          clearButton={Boolean(task.client_id)}
           onClearButtonClick={() => handleChange('client_id', '')}
         />
 
         <ProjectSelector
           onChange={(project) => handleChange('project_id', project.id)}
-          value={task?.project_id}
-          clearButton={Boolean(task?.project_id)}
+          value={task.project_id}
+          clearButton={Boolean(task.project_id)}
           onClearButtonClick={() => handleChange('project_id', '')}
         />
 
         <DebouncedCombobox
-          value={task?.assigned_user_id}
+          value={task.assigned_user_id}
           inputLabel={t('user')}
           endpoint="/api/v1/users"
           label={'first_name'}
-          clearButton={Boolean(task?.assigned_user_id)}
+          clearButton={Boolean(task.assigned_user_id)}
           formatLabel={(resource) =>
             `${resource.first_name} ${resource.last_name}`
           }
@@ -68,31 +69,30 @@ export function TaskDetails(props: Props) {
       <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
         <InputField
           label={t('task_number')}
-          value={task?.number}
+          value={task.number}
           onValueChange={(value) => handleChange('number', value)}
         />
 
         <InputField
           label={t('rate')}
-          value={task?.rate}
+          value={task.rate}
           onValueChange={(value) => handleChange('rate', value)}
         />
 
-        <SelectField
-          label={t('status')}
-          value={task?.status_id}
-          onValueChange={(value) => handleChange('status_id', value)}
-        >
-          <option value="">{t('backlog')}</option>
-          <option value="">{t('ready_to_do')}</option>
-          <option value="">{t('in_progress')}</option>
-          <option value="">{t('done')}</option>
-        </SelectField>
+        <DebouncedCombobox
+          endpoint="/api/v1/task_statuses"
+          label="name"
+          onChange={(value: Record<TaskStatus>) =>
+            value.resource && handleChange('status_id', value.resource.id)
+          }
+          defaultValue={task.status_id}
+          queryAdditional
+        />
 
         {task && company?.custom_fields?.task1 && (
           <CustomField
             field="task1"
-            defaultValue={task?.custom_value1 || ''}
+            defaultValue={task.custom_value1 || ''}
             value={company.custom_fields.task1}
             onChange={(value) => handleChange('custom_value1', value)}
             noExternalPadding
@@ -102,7 +102,7 @@ export function TaskDetails(props: Props) {
         {task && company?.custom_fields?.task2 && (
           <CustomField
             field="task2"
-            defaultValue={task?.custom_value2 || ''}
+            defaultValue={task.custom_value2 || ''}
             value={company.custom_fields.task2}
             onChange={(value) => handleChange('custom_value2', value)}
             noExternalPadding
@@ -114,14 +114,14 @@ export function TaskDetails(props: Props) {
         <InputField
           label={t('description')}
           element="textarea"
-          value={task?.description}
+          value={task.description}
           onValueChange={(value) => handleChange('description', value)}
         />
 
         {task && company?.custom_fields?.task3 && (
           <CustomField
             field="task3"
-            defaultValue={task?.custom_value3 || ''}
+            defaultValue={task.custom_value3 || ''}
             value={company.custom_fields.task3}
             onChange={(value) => handleChange('custom_value3', value)}
             noExternalPadding
@@ -131,7 +131,7 @@ export function TaskDetails(props: Props) {
         {task && company?.custom_fields?.task4 && (
           <CustomField
             field="task4"
-            defaultValue={task?.custom_value4 || ''}
+            defaultValue={task.custom_value4 || ''}
             value={company.custom_fields.task4}
             onChange={(value) => handleChange('custom_value4', value)}
             noExternalPadding
