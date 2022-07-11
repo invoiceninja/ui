@@ -11,11 +11,7 @@
 import { Task } from 'common/interfaces/task';
 import { parseTimeLog } from './calculate-time';
 
-export function calculateEntityState(task: Task) {
-  if (task.invoice_id) {
-    return 'invoiced';
-  }
-
+export function isTaskRunning(task: Task) {
   let running = false;
 
   parseTimeLog(task.time_log).forEach(([, stop]) => {
@@ -24,7 +20,15 @@ export function calculateEntityState(task: Task) {
     }
   });
 
-  if (running) {
+  return running;
+}
+
+export function calculateEntityState(task: Task) {
+  if (task.invoice_id) {
+    return 'invoiced';
+  }
+
+  if (isTaskRunning(task)) {
     return 'active';
   }
 
