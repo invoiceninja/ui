@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
+import { isOverlapping } from '../common/helpers/is-overlapping';
 
 export function Create() {
   const { documentTitle } = useTitle('edit_task');
@@ -39,6 +40,10 @@ export function Create() {
   };
 
   const handleSave = (task: Task) => {
+    if (isOverlapping(task)) {
+      return toast.error('task_errors');
+    }
+
     toast.processing();
 
     request('POST', endpoint('/api/v1/tasks'), task)
