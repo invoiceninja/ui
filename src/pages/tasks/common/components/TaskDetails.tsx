@@ -8,9 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Tab } from '@headlessui/react';
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { Task } from 'common/interfaces/task';
 import { TaskStatus } from 'common/interfaces/task-status';
 import { User } from 'common/interfaces/user';
@@ -18,7 +20,11 @@ import { ClientSelector } from 'components/clients/ClientSelector';
 import { CustomField } from 'components/CustomField';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
+import { TabGroup } from 'components/TabGroup';
+import { Tabs } from 'components/Tabs';
+import { Field } from 'pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
 
 interface Props {
   task: Task;
@@ -31,6 +37,8 @@ export function TaskDetails(props: Props) {
   const { task, handleChange } = props;
 
   const company = useCurrentCompany();
+  const location = useLocation();
+  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -136,14 +144,46 @@ export function TaskDetails(props: Props) {
         )}
       </Card>
 
-      <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-        <InputField
-          label={t('description')}
-          element="textarea"
-          value={task.description}
-          onValueChange={(value) => handleChange('description', value)}
-        />
-      </Card>
+      {location.pathname.endsWith('/edit') && (
+        <Card className="col-span-12 xl:col-span-4 h-max px-6">
+          <TabGroup tabs={[t('description'), t('custom_fields')]}>
+            <Tab.Panel>
+              <InputField
+                element="textarea"
+                value={task.description}
+                onValueChange={(value) => handleChange('description', value)}
+              />
+            </Tab.Panel>
+
+            <Tab.Panel>
+              {company &&
+                ['task1', 'task2', 'task3', 'task4'].map((field) => (
+                  <Field
+                    key={field}
+                    initialValue={company.custom_fields[field]}
+                    field={field}
+                    placeholder={t('task_field')}
+                    onChange={(value: any) =>
+                      handleCustomFieldChange(field, value)
+                    }
+                    noExternalPadding
+                  />
+                ))}
+            </Tab.Panel>
+          </TabGroup>
+        </Card>
+      )}
+
+      {!location.pathname.endsWith('/edit') && (
+        <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
+          <InputField
+            label={t('description')}
+            element="textarea"
+            value={task.description}
+            onValueChange={(value) => handleChange('description', value)}
+          />
+        </Card>
+      )}
     </div>
   );
 }
