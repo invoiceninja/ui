@@ -20,26 +20,7 @@ export function parseTimeLog(log: string) {
     return numbers;
   }
 
-  const stringOfLogs = log.substring(1).slice(0, -1); // [1656923640,1656927240],[1658910857,1658946857],[1657032777,0]
-  const arrayOfLogs = stringOfLogs.split('],['); // ['[1656923640,1656927240', '1658910857,1658946857', '1657032777,0]']
-
-  console.log(arrayOfLogs);
-
-  arrayOfLogs.forEach((record) => {
-    const [startString, stopString] = record.split(','); // [1656923640,1656927240
-
-    const startNumber = startString.startsWith('[')
-      ? parseInt(startString.substring(1))
-      : parseInt(startString);
-
-    const stopNumber = stopString.endsWith(']')
-      ? parseInt(stopString.slice(0, -1))
-      : parseInt(stopString);
-
-    numbers.push([startNumber, stopNumber]);
-  });
-
-  return numbers;
+  return parsed;
 }
 
 export function calculateTime(log: string) {
