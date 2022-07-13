@@ -20,7 +20,7 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
 
   return (
     <DebouncedCombobox
-      inputLabel={t('project')}
+      inputLabel={props.inputLabel}
       endpoint="/api/v1/projects"
       label="name"
       onChange={(value: Record<Project>) =>

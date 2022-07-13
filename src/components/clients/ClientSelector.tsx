@@ -28,7 +28,7 @@ export function ClientSelector(props: GenericSelectorProps<Client>) {
       />
 
       <DebouncedCombobox
-        inputLabel={t('client')}
+        inputLabel={props.inputLabel}
         endpoint="/api/v1/clients"
         label="display_name"
         onChange={(value: Record<Client>) =>
