@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
+import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Task } from 'common/interfaces/task';
@@ -34,60 +34,42 @@ export function TaskDetails(props: Props) {
 
   return (
     <div className="grid grid-cols-12 gap-4">
-      <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-        <ClientSelector
-          onChange={(client) => handleChange('client_id', client.id)}
-          value={task.client_id}
-          clearButton={Boolean(task.client_id)}
-          onClearButtonClick={() => handleChange('client_id', '')}
-        />
+      <Card className="col-span-12 xl:col-span-4 h-max">
+        <Element leftSide={t('client')}>
+          <ClientSelector
+            onChange={(client) => handleChange('client_id', client.id)}
+            value={task.client_id}
+            clearButton={Boolean(task.client_id)}
+            onClearButtonClick={() => handleChange('client_id', '')}
+          />
+        </Element>
 
-        <ProjectSelector
-          onChange={(project) => handleChange('project_id', project.id)}
-          value={task.project_id}
-          clearButton={Boolean(task.project_id)}
-          onClearButtonClick={() => handleChange('project_id', '')}
-        />
+        <Element leftSide={t('project')}>
+          <ProjectSelector
+            onChange={(project) => handleChange('project_id', project.id)}
+            value={task.project_id}
+            clearButton={Boolean(task.project_id)}
+            onClearButtonClick={() => handleChange('project_id', '')}
+          />
+        </Element>
 
-        <DebouncedCombobox
-          value={task.assigned_user_id}
-          inputLabel={t('user')}
-          endpoint="/api/v1/users"
-          label={'first_name'}
-          clearButton={Boolean(task.assigned_user_id)}
-          formatLabel={(resource) =>
-            `${resource.first_name} ${resource.last_name}`
-          }
-          onChange={(user: Record<User>) =>
-            user.resource && handleChange('assigned_user_id', user.resource.id)
-          }
-          onClearButtonClick={() => handleChange('assigned_user_id', '')}
-          queryAdditional
-        />
-      </Card>
-
-      <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-        <InputField
-          label={t('task_number')}
-          value={task.number}
-          onValueChange={(value) => handleChange('number', value)}
-        />
-
-        <InputField
-          label={t('rate')}
-          value={task.rate}
-          onValueChange={(value) => handleChange('rate', value)}
-        />
-
-        <DebouncedCombobox
-          endpoint="/api/v1/task_statuses"
-          label="name"
-          onChange={(value: Record<TaskStatus>) =>
-            value.resource && handleChange('status_id', value.resource.id)
-          }
-          defaultValue={task.status_id}
-          queryAdditional
-        />
+        <Element leftSide={t('user')}>
+          <DebouncedCombobox
+            value={task.assigned_user_id}
+            endpoint="/api/v1/users"
+            label={'first_name'}
+            clearButton={Boolean(task.assigned_user_id)}
+            formatLabel={(resource) =>
+              `${resource.first_name} ${resource.last_name}`
+            }
+            onChange={(user: Record<User>) =>
+              user.resource &&
+              handleChange('assigned_user_id', user.resource.id)
+            }
+            onClearButtonClick={() => handleChange('assigned_user_id', '')}
+            queryAdditional
+          />
+        </Element>
 
         {task && company?.custom_fields?.task1 && (
           <CustomField
@@ -95,7 +77,6 @@ export function TaskDetails(props: Props) {
             defaultValue={task.custom_value1 || ''}
             value={company.custom_fields.task1}
             onChange={(value) => handleChange('custom_value1', value)}
-            noExternalPadding
           />
         )}
 
@@ -105,7 +86,52 @@ export function TaskDetails(props: Props) {
             defaultValue={task.custom_value2 || ''}
             value={company.custom_fields.task2}
             onChange={(value) => handleChange('custom_value2', value)}
-            noExternalPadding
+          />
+        )}
+      </Card>
+
+      <Card className="col-span-12 xl:col-span-4 h-max">
+        <Element leftSide={t('task_number')}>
+          <InputField
+            value={task.number}
+            onValueChange={(value) => handleChange('number', value)}
+          />
+        </Element>
+
+        <Element leftSide={t('rate')}>
+          <InputField
+            value={task.rate}
+            onValueChange={(value) => handleChange('rate', value)}
+          />
+        </Element>
+
+        <Element leftSide={t('status')}>
+          <DebouncedCombobox
+            endpoint="/api/v1/task_statuses"
+            label="name"
+            onChange={(value: Record<TaskStatus>) =>
+              value.resource && handleChange('status_id', value.resource.id)
+            }
+            defaultValue={task.status_id}
+            queryAdditional
+          />
+        </Element>
+
+        {task && company?.custom_fields?.task3 && (
+          <CustomField
+            field="task3"
+            defaultValue={task.custom_value3 || ''}
+            value={company.custom_fields.task3}
+            onChange={(value) => handleChange('custom_value3', value)}
+          />
+        )}
+
+        {task && company?.custom_fields?.task4 && (
+          <CustomField
+            field="task4"
+            defaultValue={task.custom_value4 || ''}
+            value={company.custom_fields.task4}
+            onChange={(value) => handleChange('custom_value4', value)}
           />
         )}
       </Card>
@@ -117,26 +143,6 @@ export function TaskDetails(props: Props) {
           value={task.description}
           onValueChange={(value) => handleChange('description', value)}
         />
-
-        {task && company?.custom_fields?.task3 && (
-          <CustomField
-            field="task3"
-            defaultValue={task.custom_value3 || ''}
-            value={company.custom_fields.task3}
-            onChange={(value) => handleChange('custom_value3', value)}
-            noExternalPadding
-          />
-        )}
-
-        {task && company?.custom_fields?.task4 && (
-          <CustomField
-            field="task4"
-            defaultValue={task.custom_value4 || ''}
-            value={company.custom_fields.task4}
-            onChange={(value) => handleChange('custom_value4', value)}
-            noExternalPadding
-          />
-        )}
       </Card>
     </div>
   );
