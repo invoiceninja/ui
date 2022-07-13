@@ -21,7 +21,6 @@ import { CustomField } from 'components/CustomField';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { TabGroup } from 'components/TabGroup';
-import { Tabs } from 'components/Tabs';
 import { Field } from 'pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
