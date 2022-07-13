@@ -19,6 +19,7 @@ import { useEffect, useState } from 'react';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
+import { isOverlapping } from '../common/helpers/is-overlapping';
 
 export function Clone() {
   const { documentTitle } = useTitle('new_task');
@@ -42,6 +43,10 @@ export function Clone() {
 
   const handleSave = (task: Task) => {
     toast.processing();
+
+    if (isOverlapping(task)) {
+      return toast.error('task_errors');
+    }
 
     request('POST', endpoint('/api/v1/tasks'), task)
       .then((response) => {

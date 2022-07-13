@@ -40,11 +40,11 @@ export function Create() {
   };
 
   const handleSave = (task: Task) => {
+    toast.processing();
+
     if (isOverlapping(task)) {
       return toast.error('task_errors');
     }
-
-    toast.processing();
 
     request('POST', endpoint('/api/v1/tasks'), task)
       .then((response) => {
