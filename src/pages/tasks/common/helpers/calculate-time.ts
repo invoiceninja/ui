@@ -12,8 +12,9 @@ import dayjs from 'dayjs';
 
 export function parseTimeLog(log: string) {
   const numbers: number[][] = [];
+  const parsed: number[][] = JSON.parse(log);
 
-  if (log === '[]') {
+  if (parsed.length === 0) {
     numbers.push([0, 0]);
 
     return numbers;
@@ -21,6 +22,8 @@ export function parseTimeLog(log: string) {
 
   const stringOfLogs = log.substring(1).slice(0, -1); // [1656923640,1656927240],[1658910857,1658946857],[1657032777,0]
   const arrayOfLogs = stringOfLogs.split('],['); // ['[1656923640,1656927240', '1658910857,1658946857', '1657032777,0]']
+
+  console.log(arrayOfLogs);
 
   arrayOfLogs.forEach((record) => {
     const [startString, stopString] = record.split(','); // [1656923640,1656927240
