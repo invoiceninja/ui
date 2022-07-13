@@ -9,6 +9,7 @@
  */
 
 export interface GenericSelectorProps<T> {
+  inputLabel?: string;
   value?: string | undefined;
   readonly?: boolean;
   clearButton?: boolean;
