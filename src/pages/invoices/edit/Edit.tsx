@@ -38,6 +38,8 @@ import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
+import { TabGroup } from 'components/TabGroup';
+import { Tab } from '@headlessui/react';
 
 export function Edit() {
   const { id } = useParams();
@@ -107,28 +109,36 @@ export function Edit() {
         <InvoiceDetails />
 
         <div className="col-span-12">
-          {currentInvoice && (
-            <ProductsTable
-              resource={currentInvoice}
-              onProductChange={(index, lineItem) =>
-                dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
-              }
-              onLineItemPropertyChange={(key, value, index) =>
-                dispatch(
-                  setCurrentLineItemProperty({
-                    position: index,
-                    property: key,
-                    value,
-                  })
-                )
-              }
-              onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onDeleteRowClick={(index) =>
-                dispatch(deleteInvoiceLineItem(index))
-              }
-              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
-            />
-          )}
+          <TabGroup tabs={[t('products'), t('tasks')]}>
+            <Tab.Panel>
+              {currentInvoice && (
+                <ProductsTable
+                  resource={currentInvoice}
+                  onProductChange={(index, lineItem) =>
+                    dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
+                  }
+                  onLineItemPropertyChange={(key, value, index) =>
+                    dispatch(
+                      setCurrentLineItemProperty({
+                        position: index,
+                        property: key,
+                        value,
+                      })
+                    )
+                  }
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onDeleteRowClick={(index) =>
+                    dispatch(deleteInvoiceLineItem(index))
+                  }
+                  onCreateItemClick={() =>
+                    dispatch(injectBlankItemIntoCurrent())
+                  }
+                />
+              )}
+            </Tab.Panel>
+
+            <Tab.Panel>Tasks table</Tab.Panel>
+          </TabGroup>
         </div>
 
         <InvoiceFooter page="edit" />
