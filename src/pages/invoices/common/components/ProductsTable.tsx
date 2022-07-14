@@ -11,7 +11,6 @@
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useProductColumns } from '../hooks/useProductColumns';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
@@ -24,6 +23,8 @@ import { Fragment } from 'react';
 
 interface Props {
   resource: Invoice | RecurringInvoice;
+  items: InvoiceItem[];
+  columns: string[];
   onProductChange: (index: number, lineItem: InvoiceItem) => unknown;
   onSort: (lineItems: InvoiceItem[]) => unknown;
   onLineItemPropertyChange: (
@@ -38,8 +39,7 @@ interface Props {
 export function ProductsTable(props: Props) {
   const [t] = useTranslation();
 
-  const resource = props.resource;
-  const columns = useProductColumns();
+  const { resource, items, columns } = props;
 
   const resolveTranslation = useResolveTranslation();
 
@@ -66,7 +66,7 @@ export function ProductsTable(props: Props) {
           {(provided) => (
             <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
               {resource?.client_id ? (
-                resource.line_items.map((lineItem, lineItemIndex) => (
+                items.map((lineItem, lineItemIndex) => (
                   <Draggable
                     key={lineItemIndex}
                     draggableId={lineItemIndex.toString()}
