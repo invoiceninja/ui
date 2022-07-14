@@ -40,6 +40,9 @@ import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { TabGroup } from 'components/TabGroup';
 import { Tab } from '@headlessui/react';
+import { useProductColumns } from '../common/hooks/useProductColumns';
+import { useTaskColumns } from '../common/hooks/useTaskColumns';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
 
 export function Edit() {
   const { id } = useParams();
@@ -55,6 +58,9 @@ export function Edit() {
   const handleChange = useSetCurrentInvoiceProperty();
 
   const invoiceSum = useInvoiceSum();
+
+  const productColumns = useProductColumns();
+  const taskColumns = useTaskColumns();
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -114,6 +120,10 @@ export function Edit() {
               {currentInvoice && (
                 <ProductsTable
                   resource={currentInvoice}
+                  columns={productColumns}
+                  items={currentInvoice.line_items.filter(
+                    (item) => item.type_id == InvoiceItemType.Product
+                  )}
                   onProductChange={(index, lineItem) =>
                     dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
                   }
@@ -131,13 +141,48 @@ export function Edit() {
                     dispatch(deleteInvoiceLineItem(index))
                   }
                   onCreateItemClick={() =>
-                    dispatch(injectBlankItemIntoCurrent())
+                    dispatch(
+                      injectBlankItemIntoCurrent({
+                        type: InvoiceItemType.Product,
+                      })
+                    )
                   }
                 />
               )}
             </Tab.Panel>
 
-            <Tab.Panel>Tasks table</Tab.Panel>
+            <Tab.Panel>
+              {currentInvoice && (
+                <ProductsTable
+                  resource={currentInvoice}
+                  columns={taskColumns}
+                  items={currentInvoice.line_items.filter(
+                    (item) => item.type_id == InvoiceItemType.Task
+                  )}
+                  onProductChange={(index, lineItem) =>
+                    dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
+                  }
+                  onLineItemPropertyChange={(key, value, index) =>
+                    dispatch(
+                      setCurrentLineItemProperty({
+                        position: index,
+                        property: key,
+                        value,
+                      })
+                    )
+                  }
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onDeleteRowClick={(index) =>
+                    dispatch(deleteInvoiceLineItem(index))
+                  }
+                  onCreateItemClick={() =>
+                    dispatch(
+                      injectBlankItemIntoCurrent({ type: InvoiceItemType.Task })
+                    )
+                  }
+                />
+              )}
+            </Tab.Panel>
           </TabGroup>
         </div>
 
