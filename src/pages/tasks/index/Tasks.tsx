@@ -13,6 +13,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
+import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { calculateEntityState } from '../common/helpers/calculate-entity-state';
@@ -23,6 +24,13 @@ export function Tasks() {
   const [t] = useTranslation();
 
   const columns: DataTableColumns = [
+    {
+      id: 'status_id',
+      label: t('status'),
+      format: (value, task: Task) => (
+        <StatusBadge for={{}} code={task.status?.name || 'logged'} />
+      ),
+    },
     {
       id: 'number',
       label: t('number'),
@@ -63,7 +71,7 @@ export function Tasks() {
       <DataTable
         resource="task"
         columns={columns}
-        endpoint="/api/v1/tasks?include=client"
+        endpoint="/api/v1/tasks?include=status,client"
         bulkRoute="/api/v1/tasks/bulk"
         linkToEdit="/tasks/:id/edit"
         linkToCreate="/tasks/create"
