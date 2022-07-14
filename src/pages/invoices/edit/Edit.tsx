@@ -43,6 +43,7 @@ import { Tab } from '@headlessui/react';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
+import { uuid4 } from '@sentry/utils';
 
 export function Edit() {
   const { id } = useParams();
@@ -72,7 +73,11 @@ export function Edit() {
 
   useEffect(() => {
     if (invoice?.data.data) {
-      dispatch(setCurrentInvoice(invoice.data.data));
+      const data: Invoice = { ...invoice.data.data };
+
+      data.line_items.forEach((item) => (item._id = uuid4()));
+
+      dispatch(setCurrentInvoice(data));
     }
 
     return () => {
