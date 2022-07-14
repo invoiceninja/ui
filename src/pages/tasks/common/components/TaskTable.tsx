@@ -14,6 +14,7 @@ import { Task } from 'common/interfaces/task';
 import dayjs from 'dayjs';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { parseTimeLog } from '../helpers/calculate-time';
 
 interface Props {
   task: Task;
@@ -26,7 +27,7 @@ export function TaskTable(props: Props) {
   const [t] = useTranslation();
 
   const createTableRow = () => {
-    const logs = JSON.parse(task.time_log);
+    const logs = parseTimeLog(task.time_log);
 
     logs.push([dayjs().unix(), 0]);
 
@@ -34,7 +35,7 @@ export function TaskTable(props: Props) {
   };
 
   const deleteTableRow = (index: number) => {
-    const logs: number[][] = JSON.parse(task.time_log);
+    const logs: number[][] = parseTimeLog(task.time_log);
 
     logs.splice(index, 1);
 
@@ -76,7 +77,7 @@ export function TaskTable(props: Props) {
       'YYYY-MM-DD hh:mm:ss'
     ).unix();
 
-    const logs = JSON.parse(task.time_log);
+    const logs = parseTimeLog(task.time_log);
 
     logs[index][position] = unixTimestamp;
 
@@ -92,7 +93,7 @@ export function TaskTable(props: Props) {
       'YYYY-MM-DD hh:mm:ss'
     ).unix();
 
-    const logs = JSON.parse(task.time_log);
+    const logs = parseTimeLog(task.time_log);
 
     logs[index][0] = unixTimestamp;
 
@@ -119,7 +120,7 @@ export function TaskTable(props: Props) {
       date = date.add(parseFloat(parts[2]), 'second');
     }
 
-    const logs = JSON.parse(task.time_log);
+    const logs = parseTimeLog(task.time_log);
 
     logs[index][1] = date.unix();
 

@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
 
 export function parseTimeLog(log: string) {
   if (log === '' || log === '[]') {
-    return [[0, 0]];
+    return [];
   }
 
   const numbers: number[][] = [];
