@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Client } from './client';
+import { TaskStatus } from './task-status';
+
 export interface Task {
   id: string;
   user_id: string;
@@ -34,4 +37,6 @@ export interface Task {
   archived_at: number;
   created_at: number;
   updated_at: number;
+  client?: Client;
+  status?: TaskStatus;
 }
