@@ -13,6 +13,7 @@ import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { isTaskRunning } from 'pages/tasks/common/helpers/calculate-entity-state';
 import { useBulkAction } from 'pages/tasks/common/hooks/useBulk';
+import { useInvoiceTask } from 'pages/tasks/common/hooks/useInvoiceTask';
 import { useStart } from 'pages/tasks/common/hooks/useStart';
 import { useStop } from 'pages/tasks/common/hooks/useStop';
 import { useTranslation } from 'react-i18next';
@@ -29,6 +30,7 @@ export function Actions(props: Props) {
   const start = useStart();
   const stop = useStop();
   const bulk = useBulkAction();
+  const invoiceTask = useInvoiceTask();
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
@@ -49,7 +51,11 @@ export function Actions(props: Props) {
           {t('clone')}
         </DropdownElement>
 
-        {/* <DropdownElement>{t('invoice_task')}</DropdownElement> */}
+        {!isTaskRunning(task) && !task.invoice_id && (
+          <DropdownElement onClick={() => invoiceTask(task)}>
+            {t('invoice_task')}
+          </DropdownElement>
+        )}
       </div>
 
       <div>
