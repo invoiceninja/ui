@@ -23,6 +23,8 @@ export function Tasks() {
   const { documentTitle } = useTitle('tasks');
   const [t] = useTranslation();
 
+  const pages = [{ name: t('tasks'), href: '/tasks' }];
+
   const columns: DataTableColumns = [
     {
       id: 'status_id',
@@ -68,7 +70,7 @@ export function Tasks() {
   ];
 
   return (
-    <Default title={documentTitle}>
+    <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
         resource="task"
         columns={columns}

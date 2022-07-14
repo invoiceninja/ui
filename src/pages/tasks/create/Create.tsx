@@ -16,14 +16,22 @@ import { Task } from 'common/interfaces/task';
 import { useBlankTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
 import { isOverlapping } from '../common/helpers/is-overlapping';
 
 export function Create() {
-  const { documentTitle } = useTitle('edit_task');
+  const [t] = useTranslation();
+
+  const { documentTitle } = useTitle('new_task');
   const { data } = useBlankTaskQuery();
+
+  const pages = [
+    { name: t('tasks'), href: '/tasks' },
+    { name: t('new_task'), href: '/tasks/create' },
+  ];
 
   const [task, setTask] = useState<Task>();
 
@@ -66,6 +74,7 @@ export function Create() {
       title={documentTitle}
       onBackClick={generatePath('/tasks')}
       onSaveClick={() => task && handleSave(task)}
+      breadcrumbs={pages}
     >
       {task && <TaskDetails task={task} handleChange={handleChange} />}
       {task && <TaskTable task={task} handleChange={handleChange} />}

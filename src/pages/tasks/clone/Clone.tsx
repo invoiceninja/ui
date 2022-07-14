@@ -16,13 +16,21 @@ import { Task } from 'common/interfaces/task';
 import { useTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
 import { isOverlapping } from '../common/helpers/is-overlapping';
 
 export function Clone() {
+  const [t] = useTranslation();
+
   const { documentTitle } = useTitle('new_task');
+
+  const pages = [
+    { name: t('tasks'), href: '/tasks' },
+    { name: t('new_task'), href: '/tasks/create' },
+  ];
 
   const { id } = useParams();
   const { data } = useTaskQuery({ id });
@@ -68,6 +76,7 @@ export function Clone() {
       title={documentTitle}
       onBackClick={generatePath('/tasks')}
       onSaveClick={() => task && handleSave(task)}
+      breadcrumbs={pages}
     >
       {task && <TaskDetails task={task} handleChange={handleChange} />}
       {task && <TaskTable task={task} handleChange={handleChange} />}
