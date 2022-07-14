@@ -41,7 +41,7 @@ export function Clone() {
 
   useEffect(() => {
     if (data) {
-      setTask({ ...data, number: '' });
+      setTask({ ...data, number: '', invoice_id: '' });
     }
   }, [data]);
 
