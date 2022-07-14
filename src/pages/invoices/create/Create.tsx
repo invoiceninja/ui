@@ -72,7 +72,11 @@ export function Create() {
   ];
 
   useEffect(() => {
-    if (invoice?.data.data) {
+    const preload = searchParams.has('preload')
+      ? searchParams.get('preload') === 'true'
+      : false;
+
+    if (invoice?.data.data && !preload) {
       dispatch(setCurrentInvoice(invoice.data.data));
 
       if (company && company.enabled_tax_rates > 0) {
