@@ -20,6 +20,10 @@ export function isOverlapping(task: Task) {
   sorted.forEach(([, stop], index) => {
     const next = sorted[index + 1];
 
+    if (stop == 0 && next) {
+      overlaps = true;
+    }
+
     if (next && stop > next[0]) {
       overlaps = true;
     }
