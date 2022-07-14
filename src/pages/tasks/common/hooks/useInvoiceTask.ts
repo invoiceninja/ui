@@ -68,7 +68,9 @@ export function useInvoiceTask() {
         '<div class="task-time-details">',
         ...parsed,
         '</div>',
-      ].join('\n');
+      ]
+        .join('\n')
+        .trim();
 
       handleChange('line_items', [item]);
 
