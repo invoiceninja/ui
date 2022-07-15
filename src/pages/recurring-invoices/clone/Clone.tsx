@@ -9,6 +9,7 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
@@ -27,6 +28,7 @@ import { ClientSelector } from 'pages/invoices/common/components/ClientSelector'
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
+import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -52,6 +54,7 @@ export function Clone() {
   const handleChange = useSetCurrentRecurringInvoiceProperty();
 
   const invoiceSum = useInvoiceSum();
+  const productColumns = useProductColumns();
 
   const pages: BreadcrumRecord[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
@@ -67,7 +70,7 @@ export function Clone() {
         setCurrentRecurringInvoice({
           ...recurringInvoice.data.data,
           number: '',
-          documents: []
+          documents: [],
         })
       );
     }
@@ -105,6 +108,10 @@ export function Clone() {
         <div className="col-span-12">
           {currentRecurringInvoice && (
             <ProductsTable
+              columns={productColumns}
+              items={currentRecurringInvoice.line_items.filter(
+                (item) => item.type_id === InvoiceItemType.Product
+              )}
               resource={currentRecurringInvoice}
               onProductChange={(index, lineItem) =>
                 dispatch(
