@@ -10,6 +10,7 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { Credit } from 'common/interfaces/credit';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { useCreditQuery } from 'common/queries/credits';
 import {
   dismissCurrentCredit,
@@ -26,6 +27,7 @@ import { ClientSelector } from 'pages/invoices/common/components/ClientSelector'
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
+import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -51,6 +53,7 @@ export function Edit() {
 
   const currentCredit = useCurrentCredit();
   const invoiceSum = useInvoiceSum();
+  const productColumns = useProductColumns();
 
   const pages: BreadcrumRecord[] = [
     { name: t('credits'), href: '/credits' },
@@ -99,6 +102,10 @@ export function Edit() {
         <div className="col-span-12">
           {currentCredit && (
             <ProductsTable
+              columns={productColumns}
+              items={currentCredit.line_items.filter(
+                (item) => item.type_id === InvoiceItemType.Product
+              )}
               resource={currentCredit}
               onProductChange={(index, lineItem) =>
                 dispatch(setCurrentCreditLineItem({ index, lineItem }))
