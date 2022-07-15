@@ -10,6 +10,9 @@
 
 export const aliases: Record<string, string> = {
   item: 'product_key',
+  service: 'product_key',
   description: 'notes',
   unit_cost: 'cost',
+  rate: 'cost',
+  hours: 'quantity',
 };
