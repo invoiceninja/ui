@@ -44,7 +44,7 @@ export const invoiceSlice = createSlice({
       payload: PayloadAction<{ type: InvoiceItemType }>
     ) => {
       state.current?.line_items.push({
-        ...blankLineItem,
+        ...blankLineItem(),
         type_id: payload.payload.type,
       });
     },
