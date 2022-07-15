@@ -14,7 +14,7 @@ export enum InvoiceItemType {
 }
 
 export interface InvoiceItem {
-  _id?: string; // Used for internal reference
+  _id?: string;
   quantity: number;
   cost: number;
   product_key: string;
