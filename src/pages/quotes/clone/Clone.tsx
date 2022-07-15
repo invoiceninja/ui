@@ -9,6 +9,7 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { Quote } from 'common/interfaces/quote';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useQuoteQuery } from 'common/queries/quotes';
@@ -28,6 +29,7 @@ import { ClientSelector } from 'pages/invoices/common/components/ClientSelector'
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
+import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -54,6 +56,7 @@ export function Clone() {
 
   const currentQuote = useCurrentQuote();
   const invoiceSum = useInvoiceSum();
+  const productColumns = useProductColumns();
 
   const pages: BreadcrumRecord[] = [
     { name: t('quotes'), href: '/quotes' },
@@ -104,6 +107,10 @@ export function Clone() {
         <div className="col-span-12">
           {currentQuote && (
             <ProductsTable
+              columns={productColumns}
+              items={currentQuote.line_items.filter(
+                (item) => item.type_id == InvoiceItemType.Product
+              )}
               resource={currentQuote}
               onProductChange={(index, lineItem) =>
                 dispatch(setCurrentQuoteLineItem({ index, lineItem }))
