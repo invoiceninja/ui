@@ -47,12 +47,6 @@ export function useTaskColumns() {
 
       variables.splice(taxVariableIndex + 1, 0, ...taxes);
 
-      if (!company.enable_product_discount) {
-        variables = variables.filter(
-          (variable) => variable !== '$task.discount'
-        );
-      }
-
       variables = variables.filter((variable) => variable !== '$task.tax');
     }
 

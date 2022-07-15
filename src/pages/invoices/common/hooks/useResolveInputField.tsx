@@ -28,7 +28,15 @@ import { CustomField } from 'components/CustomField';
 import { Invoice } from 'common/interfaces/invoice';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
-const numberInputs = ['discount', 'cost', 'unit_cost', 'quantity'];
+const numberInputs = [
+  'discount',
+  'cost',
+  'unit_cost',
+  'quantity',
+  'rate',
+  'hours',
+];
+
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 
 interface Props {
@@ -69,8 +77,9 @@ export function useResolveInputField(props: Props) {
     }
   }, [resource?.client_id]);
 
-  return (key: string, index: number) => {
+  return (key: string, _id: string) => {
     const property = resolveProperty(key);
+    const index = resource.line_items.findIndex((item) => item._id === _id);
 
     if (property === 'product_key') {
       return (
