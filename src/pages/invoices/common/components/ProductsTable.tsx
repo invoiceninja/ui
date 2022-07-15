@@ -85,11 +85,17 @@ export function ProductsTable(props: Props) {
                             key={columnIndex}
                           >
                             {length - 1 !== columnIndex &&
-                              resolveInputField(column, lineItemIndex)}
+                              resolveInputField(
+                                column,
+                                lineItem!._id as string
+                              )}
 
                             {length - 1 === columnIndex && (
                               <div className="flex justify-between items-center">
-                                {resolveInputField(column, lineItemIndex)}
+                                {resolveInputField(
+                                  column,
+                                  lineItem!._id as string
+                                )}
 
                                 {resource &&
                                   (lineItem.product_key || lineItemIndex > 0) &&
