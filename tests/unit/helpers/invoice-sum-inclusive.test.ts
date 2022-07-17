@@ -2,7 +2,10 @@ import { InvoiceSumInclusive } from './../../../src/common/helpers/invoices/invo
 import invoice from '../../helpers/data/invoice';
 import invoice_item from '../../helpers/data/invoice_item';
 import { InvoiceItemSum } from '../../../src/common/helpers/invoices/invoice-item-sum';
-import { InvoiceItem } from '../../../src/common/interfaces/invoice-item';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '../../../src/common/interfaces/invoice-item';
 import currencies from '../../helpers/data/currencies';
 
 const USD = currencies[0];
@@ -181,7 +184,7 @@ describe('InvoiceSum test invoice calculation', () => {
       custom_value2: '',
       custom_value3: '',
       custom_value4: '',
-      type_id: '1',
+      type_id: InvoiceItemType.Product,
       product_cost: 0,
       date: '',
     };
@@ -225,7 +228,7 @@ describe('InvoiceSum test invoice calculation', () => {
       custom_value2: '',
       custom_value3: '',
       custom_value4: '',
-      type_id: '1',
+      type_id: InvoiceItemType.Product,
       product_cost: 0,
       date: '',
     };
