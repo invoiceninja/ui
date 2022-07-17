@@ -7,7 +7,14 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
+export enum InvoiceItemType {
+  Product = '1',
+  Task = '2',
+}
+
 export interface InvoiceItem {
+  _id?: string;
   quantity: number;
   cost: number;
   product_key: string;
@@ -27,7 +34,7 @@ export interface InvoiceItem {
   custom_value2: string;
   custom_value3: string;
   custom_value4: string;
-  type_id: string;
+  type_id: InvoiceItemType;
   product_cost: number;
   date: string;
 }

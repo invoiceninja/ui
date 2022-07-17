@@ -69,7 +69,7 @@ export const creditSlice = createSlice({
       }
     },
     injectBlankItemIntoCurrent: (state) => {
-      state.current?.line_items.push(blankLineItem);
+      state.current?.line_items.push(blankLineItem());
     },
   },
   extraReducers: (builder) => {

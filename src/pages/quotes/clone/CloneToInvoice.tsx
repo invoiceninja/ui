@@ -38,6 +38,8 @@ import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview'
 import { InvoiceDetails } from 'pages/invoices/common/components/InvoiceDetails';
 import { useHandleCreate } from 'pages/invoices/create/hooks/useHandleCreate';
 import { useInvoiceSum } from 'pages/invoices/common/hooks/useInvoiceSum';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
+import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 
 export function CloneToInvoice() {
   const { documentTitle } = useTitle('new_invoice');
@@ -51,6 +53,7 @@ export function CloneToInvoice() {
   const handleCreate = useHandleCreate(setErrors);
   const handleChange = useSetCurrentInvoiceProperty();
   const invoiceSum = useInvoiceSum();
+  const productColumns = useProductColumns();
 
   const currentInvoice = useCurrentInvoice();
 
@@ -106,6 +109,10 @@ export function CloneToInvoice() {
         <div className="col-span-12">
           {currentInvoice && (
             <ProductsTable
+              columns={productColumns}
+              items={currentInvoice.line_items.filter(
+                (item) => item.type_id == InvoiceItemType.Product
+              )}
               resource={currentInvoice}
               onProductChange={(index, lineItem) =>
                 dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
@@ -123,7 +130,11 @@ export function CloneToInvoice() {
               onDeleteRowClick={(index) =>
                 dispatch(deleteInvoiceLineItem(index))
               }
-              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+              onCreateItemClick={() =>
+                dispatch(
+                  injectBlankItemIntoCurrent({ type: InvoiceItemType.Product })
+                )
+              }
             />
           )}
         </div>

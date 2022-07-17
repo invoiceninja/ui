@@ -27,7 +27,8 @@
     "no-loss-of-precision": "off",
     "@typescript-eslint/no-loss-of-precision": ["off"],
     "react/display-name": "off",
-    "react/prop-types": "off"
+    "react/prop-types": "off",
+    "@typescript-eslint/no-non-null-assertion": "off"
   },
   "settings": {
     "react": {
