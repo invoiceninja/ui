@@ -21,10 +21,6 @@ export function TabGroup(props: Props) {
   const accentColor = useAccentColor();
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  console.log(
-    [...props.children].map((element) => React.isValidElement(element))
-  );
-
   return (
     <div className={props.className}>
       <div className="-mb-px flex space-x-8 overflow-x-auto border-b border-gray-200">
