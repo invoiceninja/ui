@@ -15,11 +15,12 @@ interface Props {
   children: ReactElement[];
   tabs: string[];
   className?: string;
+  defaultTabIndex?: number;
 }
 
 export function TabGroup(props: Props) {
   const accentColor = useAccentColor();
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
 
   return (
     <div className={props.className}>
