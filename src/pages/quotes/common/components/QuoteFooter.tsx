@@ -56,43 +56,43 @@ export function QuoteFooter(props: Props) {
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
       <TabGroup tabs={tabs}>
-        <Tab.Panel>
+        <div>
           <MarkdownEditor
             value={quote?.terms || ''}
             onChange={(value) => handleChange('terms', value)}
           />
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           <MarkdownEditor
             value={quote?.footer || ''}
             onChange={(value) => handleChange('footer', value)}
           />
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           <MarkdownEditor
             value={quote?.public_notes || ''}
             onChange={(value) => handleChange('public_notes', value)}
           />
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           <MarkdownEditor
             value={quote?.private_notes || ''}
             onChange={(value) => handleChange('private_notes', value)}
           />
-        </Tab.Panel>
+        </div>
 
         {props.page === 'edit' ? (
-          <Tab.Panel>
+          <div>
             <QuoteDocuments />
-          </Tab.Panel>
+          </div>
         ) : (
           <></>
         )}
 
-        <Tab.Panel>
+        <div>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
@@ -164,9 +164,9 @@ export function QuoteFooter(props: Props) {
               </div>
             </div>
           </div>
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           {company &&
             ['quote1', 'quote2', 'quote3', 'quote4'].map((field) => (
               <Field
@@ -178,7 +178,7 @@ export function QuoteFooter(props: Props) {
                 noExternalPadding
               />
             ))}
-        </Tab.Panel>
+        </div>
       </TabGroup>
     </Card>
   );

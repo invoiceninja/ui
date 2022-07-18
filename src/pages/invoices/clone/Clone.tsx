@@ -112,7 +112,7 @@ export function Clone() {
 
         <div className="col-span-12">
           <TabGroup tabs={[t('products'), t('tasks')]}>
-            <Tab.Panel>
+            <div>
               {currentInvoice && (
                 <ProductsTable
                   resource={currentInvoice}
@@ -145,9 +145,9 @@ export function Clone() {
                   }
                 />
               )}
-            </Tab.Panel>
+            </div>
 
-            <Tab.Panel>
+            <div>
               {currentInvoice && (
                 <ProductsTable
                   resource={currentInvoice}
@@ -178,7 +178,7 @@ export function Clone() {
                   }
                 />
               )}
-            </Tab.Panel>
+            </div>
           </TabGroup>
         </div>
 

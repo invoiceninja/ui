@@ -121,7 +121,7 @@ export function Edit() {
 
         <div className="col-span-12">
           <TabGroup tabs={[t('products'), t('tasks')]}>
-            <Tab.Panel>
+            <div>
               {currentInvoice && (
                 <ProductsTable
                   resource={currentInvoice}
@@ -154,9 +154,9 @@ export function Edit() {
                   }
                 />
               )}
-            </Tab.Panel>
+            </div>
 
-            <Tab.Panel>
+            <div>
               {currentInvoice && (
                 <ProductsTable
                   resource={currentInvoice}
@@ -187,13 +187,13 @@ export function Edit() {
                   }
                 />
               )}
-            </Tab.Panel>
+            </div>
           </TabGroup>
         </div>
 
         <InvoiceFooter page="edit" />
 
-        {currentInvoice && (
+        {/* {currentInvoice && (
           <InvoiceTotals
             resource={currentInvoice}
             invoiceSum={invoiceSum}
@@ -201,10 +201,10 @@ export function Edit() {
               handleChange(property as keyof Invoice, value)
             }
           />
-        )}
+        )} */}
       </div>
 
-      <div className="my-4">
+      {/* <div className="my-4">
         {currentInvoice && (
           <InvoicePreview
             for="invoice"
@@ -212,7 +212,7 @@ export function Edit() {
             entity="invoice"
           />
         )}
-      </div>
+      </div> */}
     </Default>
   );
 }

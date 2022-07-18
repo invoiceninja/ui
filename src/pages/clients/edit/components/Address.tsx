@@ -30,13 +30,13 @@ export function Address(props: Props) {
         className="px-5"
         tabs={[t('billing_address'), t('shipping_address')]}
       >
-        <Tab.Panel>
+        <div>
           <BillingAddress {...props} />
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           <ShippingAddress {...props} />
-        </Tab.Panel>
+        </div>
       </TabGroup>
     </Card>
   );

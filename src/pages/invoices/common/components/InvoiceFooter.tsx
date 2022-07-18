@@ -77,43 +77,43 @@ export function InvoiceFooter(props: Props) {
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
       <TabGroup tabs={tabs}>
-        <Tab.Panel>
+        <div>
           <MarkdownEditor
             value={invoice?.public_notes || ''}
             onChange={(value) => handleChange('public_notes', value)}
           />
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           <MarkdownEditor
             value={invoice?.private_notes || ''}
             onChange={(value) => handleChange('private_notes', value)}
           />
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           <MarkdownEditor
             value={invoice?.terms || ''}
             onChange={(value) => handleChange('terms', value)}
           />
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           <MarkdownEditor
             value={invoice?.footer || ''}
             onChange={(value) => handleChange('footer', value)}
           />
-        </Tab.Panel>
+        </div>
 
         {props.page === 'edit' ? (
-          <Tab.Panel>
+          <div>
             <InvoiceDocuments />
-          </Tab.Panel>
+          </div>
         ) : (
           <></>
         )}
 
-        <Tab.Panel>
+        <div>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
@@ -187,9 +187,9 @@ export function InvoiceFooter(props: Props) {
               />
             </div>
           </div>
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           {company &&
             ['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
               <Field
@@ -229,7 +229,7 @@ export function InvoiceFooter(props: Props) {
                 </Element>
               )
             )}
-        </Tab.Panel>
+        </div>
       </TabGroup>
     </Card>
   );
