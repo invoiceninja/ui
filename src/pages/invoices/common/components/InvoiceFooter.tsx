@@ -17,7 +17,6 @@ import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoicePrope
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { MarkdownEditor } from 'components/forms/MarkdownEditor';
-import { Tab } from '@headlessui/react';
 import { Card } from '@invoiceninja/cards';
 import { InputLabel, InputField } from '@invoiceninja/forms';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';

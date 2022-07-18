@@ -46,7 +46,6 @@ import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { TabGroup } from 'components/TabGroup';
-import { Tab } from '@headlessui/react';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 
 export function Create() {

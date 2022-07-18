@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Tab } from '@headlessui/react';
 import { Card } from '@invoiceninja/cards';
 import { InputField, InputLabel } from '@invoiceninja/forms';
 import MDEditor from '@uiw/react-md-editor';

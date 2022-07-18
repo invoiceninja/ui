@@ -21,7 +21,6 @@ import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
-import { InvoicePreview } from '../common/components/InvoicePreview';
 import { useInvoiceSave } from './hooks/useInvoiceSave';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
@@ -36,14 +35,13 @@ import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoi
 import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
 import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
-import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { TabGroup } from 'components/TabGroup';
-import { Tab } from '@headlessui/react';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { uuid4 } from '@sentry/utils';
+import { InvoiceTotals } from '../common/components/InvoiceTotals';
 
 export function Edit() {
   const { id } = useParams();
@@ -193,7 +191,7 @@ export function Edit() {
 
         <InvoiceFooter page="edit" />
 
-        {/* {currentInvoice && (
+        {currentInvoice && (
           <InvoiceTotals
             resource={currentInvoice}
             invoiceSum={invoiceSum}
@@ -201,7 +199,7 @@ export function Edit() {
               handleChange(property as keyof Invoice, value)
             }
           />
-        )} */}
+        )}
       </div>
 
       {/* <div className="my-4">

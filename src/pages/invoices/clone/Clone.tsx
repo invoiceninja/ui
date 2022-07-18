@@ -40,7 +40,6 @@ import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reduc
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { TabGroup } from 'components/TabGroup';
-import { Tab } from '@headlessui/react';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 

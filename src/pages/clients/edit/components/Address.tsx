@@ -10,7 +10,6 @@
 
 import { Card } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
-import { Tab } from '@headlessui/react';
 import { TabGroup } from 'components/TabGroup';
 import { BillingAddress } from './address/BillingAddress';
 import { ShippingAddress } from './address/ShippingAddress';
