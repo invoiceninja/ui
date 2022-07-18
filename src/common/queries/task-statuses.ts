@@ -11,23 +11,18 @@
 import { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { GenericManyResponse } from 'common/interfaces/generic-many-response';
+import { TaskStatus } from 'common/interfaces/task-status';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
-import { Params } from './common/params.interface';
 
-export function useTaskStatusesQuery(params: Params) {
-  return useQuery(['/api/v1/task_statuses', params], () =>
-    request(
-      'GET',
-      endpoint(
-        '/api/v1/task_statuses?per_page=:perPage&page=:currentPage&sort=:sort',
-        {
-          perPage: params.perPage,
-          currentPage: params.currentPage,
-          sort: params.sort ?? 'id|asc',
-        }
+export function useTaskStatusesQuery() {
+  return useQuery<GenericManyResponse<TaskStatus>>(
+    generatePath('/api/v1/task_statuses'),
+    () =>
+      request('GET', endpoint('/api/v1/task_statuses')).then(
+        (response) => response.data
       )
-    )
   );
 }
 
