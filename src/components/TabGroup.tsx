@@ -26,8 +26,8 @@ export function TabGroup(props: Props) {
   );
 
   return (
-    <div className={`border-b border-gray-200 ${props.className}`}>
-      <div className="-mb-px flex space-x-8 overflow-x-auto">
+    <div className={props.className}>
+      <div className="-mb-px flex space-x-8 overflow-x-auto border-b border-gray-200">
         {props.tabs.map((tab, index) => (
           <div key={index}>
             <button
