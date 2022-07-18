@@ -56,6 +56,8 @@ export function Payments() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/payments/bulk"
+      linkToCreate={generatePath('/payments/create?client=:id', { id: id })}
+
     />
   );
 }

@@ -1,3 +1,4 @@
+
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -8,15 +9,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isSelfHosted } from 'common/helpers';
 import { store } from 'common/stores/store';
 
 export function proPlan() {
-  // For self-hosted we don't have a plan.
-  if (
-    store.getState().companyUsers.api?.[
-      store.getState().companyUsers.currentIndex
-    ]?.account.plan === ''
-  ) {
+  if (isSelfHosted()) {
     return true;
   }
 

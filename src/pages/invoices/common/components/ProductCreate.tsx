@@ -57,6 +57,7 @@ export function ProductCreate(props: Props) {
       custom_value2: product?.data.data.custom_value2 || '',
       custom_value3: product?.data.data.custom_value3 || '',
       custom_value4: product?.data.data.custom_value4 || '',
+      price: product?.data.data.price || 0,
     },
     onSubmit: (values: CreateProductDto) => {
       request('POST', endpoint('/api/v1/products'), values)

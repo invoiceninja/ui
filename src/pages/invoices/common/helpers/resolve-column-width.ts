@@ -19,6 +19,7 @@ export function resolveColumnWidth(column: string) {
     cost: '10%',
     quantity: '10%',
     line_total: '5%',
+    discount: '10%',
   };
 
   return mappings[property] || '';

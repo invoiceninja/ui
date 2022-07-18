@@ -38,6 +38,7 @@ export interface CreateProductDto {
   tax_name2: string;
   tax_rate3: number;
   tax_name3: string;
+  price: number;
 }
 
 interface Props {
@@ -70,6 +71,7 @@ export function CreateProduct(props: Props) {
       tax_rate2: props.product?.tax_rate2 || 0,
       tax_name3: props.product?.tax_name3 || '',
       tax_rate3: props.product?.tax_rate3 || 0,
+      price: props.product?.price || 0,
     },
     onSubmit: (values: CreateProductDto) => {
       request('POST', endpoint('/api/v1/products'), values)
@@ -119,23 +121,36 @@ export function CreateProduct(props: Props) {
         />
       </Element>
 
-      <Element leftSide={t('cost')}>
+      <Element leftSide={t('price')}>
         <InputField
-          id="cost"
-          value={formik.initialValues.cost}
+          id="price"
+          value={formik.values.price}
           onChange={formik.handleChange}
-          errorMessage={errors?.cost}
+          errorMessage={errors?.errors.price}
         />
       </Element>
 
-      <Element leftSide={t('quantity')}>
-        <InputField
-          id="quantity"
-          value={formik.initialValues.quantity}
-          onChange={formik.handleChange}
-          errorMessage={errors?.quantity}
-        />
-      </Element>
+      {company?.enable_product_cost && (
+        <Element leftSide={t('cost')}>
+          <InputField
+            id="cost"
+            value={formik.initialValues.cost}
+            onChange={formik.handleChange}
+            errorMessage={errors?.cost}
+          />
+        </Element>
+      )}
+
+      {company?.enable_product_quantity && (
+        <Element leftSide={t('quantity')}>
+          <InputField
+            id="quantity"
+            value={formik.initialValues.quantity}
+            onChange={formik.handleChange}
+            errorMessage={errors?.quantity}
+          />
+        </Element>
+      )}
 
       {company && company.enabled_item_tax_rates > 0 && (
         <Element leftSide={t('tax')}>

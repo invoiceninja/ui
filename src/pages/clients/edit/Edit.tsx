@@ -93,7 +93,7 @@ export function Edit() {
 
     axios
       .all([
-        request('PUT', endpoint('/api/v1/clients/:id', { id }), client),
+        request('PUT', endpoint('/api/v1/clients/:id', { id }), {...client, documents: []}),
         request(
           'PUT',
           endpoint('/api/v1/companies/:id', { id: company?.id }),

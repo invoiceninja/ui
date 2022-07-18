@@ -54,11 +54,11 @@ export class Number {
     if (options?.showCurrencyCode && currency.code === 'CHF') {
       return `${code} ${formatted}`;
     } else if (options?.showCurrencyCode) {
-      return `${value} ${code}`;
+      return `${formatted} ${code}`;
     } else if (swapSymbol) {
-      return `${value} ${symbol.trim()}`;
+      return `${formatted} ${symbol.trim()}`;
     } else if (!options?.showCurrencyCode) {
-      return `${symbol}${value}`;
+      return `${symbol}${formatted}`;
     }
 
     return this.formatValue(formatted, currency);

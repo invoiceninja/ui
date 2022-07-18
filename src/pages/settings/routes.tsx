@@ -9,7 +9,8 @@
  */
 
 import { Guard } from 'common/guards/Guard';
-import { freePlan } from 'common/guards/guards/free-plan';
+import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
+import { proPlan } from 'common/guards/guards/pro-plan';
 import { Route } from 'react-router-dom';
 import * as Settings from './index';
 
@@ -34,7 +35,7 @@ export const settingsRoutes = (
       path="invoice_design"
       element={
         <Guard
-          guards={[() => !freePlan()]}
+          guards={[() => proPlan() || enterprisePlan()]}
           component={<Settings.InvoiceDesign />}
         />
       }
@@ -73,18 +74,63 @@ export const settingsRoutes = (
         element={<Settings.RecurringExpensesGeneratedNumbers />}
       />
     </Route>
-    <Route path="email_settings" element={<Settings.EmailSettings />} />
-    <Route path="client_portal" element={<Settings.ClientPortal />} />
+    <Route
+      path="client_portal"
+      element={
+        <Guard
+          guards={[() => proPlan() || enterprisePlan()]}
+          component={<Settings.ClientPortal />}
+        />
+      }
+    />
+    <Route
+      path="email_settings"
+      element={
+        <Guard
+          guards={[() => proPlan() || enterprisePlan()]}
+          component={<Settings.EmailSettings />}
+        />
+      }
+    />
     <Route
       path="templates_and_reminders"
-      element={<Settings.TemplatesAndReminders />}
+      element={
+        <Guard
+          guards={[() => proPlan() || enterprisePlan()]}
+          component={<Settings.TemplatesAndReminders />}
+        />
+      }
     />
     <Route path="group_settings" element={<Settings.GroupSettings />} />
     <Route path="subscriptions" element={<Settings.Subscriptions />} />
     <Route path="users">
-      <Route path="" element={<Settings.Users />} />
-      <Route path="create" element={<Settings.CreateUser />} />
-      <Route path=":id/edit" element={<Settings.EditUser />} />
+      <Route
+        path=""
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.Users />}
+          />
+        }
+      />
+      <Route
+        path="create"
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.CreateUser />}
+          />
+        }
+      />
+      <Route
+        path=":id/edit"
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.EditUser />}
+          />
+        }
+      />
     </Route>
     <Route path="payment_terms">
       <Route path="" element={<Settings.PaymentTerms />} />

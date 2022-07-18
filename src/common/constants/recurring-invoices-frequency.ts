@@ -10,7 +10,7 @@
 import { RecurringInvoicesFrequency } from 'common/enums/recurring-invoices-frequency';
 
 export default {
-  [RecurringInvoicesFrequency.FREQUENCY_ANNUALLY]: 'freq_annualy',
+  [RecurringInvoicesFrequency.FREQUENCY_ANNUALLY]: 'freq_annually',
   [RecurringInvoicesFrequency.FREQUENCY_DAILY]: 'freq_daily',
   [RecurringInvoicesFrequency.FREQUENCY_FOUR_MONTHS]: 'freq_four_months',
   [RecurringInvoicesFrequency.FREQUENCY_FOUR_WEEKS]: 'freq_four_weeks',

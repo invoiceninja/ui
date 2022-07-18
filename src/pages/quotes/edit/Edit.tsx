@@ -9,6 +9,7 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { Quote } from 'common/interfaces/quote';
 import { useQuoteQuery } from 'common/queries/quotes';
 import {
@@ -26,6 +27,7 @@ import { ClientSelector } from 'pages/invoices/common/components/ClientSelector'
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
+import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -51,6 +53,7 @@ export function Edit() {
 
   const currentQuote = useCurrentQuote();
   const invoiceSum = useInvoiceSum();
+  const productColumns = useProductColumns();
 
   const pages: BreadcrumRecord[] = [
     { name: t('quotes'), href: '/quotes' },
@@ -103,6 +106,10 @@ export function Edit() {
           {currentQuote && (
             <ProductsTable
               resource={currentQuote}
+              columns={productColumns}
+              items={currentQuote.line_items.filter(
+                (item) => item.type_id == InvoiceItemType.Product
+              )}
               onProductChange={(index, lineItem) =>
                 dispatch(setCurrentQuoteLineItem({ index, lineItem }))
               }

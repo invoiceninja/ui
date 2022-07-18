@@ -39,7 +39,7 @@ export const recurringInvoiceSlice = createSlice({
       state.current = undefined;
     },
     injectBlankItemIntoCurrent: (state) => {
-      state.current?.line_items.push(blankLineItem);
+      state.current?.line_items.push(blankLineItem());
     },
     setCurrentRecurringInvoicePropertySync: (
       state,

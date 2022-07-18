@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Tab } from '@headlessui/react';
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import MDEditor from '@uiw/react-md-editor';
@@ -79,7 +78,7 @@ export function AdditionalInfo(props: Props) {
   return (
     <Card className="mt-4" title={t('additional_info')}>
       <TabGroup className="px-5" tabs={tabs}>
-        <Tab.Panel>
+        <div>
           {currencies.length > 1 && (
             <Element leftSide={t('currency')}>
               <SelectField
@@ -171,9 +170,9 @@ export function AdditionalInfo(props: Props) {
               }
             />
           </Element>
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           <Element leftSide={t('public_notes')}>
             <MDEditor
               value={props.client?.public_notes}
@@ -197,9 +196,9 @@ export function AdditionalInfo(props: Props) {
               }}
             />
           </Element>
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           {statics && (
             <Element leftSide={t('size_id')}>
               <SelectField
@@ -239,9 +238,9 @@ export function AdditionalInfo(props: Props) {
               </SelectField>
             </Element>
           )}
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           <Element
             leftSide={
               <div className="inline-flex items-center space-x-2">
@@ -264,9 +263,9 @@ export function AdditionalInfo(props: Props) {
                 onChange={(value) => handleCustomFieldChange(field, value)}
               />
             ))}
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           <Element
             leftSide={
               <div className="inline-flex items-center space-x-2">
@@ -289,10 +288,10 @@ export function AdditionalInfo(props: Props) {
                 onChange={(value) => handleCustomFieldChange(field, value)}
               />
             ))}
-        </Tab.Panel>
+        </div>
 
         {id ? (
-          <Tab.Panel>
+          <div>
             <div className="px-6">
               <Upload
                 widgetOnly
@@ -305,7 +304,7 @@ export function AdditionalInfo(props: Props) {
                 onDocumentDelete={onSuccess}
               />
             </div>
-          </Tab.Panel>
+          </div>
         ) : (
           <></>
         )}

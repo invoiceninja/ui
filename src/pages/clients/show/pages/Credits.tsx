@@ -27,7 +27,7 @@ export function Credits() {
       id: 'number',
       label: t('number'),
       format: (value, resource) => (
-        <Link to={generatePath('/credits/:id', { id: resource.id })}>
+        <Link to={generatePath('/credits/:id/edit', { id: resource.id })}>
           {value}
         </Link>
       ),
@@ -60,6 +60,7 @@ export function Credits() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/credits/bulk"
+      linkToCreate={generatePath('/credits/create?client=:id', {id: id})}
     />
   );
 }

@@ -15,7 +15,19 @@ import { generatePath } from 'react-router';
 import entityState from './constants/entity-state';
 import { request } from './helpers/request';
 
+export function isHosted(): boolean {
+  return import.meta.env.VITE_IS_HOSTED === 'true';
+}
+
+export function isSelfHosted(): boolean {
+  return !isHosted();
+}
+
 export function apiEndpoint(): string {
+  if (isHosted()) {
+    return 'https://invoicing.co';
+  }
+
   return (
     import.meta.env.VITE_API_URL ||
     window.location.origin ||
@@ -25,14 +37,6 @@ export function apiEndpoint(): string {
 
 export function endpoint(endpoint: string, params = {}): string {
   return apiEndpoint() + generatePath(endpoint, params);
-}
-
-export function isHosted(): boolean {
-  return import.meta.env.VITE_IS_HOSTED === 'true';
-}
-
-export function isSelfHosted(): boolean {
-  return !isHosted();
 }
 
 export function fetcher(
@@ -84,4 +88,12 @@ export function trans(key: string, replace: Record<string, unknown>) {
   }
 
   return translation;
+}
+
+export function previewEndpoint(endpoint: string, params = {}): string {
+  if (isHosted()) {
+    return 'https://preview.invoicing.co' + generatePath(endpoint, params);
+  }
+
+  return apiEndpoint() + generatePath(endpoint, params);
 }

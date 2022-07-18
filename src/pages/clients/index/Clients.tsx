@@ -81,10 +81,34 @@ export function Clients() {
     ),
     (resource: Client) => (
       <DropdownElement
+        key={'new_invoice'}
+        to={generatePath('/invoices/create?client=:id', { id: resource.id })}
+      >
+        {t('new_invoice')}
+      </DropdownElement>
+    ),
+    (resource: Client) => (
+      <DropdownElement
         key={'new_payment'}
         to={generatePath('/payments/create?client=:id', { id: resource.id })}
       >
         {t('new_payment')}
+      </DropdownElement>
+    ),
+    (resource: Client) => (
+      <DropdownElement
+        key={'new_quote'}
+        to={generatePath('/quotes/create?client=:id', { id: resource.id })}
+      >
+        {t('new_quote')}
+      </DropdownElement>
+    ),
+    (resource: Client) => (
+      <DropdownElement
+        key={'new_credit'}
+        to={generatePath('/credits/create?client=:id', { id: resource.id })}
+      >
+        {t('new_credit')}
       </DropdownElement>
     ),
   ];
