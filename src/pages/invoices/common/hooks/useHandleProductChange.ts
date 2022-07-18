@@ -15,6 +15,7 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 interface Props {
   resource: Invoice | RecurringInvoice;
+  type: 'product' | 'task';
   onChange: (index: number, lineItem: InvoiceItem) => unknown;
 }
 
@@ -27,7 +28,14 @@ export function useHandleProductChange(props: Props) {
     lineItem.product_key = product?.product_key || product_key;
     lineItem.quantity = product?.quantity || 1;
     lineItem.cost = product?.price || 0;
-    lineItem.notes = product?.notes || '';
+
+    if (props.type == 'product' && product?.notes) {
+      lineItem.notes = product.notes;
+    }
+
+    if (props.type == 'task' && product?.notes && !lineItem.notes) {
+      lineItem.notes = product.notes;
+    }
 
     lineItem.tax_name1 = product?.tax_name1 || '';
     lineItem.tax_name2 = product?.tax_name2 || '';

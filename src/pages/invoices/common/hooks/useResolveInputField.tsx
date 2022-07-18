@@ -41,6 +41,7 @@ const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 
 interface Props {
   resource: Invoice | RecurringInvoice;
+  type: 'product' | 'task';
   onProductChange: (index: number, lineItem: InvoiceItem) => unknown;
   onLineItemPropertyChange: (
     key: keyof InvoiceItem,
@@ -60,6 +61,7 @@ export function useResolveInputField(props: Props) {
 
   const handleProductChange = useHandleProductChange({
     resource: props.resource,
+    type: props.type,
     onChange: props.onProductChange,
   });
 
