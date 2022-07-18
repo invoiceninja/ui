@@ -54,7 +54,7 @@ export function CloneInvoiceToRecurringInvoice() {
   const handleChange = useSetCurrentRecurringInvoiceProperty();
 
   const invoiceSum = useInvoiceSum();
-  const productColumns = useProductColumns()
+  const productColumns = useProductColumns();
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -106,10 +106,11 @@ export function CloneInvoiceToRecurringInvoice() {
         <div className="col-span-12">
           {currentRecurringInvoice && (
             <ProductsTable
-            columns={productColumns}
-            items={currentRecurringInvoice.line_items.filter(
-              (item) => item.type_id === InvoiceItemType.Product
-            )}
+              type="product"
+              columns={productColumns}
+              items={currentRecurringInvoice.line_items.filter(
+                (item) => item.type_id === InvoiceItemType.Product
+              )}
               resource={currentRecurringInvoice}
               onProductChange={(index, lineItem) =>
                 dispatch(

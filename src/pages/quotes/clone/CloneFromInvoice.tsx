@@ -106,6 +106,7 @@ export function CloneInvoiceToQuote() {
         <div className="col-span-12">
           {currentQuote && (
             <ProductsTable
+            type="product"
               columns={productColumns}
               items={currentQuote.line_items.filter(
                 (item) => item.type_id == InvoiceItemType.Product

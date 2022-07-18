@@ -22,6 +22,7 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { Fragment } from 'react';
 
 interface Props {
+  type: 'product' | 'task';
   resource: Invoice | RecurringInvoice;
   items: InvoiceItem[];
   columns: string[];
@@ -44,6 +45,7 @@ export function ProductsTable(props: Props) {
   const resolveTranslation = useResolveTranslation();
 
   const resolveInputField = useResolveInputField({
+    type: props.type,
     resource: props.resource,
     onProductChange: props.onProductChange,
     onLineItemPropertyChange: props.onLineItemPropertyChange,

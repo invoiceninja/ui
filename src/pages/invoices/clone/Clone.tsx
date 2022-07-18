@@ -114,6 +114,7 @@ export function Clone() {
             <div>
               {currentInvoice && (
                 <ProductsTable
+                  type="product"
                   resource={currentInvoice}
                   columns={productColumns}
                   items={currentInvoice.line_items.filter(
@@ -149,6 +150,7 @@ export function Clone() {
             <div>
               {currentInvoice && (
                 <ProductsTable
+                  type="task"
                   resource={currentInvoice}
                   columns={taskColumns}
                   items={currentInvoice.line_items.filter(
