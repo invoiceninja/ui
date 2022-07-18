@@ -23,6 +23,8 @@ import collect from 'collect.js';
 import { toast } from 'common/helpers/toast/toast';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
+import { useQueryClient } from 'react-query';
+import { generatePath } from 'react-router-dom';
 
 interface Card {
   id: string;
@@ -48,6 +50,8 @@ export function Kanban() {
     { name: t('tasks'), href: '/tasks' },
     { name: t('kanban'), href: '/tasks/kanban' },
   ];
+
+  const queryClient = useQueryClient();
 
   const { data: taskStatuses } = useTaskStatusesQuery();
   const { data: tasks } = useTasksQuery();
@@ -105,7 +109,10 @@ export function Kanban() {
         console.error(error);
 
         toast.error();
-      });
+      })
+      .finally(() =>
+        queryClient.invalidateQueries(generatePath('/api/v1/tasks'))
+      );
   };
 
   return (
