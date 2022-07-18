@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
+    "@asseinfo/react-kanban": "^2.2.0",
     "@emotion/styled": "^11.6.0",
     "@headlessui/react": "^1.4.3",
     "@monaco-editor/react": "^4.3.1",
