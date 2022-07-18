@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { calculateEntityState } from '../common/helpers/calculate-entity-state';
 import { calculateTime } from '../common/helpers/calculate-time';
+import { BsKanban } from 'react-icons/bs';
 
 export function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -70,7 +71,15 @@ export function Tasks() {
   ];
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      navigationTopRight={
+        <Link to="/tasks/kanban" className="inline-flex items-center space-x-2">
+          <BsKanban size={20} />
+        </Link>
+      }
+    >
       <DataTable
         resource="task"
         columns={columns}
