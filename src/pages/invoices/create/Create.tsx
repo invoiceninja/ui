@@ -46,7 +46,6 @@ import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { TabGroup } from 'components/TabGroup';
-import { Tab } from '@headlessui/react';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 
 export function Create() {
@@ -166,7 +165,7 @@ export function Create() {
 
         <div className="col-span-12">
           <TabGroup tabs={[t('products'), t('tasks')]}>
-            <Tab.Panel>
+            <div>
               {currentInvoice && (
                 <ProductsTable
                   resource={currentInvoice}
@@ -199,9 +198,9 @@ export function Create() {
                   }
                 />
               )}
-            </Tab.Panel>
+            </div>
 
-            <Tab.Panel>
+            <div>
               {currentInvoice && (
                 <ProductsTable
                   resource={currentInvoice}
@@ -232,7 +231,7 @@ export function Create() {
                   }
                 />
               )}
-            </Tab.Panel>
+            </div>
           </TabGroup>
         </div>
 

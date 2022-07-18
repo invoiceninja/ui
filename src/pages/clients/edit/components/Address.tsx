@@ -10,7 +10,6 @@
 
 import { Card } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
-import { Tab } from '@headlessui/react';
 import { TabGroup } from 'components/TabGroup';
 import { BillingAddress } from './address/BillingAddress';
 import { ShippingAddress } from './address/ShippingAddress';
@@ -30,13 +29,13 @@ export function Address(props: Props) {
         className="px-5"
         tabs={[t('billing_address'), t('shipping_address')]}
       >
-        <Tab.Panel>
+        <div>
           <BillingAddress {...props} />
-        </Tab.Panel>
+        </div>
 
-        <Tab.Panel>
+        <div>
           <ShippingAddress {...props} />
-        </Tab.Panel>
+        </div>
       </TabGroup>
     </Card>
   );

@@ -40,7 +40,6 @@ import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reduc
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { TabGroup } from 'components/TabGroup';
-import { Tab } from '@headlessui/react';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 
@@ -112,7 +111,7 @@ export function Clone() {
 
         <div className="col-span-12">
           <TabGroup tabs={[t('products'), t('tasks')]}>
-            <Tab.Panel>
+            <div>
               {currentInvoice && (
                 <ProductsTable
                   resource={currentInvoice}
@@ -145,9 +144,9 @@ export function Clone() {
                   }
                 />
               )}
-            </Tab.Panel>
+            </div>
 
-            <Tab.Panel>
+            <div>
               {currentInvoice && (
                 <ProductsTable
                   resource={currentInvoice}
@@ -178,7 +177,7 @@ export function Clone() {
                   }
                 />
               )}
-            </Tab.Panel>
+            </div>
           </TabGroup>
         </div>
 
