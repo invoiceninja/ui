@@ -15,6 +15,7 @@ import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Tasks } from './index/Tasks';
+import { Kanban } from './kanban/Kanban';
 
 export const taskRoutes = (
   <Route path="/tasks">
@@ -22,6 +23,15 @@ export const taskRoutes = (
       path=""
       element={
         <Guard guards={[() => permission('view_task')]} component={<Tasks />} />
+      }
+    />
+    <Route
+      path="kanban"
+      element={
+        <Guard
+          guards={[() => permission('view_task')]}
+          component={<Kanban />}
+        />
       }
     />
     <Route
