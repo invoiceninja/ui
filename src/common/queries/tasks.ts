@@ -10,6 +10,7 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { GenericManyResponse } from 'common/interfaces/generic-many-response';
 import { Task } from 'common/interfaces/task';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
@@ -30,5 +31,15 @@ export function useBlankTaskQuery() {
     request('GET', endpoint('/api/v1/tasks/create')).then(
       (response) => response.data.data
     )
+  );
+}
+
+export function useTasksQuery() {
+  return useQuery<GenericManyResponse<Task>>(
+    generatePath('/api/v1/tasks'),
+    () =>
+      request('GET', endpoint('/api/v1/tasks')).then(
+        (response) => response.data
+      )
   );
 }
