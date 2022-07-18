@@ -146,15 +146,15 @@ export function TaskDetails(props: Props) {
       {location.pathname.endsWith('/edit') && (
         <Card className="col-span-12 xl:col-span-4 h-max px-6">
           <TabGroup tabs={[t('description'), t('custom_fields')]}>
-            <Tab.Panel>
+            <div>
               <InputField
                 element="textarea"
                 value={task.description}
                 onValueChange={(value) => handleChange('description', value)}
               />
-            </Tab.Panel>
+            </div>
 
-            <Tab.Panel>
+            <div>
               {company &&
                 ['task1', 'task2', 'task3', 'task4'].map((field) => (
                   <Field
@@ -168,7 +168,7 @@ export function TaskDetails(props: Props) {
                     noExternalPadding
                   />
                 ))}
-            </Tab.Panel>
+            </div>
           </TabGroup>
         </Card>
       )}
