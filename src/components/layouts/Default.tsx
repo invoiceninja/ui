@@ -227,7 +227,7 @@ export function Default(props: Props) {
               <span className="sr-only">Open sidebar</span>
               <MenuIcon className="dark:text-gray-100" />
             </button>
-            <div className="flex-1 px-4 flex items-center justify-between">
+            <div className="flex-1 px-4 md:px-8 flex items-center justify-between">
               <h2 className="text-sm md:text-xl dark:text-gray-100">
                 {props.title}
               </h2>
