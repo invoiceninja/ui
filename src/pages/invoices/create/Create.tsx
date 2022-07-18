@@ -168,10 +168,14 @@ export function Create() {
         <InvoiceDetails />
 
         <div className="col-span-12">
-          <TabGroup tabs={[t('products'), t('tasks')]}>
+          <TabGroup
+            tabs={[t('products'), t('tasks')]}
+            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+          >
             <div>
               {currentInvoice && (
                 <ProductsTable
+                  type="product"
                   resource={currentInvoice}
                   columns={productColumns}
                   items={currentInvoice.line_items.filter(
@@ -207,6 +211,7 @@ export function Create() {
             <div>
               {currentInvoice && (
                 <ProductsTable
+                  type="task"
                   resource={currentInvoice}
                   columns={taskColumns}
                   items={currentInvoice.line_items.filter(
