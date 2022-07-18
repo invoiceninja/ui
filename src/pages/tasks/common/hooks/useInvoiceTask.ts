@@ -12,40 +12,40 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Task } from 'common/interfaces/task';
 import { useBlankInvoiceQuery } from 'common/queries/invoices';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
-import { useSetCurrentInvoiceProperty } from 'pages/invoices/common/hooks/useSetCurrentInvoiceProperty';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
 import { parseTimeLog } from '../helpers/calculate-time';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import dayjs from 'dayjs';
+import { Invoice } from 'common/interfaces/invoice';
+import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
 
 export function useInvoiceTask() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const company = useCurrentCompany();
-  const handleChange = useSetCurrentInvoiceProperty();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const { data: invoice } = useBlankInvoiceQuery();
+  const { data: invoiceQuery } = useBlankInvoiceQuery();
 
   return (task: Task) => {
-    if (invoice?.data.data) {
-      dispatch(setCurrentInvoice(invoice.data.data));
+    if (invoiceQuery?.data.data) {
+      const invoice: Invoice = { ...invoiceQuery.data.data };
 
       if (company && company.enabled_tax_rates > 0) {
-        handleChange('tax_name1', company.settings?.tax_name1);
-        handleChange('tax_rate1', company.settings?.tax_rate1);
+        invoice.tax_name1 = company.settings?.tax_name1;
+        invoice.tax_rate1 = company.settings?.tax_rate1;
       }
 
       if (company && company.enabled_tax_rates > 1) {
-        handleChange('tax_name2', company.settings?.tax_name2);
-        handleChange('tax_rate2', company.settings?.tax_rate2);
+        invoice.tax_name2 = company.settings?.tax_name2;
+        invoice.tax_rate2 = company.settings?.tax_rate2;
       }
 
       if (company && company.enabled_tax_rates > 2) {
-        handleChange('tax_name3', company.settings?.tax_name3);
-        handleChange('tax_rate3', company.settings?.tax_rate3);
+        invoice.tax_name3 = company.settings?.tax_name3;
+        invoice.tax_rate3 = company.settings?.tax_rate3;
       }
 
       const logs = parseTimeLog(task.time_log);
@@ -59,9 +59,10 @@ export function useInvoiceTask() {
         );
       });
 
-      const item = { ...blankLineItem };
-
-      item.type_id = '2';
+      const item: InvoiceItem = {
+        ...blankLineItem(),
+        type_id: InvoiceItemType.Task,
+      };
 
       item.notes = [
         task.description,
@@ -72,7 +73,9 @@ export function useInvoiceTask() {
         .join('\n')
         .trim();
 
-      handleChange('line_items', [item]);
+      invoice.line_items = [item];
+
+      dispatch(setCurrentInvoice(invoice));
 
       navigate('/invoices/create?preload=true&table=tasks');
     }
