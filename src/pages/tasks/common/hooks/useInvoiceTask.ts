@@ -20,6 +20,8 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import dayjs from 'dayjs';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
+import collect from 'collect.js';
+import toast from 'react-hot-toast';
 
 export function useInvoiceTask() {
   const navigate = useNavigate();
@@ -47,6 +49,14 @@ export function useInvoiceTask() {
         invoice.tax_name3 = company.settings?.tax_name3;
         invoice.tax_rate3 = company.settings?.tax_rate3;
       }
+
+      const clients = collect(tasks).pluck('client_id').unique().toArray();
+
+      if (clients.length > 1) {
+        return toast.error('multiple_client_error');
+      }
+
+      invoice.client_id = tasks[0].client_id;
 
       tasks.forEach((task) => {
         const logs = parseTimeLog(task.time_log);
