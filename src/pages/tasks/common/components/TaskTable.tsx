@@ -10,6 +10,7 @@
 
 import { InputField } from '@invoiceninja/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Task } from 'common/interfaces/task';
 import dayjs from 'dayjs';
 import { Plus, Trash2 } from 'react-feather';
@@ -25,6 +26,8 @@ export function TaskTable(props: Props) {
   const { task, handleChange } = props;
 
   const [t] = useTranslation();
+
+  const company = useCurrentCompany();
 
   const createTableRow = () => {
     const logs = parseTimeLog(task.time_log);
@@ -43,6 +46,10 @@ export function TaskTable(props: Props) {
   };
 
   const parseTimeToDate = (timestamp: number) => {
+    if (timestamp === 0) {
+      return;
+    }
+
     return dayjs.unix(timestamp).format('YYYY-MM-DD');
   };
 
@@ -84,7 +91,12 @@ export function TaskTable(props: Props) {
     handleChange('time_log', JSON.stringify(logs));
   };
 
-  const handleDateChange = (unix: number, value: string, index: number) => {
+  const handleDateChange = (
+    unix: number,
+    value: string,
+    index: number,
+    position: number
+  ) => {
     const date = parseTimeToDate(unix);
     const time = parseTime(unix);
 
@@ -95,7 +107,7 @@ export function TaskTable(props: Props) {
 
     const logs = parseTimeLog(task.time_log);
 
-    logs[index][0] = unixTimestamp;
+    logs[index][position] = unixTimestamp;
 
     handleChange('time_log', JSON.stringify(logs));
   };
@@ -132,6 +144,7 @@ export function TaskTable(props: Props) {
       <Thead>
         <Th>{t('start_date')}</Th>
         <Th>{t('start_time')}</Th>
+        {company?.show_task_end_date && <Th>{t('end_date')}</Th>}
         <Th>{t('end_time')}</Th>
         <Th>{t('duration')}</Th>
       </Thead>
@@ -145,7 +158,7 @@ export function TaskTable(props: Props) {
                     type="date"
                     value={parseTimeToDate(start)}
                     onValueChange={(value) =>
-                      handleDateChange(start, value, index)
+                      handleDateChange(start, value, index, 0)
                     }
                   />
                 </Td>
@@ -159,6 +172,17 @@ export function TaskTable(props: Props) {
                     step="1"
                   />
                 </Td>
+                {company?.show_task_end_date && (
+                  <Td>
+                    <InputField
+                      type="date"
+                      value={parseTimeToDate(stop)}
+                      onValueChange={(value) =>
+                        handleDateChange(start, value, index, 0)
+                      }
+                    />
+                  </Td>
+                )}
                 <Td>
                   <InputField
                     type="time"
