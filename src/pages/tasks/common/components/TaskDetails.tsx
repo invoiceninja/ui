@@ -61,7 +61,6 @@ export function TaskDetails(props: Props) {
 
         <Element leftSide={t('user')}>
           <DebouncedCombobox
-            value={task.assigned_user_id}
             endpoint="/api/v1/users"
             label={'first_name'}
             clearButton={Boolean(task.assigned_user_id)}
@@ -74,6 +73,7 @@ export function TaskDetails(props: Props) {
             }
             onClearButtonClick={() => handleChange('assigned_user_id', '')}
             queryAdditional
+            defaultValue={task.assigned_user_id}
           />
         </Element>
 
