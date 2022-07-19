@@ -13,6 +13,7 @@ import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
+import { useTaskStatusesQuery } from 'common/queries/task-statuses';
 import { useBlankTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
@@ -27,6 +28,7 @@ export function Create() {
 
   const { documentTitle } = useTitle('new_task');
   const { data } = useBlankTaskQuery();
+  const { data: taskStatuses } = useTaskStatusesQuery();
 
   const pages = [
     { name: t('tasks'), href: '/tasks' },
@@ -38,10 +40,13 @@ export function Create() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (data) {
-      setTask(data);
+    if (data && taskStatuses) {
+      setTask({
+        ...data,
+        status_id: taskStatuses.data.length > 0 ? taskStatuses.data[0].id : '',
+      });
     }
-  }, [data]);
+  }, [data, taskStatuses]);
 
   const handleChange = (property: keyof Task, value: unknown) => {
     setTask((current) => current && { ...current, [property]: value });
