@@ -57,7 +57,7 @@ export function Kanban() {
   const queryClient = useQueryClient();
 
   const { data: taskStatuses } = useTaskStatusesQuery();
-  const { data: tasks } = useTasksQuery();
+  const { data: tasks } = useTasksQuery({ limit: 1000 });
 
   const [board, setBoard] = useState<Board>();
 
