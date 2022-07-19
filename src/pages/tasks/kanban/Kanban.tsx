@@ -16,8 +16,6 @@ import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsTable } from 'react-icons/bs';
-import Board from '@asseinfo/react-kanban';
-import '@asseinfo/react-kanban/dist/styles.css';
 import { calculateTime } from '../common/helpers/calculate-time';
 import collect from 'collect.js';
 import { toast } from 'common/helpers/toast/toast';
@@ -25,6 +23,11 @@ import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { useQueryClient } from 'react-query';
 import { generatePath } from 'react-router-dom';
+
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
+import Board from '@asseinfo/react-kanban';
+import '@asseinfo/react-kanban/dist/styles.css';
 
 interface Card {
   id: string;
