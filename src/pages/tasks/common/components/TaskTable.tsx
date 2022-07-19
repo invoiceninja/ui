@@ -31,8 +31,15 @@ export function TaskTable(props: Props) {
 
   const createTableRow = () => {
     const logs = parseTimeLog(task.time_log);
+    const last = logs.at(-1);
 
-    logs.push([dayjs().unix(), 0]);
+    let startTime = dayjs().unix();
+
+    if (last && last[1] !== 0) {
+      startTime = last[1] + 1;
+    }
+
+    logs.push([startTime, 0]);
 
     handleChange('time_log', JSON.stringify(logs));
   };
