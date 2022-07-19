@@ -16,9 +16,16 @@ import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
-import { calculateEntityState } from '../common/helpers/calculate-entity-state';
+import {
+  calculateEntityState,
+  isTaskRunning,
+} from '../common/helpers/calculate-entity-state';
 import { calculateTime } from '../common/helpers/calculate-time';
 import { BsKanban } from 'react-icons/bs';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { useStart } from '../common/hooks/useStart';
+import { useStop } from '../common/hooks/useStop';
+import { useInvoiceTask } from '../common/hooks/useInvoiceTask';
 
 export function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -70,6 +77,32 @@ export function Tasks() {
     },
   ];
 
+  const start = useStart();
+  const stop = useStop();
+  const invoiceTask = useInvoiceTask();
+
+  const actions = [
+    (task: Task) =>
+      !isTaskRunning(task) && (
+        <DropdownElement onClick={() => start(task)}>
+          {t('start')}
+        </DropdownElement>
+      ),
+    (task: Task) =>
+      isTaskRunning(task) && (
+        <DropdownElement onClick={() => stop(task)}>
+          {t('stop')}
+        </DropdownElement>
+      ),
+    (task: Task) =>
+      !isTaskRunning(task) &&
+      !task.invoice_id && (
+        <DropdownElement onClick={() => invoiceTask(task)}>
+          {t('invoice_task')}
+        </DropdownElement>
+      ),
+  ];
+
   return (
     <Default
       title={documentTitle}
@@ -83,6 +116,7 @@ export function Tasks() {
       <DataTable
         resource="task"
         columns={columns}
+        customActions={actions}
         endpoint="/api/v1/tasks?include=status,client"
         bulkRoute="/api/v1/tasks/bulk"
         linkToEdit="/tasks/:id/edit"

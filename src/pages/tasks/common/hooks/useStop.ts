@@ -32,10 +32,12 @@ export function useStop() {
 
         toast.error();
       })
-      .finally(() =>
+      .finally(() => {
+        queryClient.invalidateQueries('/api/v1/tasks');
+
         queryClient.invalidateQueries(
           generatePath('/api/v1/tasks/:id', { id: task.id })
-        )
-      );
+        );
+      });
   };
 }

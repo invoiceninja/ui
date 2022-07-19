@@ -33,8 +33,8 @@ export function useBulkAction() {
         toast.error();
       })
       .finally(() => {
-        queryClient.invalidateQueries(endpoint('/api/v1/tasks'));
-        
+        queryClient.invalidateQueries('/api/v1/tasks');
+
         queryClient.invalidateQueries(
           generatePath('/api/v1/tasks/:id', { id })
         );
