@@ -79,7 +79,11 @@ export function Create() {
   ];
 
   useEffect(() => {
-    if (invoice?.data.data) {
+    const preload = searchParams.has('preload')
+      ? searchParams.get('preload') === 'true'
+      : false;
+
+    if (invoice?.data.data && !preload) {
       dispatch(setCurrentInvoice(invoice.data.data));
 
       if (company && company.enabled_tax_rates > 0) {
@@ -150,6 +154,7 @@ export function Create() {
       <div className="grid grid-cols-12 gap-4">
         {currentInvoice && (
           <ClientSelector
+            readonly={searchParams.get('table') === 'tasks'}
             resource={currentInvoice}
             onChange={(id) => handleChange('client_id', id)}
             onClearButtonClick={() => handleChange('client_id', '')}
@@ -164,10 +169,14 @@ export function Create() {
         <InvoiceDetails />
 
         <div className="col-span-12">
-          <TabGroup tabs={[t('products'), t('tasks')]}>
+          <TabGroup
+            tabs={[t('products'), t('tasks')]}
+            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+          >
             <div>
               {currentInvoice && (
                 <ProductsTable
+                  type="product"
                   resource={currentInvoice}
                   columns={productColumns}
                   items={currentInvoice.line_items.filter(
@@ -203,6 +212,7 @@ export function Create() {
             <div>
               {currentInvoice && (
                 <ProductsTable
+                  type="task"
                   resource={currentInvoice}
                   columns={taskColumns}
                   items={currentInvoice.line_items.filter(

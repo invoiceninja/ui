@@ -24,6 +24,7 @@ export interface Company {
   portal_domain: string;
   enable_product_cost: boolean;
   enable_product_quantity: boolean;
+  show_task_end_date: boolean;
 }
 
 export interface Settings {

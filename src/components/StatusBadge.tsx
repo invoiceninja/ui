@@ -26,7 +26,7 @@ export function StatusBadge(props: Props) {
           !props.headless,
       })}
     >
-      {t(props.for[props.code])}
+      {t(props.for[props.code]) || t(props.code.toString())}
     </span>
   );
 }

@@ -15,19 +15,16 @@ interface Props {
   children: ReactElement[];
   tabs: string[];
   className?: string;
+  defaultTabIndex?: number;
 }
 
 export function TabGroup(props: Props) {
   const accentColor = useAccentColor();
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  console.log(
-    [...props.children].map((element) => React.isValidElement(element))
-  );
+  const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
 
   return (
-    <div className={`border-b border-gray-200 ${props.className}`}>
-      <div className="-mb-px flex space-x-8 overflow-x-auto">
+    <div className={props.className}>
+      <div className="-mb-px flex space-x-8 overflow-x-auto border-b border-gray-200">
         {props.tabs.map((tab, index) => (
           <div key={index}>
             <button

@@ -42,6 +42,7 @@ import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { uuid4 } from '@sentry/utils';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
+import { InvoicePreview } from '../common/components/InvoicePreview';
 
 export function Edit() {
   const { id } = useParams();
@@ -122,6 +123,7 @@ export function Edit() {
             <div>
               {currentInvoice && (
                 <ProductsTable
+                  type="product"
                   resource={currentInvoice}
                   columns={productColumns}
                   items={currentInvoice.line_items.filter(
@@ -157,6 +159,7 @@ export function Edit() {
             <div>
               {currentInvoice && (
                 <ProductsTable
+                  type="task"
                   resource={currentInvoice}
                   columns={taskColumns}
                   items={currentInvoice.line_items.filter(
@@ -202,7 +205,7 @@ export function Edit() {
         )}
       </div>
 
-      {/* <div className="my-4">
+      <div className="my-4">
         {currentInvoice && (
           <InvoicePreview
             for="invoice"
@@ -210,7 +213,7 @@ export function Edit() {
             entity="invoice"
           />
         )}
-      </div> */}
+      </div>
     </Default>
   );
 }
