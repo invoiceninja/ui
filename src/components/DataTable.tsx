@@ -88,7 +88,7 @@ export function DataTable(props: Props) {
   }, [perPage, currentPage, filter, sort, status]);
 
   const { data, isLoading, isError } = useQuery(
-    [apiEndpoint.href, perPage, currentPage, filter, sort, status],
+    [apiEndpoint.pathname, perPage, currentPage, filter, sort, status],
     () => request('GET', apiEndpoint.href)
   );
 
@@ -138,7 +138,7 @@ export function DataTable(props: Props) {
         });
       })
       .finally(() => {
-        queryClient.invalidateQueries(apiEndpoint.href);
+        queryClient.invalidateQueries(apiEndpoint.pathname);
         setSelected([]);
       });
   };
