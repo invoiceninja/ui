@@ -154,6 +154,7 @@ export function Create() {
       <div className="grid grid-cols-12 gap-4">
         {currentInvoice && (
           <ClientSelector
+            readonly={searchParams.get('table') === 'tasks'}
             resource={currentInvoice}
             onChange={(id) => handleChange('client_id', id)}
             onClearButtonClick={() => handleChange('client_id', '')}
