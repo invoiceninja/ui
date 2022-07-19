@@ -52,7 +52,7 @@ export function Actions(props: Props) {
         </DropdownElement>
 
         {!isTaskRunning(task) && !task.invoice_id && (
-          <DropdownElement onClick={() => invoiceTask(task)}>
+          <DropdownElement onClick={() => invoiceTask([task])}>
             {t('invoice_task')}
           </DropdownElement>
         )}

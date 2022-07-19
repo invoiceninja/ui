@@ -29,7 +29,7 @@ export function useInvoiceTask() {
 
   const { data: invoiceQuery } = useBlankInvoiceQuery();
 
-  return (task: Task) => {
+  return (tasks: Task[]) => {
     if (invoiceQuery?.data.data) {
       const invoice: Invoice = { ...invoiceQuery.data.data };
 
@@ -48,32 +48,34 @@ export function useInvoiceTask() {
         invoice.tax_rate3 = company.settings?.tax_rate3;
       }
 
-      const logs = parseTimeLog(task.time_log);
-      const parsed: string[] = [];
+      tasks.forEach((task) => {
+        const logs = parseTimeLog(task.time_log);
+        const parsed: string[] = [];
 
-      logs.forEach(([start, stop]) => {
-        parsed.push(
-          `${dayjs.unix(start).format(`${dateFormat} hh:mm:ss A`)} - ${dayjs
-            .unix(stop)
-            .format('hh:mm:ss A')} <br />`
-        );
+        logs.forEach(([start, stop]) => {
+          parsed.push(
+            `${dayjs.unix(start).format(`${dateFormat} hh:mm:ss A`)} - ${dayjs
+              .unix(stop)
+              .format('hh:mm:ss A')} <br />`
+          );
+        });
+
+        const item: InvoiceItem = {
+          ...blankLineItem(),
+          type_id: InvoiceItemType.Task,
+        };
+
+        item.notes = [
+          task.description,
+          '<div class="task-time-details">',
+          ...parsed,
+          '</div>',
+        ]
+          .join('\n')
+          .trim();
+
+        invoice.line_items = [item];
       });
-
-      const item: InvoiceItem = {
-        ...blankLineItem(),
-        type_id: InvoiceItemType.Task,
-      };
-
-      item.notes = [
-        task.description,
-        '<div class="task-time-details">',
-        ...parsed,
-        '</div>',
-      ]
-        .join('\n')
-        .trim();
-
-      invoice.line_items = [item];
 
       dispatch(setCurrentInvoice(invoice));
 

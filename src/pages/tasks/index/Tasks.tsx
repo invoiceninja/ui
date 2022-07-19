@@ -97,7 +97,7 @@ export function Tasks() {
     (task: Task) =>
       !isTaskRunning(task) &&
       !task.invoice_id && (
-        <DropdownElement onClick={() => invoiceTask(task)}>
+        <DropdownElement onClick={() => invoiceTask([task])}>
           {t('invoice_task')}
         </DropdownElement>
       ),
