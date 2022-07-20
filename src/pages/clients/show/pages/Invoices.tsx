@@ -47,6 +47,8 @@ export function Invoices() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/invoices/bulk"
+      linkToCreate={generatePath('/invoices/create?client=:id', { id: id })}
+
     />
   );
 }

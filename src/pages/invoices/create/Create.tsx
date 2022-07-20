@@ -43,6 +43,10 @@ import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-r
 import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
+import { useProductColumns } from '../common/hooks/useProductColumns';
+import { useTaskColumns } from '../common/hooks/useTaskColumns';
+import { TabGroup } from 'components/TabGroup';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
 
 export function Create() {
   const { documentTitle } = useTitle('new_invoice');
@@ -63,6 +67,9 @@ export function Create() {
   const clientResolver = useClientResolver();
   const invoiceSum = useInvoiceSum();
 
+  const productColumns = useProductColumns();
+  const taskColumns = useTaskColumns();
+
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
     {
@@ -72,7 +79,11 @@ export function Create() {
   ];
 
   useEffect(() => {
-    if (invoice?.data.data) {
+    const preload = searchParams.has('preload')
+      ? searchParams.get('preload') === 'true'
+      : false;
+
+    if (invoice?.data.data && !preload) {
       dispatch(setCurrentInvoice(invoice.data.data));
 
       if (company && company.enabled_tax_rates > 0) {
@@ -143,6 +154,7 @@ export function Create() {
       <div className="grid grid-cols-12 gap-4">
         {currentInvoice && (
           <ClientSelector
+            readonly={searchParams.get('table') === 'tasks'}
             resource={currentInvoice}
             onChange={(id) => handleChange('client_id', id)}
             onClearButtonClick={() => handleChange('client_id', '')}
@@ -157,28 +169,80 @@ export function Create() {
         <InvoiceDetails />
 
         <div className="col-span-12">
-          {currentInvoice && (
-            <ProductsTable
-              resource={currentInvoice}
-              onProductChange={(index, lineItem) =>
-                dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
-              }
-              onLineItemPropertyChange={(key, value, index) =>
-                dispatch(
-                  setCurrentLineItemProperty({
-                    position: index,
-                    property: key,
-                    value,
-                  })
-                )
-              }
-              onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onDeleteRowClick={(index) =>
-                dispatch(deleteInvoiceLineItem(index))
-              }
-              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
-            />
-          )}
+          <TabGroup
+            tabs={[t('products'), t('tasks')]}
+            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+          >
+            <div>
+              {currentInvoice && (
+                <ProductsTable
+                  type="product"
+                  resource={currentInvoice}
+                  columns={productColumns}
+                  items={currentInvoice.line_items.filter(
+                    (item) => item.type_id == InvoiceItemType.Product
+                  )}
+                  onProductChange={(index, lineItem) =>
+                    dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
+                  }
+                  onLineItemPropertyChange={(key, value, index) =>
+                    dispatch(
+                      setCurrentLineItemProperty({
+                        position: index,
+                        property: key,
+                        value,
+                      })
+                    )
+                  }
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onDeleteRowClick={(index) =>
+                    dispatch(deleteInvoiceLineItem(index))
+                  }
+                  onCreateItemClick={() =>
+                    dispatch(
+                      injectBlankItemIntoCurrent({
+                        type: InvoiceItemType.Product,
+                      })
+                    )
+                  }
+                />
+              )}
+            </div>
+
+            <div>
+              {currentInvoice && (
+                <ProductsTable
+                  type="task"
+                  resource={currentInvoice}
+                  columns={taskColumns}
+                  items={currentInvoice.line_items.filter(
+                    (item) => item.type_id == InvoiceItemType.Task
+                  )}
+                  onProductChange={(index, lineItem) =>
+                    dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
+                  }
+                  onLineItemPropertyChange={(key, value, index) =>
+                    dispatch(
+                      setCurrentLineItemProperty({
+                        position: index,
+                        property: key,
+                        value,
+                      })
+                    )
+                  }
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onDeleteRowClick={(index) =>
+                    dispatch(deleteInvoiceLineItem(index))
+                  }
+                  onCreateItemClick={() =>
+                    dispatch(
+                      injectBlankItemIntoCurrent({ type: InvoiceItemType.Task })
+                    )
+                  }
+                />
+              )}
+            </div>
+          </TabGroup>
         </div>
 
         <InvoiceFooter page="create" />

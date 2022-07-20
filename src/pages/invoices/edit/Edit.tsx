@@ -21,7 +21,6 @@ import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
-import { InvoicePreview } from '../common/components/InvoicePreview';
 import { useInvoiceSave } from './hooks/useInvoiceSave';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
@@ -36,8 +35,14 @@ import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoi
 import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
 import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
-import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
+import { TabGroup } from 'components/TabGroup';
+import { useProductColumns } from '../common/hooks/useProductColumns';
+import { useTaskColumns } from '../common/hooks/useTaskColumns';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
+import { uuid4 } from '@sentry/utils';
+import { InvoiceTotals } from '../common/components/InvoiceTotals';
+import { InvoicePreview } from '../common/components/InvoicePreview';
 
 export function Edit() {
   const { id } = useParams();
@@ -54,6 +59,9 @@ export function Edit() {
 
   const invoiceSum = useInvoiceSum();
 
+  const productColumns = useProductColumns();
+  const taskColumns = useTaskColumns();
+
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
     {
@@ -64,7 +72,11 @@ export function Edit() {
 
   useEffect(() => {
     if (invoice?.data.data) {
-      dispatch(setCurrentInvoice(invoice.data.data));
+      const data: Invoice = { ...invoice.data.data };
+
+      data.line_items.forEach((item) => (item._id = uuid4()));
+
+      dispatch(setCurrentInvoice(data));
     }
 
     return () => {
@@ -107,28 +119,77 @@ export function Edit() {
         <InvoiceDetails />
 
         <div className="col-span-12">
-          {currentInvoice && (
-            <ProductsTable
-              resource={currentInvoice}
-              onProductChange={(index, lineItem) =>
-                dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
-              }
-              onLineItemPropertyChange={(key, value, index) =>
-                dispatch(
-                  setCurrentLineItemProperty({
-                    position: index,
-                    property: key,
-                    value,
-                  })
-                )
-              }
-              onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onDeleteRowClick={(index) =>
-                dispatch(deleteInvoiceLineItem(index))
-              }
-              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
-            />
-          )}
+          <TabGroup tabs={[t('products'), t('tasks')]}>
+            <div>
+              {currentInvoice && (
+                <ProductsTable
+                  type="product"
+                  resource={currentInvoice}
+                  columns={productColumns}
+                  items={currentInvoice.line_items.filter(
+                    (item) => item.type_id == InvoiceItemType.Product
+                  )}
+                  onProductChange={(index, lineItem) =>
+                    dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
+                  }
+                  onLineItemPropertyChange={(key, value, index) =>
+                    dispatch(
+                      setCurrentLineItemProperty({
+                        position: index,
+                        property: key,
+                        value,
+                      })
+                    )
+                  }
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onDeleteRowClick={(index) =>
+                    dispatch(deleteInvoiceLineItem(index))
+                  }
+                  onCreateItemClick={() =>
+                    dispatch(
+                      injectBlankItemIntoCurrent({
+                        type: InvoiceItemType.Product,
+                      })
+                    )
+                  }
+                />
+              )}
+            </div>
+
+            <div>
+              {currentInvoice && (
+                <ProductsTable
+                  type="task"
+                  resource={currentInvoice}
+                  columns={taskColumns}
+                  items={currentInvoice.line_items.filter(
+                    (item) => item.type_id == InvoiceItemType.Task
+                  )}
+                  onProductChange={(index, lineItem) =>
+                    dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
+                  }
+                  onLineItemPropertyChange={(key, value, index) =>
+                    dispatch(
+                      setCurrentLineItemProperty({
+                        position: index,
+                        property: key,
+                        value,
+                      })
+                    )
+                  }
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onDeleteRowClick={(index) =>
+                    dispatch(deleteInvoiceLineItem(index))
+                  }
+                  onCreateItemClick={() =>
+                    dispatch(
+                      injectBlankItemIntoCurrent({ type: InvoiceItemType.Task })
+                    )
+                  }
+                />
+              )}
+            </div>
+          </TabGroup>
         </div>
 
         <InvoiceFooter page="edit" />

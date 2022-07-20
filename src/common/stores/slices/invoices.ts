@@ -12,6 +12,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { Currency } from 'common/interfaces/currency';
 import { Invoice } from 'common/interfaces/invoice';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { cloneDeep, set } from 'lodash';
 import { blankInvitation } from './invoices/constants/blank-invitation';
 import { blankLineItem } from './invoices/constants/blank-line-item';
@@ -38,8 +39,14 @@ export const invoiceSlice = createSlice({
     dismissCurrentInvoice: (state) => {
       state.current = undefined;
     },
-    injectBlankItemIntoCurrent: (state) => {
-      state.current?.line_items.push(blankLineItem);
+    injectBlankItemIntoCurrent: (
+      state,
+      payload: PayloadAction<{ type: InvoiceItemType }>
+    ) => {
+      state.current?.line_items.push({
+        ...blankLineItem(),
+        type_id: payload.payload.type,
+      });
     },
     injectProductItemIntoCurrent: (state, payload) => {
       state.current?.line_items.push(payload.payload);

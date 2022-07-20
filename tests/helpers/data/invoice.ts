@@ -1,10 +1,13 @@
-export default {
+import { Invoice } from '../../../src/common/interfaces/invoice';
+import { InvoiceItemType } from '../../../src/common/interfaces/invoice-item';
+
+const invoice: Invoice = {
   id: 'VolejRejNm',
   user_id: 'VolejRejNm',
   project_id: '',
   assigned_user_id: '',
-  amount: 3766.80,
-  balance: 3766.80,
+  amount: 3766.8,
+  balance: 3766.8,
   client_id: 'VolejRejNm',
   vendor_id: '',
   status_id: '2',
@@ -72,7 +75,7 @@ export default {
       custom_value2: 'Enim eum et.',
       custom_value3: 'Ut ratione voluptas.',
       custom_value4: 'Magnam nemo numquam.',
-      type_id: '1',
+      type_id: InvoiceItemType.Product,
       product_cost: 0,
       date: '',
     },
@@ -96,7 +99,7 @@ export default {
       custom_value2: 'Enim eum et.',
       custom_value3: 'Ut ratione voluptas.',
       custom_value4: 'Magnam nemo numquam.',
-      type_id: '1',
+      type_id: InvoiceItemType.Product,
       product_cost: 0,
       date: '',
     },
@@ -120,7 +123,7 @@ export default {
       custom_value2: 'Enim eum et.',
       custom_value3: 'Ut ratione voluptas.',
       custom_value4: 'Magnam nemo numquam.',
-      type_id: '1',
+      type_id: InvoiceItemType.Product,
       product_cost: 0,
       date: '',
     },
@@ -165,3 +168,5 @@ export default {
   ],
   documents: [],
 };
+
+export default invoice;

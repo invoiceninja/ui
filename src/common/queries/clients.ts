@@ -15,7 +15,7 @@ import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
 export function useClientsQuery() {
-  return useQuery(['/api/v1/clients'], () =>
+  return useQuery(['/api/v1/clients?filter_deleted_clients=true'], () =>
     request('GET', endpoint('/api/v1/clients'))
   );
 }

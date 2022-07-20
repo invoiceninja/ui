@@ -60,6 +60,8 @@ export function Projects() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/projects/bulk"
+      linkToCreate={generatePath('/projects/create?client=:id', { id: id })}
+
     />
   );
 }

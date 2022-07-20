@@ -22,6 +22,7 @@ import {
   File,
   ShieldOff,
   Briefcase,
+  Clock,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -173,6 +174,19 @@ export function Default(props: Props) {
       },
     },
     {
+      name: t('tasks'),
+      href: '/tasks',
+      icon: Clock,
+      current: location.pathname.startsWith('/tasks'),
+      visible: hasPermission('view_task'),
+      rightButton: {
+        icon: PlusCircle,
+        to: '/tasks/create',
+        label: t('new_task'),
+        visible: hasPermission('create_task'),
+      },
+    },
+    {
       name: t('settings'),
       href: '/settings/company_details',
       icon: Settings,
@@ -213,7 +227,7 @@ export function Default(props: Props) {
               <span className="sr-only">Open sidebar</span>
               <MenuIcon className="dark:text-gray-100" />
             </button>
-            <div className="flex-1 px-4 flex items-center justify-between">
+            <div className="flex-1 px-4 md:px-8 flex items-center justify-between">
               <h2 className="text-sm md:text-xl dark:text-gray-100">
                 {props.title}
               </h2>

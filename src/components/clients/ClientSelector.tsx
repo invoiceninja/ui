@@ -9,20 +9,13 @@
  */
 
 import { Client } from 'common/interfaces/client';
+import { GenericSelectorProps } from 'common/interfaces/generic-selector-props';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import { ClientCreate } from 'pages/invoices/common/components/ClientCreate';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
-  value?: string | undefined;
-  readonly?: boolean;
-  clearButton?: boolean;
-  onChange: (client: Client) => unknown;
-  onClearButtonClick?: () => unknown;
-}
-
-export function ClientSelector(props: Props) {
+export function ClientSelector(props: GenericSelectorProps<Client>) {
   const [t] = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -35,7 +28,7 @@ export function ClientSelector(props: Props) {
       />
 
       <DebouncedCombobox
-        inputLabel={t('client')}
+        inputLabel={props.inputLabel}
         endpoint="/api/v1/clients"
         label="display_name"
         onChange={(value: Record<Client>) =>
@@ -47,7 +40,7 @@ export function ClientSelector(props: Props) {
         onClearButtonClick={props.onClearButtonClick}
         queryAdditional
         initiallyVisible={Boolean(!props.value)}
-        actionLabel={t('create_new_client')}
+        actionLabel={t('new_client')}
         onActionClick={() => setIsModalOpen(true)}
       />
     </>

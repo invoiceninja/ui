@@ -54,6 +54,15 @@ export function RecurringInvoices() {
       ),
     },
     {
+      id: 'client_id',
+      label: t('client'),
+      format: (value, resource) => (
+        <Link to={generatePath('/clients/:id', { id: resource.client.id })}>
+          {resource.client.display_name}
+        </Link>
+      ),
+    },
+    {
       id: 'amount',
       label: t('amount'),
       format: (value, resource) =>

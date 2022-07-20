@@ -11,7 +11,6 @@
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useProductColumns } from '../hooks/useProductColumns';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
@@ -23,7 +22,10 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { Fragment } from 'react';
 
 interface Props {
+  type: 'product' | 'task';
   resource: Invoice | RecurringInvoice;
+  items: InvoiceItem[];
+  columns: string[];
   onProductChange: (index: number, lineItem: InvoiceItem) => unknown;
   onSort: (lineItems: InvoiceItem[]) => unknown;
   onLineItemPropertyChange: (
@@ -38,12 +40,12 @@ interface Props {
 export function ProductsTable(props: Props) {
   const [t] = useTranslation();
 
-  const resource = props.resource;
-  const columns = useProductColumns();
+  const { resource, items, columns } = props;
 
   const resolveTranslation = useResolveTranslation();
 
   const resolveInputField = useResolveInputField({
+    type: props.type,
     resource: props.resource,
     onProductChange: props.onProductChange,
     onLineItemPropertyChange: props.onLineItemPropertyChange,
@@ -66,7 +68,7 @@ export function ProductsTable(props: Props) {
           {(provided) => (
             <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
               {resource?.client_id ? (
-                resource.line_items.map((lineItem, lineItemIndex) => (
+                items.map((lineItem, lineItemIndex) => (
                   <Draggable
                     key={lineItemIndex}
                     draggableId={lineItemIndex.toString()}
@@ -85,11 +87,17 @@ export function ProductsTable(props: Props) {
                             key={columnIndex}
                           >
                             {length - 1 !== columnIndex &&
-                              resolveInputField(column, lineItemIndex)}
+                              resolveInputField(
+                                column,
+                                lineItem!._id as string
+                              )}
 
                             {length - 1 === columnIndex && (
                               <div className="flex justify-between items-center">
-                                {resolveInputField(column, lineItemIndex)}
+                                {resolveInputField(
+                                  column,
+                                  lineItem!._id as string
+                                )}
 
                                 {resource &&
                                   (lineItem.product_key || lineItemIndex > 0) &&

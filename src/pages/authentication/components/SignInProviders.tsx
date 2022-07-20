@@ -86,7 +86,7 @@ export function SignInProviders() {
         <MicrosoftLogin
           clientId={microsoftClientId}
           authCallback={authHandler}
-          redirectUri={'https://react.invoicing.co/'}
+          redirectUri={'https://app.invoicing.co/'}
         />
       </div>
     </div>

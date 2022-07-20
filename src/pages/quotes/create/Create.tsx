@@ -9,6 +9,7 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { Quote } from 'common/interfaces/quote';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankQuoteQuery } from 'common/queries/quotes';
@@ -28,6 +29,7 @@ import { ClientSelector } from 'pages/invoices/common/components/ClientSelector'
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
+import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -52,6 +54,7 @@ export function Create() {
   const invoiceSum = useInvoiceSum();
 
   const handleCreate = useHandleCreate(setErrors);
+  const productColumns = useProductColumns();
 
   useEffect(() => {
     if (blankQuote?.data.data) {
@@ -101,7 +104,12 @@ export function Create() {
         <div className="col-span-12">
           {currentQuote && (
             <ProductsTable
+            type="product"
               resource={currentQuote}
+              columns={productColumns}
+              items={currentQuote.line_items.filter(
+                (item) => item.type_id == InvoiceItemType.Product
+              )}
               onProductChange={(index, lineItem) =>
                 dispatch(setCurrentQuoteLineItem({ index, lineItem }))
               }

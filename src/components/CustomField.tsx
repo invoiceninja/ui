@@ -17,6 +17,7 @@ import {
 
 interface Props extends InputCustomFieldProps {
   fieldOnly?: boolean;
+  noExternalPadding?: boolean;
 }
 
 export function CustomField(props: Props) {
@@ -34,7 +35,7 @@ export function CustomField(props: Props) {
   }
 
   return (
-    <Element leftSide={label}>
+    <Element leftSide={label} noExternalPadding={props.noExternalPadding}>
       <InputCustomField {...props} />
     </Element>
   );

@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "dependencies": {
+    "@asseinfo/react-kanban": "^2.2.0",
     "@emotion/styled": "^11.6.0",
     "@headlessui/react": "^1.4.3",
     "@monaco-editor/react": "^4.3.1",
@@ -33,6 +34,7 @@
     "react-google-login": "^5.2.2",
     "react-hot-toast": "^2.2.0",
     "react-i18next": "^11.15.4",
+    "react-icons": "^4.4.0",
     "react-json-view": "^1.21.3",
     "react-microsoft-login": "^1.15.0",
     "react-qr-code": "^2.0.3",

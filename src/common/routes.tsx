@@ -23,6 +23,7 @@ import { quoteRoutes } from 'pages/quotes/routes';
 import { creditRoutes } from 'pages/credits/routes';
 import { systemlogRoutes } from 'pages/system-logs/routes';
 import { projectRoutes } from 'pages/projects/routes';
+import { taskRoutes } from 'pages/tasks/routes';
 
 export const routes = (
   <Routes>
@@ -38,6 +39,7 @@ export const routes = (
       {quoteRoutes}
       {creditRoutes}
       {projectRoutes}
+      {taskRoutes}
       {settingsRoutes}
       {systemlogRoutes}
     </Route>

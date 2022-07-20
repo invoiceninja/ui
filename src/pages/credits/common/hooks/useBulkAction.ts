@@ -45,7 +45,7 @@ export function useBulkAction() {
         });
       })
       .finally(() => {
-        queryClient.invalidateQueries(endpoint('/api/v1/credits'));
+        queryClient.invalidateQueries('/api/v1/credits');
       });
   };
 }
