@@ -9,10 +9,12 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { Vendor } from 'common/interfaces/vendor';
+import { Button, InputField } from '@invoiceninja/forms';
+import { Vendor, Contact } from 'common/interfaces/vendor';
+import { Divider } from 'components/cards/Divider';
 import { CountrySelector } from 'components/CountrySelector';
 import { UserSelector } from 'components/users/UserSelector';
+import { set } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -28,9 +30,21 @@ export function Form(props: Props) {
     setVendor((current) => current && { ...current, [property]: value });
   };
 
+  const handleContactChange = (
+    property: keyof Contact,
+    value: string,
+    index: number
+  ) => {
+    const contacts = [...vendor.contacts];
+
+    set(contacts[index], property, value);
+
+    handleChange('contacts', contacts);
+  };
+
   return (
     <div className="grid grid-cols-12 gap-4">
-      <div className="col-span-12 md:col-span-6 space-y-4">
+      <div className="col-span-12 xl:col-span-6 space-y-4">
         <Card title={t('details')}>
           <Element leftSide={t('name')}>
             <InputField
@@ -126,6 +140,53 @@ export function Form(props: Props) {
               onChange={(value) => handleChange('country_id', value)}
             />
           </Element>
+        </Card>
+      </div>
+
+      <div className="col-span-12 xl:col-span-6 space-y-4">
+        <Card title={t('contacts')}>
+          {vendor.contacts.map((contact, index, { length }) => (
+            <div key={index}>
+              <Element leftSide={t('first_name')}>
+                <InputField
+                  value={contact.first_name}
+                  onValueChange={(value) =>
+                    handleContactChange('first_name', value, index)
+                  }
+                />
+              </Element>
+
+              <Element leftSide={t('last_name')}>
+                <InputField value={contact.last_name} />
+              </Element>
+
+              <Element leftSide={t('email')}>
+                <InputField value={contact.email} />
+              </Element>
+
+              <Element leftSide={t('phone')}>
+                <InputField value={contact.phone} />
+              </Element>
+
+              <Element>
+                <div className="flex justify-between items-center">
+                  {vendor.contacts.length >= 2 && (
+                    <button type="button" className="text-red-600">
+                      {t('remove_contact')}
+                    </button>
+                  )}
+
+                  {index + 1 == length && (
+                    <Button type="minimal" behavior="button">
+                      {t('add_contact')}
+                    </Button>
+                  )}
+                </div>
+              </Element>
+
+              <Divider />
+            </div>
+          ))}
         </Card>
       </div>
     </div>
