@@ -42,10 +42,32 @@ export function Form(props: Props) {
     handleChange('contacts', contacts);
   };
 
-  const destroy = (index: number) => {
+  const handleDelete = (index: number) => {
     const contacts = [...vendor.contacts];
 
     contacts.splice(index, 1);
+
+    handleChange('contacts', contacts);
+  };
+
+  const handleCreate = () => {
+    const contacts = [...vendor.contacts];
+
+    contacts.push({
+      id: '',
+      first_name: '',
+      last_name: '',
+      email: '',
+      created_at: 0,
+      updated_at: 0,
+      archived_at: 0,
+      is_primary: false,
+      phone: '',
+      custom_value1: '',
+      custom_value2: '',
+      custom_value3: '',
+      custom_value4: '',
+    });
 
     handleChange('contacts', contacts);
   };
@@ -182,14 +204,18 @@ export function Form(props: Props) {
                     <button
                       type="button"
                       className="text-red-600"
-                      onClick={() => destroy(index)}
+                      onClick={() => handleDelete(index)}
                     >
                       {t('remove_contact')}
                     </button>
                   )}
 
                   {index + 1 == length && (
-                    <Button type="minimal" behavior="button">
+                    <Button
+                      type="minimal"
+                      behavior="button"
+                      onClick={handleCreate}
+                    >
                       {t('add_contact')}
                     </Button>
                   )}
