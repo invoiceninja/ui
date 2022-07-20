@@ -89,7 +89,10 @@ export function DataTable(props: Props) {
 
   const { data, isLoading, isError } = useQuery(
     [apiEndpoint.pathname, perPage, currentPage, filter, sort, status],
-    () => request('GET', apiEndpoint.href)
+    () => request('GET', apiEndpoint.href),
+    {
+      staleTime: 5000,
+    }
   );
 
   const options: SelectOption[] = [
