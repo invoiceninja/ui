@@ -8,10 +8,68 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Link } from '@invoiceninja/forms';
+import { date } from 'common/helpers';
+import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
+import { Vendor } from 'common/interfaces/vendor';
+import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { DataTable, DataTableColumns } from 'components/DataTable';
+import { EntityStatus } from 'components/EntityStatus';
+import { Default } from 'components/layouts/Default';
+import { useTranslation } from 'react-i18next';
+import { generatePath } from 'react-router-dom';
 
 export function Vendors() {
-  useTitle('vendors');
+  const { documentTitle } = useTitle('vendors');
 
-  return <div>Vendors</div>;
+  const [t] = useTranslation();
+
+  const pages: BreadcrumRecord[] = [{ name: t('vendors'), href: '/vendors' }];
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const columns: DataTableColumns = [
+    { id: 'number', label: t('number') },
+    {
+      id: 'name',
+      label: t('name'),
+      format: (value, vendor: Vendor) => (
+        <Link to={generatePath('/vendors/:id', { id: vendor.id })}>
+          {value}
+        </Link>
+      ),
+    },
+    {
+      id: 'city',
+      label: t('city'),
+    },
+    {
+      id: 'phone',
+      label: t('phone'),
+    },
+    {
+      id: 'entiy_state',
+      label: t('entity_state'),
+      format: (value, resource) => <EntityStatus entity={resource} />,
+    },
+    {
+      id: 'created_at',
+      label: t('created_at'),
+      format: (value) => date(value, dateFormat),
+    },
+  ];
+
+  return (
+    <Default title={documentTitle} breadcrumbs={pages}>
+      <DataTable
+        resource="vendor"
+        columns={columns}
+        endpoint="/api/v1/vendors"
+        linkToCreate="/vendors/create"
+        linkToEdit="/vendors/:id/edit"
+        withResourcefulActions
+      />
+    </Default>
+  );
 }
