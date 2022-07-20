@@ -10,9 +10,11 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Vendor, Contact } from 'common/interfaces/vendor';
 import { Divider } from 'components/cards/Divider';
 import { CountrySelector } from 'components/CountrySelector';
+import { CustomField } from 'components/CustomField';
 import { UserSelector } from 'components/users/UserSelector';
 import { set } from 'lodash';
 import { useTranslation } from 'react-i18next';
@@ -25,6 +27,8 @@ interface Props {
 export function Form(props: Props) {
   const [t] = useTranslation();
   const { vendor, setVendor } = props;
+
+  const company = useCurrentCompany();
 
   const handleChange = (property: keyof Vendor, value: unknown) => {
     setVendor((current) => current && { ...current, [property]: value });
@@ -126,6 +130,42 @@ export function Form(props: Props) {
               onValueChange={(value) => handleChange('phone', value)}
             />
           </Element>
+
+          {company?.custom_fields?.contact1 && (
+            <CustomField
+              field="contact1"
+              defaultValue={vendor.custom_value1}
+              value={company.custom_fields.vendor1}
+              onChange={(value) => handleChange('custom_value1', value)}
+            />
+          )}
+
+          {company?.custom_fields?.vendor2 && (
+            <CustomField
+              field="vendor2"
+              defaultValue={vendor.custom_value2}
+              value={company.custom_fields.vendor2}
+              onChange={(value) => handleChange('custom_value2', value)}
+            />
+          )}
+
+          {company?.custom_fields?.vendor3 && (
+            <CustomField
+              field="vendor3"
+              defaultValue={vendor.custom_value3}
+              value={company.custom_fields.vendor3}
+              onChange={(value) => handleChange('custom_value3', value)}
+            />
+          )}
+
+          {company?.custom_fields?.vendor4 && (
+            <CustomField
+              field="vendor4"
+              defaultValue={vendor.custom_value4}
+              value={company.custom_fields.vendor4}
+              onChange={(value) => handleChange('custom_value4', value)}
+            />
+          )}
         </Card>
 
         <Card title={t('address')}>
