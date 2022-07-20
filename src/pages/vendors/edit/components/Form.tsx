@@ -11,12 +11,14 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { Vendor, Contact } from 'common/interfaces/vendor';
 import { Divider } from 'components/cards/Divider';
 import { CountrySelector } from 'components/CountrySelector';
 import { CustomField } from 'components/CustomField';
 import { UserSelector } from 'components/users/UserSelector';
 import { set } from 'lodash';
+import { Field } from 'pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -29,6 +31,7 @@ export function Form(props: Props) {
   const { vendor, setVendor } = props;
 
   const company = useCurrentCompany();
+  const handleCustomFieldChange = useHandleCustomFieldChange();
 
   const handleChange = (property: keyof Vendor, value: unknown) => {
     setVendor((current) => current && { ...current, [property]: value });
@@ -265,6 +268,19 @@ export function Form(props: Props) {
               <Divider />
             </div>
           ))}
+        </Card>
+
+        <Card title={t('custom_fields')}>
+          {company &&
+            ['vendor1', 'vendor2', 'vendor3', 'vendor4'].map((field) => (
+              <Field
+                key={field}
+                initialValue={company.custom_fields[field]}
+                field={field}
+                placeholder={t('contact_field')}
+                onChange={(value) => handleCustomFieldChange(field, value)}
+              />
+            ))}
         </Card>
       </div>
     </div>
