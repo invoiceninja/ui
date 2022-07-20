@@ -42,6 +42,14 @@ export function Form(props: Props) {
     handleChange('contacts', contacts);
   };
 
+  const destroy = (index: number) => {
+    const contacts = [...vendor.contacts];
+
+    contacts.splice(index, 1);
+
+    handleChange('contacts', contacts);
+  };
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="col-span-12 xl:col-span-6 space-y-4">
@@ -171,7 +179,11 @@ export function Form(props: Props) {
               <Element>
                 <div className="flex justify-between items-center">
                   {vendor.contacts.length >= 2 && (
-                    <button type="button" className="text-red-600">
+                    <button
+                      type="button"
+                      className="text-red-600"
+                      onClick={() => destroy(index)}
+                    >
                       {t('remove_contact')}
                     </button>
                   )}
