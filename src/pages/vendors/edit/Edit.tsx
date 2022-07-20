@@ -9,10 +9,14 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { Vendor } from 'common/interfaces/vendor';
+import { useVendorQuery } from 'common/queries/vendor';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
+import { Form } from './components/Form';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_vendor');
@@ -20,11 +24,24 @@ export function Edit() {
   const [t] = useTranslation();
 
   const { id } = useParams();
+  const { data } = useVendorQuery({ id });
+
+  const [vendor, setVendor] = useState<Vendor>();
 
   const pages: BreadcrumRecord[] = [
     { name: t('vendors'), href: '/vendors' },
     { name: t('edit_vendor'), href: generatePath('/vendors/:id/edit', { id }) },
   ];
 
-  return <Default title={documentTitle} breadcrumbs={pages}></Default>;
+  useEffect(() => {
+    if (data) {
+      setVendor({ ...data });
+    }
+  }, [data]);
+
+  return (
+    <Default title={documentTitle} breadcrumbs={pages}>
+      {vendor && <Form vendor={vendor} setVendor={setVendor} />}
+    </Default>
+  );
 }
