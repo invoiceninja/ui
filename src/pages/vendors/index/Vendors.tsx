@@ -30,7 +30,15 @@ export function Vendors() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const columns: DataTableColumns = [
-    { id: 'number', label: t('number') },
+    {
+      id: 'number',
+      label: t('number'),
+      format: (value, vendor: Vendor) => (
+        <Link to={generatePath('/vendors/:id', { id: vendor.id })}>
+          {value}
+        </Link>
+      ),
+    },
     {
       id: 'name',
       label: t('name'),
