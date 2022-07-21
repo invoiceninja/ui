@@ -53,6 +53,26 @@ export function Expenses() {
       ),
     },
     {
+      id: 'client_id',
+      label: t('client'),
+      format: (value, expense) =>
+        expense.client && (
+          <Link to={generatePath('/clients/:id', { id: value.toString() })}>
+            {expense.client.display_name}
+          </Link>
+        ),
+    },
+    {
+      id: 'vendor_id',
+      label: t('vendor'),
+      format: (value, expense) =>
+        expense.vendor && (
+          <Link to={generatePath('/vendors/:id', { id: value.toString() })}>
+            {expense.vendor.name}
+          </Link>
+        ),
+    },
+    {
       id: 'date',
       label: t('date'),
       format: (value) => date(value, dateFormat),
@@ -86,8 +106,9 @@ export function Expenses() {
     >
       <DataTable
         resource="expense"
-        endpoint="/api/v1/expenses"
+        endpoint="/api/v1/expenses?include=client,vendor"
         columns={columns}
+        bulkRoute="/api/v1/expenses/bulk"
         linkToCreate="/expenses/create"
         linkToEdit="/expenses/:id/edit"
         withResourcefulActions
