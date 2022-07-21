@@ -14,6 +14,8 @@ import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Vendors } from './index/Vendors';
+import { Show } from './show/Show';
+import { Vendor } from './Vendor';
 
 export const vendorRoutes = (
   <Route path="vendors">
@@ -26,6 +28,17 @@ export const vendorRoutes = (
         />
       }
     />
+    <Route
+      path=":id"
+      element={
+        <Guard
+          guards={[() => permission('view_vendor')]}
+          component={<Vendor />}
+        />
+      }
+    >
+      <Route path="" element={<Show />} />
+    </Route>
     <Route
       path=":id/edit"
       element={
