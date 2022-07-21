@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
+import { Button, Link } from '@invoiceninja/forms';
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import { useCountries } from 'common/hooks/useCountries';
 import { useTitle } from 'common/hooks/useTitle';
@@ -19,6 +19,7 @@ import { Default } from 'components/layouts/Default';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Outlet, useParams } from 'react-router-dom';
+import { Actions } from './components/Actions';
 
 export function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
@@ -42,7 +43,19 @@ export function Vendor() {
   ];
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      topRight={
+        <div className="inline-flex items-center space-x-2">
+          <Button to={generatePath('/vendors/:id/edit', { id })}>
+            {t('edit_vendor')}
+          </Button>
+
+          {vendor && <Actions vendor={vendor} />}
+        </div>
+      }
+    >
       <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
         <InfoCard title={t('details')} className="col-span-12 lg:col-span-4">
           <p>
