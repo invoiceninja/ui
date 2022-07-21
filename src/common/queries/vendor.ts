@@ -26,9 +26,12 @@ export function useVendorQuery(params: { id: string | undefined }) {
 }
 
 export function useBlankVendorQuery() {
-  return useQuery(
-    endpoint('/api/v1/vendors/create'),
-    () => request('GET', endpoint('/api/v1/vendors/create')),
+  return useQuery<Vendor>(
+    '/api/v1/vendors/create',
+    () =>
+      request('GET', endpoint('/api/v1/vendors/create')).then(
+        (response) => response.data.data
+      ),
     { staleTime: Infinity }
   );
 }

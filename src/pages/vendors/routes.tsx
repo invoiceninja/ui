@@ -11,6 +11,7 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
+import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Vendors } from './index/Vendors';
 
@@ -31,6 +32,15 @@ export const vendorRoutes = (
         <Guard
           guards={[() => permission('edit_vendor')]}
           component={<Edit />}
+        />
+      }
+    />
+    <Route
+      path="create"
+      element={
+        <Guard
+          guards={[() => permission('create_vendor')]}
+          component={<Create />}
         />
       }
     />
