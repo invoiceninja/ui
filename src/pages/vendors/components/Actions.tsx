@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
 import { Vendor } from 'common/interfaces/vendor';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
