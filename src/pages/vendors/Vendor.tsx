@@ -44,7 +44,7 @@ export function Vendor() {
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
-        <InfoCard title={t('details')} className="col-span-12 lg:col-span-3">
+        <InfoCard title={t('details')} className="col-span-12 lg:col-span-4">
           <p>
             {t('id_number')}: {vendor?.id_number}
           </p>
@@ -60,7 +60,7 @@ export function Vendor() {
           )}
         </InfoCard>
 
-        <InfoCard title={t('address')} className="col-span-12 lg:col-span-3">
+        <InfoCard title={t('address')} className="col-span-12 lg:col-span-4">
           <p>{vendor?.address1}</p>
           <p>{vendor?.address2}</p>
           <p>
@@ -76,7 +76,7 @@ export function Vendor() {
 
         <InfoCard
           title={t('contacts')}
-          className="col-span-12 lg:col-span-3"
+          className="col-span-12 lg:col-span-4"
           value={
             <div className="space-y-2">
               {vendor?.contacts.map((contact, index: number) => (
