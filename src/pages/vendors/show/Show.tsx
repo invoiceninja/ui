@@ -9,5 +9,5 @@
  */
 
 export function Show() {
-  return <div>wrapper</div>;
+  return <div></div>;
 }

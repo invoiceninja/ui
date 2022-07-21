@@ -8,9 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Link } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { useVendorQuery } from 'common/queries/vendor';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { InfoCard } from 'components/InfoCard';
 import { Default } from 'components/layouts/Default';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -36,6 +38,24 @@ export function Vendor() {
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
+      <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
+        <InfoCard title={t('details')} className="col-span-12 lg:col-span-3">
+          <p>
+            {t('id_number')}: {vendor?.id_number}
+          </p>
+
+          <p>
+            {t('vat_number')}: {vendor?.vat_number}
+          </p>
+
+          {vendor?.website && (
+            <Link to={vendor.website} external>
+              {vendor.website}
+            </Link>
+          )}
+        </InfoCard>
+      </div>
+
       <Outlet />
     </Default>
   );
