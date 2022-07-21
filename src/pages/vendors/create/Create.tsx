@@ -21,9 +21,8 @@ import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { Form } from '../edit/components/Form';
 
 export function Create() {
@@ -31,14 +30,12 @@ export function Create() {
 
   const [t] = useTranslation();
 
-  const { id } = useParams();
   const { data } = useBlankVendorQuery();
 
   const [vendor, setVendor] = useState<Vendor>();
 
   const company = useInjectCompanyChanges();
   const dispatch = useDispatch();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
 
   const pages: BreadcrumRecord[] = [

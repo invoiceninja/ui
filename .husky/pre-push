@@ -1,6 +1,4 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-npx eslint src/ --fix
-git add . && git commit -m "eslint fixes"
 npm run lint && npm run build
