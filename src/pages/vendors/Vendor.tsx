@@ -9,6 +9,7 @@
  */
 
 import { Link } from '@invoiceninja/forms';
+import { useCountries } from 'common/hooks/useCountries';
 import { useTitle } from 'common/hooks/useTitle';
 import { useVendorQuery } from 'common/queries/vendor';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
@@ -22,6 +23,8 @@ export function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
   const { id } = useParams();
   const { data: vendor } = useVendorQuery({ id });
+
+  const countries = useCountries();
 
   const [t] = useTranslation();
 
@@ -53,6 +56,20 @@ export function Vendor() {
               {vendor.website}
             </Link>
           )}
+        </InfoCard>
+
+        <InfoCard title={t('address')} className="col-span-12 lg:col-span-3">
+          <p>{vendor?.address1}</p>
+          <p>{vendor?.address2}</p>
+          <p>
+            {vendor?.city}, {vendor?.state} {vendor?.postal_code}
+          </p>
+          <p>
+            {
+              countries.find((country) => country.id === vendor?.country_id)
+                ?.name
+            }
+          </p>
         </InfoCard>
       </div>
 
