@@ -17,7 +17,6 @@ import { Vendors } from './index/Vendors';
 import { Expenses } from './show/pages/Expenses';
 import { PurchaseOrders } from './show/pages/PurchaseOrders';
 import { RecurringExpenses } from './show/pages/RecurringExpenses';
-import { Show } from './show/Show';
 import { Vendor } from './Vendor';
 
 export const vendorRoutes = (
@@ -40,10 +39,10 @@ export const vendorRoutes = (
         />
       }
     >
-      <Route path="" element={<Show />} />
+      <Route path="" element={<PurchaseOrders />} />
+      <Route path="purchase_orders" element={<PurchaseOrders />} />
       <Route path="expenses" element={<Expenses />} />
       <Route path="recurring_expenses" element={<RecurringExpenses />} />
-      <Route path="purchase_orders" element={<PurchaseOrders />} />
     </Route>
     <Route
       path=":id/edit"

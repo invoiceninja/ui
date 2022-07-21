@@ -16,6 +16,7 @@ import { useVendorQuery } from 'common/queries/vendor';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { InfoCard } from 'components/InfoCard';
 import { Default } from 'components/layouts/Default';
+import { Tab, Tabs } from 'components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Outlet, useParams } from 'react-router-dom';
@@ -40,6 +41,21 @@ export function Vendor() {
   const pages: BreadcrumRecord[] = [
     { name: t('vendors'), href: '/vendors' },
     { name: documentTitle, href: generatePath('/vendors/:id', { id }) },
+  ];
+
+  const tabs: Tab[] = [
+    {
+      name: t('purchase_orders'),
+      href: generatePath('/vendors/:id/purchase_orders', { id }),
+    },
+    {
+      name: t('expenses'),
+      href: generatePath('/vendors/:id/expenses', { id }),
+    },
+    {
+      name: t('recurring_expenses'),
+      href: generatePath('/vendors/:id/recurring_expenses', { id }),
+    },
   ];
 
   return (
@@ -105,6 +121,8 @@ export function Vendor() {
           }
         />
       </div>
+
+      <Tabs tabs={tabs} className="my-6" />
 
       <Outlet />
     </Default>
