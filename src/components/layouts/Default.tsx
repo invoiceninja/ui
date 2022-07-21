@@ -34,6 +34,7 @@ import { RootState } from 'common/stores/store';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
 import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
+import { BiWallet } from 'react-icons/bi';
 
 interface Props extends CommonProps {
   title?: string;
@@ -184,6 +185,19 @@ export function Default(props: Props) {
         to: '/tasks/create',
         label: t('new_task'),
         visible: hasPermission('create_task'),
+      },
+    },
+    {
+      name: t('expenses'),
+      href: '/expenses',
+      icon: BiWallet,
+      current: location.pathname.startsWith('/expenses'),
+      visible: hasPermission('view_expense'),
+      rightButton: {
+        icon: PlusCircle,
+        to: '/expenses/create',
+        label: t('new_expense'),
+        visible: hasPermission('create_expense'),
       },
     },
     {

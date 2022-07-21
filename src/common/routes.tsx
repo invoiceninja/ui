@@ -24,6 +24,7 @@ import { creditRoutes } from 'pages/credits/routes';
 import { systemlogRoutes } from 'pages/system-logs/routes';
 import { projectRoutes } from 'pages/projects/routes';
 import { taskRoutes } from 'pages/tasks/routes';
+import { expenseRoutes } from 'pages/expenses/routes';
 
 export const routes = (
   <Routes>
@@ -40,6 +41,7 @@ export const routes = (
       {creditRoutes}
       {projectRoutes}
       {taskRoutes}
+      {expenseRoutes}
       {settingsRoutes}
       {systemlogRoutes}
     </Route>
