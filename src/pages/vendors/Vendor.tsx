@@ -9,6 +9,7 @@
  */
 
 import { Link } from '@invoiceninja/forms';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 import { useCountries } from 'common/hooks/useCountries';
 import { useTitle } from 'common/hooks/useTitle';
 import { useVendorQuery } from 'common/queries/vendor';
@@ -25,6 +26,7 @@ export function Vendor() {
   const { data: vendor } = useVendorQuery({ id });
 
   const countries = useCountries();
+  const accentColor = useAccentColor();
 
   const [t] = useTranslation();
 
@@ -71,6 +73,24 @@ export function Vendor() {
             }
           </p>
         </InfoCard>
+
+        <InfoCard
+          title={t('contacts')}
+          className="col-span-12 lg:col-span-3"
+          value={
+            <div className="space-y-2">
+              {vendor?.contacts.map((contact, index: number) => (
+                <div key={index}>
+                  <p className="font-semibold" style={{ color: accentColor }}>
+                    {contact.first_name} {contact.last_name}
+                  </p>
+
+                  <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                </div>
+              ))}
+            </div>
+          }
+        />
       </div>
 
       <Outlet />
