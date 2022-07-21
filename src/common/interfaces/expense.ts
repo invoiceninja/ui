@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Client } from './client';
+import { Vendor } from './vendor';
+
 export interface Expense {
   id: string;
   amount: number;
@@ -50,4 +53,6 @@ export interface Expense {
   transaction_reference: string;
   uses_inclusive_taxes: boolean;
   vendor_id: string;
+  client?: Client;
+  vendor?: Vendor;
 }

@@ -39,10 +39,10 @@ import {
   Tr,
 } from './tables';
 
-export type DataTableColumns = {
+export type DataTableColumns<T = any> = {
   id: string;
   label: string;
-  format?: (field: string | number, resource?: any) => any;
+  format?: (field: string | number, resource: T) => unknown;
 }[];
 
 interface Props {
