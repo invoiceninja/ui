@@ -15,7 +15,6 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { Vendor, Contact } from 'common/interfaces/vendor';
 import { Divider } from 'components/cards/Divider';
-import { CountrySelector } from 'components/CountrySelector';
 import { CustomField } from 'components/CustomField';
 import { UserSelector } from 'components/users/UserSelector';
 import { set } from 'lodash';
