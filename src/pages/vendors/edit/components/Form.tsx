@@ -9,12 +9,12 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { Button, InputField, SelectField } from '@invoiceninja/forms';
-import { useCountries } from 'common/hooks/useCountries';
+import { Button, InputField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { Vendor, Contact } from 'common/interfaces/vendor';
 import { Divider } from 'components/cards/Divider';
+import { CountrySelector } from 'components/CountrySelector';
 import { CustomField } from 'components/CustomField';
 import { UserSelector } from 'components/users/UserSelector';
 import { set } from 'lodash';
@@ -32,7 +32,6 @@ export function Form(props: Props) {
 
   const company = useCurrentCompany();
   const handleCustomFieldChange = useHandleCustomFieldChange();
-  const countries = useCountries();
 
   const handleChange = (property: keyof Vendor, value: unknown) => {
     setVendor((current) => current && { ...current, [property]: value });
@@ -209,21 +208,10 @@ export function Form(props: Props) {
           </Element>
 
           <Element leftSide={t('country')}>
-            <SelectField
-              id="country_id"
-              value={vendor?.country_id}
-              onValueChange={(value) => handleChange('country_id', value)}
-            >
-              <option value=""></option>
-
-              {countries.map((country, index) => (
-                <option key={index} value={country.id}>
-                  {country.name}
-                </option>
-              ))}
-            </SelectField>
-
-
+            <CountrySelector
+              value={vendor.country_id}
+              onChange={(value) => handleChange('country_id', value)}
+            />
           </Element>
         </Card>
       </div>
