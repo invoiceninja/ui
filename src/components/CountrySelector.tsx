@@ -20,7 +20,7 @@ export function CountrySelector(props: Props) {
   const countries = useCountries();
 
   return (
-    <SelectField onValueChange={props.onChange} withBlank>
+    <SelectField onValueChange={props.onChange} value={props.value} withBlank>
       {countries.map((country, index) => (
         <option key={index} value={country.id}>
           {country.name}
