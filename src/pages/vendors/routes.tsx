@@ -14,6 +14,7 @@ import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Vendors } from './index/Vendors';
+import { Documents } from './show/pages/Documents';
 import { Expenses } from './show/pages/Expenses';
 import { PurchaseOrders } from './show/pages/PurchaseOrders';
 import { RecurringExpenses } from './show/pages/RecurringExpenses';
@@ -43,6 +44,7 @@ export const vendorRoutes = (
       <Route path="purchase_orders" element={<PurchaseOrders />} />
       <Route path="expenses" element={<Expenses />} />
       <Route path="recurring_expenses" element={<RecurringExpenses />} />
+      <Route path="documents" element={<Documents />} />
     </Route>
     <Route
       path=":id/edit"
