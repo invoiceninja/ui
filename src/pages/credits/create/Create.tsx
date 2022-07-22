@@ -130,7 +130,7 @@ export function Create() {
           )}
         </div>
 
-        <CreditFooter page="edit" />
+        <CreditFooter page="create" />
 
         {currentCredit && (
           <InvoiceTotals
