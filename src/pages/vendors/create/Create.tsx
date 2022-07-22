@@ -7,113 +7,110 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { AxiosError } from 'axios';
+
+import axios from 'axios';
 import { endpoint } from 'common/helpers';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankVendorQuery } from 'common/queries/vendor';
-import { Default } from 'components/layouts/Default';
-import { useFormik } from 'formik';
-import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
-import { AdditionalInfo } from '../components/AdditionalInfo';
-import { Address } from '../components/Address';
-import { Contacts } from '../components/Contacts';
-import { Details } from '../components/Details';
-import toast from 'react-hot-toast';
-import { useQueryClient } from 'react-query';
 import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useTitle } from 'common/hooks/useTitle';
+import { Vendor } from 'common/interfaces/vendor';
+import { useBlankVendorQuery } from 'common/queries/vendor';
+import { updateRecord } from 'common/stores/slices/company-users';
+import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Default } from 'components/layouts/Default';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
+import { generatePath, useNavigate } from 'react-router-dom';
+import { Form } from '../edit/components/Form';
 
 export function Create() {
+  const { documentTitle } = useTitle('create_vendor');
+
   const [t] = useTranslation();
 
-  const { data: vendor } = useBlankVendorQuery();
-  const [errors, setErrors] = useState<ValidationBag>();
-  const queryClient = useQueryClient();
+  const { data } = useBlankVendorQuery();
 
-  const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      name: vendor?.data.data.name,
-      number: vendor?.data.data.number,
-      user_id: vendor?.data.data.user_id,
-      id_number: vendor?.data.data.id_number,
-      vat_number: vendor?.data.data.vat_number,
-      website: vendor?.data.data.website,
-      phone: vendor?.data.data.phone,
-      address1: vendor?.data.data.address1,
-      address2: vendor?.data.data.address2,
-      city: vendor?.data.data.city,
-      state: vendor?.data.data.state,
-      postal_code: vendor?.data.data.postal_code,
-      country_id: vendor?.data.data.country_id,
-      currency_id: vendor?.data.data.currency_id,
-      private_notes: vendor?.data.data.private_notes,
-      public_notes: vendor?.data.data.public_notes,
-      contacts: vendor?.data.data.contacts,
-    },
-    onSubmit: (values) => {
-      const toastId = toast.loading(t('processing'));
-      setErrors(undefined);
+  const [vendor, setVendor] = useState<Vendor>();
 
-      request('POST', endpoint('/api/v1/vendors/'), values)
-        .then(() => {
-          toast.success(t('new_vendor'), { id: toastId });
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
-          toast.error(t('error_title'), { id: toastId });
-          if (error.response?.status === 422) {
-            setErrors(error.response.data);
-          }
-        })
-        .finally(() => {
-          formik.setSubmitting(false);
-          queryClient.invalidateQueries(generatePath('/api/v1/vendors'));
-        });
-    },
-  });
-  const pages = [
+  const company = useInjectCompanyChanges();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const pages: BreadcrumRecord[] = [
     { name: t('vendors'), href: '/vendors' },
     {
-      name: t('new_vendor'),
-      href: generatePath('/vendors/create'),
+      name: t('create_vendor'),
+      href: '/vendors/:id/create',
     },
   ];
 
+  useEffect(() => {
+    if (data) {
+      setVendor({
+        ...data,
+        contacts: [
+          {
+            id: '',
+            first_name: '',
+            last_name: '',
+            email: '',
+            created_at: 0,
+            updated_at: 0,
+            archived_at: 0,
+            is_primary: false,
+            phone: '',
+            custom_value1: '',
+            custom_value2: '',
+            custom_value3: '',
+            custom_value4: '',
+          },
+        ],
+      });
+    }
+  }, [data]);
+
+  const onSave = () => {
+    toast.processing();
+
+    axios
+      .all([
+        request('POST', endpoint('/api/v1/vendors'), vendor),
+        request(
+          'PUT',
+          endpoint('/api/v1/companies/:id', { id: company?.id }),
+          company
+        ),
+      ])
+      .then((response) => {
+        toast.success('created_vendor');
+
+        dispatch(
+          updateRecord({ object: 'company', data: response[1].data.data })
+        );
+
+        console.log(response);
+
+        navigate(
+          generatePath('/vendors/:id', { id: response[0].data.data.id })
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.error();
+      });
+  };
+
   return (
-    <Default title={t('vendor')} breadcrumbs={pages} docsLink="docs/vendors/">
-      <div className="flex flex-col xl:flex-row xl:gap-4">
-        <div className="w-full xl:w-1/2">
-          <Details
-            data={formik.values}
-            setFieldValue={formik.setFieldValue}
-            handleChange={formik.handleChange}
-            errors={errors}
-          />
-          <AdditionalInfo
-            data={formik.values}
-            handleChange={formik.handleChange}
-            setFieldValue={formik.setFieldValue}
-            errors={errors}
-          />
-        </div>
-        <div className="w-full xl:w-1/2">
-          <Address
-            data={formik.values}
-            setFieldValue={formik.setFieldValue}
-            handleChange={formik.handleChange}
-            errors={errors}
-          />
-          <Contacts
-            handleChange={formik.handleChange}
-            setFieldValue={formik.setFieldValue}
-            isSubmitting={formik.isSubmitting}
-            handleSubmit={formik.handleSubmit}
-            data={formik.values.contacts}
-          />
-        </div>
-      </div>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onBackClick="/vendors"
+      onSaveClick={onSave}
+    >
+      {vendor && <Form vendor={vendor} setVendor={setVendor} />}
     </Default>
   );
 }

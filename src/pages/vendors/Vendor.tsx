@@ -8,22 +8,46 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Button, Link } from '@invoiceninja/forms';
+import { useAccentColor } from 'common/hooks/useAccentColor';
+import { useCountries } from 'common/hooks/useCountries';
+import { useTitle } from 'common/hooks/useTitle';
 import { useVendorQuery } from 'common/queries/vendor';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { InfoCard } from 'components/InfoCard';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Outlet, useParams } from 'react-router-dom';
+import { Actions } from './components/Actions';
 
 export function Vendor() {
+  const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
   const { id } = useParams();
-  const [t] = useTranslation();
-  const [documentTitle, setdocumentTitle] = useState('');
   const { data: vendor } = useVendorQuery({ id });
 
+  const countries = useCountries();
+  const accentColor = useAccentColor();
+
+  const [t] = useTranslation();
+
+  useEffect(() => {
+    if (vendor && vendor.name.length >= 1) {
+      setDocumentTitle(vendor.name);
+    }
+  }, [vendor]);
+
+  const pages: BreadcrumRecord[] = [
+    { name: t('vendors'), href: '/vendors' },
+    { name: documentTitle, href: generatePath('/vendors/:id', { id }) },
+  ];
+
   const tabs: Tab[] = [
-    { name: t('details'), href: generatePath('/vendors/:id/edit', { id }) },
+    {
+      name: t('purchase_orders'),
+      href: generatePath('/vendors/:id/purchase_orders', { id }),
+    },
     {
       name: t('expenses'),
       href: generatePath('/vendors/:id/expenses', { id }),
@@ -32,31 +56,75 @@ export function Vendor() {
       name: t('recurring_expenses'),
       href: generatePath('/vendors/:id/recurring_expenses', { id }),
     },
-    {
-      name: t('custom_fields'),
-      href: generatePath('/vendors/:id/vendor_fields', { id }),
-    },
   ];
-
-  const pages: BreadcrumRecord[] = [
-    { name: t('vendors'), href: '/vendors' },
-    {
-      name: documentTitle,
-      href: generatePath('/vendors/:id', { id }),
-    },
-  ];
-
-  useEffect(() => {
-    setdocumentTitle(vendor?.data.data.name || t('vendor'));
-  }, [vendor?.data.data]);
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
-      <Tabs tabs={tabs} />
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      topRight={
+        <div className="inline-flex items-center space-x-2">
+          <Button to={generatePath('/vendors/:id/edit', { id })}>
+            {t('edit_vendor')}
+          </Button>
 
-      <div className="my-4">
-        <Outlet />
+          {vendor && <Actions vendor={vendor} />}
+        </div>
+      }
+    >
+      <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
+        <InfoCard title={t('details')} className="col-span-12 lg:col-span-4">
+          <p>
+            {t('id_number')}: {vendor?.id_number}
+          </p>
+
+          <p>
+            {t('vat_number')}: {vendor?.vat_number}
+          </p>
+
+          {vendor?.website && (
+            <Link to={vendor.website} external>
+              {vendor.website}
+            </Link>
+          )}
+        </InfoCard>
+
+        <InfoCard title={t('address')} className="col-span-12 lg:col-span-4">
+          <p>{vendor?.address1}</p>
+          <p>{vendor?.address2}</p>
+          <p>
+            {vendor?.city}, {vendor?.state} {vendor?.postal_code}
+          </p>
+          <p>
+            {
+              countries.find((country) => country.id === vendor?.country_id)
+                ?.name
+            }
+          </p>
+        </InfoCard>
+
+        <InfoCard
+          title={t('contacts')}
+          className="col-span-12 lg:col-span-4"
+          value={
+            <div className="space-y-2">
+              {vendor?.contacts.map((contact, index: number) => (
+                <div key={index}>
+                  <p className="font-semibold" style={{ color: accentColor }}>
+                    {contact.first_name} {contact.last_name}
+                  </p>
+
+                  <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                </div>
+              ))}
+            </div>
+          }
+        />
       </div>
+
+      <Tabs tabs={tabs} className="my-6" />
+
+      <Outlet />
     </Default>
   );
 }
