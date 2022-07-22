@@ -9,7 +9,8 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { Button, InputField } from '@invoiceninja/forms';
+import { Button, InputField, SelectField } from '@invoiceninja/forms';
+import { useCountries } from 'common/hooks/useCountries';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { Vendor, Contact } from 'common/interfaces/vendor';
@@ -32,6 +33,7 @@ export function Form(props: Props) {
 
   const company = useCurrentCompany();
   const handleCustomFieldChange = useHandleCustomFieldChange();
+  const countries = useCountries();
 
   const handleChange = (property: keyof Vendor, value: unknown) => {
     setVendor((current) => current && { ...current, [property]: value });
@@ -134,7 +136,7 @@ export function Form(props: Props) {
             />
           </Element>
 
-          {company?.custom_fields?.contact1 && (
+          {company?.custom_fields?.vendor1 && (
             <CustomField
               field="contact1"
               defaultValue={vendor.custom_value1}
@@ -208,10 +210,21 @@ export function Form(props: Props) {
           </Element>
 
           <Element leftSide={t('country')}>
-            <CountrySelector
-              value={vendor.country_id}
-              onChange={(value) => handleChange('country_id', value)}
-            />
+            <SelectField
+              id="country_id"
+              value={vendor?.country_id}
+              onValueChange={(value) => handleChange('country_id', value)}
+            >
+              <option value=""></option>
+
+              {countries.map((country, index) => (
+                <option key={index} value={country.id}>
+                  {country.name}
+                </option>
+              ))}
+            </SelectField>
+
+
           </Element>
         </Card>
       </div>
@@ -230,15 +243,30 @@ export function Form(props: Props) {
               </Element>
 
               <Element leftSide={t('last_name')}>
-                <InputField value={contact.last_name} />
+                <InputField
+                  value={contact.last_name}
+                  onValueChange={(value) =>
+                    handleContactChange('last_name', value, index)
+                  }
+                />
               </Element>
 
               <Element leftSide={t('email')}>
-                <InputField value={contact.email} />
+                <InputField
+                  value={contact.email}
+                  onValueChange={(value) =>
+                    handleContactChange('email', value, index)
+                  }
+                />
               </Element>
 
               <Element leftSide={t('phone')}>
-                <InputField value={contact.phone} />
+                <InputField
+                  value={contact.phone}
+                  onValueChange={(value) =>
+                    handleContactChange('phone', value, index)
+                  }
+                />
               </Element>
 
               <Element>

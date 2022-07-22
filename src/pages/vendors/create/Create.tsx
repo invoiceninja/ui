@@ -50,6 +50,7 @@ export function Create() {
     if (data) {
       setVendor({
         ...data,
+        country_id: '',
         contacts: [
           {
             id: '',
