@@ -42,7 +42,7 @@ export function Clients() {
         </Link>
       ),
     },
-    { id: 'name', label: t('name') },
+    { id: 'display_name', label: t('name') },
     {
       id: 'balance',
       label: t('balance'),
