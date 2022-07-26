@@ -126,7 +126,7 @@ export function CreateProduct(props: Props) {
           id="price"
           value={formik.values.price}
           onChange={formik.handleChange}
-          errorMessage={errors?.errors.price}
+          errorMessage={errors?.price}
         />
       </Element>
 
