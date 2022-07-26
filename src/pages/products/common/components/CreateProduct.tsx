@@ -26,7 +26,7 @@ import { request } from 'common/helpers/request';
 export interface CreateProductDto {
   product_key: string;
   notes: string;
-  cost: string;
+  cost: number;
   quantity: number;
   custom_value1: string;
   custom_value2: string;
@@ -59,7 +59,7 @@ export function CreateProduct(props: Props) {
     initialValues: {
       product_key: props.product?.product_key || '',
       notes: props.product?.notes || '',
-      cost: props.product?.cost || '',
+      cost: props.product?.cost || 0,
       quantity: props.product?.quantity || 1,
       custom_value1: props.product?.custom_value1 || '',
       custom_value2: props.product?.custom_value2 || '',
@@ -126,7 +126,7 @@ export function CreateProduct(props: Props) {
           id="price"
           value={formik.values.price}
           onChange={formik.handleChange}
-          errorMessage={errors?.errors.price}
+          errorMessage={errors?.price}
         />
       </Element>
 
