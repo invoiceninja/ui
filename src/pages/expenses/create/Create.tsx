@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Details } from './components/Details';
 import { Notes } from './components/Notes';
+import { AdditionalInfo } from './components/AdditionalInfo';
 
 export function Create() {
   const [t] = useTranslation();
@@ -54,6 +55,10 @@ export function Create() {
 
         <div className="col-span-12 xl:col-span-4">
           <Notes expense={expense} handleChange={handleChange} />
+        </div>
+
+        <div className="col-span-12 xl:col-span-4">
+          <AdditionalInfo expense={expense} handleChange={handleChange} />
         </div>
       </div>
     </Default>
