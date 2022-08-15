@@ -15,6 +15,7 @@ import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Details } from './components/Details';
+import { Notes } from './components/Notes';
 
 export function Create() {
   const [t] = useTranslation();
@@ -49,6 +50,10 @@ export function Create() {
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 xl:col-span-4">
           <Details expense={expense} handleChange={handleChange} />
+        </div>
+
+        <div className="col-span-12 xl:col-span-4">
+          <Notes expense={expense} handleChange={handleChange} />
         </div>
       </div>
     </Default>

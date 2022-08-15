@@ -19,7 +19,7 @@ import { UserSelector } from 'components/users/UserSelector';
 import { VendorSelector } from 'components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
+export interface ExpenseCardProps {
   expense: Expense | undefined;
   handleChange: <T extends keyof Expense>(
     property: T,
@@ -27,7 +27,7 @@ interface Props {
   ) => void;
 }
 
-export function Details(props: Props) {
+export function Details(props: ExpenseCardProps) {
   const [t] = useTranslation();
   const { expense, handleChange } = props;
 
