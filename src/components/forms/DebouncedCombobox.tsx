@@ -49,6 +49,7 @@ interface Props {
   errorMessage?: string | string[];
   queryAdditional?: boolean;
   initiallyVisible?: boolean;
+  withProperty?: string;
 }
 
 export function DebouncedCombobox(props: Props) {
@@ -86,6 +87,10 @@ export function DebouncedCombobox(props: Props) {
 
     if (query) {
       url.searchParams.set('filter', query);
+    }
+
+    if (props.defaultValue && props.defaultValue.toString().length >= 1) {
+      url.searchParams.set('with', props.defaultValue.toString());
     }
 
     url.searchParams.set('sort', 'created_at|desc');
