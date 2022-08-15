@@ -14,9 +14,9 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTranslation } from 'react-i18next';
 import { ExpenseCardProps } from './Details';
 
-export function Taxes(props: ExpenseCardProps) {
+export function TaxSettings(props: ExpenseCardProps) {
   const [t] = useTranslation();
-  const { expense, handleChange } = props;
+  const { expense } = props;
   const company = useCurrentCompany();
 
   return (

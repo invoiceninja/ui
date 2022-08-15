@@ -97,6 +97,8 @@ export function Details(props: ExpenseCardProps) {
         </Element>
       )}
 
+      
+
       {expense && (
         <Element leftSide={t('currency')}>
           <CurrencySelector
