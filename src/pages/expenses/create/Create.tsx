@@ -35,11 +35,20 @@ export function Create() {
     }
   }, [data]);
 
+  const handleChange = <T extends keyof Expense>(
+    property: T,
+    value: Expense[typeof property]
+  ) => {
+    setExpense((expense) => expense && { ...expense, [property]: value });
+  };
+
+  console.log(expense);
+
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 xl:col-span-4">
-          <Details expense={expense} setExpense={setExpense} />
+          <Details expense={expense} handleChange={handleChange} />
         </div>
       </div>
     </Default>
