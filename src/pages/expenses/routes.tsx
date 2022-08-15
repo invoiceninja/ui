@@ -11,16 +11,26 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
+import { Create } from './create/Create';
 import { Expenses } from './index/Expenses';
 
 export const expenseRoutes = (
-  <Route>
+  <Route path="expenses">
     <Route
-      path="expenses"
+      path=""
       element={
         <Guard
           guards={[() => permission('view_expense')]}
           component={<Expenses />}
+        />
+      }
+    />
+    <Route
+      path="create"
+      element={
+        <Guard
+          guards={[() => permission('create_expense')]}
+          component={<Create />}
         />
       }
     />
