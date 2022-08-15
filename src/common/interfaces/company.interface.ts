@@ -16,6 +16,7 @@ export interface Company {
   custom_fields: Record<string, string>;
   enabled_tax_rates: number;
   enabled_item_tax_rates: number;
+  enabled_expense_tax_rates: number;
   enable_product_discount: boolean;
   custom_surcharge_taxes1: boolean;
   custom_surcharge_taxes2: boolean;
