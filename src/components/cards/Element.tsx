@@ -16,7 +16,7 @@ interface Props {
   leftSideHelp?: ReactNode;
   pushContentToRight?: boolean;
   required?: boolean;
-  children: ReactNode;
+  children?: ReactNode;
   className?: any;
   onClick?: () => unknown;
   noExternalPadding?: boolean;
