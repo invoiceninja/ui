@@ -96,6 +96,19 @@ export function TaxSettings() {
           </SelectField>
         </Element>
 
+        <Element leftSide={t('expense_tax_rates')}>
+          <SelectField
+            id="enabled_expense_tax_rates"
+            onChange={handleChange}
+            value={companyChanges?.enabled_expense_tax_rates || 0}
+          >
+            <option value="0">{t('disabled')}</option>
+            <option value="1">{t('one_tax_rate')}</option>
+            <option value="2">{t('two_tax_rates')}</option>
+            <option value="3">{t('three_tax_rates')}</option>
+          </SelectField>
+        </Element>
+
         <Element
           leftSide={t('inclusive_taxes')}
           leftSideHelp={
