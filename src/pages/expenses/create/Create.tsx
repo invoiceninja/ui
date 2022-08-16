@@ -17,9 +17,16 @@ import { useTranslation } from 'react-i18next';
 import { Details } from './components/Details';
 import { Notes } from './components/Notes';
 import { AdditionalInfo } from './components/AdditionalInfo';
+import { request } from 'common/helpers/request';
+import { endpoint } from 'common/helpers';
+import { toast } from 'common/helpers/toast/toast';
+import { generatePath, useNavigate } from 'react-router-dom';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
 export function Create() {
   const [t] = useTranslation();
+
+  const navigate = useNavigate();
 
   const { documentTitle } = useTitle('new_expense');
   const { data } = useBlankExpenseQuery();
@@ -44,10 +51,29 @@ export function Create() {
     setExpense((expense) => expense && { ...expense, [property]: value });
   };
 
-  console.log(expense);
+  const onSave = (expense: Expense) => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/expenses'), expense)
+      .then((response: GenericSingleResourceResponse<Expense>) => {
+        toast.success('created_expense');
+
+        navigate(generatePath('/expenses/:id', { id: response.data.data.id }));
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.error();
+      });
+  };
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onBackClick="/expenses"
+      onSaveClick={() => expense && onSave(expense)}
+    >
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 xl:col-span-4">
           <Details expense={expense} handleChange={handleChange} />
