@@ -18,29 +18,28 @@ interface Props {
 }
 
 export function MarkdownEditor(props: Props) {
-  const [value, setValue] = useState<string | undefined>('');
-
-  useEffect(() => setValue(props.value), [props.value]);
-
-  const debouncedSearch = useRef(
-    debounce((value) => {
-      props.onChange(value);
-    }, 300)
-  ).current;
+  const [value, setValue] = useState<string | undefined>();
 
   useEffect(() => {
-    return () => {
-      debouncedSearch.cancel();
-    };
-  }, [debouncedSearch]);
+    setValue(props.value);
+  }, [props.value]);
 
-  useEffect(() => debouncedSearch(value), [value]);
+  const handleChangeEvent = (value: string) => {
+    props.onChange(value)
+  };
+
+  const delayedQuery = useRef(
+    debounce((q) => handleChangeEvent(q), 500)
+  ).current;
+
+  const handleChange = (input: string | undefined) => {
+    setValue(input || '');
+    delayedQuery(input || '');
+  };
 
   return (
-    <MDEditor
-      value={value}
-      onChange={(value) => setValue(value ?? '')}
-      preview="edit"
-    />
+    <div>
+      <MDEditor value={value} onChange={handleChange} preview="edit" />
+    </div>
   );
 }

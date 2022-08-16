@@ -188,7 +188,7 @@ export function TemplatesAndReminders() {
             value={templateBody?.subject}
             onValueChange={(value) =>
               setTemplateBody(
-                templateBody && { ...templateBody, subject: value }
+                (current) => current && { ...current, subject: value }
               )
             }
           />
@@ -197,9 +197,9 @@ export function TemplatesAndReminders() {
         <Element leftSide={t('body')}>
           <MarkdownEditor
             value={templateBody?.body}
-            onChange={(value) =>
-              setTemplateBody(templateBody && { ...templateBody, body: value })
-            }
+            onChange={(value) => setTemplateBody(
+              (current) => current && { ...current, body: value }
+            )}
           />
         </Element>
       </Card>
