@@ -12,7 +12,8 @@ import { ReactNode } from 'react';
 
 interface Props {
   title: string;
-  value: ReactNode;
+  value?: ReactNode;
+  children?: ReactNode;
   className?: string;
 }
 
@@ -22,7 +23,9 @@ export function InfoCard(props: Props) {
       className={`px-4 py-5 bg-white shadow rounded overflow-hidden sm:p-6 space-y-2 ${props.className}`}
     >
       <dd className="text-xl font-medium text-gray-900">{props.title}</dd>
-      <dt className="text-sm text-gray-500 truncate">{props.value}</dt>
+      <dt className="text-sm text-gray-500 truncate">
+        {props.value} {props.children}
+      </dt>
     </div>
   );
 }

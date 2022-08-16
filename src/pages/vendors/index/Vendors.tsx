@@ -8,38 +8,54 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Link } from '@invoiceninja/forms';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
+import { Vendor } from 'common/interfaces/vendor';
+import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
-import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 
 export function Vendors() {
+  const { documentTitle } = useTitle('vendors');
+
   const [t] = useTranslation();
+
+  const pages: BreadcrumRecord[] = [{ name: t('vendors'), href: '/vendors' }];
+
   const { dateFormat } = useCurrentCompanyDateFormats();
-  useTitle('vendors');
-  const pages = [{ name: t('vendors'), href: '/vendors' }];
+
   const columns: DataTableColumns = [
     {
       id: 'number',
       label: t('number'),
-      format: (value, resource) => (
-        <Link to={generatePath('/vendors/:id', { id: resource.id })}>
-          {resource.number}
+      format: (value, vendor: Vendor) => (
+        <Link to={generatePath('/vendors/:id', { id: vendor.id })}>
+          {value}
         </Link>
       ),
     },
-
-    { id: 'name', label: t('name') },
+    {
+      id: 'name',
+      label: t('name'),
+      format: (value, vendor: Vendor) => (
+        <Link to={generatePath('/vendors/:id', { id: vendor.id })}>
+          {value}
+        </Link>
+      ),
+    },
     {
       id: 'city',
       label: t('city'),
     },
-    { id: 'phone', label: t('phone') },
+    {
+      id: 'phone',
+      label: t('phone'),
+    },
     {
       id: 'entiy_state',
       label: t('entity_state'),
@@ -53,13 +69,13 @@ export function Vendors() {
   ];
 
   return (
-    <Default title={t('vendors')} breadcrumbs={pages} docsLink="docs/vendors/">
+    <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
         resource="vendor"
-        endpoint="/api/v1/vendors"
         columns={columns}
+        endpoint="/api/v1/vendors"
         linkToCreate="/vendors/create"
-        linkToEdit="/vendors/:id"
+        linkToEdit="/vendors/:id/edit"
         withResourcefulActions
       />
     </Default>

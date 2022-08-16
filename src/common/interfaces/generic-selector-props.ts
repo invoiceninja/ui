@@ -13,6 +13,6 @@ export interface GenericSelectorProps<T> {
   value?: string | undefined;
   readonly?: boolean;
   clearButton?: boolean;
-  onChange: (client: T) => unknown;
+  onChange: (resource: T) => unknown;
   onClearButtonClick?: () => unknown;
 }
