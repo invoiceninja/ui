@@ -9,6 +9,7 @@
  */
 
 import { useAccentColor } from 'common/hooks/useAccentColor';
+import { ChangeEvent } from 'react';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
@@ -19,6 +20,7 @@ interface Props extends CommonProps {
   }[];
   defaultSelected?: string;
   name: string;
+  onValueChange?: (value: string) => unknown;
 }
 
 export function Radio(props: Props) {
@@ -29,7 +31,13 @@ export function Radio(props: Props) {
       <legend className="sr-only">Notification method</legend>
       <div className="space-y-4 sm:flex sm:items-center sm:space-y-0 sm:space-x-10">
         {props.options.map((option) => (
-          <div key={option.id} className="flex items-center">
+          <div
+            key={option.id}
+            className="flex items-center"
+            onChange={(event: ChangeEvent<HTMLInputElement>) =>
+              props.onValueChange?.(event.target.value)
+            }
+          >
             <input
               value={option.value}
               onClick={props.onClick}
