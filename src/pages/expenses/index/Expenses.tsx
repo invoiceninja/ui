@@ -38,7 +38,7 @@ export function Expenses() {
       id: 'status_id',
       label: t('status'),
       format: (value, expense) => (
-        <Link to={generatePath('/expense/:id/edit', { id: expense.id })}>
+        <Link to={generatePath('/expense/:id', { id: expense.id })}>
           <Status expense={expense} />
         </Link>
       ),
@@ -47,7 +47,7 @@ export function Expenses() {
       id: 'number',
       label: t('number'),
       format: (field, expense) => (
-        <Link to={generatePath('/expense/:id/edit', { id: expense.id })}>
+        <Link to={generatePath('/expense/:id', { id: expense.id })}>
           {field}
         </Link>
       ),
