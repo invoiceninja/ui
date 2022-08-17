@@ -12,9 +12,9 @@ import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
+import { Edit } from './edit/Edit';
 import { Expense } from './Expense';
 import { Expenses } from './index/Expenses';
-import { Show } from './show/Show';
 
 export const expenseRoutes = (
   <Route path="expenses">
@@ -45,7 +45,7 @@ export const expenseRoutes = (
         />
       }
     >
-      <Route path="" element={<Show />} />
+      <Route path="edit" element={<Edit />} />
     </Route>
   </Route>
 );
