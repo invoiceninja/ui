@@ -9,14 +9,30 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { Link } from '@invoiceninja/forms';
+import { Link, Radio } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import Toggle from 'components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 import { ExpenseCardProps } from './Details';
 
-export function TaxSettings(props: ExpenseCardProps) {
+interface Props extends ExpenseCardProps {
+  isInclusiveTax: boolean;
+  taxInputType: 'by_rate' | 'by_amount';
+  setIsInclusiveTax: (value: boolean) => unknown;
+  setTaxInputType: (type: 'by_rate' | 'by_amount') => unknown;
+}
+
+export function TaxSettings(props: Props) {
   const [t] = useTranslation();
-  const { expense } = props;
+
+  const {
+    expense,
+    taxInputType,
+    setTaxInputType,
+    isInclusiveTax,
+    setIsInclusiveTax,
+  } = props;
+
   const company = useCurrentCompany();
 
   return (
@@ -24,6 +40,36 @@ export function TaxSettings(props: ExpenseCardProps) {
       {company?.enabled_expense_tax_rates === 0 && (
         <Element leftSide={t('expense_tax_help')}>
           <Link to="/settings/tax_settings">{t('settings')}</Link>
+        </Element>
+      )}
+
+      {company?.enabled_expense_tax_rates > 0 && expense && (
+        <Element leftSide={t('enter_taxes')}>
+          <Radio
+            name="enter_taxes"
+            options={[
+              { id: 'by_rate', title: t('by_rate'), value: 'by_rate' },
+              { id: 'by_amount', title: t('by_amount'), value: 'by_amount' },
+            ]}
+            defaultSelected={taxInputType}
+            onValueChange={(value) =>
+              setTaxInputType(value as 'by_rate' | 'by_amount')
+            }
+          />
+        </Element>
+      )}
+
+      {company?.enabled_expense_tax_rates > 0 && expense && (
+        <Element
+          leftSide={t('inclusive_taxes')}
+          leftSideHelp={
+            <span className="flex flex-col">
+              <span>{t('exclusive')}: 100 + 10% = 100 + 10</span>
+              <span>{t('inclusive')}: 100 + 10% = 90.91 + 9.09</span>
+            </span>
+          }
+        >
+          <Toggle onChange={setIsInclusiveTax} checked={isInclusiveTax} />
         </Element>
       )}
     </Card>

@@ -22,6 +22,7 @@ import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { TaxSettings } from './components/Taxes';
 
 export function Create() {
   const [t] = useTranslation();
@@ -37,6 +38,10 @@ export function Create() {
   ];
 
   const [expense, setExpense] = useState<Expense>();
+  const [isInclusiveTax, setIsInclusiveTax] = useState(true);
+  const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
+    'by_rate'
+  );
 
   useEffect(() => {
     if (data) {
@@ -49,6 +54,10 @@ export function Create() {
     value: Expense[typeof property]
   ) => {
     setExpense((expense) => expense && { ...expense, [property]: value });
+  };
+
+  const handleTaxTypeChange = (type: 'by_rate' | 'by_amount') => {
+    setTaxInputType(type);
   };
 
   const onSave = (expense: Expense) => {
@@ -85,7 +94,15 @@ export function Create() {
 
         <div className="col-span-12 xl:col-span-4 space-y-4">
           <AdditionalInfo expense={expense} handleChange={handleChange} />
-          {/* <TaxSettings expense={expense} handleChange={handleChange} /> */}
+
+          <TaxSettings
+            expense={expense}
+            handleChange={handleChange}
+            taxInputType={taxInputType}
+            setTaxInputType={setTaxInputType}
+            isInclusiveTax={isInclusiveTax}
+            setIsInclusiveTax={setIsInclusiveTax}
+          />
         </div>
       </div>
     </Default>
