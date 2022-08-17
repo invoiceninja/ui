@@ -24,3 +24,14 @@ export function useBlankExpenseQuery() {
     { staleTime: Infinity }
   );
 }
+
+export function useExpenseQuery(params: { id: string | undefined }) {
+  return useQuery<Expense>(
+    generatePath('/api/v1/expenses/:id', { id: params.id }),
+    () =>
+      request('GET', endpoint('/api/v1/expenses/:id', { id: params.id })).then(
+        (response) => response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}
