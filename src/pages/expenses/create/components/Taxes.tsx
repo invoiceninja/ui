@@ -16,22 +16,14 @@ import { useTranslation } from 'react-i18next';
 import { ExpenseCardProps } from './Details';
 
 interface Props extends ExpenseCardProps {
-  isInclusiveTax: boolean;
   taxInputType: 'by_rate' | 'by_amount';
-  setIsInclusiveTax: (value: boolean) => unknown;
   setTaxInputType: (type: 'by_rate' | 'by_amount') => unknown;
 }
 
 export function TaxSettings(props: Props) {
   const [t] = useTranslation();
 
-  const {
-    expense,
-    taxInputType,
-    setTaxInputType,
-    isInclusiveTax,
-    setIsInclusiveTax,
-  } = props;
+  const { expense, handleChange, taxInputType, setTaxInputType } = props;
 
   const company = useCurrentCompany();
 
@@ -69,7 +61,10 @@ export function TaxSettings(props: Props) {
             </span>
           }
         >
-          <Toggle onChange={setIsInclusiveTax} checked={isInclusiveTax} />
+          <Toggle
+            onChange={(value) => handleChange('uses_inclusive_taxes', value)}
+            checked={expense.uses_inclusive_taxes}
+          />
         </Element>
       )}
     </Card>

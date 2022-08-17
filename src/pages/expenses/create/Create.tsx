@@ -38,7 +38,6 @@ export function Create() {
   ];
 
   const [expense, setExpense] = useState<Expense>();
-  const [isInclusiveTax, setIsInclusiveTax] = useState(true);
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
   );
@@ -54,10 +53,6 @@ export function Create() {
     value: Expense[typeof property]
   ) => {
     setExpense((expense) => expense && { ...expense, [property]: value });
-  };
-
-  const handleTaxTypeChange = (type: 'by_rate' | 'by_amount') => {
-    setTaxInputType(type);
   };
 
   const onSave = (expense: Expense) => {
@@ -100,8 +95,6 @@ export function Create() {
             handleChange={handleChange}
             taxInputType={taxInputType}
             setTaxInputType={setTaxInputType}
-            isInclusiveTax={isInclusiveTax}
-            setIsInclusiveTax={setIsInclusiveTax}
           />
         </div>
       </div>
