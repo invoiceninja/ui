@@ -154,6 +154,23 @@ export function Defaults() {
             />
           </Element>
 
+          <Element leftSide={t('use_quote_terms')}>
+            <Toggle
+              checked={
+                companyChanges?.use_quote_terms_on_conversion
+              }
+              onChange={(value: boolean) =>
+                dispatch(
+                  updateChanges({
+                    object: 'company',
+                    property: 'use_quote_terms_on_conversion',
+                    value,
+                  })
+                )
+              }
+            />
+          </Element>
+
           <div className="pt-6 border-b"></div>
 
           <Element className="mt-4" leftSide={t('invoice_terms')}>
