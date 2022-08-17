@@ -80,7 +80,11 @@ export function Create() {
     >
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 xl:col-span-4">
-          <Details expense={expense} handleChange={handleChange} />
+          <Details
+            expense={expense}
+            handleChange={handleChange}
+            taxInputType={taxInputType}
+          />
         </div>
 
         <div className="col-span-12 xl:col-span-4">

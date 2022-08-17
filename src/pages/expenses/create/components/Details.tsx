@@ -10,11 +10,13 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Expense } from 'common/interfaces/expense';
 import { ClientSelector } from 'components/clients/ClientSelector';
 import { CurrencySelector } from 'components/CurrencySelector';
 import { ExpenseCategorySelector } from 'components/expense-categories/ExpenseCategorySelector';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
+import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { UserSelector } from 'components/users/UserSelector';
 import { VendorSelector } from 'components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
@@ -27,9 +29,14 @@ export interface ExpenseCardProps {
   ) => void;
 }
 
-export function Details(props: ExpenseCardProps) {
+interface Props extends ExpenseCardProps {
+  taxInputType: 'by_rate' | 'by_amount';
+}
+
+export function Details(props: Props) {
   const [t] = useTranslation();
-  const { expense, handleChange } = props;
+  const { expense, handleChange, taxInputType } = props;
+  const company = useCurrentCompany();
 
   return (
     <Card title={t('details')} isLoading={!expense}>
@@ -88,16 +95,142 @@ export function Details(props: ExpenseCardProps) {
         </Element>
       )}
 
+      {/* Tax 1 */}
+      {expense &&
+        company?.enabled_expense_tax_rates > 0 &&
+        taxInputType === 'by_rate' && (
+          <Element leftSide={t('tax')}>
+            <TaxRateSelector
+              defaultValue={expense.tax_rate1}
+              clearButton={Boolean(expense.tax_rate1)}
+              onClearButtonClick={() => {
+                handleChange('tax_name1', '');
+                handleChange('tax_rate1', 0);
+              }}
+              onChange={(taxRate) => {
+                taxRate.resource &&
+                  handleChange('tax_rate1', taxRate.resource.rate);
+
+                taxRate.resource &&
+                  handleChange('tax_name1', taxRate.resource.name);
+              }}
+            />
+          </Element>
+        )}
+
+      {expense &&
+        company?.enabled_expense_tax_rates > 0 &&
+        taxInputType === 'by_amount' && (
+          <Element leftSide={t('tax')}>
+            <div className="flex flex-col xl:flex-row xl:items-center space-y-4 xl:space-y-0 xl:space-x-4">
+              <InputField
+                label={t('tax_name')}
+                onValueChange={(value) => handleChange('tax_name1', value)}
+              />
+              <InputField
+                label={t('tax_amount')}
+                onValueChange={(value) =>
+                  handleChange('tax_amount1', parseFloat(value))
+                }
+              />
+            </div>
+          </Element>
+        )}
+
+      {/* Tax 2 */}
+      {expense &&
+        company?.enabled_expense_tax_rates > 1 &&
+        taxInputType === 'by_rate' && (
+          <Element leftSide={t('tax')}>
+            <TaxRateSelector
+              defaultValue={expense.tax_rate2}
+              clearButton={Boolean(expense.tax_rate2)}
+              onClearButtonClick={() => {
+                handleChange('tax_name2', '');
+                handleChange('tax_rate2', 0);
+              }}
+              onChange={(taxRate) => {
+                taxRate.resource &&
+                  handleChange('tax_rate2', taxRate.resource.rate);
+
+                taxRate.resource &&
+                  handleChange('tax_name2', taxRate.resource.name);
+              }}
+            />
+          </Element>
+        )}
+
+      {expense &&
+        company?.enabled_expense_tax_rates > 1 &&
+        taxInputType === 'by_amount' && (
+          <Element leftSide={t('tax')}>
+            <div className="flex flex-col xl:flex-row xl:items-center space-y-4 xl:space-y-0 xl:space-x-4">
+              <InputField
+                label={t('tax_name')}
+                onValueChange={(value) => handleChange('tax_name2', value)}
+              />
+              <InputField
+                label={t('tax_amount')}
+                onValueChange={(value) =>
+                  handleChange('tax_amount2', parseFloat(value))
+                }
+              />
+            </div>
+          </Element>
+        )}
+
+      {/* Tax 3 */}
+      {expense &&
+        company?.enabled_expense_tax_rates > 2 &&
+        taxInputType === 'by_rate' && (
+          <Element leftSide={t('tax')}>
+            <TaxRateSelector
+              defaultValue={expense.tax_rate3}
+              clearButton={Boolean(expense.tax_rate3)}
+              onClearButtonClick={() => {
+                handleChange('tax_name3', '');
+                handleChange('tax_rate3', 0);
+              }}
+              onChange={(taxRate) => {
+                taxRate.resource &&
+                  handleChange('tax_rate3', taxRate.resource.rate);
+
+                taxRate.resource &&
+                  handleChange('tax_name3', taxRate.resource.name);
+              }}
+            />
+          </Element>
+        )}
+
+      {expense &&
+        company?.enabled_expense_tax_rates > 2 &&
+        taxInputType === 'by_amount' && (
+          <Element leftSide={t('tax')}>
+            <div className="flex flex-col xl:flex-row xl:items-center space-y-4 xl:space-y-0 xl:space-x-4">
+              <InputField
+                label={t('tax_name')}
+                onValueChange={(value) => handleChange('tax_name3', value)}
+              />
+              <InputField
+                label={t('tax_amount')}
+                onValueChange={(value) =>
+                  handleChange('tax_amount3', parseFloat(value))
+                }
+              />
+            </div>
+          </Element>
+        )}
+
       {expense && (
         <Element leftSide={t('amount')}>
           <InputField
             value={expense.amount}
-            onValueChange={(value) => handleChange('amount', parseFloat(value) || 0)}
+            onValueChange={(value) =>
+              handleChange('amount', parseFloat(value) || 0)
+            }
           />
         </Element>
       )}
-
-      
 
       {expense && (
         <Element leftSide={t('currency')}>
