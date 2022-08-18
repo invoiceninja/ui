@@ -12,11 +12,13 @@ import { useTitle } from 'common/hooks/useTitle';
 import { useExpenseQuery } from 'common/queries/expenses';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Dropdown } from 'components/dropdown/Dropdown';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, Outlet, useParams } from 'react-router-dom';
+import { useBulk } from './edit/hooks/useBulk';
 
 export function Expense() {
   const { documentTitle, setDocumentTitle } = useTitle('expense');
@@ -45,15 +47,34 @@ export function Expense() {
     },
   ];
 
+  const bulk = useBulk();
+
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
       topRight={
-        <Dropdown label={t('more_actions')}>
-          {/* <DropdownElement>A</DropdownElement>
-            <DropdownElement>B</DropdownElement> */}
-        </Dropdown>
+        expense && (
+          <Dropdown label={t('more_actions')}>
+            {expense.archived_at === 0 && (
+              <DropdownElement onClick={() => bulk([expense.id], 'archive')}>
+                {t('archive')}
+              </DropdownElement>
+            )}
+
+            {expense.archived_at > 0 && (
+              <DropdownElement onClick={() => bulk([expense.id], 'restore')}>
+                {t('restore')}
+              </DropdownElement>
+            )}
+
+            {!expense.is_deleted && (
+              <DropdownElement onClick={() => bulk([expense.id], 'delete')}>
+                {t('delete')}
+              </DropdownElement>
+            )}
+          </Dropdown>
+        )
       }
     >
       <div className="space-y-4">
