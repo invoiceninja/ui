@@ -48,7 +48,7 @@ export interface Gateway {
   provider: string;
   visible: boolean;
   sort_order: number;
-  site_url: string;
+  site_url?: string;
   is_offsite: boolean;
   is_secure: boolean;
   fields: string;
