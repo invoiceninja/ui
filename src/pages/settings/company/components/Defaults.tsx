@@ -262,6 +262,36 @@ export function Defaults() {
               }
             />
           </Element>
+
+          <Element className="mt-4" leftSide={t('purchase_order_terms')}>
+            <MDEditor
+              value={companyChanges?.settings?.purchase_order_terms}
+              onChange={(value) =>
+                dispatch(
+                  updateChanges({
+                    object: 'company',
+                    property: 'settings.purchase_order_terms',
+                    value,
+                  })
+                )
+              }
+            />
+          </Element>
+
+          <Element className="mt-4" leftSide={t('purchase_order_footer')}>
+            <MDEditor
+              value={companyChanges?.settings?.purchase_order_footer}
+              onChange={(value) =>
+                dispatch(
+                  updateChanges({
+                    object: 'company',
+                    property: 'settings.purchase_order_footer',
+                    value,
+                  })
+                )
+              }
+            />
+          </Element>
         </Card>
       )}
     </>
