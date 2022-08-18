@@ -13,7 +13,6 @@ import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
-import { Expense } from './Expense';
 import { Expenses } from './index/Expenses';
 
 export const expenseRoutes = (
@@ -36,16 +35,16 @@ export const expenseRoutes = (
         />
       }
     />
-    <Route
-      path=":id"
-      element={
-        <Guard
-          guards={[() => permission('view_expense')]}
-          component={<Expense />}
-        />
-      }
-    >
-      <Route path="edit" element={<Edit />} />
+    <Route path=":id">
+      <Route
+        path="edit"
+        element={
+          <Guard
+            guards={[() => permission('edit_expense')]}
+            component={<Edit />}
+          />
+        }
+      />
     </Route>
   </Route>
 );
