@@ -8,13 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
 import { useExpenseQuery } from 'common/queries/expenses';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Dropdown } from 'components/dropdown/Dropdown';
-import { InfoCard } from 'components/InfoCard';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
 import { useEffect } from 'react';
@@ -48,9 +45,6 @@ export function Expense() {
     },
   ];
 
-  const company = useCurrentCompany();
-  const formatMoney = useFormatMoney();
-
   return (
     <Default
       title={documentTitle}
@@ -62,17 +56,7 @@ export function Expense() {
         </Dropdown>
       }
     >
-      <div className="grid grid-cols-12">
-        <InfoCard className="col-span-12 xl:col-span-3" title={t('amount')}>
-          {formatMoney(
-            expense?.amount || 0,
-            company?.settings.country_id,
-            company.settings.currency_id
-          )}
-        </InfoCard>
-      </div>
-
-      <div className="mt-4 space-y-4">
+      <div className="space-y-4">
         <Tabs tabs={tabs} />
         <Outlet />
       </div>
