@@ -57,7 +57,7 @@ export function Settings(props: Props) {
       current: location.pathname === '/settings/localization',
     },
     {
-      name: t('online_payments'),
+      name: t('payment_settings'),
       href: '/settings/online_payments',
       current: location.pathname === '/settings/online_payments',
     },
