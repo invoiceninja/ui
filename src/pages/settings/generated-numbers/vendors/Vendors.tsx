@@ -74,7 +74,7 @@ export function Vendors() {
         <Element leftSide={t('number_counter')}>
           <InputField 
           id="settings.vendor_number_counter" 
-          value={companyChanges?.settings?.vendor_number_counter}
+          value={companyChanges?.settings?.vendors_number_counter}
           onChange={handleChange}
           />
         </Element>
