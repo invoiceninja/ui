@@ -27,7 +27,7 @@ import { useBulk } from './hooks/useBulk';
 import { useSave } from './hooks/useSave';
 
 export function Edit() {
-  const { documentTitle, setDocumentTitle } = useTitle('expense');
+  const { documentTitle } = useTitle('expense');
   const { id } = useParams();
   const { data } = useExpenseQuery({ id });
 
@@ -35,7 +35,7 @@ export function Edit() {
 
   const pages: BreadcrumRecord[] = [
     { name: t('expenses'), href: '/expenses' },
-    { name: documentTitle, href: generatePath('/expenses/:id', { id }) },
+    { name: t('edit_expense'), href: generatePath('/expenses/:id', { id }) },
   ];
 
   const tabs: Tab[] = [
