@@ -12,6 +12,8 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement } from '../../../components/cards';
 import { Settings } from '../../../components/layouts/Settings';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { Settings as SettingsComponent } from './components/Settings';
 
 export function GeneratedNumbers() {
@@ -20,6 +22,9 @@ export function GeneratedNumbers() {
     { name: t('settings'), href: '/settings' },
     { name: t('generated_numbers'), href: '/settings/generated_numbers' },
   ];
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
+
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
       'generated_numbers'
@@ -30,6 +35,8 @@ export function GeneratedNumbers() {
     <Settings
       title={t('generated_numbers')}
       breadcrumbs={pages}
+      onSaveClick={onSave}
+      onCancelClick={onCancel}
       docsLink="docs/advanced-settings/#generated_numbers"
     >
       <SettingsComponent />
