@@ -241,4 +241,6 @@ export interface Settings {
   first_month_of_year: string;
   qr_iban: string;
   besr_id: string;
+  vendor_portal_enable_uploads: boolean;
+
 }
