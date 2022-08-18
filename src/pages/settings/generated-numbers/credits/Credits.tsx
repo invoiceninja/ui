@@ -22,11 +22,6 @@ export function Credits() {
     { name: t('generated_numbers'), href: '/settings/generated_numbers' },
     { name: t('credits'), href: '/settings/generated_numbers/credits' },
   ];
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'generated_numbers'
-    )}`;
-  });
 
   const variables = [
     '{$counter}',
