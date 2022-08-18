@@ -13,6 +13,8 @@ import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { updateChanges } from 'common/stores/slices/company-users';
 import { Divider } from 'components/cards/Divider';
+import { InputField } from 'components/forms/InputField';
+import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../components/cards';
@@ -46,6 +48,15 @@ export function ProductSettings() {
     );
   };
 
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: event.target.id,
+        value: event.target.value,
+      })
+  );
+
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
 
@@ -58,6 +69,43 @@ export function ProductSettings() {
       docsLink="docs/basic-settings/#product_settings"
     >
       <Card title={t('Settings')}>
+
+        <Element
+          leftSide={t('track_inventory')}
+          leftSideHelp={t('track_inventory_help')}
+        >
+          <Toggle
+            checked={companyChanges?.track_inventory}
+            onChange={(value: boolean) =>
+              handleToggleChange('track_inventory', value)
+            }
+          />
+        </Element>
+        <Element
+          leftSide={t('stock_notifications')}
+          leftSideHelp={t('stock_notifications_help')}
+        >
+          <Toggle
+            checked={companyChanges?.stock_notification}
+            onChange={(value: boolean) =>
+              handleToggleChange('stock_notification', value)
+            }
+          />
+        </Element>
+        {companyChanges?.stock_notification === true ?
+          <>
+          <Element leftSide={t('notification_threshold')}>
+            <InputField
+              id="inventory_notification_threshold"
+              onChange={handleChange}
+              value={companyChanges?.inventory_notification_threshold || ''}
+            />
+          </Element>
+        </> : ''
+        }
+
+        <Divider />
+
         <Element
           leftSide={t('show_product_discount')}
           leftSideHelp={t('show_product_discount_help')}
