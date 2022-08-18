@@ -55,24 +55,35 @@ export function Expense() {
       breadcrumbs={pages}
       topRight={
         expense && (
-          <Dropdown label={t('more_actions')}>
-            {expense.archived_at === 0 && (
-              <DropdownElement onClick={() => bulk([expense.id], 'archive')}>
-                {t('archive')}
-              </DropdownElement>
-            )}
+          <Dropdown label={t('more_actions')} className="divide-y">
+            <div>
+              {expense.archived_at === 0 && (
+                <DropdownElement onClick={() => bulk([expense.id], 'archive')}>
+                  {t('archive')}
+                </DropdownElement>
+              )}
 
-            {expense.archived_at > 0 && (
-              <DropdownElement onClick={() => bulk([expense.id], 'restore')}>
-                {t('restore')}
-              </DropdownElement>
-            )}
+              {expense.archived_at > 0 && (
+                <DropdownElement onClick={() => bulk([expense.id], 'restore')}>
+                  {t('restore')}
+                </DropdownElement>
+              )}
 
-            {!expense.is_deleted && (
-              <DropdownElement onClick={() => bulk([expense.id], 'delete')}>
-                {t('delete')}
+              {!expense.is_deleted && (
+                <DropdownElement onClick={() => bulk([expense.id], 'delete')}>
+                  {t('delete')}
+                </DropdownElement>
+              )}
+            </div>
+
+            <div>
+              <DropdownElement
+                to={generatePath('/expenses/:id/clone', { id: expense.id })}
+              >
+                {t('clone_to_expense')}
               </DropdownElement>
-            )}
+              {/* <DropdownElement>{t('clone_to_recurring')}</DropdownElement> */}
+            </div>
           </Dropdown>
         )
       }
