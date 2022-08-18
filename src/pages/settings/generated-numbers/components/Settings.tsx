@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { InputField, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { useDispatch } from 'react-redux';
-import { updateChanges } from 'common/stores/slices/company-users';
 import { ChangeEvent } from 'react';
+import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { updateChanges } from 'common/stores/slices/company-users';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 
 export function Settings() {
@@ -122,15 +122,18 @@ export function Settings() {
           <option value="12">{t('freq_three_years')}</option>
         </SelectField>
       </Element>
-
-      <Element leftSide={t('next_reset')}>
-          <InputField
-            type="date"
-            id="settings.reset_counter_date"
-            onChange={handleChange}
-            value={companyChanges?.settings?.reset_counter_date || ''}
-          />
-      </Element>
+      {companyChanges?.settings?.reset_counter_frequency_id > 0 &&
+      <>
+        <Element leftSide={t('next_reset')}>
+            <InputField
+              type="date"
+              id="settings.reset_counter_date"
+              onChange={handleChange}
+              value={companyChanges?.settings?.reset_counter_date || ''}
+            />
+        </Element>
+      </>
+      }
     </Card>
   );
 }
