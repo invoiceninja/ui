@@ -13,7 +13,7 @@ import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { updateChanges } from 'common/stores/slices/company-users';
 import { useDiscardChanges } from 'pages/settings/common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from 'pages/settings/common/hooks/useHandleCompanySave';
-import React, { ChangeEvent, useEffect, useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
