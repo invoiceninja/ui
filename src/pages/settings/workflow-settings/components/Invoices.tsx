@@ -45,6 +45,22 @@ export function Invoices() {
           }
         />
       </Element>
+
+      <Element
+        leftSide={t('stop_on_unpaid')}
+        leftSideHelp={t('stop_on_unpaid_help')}
+      >
+        <Toggle
+          checked={companyChanges?.stop_on_unpaid_recurring || false}
+          onChange={(value: boolean) =>
+            handleToggleChange('stop_on_unpaid_recurring', value)
+          }
+        />
+      </Element>
+
+
+      <Divider />
+
       <Element
         leftSide={t('auto_archive_invoice')}
         leftSideHelp={t('auto_archive_invoice_help')}

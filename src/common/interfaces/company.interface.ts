@@ -30,6 +30,7 @@ export interface Company {
   enabled_expense_tax_rates: number;
   stock_notification: boolean;
   track_inventory: boolean;
+  stop_on_unpaid_recurring: boolean;
 }
 
 export interface Settings {
