@@ -108,6 +108,7 @@ export function Edit() {
           </Dropdown>
         )
       }
+      onBackClick={generatePath('/expenses')}
       onSaveClick={() => expense && save(expense)}
     >
       <div className="space-y-4">
