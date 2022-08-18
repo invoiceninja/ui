@@ -11,13 +11,12 @@
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
-import { Datepicker, InputField, SelectField } from '../../../../components/forms';
+import { InputField, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { useDispatch } from 'react-redux';
 import { updateChanges } from 'common/stores/slices/company-users';
 import { ChangeEvent } from 'react';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useTitle } from 'common/hooks/useTitle';
 
 export function Settings() {
   const [t] = useTranslation();
