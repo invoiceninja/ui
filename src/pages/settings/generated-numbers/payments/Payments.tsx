@@ -13,21 +13,40 @@ import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 import { Settings } from '../../../../components/layouts/Settings';
+import { updateChanges } from 'common/stores/slices/company-users';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useDispatch } from 'react-redux';
+import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { ChangeEvent } from 'react';
+import { useHandleCompanySave } from 'pages/settings/common/hooks/useHandleCompanySave';
+import { useDiscardChanges } from 'pages/settings/common/hooks/useDiscardChanges';
 
 export function Payments() {
   const [t] = useTranslation();
   const [pattern, setPattern] = useState<string>('');
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'generated_numbers'
-    )}`;
-  });
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('generated_numbers'), href: '/settings/generated_numbers' },
     { name: t('payments'), href: '/settings/generated_numbers/payments' },
   ];
+  
+  const companyChanges = useCompanyChanges();
+  const dispatch = useDispatch();
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
+  useInjectCompanyChanges();
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: event.target.id,
+        value: event.target.value,
+      })
+    );
+
+  
   const variables = [
     '{$counter}',
     '{$year}',
@@ -46,17 +65,19 @@ export function Payments() {
       docsLink="docs/advanced-settings/#clients-invoices-recurring-invoices-payments-etc"
     >
       <Card title={`${t('generated_numbers')}: ${t('payments')}`}>
-        <Element leftSide={t('number_pattern')}>
-          <InputField
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setPattern(e.target.value)
-            }
-            value={pattern}
-            id="number_pattern"
+      <Element leftSide={t('number_pattern')}>
+          <InputField 
+          id="settings.payment_number_pattern" 
+          value={companyChanges?.settings?.payment_number_pattern}
+          onChange={handleChange}
           />
         </Element>
         <Element leftSide={t('number_counter')}>
-          <InputField id="number_counter" />
+          <InputField 
+          id="settings.payment_number_counter" 
+          value={companyChanges?.settings?.payment_number_counter}
+          onChange={handleChange}
+          />
         </Element>
       </Card>
 

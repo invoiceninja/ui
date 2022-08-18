@@ -13,6 +13,13 @@ import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 import { Settings } from '../../../../components/layouts/Settings';
+import { updateChanges } from 'common/stores/slices/company-users';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useDispatch } from 'react-redux';
+import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { ChangeEvent } from 'react';
+import { useHandleCompanySave } from 'pages/settings/common/hooks/useHandleCompanySave';
+import { useDiscardChanges } from 'pages/settings/common/hooks/useDiscardChanges';
 
 export function Quotes() {
   const [t] = useTranslation();
@@ -22,11 +29,22 @@ export function Quotes() {
     { name: t('generated_numbers'), href: '/settings/generated_numbers' },
     { name: t('quotes'), href: '/settings/generated_numbers/quotes' },
   ];
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'generated_numbers'
-    )}`;
-  });
+
+  const companyChanges = useCompanyChanges();
+  const dispatch = useDispatch();
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
+  useInjectCompanyChanges();
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: event.target.id,
+        value: event.target.value,
+      })
+    );
+
 
   const variables = [
     '{$counter}',
@@ -47,16 +65,18 @@ export function Quotes() {
     >
       <Card title={`${t('generated_numbers')}: ${t('quotes')}`}>
         <Element leftSide={t('number_pattern')}>
-          <InputField
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setPattern(e.target.value)
-            }
-            value={pattern}
-            id="number_pattern"
+          <InputField 
+          id="settings.quote_number_pattern" 
+          value={companyChanges?.settings?.quote_number_pattern}
+          onChange={handleChange}
           />
         </Element>
         <Element leftSide={t('number_counter')}>
-          <InputField id="number_counter" />
+          <InputField 
+          id="settings.quote_number_counter" 
+          value={companyChanges?.settings?.quote_number_counter}
+          onChange={handleChange}
+          />
         </Element>
       </Card>
 
