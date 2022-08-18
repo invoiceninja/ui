@@ -41,7 +41,7 @@ export function Credentials(props: Props) {
 
   return (
     <Card title={t('credentials')}>
-      {props.gateway.site_url.length >= 1 && (
+      {props.gateway.site_url && props.gateway.site_url.length >= 1 && (
         <Element leftSide={t('help')}>
           <Link external to={props.gateway.site_url}>
             {t('learn_more')}
