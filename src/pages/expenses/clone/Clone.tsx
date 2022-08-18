@@ -10,31 +10,33 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { Expense } from 'common/interfaces/expense';
-import { useBlankExpenseQuery } from 'common/queries/expenses';
+import { useExpenseQuery } from 'common/queries/expenses';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Details } from './components/Details';
-import { Notes } from './components/Notes';
-import { AdditionalInfo } from './components/AdditionalInfo';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { TaxSettings } from './components/Taxes';
+import { Details } from '../create/components/Details';
+import { Notes } from '../create/components/Notes';
+import { AdditionalInfo } from '../create/components/AdditionalInfo';
+import { TaxSettings } from '../create/components/Taxes';
 
-export function Create() {
+export function Clone() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
   const { documentTitle } = useTitle('new_expense');
-  const { data } = useBlankExpenseQuery();
+  const { id } = useParams();
+  const { data } = useExpenseQuery({ id });
 
   const pages = [
     { name: t('expenses'), href: '/expenses' },
-    { name: t('new_expense'), href: '/expenses/create' },
+    { name: t('expense'), href: generatePath('/expenses/:id/edit', { id }) },
+    { name: t('clone'), href: generatePath('/expenses/:id/clone', { id }) },
   ];
 
   const [expense, setExpense] = useState<Expense>();
@@ -44,7 +46,7 @@ export function Create() {
 
   useEffect(() => {
     if (data) {
-      setExpense(data);
+      setExpense({ ...data, number: '' });
     }
   }, [data]);
 

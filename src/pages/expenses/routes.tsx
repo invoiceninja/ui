@@ -11,6 +11,7 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
+import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
 import { Documents } from './documents/Documents';
 import { Edit } from './edit/Edit';
@@ -52,6 +53,15 @@ export const expenseRoutes = (
           <Guard
             guards={[() => permission('view_expense')]}
             component={<Documents />}
+          />
+        }
+      />
+      <Route
+        path="clone"
+        element={
+          <Guard
+            guards={[() => permission('view_expense')]}
+            component={<Clone />}
           />
         }
       />
