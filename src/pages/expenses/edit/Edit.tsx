@@ -132,7 +132,6 @@ export function Edit() {
             <Notes
               expense={expense}
               handleChange={handleChange}
-              errors={errors}
             />
           </div>
 
@@ -140,7 +139,6 @@ export function Edit() {
             <AdditionalInfo
               expense={expense}
               handleChange={handleChange}
-              errors={errors}
             />
 
             <TaxSettings
@@ -148,7 +146,6 @@ export function Edit() {
               handleChange={handleChange}
               taxInputType={taxInputType}
               setTaxInputType={setTaxInputType}
-              errors={errors}
             />
           </div>
         </div>

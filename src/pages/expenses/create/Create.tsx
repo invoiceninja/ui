@@ -23,6 +23,8 @@ import { toast } from 'common/helpers/toast/toast';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { TaxSettings } from './components/Taxes';
+import { ValidationBag } from 'common/interfaces/validation-bag';
+import { AxiosError } from 'axios';
 
 export function Create() {
   const [t] = useTranslation();
@@ -42,6 +44,8 @@ export function Create() {
     'by_rate'
   );
 
+  const [errors, setErrors] = useState<ValidationBag>();
+
   useEffect(() => {
     if (data) {
       setExpense(data);
@@ -57,17 +61,23 @@ export function Create() {
 
   const onSave = (expense: Expense) => {
     toast.processing();
+    setErrors(undefined);
 
     request('POST', endpoint('/api/v1/expenses'), expense)
       .then((response: GenericSingleResourceResponse<Expense>) => {
         toast.success('created_expense');
 
-        navigate(generatePath('/expenses/:id/edit', { id: response.data.data.id }));
+        navigate(
+          generatePath('/expenses/:id/edit', { id: response.data.data.id })
+        );
       })
-      .catch((error) => {
+      .catch((error: AxiosError) => {
         console.error(error);
-
         toast.error();
+
+        if (error.response?.status === 422) {
+          setErrors(errors);
+        }
       });
   };
 
@@ -85,15 +95,22 @@ export function Create() {
             handleChange={handleChange}
             taxInputType={taxInputType}
             pageType="create"
+            errors={errors}
           />
         </div>
 
         <div className="col-span-12 xl:col-span-4">
-          <Notes expense={expense} handleChange={handleChange} />
+          <Notes
+            expense={expense}
+            handleChange={handleChange}
+          />
         </div>
 
         <div className="col-span-12 xl:col-span-4 space-y-4">
-          <AdditionalInfo expense={expense} handleChange={handleChange} />
+          <AdditionalInfo
+            expense={expense}
+            handleChange={handleChange}
+          />
 
           <TaxSettings
             expense={expense}

@@ -28,7 +28,7 @@ export interface ExpenseCardProps {
     property: T,
     value: Expense[T]
   ) => void;
-  errors: ValidationBag | undefined;
+  errors?: ValidationBag | undefined;
 }
 
 interface Props extends ExpenseCardProps {
