@@ -10,6 +10,7 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { Expense } from 'common/interfaces/expense';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useExpenseQuery } from 'common/queries/expenses';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Dropdown } from 'components/dropdown/Dropdown';
@@ -54,8 +55,10 @@ export function Edit() {
     'by_rate'
   );
 
+  const [errors, setErrors] = useState<ValidationBag>();
+
   const bulk = useBulk();
-  const save = useSave();
+  const save = useSave({ setErrors });
 
   const handleChange = <T extends keyof Expense>(
     property: T,
@@ -121,21 +124,31 @@ export function Edit() {
               handleChange={handleChange}
               taxInputType={taxInputType}
               pageType="edit"
+              errors={errors}
             />
           </div>
 
           <div className="col-span-12 xl:col-span-4">
-            <Notes expense={expense} handleChange={handleChange} />
+            <Notes
+              expense={expense}
+              handleChange={handleChange}
+              errors={errors}
+            />
           </div>
 
           <div className="col-span-12 xl:col-span-4 space-y-4">
-            <AdditionalInfo expense={expense} handleChange={handleChange} />
+            <AdditionalInfo
+              expense={expense}
+              handleChange={handleChange}
+              errors={errors}
+            />
 
             <TaxSettings
               expense={expense}
               handleChange={handleChange}
               taxInputType={taxInputType}
               setTaxInputType={setTaxInputType}
+              errors={errors}
             />
           </div>
         </div>

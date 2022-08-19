@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Expense } from 'common/interfaces/expense';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { ClientSelector } from 'components/clients/ClientSelector';
 import { CurrencySelector } from 'components/CurrencySelector';
 import { ExpenseCategorySelector } from 'components/expense-categories/ExpenseCategorySelector';
@@ -27,6 +28,7 @@ export interface ExpenseCardProps {
     property: T,
     value: Expense[T]
   ) => void;
+  errors: ValidationBag | undefined;
 }
 
 interface Props extends ExpenseCardProps {
@@ -36,7 +38,7 @@ interface Props extends ExpenseCardProps {
 
 export function Details(props: Props) {
   const [t] = useTranslation();
-  const { expense, handleChange, taxInputType, pageType } = props;
+  const { expense, handleChange, taxInputType, pageType, errors } = props;
   const company = useCurrentCompany();
 
   return (
@@ -46,6 +48,7 @@ export function Details(props: Props) {
           <InputField
             value={expense.number}
             onValueChange={(value) => handleChange('number', value)}
+            errorMessage={errors?.errors.number}
           />
         </Element>
       )}
@@ -238,6 +241,7 @@ export function Details(props: Props) {
             onValueChange={(value) =>
               handleChange('amount', parseFloat(value) || 0)
             }
+            errorMessage={errors?.errors.amount}
           />
         </Element>
       )}
@@ -256,6 +260,7 @@ export function Details(props: Props) {
           <InputField
             type="date"
             onValueChange={(value) => handleChange('date', value)}
+            errorMessage={errors?.errors.date}
           />
         </Element>
       )}
