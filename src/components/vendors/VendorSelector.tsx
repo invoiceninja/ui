@@ -21,6 +21,7 @@ export function VendorSelector(props: GenericSelectorProps<Vendor>) {
   return (
     <DebouncedCombobox
       {...props}
+      value="id"
       endpoint="/api/v1/vendors"
       label="name"
       defaultValue={props.value}
