@@ -30,12 +30,24 @@ export function Standing() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <p className="font-semibold">{t('paid_to_date')}</p>
-                  <span>{formatMoney(client.data.data.paid_to_date, client.data.data.country_id, client.data.data.settings.currency_id)}</span>
+                  <span>
+                    {formatMoney(
+                      client.data.data.paid_to_date,
+                      client.data.data.country_id,
+                      client.data.data.settings.currency_id
+                    )}
+                  </span>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <p className="font-semibold">{t('balance')}</p>
-                  <span>{formatMoney(client.data.data.balance, client.data.data.country_id, client.data.data.settings.currency_id)}</span>
+                  <span>
+                    {formatMoney(
+                      client.data.data.balance,
+                      client.data.data.country_id,
+                      client.data.data.settings.currency_id
+                    )}
+                  </span>
                 </div>
               </div>
             }

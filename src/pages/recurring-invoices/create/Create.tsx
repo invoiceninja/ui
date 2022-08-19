@@ -157,7 +157,7 @@ export function Create() {
         <div className="col-span-12">
           {currentRecurringInvoice && (
             <ProductsTable
-            type="product"
+              type="product"
               columns={productColumns}
               items={currentRecurringInvoice.line_items.filter(
                 (item) => item.type_id === InvoiceItemType.Product

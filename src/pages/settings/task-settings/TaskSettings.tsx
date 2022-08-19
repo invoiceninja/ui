@@ -18,7 +18,7 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { TaskStatuses } from '..';
 import { Card, Element } from '../../../components/cards';
-import { InputField } from '../../../components/forms';
+import { InputField, SelectField } from '../../../components/forms';
 import Toggle from '../../../components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
@@ -148,6 +148,33 @@ export function TaskSettings() {
               handleToggleChange('invoice_task_documents', value)
             }
           />
+        </Element>
+
+        <Divider />
+
+        <Element leftSide={t('client_portal_tasks')}>
+          <Toggle
+            checked={companyChanges?.settings?.enable_client_portal_tasks}
+            onChange={(value: boolean) =>
+              handleToggleChange('settings.enable_client_portal_tasks', value)
+            }
+          />
+        </Element>
+        <Element leftSide={t('tasks_shown_in_portal')}>
+          <SelectField
+            id="settings.show_all_tasks_client_portal"
+            onChange={handleChange}
+            disabled={
+              companyChanges?.settings?.enable_client_portal_tasks
+                ? false
+                : true
+            }
+            value={companyChanges?.settings?.show_all_tasks_client_portal.toString()}
+          >
+            <option value="invoiced">{t('invoiced')}</option>
+            <option value="uninvoiced">{t('uninvoiced')}</option>
+            <option value="all">{t('all')}</option>
+          </SelectField>
         </Element>
       </Card>
 

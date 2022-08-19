@@ -154,6 +154,21 @@ export function Defaults() {
             />
           </Element>
 
+          <Element leftSide={t('use_quote_terms')}>
+            <Toggle
+              checked={companyChanges?.use_quote_terms_on_conversion}
+              onChange={(value: boolean) =>
+                dispatch(
+                  updateChanges({
+                    object: 'company',
+                    property: 'use_quote_terms_on_conversion',
+                    value,
+                  })
+                )
+              }
+            />
+          </Element>
+
           <div className="pt-6 border-b"></div>
 
           <Element className="mt-4" leftSide={t('invoice_terms')}>
@@ -239,6 +254,36 @@ export function Defaults() {
                   updateChanges({
                     object: 'company',
                     property: 'settings.credit_footer',
+                    value,
+                  })
+                )
+              }
+            />
+          </Element>
+
+          <Element className="mt-4" leftSide={t('purchase_order_terms')}>
+            <MDEditor
+              value={companyChanges?.settings?.purchase_order_terms}
+              onChange={(value) =>
+                dispatch(
+                  updateChanges({
+                    object: 'company',
+                    property: 'settings.purchase_order_terms',
+                    value,
+                  })
+                )
+              }
+            />
+          </Element>
+
+          <Element className="mt-4" leftSide={t('purchase_order_footer')}>
+            <MDEditor
+              value={companyChanges?.settings?.purchase_order_footer}
+              onChange={(value) =>
+                dispatch(
+                  updateChanges({
+                    object: 'company',
+                    property: 'settings.purchase_order_footer',
                     value,
                   })
                 )

@@ -60,7 +60,7 @@ export function ClientSelector(props: Props) {
           onClearButtonClick={props.onClearButtonClick}
         />
       </div>
-      
+
       {resource?.client_id &&
         client &&
         client.contacts.map((contact, index) => (

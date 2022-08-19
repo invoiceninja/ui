@@ -109,7 +109,7 @@ export function CloneToInvoice() {
         <div className="col-span-12">
           {currentInvoice && (
             <ProductsTable
-            type="product"
+              type="product"
               columns={productColumns}
               items={currentInvoice.line_items.filter(
                 (item) => item.type_id == InvoiceItemType.Product

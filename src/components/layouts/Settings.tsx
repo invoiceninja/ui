@@ -57,7 +57,7 @@ export function Settings(props: Props) {
       current: location.pathname === '/settings/localization',
     },
     {
-      name: t('online_payments'),
+      name: t('payment_settings'),
       href: '/settings/online_payments',
       current: location.pathname === '/settings/online_payments',
     },
@@ -98,6 +98,12 @@ export function Settings(props: Props) {
       name: t('invoice_design'),
       href: '/settings/invoice_design',
       current: location.pathname === '/settings/invoice_design',
+      visible: proPlan() || enterprisePlan(),
+    },
+    {
+      name: t('generated_numbers'),
+      href: '/settings/generated_numbers',
+      current: location.pathname === '/settings/generated_numbers',
       visible: proPlan() || enterprisePlan(),
     },
     {

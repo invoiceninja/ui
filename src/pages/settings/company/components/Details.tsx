@@ -90,6 +90,27 @@ export function Details() {
             />
           </Element>
 
+          {companyChanges?.settings.country_id == '756' ? (
+            <>
+              <Element leftSide={t('qr_iban')}>
+                <InputField
+                  value={companyChanges?.settings?.qr_iban || ''}
+                  onChange={handleChange}
+                  id="settings.qr_iban"
+                />
+              </Element>
+              <Element leftSide={t('besr_id')}>
+                <InputField
+                  value={companyChanges?.settings?.besr_id || ''}
+                  onChange={handleChange}
+                  id="settings.besr_id"
+                />
+              </Element>
+            </>
+          ) : (
+            ''
+          )}
+
           <Element leftSide={t('size_id')}>
             <SelectField
               value={companyChanges?.size_id || '1'}

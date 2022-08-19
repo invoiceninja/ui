@@ -25,6 +25,12 @@ export interface Company {
   enable_product_cost: boolean;
   enable_product_quantity: boolean;
   show_task_end_date: boolean;
+  use_quote_terms_on_conversion: boolean;
+  enable_applying_payments: boolean;
+  enabled_expense_tax_rates: number;
+  stock_notification: boolean;
+  track_inventory: boolean;
+  stop_on_unpaid_recurring: boolean;
 }
 
 export interface Settings {
@@ -233,4 +239,7 @@ export interface Settings {
   auto_archive_invoice_cancelled: boolean;
   use_comma_as_decimal_place: boolean;
   first_month_of_year: string;
+  qr_iban: string;
+  besr_id: string;
+  vendor_portal_enable_uploads: boolean;
 }

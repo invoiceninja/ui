@@ -21,14 +21,13 @@ import { ChangeEvent } from 'react';
 import { useHandleCompanySave } from 'pages/settings/common/hooks/useHandleCompanySave';
 import { useDiscardChanges } from 'pages/settings/common/hooks/useDiscardChanges';
 
-export function Payments() {
+export function PurchaseOrders() {
   const [t] = useTranslation();
   const [pattern, setPattern] = useState<string>('');
-
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('generated_numbers'), href: '/settings/generated_numbers' },
-    { name: t('payments'), href: '/settings/generated_numbers/payments' },
+    { name: t('quotes'), href: '/settings/generated_numbers/quotes' },
   ];
 
   const companyChanges = useCompanyChanges();
@@ -65,18 +64,18 @@ export function Payments() {
       onCancelClick={onCancel}
       docsLink="docs/advanced-settings/#clients-invoices-recurring-invoices-payments-etc"
     >
-      <Card title={`${t('generated_numbers')}: ${t('payments')}`}>
+      <Card title={`${t('generated_numbers')}: ${t('purchase_orders')}`}>
         <Element leftSide={t('number_pattern')}>
           <InputField
-            id="settings.payment_number_pattern"
-            value={companyChanges?.settings?.payment_number_pattern}
+            id="settings.purchase_order_number_pattern"
+            value={companyChanges?.settings?.purchase_order_number_pattern}
             onChange={handleChange}
           />
         </Element>
         <Element leftSide={t('number_counter')}>
           <InputField
-            id="settings.payment_number_counter"
-            value={companyChanges?.settings?.payment_number_counter}
+            id="settings.purchase_order_number_counter"
+            value={companyChanges?.settings?.purchase_order_number_counter}
             onChange={handleChange}
           />
         </Element>

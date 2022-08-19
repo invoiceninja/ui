@@ -85,6 +85,18 @@ export function Authorization() {
       </Element>
 
       <Element
+        leftSide={t('require_purchase_order_signature')}
+        leftSideHelp={t('require_purchase_order_signature_help')}
+      >
+        <Toggle
+          value={company?.settings.require_purchase_order_signature}
+          onValueChange={(value) =>
+            handleChange('settings.require_purchase_order_signature', value)
+          }
+        />
+      </Element>
+
+      <Element
         leftSide={t('signature_on_pdf')}
         leftSideHelp={t('signature_on_pdf_help')}
       >

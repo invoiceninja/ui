@@ -104,7 +104,7 @@ export function Create() {
         <div className="col-span-12">
           {currentQuote && (
             <ProductsTable
-            type="product"
+              type="product"
               resource={currentQuote}
               columns={productColumns}
               items={currentQuote.line_items.filter(

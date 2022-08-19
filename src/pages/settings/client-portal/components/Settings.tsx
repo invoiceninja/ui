@@ -69,13 +69,25 @@ export function Settings() {
       </Element>
 
       <Element
-        leftSide={t('document_upload')}
+        leftSide={t('client_document_upload')}
         leftSideHelp={t('document_upload_help')}
       >
         <Toggle
           checked={company?.settings.client_portal_enable_uploads}
           onValueChange={(value) =>
             handleChange('settings.client_portal_enable_uploads', value)
+          }
+        />
+      </Element>
+
+      <Element
+        leftSide={t('vendor_document_upload')}
+        leftSideHelp={t('vendor_document_upload_help')}
+      >
+        <Toggle
+          checked={company?.settings.vendor_portal_enable_uploads}
+          onValueChange={(value) =>
+            handleChange('settings.vendor_portal_enable_uploads', value)
           }
         />
       </Element>

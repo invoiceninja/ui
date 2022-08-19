@@ -840,6 +840,21 @@ export function GeneralSettings() {
         </SelectField>
       </Element>
 
+      <Element leftSide={t('purchase_order_design')}>
+        <SelectField
+          id="settings.purchase_order_design_id"
+          value={company?.settings?.purchase_order_design_id || 'VolejRejNm'}
+          onChange={handleChange}
+        >
+          {designs &&
+            designs.data.data.map((design: Design) => (
+              <option key={design.id} value={design.id}>
+                {design.name}
+              </option>
+            ))}
+        </SelectField>
+      </Element>
+
       <Element leftSide={t('page_layout')}>
         <SelectField
           id="settings.page_layout"
@@ -942,6 +957,29 @@ export function GeneralSettings() {
             handleToggleChange('settings.hide_empty_columns_on_pdf', value)
           }
         />
+      </Element>
+
+      <Element leftSide={t('page_numbering')}>
+        <Toggle
+          checked={company?.settings?.page_numbering}
+          id="settings.page_numbering"
+          onChange={(value: boolean) =>
+            handleToggleChange('settings.page_numbering', value)
+          }
+        />
+      </Element>
+
+      <Element leftSide={t('page_numbering_alignment')}>
+        <SelectField
+          id="settings.page_numbering_alignment"
+          onChange={handleChange}
+          disabled={company?.settings?.page_numbering ? false : true}
+          value={company?.settings?.page_numbering_alignment.toString()}
+        >
+          <option value="C">{t('center')}</option>
+          <option value="R">{t('right')}</option>
+          <option value="L">{t('left')}</option>
+        </SelectField>
       </Element>
     </Card>
   );
