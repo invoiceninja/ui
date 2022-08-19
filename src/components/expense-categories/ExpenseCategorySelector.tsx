@@ -23,6 +23,7 @@ export function ExpenseCategorySelector(
   return (
     <DebouncedCombobox
       {...props}
+      value="id"
       endpoint="/api/v1/expense_categories"
       label="name"
       defaultValue={props.value}
