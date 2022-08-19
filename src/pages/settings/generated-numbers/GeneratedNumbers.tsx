@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect } from 'react';
+import { useTitle } from 'common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement } from '../../../components/cards';
 import { Settings } from '../../../components/layouts/Settings';
@@ -17,19 +17,17 @@ import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { Settings as SettingsComponent } from './components/Settings';
 
 export function GeneratedNumbers() {
+  useTitle('generated_numbers');
+
   const [t] = useTranslation();
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('generated_numbers'), href: '/settings/generated_numbers' },
   ];
+  
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
-
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'generated_numbers'
-    )}`;
-  });
 
   return (
     <Settings
