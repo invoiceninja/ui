@@ -261,6 +261,7 @@ export function Details(props: Props) {
             type="date"
             onValueChange={(value) => handleChange('date', value)}
             errorMessage={errors?.errors.date}
+            value={expense.date}
           />
         </Element>
       )}
