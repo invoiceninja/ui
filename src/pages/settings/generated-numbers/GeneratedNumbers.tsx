@@ -78,6 +78,10 @@ export function GeneratedNumbers() {
           {t('vendors')}
         </ClickableElement>
 
+        <ClickableElement to="/settings/generated_numbers/purchase_orders">
+          {t('purchase_orders')}
+        </ClickableElement>
+
         <ClickableElement to="/settings/generated_numbers/expenses">
           {t('expenses')}
         </ClickableElement>

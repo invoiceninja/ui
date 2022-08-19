@@ -62,6 +62,8 @@ export function Payments() {
     <Settings
       title={t('generated_numbers')}
       breadcrumbs={pages}
+      onSaveClick={onSave}
+      onCancelClick={onCancel}      
       docsLink="docs/advanced-settings/#clients-invoices-recurring-invoices-payments-etc"
     >
       <Card title={`${t('generated_numbers')}: ${t('payments')}`}>

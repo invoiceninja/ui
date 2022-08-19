@@ -21,19 +21,15 @@ import { ChangeEvent } from 'react';
 import { useHandleCompanySave } from 'pages/settings/common/hooks/useHandleCompanySave';
 import { useDiscardChanges } from 'pages/settings/common/hooks/useDiscardChanges';
 
-export function RecurringExpenses() {
+export function PurchaseOrders() {
   const [t] = useTranslation();
   const [pattern, setPattern] = useState<string>('');
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('generated_numbers'), href: '/settings/generated_numbers' },
-    {
-      name: t('recurring_expenses'),
-      href: '/settings/generated_numbers/recurring_expenses',
-    },
+    { name: t('quotes'), href: '/settings/generated_numbers/quotes' },
   ];
 
-  
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
   const onSave = useHandleCompanySave();
@@ -48,7 +44,6 @@ export function RecurringExpenses() {
         value: event.target.value,
       })
     );
-
 
 
   const variables = [
@@ -70,18 +65,18 @@ export function RecurringExpenses() {
       onCancelClick={onCancel}
       docsLink="docs/advanced-settings/#clients-invoices-recurring-invoices-payments-etc"
     >
-      <Card title={`${t('generated_numbers')}: ${t('recurring_expenses')}`}>
+      <Card title={`${t('generated_numbers')}: ${t('purchase_orders')}`}>
         <Element leftSide={t('number_pattern')}>
           <InputField 
-          id="settings.recurring_expense_number_pattern" 
-          value={companyChanges?.settings?.recurring_expense_number_pattern}
+          id="settings.purchase_order_number_pattern" 
+          value={companyChanges?.settings?.purchase_order_number_pattern}
           onChange={handleChange}
           />
         </Element>
         <Element leftSide={t('number_counter')}>
           <InputField 
-          id="settings.recurring_expense_number_counter" 
-          value={companyChanges?.settings?.recurring_expense_number_counter}
+          id="settings.purchase_order_number_counter" 
+          value={companyChanges?.settings?.purchase_order_number_counter}
           onChange={handleChange}
           />
         </Element>
