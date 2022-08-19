@@ -31,15 +31,25 @@ export interface ExpenseCardProps {
 
 interface Props extends ExpenseCardProps {
   taxInputType: 'by_rate' | 'by_amount';
+  pageType: 'create' | 'edit';
 }
 
 export function Details(props: Props) {
   const [t] = useTranslation();
-  const { expense, handleChange, taxInputType } = props;
+  const { expense, handleChange, taxInputType, pageType } = props;
   const company = useCurrentCompany();
 
   return (
     <Card title={t('details')} isLoading={!expense}>
+      {expense && pageType === 'edit' && (
+        <Element leftSide={t('expense_number')}>
+          <InputField
+            value={expense.number}
+            onValueChange={(value) => handleChange('number', value)}
+          />
+        </Element>
+      )}
+
       {expense && (
         <Element leftSide={t('vendor')}>
           <VendorSelector

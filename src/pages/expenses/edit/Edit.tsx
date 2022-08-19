@@ -120,6 +120,7 @@ export function Edit() {
               expense={expense}
               handleChange={handleChange}
               taxInputType={taxInputType}
+              pageType="edit"
             />
           </div>
 

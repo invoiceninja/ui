@@ -86,6 +86,7 @@ export function Clone() {
             expense={expense}
             handleChange={handleChange}
             taxInputType={taxInputType}
+            pageType="create"
           />
         </div>
 

@@ -84,6 +84,7 @@ export function Create() {
             expense={expense}
             handleChange={handleChange}
             taxInputType={taxInputType}
+            pageType="create"
           />
         </div>
 
