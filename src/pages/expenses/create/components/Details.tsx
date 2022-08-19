@@ -250,6 +250,15 @@ export function Details(props: Props) {
           />
         </Element>
       )}
+
+      {expense && (
+        <Element leftSide={t('date')}>
+          <InputField
+            type="date"
+            onValueChange={(value) => handleChange('date', value)}
+          />
+        </Element>
+      )}
     </Card>
   );
 }
