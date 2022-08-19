@@ -45,7 +45,6 @@ export function Quotes() {
       })
     );
 
-
   const variables = [
     '{$counter}',
     '{$year}',
@@ -67,17 +66,17 @@ export function Quotes() {
     >
       <Card title={`${t('generated_numbers')}: ${t('quotes')}`}>
         <Element leftSide={t('number_pattern')}>
-          <InputField 
-          id="settings.quote_number_pattern" 
-          value={companyChanges?.settings?.quote_number_pattern}
-          onChange={handleChange}
+          <InputField
+            id="settings.quote_number_pattern"
+            value={companyChanges?.settings?.quote_number_pattern}
+            onChange={handleChange}
           />
         </Element>
         <Element leftSide={t('number_counter')}>
-          <InputField 
-          id="settings.quote_number_counter" 
-          value={companyChanges?.settings?.quote_number_counter}
-          onChange={handleChange}
+          <InputField
+            id="settings.quote_number_counter"
+            value={companyChanges?.settings?.quote_number_counter}
+            onChange={handleChange}
           />
         </Element>
       </Card>

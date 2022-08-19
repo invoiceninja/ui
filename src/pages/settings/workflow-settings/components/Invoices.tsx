@@ -58,7 +58,6 @@ export function Invoices() {
         />
       </Element>
 
-
       <Divider />
 
       <Element

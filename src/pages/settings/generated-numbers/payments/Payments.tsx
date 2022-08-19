@@ -30,7 +30,7 @@ export function Payments() {
     { name: t('generated_numbers'), href: '/settings/generated_numbers' },
     { name: t('payments'), href: '/settings/generated_numbers/payments' },
   ];
-  
+
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
   const onSave = useHandleCompanySave();
@@ -46,7 +46,6 @@ export function Payments() {
       })
     );
 
-  
   const variables = [
     '{$counter}',
     '{$year}',
@@ -63,22 +62,22 @@ export function Payments() {
       title={t('generated_numbers')}
       breadcrumbs={pages}
       onSaveClick={onSave}
-      onCancelClick={onCancel}      
+      onCancelClick={onCancel}
       docsLink="docs/advanced-settings/#clients-invoices-recurring-invoices-payments-etc"
     >
       <Card title={`${t('generated_numbers')}: ${t('payments')}`}>
-      <Element leftSide={t('number_pattern')}>
-          <InputField 
-          id="settings.payment_number_pattern" 
-          value={companyChanges?.settings?.payment_number_pattern}
-          onChange={handleChange}
+        <Element leftSide={t('number_pattern')}>
+          <InputField
+            id="settings.payment_number_pattern"
+            value={companyChanges?.settings?.payment_number_pattern}
+            onChange={handleChange}
           />
         </Element>
         <Element leftSide={t('number_counter')}>
-          <InputField 
-          id="settings.payment_number_counter" 
-          value={companyChanges?.settings?.payment_number_counter}
-          onChange={handleChange}
+          <InputField
+            id="settings.payment_number_counter"
+            value={companyChanges?.settings?.payment_number_counter}
+            onChange={handleChange}
           />
         </Element>
       </Card>

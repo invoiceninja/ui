@@ -242,5 +242,4 @@ export interface Settings {
   qr_iban: string;
   besr_id: string;
   vendor_portal_enable_uploads: boolean;
-
 }

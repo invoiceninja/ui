@@ -78,14 +78,9 @@ export function OnlinePayments() {
           <Toggle
             label={t('enable_applying_payments_help')}
             id="allow_over_payment"
-            checked={
-              company?.enable_applying_payments || false
-            }
+            checked={company?.enable_applying_payments || false}
             onChange={(value) =>
-              handleChangeProperty(
-                'enable_applying_payments',
-                value
-              )
+              handleChangeProperty('enable_applying_payments', value)
             }
           />
         </Element>

@@ -969,19 +969,18 @@ export function GeneralSettings() {
         />
       </Element>
 
-        <Element leftSide={t('page_numbering_alignment')}>
-          <SelectField
-            id="settings.page_numbering_alignment"
-            onChange={handleChange}
-            disabled={company?.settings?.page_numbering ? false : true }
-            value={company?.settings?.page_numbering_alignment.toString()}
-          >
-            <option value="C">{t('center')}</option>
-            <option value="R">{t('right')}</option>
-            <option value="L">{t('left')}</option>
-          </SelectField>
-        </Element>
-
+      <Element leftSide={t('page_numbering_alignment')}>
+        <SelectField
+          id="settings.page_numbering_alignment"
+          onChange={handleChange}
+          disabled={company?.settings?.page_numbering ? false : true}
+          value={company?.settings?.page_numbering_alignment.toString()}
+        >
+          <option value="C">{t('center')}</option>
+          <option value="R">{t('right')}</option>
+          <option value="L">{t('left')}</option>
+        </SelectField>
+      </Element>
     </Card>
   );
 }

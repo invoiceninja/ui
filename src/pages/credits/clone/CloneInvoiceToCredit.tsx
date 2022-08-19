@@ -57,7 +57,7 @@ export function CloneInvoiceToCredit() {
   const currentCredit = useCurrentCredit();
   const invoiceSum = useInvoiceSum();
 
-  const productColumns = useProductColumns()
+  const productColumns = useProductColumns();
 
   const pages: BreadcrumRecord[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -106,11 +106,11 @@ export function CloneInvoiceToCredit() {
         <div className="col-span-12">
           {currentCredit && (
             <ProductsTable
-            type="product"
-            columns={productColumns}
-            items={currentCredit.line_items.filter(
-              (item) => item.type_id === InvoiceItemType.Product
-            )}
+              type="product"
+              columns={productColumns}
+              items={currentCredit.line_items.filter(
+                (item) => item.type_id === InvoiceItemType.Product
+              )}
               resource={currentCredit}
               onProductChange={(index, lineItem) =>
                 dispatch(setCurrentCreditLineItem({ index, lineItem }))

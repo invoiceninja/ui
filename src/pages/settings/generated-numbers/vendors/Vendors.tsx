@@ -30,7 +30,6 @@ export function Vendors() {
     { name: t('vendors'), href: '/settings/generated_numbers/vendors' },
   ];
 
-  
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
   const onSave = useHandleCompanySave();
@@ -67,17 +66,17 @@ export function Vendors() {
     >
       <Card title={`${t('generated_numbers')}: ${t('vendors')}`}>
         <Element leftSide={t('number_pattern')}>
-          <InputField 
-          id="settings.vendor_number_pattern" 
-          value={companyChanges?.settings?.vendor_number_pattern}
-          onChange={handleChange}
+          <InputField
+            id="settings.vendor_number_pattern"
+            value={companyChanges?.settings?.vendor_number_pattern}
+            onChange={handleChange}
           />
         </Element>
         <Element leftSide={t('number_counter')}>
-          <InputField 
-          id="settings.vendor_number_counter" 
-          value={companyChanges?.settings?.vendors_number_counter}
-          onChange={handleChange}
+          <InputField
+            id="settings.vendor_number_counter"
+            value={companyChanges?.settings?.vendors_number_counter}
+            onChange={handleChange}
           />
         </Element>
       </Card>

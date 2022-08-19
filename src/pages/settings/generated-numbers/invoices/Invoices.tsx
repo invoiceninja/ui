@@ -33,7 +33,7 @@ export function Invoices() {
   const dispatch = useDispatch();
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
-  
+
   useInjectCompanyChanges();
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
@@ -44,7 +44,6 @@ export function Invoices() {
         value: event.target.value,
       })
     );
-
 
   const variables = [
     '{$counter}',
@@ -67,17 +66,17 @@ export function Invoices() {
     >
       <Card title={`${t('generated_numbers')}: ${t('invoices')}`}>
         <Element leftSide={t('number_pattern')}>
-          <InputField 
-          id="settings.invoice_number_pattern" 
-          value={companyChanges?.settings?.invoice_number_pattern}
-          onChange={handleChange}
+          <InputField
+            id="settings.invoice_number_pattern"
+            value={companyChanges?.settings?.invoice_number_pattern}
+            onChange={handleChange}
           />
         </Element>
         <Element leftSide={t('number_counter')}>
-          <InputField 
-          id="settings.invoice_number_counter" 
-          value={companyChanges?.settings?.invoice_number_counter}
-          onChange={handleChange}
+          <InputField
+            id="settings.invoice_number_counter"
+            value={companyChanges?.settings?.invoice_number_counter}
+            onChange={handleChange}
           />
         </Element>
       </Card>

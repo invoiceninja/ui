@@ -45,7 +45,6 @@ export function PurchaseOrders() {
       })
     );
 
-
   const variables = [
     '{$counter}',
     '{$year}',
@@ -67,17 +66,17 @@ export function PurchaseOrders() {
     >
       <Card title={`${t('generated_numbers')}: ${t('purchase_orders')}`}>
         <Element leftSide={t('number_pattern')}>
-          <InputField 
-          id="settings.purchase_order_number_pattern" 
-          value={companyChanges?.settings?.purchase_order_number_pattern}
-          onChange={handleChange}
+          <InputField
+            id="settings.purchase_order_number_pattern"
+            value={companyChanges?.settings?.purchase_order_number_pattern}
+            onChange={handleChange}
           />
         </Element>
         <Element leftSide={t('number_counter')}>
-          <InputField 
-          id="settings.purchase_order_number_counter" 
-          value={companyChanges?.settings?.purchase_order_number_counter}
-          onChange={handleChange}
+          <InputField
+            id="settings.purchase_order_number_counter"
+            value={companyChanges?.settings?.purchase_order_number_counter}
+            onChange={handleChange}
           />
         </Element>
       </Card>

@@ -69,17 +69,17 @@ export function RecurringInvoices() {
     >
       <Card title={`${t('generated_numbers')}: ${t('recurring_invoices')}`}>
         <Element leftSide={t('number_pattern')}>
-          <InputField 
-          id="settings.recurring_invoice_number_pattern" 
-          value={companyChanges?.settings?.recurring_invoice_number_pattern}
-          onChange={handleChange}
+          <InputField
+            id="settings.recurring_invoice_number_pattern"
+            value={companyChanges?.settings?.recurring_invoice_number_pattern}
+            onChange={handleChange}
           />
         </Element>
         <Element leftSide={t('number_counter')}>
-          <InputField 
-          id="settings.recurring_invoice_number_counter" 
-          value={companyChanges?.settings?.recurring_invoice_number_counter}
-          onChange={handleChange}
+          <InputField
+            id="settings.recurring_invoice_number_counter"
+            value={companyChanges?.settings?.recurring_invoice_number_counter}
+            onChange={handleChange}
           />
         </Element>
       </Card>

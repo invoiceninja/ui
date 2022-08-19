@@ -69,17 +69,17 @@ export function Clients() {
     >
       <Card title={`${t('generated_numbers')}: ${t('clients')}`}>
         <Element leftSide={t('number_pattern')}>
-          <InputField 
-          id="settings.client_number_pattern" 
-          value={companyChanges?.settings?.client_number_pattern}
-          onChange={handleChange}
+          <InputField
+            id="settings.client_number_pattern"
+            value={companyChanges?.settings?.client_number_pattern}
+            onChange={handleChange}
           />
         </Element>
         <Element leftSide={t('number_counter')}>
-          <InputField 
-          id="settings.client_number_counter" 
-          value={companyChanges?.settings?.client_number_counter}
-          onChange={handleChange}
+          <InputField
+            id="settings.client_number_counter"
+            value={companyChanges?.settings?.client_number_counter}
+            onChange={handleChange}
           />
         </Element>
       </Card>

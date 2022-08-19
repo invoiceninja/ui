@@ -46,11 +46,11 @@ export function Settings() {
   return (
     <Card title={t('settings')}>
       <Element leftSide={t('number_padding')}>
-          <SelectField
-            id="settings.counter_padding"
-            onChange={handleChange}
-            value={companyChanges?.settings?.counter_padding}
-          >
+        <SelectField
+          id="settings.counter_padding"
+          onChange={handleChange}
+          value={companyChanges?.settings?.counter_padding}
+        >
           <option value="1">1</option>
           <option value="2">01</option>
           <option value="3">0001</option>
@@ -65,9 +65,9 @@ export function Settings() {
 
       <Element leftSide={t('generate_number')}>
         <SelectField
-            id="settings.counter_number_applied"
-            onChange={handleChange}
-            value={companyChanges?.settings?.counter_number_applied}
+          id="settings.counter_number_applied"
+          onChange={handleChange}
+          value={companyChanges?.settings?.counter_number_applied}
         >
           <option value="when_saved">{t('when_saved')}</option>
           <option value="when_sent">{t('when_sent')}</option>
@@ -75,37 +75,40 @@ export function Settings() {
       </Element>
 
       <Element leftSide={t('recurring_prefix')}>
-        <InputField 
-        id="settings.recurring_number_prefix" 
-        value={companyChanges?.settings?.recurring_number_prefix}
-        onChange={handleChange}
+        <InputField
+          id="settings.recurring_number_prefix"
+          value={companyChanges?.settings?.recurring_number_prefix}
+          onChange={handleChange}
         />
-
       </Element>
 
       <Element leftSide={t('shared_invoice_quote_counter')}>
-        <Toggle 
-            onChange={(value: boolean) =>
-              handleToggleChange('settings.shared_invoice_quote_counter', value)
-            }
-            checked={companyChanges?.settings?.shared_invoice_quote_counter || false}
+        <Toggle
+          onChange={(value: boolean) =>
+            handleToggleChange('settings.shared_invoice_quote_counter', value)
+          }
+          checked={
+            companyChanges?.settings?.shared_invoice_quote_counter || false
+          }
         />
       </Element>
 
       <Element leftSide={t('shared_invoice_credit_counter')}>
-        <Toggle 
-            onChange={(value: boolean) =>
-              handleToggleChange('settings.shared_invoice_credit_counter', value)
-            }
-            checked={companyChanges?.settings?.shared_invoice_credit_counter || false}
+        <Toggle
+          onChange={(value: boolean) =>
+            handleToggleChange('settings.shared_invoice_credit_counter', value)
+          }
+          checked={
+            companyChanges?.settings?.shared_invoice_credit_counter || false
+          }
         />
       </Element>
 
       <Element leftSide={t('reset_counter')}>
         <SelectField
-            id="settings.reset_counter_frequency_id"
-            onChange={handleChange}
-            value={companyChanges?.settings?.reset_counter_frequency_id}
+          id="settings.reset_counter_frequency_id"
+          onChange={handleChange}
+          value={companyChanges?.settings?.reset_counter_frequency_id}
         >
           <option value="0">{t('never')}</option>
           <option value="1">{t('freq_daily')}</option>
@@ -122,18 +125,18 @@ export function Settings() {
           <option value="12">{t('freq_three_years')}</option>
         </SelectField>
       </Element>
-      {companyChanges?.settings?.reset_counter_frequency_id > 0 &&
-      <>
-        <Element leftSide={t('next_reset')}>
+      {companyChanges?.settings?.reset_counter_frequency_id > 0 && (
+        <>
+          <Element leftSide={t('next_reset')}>
             <InputField
               type="date"
               id="settings.reset_counter_date"
               onChange={handleChange}
               value={companyChanges?.settings?.reset_counter_date || ''}
             />
-        </Element>
-      </>
-      }
+          </Element>
+        </>
+      )}
     </Card>
   );
 }

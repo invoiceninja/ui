@@ -45,7 +45,6 @@ export function Projects() {
       })
     );
 
-
   const variables = [
     '{$counter}',
     '{$year}',
@@ -66,18 +65,18 @@ export function Projects() {
       docsLink="docs/advanced-settings/#clients-invoices-recurring-invoices-payments-etc"
     >
       <Card title={`${t('generated_numbers')}: ${t('projects')}`}>
-      <Element leftSide={t('number_pattern')}>
-          <InputField 
-          id="settings.project_number_pattern" 
-          value={companyChanges?.settings?.project_number_pattern}
-          onChange={handleChange}
+        <Element leftSide={t('number_pattern')}>
+          <InputField
+            id="settings.project_number_pattern"
+            value={companyChanges?.settings?.project_number_pattern}
+            onChange={handleChange}
           />
         </Element>
         <Element leftSide={t('number_counter')}>
-          <InputField 
-          id="settings.project_number_counter" 
-          value={companyChanges?.settings?.project_number_counter}
-          onChange={handleChange}
+          <InputField
+            id="settings.project_number_counter"
+            value={companyChanges?.settings?.project_number_counter}
+            onChange={handleChange}
           />
         </Element>
       </Card>

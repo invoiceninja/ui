@@ -156,9 +156,7 @@ export function Defaults() {
 
           <Element leftSide={t('use_quote_terms')}>
             <Toggle
-              checked={
-                companyChanges?.use_quote_terms_on_conversion
-              }
+              checked={companyChanges?.use_quote_terms_on_conversion}
               onChange={(value: boolean) =>
                 dispatch(
                   updateChanges({

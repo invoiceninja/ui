@@ -150,7 +150,7 @@ export function TaskSettings() {
           />
         </Element>
 
-      <Divider />
+        <Divider />
 
         <Element leftSide={t('client_portal_tasks')}>
           <Toggle
@@ -164,7 +164,11 @@ export function TaskSettings() {
           <SelectField
             id="settings.show_all_tasks_client_portal"
             onChange={handleChange}
-            disabled={companyChanges?.settings?.enable_client_portal_tasks ? false : true}
+            disabled={
+              companyChanges?.settings?.enable_client_portal_tasks
+                ? false
+                : true
+            }
             value={companyChanges?.settings?.show_all_tasks_client_portal.toString()}
           >
             <option value="invoiced">{t('invoiced')}</option>
@@ -172,7 +176,6 @@ export function TaskSettings() {
             <option value="all">{t('all')}</option>
           </SelectField>
         </Element>
-
       </Card>
 
       <TaskStatuses />

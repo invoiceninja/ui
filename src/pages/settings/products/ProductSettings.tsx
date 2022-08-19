@@ -55,7 +55,7 @@ export function ProductSettings() {
         property: event.target.id,
         value: event.target.value,
       })
-  );
+    );
 
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
@@ -69,7 +69,6 @@ export function ProductSettings() {
       docsLink="docs/basic-settings/#product_settings"
     >
       <Card title={t('Settings')}>
-
         <Element
           leftSide={t('track_inventory')}
           leftSideHelp={t('track_inventory_help')}
@@ -92,17 +91,19 @@ export function ProductSettings() {
             }
           />
         </Element>
-        {companyChanges?.stock_notification === true ?
+        {companyChanges?.stock_notification === true ? (
           <>
-          <Element leftSide={t('notification_threshold')}>
-            <InputField
-              id="inventory_notification_threshold"
-              onChange={handleChange}
-              value={companyChanges?.inventory_notification_threshold || ''}
-            />
-          </Element>
-        </> : ''
-        }
+            <Element leftSide={t('notification_threshold')}>
+              <InputField
+                id="inventory_notification_threshold"
+                onChange={handleChange}
+                value={companyChanges?.inventory_notification_threshold || ''}
+              />
+            </Element>
+          </>
+        ) : (
+          ''
+        )}
 
         <Divider />
 

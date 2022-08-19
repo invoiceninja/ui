@@ -41,10 +41,13 @@ export function InvoicePreview(props: Props) {
   ) {
     return (
       <InvoiceViewer
-        link={previewEndpoint('/api/v1/live_preview?entity=:entity&entity_id=:id', {
-          entity: props.entity,
-          id: props.resource?.id,
-        })}
+        link={previewEndpoint(
+          '/api/v1/live_preview?entity=:entity&entity_id=:id',
+          {
+            entity: props.entity,
+            id: props.resource?.id,
+          }
+        )}
         resource={props.resource}
         method="POST"
       />

@@ -76,7 +76,7 @@ export function CustomResourcefulActions(props: Props) {
         >
           {t('new_invoice')}
         </DropdownElement>
-  
+
         <DropdownElement
           to={generatePath('/payments/create?client=:id', {
             id: props.clientId,

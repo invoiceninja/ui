@@ -25,7 +25,7 @@ export function GeneratedNumbers() {
     { name: t('settings'), href: '/settings' },
     { name: t('generated_numbers'), href: '/settings/generated_numbers' },
   ];
-  
+
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
 
