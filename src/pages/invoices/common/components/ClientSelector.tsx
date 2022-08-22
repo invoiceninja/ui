@@ -20,7 +20,7 @@ import { ClientSelector as Selector } from 'components/clients/ClientSelector';
 
 interface Props {
   readonly?: boolean;
-  resource: Invoice | RecurringInvoice;
+  resource?: Invoice | RecurringInvoice;
   onChange: (id: string) => unknown;
   onClearButtonClick: () => unknown;
   onContactCheckboxChange: (contactId: string, value: boolean) => unknown;
@@ -54,11 +54,11 @@ export function ClientSelector(props: Props) {
       <div className="flex items-center justify-between">
         <Selector
           onChange={(client) => props.onChange(client.id)}
-          value={resource.client_id}
+          value={resource?.client_id}
           readonly={props.readonly}
-          clearButton={Boolean(resource.client_id)}
+          clearButton={Boolean(resource?.client_id)}
           onClearButtonClick={props.onClearButtonClick}
-          initiallyVisible={!resource.client_id}
+          initiallyVisible={!resource?.client_id}
         />
       </div>
 
