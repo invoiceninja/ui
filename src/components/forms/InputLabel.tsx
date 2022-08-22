@@ -19,7 +19,7 @@ interface Props extends CommonProps {
 export function InputLabel(props: Props) {
   return (
     <label
-      className={`text-sm text-gray-800 block ${props.className}`}
+      className={`text-sm text-gray-500 font-medium block ${props.className}`}
       htmlFor={props.for}
     >
       {props.children}

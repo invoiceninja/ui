@@ -16,7 +16,7 @@ interface Props {
   leftSideHelp?: ReactNode;
   pushContentToRight?: boolean;
   required?: boolean;
-  children: ReactNode;
+  children?: ReactNode;
   className?: any;
   onClick?: () => unknown;
   noExternalPadding?: boolean;
@@ -32,7 +32,7 @@ export function Element(props: Props) {
       onClick={props.onClick}
     >
       <dt className="text-sm text-gray-500 flex flex-col">
-        <span className="text-gray-500 font-medium ">
+        <span className="text-gray-500 font-medium">
           {props.leftSide}
           {props.required && <span className="ml-1 text-red-600">*</span>}
         </span>

@@ -15,7 +15,11 @@ import { ClientCreate } from 'pages/invoices/common/components/ClientCreate';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export function ClientSelector(props: GenericSelectorProps<Client>) {
+export interface ClientSelectorProps extends GenericSelectorProps<Client> {
+  initiallyVisible?: boolean;
+}
+
+export function ClientSelector(props: ClientSelectorProps) {
   const [t] = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -39,7 +43,7 @@ export function ClientSelector(props: GenericSelectorProps<Client>) {
         clearButton={props.clearButton}
         onClearButtonClick={props.onClearButtonClick}
         queryAdditional
-        initiallyVisible={Boolean(!props.value)}
+        initiallyVisible={props.initiallyVisible}
         actionLabel={t('new_client')}
         onActionClick={() => setIsModalOpen(true)}
       />

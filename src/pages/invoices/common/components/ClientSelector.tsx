@@ -58,6 +58,7 @@ export function ClientSelector(props: Props) {
           readonly={props.readonly}
           clearButton={Boolean(resource.client_id)}
           onClearButtonClick={props.onClearButtonClick}
+          initiallyVisible={!resource.client_id}
         />
       </div>
 

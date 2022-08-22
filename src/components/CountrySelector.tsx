@@ -11,12 +11,12 @@
 import { useCountries } from 'common/hooks/useCountries';
 import { SelectField } from './forms';
 
-interface Props {
-  value: string;
+export interface GenericSelectorProps<T = string> {
+  value: T;
   onChange: (id: string) => unknown;
 }
 
-export function CountrySelector(props: Props) {
+export function CountrySelector(props: GenericSelectorProps) {
   const countries = useCountries();
 
   return (

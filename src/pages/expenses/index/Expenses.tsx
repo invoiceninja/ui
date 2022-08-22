@@ -7,39 +7,86 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+import { Link } from '@invoiceninja/forms';
 import { date } from 'common/helpers';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
+import { Expense } from 'common/interfaces/expense';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
+import { generatePath } from 'react-router-dom';
+import { Status } from './components/Status';
 
 export function Expenses() {
-  const [t] = useTranslation();
   useTitle('expenses');
+
+  const [t] = useTranslation();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
+
   const pages = [{ name: t('expenses'), href: '/expenses' }];
-  const columns: DataTableColumns = [
+
+  const company = useCurrentCompany();
+  const formatMoney = useFormatMoney();
+
+  const columns: DataTableColumns<Expense> = [
     {
       id: 'status_id',
       label: t('status'),
-      format: (value, resource) => {
-        if (resource.should_be_invoiced) return t('pending');
-        else if (resource.invoice_id) return t('invoiced');
-        else return t('logged');
-      },
+      format: (value, expense) => (
+        <Link to={generatePath('/expenses/:id/edit', { id: expense.id })}>
+          <Status expense={expense} />
+        </Link>
+      ),
     },
     {
       id: 'number',
       label: t('number'),
+      format: (field, expense) => (
+        <Link to={generatePath('/expenses/:id/edit', { id: expense.id })}>
+          {field}
+        </Link>
+      ),
+    },
+    {
+      id: 'client_id',
+      label: t('client'),
+      format: (value, expense) =>
+        expense.client && (
+          <Link to={generatePath('/clients/:id', { id: value.toString() })}>
+            {expense.client.display_name}
+          </Link>
+        ),
+    },
+    {
+      id: 'vendor_id',
+      label: t('vendor'),
+      format: (value, expense) =>
+        expense.vendor && (
+          <Link to={generatePath('/vendors/:id', { id: value.toString() })}>
+            {expense.vendor.name}
+          </Link>
+        ),
     },
     {
       id: 'date',
       label: t('date'),
       format: (value) => date(value, dateFormat),
     },
-    { id: 'amount', label: t('amount') },
+    {
+      id: 'amount',
+      label: t('amount'),
+      format: (value) =>
+        formatMoney(
+          value,
+          company?.settings.country_id,
+          company?.settings.currency_id
+        ),
+    },
     {
       id: 'public_notes',
       label: t('public_notes'),
@@ -59,8 +106,9 @@ export function Expenses() {
     >
       <DataTable
         resource="expense"
-        endpoint="/api/v1/expenses"
+        endpoint="/api/v1/expenses?include=client,vendor"
         columns={columns}
+        bulkRoute="/api/v1/expenses/bulk"
         linkToCreate="/expenses/create"
         linkToEdit="/expenses/:id/edit"
         withResourcefulActions
