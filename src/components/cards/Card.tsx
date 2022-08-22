@@ -9,10 +9,12 @@
  */
 
 import classNames from 'classnames';
+import { Spinner } from 'components/Spinner';
 import React, { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer } from '.';
 import { Button } from '../forms';
+import { Element } from 'components/cards/Element';
 
 interface Props {
   children: ReactNode;
@@ -28,6 +30,7 @@ interface Props {
   style?: React.CSSProperties;
   withScrollableBody?: boolean;
   additionalAction?: ReactNode;
+  isLoading?: boolean;
 }
 
 export function Card(props: Props) {
@@ -62,6 +65,8 @@ export function Card(props: Props) {
 
         <div className="py-0">
           <dl className="py-4">
+            {props.isLoading && <Element leftSide={<Spinner />} />}
+
             {props.withContainer ? (
               <CardContainer>{props.children}</CardContainer>
             ) : (

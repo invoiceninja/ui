@@ -14,7 +14,6 @@ import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
 import { ReactNode, ChangeEvent } from 'react';
 
-
 export interface SelectOption {
   value: string;
   label: string;
@@ -87,7 +86,6 @@ export function Actions(props: Props) {
         )}
       </div>
       <div className="mt-2 lg:mt-0 flex items-center space-x-4">
-
         <InputField
           id="filter"
           placeholder={t('filter')}

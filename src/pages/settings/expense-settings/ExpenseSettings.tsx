@@ -13,7 +13,6 @@ import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { updateChanges } from 'common/stores/slices/company-users';
 import { Divider } from 'components/cards/Divider';
-import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../components/cards';
@@ -97,12 +96,12 @@ export function ExpenseSettings() {
 
         <Element leftSide={t('enter_taxes')}>
           <Radio
-            onClick={(event: ChangeEvent<HTMLInputElement>) =>
+            onValueChange={(value) =>
               dispatch(
                 updateChanges({
                   object: 'company',
                   property: 'calculate_expense_tax_by_amount',
-                  value: event.target.value === 'true' ? true : false,
+                  value: value === 'true' ? true : false,
                 })
               )
             }

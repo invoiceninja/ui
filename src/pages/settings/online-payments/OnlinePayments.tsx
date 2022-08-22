@@ -74,6 +74,17 @@ export function OnlinePayments() {
           </SelectField>
         </Element>
 
+        <Element leftSide={t('enable_applying_payments')}>
+          <Toggle
+            label={t('enable_applying_payments_help')}
+            id="allow_over_payment"
+            checked={company?.enable_applying_payments || false}
+            onChange={(value) =>
+              handleChangeProperty('enable_applying_payments', value)
+            }
+          />
+        </Element>
+
         <Element leftSide={t('allow_over_payment')}>
           <Toggle
             label={t('allow_over_payment_help')}

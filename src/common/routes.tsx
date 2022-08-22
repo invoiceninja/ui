@@ -25,6 +25,7 @@ import { systemlogRoutes } from 'pages/system-logs/routes';
 import { projectRoutes } from 'pages/projects/routes';
 import { taskRoutes } from 'pages/tasks/routes';
 import { vendorRoutes } from 'pages/vendors/routes';
+import { expenseRoutes } from 'pages/expenses/routes';
 
 export const routes = (
   <Routes>
@@ -42,6 +43,7 @@ export const routes = (
       {projectRoutes}
       {taskRoutes}
       {vendorRoutes}
+      {expenseRoutes}
       {settingsRoutes}
       {systemlogRoutes}
     </Route>

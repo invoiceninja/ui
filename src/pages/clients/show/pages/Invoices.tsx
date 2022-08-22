@@ -48,7 +48,6 @@ export function Invoices() {
       withResourcefulActions
       bulkRoute="/api/v1/invoices/bulk"
       linkToCreate={generatePath('/invoices/create?client=:id', { id: id })}
-
     />
   );
 }

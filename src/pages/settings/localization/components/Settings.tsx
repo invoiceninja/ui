@@ -17,7 +17,6 @@ import { updateChanges } from 'common/stores/slices/company-users';
 import { Divider } from 'components/cards/Divider';
 import dayjs from 'dayjs';
 import { useHandleCurrentCompanyChange } from 'pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
@@ -62,12 +61,12 @@ export function Settings() {
 
         <Element leftSide={t('currency_format')}>
           <Radio
-            onClick={(event: ChangeEvent<HTMLInputElement>) =>
+            onValueChange={(value) =>
               dispatch(
                 updateChanges({
                   object: 'company',
                   property: 'settings.show_currency_code',
-                  value: event.target.value === 'true' ? true : false,
+                  value: value === 'true' ? true : false,
                 })
               )
             }

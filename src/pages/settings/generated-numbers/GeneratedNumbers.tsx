@@ -8,28 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect } from 'react';
+import { useTitle } from 'common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement } from '../../../components/cards';
 import { Settings } from '../../../components/layouts/Settings';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { Settings as SettingsComponent } from './components/Settings';
 
 export function GeneratedNumbers() {
+  useTitle('generated_numbers');
+
   const [t] = useTranslation();
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('generated_numbers'), href: '/settings/generated_numbers' },
   ];
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'generated_numbers'
-    )}`;
-  });
+
+  const onSave = useHandleCompanySave();
+  const onCancel = useDiscardChanges();
 
   return (
     <Settings
       title={t('generated_numbers')}
       breadcrumbs={pages}
+      onSaveClick={onSave}
+      onCancelClick={onCancel}
       docsLink="docs/advanced-settings/#generated_numbers"
     >
       <SettingsComponent />
@@ -69,6 +74,10 @@ export function GeneratedNumbers() {
 
         <ClickableElement to="/settings/generated_numbers/vendors">
           {t('vendors')}
+        </ClickableElement>
+
+        <ClickableElement to="/settings/generated_numbers/purchase_orders">
+          {t('purchase_orders')}
         </ClickableElement>
 
         <ClickableElement to="/settings/generated_numbers/expenses">

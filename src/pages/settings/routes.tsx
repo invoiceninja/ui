@@ -68,6 +68,10 @@ export const settingsRoutes = (
       <Route path="projects" element={<Settings.ProjectsGeneratedNumbers />} />
       <Route path="tasks" element={<Settings.TasksGeneratedNumbers />} />
       <Route path="vendors" element={<Settings.VendorsGeneratedNumbers />} />
+      <Route
+        path="purchase_orders"
+        element={<Settings.PurchaseOrdersGeneratedNumbers />}
+      />
       <Route path="expenses" element={<Settings.ExpensesGeneratedNumbers />} />
       <Route
         path="recurring_expenses"

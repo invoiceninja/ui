@@ -7,4 +7,12 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-export * from './index/Expenses';
+
+import { AxiosResponse } from 'axios';
+
+export interface GenericSingleResourceResponse<T = unknown>
+  extends AxiosResponse {
+  data: {
+    data: T;
+  };
+}

@@ -25,6 +25,8 @@ import {
   TaskColumns,
   TotalFields,
 } from './components';
+import { PurchaseOrderDetails } from './components/PurchaseOrderDetails';
+import { VendorDetails } from './components/VendorDetails';
 
 export function InvoiceDesign() {
   useTitle('invoice_design');
@@ -55,6 +57,8 @@ export function InvoiceDesign() {
       <InvoiceDetails />
       <QuoteDetails />
       <CreditDetails />
+      <VendorDetails />
+      <PurchaseOrderDetails />
       <ProductColumns />
       <TaskColumns />
       <TotalFields />

@@ -47,7 +47,6 @@ export function Quotes() {
       withResourcefulActions
       bulkRoute="/api/v1/quotes/bulk"
       linkToCreate={generatePath('/quotes/create?client=:id', { id: id })}
-
     />
   );
 }

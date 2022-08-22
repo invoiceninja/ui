@@ -103,7 +103,7 @@ export function Create() {
         <div className="col-span-12">
           {currentCredit && (
             <ProductsTable
-            type="product"
+              type="product"
               columns={productColumns}
               items={currentCredit.line_items.filter(
                 (item) => item.type_id === InvoiceItemType.Product
