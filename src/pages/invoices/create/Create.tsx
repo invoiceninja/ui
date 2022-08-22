@@ -211,7 +211,7 @@ export function Create() {
             </div>
 
             <div>
-              {currentInvoice && (
+              {currentInvoice ? (
                 <ProductsTable
                   type="task"
                   resource={currentInvoice}
@@ -241,7 +241,7 @@ export function Create() {
                     )
                   }
                 />
-              )}
+              ): <Spinner  />}
             </div>
           </TabGroup>
         </div>

@@ -23,6 +23,7 @@ import { setCurrentQuote } from 'common/stores/slices/quotes/extra-reducers/set-
 import { setCurrentQuoteLineItem } from 'common/stores/slices/quotes/extra-reducers/set-current-quote-line-item';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { Spinner } from 'components/Spinner';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
@@ -101,7 +102,7 @@ export function Edit() {
         <QuoteDetails />
 
         <div className="col-span-12">
-          {currentQuote && (
+          {currentQuote ? (
             <ProductsTable
               type="product"
               resource={currentQuote}
@@ -125,7 +126,7 @@ export function Edit() {
               onDeleteRowClick={(index) => dispatch(deleteQuoteLineItem(index))}
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
-          )}
+          ): <Spinner />}
         </div>
 
         <QuoteFooter page="edit" />

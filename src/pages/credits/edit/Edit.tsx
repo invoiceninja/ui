@@ -23,6 +23,7 @@ import { setCurrentCreditLineItem } from 'common/stores/slices/credits/extra-red
 import { setCurrentLineItemProperty } from 'common/stores/slices/credits/extra-reducers/set-current-line-item-property';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { Spinner } from 'components/Spinner';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
@@ -98,7 +99,7 @@ export function Edit() {
         <CreditDetails />
 
         <div className="col-span-12">
-          {currentCredit && (
+          {currentCredit ? (
             <ProductsTable
               type="product"
               columns={productColumns}
@@ -124,7 +125,7 @@ export function Edit() {
               }
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
-          )}
+          ): <Spinner /> }
         </div>
 
         <CreditFooter page="edit" />

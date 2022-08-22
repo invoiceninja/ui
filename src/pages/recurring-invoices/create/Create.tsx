@@ -28,6 +28,7 @@ import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoi
 import { setCurrentRecurringInvoiceLineItem } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice-line-item';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { Spinner } from 'components/Spinner';
 import { ValidationAlert } from 'components/ValidationAlert';
 import { cloneDeep } from 'lodash';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
@@ -153,7 +154,7 @@ export function Create() {
         <InvoiceDetails autoBill={company?.settings?.auto_bill} />
 
         <div className="col-span-12">
-          {currentRecurringInvoice && (
+          {currentRecurringInvoice ? (
             <ProductsTable
               type="product"
               columns={productColumns}
@@ -181,7 +182,7 @@ export function Create() {
               }
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
-          )}
+          ): <Spinner />}
         </div>
 
         <InvoiceFooter page="create" />

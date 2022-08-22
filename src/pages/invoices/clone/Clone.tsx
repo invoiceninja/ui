@@ -42,6 +42,7 @@ import { useProductColumns } from '../common/hooks/useProductColumns';
 import { TabGroup } from 'components/TabGroup';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
+import { Spinner } from 'components/Spinner';
 
 export function Clone() {
   const { documentTitle } = useTitle('new_invoice');
@@ -110,7 +111,7 @@ export function Clone() {
         <div className="col-span-12">
           <TabGroup tabs={[t('products'), t('tasks')]}>
             <div>
-              {currentInvoice && (
+              {currentInvoice ? (
                 <ProductsTable
                   type="product"
                   resource={currentInvoice}
@@ -142,11 +143,11 @@ export function Clone() {
                     )
                   }
                 />
-              )}
+              ): <Spinner />}
             </div>
 
             <div>
-              {currentInvoice && (
+              {currentInvoice ? (
                 <ProductsTable
                   type="task"
                   resource={currentInvoice}
@@ -176,7 +177,7 @@ export function Clone() {
                     )
                   }
                 />
-              )}
+              ): <Spinner />}
             </div>
           </TabGroup>
         </div>

@@ -40,6 +40,7 @@ import { useHandleCreate } from 'pages/invoices/create/hooks/useHandleCreate';
 import { useInvoiceSum } from 'pages/invoices/common/hooks/useInvoiceSum';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
+import { Spinner } from 'components/Spinner';
 
 export function CloneToInvoice() {
   const { documentTitle } = useTitle('new_invoice');
@@ -105,7 +106,7 @@ export function CloneToInvoice() {
         <InvoiceDetails />
 
         <div className="col-span-12">
-          {currentInvoice && (
+          {currentInvoice ? (
             <ProductsTable
               type="product"
               columns={productColumns}
@@ -135,7 +136,7 @@ export function CloneToInvoice() {
                 )
               }
             />
-          )}
+          ): <Spinner />}
         </div>
 
         <InvoiceFooter page="create" />
