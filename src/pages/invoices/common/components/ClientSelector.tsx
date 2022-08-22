@@ -17,10 +17,11 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector as Selector } from 'components/clients/ClientSelector';
+import { Spinner } from 'components/Spinner';
 
 interface Props {
   readonly?: boolean;
-  resource: Invoice | RecurringInvoice;
+  resource?: Invoice | RecurringInvoice;
   onChange: (id: string) => unknown;
   onClearButtonClick: () => unknown;
   onContactCheckboxChange: (contactId: string, value: boolean) => unknown;
@@ -53,16 +54,17 @@ export function ClientSelector(props: Props) {
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex items-center justify-between">
         <Selector
+          inputLabel={t('client')}
           onChange={(client) => props.onChange(client.id)}
-          value={resource.client_id}
+          value={resource?.client_id}
           readonly={props.readonly}
-          clearButton={Boolean(resource.client_id)}
+          clearButton={Boolean(resource?.client_id)}
           onClearButtonClick={props.onClearButtonClick}
-          initiallyVisible={!resource.client_id}
+          initiallyVisible={!resource?.client_id}
         />
       </div>
 
-      {resource?.client_id &&
+      {resource?.client_id ? (
         client &&
         client.contacts.map((contact, index) => (
           <div key={index}>
@@ -85,7 +87,10 @@ export function ClientSelector(props: Props) {
 
             <span className="text-sm text-gray-700">{contact.email}</span>
           </div>
-        ))}
+        ))
+      ) : (
+        <Spinner />
+      )}
     </Card>
   );
 }

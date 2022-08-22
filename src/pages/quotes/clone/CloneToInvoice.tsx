@@ -40,6 +40,7 @@ import { useHandleCreate } from 'pages/invoices/create/hooks/useHandleCreate';
 import { useInvoiceSum } from 'pages/invoices/common/hooks/useInvoiceSum';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
+import { Spinner } from 'components/Spinner';
 
 export function CloneToInvoice() {
   const { documentTitle } = useTitle('new_invoice');
@@ -91,23 +92,21 @@ export function CloneToInvoice() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        {currentInvoice && (
-          <ClientSelector
-            resource={currentInvoice}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentInvoiceInvitation({ contactId, checked: value })
-              )
-            }
-          />
-        )}
+        <ClientSelector
+          resource={currentInvoice}
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentInvoiceInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <InvoiceDetails />
 
         <div className="col-span-12">
-          {currentInvoice && (
+          {currentInvoice ? (
             <ProductsTable
               type="product"
               columns={productColumns}
@@ -137,6 +136,8 @@ export function CloneToInvoice() {
                 )
               }
             />
+          ) : (
+            <Spinner />
           )}
         </div>
 

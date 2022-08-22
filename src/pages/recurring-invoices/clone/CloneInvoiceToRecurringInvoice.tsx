@@ -23,6 +23,7 @@ import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoi
 import { setCurrentRecurringInvoiceLineItem } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice-line-item';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { Spinner } from 'components/Spinner';
 import { ValidationAlert } from 'components/ValidationAlert';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
@@ -86,25 +87,24 @@ export function CloneInvoiceToRecurringInvoice() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        {currentRecurringInvoice && (
-          <ClientSelector
-            resource={currentRecurringInvoice}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentRecurringInvoiceInvitation({
-                  contactId,
-                  checked: value,
-                })
-              )
-            }
-          />
-        )}
+        <ClientSelector
+          resource={currentRecurringInvoice}
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentRecurringInvoiceInvitation({
+                contactId,
+                checked: value,
+              })
+            )
+          }
+        />
+
         <InvoiceDetails />
 
         <div className="col-span-12">
-          {currentRecurringInvoice && (
+          {currentRecurringInvoice ? (
             <ProductsTable
               type="product"
               columns={productColumns}
@@ -132,6 +132,8 @@ export function CloneInvoiceToRecurringInvoice() {
               }
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
+          ) : (
+            <Spinner />
           )}
         </div>
 

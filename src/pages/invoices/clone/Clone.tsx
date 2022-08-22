@@ -42,6 +42,7 @@ import { useProductColumns } from '../common/hooks/useProductColumns';
 import { TabGroup } from 'components/TabGroup';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
+import { Spinner } from 'components/Spinner';
 
 export function Clone() {
   const { documentTitle } = useTitle('new_invoice');
@@ -94,25 +95,23 @@ export function Clone() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        {currentInvoice && (
-          <ClientSelector
-            resource={currentInvoice}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentInvoiceInvitation({ contactId, checked: value })
-              )
-            }
-          />
-        )}
+        <ClientSelector
+          resource={currentInvoice}
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentInvoiceInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <InvoiceDetails />
 
         <div className="col-span-12">
           <TabGroup tabs={[t('products'), t('tasks')]}>
             <div>
-              {currentInvoice && (
+              {currentInvoice ? (
                 <ProductsTable
                   type="product"
                   resource={currentInvoice}
@@ -144,11 +143,13 @@ export function Clone() {
                     )
                   }
                 />
+              ) : (
+                <Spinner />
               )}
             </div>
 
             <div>
-              {currentInvoice && (
+              {currentInvoice ? (
                 <ProductsTable
                   type="task"
                   resource={currentInvoice}
@@ -178,6 +179,8 @@ export function Clone() {
                     )
                   }
                 />
+              ) : (
+                <Spinner />
               )}
             </div>
           </TabGroup>

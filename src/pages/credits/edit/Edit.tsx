@@ -23,6 +23,7 @@ import { setCurrentCreditLineItem } from 'common/stores/slices/credits/extra-red
 import { setCurrentLineItemProperty } from 'common/stores/slices/credits/extra-reducers/set-current-line-item-property';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { Spinner } from 'components/Spinner';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
@@ -83,24 +84,22 @@ export function Edit() {
       navigationTopRight={currentCredit && <Actions />}
     >
       <div className="grid grid-cols-12 gap-4">
-        {currentCredit && (
-          <ClientSelector
-            resource={currentCredit}
-            readonly
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentCreditInvitation({ contactId, checked: value })
-              )
-            }
-          />
-        )}
+        <ClientSelector
+          resource={currentCredit}
+          readonly
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentCreditInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <CreditDetails />
 
         <div className="col-span-12">
-          {currentCredit && (
+          {currentCredit ? (
             <ProductsTable
               type="product"
               columns={productColumns}
@@ -126,6 +125,8 @@ export function Edit() {
               }
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
+          ) : (
+            <Spinner />
           )}
         </div>
 

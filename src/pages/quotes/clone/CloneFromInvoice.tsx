@@ -24,6 +24,7 @@ import { setCurrentQuote } from 'common/stores/slices/quotes/extra-reducers/set-
 import { setCurrentQuoteLineItem } from 'common/stores/slices/quotes/extra-reducers/set-current-quote-line-item';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { Spinner } from 'components/Spinner';
 import { ValidationAlert } from 'components/ValidationAlert';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
@@ -87,24 +88,22 @@ export function CloneInvoiceToQuote() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        {currentQuote && (
-          <ClientSelector
-            resource={currentQuote}
-            readonly
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentQuoteInvitation({ contactId, checked: value })
-              )
-            }
-          />
-        )}
+        <ClientSelector
+          resource={currentQuote}
+          readonly
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentQuoteInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <QuoteDetails />
 
         <div className="col-span-12">
-          {currentQuote && (
+          {currentQuote ? (
             <ProductsTable
               type="product"
               columns={productColumns}
@@ -128,6 +127,8 @@ export function CloneInvoiceToQuote() {
               onDeleteRowClick={(index) => dispatch(deleteQuoteLineItem(index))}
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
+          ) : (
+            <Spinner />
           )}
         </div>
 

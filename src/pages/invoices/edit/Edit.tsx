@@ -43,6 +43,7 @@ import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { uuid4 } from '@sentry/utils';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { InvoicePreview } from '../common/components/InvoicePreview';
+import { Spinner } from 'components/Spinner';
 
 export function Edit() {
   const { id } = useParams();
@@ -102,26 +103,24 @@ export function Edit() {
       }
     >
       <div className="grid grid-cols-12 gap-4">
-        {currentInvoice && (
-          <ClientSelector
-            resource={currentInvoice}
-            readonly
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentInvoiceInvitation({ contactId, checked: value })
-              )
-            }
-          />
-        )}
+        <ClientSelector
+          resource={currentInvoice}
+          readonly
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentInvoiceInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <InvoiceDetails />
 
         <div className="col-span-12">
           <TabGroup tabs={[t('products'), t('tasks')]}>
             <div>
-              {currentInvoice && (
+              {currentInvoice ? (
                 <ProductsTable
                   type="product"
                   resource={currentInvoice}
@@ -153,11 +152,13 @@ export function Edit() {
                     )
                   }
                 />
+              ) : (
+                <Spinner />
               )}
             </div>
 
             <div>
-              {currentInvoice && (
+              {currentInvoice ? (
                 <ProductsTable
                   type="task"
                   resource={currentInvoice}
@@ -187,6 +188,8 @@ export function Edit() {
                     )
                   }
                 />
+              ) : (
+                <Spinner />
               )}
             </div>
           </TabGroup>
