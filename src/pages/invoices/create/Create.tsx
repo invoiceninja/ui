@@ -47,6 +47,7 @@ import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { TabGroup } from 'components/TabGroup';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
+import { Spinner } from 'components/Spinner';
 
 export function Create() {
   const { documentTitle } = useTitle('new_invoice');
@@ -152,19 +153,17 @@ export function Create() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        {currentInvoice && (
-          <ClientSelector
-            readonly={searchParams.get('table') === 'tasks'}
-            resource={currentInvoice}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentInvoiceInvitation({ contactId, checked: value })
-              )
-            }
-          />
-        )}
+        <ClientSelector
+          readonly={searchParams.get('table') === 'tasks'}
+          resource={currentInvoice}
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentInvoiceInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <InvoiceDetails />
 
@@ -174,7 +173,7 @@ export function Create() {
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
           >
             <div>
-              {currentInvoice && (
+              {currentInvoice ? (
                 <ProductsTable
                   type="product"
                   resource={currentInvoice}
@@ -206,6 +205,8 @@ export function Create() {
                     )
                   }
                 />
+              ) : (
+                <Spinner />
               )}
             </div>
 

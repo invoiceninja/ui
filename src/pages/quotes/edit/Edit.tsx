@@ -86,7 +86,6 @@ export function Edit() {
       onBackClick={generatePath('/quotes')}
     >
       <div className="grid grid-cols-12 gap-4">
-        {currentQuote && (
           <ClientSelector
             resource={currentQuote}
             readonly
@@ -98,7 +97,6 @@ export function Edit() {
               )
             }
           />
-        )}
 
         <QuoteDetails />
 

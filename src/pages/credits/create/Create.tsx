@@ -85,7 +85,6 @@ export function Create() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        {currentCredit && (
           <ClientSelector
             resource={currentCredit}
             onChange={(id) => handleChange('client_id', id)}
@@ -96,7 +95,6 @@ export function Create() {
               )
             }
           />
-        )}
 
         <CreditDetails />
 

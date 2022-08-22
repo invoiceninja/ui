@@ -88,21 +88,20 @@ export function Clone() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        {currentRecurringInvoice && (
-          <ClientSelector
-            resource={currentRecurringInvoice}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentRecurringInvoiceInvitation({
-                  contactId,
-                  checked: value,
-                })
-              )
-            }
-          />
-        )}
+        <ClientSelector
+          resource={currentRecurringInvoice}
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentRecurringInvoiceInvitation({
+                contactId,
+                checked: value,
+              })
+            )
+          }
+        />
+        
         <InvoiceDetails />
 
         <div className="col-span-12">

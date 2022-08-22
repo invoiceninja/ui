@@ -102,7 +102,6 @@ export function Edit() {
       }
     >
       <div className="grid grid-cols-12 gap-4">
-        {currentInvoice && (
           <ClientSelector
             resource={currentInvoice}
             readonly
@@ -114,7 +113,6 @@ export function Edit() {
               )
             }
           />
-        )}
 
         <InvoiceDetails />
 

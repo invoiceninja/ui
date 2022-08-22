@@ -88,7 +88,6 @@ export function Clone() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        {currentQuote && (
           <ClientSelector
             resource={currentQuote}
             readonly
@@ -100,7 +99,6 @@ export function Clone() {
               )
             }
           />
-        )}
 
         <QuoteDetails />
 

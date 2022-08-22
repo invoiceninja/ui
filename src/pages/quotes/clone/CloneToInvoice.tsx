@@ -91,7 +91,6 @@ export function CloneToInvoice() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        {currentInvoice && (
           <ClientSelector
             resource={currentInvoice}
             onChange={(id) => handleChange('client_id', id)}
@@ -102,7 +101,6 @@ export function CloneToInvoice() {
               )
             }
           />
-        )}
 
         <InvoiceDetails />
 

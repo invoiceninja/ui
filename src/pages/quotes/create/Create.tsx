@@ -86,7 +86,6 @@ export function Create() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        {currentQuote && (
           <ClientSelector
             resource={currentQuote}
             onChange={(id) => handleChange('client_id', id)}
@@ -97,7 +96,6 @@ export function Create() {
               )
             }
           />
-        )}
 
         <QuoteDetails />
 

@@ -136,7 +136,6 @@ export function Create() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        {currentRecurringInvoice && (
           <ClientSelector
             resource={currentRecurringInvoice}
             onChange={(id) => handleChange('client_id', id)}
@@ -150,7 +149,6 @@ export function Create() {
               )
             }
           />
-        )}
 
         <InvoiceDetails autoBill={company?.settings?.auto_bill} />
 

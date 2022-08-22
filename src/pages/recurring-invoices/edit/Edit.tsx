@@ -89,7 +89,6 @@ export function Edit() {
       navigationTopRight={<Actions />}
     >
       <div className="grid grid-cols-12 gap-4">
-        {currentRecurringInvoice && (
           <ClientSelector
             resource={currentRecurringInvoice}
             readonly
@@ -104,7 +103,6 @@ export function Edit() {
               )
             }
           />
-        )}
 
         <InvoiceDetails autoBill={currentRecurringInvoice?.auto_bill} />
 

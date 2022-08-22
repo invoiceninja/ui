@@ -83,7 +83,6 @@ export function Edit() {
       navigationTopRight={currentCredit && <Actions />}
     >
       <div className="grid grid-cols-12 gap-4">
-        {currentCredit && (
           <ClientSelector
             resource={currentCredit}
             readonly
@@ -95,7 +94,6 @@ export function Edit() {
               )
             }
           />
-        )}
 
         <CreditDetails />
 
