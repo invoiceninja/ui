@@ -90,20 +90,20 @@ export function Edit() {
       navigationTopRight={<Actions />}
     >
       <div className="grid grid-cols-12 gap-4">
-          <ClientSelector
-            resource={currentRecurringInvoice}
-            readonly
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentRecurringInvoiceInvitation({
-                  contactId,
-                  checked: value,
-                })
-              )
-            }
-          />
+        <ClientSelector
+          resource={currentRecurringInvoice}
+          readonly
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentRecurringInvoiceInvitation({
+                contactId,
+                checked: value,
+              })
+            )
+          }
+        />
 
         <InvoiceDetails autoBill={currentRecurringInvoice?.auto_bill} />
 
@@ -136,7 +136,9 @@ export function Edit() {
               }
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
-          ): <Spinner/>}
+          ) : (
+            <Spinner />
+          )}
         </div>
 
         <InvoiceFooter page="edit" />

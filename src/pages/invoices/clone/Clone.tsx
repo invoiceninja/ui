@@ -95,16 +95,16 @@ export function Clone() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-          <ClientSelector
-            resource={currentInvoice}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentInvoiceInvitation({ contactId, checked: value })
-              )
-            }
-          />
+        <ClientSelector
+          resource={currentInvoice}
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentInvoiceInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <InvoiceDetails />
 
@@ -143,7 +143,9 @@ export function Clone() {
                     )
                   }
                 />
-              ): <Spinner />}
+              ) : (
+                <Spinner />
+              )}
             </div>
 
             <div>
@@ -177,7 +179,9 @@ export function Clone() {
                     )
                   }
                 />
-              ): <Spinner />}
+              ) : (
+                <Spinner />
+              )}
             </div>
           </TabGroup>
         </div>

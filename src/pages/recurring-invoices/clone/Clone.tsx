@@ -102,7 +102,7 @@ export function Clone() {
             )
           }
         />
-        
+
         <InvoiceDetails />
 
         <div className="col-span-12">
@@ -134,7 +134,9 @@ export function Clone() {
               }
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
-          ): <Spinner />}
+          ) : (
+            <Spinner />
+          )}
         </div>
 
         <InvoiceFooter page="create" />

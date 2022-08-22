@@ -86,16 +86,16 @@ export function Create() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-          <ClientSelector
-            resource={currentCredit}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentCreditInvitation({ contactId, checked: value })
-              )
-            }
-          />
+        <ClientSelector
+          resource={currentCredit}
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentCreditInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <CreditDetails />
 
@@ -126,7 +126,9 @@ export function Create() {
               }
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
-          ): <Spinner /> }
+          ) : (
+            <Spinner />
+          )}
         </div>
 
         <CreditFooter page="create" />

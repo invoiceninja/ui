@@ -88,17 +88,17 @@ export function CloneInvoiceToQuote() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-          <ClientSelector
-            resource={currentQuote}
-            readonly
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentQuoteInvitation({ contactId, checked: value })
-              )
-            }
-          />
+        <ClientSelector
+          resource={currentQuote}
+          readonly
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentQuoteInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <QuoteDetails />
 
@@ -127,7 +127,9 @@ export function CloneInvoiceToQuote() {
               onDeleteRowClick={(index) => dispatch(deleteQuoteLineItem(index))}
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
-          ): <Spinner />}
+          ) : (
+            <Spinner />
+          )}
         </div>
 
         <QuoteFooter page="edit" />

@@ -129,7 +129,9 @@ export function CloneInvoiceToCredit() {
               }
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
-          ) : <Spinner /> }
+          ) : (
+            <Spinner />
+          )}
         </div>
 
         <CreditFooter page="edit" />

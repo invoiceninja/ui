@@ -87,16 +87,16 @@ export function Create() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-          <ClientSelector
-            resource={currentQuote}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentQuoteInvitation({ contactId, checked: value })
-              )
-            }
-          />
+        <ClientSelector
+          resource={currentQuote}
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentQuoteInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <QuoteDetails />
 
@@ -125,7 +125,9 @@ export function Create() {
               onDeleteRowClick={(index) => dispatch(deleteQuoteLineItem(index))}
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
-          ): <Spinner />}
+          ) : (
+            <Spinner />
+          )}
         </div>
 
         <QuoteFooter page="create" />

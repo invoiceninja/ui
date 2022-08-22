@@ -128,7 +128,9 @@ export function Clone() {
               }
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
-          ): <Spinner />}
+          ) : (
+            <Spinner />
+          )}
         </div>
 
         <CreditFooter page="edit" />

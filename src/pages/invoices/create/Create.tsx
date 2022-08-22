@@ -241,7 +241,9 @@ export function Create() {
                     )
                   }
                 />
-              ): <Spinner  />}
+              ) : (
+                <Spinner />
+              )}
             </div>
           </TabGroup>
         </div>

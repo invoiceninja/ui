@@ -103,17 +103,17 @@ export function Edit() {
       }
     >
       <div className="grid grid-cols-12 gap-4">
-          <ClientSelector
-            resource={currentInvoice}
-            readonly
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentInvoiceInvitation({ contactId, checked: value })
-              )
-            }
-          />
+        <ClientSelector
+          resource={currentInvoice}
+          readonly
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentInvoiceInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <InvoiceDetails />
 
@@ -152,7 +152,9 @@ export function Edit() {
                     )
                   }
                 />
-              ): <Spinner />}
+              ) : (
+                <Spinner />
+              )}
             </div>
 
             <div>
@@ -186,7 +188,9 @@ export function Edit() {
                     )
                   }
                 />
-              ): <Spinner />}
+              ) : (
+                <Spinner />
+              )}
             </div>
           </TabGroup>
         </div>

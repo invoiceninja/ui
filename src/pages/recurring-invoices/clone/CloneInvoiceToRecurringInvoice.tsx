@@ -100,7 +100,7 @@ export function CloneInvoiceToRecurringInvoice() {
             )
           }
         />
-        
+
         <InvoiceDetails />
 
         <div className="col-span-12">
@@ -132,7 +132,9 @@ export function CloneInvoiceToRecurringInvoice() {
               }
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
-          ): <Spinner />}
+          ) : (
+            <Spinner />
+          )}
         </div>
 
         <InvoiceFooter page="create" />

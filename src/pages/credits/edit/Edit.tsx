@@ -84,17 +84,17 @@ export function Edit() {
       navigationTopRight={currentCredit && <Actions />}
     >
       <div className="grid grid-cols-12 gap-4">
-          <ClientSelector
-            resource={currentCredit}
-            readonly
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentCreditInvitation({ contactId, checked: value })
-              )
-            }
-          />
+        <ClientSelector
+          resource={currentCredit}
+          readonly
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentCreditInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <CreditDetails />
 
@@ -125,7 +125,9 @@ export function Edit() {
               }
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
-          ): <Spinner /> }
+          ) : (
+            <Spinner />
+          )}
         </div>
 
         <CreditFooter page="edit" />

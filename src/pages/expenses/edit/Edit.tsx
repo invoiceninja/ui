@@ -129,17 +129,11 @@ export function Edit() {
           </div>
 
           <div className="col-span-12 xl:col-span-4">
-            <Notes
-              expense={expense}
-              handleChange={handleChange}
-            />
+            <Notes expense={expense} handleChange={handleChange} />
           </div>
 
           <div className="col-span-12 xl:col-span-4 space-y-4">
-            <AdditionalInfo
-              expense={expense}
-              handleChange={handleChange}
-            />
+            <AdditionalInfo expense={expense} handleChange={handleChange} />
 
             <TaxSettings
               expense={expense}
