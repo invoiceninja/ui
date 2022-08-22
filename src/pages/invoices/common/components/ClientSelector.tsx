@@ -17,6 +17,7 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector as Selector } from 'components/clients/ClientSelector';
+import { Spinner } from 'components/Spinner';
 
 interface Props {
   readonly?: boolean;
@@ -53,6 +54,7 @@ export function ClientSelector(props: Props) {
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex items-center justify-between">
         <Selector
+          inputLabel={t('client')}
           onChange={(client) => props.onChange(client.id)}
           value={resource?.client_id}
           readonly={props.readonly}
@@ -62,7 +64,7 @@ export function ClientSelector(props: Props) {
         />
       </div>
 
-      {resource?.client_id &&
+      {resource?.client_id ? (
         client &&
         client.contacts.map((contact, index) => (
           <div key={index}>
@@ -85,7 +87,10 @@ export function ClientSelector(props: Props) {
 
             <span className="text-sm text-gray-700">{contact.email}</span>
           </div>
-        ))}
+        ))
+      ) : (
+        <Spinner />
+      )}
     </Card>
   );
 }
