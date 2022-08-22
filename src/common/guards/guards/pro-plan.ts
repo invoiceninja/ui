@@ -1,4 +1,3 @@
-
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *

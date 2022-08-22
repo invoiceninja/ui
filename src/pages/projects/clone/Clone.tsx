@@ -56,7 +56,7 @@ export function Clone() {
       setProject({
         ...existingProject,
         task_rate: company?.settings.default_task_rate || 0,
-        number: ''
+        number: '',
       });
     }
   }, [existingProject]);

@@ -32,7 +32,6 @@ export function ShippingAddress(props: Props) {
   };
 
   const copyBilling = () => {
-
     props.setClient(
       (client) =>
         client && {
@@ -42,15 +41,19 @@ export function ShippingAddress(props: Props) {
           shipping_city: client?.city,
           shipping_state: client?.state,
           shipping_postal_code: client?.postal_code,
-          shipping_country_id: client?.country_id
+          shipping_country_id: client?.country_id,
         }
     );
-
   };
 
   return (
     <>
-      <Button onClick={copyBilling} type="secondary" behavior="button" className='mx-4 rounded-md bg-grey h-6'>
+      <Button
+        onClick={copyBilling}
+        type="secondary"
+        behavior="button"
+        className="mx-4 rounded-md bg-grey h-6"
+      >
         {t('copy_billing')}
       </Button>
       <Element leftSide={t('billing_address1')}>

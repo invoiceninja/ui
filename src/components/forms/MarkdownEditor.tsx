@@ -25,7 +25,7 @@ export function MarkdownEditor(props: Props) {
   }, [props.value]);
 
   const handleChangeEvent = (value: string) => {
-    props.onChange(value)
+    props.onChange(value);
   };
 
   const delayedQuery = useRef(
