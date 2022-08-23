@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Expense } from './expense';
+import { Vendor } from './vendor';
+
 export interface PurchaseOrder {
   id: string;
   user_id: string;
@@ -71,6 +74,8 @@ export interface PurchaseOrder {
   expense_id: string;
   invitations: Invitation[];
   documents: any[];
+  vendor?: Vendor;
+  expense?: Expense;
 }
 
 export interface Invitation {
