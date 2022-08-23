@@ -8,6 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTitle } from 'common/hooks/useTitle';
+import { Default } from 'components/layouts/Default';
+
 export function PurchaseOrders() {
-  return <div>Purchase orders</div>;
+  const { documentTitle } = useTitle('purchase_orders');
+
+  return <Default title={documentTitle}></Default>;
 }
