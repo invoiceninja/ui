@@ -76,11 +76,11 @@ export function Credits() {
       format: (value) => date(value, dateFormat),
     },
     {
-      id: 'paid_to_date',
+      id: 'balance',
       label: t('remaining'),
       format: (_, resource) => {
         return formatMoney(
-          resource.amount - resource.paid_to_date,
+          resource.balance,
           resource?.client.country_id,
           resource?.client.settings.currency_id
         );
