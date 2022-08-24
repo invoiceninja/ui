@@ -17,11 +17,10 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector as Selector } from 'components/clients/ClientSelector';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
 
 interface Props {
   readonly?: boolean;
-  resource?: Invoice | RecurringInvoice | PurchaseOrder;
+  resource?: Invoice | RecurringInvoice;
   onChange: (id: string) => unknown;
   onClearButtonClick: () => unknown;
   onContactCheckboxChange: (contactId: string, value: boolean) => unknown;
