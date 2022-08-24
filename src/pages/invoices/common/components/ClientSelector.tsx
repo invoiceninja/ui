@@ -17,11 +17,11 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector as Selector } from 'components/clients/ClientSelector';
-import { Spinner } from 'components/Spinner';
+import { PurchaseOrder } from 'common/interfaces/purchase-order';
 
 interface Props {
   readonly?: boolean;
-  resource?: Invoice | RecurringInvoice;
+  resource?: Invoice | RecurringInvoice | PurchaseOrder;
   onChange: (id: string) => unknown;
   onClearButtonClick: () => unknown;
   onContactCheckboxChange: (contactId: string, value: boolean) => unknown;
@@ -64,7 +64,7 @@ export function ClientSelector(props: Props) {
         />
       </div>
 
-      {resource?.client_id ? (
+      {resource?.client_id &&
         client &&
         client.contacts.map((contact, index) => (
           <div key={index}>
@@ -87,10 +87,7 @@ export function ClientSelector(props: Props) {
 
             <span className="text-sm text-gray-700">{contact.email}</span>
           </div>
-        ))
-      ) : (
-        <Spinner />
-      )}
+        ))}
     </Card>
   );
 }
