@@ -9,10 +9,12 @@
  */
 
 import { Route } from 'react-router-dom';
+import { Edit } from './edit/Edit';
 import { PurchaseOrders } from './index/PurchaseOrders';
 
 export const purchaseOrdersRoutes = (
   <Route path="/purchase_orders">
     <Route path="" element={<PurchaseOrders />} />
+    <Route path=":id/edit" element={<Edit />} />
   </Route>
 );
