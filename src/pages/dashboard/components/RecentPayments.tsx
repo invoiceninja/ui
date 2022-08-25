@@ -15,19 +15,22 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { t } from 'i18next';
 import { generatePath } from 'react-router-dom';
 import { Link } from 'components/forms/Link';
+import { Payment } from 'common/interfaces/payment';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 
 export function RecentPayments() {
   const { dateFormat } = useCurrentCompanyDateFormats();
   const formatMoney = useFormatMoney();
+  const company = useCurrentCompany();
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<Payment> = [
     {
       id: 'number',
       label: t('number'),
-      format: (value, resource) => {
+      format: (value, payment) => {
         return (
-          <Link to={generatePath('/payments/:id/edit', { id: resource.id })}>
-            {resource.number}
+          <Link to={generatePath('/payments/:id/edit', { id: payment.id })}>
+            {payment.number}
           </Link>
         );
       },
@@ -35,26 +38,27 @@ export function RecentPayments() {
     {
       id: 'client_id',
       label: t('client'),
-      format: (value, resource) => (
-        <Link to={generatePath('/clients/:id', { id: resource.client.id })}>
-          {resource.client.display_name}
+      format: (value, payment) => (
+        <Link to={generatePath('/clients/:id', { id: payment.client_id })}>
+          {payment.client?.display_name}
         </Link>
       ),
     },
     {
       id: 'amount',
       label: t('amount'),
-      format: (value, resource) =>
+      format: (value, payment) =>
         formatMoney(
           value,
-          resource?.client.country_id,
-          resource?.client.settings.currency_id
+          payment.client?.country_id || company.settings.country_id,
+          payment.client?.settings.currency_id || company.settings.currency_id
         ),
     },
     {
       id: 'invoice_number',
       label: t('invoice_number'),
-      format: (value, resource) => resource.invoices[0]?.number,
+      format: (value, payment) =>
+        payment.invoices && payment.invoices[0].number,
     },
     {
       id: 'date',

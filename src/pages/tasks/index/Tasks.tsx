@@ -33,7 +33,7 @@ export function Tasks() {
 
   const pages = [{ name: t('tasks'), href: '/tasks' }];
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<Task> = [
     {
       id: 'status_id',
       label: t('status'),

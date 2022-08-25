@@ -12,6 +12,7 @@ import paymentStatus from 'common/constants/payment-status';
 import paymentType from 'common/constants/payment-type';
 import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Payment } from 'common/interfaces/payment';
@@ -32,12 +33,13 @@ export function Payments() {
 
   const formatMoney = useFormatMoney();
   const emailPayment = useEmailPayment();
+  const company = useCurrentCompany();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<Payment> = [
     {
       id: 'status_id',
       label: t('status'),
@@ -46,10 +48,10 @@ export function Payments() {
     {
       id: 'number',
       label: t('number'),
-      format: (value, resource) => {
+      format: (value, payment) => {
         return (
-          <Link to={generatePath('/payments/:id/edit', { id: resource.id })}>
-            {resource.number}
+          <Link to={generatePath('/payments/:id/edit', { id: payment.id })}>
+            {payment.number}
           </Link>
         );
       },
@@ -57,26 +59,26 @@ export function Payments() {
     {
       id: 'client_id',
       label: t('client'),
-      format: (value, resource) => (
-        <Link to={generatePath('/clients/:id', { id: resource.client.id })}>
-          {resource.client.display_name}
+      format: (value, payment) => (
+        <Link to={generatePath('/clients/:id', { id: payment.client_id })}>
+          {payment.client?.display_name}
         </Link>
       ),
     },
     {
       id: 'amount',
       label: t('amount'),
-      format: (value, resource) =>
+      format: (value, payment) =>
         formatMoney(
           value,
-          resource?.client.country_id,
-          resource?.client.settings.currency_id
+          payment.client?.country_id || company.settings.country_id,
+          payment.client?.settings.currency_id || company.settings.currency_id
         ),
     },
     {
       id: 'invoice_number',
       label: t('invoice_number'),
-      format: (value, resource) => resource.invoices[0]?.number,
+      format: (value, payment) => payment.invoices?.[0]?.number,
     },
     {
       id: 'date',

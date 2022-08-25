@@ -12,6 +12,7 @@ import { Link } from '@invoiceninja/forms';
 import creditStatus from 'common/constants/credit-status';
 import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Credit } from 'common/interfaces/credit';
@@ -36,7 +37,9 @@ export function Credits() {
 
   const pages = [{ name: t('credits'), href: '/credits' }];
 
-  const columns: DataTableColumns = [
+  const company = useCurrentCompany();
+
+  const columns: DataTableColumns<Credit> = [
     {
       id: 'status_id',
       label: t('status'),
@@ -45,8 +48,8 @@ export function Credits() {
     {
       id: 'number',
       label: t('number'),
-      format: (field, resource: Credit) => (
-        <Link to={generatePath('/credits/:id/edit', { id: resource.id })}>
+      format: (field, credit) => (
+        <Link to={generatePath('/credits/:id/edit', { id: credit.id })}>
           {field}
         </Link>
       ),
@@ -54,20 +57,20 @@ export function Credits() {
     {
       id: 'client_id',
       label: t('client'),
-      format: (_, resource: Credit) => (
-        <Link to={generatePath('/clients/:id', { id: resource.client_id })}>
-          {resource.client?.display_name}
+      format: (_, credit) => (
+        <Link to={generatePath('/clients/:id', { id: credit.client_id })}>
+          {credit.client?.display_name}
         </Link>
       ),
     },
     {
       id: 'amount',
       label: t('amount'),
-      format: (value, resource) =>
+      format: (value, credit) =>
         formatMoney(
           value,
-          resource?.client.country_id,
-          resource?.client.settings.currency_id
+          credit.client?.country_id || company.settings.country_id,
+          credit.client?.settings.currency_id || company.settings.currency_id
         ),
     },
     {
@@ -78,11 +81,11 @@ export function Credits() {
     {
       id: 'balance',
       label: t('remaining'),
-      format: (_, resource) => {
+      format: (_, credit) => {
         return formatMoney(
-          resource.balance,
-          resource?.client.country_id,
-          resource?.client.settings.currency_id
+          credit.balance,
+          credit.client?.country_id || company.settings.country_id,
+          credit.client?.settings.currency_id || company.settings.currency_id
         );
       },
     },

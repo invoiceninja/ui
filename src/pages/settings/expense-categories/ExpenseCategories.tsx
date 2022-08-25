@@ -9,21 +9,22 @@
  */
 
 import { Link } from '@invoiceninja/forms';
+import { ExpenseCategory } from 'common/interfaces/expense-category';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { generatePath } from 'react-router-dom';
 
 export function ExpenseCategories() {
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<ExpenseCategory> = [
     {
       id: 'category',
       label: 'name',
-      format: (value, resource) => (
+      format: (value, expenseCategory) => (
         <Link
           to={generatePath('/settings/expense_categories/:id/edit', {
-            id: resource.id,
+            id: expenseCategory.id,
           })}
         >
-          {resource.name}
+          {expenseCategory.name}
         </Link>
       ),
     },
