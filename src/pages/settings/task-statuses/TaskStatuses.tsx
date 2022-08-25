@@ -17,11 +17,11 @@ import { generatePath } from 'react-router-dom';
 export function TaskStatuses() {
   const [t] = useTranslation();
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<TaskStatus> = [
     {
       id: 'name',
       label: t('name'),
-      format: (value, taskStatus: TaskStatus) => (
+      format: (value, taskStatus) => (
         <Link
           to={generatePath('/settings/task_statuses/:id/edit', {
             id: taskStatus.id,
