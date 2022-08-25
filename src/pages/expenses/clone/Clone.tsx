@@ -64,7 +64,9 @@ export function Clone() {
       .then((response: GenericSingleResourceResponse<Expense>) => {
         toast.success('created_expense');
 
-        navigate(generatePath('/expenses/:id/edit', { id: response.data.data.id }));
+        navigate(
+          generatePath('/expenses/:id/edit', { id: response.data.data.id })
+        );
       })
       .catch((error) => {
         console.error(error);

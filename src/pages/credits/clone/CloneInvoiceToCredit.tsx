@@ -24,6 +24,7 @@ import { setCurrentCreditLineItem } from 'common/stores/slices/credits/extra-red
 import { setCurrentLineItemProperty } from 'common/stores/slices/credits/extra-reducers/set-current-line-item-property';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { Spinner } from 'components/Spinner';
 import { ValidationAlert } from 'components/ValidationAlert';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
@@ -88,23 +89,21 @@ export function CloneInvoiceToCredit() {
       {errors && <ValidationAlert errors={errors} />}
 
       <div className="grid grid-cols-12 gap-4">
-        {currentCredit && (
-          <ClientSelector
-            resource={currentCredit}
-            onChange={(id) => handleChange('client_id', id)}
-            onClearButtonClick={() => handleChange('client_id', '')}
-            onContactCheckboxChange={(contactId, value) =>
-              dispatch(
-                toggleCurrentCreditInvitation({ contactId, checked: value })
-              )
-            }
-          />
-        )}
+        <ClientSelector
+          resource={currentCredit}
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={(contactId, value) =>
+            dispatch(
+              toggleCurrentCreditInvitation({ contactId, checked: value })
+            )
+          }
+        />
 
         <CreditDetails />
 
         <div className="col-span-12">
-          {currentCredit && (
+          {currentCredit ? (
             <ProductsTable
               type="product"
               columns={productColumns}
@@ -130,6 +129,8 @@ export function CloneInvoiceToCredit() {
               }
               onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
             />
+          ) : (
+            <Spinner />
           )}
         </div>
 
