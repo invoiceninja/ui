@@ -15,19 +15,22 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { t } from 'i18next';
 import { generatePath } from 'react-router-dom';
 import { Link } from 'components/forms/Link';
+import { Invoice } from 'common/interfaces/invoice';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 
 export function UpcomingInvoices() {
   const { dateFormat } = useCurrentCompanyDateFormats();
   const formatMoney = useFormatMoney();
+  const company = useCurrentCompany();
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<Invoice> = [
     {
       id: 'number',
       label: t('number'),
-      format: (value, resource) => {
+      format: (value, invoice) => {
         return (
-          <Link to={generatePath('/invoices/:id/edit', { id: resource.id })}>
-            {resource.number}
+          <Link to={generatePath('/invoices/:id/edit', { id: invoice.id })}>
+            {invoice.number}
           </Link>
         );
       },
@@ -35,9 +38,9 @@ export function UpcomingInvoices() {
     {
       id: 'client_id',
       label: t('client'),
-      format: (value, resource) => (
-        <Link to={generatePath('/clients/:id', { id: resource.client.id })}>
-          {resource.client.display_name}
+      format: (value, invoice) => (
+        <Link to={generatePath('/clients/:id', { id: invoice.client_id })}>
+          {invoice.client?.display_name}
         </Link>
       ),
     },
@@ -49,11 +52,11 @@ export function UpcomingInvoices() {
     {
       id: 'balance',
       label: t('balance'),
-      format: (value, resource) =>
+      format: (value, invoice) =>
         formatMoney(
           value,
-          resource?.client.country_id,
-          resource?.client.settings.currency_id
+          invoice.client?.country_id || company.settings.country_id,
+          invoice.client?.settings.currency_id || company.settings.currency_id
         ),
     },
   ];
