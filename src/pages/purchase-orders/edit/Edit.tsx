@@ -123,8 +123,8 @@ export function Edit() {
         <Card className="col-span-12 xl:col-span-4 h-max">
           <Element leftSide={t('po_number')}>
             <InputField
-              value={purchaseOrder?.po_number}
-              onValueChange={(value) => handleChange('po_number', value)}
+              value={purchaseOrder?.number}
+              onValueChange={(value) => handleChange('number', value)}
             />
           </Element>
 
