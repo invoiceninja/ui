@@ -18,11 +18,11 @@ import { generatePath } from 'react-router-dom';
 export function Gateways() {
   const [t] = useTranslation();
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<CompanyGateway> = [
     {
       id: 'label',
       label: t('label'),
-      format: (field, resource: CompanyGateway) => (
+      format: (field, resource) => (
         <Link
           to={generatePath('/settings/gateways/:id/edit', { id: resource.id })}
         >
