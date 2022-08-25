@@ -12,6 +12,7 @@ import { Link } from '@invoiceninja/forms';
 import frequency from 'common/constants/frequency';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
@@ -22,13 +23,13 @@ export function RecurringInvoices() {
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<RecurringInvoice> = [
     {
       id: 'frequency_id',
       label: t('frequency'),
-      format: (value, resource) => (
+      format: (value, recurringInvoice) => (
         <Link
-          to={generatePath('/recurring_invoices/:id/edit', { id: resource.id })}
+          to={generatePath('/recurring_invoices/:id/edit', { id: recurringInvoice.id })}
         >
           <StatusBadge headless for={frequency} code={value} />
         </Link>
