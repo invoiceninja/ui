@@ -37,11 +37,11 @@ export function PurchaseOrders() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<PurchaseOrder> = [
     {
       id: 'status_id',
       label: t('status'),
-      format: (field, purchaseOrder: PurchaseOrder) => (
+      format: (field, purchaseOrder) => (
         <Link
           to={generatePath('/purchase_orders/:id/edit', {
             id: purchaseOrder.id,
@@ -54,7 +54,7 @@ export function PurchaseOrders() {
     {
       id: 'number',
       label: t('number'),
-      format: (field, purchaseOrder: PurchaseOrder) => (
+      format: (field, purchaseOrder) => (
         <Link
           to={generatePath('/purchase_orders/:id/edit', {
             id: purchaseOrder.id,
@@ -67,7 +67,7 @@ export function PurchaseOrders() {
     {
       id: 'vendor_id',
       label: t('vendor'),
-      format: (field, purchaseOrder: PurchaseOrder) =>
+      format: (field, purchaseOrder) =>
         purchaseOrder.vendor && (
           <Link
             to={generatePath('/vendors/:id', { id: purchaseOrder.vendor.id })}
@@ -79,7 +79,7 @@ export function PurchaseOrders() {
     {
       id: 'expense_id',
       label: t('expense'),
-      format: (field, purchaseOrder: PurchaseOrder) =>
+      format: (field, purchaseOrder) =>
         purchaseOrder.expense && (
           <Link
             to={generatePath('/expenses/:id', { id: purchaseOrder.expense.id })}
