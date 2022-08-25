@@ -12,6 +12,7 @@ import recurringInvoicesFrequency from 'common/constants/recurring-invoices-freq
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
+import { Expense } from 'common/interfaces/expense';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
@@ -19,14 +20,16 @@ import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 
 export function RecurringExpenses() {
-  const [t] = useTranslation();
   useTitle('recurring_expenses');
+
+  const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
   const pages = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
   ];
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<Expense> = [
     {
       id: 'status_id',
       label: t('status'),
@@ -62,6 +65,7 @@ export function RecurringExpenses() {
       format: (value, resource) => <EntityStatus entity={resource} />,
     },
   ];
+
   return (
     <Default
       title={t('recurring_expenses')}
