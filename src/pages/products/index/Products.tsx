@@ -18,24 +18,29 @@ import { Default } from 'components/layouts/Default';
 import { EntityStatus } from 'components/EntityStatus';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { Product } from 'common/interfaces/product';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 
 export function Products() {
   useTitle('products');
 
   const [t] = useTranslation();
+
   const navigate = useNavigate();
   const formatMoney = useFormatMoney();
+  const company = useCurrentCompany();
+
   const pages: BreadcrumRecord[] = [{ name: t('products'), href: '/products' }];
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<Product> = [
     {
       id: 'product_key',
       label: t('product_key'),
-      format: (value, resource) => (
+      format: (value, product) => (
         <span className="inline-flex items-center space-x-4">
-          <EntityStatus entity={resource} />
+          <EntityStatus entity={product} />
 
-          <Link to={generatePath('/products/:id/edit', { id: resource.id })}>
+          <Link to={generatePath('/products/:id/edit', { id: product.id })}>
             {value}
           </Link>
         </span>
@@ -48,11 +53,11 @@ export function Products() {
     {
       id: 'price',
       label: t('price'),
-      format: (value, resource) =>
+      format: (value, product) =>
         formatMoney(
           value,
-          resource?.company.settings?.country_id,
-          resource?.company.settings?.currency_id
+          product.company?.settings.country_id || company.settings.country_id,
+          product.company?.settings.currency_id || company.settings.currency_id
         ),
     },
     {
@@ -62,16 +67,17 @@ export function Products() {
   ];
 
   const actions = [
-    (resource: any) => (
+    (product: Product) => (
       <DropdownElement
-        onClick={() => {
-          navigate(`/products/${resource.id}/clone`);
-        }}
+        onClick={() =>
+          navigate(generatePath('/products/:id/clone', { id: product.id }))
+        }
       >
         {t('clone')}
       </DropdownElement>
     ),
   ];
+  
   return (
     <Default title={t('products')} breadcrumbs={pages} docsLink="docs/products">
       <DataTable

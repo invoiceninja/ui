@@ -1,3 +1,5 @@
+import { Company } from './company.interface';
+
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
@@ -31,4 +33,5 @@ export interface Product {
   custom_value4: string;
   is_deleted: boolean;
   documents: any[];
+  company?: Company;
 }
