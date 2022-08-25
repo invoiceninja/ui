@@ -12,6 +12,7 @@ import { Link } from '@invoiceninja/forms';
 import quoteStatus from 'common/constants/quote-status';
 import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Quote } from 'common/interfaces/quote';
@@ -37,8 +38,9 @@ export function Quotes() {
 
   const formatMoney = useFormatMoney();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
+  const company = useCurrentCompany();
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<Quote> = [
     {
       id: 'status_id',
       label: t('status'),
@@ -47,8 +49,8 @@ export function Quotes() {
     {
       id: 'number',
       label: t('number'),
-      format: (field, resource: Quote) => (
-        <Link to={generatePath('/quotes/:id/edit', { id: resource.id })}>
+      format: (field, quote) => (
+        <Link to={generatePath('/quotes/:id/edit', { id: quote.id })}>
           {field}
         </Link>
       ),
@@ -56,20 +58,20 @@ export function Quotes() {
     {
       id: 'client_id',
       label: t('client'),
-      format: (_, resource: Quote) => (
-        <Link to={generatePath('/clients/:id', { id: resource.client_id })}>
-          {resource.client?.display_name}
+      format: (_, quote) => (
+        <Link to={generatePath('/clients/:id', { id: quote.client_id })}>
+          {quote.client?.display_name}
         </Link>
       ),
     },
     {
       id: 'amount',
       label: t('amount'),
-      format: (value, resource) =>
+      format: (value, quote) =>
         formatMoney(
           value,
-          resource?.client.country_id,
-          resource?.client.settings.currency_id
+          quote.client?.country_id || company.settings.country_id,
+          quote.client?.settings.currency_id || company.settings.currency_id
         ),
     },
     {

@@ -29,11 +29,11 @@ export function Vendors() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<Vendor> = [
     {
       id: 'number',
       label: t('number'),
-      format: (value, vendor: Vendor) => (
+      format: (value, vendor) => (
         <Link to={generatePath('/vendors/:id', { id: vendor.id })}>
           {value}
         </Link>
@@ -42,7 +42,7 @@ export function Vendors() {
     {
       id: 'name',
       label: t('name'),
-      format: (value, vendor: Vendor) => (
+      format: (value, vendor) => (
         <Link to={generatePath('/vendors/:id', { id: vendor.id })}>
           {value}
         </Link>
@@ -59,7 +59,7 @@ export function Vendors() {
     {
       id: 'entiy_state',
       label: t('entity_state'),
-      format: (value, resource) => <EntityStatus entity={resource} />,
+      format: (value, vendor) => <EntityStatus entity={vendor} />,
     },
     {
       id: 'created_at',

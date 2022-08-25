@@ -12,6 +12,7 @@ import { Link } from '@invoiceninja/forms';
 import creditStatus from 'common/constants/credit-status';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { Credit } from 'common/interfaces/credit';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
@@ -22,12 +23,12 @@ export function Credits() {
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<Credit> = [
     {
       id: 'number',
       label: t('number'),
-      format: (value, resource) => (
-        <Link to={generatePath('/credits/:id/edit', { id: resource.id })}>
+      format: (value, credit) => (
+        <Link to={generatePath('/credits/:id/edit', { id: credit.id })}>
           {value}
         </Link>
       ),

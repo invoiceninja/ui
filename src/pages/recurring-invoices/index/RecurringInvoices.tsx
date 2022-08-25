@@ -16,6 +16,7 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
@@ -36,7 +37,7 @@ export function RecurringInvoices() {
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
   ];
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<RecurringInvoice> = [
     {
       id: 'status_id',
       label: t('status'),
@@ -45,9 +46,11 @@ export function RecurringInvoices() {
     {
       id: 'number',
       label: t('number'),
-      format: (value, resource) => (
+      format: (value, recurringInvoice) => (
         <Link
-          to={generatePath('/recurring_invoices/:id/edit', { id: resource.id })}
+          to={generatePath('/recurring_invoices/:id/edit', {
+            id: recurringInvoice.id,
+          })}
         >
           {value}
         </Link>
@@ -56,32 +59,29 @@ export function RecurringInvoices() {
     {
       id: 'client_id',
       label: t('client'),
-      format: (value, resource) => (
-        <Link to={generatePath('/clients/:id', { id: resource.client.id })}>
-          {resource.client.display_name}
+      format: (value, recurringInvoice) => (
+        <Link
+          to={generatePath('/clients/:id', { id: recurringInvoice.client_id })}
+        >
+          {recurringInvoice.client?.display_name}
         </Link>
       ),
     },
     {
       id: 'amount',
       label: t('amount'),
-      format: (value, resource) =>
+      format: (value, recurringInvoice) =>
         formatMoney(
           value,
-          resource?.client.country_id,
-          resource?.client.settings.currency_id
-            ? resource?.client.settings.currency_id
-            : company.settings.currency_id
+          recurringInvoice.client?.country_id || company.settings.country_id,
+          recurringInvoice.client?.settings.currency_id ||
+            company.settings.currency_id
         ),
     },
     {
       id: 'remaining_cycles',
       label: t('remaining_cycles'),
-      format: (value) => {
-        if (Number(value) < 0) {
-          return t('endless');
-        } else return value;
-      },
+      format: (value) => (Number(value) < 0 ? t('endless') : value),
     },
     {
       id: 'next_send_date',
