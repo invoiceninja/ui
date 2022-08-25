@@ -26,11 +26,11 @@ export function Users() {
     { name: t('user_management'), href: '/settings/users' },
   ];
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<User> = [
     {
       id: 'name',
       label: 'name',
-      format: (field, resource: User) => (
+      format: (field, resource) => (
         <Link
           to={generatePath('/settings/users/:id/edit', { id: resource.id })}
         >
