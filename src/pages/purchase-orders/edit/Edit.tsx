@@ -8,10 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Card, Element } from '@invoiceninja/cards';
+import { InputField, SelectField } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { Invitation, PurchaseOrder } from 'common/interfaces/purchase-order';
 import { usePurchaseOrderQuery } from 'common/queries/purchase-orders';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Inline } from 'components/Inline';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -79,6 +82,77 @@ export function Edit() {
           onClearButtonClick={() => handleChange('vendor_id', '')}
           onContactCheckboxChange={handleInvitationChange}
         />
+
+        <Card className="col-span-12 xl:col-span-4 h-max">
+          <Element leftSide={t('purchase_order_date')}>
+            <InputField
+              type="date"
+              value={purchaseOrder?.date}
+              onValueChange={(date) => handleChange('date', date)}
+            />
+          </Element>
+
+          <Element leftSide={t('due_date')}>
+            <InputField
+              type="date"
+              value={purchaseOrder?.due_date}
+              onValueChange={(date) => handleChange('due_date', date)}
+            />
+          </Element>
+
+          <Element leftSide={t('partial')}>
+            <InputField
+              value={purchaseOrder?.partial}
+              onValueChange={(partial) =>
+                handleChange('partial', parseFloat(partial) || 0)
+              }
+            />
+          </Element>
+
+          {purchaseOrder && purchaseOrder.partial > 0 && (
+            <Element leftSide={t('partial_due_date')}>
+              <InputField
+                type="date"
+                value={purchaseOrder.partial_due_date}
+                onValueChange={(date) => handleChange('partial_due_date', date)}
+              />
+            </Element>
+          )}
+        </Card>
+
+        <Card className="col-span-12 xl:col-span-4 h-max">
+          <Element leftSide={t('po_number')}>
+            <InputField
+              value={purchaseOrder?.po_number}
+              onValueChange={(value) => handleChange('po_number', value)}
+            />
+          </Element>
+
+          <Element leftSide={t('discount')}>
+            <Inline>
+              <div className="w-full lg:w-1/2">
+                <InputField
+                  value={purchaseOrder?.discount}
+                  onValueChange={(value) =>
+                    handleChange('discount', parseFloat(value) || 0)
+                  }
+                />
+              </div>
+
+              <div className="w-full lg:w-1/2">
+                <SelectField
+                  value={purchaseOrder?.is_amount_discount.toString()}
+                  onValueChange={(value) =>
+                    handleChange('is_amount_discount', JSON.parse(value))
+                  }
+                >
+                  <option value="false">{t('percent')}</option>
+                  <option value="true">{t('amount')}</option>
+                </SelectField>
+              </div>
+            </Inline>
+          </Element>
+        </Card>
       </div>
     </Default>
   );
