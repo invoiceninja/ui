@@ -73,6 +73,7 @@ export function Edit() {
     <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-4">
         <VendorSelector
+          readonly
           resource={purchaseOrder}
           onChange={(id) => handleChange('vendor_id', id)}
           onClearButtonClick={() => handleChange('vendor_id', '')}
