@@ -11,6 +11,7 @@
 import { Link } from '@invoiceninja/forms';
 import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { Project } from 'common/interfaces/project';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
@@ -20,12 +21,12 @@ export function Projects() {
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<Project> = [
     {
       id: 'name',
       label: t('name'),
-      format: (value, resource) => (
-        <Link to={generatePath('/projects/:id', { id: resource.id })}>
+      format: (value, project) => (
+        <Link to={generatePath('/projects/:id', { id: project.id })}>
           {value}
         </Link>
       ),
