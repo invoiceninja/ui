@@ -34,12 +34,12 @@ export function Projects() {
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
 
-  const columns: DataTableColumns = [
+  const columns: DataTableColumns<Project> = [
     {
       id: 'name',
       label: t('name'),
-      format: (value, resource) => (
-        <Link to={generatePath('/projects/:id/edit', { id: resource.id })}>
+      format: (value, project) => (
+        <Link to={generatePath('/projects/:id/edit', { id: project.id })}>
           {value}
         </Link>
       ),
