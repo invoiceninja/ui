@@ -46,7 +46,7 @@ export function Invoices() {
     {
       id: 'number',
       label: t('number'),
-      format: (value, resource) => (
+      format: (value, resource: Invoice) => (
         <Link to={generatePath('/invoices/:id/edit', { id: resource.id })}>
           {resource.number}
         </Link>
@@ -55,32 +55,31 @@ export function Invoices() {
     {
       id: 'client_id',
       label: t('client'),
-      format: (value, resource) => (
-        <Link to={generatePath('/clients/:id', { id: resource.client.id })}>
-          {resource.client.display_name}
-        </Link>
-      ),
+      format: (value, resource: Invoice) =>
+        resource.client && (
+          <Link to={generatePath('/clients/:id', { id: resource.client.id })}>
+            {resource.client.display_name}
+          </Link>
+        ),
     },
     {
       id: 'amount',
       label: t('amount'),
-      format: (value, resource) =>
+      format: (value, resource: Invoice) =>
         formatMoney(
           value,
-          resource?.client.country_id,
-          resource?.client.settings.currency_id
-            ? resource?.client.settings.currency_id
-            : company.settings.currency_id
+          resource.client?.country_id || company?.settings.country_id,
+          resource.client?.settings.currency_id || company?.settings.currency_id
         ),
     },
     {
       id: 'balance',
       label: t('balance'),
-      format: (value, resource) =>
+      format: (value, resource: Invoice) =>
         formatMoney(
           value,
-          resource?.client.country_id,
-          resource?.client.settings.currency_id
+          resource.client?.country_id || company?.settings.country_id,
+          resource.client?.settings.currency_id || company?.settings.currency_id
         ),
     },
     {
