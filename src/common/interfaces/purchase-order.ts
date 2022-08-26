@@ -9,6 +9,7 @@
  */
 
 import { Expense } from './expense';
+import { InvoiceItem } from './invoice-item';
 import { Vendor } from './vendor';
 
 export interface PurchaseOrder {
@@ -66,7 +67,7 @@ export interface PurchaseOrder {
   custom_surcharge_tax2: boolean;
   custom_surcharge_tax3: boolean;
   custom_surcharge_tax4: boolean;
-  line_items: LineItem[];
+  line_items: InvoiceItem[];
   entity_type: string;
   exchange_rate: number;
   paid_to_date: number;
@@ -91,30 +92,4 @@ export interface Invitation {
   created_at: number;
   email_status: string;
   email_error: string;
-}
-
-export interface LineItem {
-  product_key: string;
-  notes: string;
-  cost: number;
-  product_cost: number;
-  quantity: number;
-  tax_name1: string;
-  tax_rate1: number;
-  tax_name2: string;
-  tax_rate2: number;
-  tax_name3: string;
-  tax_rate3: number;
-  custom_value1: string;
-  custom_value2: string;
-  custom_value3: string;
-  custom_value4: string;
-  discount: number;
-  type_id: string;
-  createdAt: number;
-  is_amount_discount: boolean;
-  sort_id: string;
-  line_total: string;
-  gross_line_total: number;
-  date: string;
 }
