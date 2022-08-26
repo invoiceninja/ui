@@ -16,14 +16,13 @@ import { useResolveCountry } from 'common/hooks/useResolveCountry';
 import { Client } from 'common/interfaces/client';
 import { Country } from 'common/interfaces/country';
 import { Currency } from 'common/interfaces/currency';
-import { Invoice } from 'common/interfaces/invoice';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { generatePath } from 'react-router-dom';
+import { ProductTableResource } from '../components/ProductsTable';
 
 interface Props {
-  resource: Invoice | RecurringInvoice | undefined;
+  resource: ProductTableResource | undefined;
 }
 
 export function useFormatMoney(props: Props) {

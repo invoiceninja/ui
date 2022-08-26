@@ -25,8 +25,10 @@ import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-
 import { ProductSelector } from 'components/products/ProductSelector';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
-import { Invoice } from 'common/interfaces/invoice';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import {
+  ProductTableResource,
+  RelationType,
+} from '../components/ProductsTable';
 
 const numberInputs = [
   'discount',
@@ -40,8 +42,9 @@ const numberInputs = [
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 
 interface Props {
-  resource: Invoice | RecurringInvoice;
+  resource: ProductTableResource;
   type: 'product' | 'task';
+  relationType: RelationType;
   onProductChange: (index: number, lineItem: InvoiceItem) => unknown;
   onLineItemPropertyChange: (
     key: keyof InvoiceItem,
@@ -74,10 +77,9 @@ export function useResolveInputField(props: Props) {
   const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators);
 
   useEffect(() => {
-    if (resource?.client_id) {
-      getCurrency(resource?.client_id);
-    }
-  }, [resource?.client_id]);
+    resource[props.relationType] &&
+      getCurrency(resource[props.relationType], props.relationType);
+  }, [resource?.[props.relationType]]);
 
   return (key: string, _id: string) => {
     const property = resolveProperty(key);
