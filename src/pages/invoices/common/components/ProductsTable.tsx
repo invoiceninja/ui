@@ -20,12 +20,17 @@ import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { Fragment } from 'react';
+import { PurchaseOrder } from 'common/interfaces/purchase-order';
+
+export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
+export type RelationType = 'client_id' | 'vendor_id';
 
 interface Props {
   type: 'product' | 'task';
-  resource: Invoice | RecurringInvoice;
+  resource: ProductTableResource;
   items: InvoiceItem[];
   columns: string[];
+  relationType: RelationType;
   onProductChange: (index: number, lineItem: InvoiceItem) => unknown;
   onSort: (lineItems: InvoiceItem[]) => unknown;
   onLineItemPropertyChange: (
@@ -40,7 +45,7 @@ interface Props {
 export function ProductsTable(props: Props) {
   const [t] = useTranslation();
 
-  const { resource, items, columns } = props;
+  const { resource, items, columns, relationType } = props;
 
   const resolveTranslation = useResolveTranslation();
 
@@ -49,6 +54,7 @@ export function ProductsTable(props: Props) {
     resource: props.resource,
     onProductChange: props.onProductChange,
     onLineItemPropertyChange: props.onLineItemPropertyChange,
+    relationType,
   });
 
   const onDragEnd = useHandleSortingRows({
@@ -67,7 +73,7 @@ export function ProductsTable(props: Props) {
         <Droppable droppableId="product-table">
           {(provided) => (
             <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
-              {resource?.client_id ? (
+              {resource?.[relationType] ? (
                 items.map((lineItem, lineItemIndex) => (
                   <Draggable
                     key={lineItemIndex}
@@ -123,7 +129,7 @@ export function ProductsTable(props: Props) {
                 <Fragment />
               )}
 
-              {resource?.client_id ? (
+              {resource?.[relationType] ? (
                 <Tr className="bg-slate-100 hover:bg-slate-200">
                   <Td colSpan={100}>
                     <button
@@ -139,7 +145,7 @@ export function ProductsTable(props: Props) {
                 <Fragment />
               )}
 
-              {!resource?.client_id ? (
+              {!resource?.[relationType] ? (
                 <Tr>
                   <Td colSpan={100}>{t('no_client_selected')}.</Td>
                 </Tr>
