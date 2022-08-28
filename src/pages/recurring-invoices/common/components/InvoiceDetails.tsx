@@ -51,9 +51,7 @@ export function InvoiceDetails(props: Props) {
         <Element leftSide={t('start_date')}>
           <InputField
             type="date"
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              handleChange('date', event.target.value)
-            }
+            onValueChange={(value) => handleChange('next_send_date', value)}
             value={invoice?.date || new Date().toISOString().split('T')[0]}
             min={new Date().toISOString().split('T')[0]}
           />
