@@ -14,6 +14,7 @@ import { InvoiceStatus } from 'common/enums/invoice-status';
 import { Currency } from 'common/interfaces/currency';
 import { NumberFormatter } from '../number-formatter';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { PurchaseOrder } from 'common/interfaces/purchase-order';
 
 export class InvoiceSum {
   protected taxMap = collect();
@@ -27,7 +28,7 @@ export class InvoiceSum {
   public subTotal = 0;
 
   constructor(
-    public invoice: Invoice | RecurringInvoice,
+    public invoice: Invoice | RecurringInvoice | PurchaseOrder,
     protected currency: Currency
   ) {}
 
