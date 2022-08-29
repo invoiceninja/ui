@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
+import { Button, Link } from '@invoiceninja/forms';
 import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
@@ -18,6 +18,7 @@ import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
+import { Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 
@@ -68,6 +69,17 @@ export function Clients() {
       label: t('last_login'),
       format: (value) => date(value, dateFormat),
     },
+  ];
+
+  const moreActions = [
+      <>
+        <div>
+          <Link to="/clients/import">
+            <Download>
+            </Download>
+          </Link>
+        </div>
+      </>
   ];
 
   const actions = [
@@ -123,6 +135,7 @@ export function Clients() {
         linkToEdit="/clients/:id/edit"
         withResourcefulActions
         customActions={actions}
+        rightSide={moreActions}
       />
     </Default>
   );
