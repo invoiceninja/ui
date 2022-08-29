@@ -19,10 +19,10 @@ import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { InputField } from '@invoiceninja/forms';
 
-// interface Props {
-//   entity: string;
-//   onSuccess: boolean;
-// }
+interface Props {
+  entity: string;
+  onSuccess: boolean;
+}
 
 interface ImportMap {
   hash: string;
@@ -48,6 +48,8 @@ export function UploadImport(props: Props) {
           toast.success(t('uploaded_document'), { id: toastId });
 
           setMapData(response.data);
+
+          props.onSuccess;
           // console.log(response.data);
           // setFormData(new FormData());
           // props.onSuccess?.();
