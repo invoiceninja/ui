@@ -10,8 +10,8 @@
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { UploadImport } from 'components/import/UploadImport';
 import { Default } from 'components/layouts/Default';
-import { Upload } from 'pages/settings/company/documents/components/Upload';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate, useParams } from 'react-router-dom';
@@ -27,17 +27,16 @@ export function Import() {
 
  return (
  /*   
-{      <Upload
-        endpoint={endpoint('/api/v1/products/:id/upload', { id })}
-        onSuccess={invalidateQuery}
-      />
+{      
 }
 */
     <Default
       title={t('import')}
       onBackClick={generatePath('/clients')}
     >
-hi
+    <UploadImport
+             entity={'client'} onSuccess={false}    />
+
     </Default>
 
     
