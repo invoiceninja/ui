@@ -34,15 +34,13 @@ export function DecimalNumberInput(props: Props) {
   }, []);
 
   useEffect(() => {
-    if (value == 0)
-      props.initialValue && setValue(parseFloat(props.initialValue));
+    props.initialValue && setValue(parseFloat(props.initialValue));
   }, [props.initialValue]);
 
   return (
     <section>
       {props.currency && (
         <DebounceInput
-          element={'input'}
           debounceTimeout={300}
           id={props.id}
           type={'text'}
@@ -76,6 +74,7 @@ export function DecimalNumberInput(props: Props) {
           }).format()}
         />
       )}
+
       {props.errorMessage && (
         <Alert className="mt-2" type="danger">
           {props.errorMessage}
