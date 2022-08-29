@@ -33,17 +33,17 @@ export function UploadImport(props: Props) {
     onSubmit: () => {
       const toastId = toast.loading(t('processing'));
 
-      request('POST', generatePath('preimport'), formData, {
+      request('POST', generatePath('/api/v1/preimport'), formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
         .then(() => {
           toast.success(t('uploaded_document'), { id: toastId });
 
           setFormData(new FormData());
-
           // props.onSuccess?.();
-
           props.onSuccess = true;
+
+          //display map + submit button which will then submit for processing.
         })
         .catch((error) => {
           console.error(error);
@@ -57,7 +57,7 @@ export function UploadImport(props: Props) {
     onDrop: (acceptedFiles) => {
       formData.append('_method', 'PUT');
 
-      acceptedFiles.forEach((file) => formData.append('files[entity]', file));
+      acceptedFiles.forEach((file) => formData.append('files[`${entity}`]', file));
 
       setFormData(formData);
 
