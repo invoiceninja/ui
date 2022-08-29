@@ -17,6 +17,7 @@ import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { request } from 'common/helpers/request';
 import { generatePath } from 'react-router-dom';
+import { endpoint } from 'common/helpers';
 
 interface Props {
   entity: string;
@@ -33,7 +34,7 @@ export function UploadImport(props: Props) {
     onSubmit: () => {
       const toastId = toast.loading(t('processing'));
 
-      request('POST', generatePath('/api/v1/preimport'), formData, {
+      request('POST', endpoint('/api/v1/preimport'), formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
         .then(() => {
@@ -43,7 +44,7 @@ export function UploadImport(props: Props) {
           // props.onSuccess?.();
           props.onSuccess = true;
 
-          //display map + submit button which will then submit for processing.
+          //display map + submit button which will then submit for pro
         })
         .catch((error) => {
           console.error(error);
@@ -55,9 +56,11 @@ export function UploadImport(props: Props) {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
-      formData.append('_method', 'PUT');
+      // formData.append('_method', 'POST');
 
-      acceptedFiles.forEach((file) => formData.append('files[`${entity}`]', file));
+      acceptedFiles.forEach((file) => formData.append('files[client]', file));
+      
+      formData.append('import_type', 'client');
 
       setFormData(formData);
 
