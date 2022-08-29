@@ -41,7 +41,9 @@ export function UploadImport(props: Props) {
 
           setFormData(new FormData());
 
-          props.onSuccess?.();
+          // props.onSuccess?.();
+
+          props.onSuccess = true;
         })
         .catch((error) => {
           console.error(error);
