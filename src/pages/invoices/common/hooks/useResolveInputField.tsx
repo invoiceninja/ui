@@ -73,7 +73,12 @@ export function useResolveInputField(props: Props) {
 
   const company = useCurrentCompany();
   const resource = props.resource;
-  const formatMoney = useFormatMoney({ resource: props.resource });
+
+  const formatMoney = useFormatMoney({
+    resource: props.resource,
+    relationType: props.relationType,
+  });
+  
   const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators);
 
   useEffect(() => {
