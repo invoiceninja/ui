@@ -108,6 +108,7 @@ export function CloneToInvoice() {
         <div className="col-span-12">
           {currentInvoice ? (
             <ProductsTable
+              relationType="client_id"
               type="product"
               columns={productColumns}
               items={currentInvoice.line_items.filter(

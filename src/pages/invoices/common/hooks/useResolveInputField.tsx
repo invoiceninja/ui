@@ -78,7 +78,7 @@ export function useResolveInputField(props: Props) {
     resource: props.resource,
     relationType: props.relationType,
   });
-  
+
   const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators);
 
   useEffect(() => {

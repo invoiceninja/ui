@@ -102,6 +102,7 @@ export function Create() {
         <div className="col-span-12">
           {currentCredit ? (
             <ProductsTable
+              relationType="client_id"
               type="product"
               columns={productColumns}
               items={currentCredit.line_items.filter(

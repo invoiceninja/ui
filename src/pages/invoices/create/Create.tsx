@@ -175,6 +175,7 @@ export function Create() {
             <div>
               {currentInvoice ? (
                 <ProductsTable
+                  relationType="client_id"
                   type="product"
                   resource={currentInvoice}
                   columns={productColumns}
@@ -213,6 +214,7 @@ export function Create() {
             <div>
               {currentInvoice ? (
                 <ProductsTable
+                  relationType="client_id"
                   type="task"
                   resource={currentInvoice}
                   columns={taskColumns}

@@ -113,6 +113,7 @@ export function Clone() {
             <div>
               {currentInvoice ? (
                 <ProductsTable
+                  relationType="client_id"
                   type="product"
                   resource={currentInvoice}
                   columns={productColumns}
@@ -151,6 +152,7 @@ export function Clone() {
             <div>
               {currentInvoice ? (
                 <ProductsTable
+                  relationType="client_id"
                   type="task"
                   resource={currentInvoice}
                   columns={taskColumns}

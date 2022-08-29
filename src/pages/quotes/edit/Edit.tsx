@@ -104,6 +104,7 @@ export function Edit() {
         <div className="col-span-12">
           {currentQuote ? (
             <ProductsTable
+              relationType="client_id"
               type="product"
               resource={currentQuote}
               columns={productColumns}
