@@ -10,12 +10,22 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
+import { uuid4 } from '@sentry/utils';
+import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { useTitle } from 'common/hooks/useTitle';
+import { useVendorResolver } from 'common/hooks/vendors/useVendorResolver';
+import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { Invitation, PurchaseOrder } from 'common/interfaces/purchase-order';
 import { usePurchaseOrderQuery } from 'common/queries/purchase-orders';
+import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Inline } from 'components/Inline';
 import { Default } from 'components/layouts/Default';
+import { Spinner } from 'components/Spinner';
+import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
+import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
@@ -37,8 +47,20 @@ export function Edit() {
 
   const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder>();
 
+  const productColumns = useProductColumns();
+  const company = useCurrentCompany();
+
+  const vendorResolver = useVendorResolver();
+  const currencyResolver = useResolveCurrency();
+
   useEffect(() => {
-    data && setPurchaseOrder(data);
+    if (data) {
+      const po = { ...data };
+
+      po.line_items.forEach((item) => (item._id = uuid4()));
+
+      setPurchaseOrder(po);
+    }
   }, [data]);
 
   const handleChange = <T extends keyof PurchaseOrder>(
@@ -70,6 +92,63 @@ export function Edit() {
     }
 
     handleChange('invitations', invitations);
+  };
+
+  const resolveCurrency = async (vendorId: string) => {
+    const vendor = await vendorResolver.find(vendorId);
+
+    const currency = currencyResolver(
+      vendor.currency_id || company.settings.currency_id
+    );
+
+    return currency;
+  };
+
+  const recalculateInvoiceSum = async (purchaseOrder: PurchaseOrder) => {
+    const currency = await resolveCurrency(purchaseOrder!.vendor_id);
+    const invoiceSum = new InvoiceSum(purchaseOrder!, currency!).build();
+
+    return invoiceSum.invoice as PurchaseOrder;
+  };
+
+  const handleProductChange = async (index: number, lineItem: InvoiceItem) => {
+    const po = { ...purchaseOrder } as PurchaseOrder;
+
+    po.line_items[index] = lineItem;
+
+    // const order = await recalculateInvoiceSum(po);
+
+    setPurchaseOrder(po);
+  };
+
+  const handleLineItemPropertyChange = async (
+    property: keyof InvoiceItem,
+    value: unknown,
+    index: number
+  ) => {
+    const po = { ...purchaseOrder } as PurchaseOrder;
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    po.line_items[index][property] = value;
+
+    setPurchaseOrder({ ...po });
+  };
+
+  const handleCreateLineItem = async () => {
+    const po = { ...purchaseOrder } as PurchaseOrder;
+
+    po.line_items.push(blankLineItem());
+
+    setPurchaseOrder({ ...po });
+  };
+
+  const handleDeleteLineItem = async (index: number) => {
+    const po = { ...purchaseOrder } as PurchaseOrder;
+
+    po.line_items.splice(index, 1);
+
+    setPurchaseOrder({ ...po });
   };
 
   return (
@@ -153,6 +232,25 @@ export function Edit() {
             </Inline>
           </Element>
         </Card>
+
+        <div className="col-span-12">
+          {purchaseOrder ? (
+            <ProductsTable
+              type="product"
+              resource={purchaseOrder}
+              items={purchaseOrder.line_items}
+              columns={productColumns}
+              relationType="vendor_id"
+              onProductChange={handleProductChange}
+              onSort={(lineItems) => handleChange('line_items', lineItems)}
+              onLineItemPropertyChange={handleLineItemPropertyChange}
+              onCreateItemClick={handleCreateLineItem}
+              onDeleteRowClick={handleDeleteLineItem}
+            />
+          ) : (
+            <Spinner />
+          )}
+        </div>
       </div>
     </Default>
   );
