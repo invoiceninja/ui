@@ -16,7 +16,6 @@ import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { request } from 'common/helpers/request';
-import { generatePath } from 'react-router-dom';
 import { endpoint } from 'common/helpers';
 
 interface Props {
