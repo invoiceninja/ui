@@ -13,25 +13,17 @@ import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 
 export function Import() {
+
   const [t] = useTranslation();
 
-  // const queryClient = useQueryClient();
-
-  // const invalidateQuery = () => {
-  //   queryClient.invalidateQueries(generatePath('/api/v1/products/:id', { id }));
-  // };
-
  return (
- /*   
-{      
-}
-*/
+
     <Default
       title={t('import')}
       onBackClick={generatePath('/clients')}
     >
-    <UploadImport
-             entity={'client'} onSuccess={false}    />
+
+      <UploadImport entity={'client'} onSuccess={false} />
 
     </Default>
 
