@@ -30,11 +30,15 @@ export function DecimalNumberInput(props: Props) {
   const [value, setValue] = useState<number>(0);
 
   useEffect(() => {
-    props.initialValue && setValue(parseFloat(props.initialValue));
+    if (typeof props.initialValue !== 'undefined') {
+      setValue(parseFloat(props.initialValue));
+    }
   }, []);
 
   useEffect(() => {
-    props.initialValue && setValue(parseFloat(props.initialValue));
+    if (typeof props.initialValue !== 'undefined') {
+      setValue(parseFloat(props.initialValue));
+    }
   }, [props.initialValue]);
 
   return (
