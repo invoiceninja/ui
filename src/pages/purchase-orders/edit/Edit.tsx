@@ -24,6 +24,7 @@ import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { Inline } from 'components/Inline';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
+import { cloneDeep } from 'lodash';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
@@ -55,7 +56,7 @@ export function Edit() {
 
   useEffect(() => {
     if (data) {
-      const po = { ...data };
+      const po = cloneDeep(data);
 
       po.line_items.forEach((item) => (item._id = uuid4()));
 
@@ -112,13 +113,11 @@ export function Edit() {
   };
 
   const handleProductChange = async (index: number, lineItem: InvoiceItem) => {
-    const po = { ...purchaseOrder } as PurchaseOrder;
+    const po = cloneDeep(purchaseOrder) as PurchaseOrder;
 
     po.line_items[index] = lineItem;
 
-    // const order = await recalculateInvoiceSum(po);
-
-    setPurchaseOrder(po);
+    setPurchaseOrder(await recalculateInvoiceSum(po));
   };
 
   const handleLineItemPropertyChange = async (
@@ -126,29 +125,29 @@ export function Edit() {
     value: unknown,
     index: number
   ) => {
-    const po = { ...purchaseOrder } as PurchaseOrder;
+    const po = cloneDeep(purchaseOrder) as PurchaseOrder;
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     po.line_items[index][property] = value;
 
-    setPurchaseOrder({ ...po });
+    setPurchaseOrder(await recalculateInvoiceSum(po));
   };
 
   const handleCreateLineItem = async () => {
-    const po = { ...purchaseOrder } as PurchaseOrder;
+    const po = cloneDeep(purchaseOrder) as PurchaseOrder;
 
     po.line_items.push(blankLineItem());
 
-    setPurchaseOrder({ ...po });
+    setPurchaseOrder(po);
   };
 
   const handleDeleteLineItem = async (index: number) => {
-    const po = { ...purchaseOrder } as PurchaseOrder;
+    const po = cloneDeep(purchaseOrder) as PurchaseOrder;
 
     po.line_items.splice(index, 1);
 
-    setPurchaseOrder({ ...po });
+    setPurchaseOrder(po);
   };
 
   return (
