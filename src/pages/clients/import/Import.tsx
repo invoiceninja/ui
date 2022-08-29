@@ -7,14 +7,10 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import axios, { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
 import { UploadImport } from 'components/import/UploadImport';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { generatePath } from 'react-router-dom';
 
 export function Import() {
   const [t] = useTranslation();

@@ -20,7 +20,7 @@ import { generatePath } from 'react-router-dom';
 
 interface Props {
   entity: string;
-  onSuccess:bool
+  onSuccess: boolean;
 }
 
 export function UploadImport(props: Props) {
@@ -62,7 +62,7 @@ export function UploadImport(props: Props) {
       formik.submitForm();
     },
   });
-  
+
 
   return (
     <Card title={t('upload')}>
