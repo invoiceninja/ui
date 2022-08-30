@@ -33,6 +33,7 @@ import { Spinner } from 'components/Spinner';
 import { TabGroup } from 'components/TabGroup';
 import { UserSelector } from 'components/users/UserSelector';
 import { cloneDeep } from 'lodash';
+import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
@@ -386,6 +387,17 @@ export function Edit() {
             onChange={(property, value) =>
               handleChange(property as keyof PurchaseOrder, value as string)
             }
+          />
+        )}
+      </div>
+
+      <div className="my-4">
+        {purchaseOrder && (
+          <InvoicePreview
+            for="invoice"
+            resource={purchaseOrder}
+            entity="purchase_order"
+            relationType="vendor_id"
           />
         )}
       </div>
