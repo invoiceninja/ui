@@ -10,7 +10,6 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Invoice } from 'common/interfaces/invoice';
 import { TaxRate } from 'common/interfaces/tax-rate';
 import { Record } from 'components/forms/DebouncedCombobox';
 import { Fragment, useState } from 'react';
@@ -20,15 +19,13 @@ import { useTotalVariables } from '../hooks/useTotalVariables';
 import { CustomSurchargeField } from 'components/CustomSurchargeField';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { ProductTableResource, RelationType } from './ProductsTable';
 
 interface Props {
-  resource: Invoice | RecurringInvoice;
+  resource: ProductTableResource;
   invoiceSum?: InvoiceSum;
-  onChange: (
-    property: keyof Invoice | keyof RecurringInvoice,
-    value: unknown
-  ) => unknown;
+  relationType: RelationType;
+  onChange: (property: keyof ProductTableResource, value: unknown) => unknown;
 }
 
 export function InvoiceTotals(props: Props) {
@@ -40,9 +37,10 @@ export function InvoiceTotals(props: Props) {
     resource,
     onChange: props.onChange,
     invoiceSum: props.invoiceSum,
+    relationType: props.relationType,
   });
 
-  const handleChange = (property: keyof Invoice, value: unknown) =>
+  const handleChange = (property: keyof ProductTableResource, value: unknown) =>
     props.onChange(property, value);
 
   const [currentTaxRateInput, setCurrentTaxRateInput] = useState(1);
@@ -105,12 +103,12 @@ export function InvoiceTotals(props: Props) {
             }}
             onTaxCreated={(taxRate) => {
               handleChange(
-                `tax_name${currentTaxRateInput}` as keyof Invoice,
+                `tax_name${currentTaxRateInput}` as keyof ProductTableResource,
                 taxRate.name
               );
 
               handleChange(
-                `tax_rate${currentTaxRateInput}` as keyof Invoice,
+                `tax_rate${currentTaxRateInput}` as keyof ProductTableResource,
                 taxRate.rate
               );
             }}
@@ -134,12 +132,12 @@ export function InvoiceTotals(props: Props) {
             }}
             onTaxCreated={(taxRate) => {
               handleChange(
-                `tax_name${currentTaxRateInput}` as keyof Invoice,
+                `tax_name${currentTaxRateInput}` as keyof ProductTableResource,
                 taxRate.name
               );
 
               handleChange(
-                `tax_rate${currentTaxRateInput}` as keyof Invoice,
+                `tax_rate${currentTaxRateInput}` as keyof ProductTableResource,
                 taxRate.rate
               );
             }}
@@ -163,12 +161,12 @@ export function InvoiceTotals(props: Props) {
             }}
             onTaxCreated={(taxRate) => {
               handleChange(
-                `tax_name${currentTaxRateInput}` as keyof Invoice,
+                `tax_name${currentTaxRateInput}` as keyof ProductTableResource,
                 taxRate.name
               );
 
               handleChange(
-                `tax_rate${currentTaxRateInput}` as keyof Invoice,
+                `tax_rate${currentTaxRateInput}` as keyof ProductTableResource,
                 taxRate.rate
               );
             }}
