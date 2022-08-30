@@ -111,19 +111,14 @@ export function UploadImport(props: Props) {
     {mapData && (
       <div>
 
-      {
-        mapData.mappings.client.headers[0].map((mapping:any, index:number) => {
+      <ul>
+      {mapData.mappings.client.headers[0].map((mapping:any, index:number) => (
 
-        <Element leftSide={t('billing_address1')}>
-        <InputField
-          id="address1"
-          value={mapping[index]}
-        />
-        </Element>
-            
-          })
-      }
-
+          
+          <li>{mapping} {mapData.mappings.client.headers[1][index]}</li>
+    
+      ))}
+      </ul>
       <SelectField withBlank>
         {mapData.mappings.client.headers[0].map((mapping: any, index: number) => (
           <option key={index} value={index}>
