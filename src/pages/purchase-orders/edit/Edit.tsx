@@ -43,6 +43,7 @@ import { Details } from './components/Details';
 import { VendorSelector } from './components/VendorSelector';
 import { useCalculateInvoiceSum } from './hooks/useCalculateInvoiceSum';
 import { useHandleInvitationChange } from './hooks/useHandleInvitationChange';
+import { useHandleProductChange } from './hooks/useHandleProductChange';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -85,13 +86,10 @@ export function Edit() {
   const handleInvitationChange = useHandleInvitationChange(handleChange);
   const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
 
-  const handleProductChange = async (index: number, lineItem: InvoiceItem) => {
-    const po = cloneDeep(purchaseOrder) as PurchaseOrder;
-
-    po.line_items[index] = lineItem;
-
-    setPurchaseOrder(await calculateInvoiceSum(po));
-  };
+  const handleProductChange = useHandleProductChange(
+    setPurchaseOrder,
+    setInvoiceSum
+  );
 
   const handleLineItemPropertyChange = async (
     property: keyof InvoiceItem,
