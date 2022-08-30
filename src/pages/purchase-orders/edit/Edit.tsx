@@ -8,36 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { DesignSelector } from 'common/generic/DesignSelector';
-import { endpoint } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { usePurchaseOrderQuery } from 'common/queries/purchase-orders';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
-import { ClientSelector } from 'components/clients/ClientSelector';
-import { DocumentsTable } from 'components/DocumentsTable';
-import { MarkdownEditor } from 'components/forms/MarkdownEditor';
 import { Default } from 'components/layouts/Default';
-import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { Spinner } from 'components/Spinner';
-import { TabGroup } from 'components/TabGroup';
-import { UserSelector } from 'components/users/UserSelector';
 import { cloneDeep } from 'lodash';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
-import { Upload } from 'pages/settings/company/documents/components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { Details } from './components/Details';
+import { Footer } from './components/Footer';
 import { VendorSelector } from './components/VendorSelector';
 import { useHandleCreateLineItem } from './hooks/useHandleCreateLineItem';
 import { useHandleDeleteLineItem } from './hooks/useHandleDeleteLineItem';
@@ -75,7 +64,6 @@ export function Edit() {
   const [errors, setErrors] = useState<ValidationBag>();
 
   const productColumns = useProductColumns();
-  const queryClient = useQueryClient();
 
   const handleChange = <T extends keyof PurchaseOrder>(
     property: T,
@@ -97,21 +85,6 @@ export function Edit() {
     setPurchaseOrder,
     setInvoiceSum
   );
-
-  const tabs = [
-    t('terms'),
-    t('footer'),
-    t('public_notes'),
-    t('private_notes'),
-    t('settings'),
-    t('documents'),
-  ];
-
-  const onSuccess = () => {
-    queryClient.invalidateQueries(
-      generatePath('/api/v1/purchase_orders/:id', { id })
-    );
-  };
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
@@ -157,102 +130,11 @@ export function Edit() {
           )}
         </div>
 
-        <Card className="col-span-12 xl:col-span-8 h-max px-6">
-          <TabGroup tabs={tabs}>
-            <div>
-              <MarkdownEditor
-                value={purchaseOrder?.terms || ''}
-                onChange={(value) => handleChange('terms', value)}
-              />
-            </div>
-
-            <div>
-              <MarkdownEditor
-                value={purchaseOrder?.footer || ''}
-                onChange={(value) => handleChange('footer', value)}
-              />
-            </div>
-
-            <div>
-              <MarkdownEditor
-                value={purchaseOrder?.public_notes || ''}
-                onChange={(value) => handleChange('public_notes', value)}
-              />
-            </div>
-
-            <div>
-              <MarkdownEditor
-                value={purchaseOrder?.private_notes || ''}
-                onChange={(value) => handleChange('private_notes', value)}
-              />
-            </div>
-
-            <div>
-              <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12 lg:col-span-6 space-y-6">
-                  <UserSelector
-                    inputLabel={t('User')}
-                    value={purchaseOrder?.assigned_user_id}
-                    onChange={(user) =>
-                      handleChange('assigned_user_id', user.id)
-                    }
-                  />
-                </div>
-
-                <div className="col-span-12 lg:col-span-6 space-y-6">
-                  <ProjectSelector
-                    inputLabel={t('project')}
-                    value={purchaseOrder?.project_id}
-                    onChange={(project) =>
-                      handleChange('project_id', project.id)
-                    }
-                  />
-                </div>
-
-                <div className="col-span-12 lg:col-span-6 space-y-6">
-                  <ClientSelector
-                    inputLabel={t('client')}
-                    value={purchaseOrder?.client_id}
-                    onChange={(client) => handleChange('client_id', client.id)}
-                  />
-                </div>
-
-                <div className="col-span-12 lg:col-span-6 space-y-6">
-                  <InputField
-                    label={t('exchange_rate')}
-                    value={purchaseOrder?.exchange_rate || 1.0}
-                    onValueChange={(value) =>
-                      handleChange('exchange_rate', parseFloat(value) || 1.0)
-                    }
-                  />
-                </div>
-
-                <div className="col-span-12 lg:col-span-6 space-y-6">
-                  <DesignSelector
-                    inputLabel={t('design')}
-                    value={purchaseOrder?.design_id}
-                    onChange={(design) => handleChange('design_id', design.id)}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <Upload
-                widgetOnly
-                endpoint={endpoint('/api/v1/purchase_order/:id/upload', {
-                  id,
-                })}
-                onSuccess={onSuccess}
-              />
-
-              <DocumentsTable
-                documents={purchaseOrder?.documents || []}
-                onDocumentDelete={onSuccess}
-              />
-            </div>
-          </TabGroup>
-        </Card>
+        <Footer
+          purchaseOrder={purchaseOrder}
+          handleChange={handleChange}
+          errors={errors}
+        />
 
         {purchaseOrder && (
           <InvoiceTotals
