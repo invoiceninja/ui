@@ -27,7 +27,7 @@ import { PurchaseOrderCardProps } from './Details';
 export function Footer(props: PurchaseOrderCardProps) {
   const { t } = useTranslation();
   const { id } = useParams();
-  const { purchaseOrder, handleChange, errors } = props;
+  const { purchaseOrder, handleChange } = props;
 
   const queryClient = useQueryClient();
 
