@@ -113,9 +113,8 @@ export function UploadImport(props: Props) {
 
       <ul>
       {mapData.mappings.client.headers[0].map((mapping:any, index:number) => (
-
           
-          <li>{mapping} {mapData.mappings.client.headers[1][index]}</li>
+          <li key={index}>{mapping} {mapData.mappings.client.headers[1][index]}</li>
     
       ))}
       </ul>
