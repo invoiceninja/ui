@@ -24,25 +24,6 @@ export function Contacts() {
   const { id } = useParams();
   const { data: client } = useClientQuery({ id });
   const accentColor = useAccentColor();
-  const [value, copy] = useCopyToClipboard()
-
-  const[open, setOpen] = React.useState(false);
-  const handleClose = () => {
-    setOpen(false);
-  }
-
-  const handleClipboardCopy = async (value :string, event: ChangeEvent<HTMLInputElement>) => {
-
-      setOpen(true);
-
-      setTimeout(() => {
-      
-        handleClose();
-
-      }, 1000)
-
-    console.log(value);
-  }
 
   return (
     <>
@@ -63,9 +44,7 @@ export function Contacts() {
                       </p>
 
                       <a href={`mailto:${contact.email}`}>{contact.email}</a>
-                      <Clipboard size={12} className="mx-0" onClick={(event: ChangeEvent<HTMLInputElement>) => handleClipboardCopy(contact.email, event)}/>
-   
-                        <span>{open ? 'Copied!' : ''}</span>
+
 
                     </div>
                   )
