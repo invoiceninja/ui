@@ -11,18 +11,26 @@
 import { previewEndpoint } from 'common/helpers';
 import { Credit } from 'common/interfaces/credit';
 import { Invoice } from 'common/interfaces/invoice';
+import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Quote } from 'common/interfaces/quote';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { InvoiceViewer } from './InvoiceViewer';
+import { RelationType } from './ProductsTable';
 
 interface Props {
   for: 'create' | 'invoice';
-  resource: Invoice | RecurringInvoice | Quote | Credit;
-  entity: 'invoice' | 'recurring_invoice' | 'quote' | 'credit';
+  resource: Invoice | RecurringInvoice | Quote | Credit | PurchaseOrder;
+  entity:
+    | 'invoice'
+    | 'recurring_invoice'
+    | 'quote'
+    | 'credit'
+    | 'purchase_order';
+  relationType: RelationType;
 }
 
 export function InvoicePreview(props: Props) {
-  if (props.resource?.client_id && props.for === 'create') {
+  if (props.resource?.[props.relationType] && props.for === 'create') {
     return (
       <InvoiceViewer
         link={previewEndpoint('/api/v1/live_preview?entity=:entity', {
@@ -36,7 +44,7 @@ export function InvoicePreview(props: Props) {
 
   if (
     props.resource?.id &&
-    props.resource?.client_id &&
+    props.resource?.[props.relationType] &&
     props.for === 'invoice'
   ) {
     return (
