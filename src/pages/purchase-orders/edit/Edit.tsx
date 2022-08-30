@@ -13,10 +13,7 @@ import { InputField } from '@invoiceninja/forms';
 import { DesignSelector } from 'common/generic/DesignSelector';
 import { endpoint } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { useTitle } from 'common/hooks/useTitle';
-import { useVendorResolver } from 'common/hooks/vendors/useVendorResolver';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -45,6 +42,7 @@ import { v4 } from 'uuid';
 import { Details } from './components/Details';
 import { VendorSelector } from './components/VendorSelector';
 import { useHandleInvitationChange } from './hooks/useHandleInvitationChange';
+import { useResolveCurrency } from './hooks/useResolveCurrency';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -65,11 +63,8 @@ export function Edit() {
   const [errors, setErrors] = useState<ValidationBag>();
 
   const productColumns = useProductColumns();
-  const company = useCurrentCompany();
   const queryClient = useQueryClient();
 
-  const vendorResolver = useVendorResolver();
-  const currencyResolver = useResolveCurrency();
 
   useEffect(() => {
     if (data) {
@@ -89,16 +84,7 @@ export function Edit() {
   };
 
   const handleInvitationChange = useHandleInvitationChange(handleChange);
-
-  const resolveCurrency = async (vendorId: string) => {
-    const vendor = await vendorResolver.find(vendorId);
-
-    const currency = currencyResolver(
-      vendor.currency_id || company.settings.currency_id
-    );
-
-    return currency;
-  };
+  const resolveCurrency = useResolveCurrency();
 
   const recalculateInvoiceSum = async (purchaseOrder: PurchaseOrder) => {
     const currency = await resolveCurrency(purchaseOrder!.vendor_id);
