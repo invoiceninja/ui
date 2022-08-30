@@ -140,11 +140,17 @@ export function Edit() {
               items={purchaseOrder.line_items}
               columns={productColumns}
               relationType="vendor_id"
-              onProductChange={handleProductChange}
+              onProductChange={(index, lineItem) =>
+                handleProductChange(purchaseOrder, index, lineItem)
+              }
               onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onLineItemPropertyChange={handleLineItemPropertyChange}
-              onCreateItemClick={handleCreateLineItem}
-              onDeleteRowClick={handleDeleteLineItem}
+              onLineItemPropertyChange={(key, value, index) =>
+                handleLineItemPropertyChange(purchaseOrder, key, value, index)
+              }
+              onCreateItemClick={() => handleCreateLineItem(purchaseOrder)}
+              onDeleteRowClick={(index) =>
+                handleDeleteLineItem(purchaseOrder, index)
+              }
             />
           ) : (
             <Spinner />
