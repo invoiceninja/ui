@@ -43,6 +43,7 @@ import { Details } from './components/Details';
 import { VendorSelector } from './components/VendorSelector';
 import { useCalculateInvoiceSum } from './hooks/useCalculateInvoiceSum';
 import { useHandleInvitationChange } from './hooks/useHandleInvitationChange';
+import { useHandleLineItemPropertyChange } from './hooks/useHandleLineItemPropertyChange';
 import { useHandleProductChange } from './hooks/useHandleProductChange';
 
 export function Edit() {
@@ -91,19 +92,10 @@ export function Edit() {
     setInvoiceSum
   );
 
-  const handleLineItemPropertyChange = async (
-    property: keyof InvoiceItem,
-    value: unknown,
-    index: number
-  ) => {
-    const po = cloneDeep(purchaseOrder) as PurchaseOrder;
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    po.line_items[index][property] = value;
-
-    setPurchaseOrder(await calculateInvoiceSum(po));
-  };
+  const handleLineItemPropertyChange = useHandleLineItemPropertyChange(
+    setPurchaseOrder,
+    setInvoiceSum
+  );
 
   const handleCreateLineItem = async () => {
     const po = cloneDeep(purchaseOrder) as PurchaseOrder;
