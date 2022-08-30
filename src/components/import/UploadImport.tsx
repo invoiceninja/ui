@@ -17,7 +17,7 @@ import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
-import { InputField } from '@invoiceninja/forms';
+import { InputField, SelectField } from '@invoiceninja/forms';
 
 interface Props {
   entity: string;
@@ -29,7 +29,13 @@ interface ImportMap {
   column_map: object;
   import_type: string;
   skip_header: boolean;
+  mappings: Mappings;
 }
+
+interface Mappings {
+  client: any;
+}
+
 export function UploadImport(props: Props) {
   const [t] = useTranslation();
   const [formData, setFormData] = useState(new FormData());
@@ -48,14 +54,17 @@ export function UploadImport(props: Props) {
           toast.success(t('uploaded_document'), { id: toastId });
 
           setMapData(response.data);
-
+          console.log(response.data);
           props.onSuccess;
-          // console.log(response.data);
-          // setFormData(new FormData());
-          // props.onSuccess?.();
-          // props.onSuccess = true;
 
-          //display map + submit button which will then submit for pro
+          console.log(response.data.mappings.client.headers[0]);
+
+// const obj1 = response.data.mappings.client.headers[1];
+// const obj2 = response.data.mappings.client.headers[0];
+// // const res = Object.entries(obj1).reduce((acc, [k, v]) => ({ ...acc, [obj2[k] || k]: v }), {});
+// const res = {...obj1, ...obj2};
+// console.log(res);
+
 
         })
         .catch((error) => {
@@ -101,12 +110,34 @@ export function UploadImport(props: Props) {
     </Card>
     {mapData && (
       <div>
+
+      {
+        mapData.mappings.client.headers[0].map((mapping:any, index:number) => {
+
+        <Element leftSide={t('billing_address1')}>
+        <InputField
+          id="address1"
+          value={mapping[index]}
+        />
+        </Element>
+            
+          })
+      }
+
+      <SelectField withBlank>
+        {mapData.mappings.client.headers[0].map((mapping: any, index: number) => (
+          <option key={index} value={index}>
+            {mapping}
+          </option>
+        ))}
+      </SelectField>
+
         <Element leftSide={t('billing_address1')}>
         <InputField
           id="address1"
           value={mapData.hash}
         />
-      </Element>
+        </Element>
       </div>
     )}
     </>
