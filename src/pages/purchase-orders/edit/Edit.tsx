@@ -14,11 +14,9 @@ import { DesignSelector } from 'common/generic/DesignSelector';
 import { endpoint } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { useTitle } from 'common/hooks/useTitle';
-import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { usePurchaseOrderQuery } from 'common/queries/purchase-orders';
-import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { ClientSelector } from 'components/clients/ClientSelector';
 import { DocumentsTable } from 'components/DocumentsTable';
@@ -41,8 +39,8 @@ import { generatePath, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { Details } from './components/Details';
 import { VendorSelector } from './components/VendorSelector';
-import { useCalculateInvoiceSum } from './hooks/useCalculateInvoiceSum';
 import { useHandleCreateLineItem } from './hooks/useHandleCreateLineItem';
+import { useHandleDeleteLineItem } from './hooks/useHandleDeleteLineItem';
 import { useHandleInvitationChange } from './hooks/useHandleInvitationChange';
 import { useHandleLineItemPropertyChange } from './hooks/useHandleLineItemPropertyChange';
 import { useHandleProductChange } from './hooks/useHandleProductChange';
@@ -62,11 +60,6 @@ export function Edit() {
   ];
 
   const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder>();
-  const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();
-  const [errors, setErrors] = useState<ValidationBag>();
-
-  const productColumns = useProductColumns();
-  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (data) {
@@ -78,6 +71,12 @@ export function Edit() {
     }
   }, [data]);
 
+  const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();
+  const [errors, setErrors] = useState<ValidationBag>();
+
+  const productColumns = useProductColumns();
+  const queryClient = useQueryClient();
+
   const handleChange = <T extends keyof PurchaseOrder>(
     property: T,
     value: PurchaseOrder[typeof property]
@@ -87,6 +86,7 @@ export function Edit() {
 
   const handleInvitationChange = useHandleInvitationChange(handleChange);
   const handleCreateLineItem = useHandleCreateLineItem(setPurchaseOrder);
+  const handleDeleteLineItem = useHandleDeleteLineItem(setPurchaseOrder);
 
   const handleProductChange = useHandleProductChange(
     setPurchaseOrder,
@@ -97,15 +97,6 @@ export function Edit() {
     setPurchaseOrder,
     setInvoiceSum
   );
-
-
-  const handleDeleteLineItem = async (index: number) => {
-    const po = cloneDeep(purchaseOrder) as PurchaseOrder;
-
-    po.line_items.splice(index, 1);
-
-    setPurchaseOrder(po);
-  };
 
   const tabs = [
     t('terms'),
