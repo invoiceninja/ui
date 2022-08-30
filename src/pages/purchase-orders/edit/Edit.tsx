@@ -11,6 +11,8 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { uuid4 } from '@sentry/utils';
+import { DesignSelector } from 'common/generic/DesignSelector';
+import { endpoint } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
@@ -21,14 +23,22 @@ import { Invitation, PurchaseOrder } from 'common/interfaces/purchase-order';
 import { usePurchaseOrderQuery } from 'common/queries/purchase-orders';
 import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
 import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { ClientSelector } from 'components/clients/ClientSelector';
+import { DocumentsTable } from 'components/DocumentsTable';
+import { MarkdownEditor } from 'components/forms/MarkdownEditor';
 import { Inline } from 'components/Inline';
 import { Default } from 'components/layouts/Default';
+import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { Spinner } from 'components/Spinner';
+import { TabGroup } from 'components/TabGroup';
+import { UserSelector } from 'components/users/UserSelector';
 import { cloneDeep } from 'lodash';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
+import { Upload } from 'pages/settings/company/documents/components';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 import { VendorSelector } from './components/VendorSelector';
 
@@ -50,6 +60,7 @@ export function Edit() {
 
   const productColumns = useProductColumns();
   const company = useCurrentCompany();
+  const queryClient = useQueryClient();
 
   const vendorResolver = useVendorResolver();
   const currencyResolver = useResolveCurrency();
@@ -148,6 +159,21 @@ export function Edit() {
     po.line_items.splice(index, 1);
 
     setPurchaseOrder(po);
+  };
+
+  const tabs = [
+    t('terms'),
+    t('footer'),
+    t('public_notes'),
+    t('private_notes'),
+    t('settings'),
+    t('documents'),
+  ];
+
+  const onSuccess = () => {
+    queryClient.invalidateQueries(
+      generatePath('/api/v1/purchase_orders/:id', { id })
+    );
   };
 
   return (
@@ -250,6 +276,103 @@ export function Edit() {
             <Spinner />
           )}
         </div>
+
+        <Card className="col-span-12 xl:col-span-8 h-max px-6">
+          <TabGroup tabs={tabs}>
+            <div>
+              <MarkdownEditor
+                value={purchaseOrder?.terms || ''}
+                onChange={(value) => handleChange('terms', value)}
+              />
+            </div>
+
+            <div>
+              <MarkdownEditor
+                value={purchaseOrder?.footer || ''}
+                onChange={(value) => handleChange('footer', value)}
+              />
+            </div>
+
+            <div>
+              <MarkdownEditor
+                value={purchaseOrder?.public_notes || ''}
+                onChange={(value) => handleChange('public_notes', value)}
+              />
+            </div>
+
+            <div>
+              <MarkdownEditor
+                value={purchaseOrder?.private_notes || ''}
+                onChange={(value) => handleChange('private_notes', value)}
+              />
+            </div>
+
+            <div>
+              <div className="grid grid-cols-12 gap-4">
+                <div className="col-span-12 lg:col-span-6 space-y-6">
+                  <UserSelector
+                    inputLabel={t('User')}
+                    value={purchaseOrder?.assigned_user_id}
+                    onChange={(user) =>
+                      handleChange('assigned_user_id', user.id)
+                    }
+                  />
+                </div>
+
+                <div className="col-span-12 lg:col-span-6 space-y-6">
+                  <ProjectSelector
+                    inputLabel={t('project')}
+                    value={purchaseOrder?.project_id}
+                    onChange={(project) =>
+                      handleChange('project_id', project.id)
+                    }
+                  />
+                </div>
+
+                <div className="col-span-12 lg:col-span-6 space-y-6">
+                  <ClientSelector
+                    inputLabel={t('client')}
+                    value={purchaseOrder?.client_id}
+                    onChange={(client) => handleChange('client_id', client.id)}
+                  />
+                </div>
+
+                <div className="col-span-12 lg:col-span-6 space-y-6">
+                  <InputField
+                    label={t('exchange_rate')}
+                    value={purchaseOrder?.exchange_rate || 1.0}
+                    onValueChange={(value) =>
+                      handleChange('exchange_rate', parseFloat(value) || 1.0)
+                    }
+                  />
+                </div>
+
+                <div className="col-span-12 lg:col-span-6 space-y-6">
+                  <DesignSelector
+                    inputLabel={t('design')}
+                    value={purchaseOrder?.design_id}
+                    onChange={(design) => handleChange('design_id', design.id)}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <Upload
+                widgetOnly
+                endpoint={endpoint('/api/v1/purchase_order/:id/upload', {
+                  id,
+                })}
+                onSuccess={onSuccess}
+              />
+
+              <DocumentsTable
+                documents={purchaseOrder?.documents || []}
+                onDocumentDelete={onSuccess}
+              />
+            </div>
+          </TabGroup>
+        </Card>
       </div>
     </Default>
   );
