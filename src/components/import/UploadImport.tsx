@@ -17,15 +17,29 @@ import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
+import { InputField, SelectField } from '@invoiceninja/forms';
 
 interface Props {
   entity: string;
   onSuccess: boolean;
 }
 
+interface ImportMap {
+  hash: string;
+  column_map: object;
+  import_type: string;
+  skip_header: boolean;
+  mappings: Mappings;
+}
+
+interface Mappings {
+  client: any;
+}
+
 export function UploadImport(props: Props) {
   const [t] = useTranslation();
   const [formData, setFormData] = useState(new FormData());
+  const [mapData, setMapData] = useState<ImportMap>();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -36,18 +50,25 @@ export function UploadImport(props: Props) {
       request('POST', endpoint('/api/v1/preimport'), formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
-        .then(() => {
+        .then((response) => {
           toast.success(t('uploaded_document'), { id: toastId });
 
-          setFormData(new FormData());
-          // props.onSuccess?.();
-          props.onSuccess = true;
+          setMapData(response.data);
+          console.log(response.data);
+          props.onSuccess;
 
-          //display map + submit button which will then submit for pro
+          console.log(response.data.mappings.client.headers[0]);
+
+// const obj1 = response.data.mappings.client.headers[1];
+// const obj2 = response.data.mappings.client.headers[0];
+// // const res = Object.entries(obj1).reduce((acc, [k, v]) => ({ ...acc, [obj2[k] || k]: v }), {});
+// const res = {...obj1, ...obj2};
+// console.log(res);
+
+
         })
         .catch((error) => {
           console.error(error);
-
           toast.error(t('error_title'), { id: toastId });
         });
     },
@@ -55,7 +76,6 @@ export function UploadImport(props: Props) {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
-      // formData.append('_method', 'POST');
 
       acceptedFiles.forEach((file) => formData.append('files[client]', file));
       
@@ -69,6 +89,7 @@ export function UploadImport(props: Props) {
 
 
   return (
+    <>
     <Card title={t('upload')}>
       <Element leftSide={t('upload')}>
         <div
@@ -87,5 +108,38 @@ export function UploadImport(props: Props) {
         </div>
       </Element>
     </Card>
+    {mapData && (
+      <div>
+
+      {
+        mapData.mappings.client.headers[0].map((mapping:any, index:number) => {
+
+        <Element leftSide={t('billing_address1')}>
+        <InputField
+          id="address1"
+          value={mapping[index]}
+        />
+        </Element>
+            
+          })
+      }
+
+      <SelectField withBlank>
+        {mapData.mappings.client.headers[0].map((mapping: any, index: number) => (
+          <option key={index} value={index}>
+            {mapping}
+          </option>
+        ))}
+      </SelectField>
+
+        <Element leftSide={t('billing_address1')}>
+        <InputField
+          id="address1"
+          value={mapData.hash}
+        />
+        </Element>
+      </div>
+    )}
+    </>
   );
 }
