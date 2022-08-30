@@ -33,6 +33,7 @@ import { Spinner } from 'components/Spinner';
 import { TabGroup } from 'components/TabGroup';
 import { UserSelector } from 'components/users/UserSelector';
 import { cloneDeep } from 'lodash';
+import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
 import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { Upload } from 'pages/settings/company/documents/components';
@@ -57,6 +58,7 @@ export function Edit() {
   ];
 
   const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder>();
+  const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();
 
   const productColumns = useProductColumns();
   const company = useCurrentCompany();
@@ -119,6 +121,8 @@ export function Edit() {
   const recalculateInvoiceSum = async (purchaseOrder: PurchaseOrder) => {
     const currency = await resolveCurrency(purchaseOrder!.vendor_id);
     const invoiceSum = new InvoiceSum(purchaseOrder!, currency!).build();
+
+    setInvoiceSum(invoiceSum);
 
     return invoiceSum.invoice as PurchaseOrder;
   };
@@ -373,6 +377,17 @@ export function Edit() {
             </div>
           </TabGroup>
         </Card>
+
+        {purchaseOrder && (
+          <InvoiceTotals
+            relationType="vendor_id"
+            resource={purchaseOrder}
+            invoiceSum={invoiceSum}
+            onChange={(property, value) =>
+              handleChange(property as keyof PurchaseOrder, value as string)
+            }
+          />
+        )}
       </div>
     </Default>
   );
