@@ -41,8 +41,8 @@ import { generatePath, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { Details } from './components/Details';
 import { VendorSelector } from './components/VendorSelector';
+import { useCalculateInvoiceSum } from './hooks/useCalculateInvoiceSum';
 import { useHandleInvitationChange } from './hooks/useHandleInvitationChange';
-import { useResolveCurrency } from './hooks/useResolveCurrency';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -65,7 +65,6 @@ export function Edit() {
   const productColumns = useProductColumns();
   const queryClient = useQueryClient();
 
-
   useEffect(() => {
     if (data) {
       const po = cloneDeep(data);
@@ -84,23 +83,14 @@ export function Edit() {
   };
 
   const handleInvitationChange = useHandleInvitationChange(handleChange);
-  const resolveCurrency = useResolveCurrency();
-
-  const recalculateInvoiceSum = async (purchaseOrder: PurchaseOrder) => {
-    const currency = await resolveCurrency(purchaseOrder!.vendor_id);
-    const invoiceSum = new InvoiceSum(purchaseOrder!, currency!).build();
-
-    setInvoiceSum(invoiceSum);
-
-    return invoiceSum.invoice as PurchaseOrder;
-  };
+  const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
 
   const handleProductChange = async (index: number, lineItem: InvoiceItem) => {
     const po = cloneDeep(purchaseOrder) as PurchaseOrder;
 
     po.line_items[index] = lineItem;
 
-    setPurchaseOrder(await recalculateInvoiceSum(po));
+    setPurchaseOrder(await calculateInvoiceSum(po));
   };
 
   const handleLineItemPropertyChange = async (
@@ -114,7 +104,7 @@ export function Edit() {
     // @ts-ignore
     po.line_items[index][property] = value;
 
-    setPurchaseOrder(await recalculateInvoiceSum(po));
+    setPurchaseOrder(await calculateInvoiceSum(po));
   };
 
   const handleCreateLineItem = async () => {
