@@ -42,6 +42,7 @@ import { v4 } from 'uuid';
 import { Details } from './components/Details';
 import { VendorSelector } from './components/VendorSelector';
 import { useCalculateInvoiceSum } from './hooks/useCalculateInvoiceSum';
+import { useHandleCreateLineItem } from './hooks/useHandleCreateLineItem';
 import { useHandleInvitationChange } from './hooks/useHandleInvitationChange';
 import { useHandleLineItemPropertyChange } from './hooks/useHandleLineItemPropertyChange';
 import { useHandleProductChange } from './hooks/useHandleProductChange';
@@ -85,7 +86,7 @@ export function Edit() {
   };
 
   const handleInvitationChange = useHandleInvitationChange(handleChange);
-  const calculateInvoiceSum = useCalculateInvoiceSum(setInvoiceSum);
+  const handleCreateLineItem = useHandleCreateLineItem(setPurchaseOrder);
 
   const handleProductChange = useHandleProductChange(
     setPurchaseOrder,
@@ -97,13 +98,6 @@ export function Edit() {
     setInvoiceSum
   );
 
-  const handleCreateLineItem = async () => {
-    const po = cloneDeep(purchaseOrder) as PurchaseOrder;
-
-    po.line_items.push(blankLineItem());
-
-    setPurchaseOrder(po);
-  };
 
   const handleDeleteLineItem = async (index: number) => {
     const po = cloneDeep(purchaseOrder) as PurchaseOrder;
