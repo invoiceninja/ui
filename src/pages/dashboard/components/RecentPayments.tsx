@@ -58,7 +58,7 @@ export function RecentPayments() {
       id: 'invoice_number',
       label: t('invoice_number'),
       format: (value, payment) =>
-        payment.invoices && payment.invoices[0].number,
+        payment.invoices && payment.invoices[0]?.number,
     },
     {
       id: 'date',

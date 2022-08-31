@@ -77,7 +77,7 @@ export function Products() {
       </DropdownElement>
     ),
   ];
-  
+
   return (
     <Default title={t('products')} breadcrumbs={pages} docsLink="docs/products">
       <DataTable

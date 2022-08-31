@@ -18,6 +18,7 @@ import { Payment } from './payment';
 import { Quote } from './quote';
 import { RecurringInvoice } from './recurring-invoice';
 import { Task } from './task';
+import { Vendor } from './vendor';
 
 export interface ActivityRecord {
   id: string;
@@ -36,6 +37,7 @@ export interface ActivityRecord {
   expense_id: string;
   is_system: boolean;
   contact_id: string;
+  vendor_id: string;
   task_id: string;
   token_id: string;
   notes: string;
@@ -50,4 +52,5 @@ export interface ActivityRecord {
   payment: Payment;
   credit: Credit;
   quote: Quote;
+  vendor: Vendor;
 }

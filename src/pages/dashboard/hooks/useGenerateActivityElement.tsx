@@ -42,6 +42,7 @@ export function useGenerateActivityElement() {
           payment: activity?.payment?.number,
           credit: activity?.credit?.number,
           task: activity?.task?.number,
+          vendor: activity?.vendor?.name,
         })}
 
         <p className="text-gray-500 text-xs">

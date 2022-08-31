@@ -27,6 +27,7 @@ import { Actions, SelectOption } from './datatables/Actions';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { Button, Checkbox } from './forms';
+import { Inline } from './Inline';
 import { Spinner } from './Spinner';
 import {
   ColumnSortPayload,
@@ -56,6 +57,7 @@ interface Props {
   customActions?: any;
   withoutActions?: boolean;
   withoutPagination?: boolean;
+  rightSide?: ReactNode;
 }
 
 export function DataTable(props: Props) {
@@ -156,11 +158,15 @@ export function DataTable(props: Props) {
           defaultOption={options[0]}
           onStatusChange={setStatus}
           rightSide={
-            props.linkToCreate && (
-              <Button to={props.linkToCreate}>
-                <span>{t(`new_${props.resource}`)}</span>
-              </Button>
-            )
+            <Inline>
+              {props.rightSide}
+
+              {props.linkToCreate && (
+                <Button to={props.linkToCreate}>
+                  <span>{t(`new_${props.resource}`)}</span>
+                </Button>
+              )}
+            </Inline>
           }
         >
           <span className="text-sm">{t('with_selected')}</span>

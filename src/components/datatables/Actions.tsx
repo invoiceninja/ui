@@ -72,7 +72,7 @@ export function Actions(props: Props) {
 
   return (
     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-      <div className="flex items-center space-x-2">
+      <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
         {props.children}
         {props.options && (
           <Select
@@ -85,7 +85,7 @@ export function Actions(props: Props) {
           />
         )}
       </div>
-      <div className="mt-2 lg:mt-0 flex items-center space-x-4">
+      <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
         <InputField
           id="filter"
           placeholder={t('filter')}
@@ -94,6 +94,7 @@ export function Actions(props: Props) {
           }
           debounceTimeout={800}
         />
+
         {props.rightSide}
       </div>
     </div>

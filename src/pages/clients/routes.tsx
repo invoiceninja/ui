@@ -13,6 +13,7 @@ import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
+import { Import } from './import/Import';
 import { Clients } from './index/Clients';
 import { Client } from './show/Client';
 import { Credits } from './show/pages/Credits';
@@ -33,6 +34,17 @@ export const clientRoutes = (
         <Guard
           guards={[() => permission('view_client')]}
           component={<Clients />}
+        />
+      }
+    />
+    <Route
+      path="import"
+      element={
+        <Guard
+          guards={[
+            () => permission('create_client') || permission('edit_client'),
+          ]}
+          component={<Import />}
         />
       }
     />
