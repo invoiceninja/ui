@@ -11,35 +11,56 @@
 import toast from 'react-hot-toast';
 import { Card, Element } from '@invoiceninja/cards';
 import { useFormik } from 'formik';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
-import { SelectField } from '@invoiceninja/forms';
+import { Button, SelectField } from '@invoiceninja/forms';
 
 interface Props {
   entity: string;
   onSuccess: boolean;
 }
 
-interface ImportMap {
+interface ImportMap extends Record<any, any>{
   hash: string;
-  column_map: object;
   import_type: string;
   skip_header: boolean;
-  mappings: Mappings;
-}
-
-interface Mappings {
-  client: any;
 }
 
 export function UploadImport(props: Props) {
   const [t] = useTranslation();
   const [formData, setFormData] = useState(new FormData());
-  const [mapData, setMapData] = useState<ImportMap>();
+  const [mapData, setMapData] = useState<ImportMap>() ;
+  const [payload, setPayloadData] = useState<ImportMap>({ hash: '', import_type: '', skip_header: true, column_map: {client: {mapping:{}}},});
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    //event.target.id, event.target.value
+    let id = parseInt(event.target.id);
+
+    payload.column_map.client.mapping[id] = event.target.value;;
+
+    setPayloadData(payload);
+
+    console.log(payload);
+
+  };
+
+  const decorateMapping = (mapping: any) => {
+
+    const split_map = mapping.split(".");
+
+    let label_property = split_map[1];
+
+    if(split_map[1] == 'user_id')
+      label_property = 'user';
+
+    return `${t(split_map[0])} - ${t(label_property)}`;
+
+  }
+
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -102,7 +123,7 @@ export function UploadImport(props: Props) {
       </Element>
     </Card>
 
-    <Card title={t('')} className="mt-10">  
+    <Card title={t('')} className="mt-10" withScrollableBody>  
       {mapData && (
         <div>
           <table className="table-auto py-3">
@@ -116,14 +137,14 @@ export function UploadImport(props: Props) {
             <tbody>
             {mapData.mappings.client.headers[0].map((mapping:any, index:number) => (
                 
-                <tr className='border-t-[1px] border-gray-300 py-3' id="{index}" key="{index}">
+                <tr className='border-t-[1px] border-gray-300 py-3' id="{index}">
                   <td className='py-2 px-2 text-right'>{mapping}</td>
                   <td><span className="text-gray-400">{mapData.mappings.client.headers[1][index].substring(0,20)}</span></td>
-                  <td className='mx-4 px-4 py-3'>
-                    <SelectField withBlank>
-                      {mapData.mappings.client.headers[0].map((mapping: any, key: number) => (
-                        <option key={key} value={key}>
-                          {mapping}
+                  <td className='mx-4 px-4 py-3' key={index}>
+                    <SelectField id={index} onChange={handleChange} className="form-select form-select-lg mb-3 appearance-none block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0" withBlank>
+                      {mapData.mappings.client.available.map((mapping: any, key: number) => (
+                        <option value={mapping} >
+                          {decorateMapping(mapping)}
                         </option>
                       ))}
                     </SelectField>
@@ -135,6 +156,9 @@ export function UploadImport(props: Props) {
           </table>
         </div>
       )}
+      <Button className='align-right'>
+          {t('import')}
+      </Button>
     </Card>
 
     </>
