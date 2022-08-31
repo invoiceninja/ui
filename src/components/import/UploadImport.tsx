@@ -74,6 +74,7 @@ export function UploadImport(props: Props) {
 
           toast.success(t('uploaded_document'), { id: toastId });
           props.onSuccess;
+          console.log(response);
 
         })
         .catch((error) => {
