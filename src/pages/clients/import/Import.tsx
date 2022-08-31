@@ -7,26 +7,25 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
+import { useTitle } from 'common/hooks/useTitle';
+import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { UploadImport } from 'components/import/UploadImport';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
 
 export function Import() {
+  const { t } = useTranslation();
+  const { documentTitle } = useTitle('import');
 
-  const [t] = useTranslation();
+  const pages: BreadcrumRecord[] = [
+    { name: t('clients'), href: '/clients' },
+    { name: t('import'), href: '/clients/import' },
+  ];
 
- return (
-
-    <Default
-      title={t('import')}
-      onBackClick={generatePath('/clients')}
-    >
-
-      <UploadImport entity={'client'} onSuccess={false} type={'csv'}/>
-
+  return (
+    <Default title={documentTitle} breadcrumbs={pages} onBackClick="/clients">
+      <UploadImport entity="client" onSuccess={false} type="csv" />
     </Default>
-
-    
   );
 }
