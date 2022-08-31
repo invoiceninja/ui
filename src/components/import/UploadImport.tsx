@@ -31,6 +31,7 @@ interface ImportMap extends Record<any, any>{
 }
 
 export function UploadImport(props: Props) {
+
   const [t] = useTranslation();
   const [formData, setFormData] = useState(new FormData());
   const [mapData, setMapData] = useState<ImportMap>() ;
@@ -39,10 +40,7 @@ export function UploadImport(props: Props) {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
    
     payload.column_map.client.mapping[event.target.id] = event.target.value;
-
     setPayloadData(payload);
-
-    console.log(payload);
 
   };
 
@@ -55,6 +53,9 @@ export function UploadImport(props: Props) {
     if(split_map[1] == 'user_id')
       label_property = 'user';
 
+    if(split_map[1] == 'shipping_country_id')
+      label_property = 'shipping_country';
+
     return `${t(split_map[0])} - ${t(label_property)}`;
 
   }
@@ -64,7 +65,6 @@ export function UploadImport(props: Props) {
     const toastId = toast.loading(t('processing'));
 
     event.preventDefault();
-    console.log("howdy");
 
     payload.hash = mapData!.hash;
     payload.import_type = 'csv';
@@ -72,9 +72,8 @@ export function UploadImport(props: Props) {
     request('POST', endpoint('/api/v1/import'), payload)
         .then((response) => {
 
-          toast.success(t('uploaded_document'), { id: toastId });
+          toast.success(response?.data?.message ?? t('error_title'), { id: toastId });
           props.onSuccess;
-          console.log(response);
 
         })
         .catch((error) => {
@@ -94,13 +93,10 @@ export function UploadImport(props: Props) {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
         .then((response) => {
-          toast.success(t('uploaded_document'), { id: toastId });
 
           setMapData(response.data);
-          console.log(response.data);
           props.onSuccess;
-
-          console.log(response.data.mappings.client.headers[0]);
+          toast.dismiss();
 
         })
         .catch((error) => {
@@ -115,7 +111,7 @@ export function UploadImport(props: Props) {
 
       acceptedFiles.forEach((file) => formData.append('files[client]', file));
       
-      formData.append('import_type', 'client');
+      formData.append('import_type', props.entity);
 
       setFormData(formData);
 
@@ -145,44 +141,53 @@ export function UploadImport(props: Props) {
       </Element>
     </Card>
 
+    {mapData && (
     <Card title={t('')} className="mt-10" withScrollableBody>  
-      {mapData && (
-        <div>
-          <table className="table-auto py-3">
-            <thead>
-              <tr>
-                <th className='text-right'>Headers</th>
-                <th></th>
-                <th className='py-3 px-6'>Invoice Ninja Column</th>
+      <div>
+        <table className="table-auto py-3">
+          <thead>
+            <tr>
+              <th className='text-right'>Headers</th>
+              <th></th>
+              <th className='py-3 px-6'>Invoice Ninja Column</th>
+            </tr>
+          </thead>
+          <tbody>
+          {mapData.mappings.client.headers[0].map((mapping:any, index:number) => (
+              
+              <tr className='border-t-[1px] border-gray-300 py-3' key={index}>
+                <td className='py-2 px-2 text-right'>{mapping}</td>
+                <td><span className="text-gray-400">{mapData.mappings.client.headers[1][index].substring(0,20)}</span></td>
+                <td className='mx-4 px-4 py-3'>
+                  <SelectField id={index} onChange={handleChange} className="form-select form-select-lg mb-3 appearance-none block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0" withBlank>
+                    {mapData.mappings.client.available.map((mapping: any, index: number) => (
+                      <option value={mapping} key={index}>
+                        {decorateMapping(mapping)}
+                      </option>
+                    ))}
+                  </SelectField>
+                </td>
               </tr>
-            </thead>
-            <tbody>
-            {mapData.mappings.client.headers[0].map((mapping:any, index:number) => (
-                
-                <tr className='border-t-[1px] border-gray-300 py-3' key={index}>
-                  <td className='py-2 px-2 text-right'>{mapping}</td>
-                  <td><span className="text-gray-400">{mapData.mappings.client.headers[1][index].substring(0,20)}</span></td>
-                  <td className='mx-4 px-4 py-3'>
-                    <SelectField id={index} onChange={handleChange} className="form-select form-select-lg mb-3 appearance-none block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0" withBlank>
-                      {mapData.mappings.client.available.map((mapping: any, index: number) => (
-                        <option value={mapping} key={index}>
-                          {decorateMapping(mapping)}
-                        </option>
-                      ))}
-                    </SelectField>
-                  </td>
-                </tr>
-          
-            ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-      <Button className='align-right' onClick={(e:ChangeEvent<HTMLInputElement>) => processImport(e)}>
-          {t('import')}
-      </Button>
+        
+          ))}
+          <tr>
+            <td></td>
+            <td></td>
+            <td>
+            <Button className='flex float-right' onClick={(e:ChangeEvent<HTMLInputElement>) => processImport(e)}>
+                {t('import')}
+            </Button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+
+    
     </Card>
 
+    )}
     </>
   );
 }
