@@ -17,7 +17,7 @@ import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
-import { InputField, SelectField } from '@invoiceninja/forms';
+import { SelectField } from '@invoiceninja/forms';
 
 interface Props {
   entity: string;
@@ -58,13 +58,6 @@ export function UploadImport(props: Props) {
           props.onSuccess;
 
           console.log(response.data.mappings.client.headers[0]);
-
-// const obj1 = response.data.mappings.client.headers[1];
-// const obj2 = response.data.mappings.client.headers[0];
-// // const res = Object.entries(obj1).reduce((acc, [k, v]) => ({ ...acc, [obj2[k] || k]: v }), {});
-// const res = {...obj1, ...obj2};
-// console.log(res);
-
 
         })
         .catch((error) => {
