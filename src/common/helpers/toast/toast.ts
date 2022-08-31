@@ -33,6 +33,12 @@ class Toast {
 
     return this;
   }
+
+  dismiss(): Toast {
+    helper.dismiss(this.currentId);
+
+    return this;
+  }
 }
 
 export const toast = new Toast();

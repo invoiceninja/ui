@@ -33,6 +33,7 @@ import { useHandleDeleteLineItem } from './hooks/useHandleDeleteLineItem';
 import { useHandleInvitationChange } from './hooks/useHandleInvitationChange';
 import { useHandleLineItemPropertyChange } from './hooks/useHandleLineItemPropertyChange';
 import { useHandleProductChange } from './hooks/useHandleProductChange';
+import { useSave } from './hooks/useSave';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
@@ -91,8 +92,15 @@ export function Edit() {
     setInvoiceSum
   );
 
+  const onSave = useSave(setErrors);
+
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onBackClick="/purchase_orders"
+      onSaveClick={() => purchaseOrder && onSave(purchaseOrder)}
+    >
       <div className="grid grid-cols-12 gap-4">
         <VendorSelector
           readonly
