@@ -121,8 +121,8 @@ export function UploadImport(props: Props) {
                   <td><span className="text-gray-400">{mapData.mappings.client.headers[1][index].substring(0,20)}</span></td>
                   <td className='mx-4 px-4 py-3'>
                     <SelectField withBlank>
-                      {mapData.mappings.client.headers[0].map((mapping: any, index: number) => (
-                        <option key={index} value={index}>
+                      {mapData.mappings.client.headers[0].map((mapping: any, key: number) => (
+                        <option key={key} value={key}>
                           {mapping}
                         </option>
                       ))}
