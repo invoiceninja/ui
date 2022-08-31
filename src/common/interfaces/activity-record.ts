@@ -53,5 +53,4 @@ export interface ActivityRecord {
   credit: Credit;
   quote: Quote;
   vendor: Vendor;
-
 }

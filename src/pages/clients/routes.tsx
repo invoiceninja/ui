@@ -41,7 +41,9 @@ export const clientRoutes = (
       path="import"
       element={
         <Guard
-          guards={[() => permission('create_client') || permission('edit_client')]}
+          guards={[
+            () => permission('create_client') || permission('edit_client'),
+          ]}
           component={<Import />}
         />
       }

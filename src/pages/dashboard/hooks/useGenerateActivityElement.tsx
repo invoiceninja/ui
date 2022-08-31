@@ -23,7 +23,7 @@ export function useGenerateActivityElement() {
 
     return (
       <ClickableElement
-      to={generatePath(`/${resource}s/:id/edit`, {
+        to={generatePath(`/${resource}s/:id/edit`, {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           id: activity[resource]?.hashed_id ?? '',
@@ -42,7 +42,7 @@ export function useGenerateActivityElement() {
           payment: activity?.payment?.number,
           credit: activity?.credit?.number,
           task: activity?.task?.number,
-          vendor: activity?.vendor?.name
+          vendor: activity?.vendor?.name,
         })}
 
         <p className="text-gray-500 text-xs">

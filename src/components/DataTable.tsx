@@ -159,13 +159,13 @@ export function DataTable(props: Props) {
           onStatusChange={setStatus}
           rightSide={
             <Inline>
-            {props.rightSide}
-            
-            {props.linkToCreate && (
-              <Button to={props.linkToCreate}>
-                <span>{t(`new_${props.resource}`)}</span>
-              </Button>
-            )}
+              {props.rightSide}
+
+              {props.linkToCreate && (
+                <Button to={props.linkToCreate}>
+                  <span>{t(`new_${props.resource}`)}</span>
+                </Button>
+              )}
             </Inline>
           }
         >

@@ -94,7 +94,7 @@ export function Actions(props: Props) {
           }
           debounceTimeout={800}
         />
-        
+
         {props.rightSide}
       </div>
     </div>
