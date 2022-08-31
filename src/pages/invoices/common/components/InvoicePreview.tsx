@@ -27,13 +27,18 @@ interface Props {
     | 'credit'
     | 'purchase_order';
   relationType: RelationType;
+  endpoint?:
+    | '/api/v1/live_preview?entity=:entity'
+    | '/api/v1/live_preview/purchase_order?entity=:entity';
 }
 
 export function InvoicePreview(props: Props) {
+  const endpoint = props.endpoint || '/api/v1/live_preview?entity=:entity';
+
   if (props.resource?.[props.relationType] && props.for === 'create') {
     return (
       <InvoiceViewer
-        link={previewEndpoint('/api/v1/live_preview?entity=:entity', {
+        link={previewEndpoint(endpoint, {
           entity: props.entity,
         })}
         resource={props.resource}
@@ -49,13 +54,10 @@ export function InvoicePreview(props: Props) {
   ) {
     return (
       <InvoiceViewer
-        link={previewEndpoint(
-          '/api/v1/live_preview?entity=:entity&entity_id=:id',
-          {
-            entity: props.entity,
-            id: props.resource?.id,
-          }
-        )}
+        link={previewEndpoint(endpoint, {
+          entity: props.entity,
+          id: props.resource?.id,
+        })}
         resource={props.resource}
         method="POST"
       />
