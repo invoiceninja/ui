@@ -116,10 +116,10 @@ export function UploadImport(props: Props) {
             <tbody>
             {mapData.mappings.client.headers[0].map((mapping:any, index:number) => (
                 
-                <tr className='border-t-[1px] border-gray-300 py-3'>
-                  <td id="{index}" className='py-2 px-2 text-right'>{mapping}</td>
+                <tr className='border-t-[1px] border-gray-300 py-3' id="{index}">
+                  <td className='py-2 px-2 text-right'>{mapping}</td>
                   <td><span className="text-gray-400">{mapData.mappings.client.headers[1][index].substring(0,20)}</span></td>
-                  <td className='mx-4 px-4'>
+                  <td className='mx-4 px-4 py-3'>
                     <SelectField withBlank>
                       {mapData.mappings.client.headers[0].map((mapping: any, index: number) => (
                         <option key={index} value={index}>
