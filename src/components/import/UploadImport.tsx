@@ -38,7 +38,7 @@ export function UploadImport(props: Props) {
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
    
-    payload.column_map.client.mapping[event.target.id] = event.target.value;;
+    payload.column_map.client.mapping[event.target.id] = event.target.value;
 
     setPayloadData(payload);
 
@@ -135,7 +135,7 @@ export function UploadImport(props: Props) {
             <tbody>
             {mapData.mappings.client.headers[0].map((mapping:any, index:number) => (
                 
-                <tr className='border-t-[1px] border-gray-300 py-3' id="{index}">
+                <tr className='border-t-[1px] border-gray-300 py-3' key="{index}">
                   <td className='py-2 px-2 text-right'>{mapping}</td>
                   <td><span className="text-gray-400">{mapData.mappings.client.headers[1][index].substring(0,20)}</span></td>
                   <td className='mx-4 px-4 py-3' key={index}>
