@@ -37,10 +37,8 @@ export function UploadImport(props: Props) {
   const [payload, setPayloadData] = useState<ImportMap>({ hash: '', import_type: '', skip_header: true, column_map: {client: {mapping:{}}},});
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    //event.target.id, event.target.value
-    let id = parseInt(event.target.id);
-
-    payload.column_map.client.mapping[id] = event.target.value;;
+   
+    payload.column_map.client.mapping[event.target.id] = event.target.value;;
 
     setPayloadData(payload);
 
