@@ -75,8 +75,10 @@ export function Clients() {
       <>
         <div>
           <Link to="/clients/import">
-            <Download>
-            </Download>
+            <button className="inline-flex items-center space-x-2 justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600">
+              <svg className="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="3 3 20 20"><Download></Download></svg>
+              <span>{t('import')}</span>
+            </button>
           </Link>
         </div>
       </>

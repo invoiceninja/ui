@@ -105,6 +105,7 @@ export function UploadImport(props: Props) {
   });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: ['.csv'],
     onDrop: (acceptedFiles) => {
 
       acceptedFiles.forEach((file) => formData.append(`files[${props.entity}]`, file));
@@ -118,7 +119,7 @@ export function UploadImport(props: Props) {
 
   return (
     <>
-    <Card title={t('import')}>
+    <Card title={t(props.entity)}>
       <Element leftSide={t('csv_file')}>
         <div
           {...getRootProps()}
@@ -154,8 +155,8 @@ export function UploadImport(props: Props) {
               <tr className='border-t-[1px] border-gray-300 py-3' key={index}>
                 <td className='py-2 px-2 text-right'>{mapping}</td>
                 <td><span className="text-gray-400">{mapData.mappings.client.headers[1][index].substring(0,20)}</span></td>
-                <td className='mx-4 px-4 py-3'>
-                  <SelectField id={index} onChange={handleChange} className="form-select form-select-lg mb-3 appearance-none block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0" withBlank>
+                <td className='px-20 py-2'>
+                  <SelectField id={index} onChange={handleChange} className="form-select form-select-lg mb-2 appearance-none block w-full px-2 py-1 text-xl font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0" withBlank>
                     {mapData.mappings.client.available.map((mapping: any, index: number) => (
                       <option value={mapping} key={index}>
                         {decorateMapping(mapping)}
