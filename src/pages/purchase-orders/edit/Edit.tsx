@@ -56,6 +56,11 @@ export function Edit() {
 
       po.line_items.forEach((item) => (item._id = v4()));
 
+      po.invitations.forEach(
+        (invitation) =>
+          (invitation['client_contact_id'] = invitation.client_contact_id || '')
+      );
+
       setPurchaseOrder(po);
     }
   }, [data]);
@@ -155,6 +160,7 @@ export function Edit() {
             resource={purchaseOrder}
             entity="purchase_order"
             relationType="vendor_id"
+            endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
           />
         )}
       </div>

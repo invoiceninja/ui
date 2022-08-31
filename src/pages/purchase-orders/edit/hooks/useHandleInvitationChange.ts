@@ -30,6 +30,7 @@ export function useHandleInvitationChange(handleChange: Handler) {
     if (potential === -1) {
       const invitation: Partial<Invitation> = {
         vendor_contact_id: '',
+        client_contact_id: '',
       };
 
       invitation.vendor_contact_id = id;
