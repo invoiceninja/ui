@@ -71,18 +71,20 @@ export function Clients() {
     },
   ];
 
-  const moreActions = [
-      <>
-        <div>
-          <Link to="/clients/import">
-            <button className="inline-flex items-center space-x-2 justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600">
-              <svg className="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="3 3 20 20"><Download></Download></svg>
-              <span>{t('import')}</span>
-            </button>
-          </Link>
-        </div>
-      </>
-  ];
+  const importButton = (
+    <Link to="/clients/import">
+      <button className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600">
+        <svg
+          className="w-4 h-4 mr-2"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="3 3 20 20"
+        >
+          <Download />
+        </svg>
+        <span>{t('import')}</span>
+      </button>
+    </Link>
+  );
 
   const actions = [
     (resource: Client) => (
@@ -137,7 +139,7 @@ export function Clients() {
         linkToEdit="/clients/:id/edit"
         withResourcefulActions
         customActions={actions}
-        rightSide={moreActions}
+        rightSide={importButton}
       />
     </Default>
   );
