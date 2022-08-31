@@ -59,6 +59,29 @@ export function UploadImport(props: Props) {
 
   }
 
+  const processImport = (event: ChangeEvent<HTMLInputElement>) => {
+
+    const toastId = toast.loading(t('processing'));
+
+    event.preventDefault();
+    console.log("howdy");
+
+    payload.hash = mapData!.hash;
+    payload.import_type = 'csv';
+
+    request('POST', endpoint('/api/v1/import'), payload)
+        .then((response) => {
+
+          toast.success(t('uploaded_document'), { id: toastId });
+          props.onSuccess;
+
+        })
+        .catch((error) => {
+          console.error(error);
+          toast.error(t('error_title'), { id: toastId });
+    });
+
+  }
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -135,13 +158,13 @@ export function UploadImport(props: Props) {
             <tbody>
             {mapData.mappings.client.headers[0].map((mapping:any, index:number) => (
                 
-                <tr className='border-t-[1px] border-gray-300 py-3' key="{index}">
+                <tr className='border-t-[1px] border-gray-300 py-3' key={index}>
                   <td className='py-2 px-2 text-right'>{mapping}</td>
                   <td><span className="text-gray-400">{mapData.mappings.client.headers[1][index].substring(0,20)}</span></td>
-                  <td className='mx-4 px-4 py-3' key={index}>
+                  <td className='mx-4 px-4 py-3'>
                     <SelectField id={index} onChange={handleChange} className="form-select form-select-lg mb-3 appearance-none block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0" withBlank>
-                      {mapData.mappings.client.available.map((mapping: any, index:number) => (
-                        <option value={mapping} key={index}>
+                      {mapData.mappings.client.available.map((mapping: any) => (
+                        <option value={mapping}>
                           {decorateMapping(mapping)}
                         </option>
                       ))}
@@ -154,7 +177,7 @@ export function UploadImport(props: Props) {
           </table>
         </div>
       )}
-      <Button className='align-right'>
+      <Button className='align-right' onClick={(e:ChangeEvent<HTMLInputElement>) => processImport(e)}>
           {t('import')}
       </Button>
     </Card>
