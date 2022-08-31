@@ -82,6 +82,7 @@ export interface PurchaseOrder {
 export interface Invitation {
   id: string;
   vendor_contact_id: string;
+  client_contact_id: string;
   key: string;
   link: string;
   sent_date: string;
