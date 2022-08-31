@@ -22,6 +22,7 @@ import { Button, SelectField } from '@invoiceninja/forms';
 interface Props {
   entity: string;
   onSuccess: boolean;
+  type: string;
 }
 
 interface ImportMap extends Record<any, any>{
@@ -35,7 +36,7 @@ export function UploadImport(props: Props) {
   const [t] = useTranslation();
   const [formData, setFormData] = useState(new FormData());
   const [mapData, setMapData] = useState<ImportMap>() ;
-  const [payload, setPayloadData] = useState<ImportMap>({ hash: '', import_type: '', skip_header: true, column_map: {client: {mapping:{}}},});
+  const [payload, setPayloadData] = useState<ImportMap>({ hash: '', import_type: props.type, skip_header: true, column_map: {client: {mapping:{}}},});
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
    
@@ -63,11 +64,8 @@ export function UploadImport(props: Props) {
   const processImport = (event: ChangeEvent<HTMLInputElement>) => {
 
     const toastId = toast.loading(t('processing'));
-
     event.preventDefault();
-
     payload.hash = mapData!.hash;
-    payload.import_type = 'csv';
 
     request('POST', endpoint('/api/v1/import'), payload)
         .then((response) => {
@@ -109,10 +107,8 @@ export function UploadImport(props: Props) {
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop: (acceptedFiles) => {
 
-      acceptedFiles.forEach((file) => formData.append('files[client]', file));
-      
+      acceptedFiles.forEach((file) => formData.append(`files[${props.entity}]`, file));
       formData.append('import_type', props.entity);
-
       setFormData(formData);
 
       formik.submitForm();
@@ -123,7 +119,7 @@ export function UploadImport(props: Props) {
   return (
     <>
     <Card title={t('import')}>
-      <Element leftSide={t('upload')}>
+      <Element leftSide={t('csv_file')}>
         <div
           {...getRootProps()}
           className="flex flex-col md:flex-row md:items-center"

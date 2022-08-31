@@ -23,7 +23,7 @@ export function Import() {
       onBackClick={generatePath('/clients')}
     >
 
-      <UploadImport entity={'client'} onSuccess={false} />
+      <UploadImport entity={'client'} onSuccess={false} type={'csv'}/>
 
     </Default>
 
