@@ -163,8 +163,8 @@ export function UploadImport(props: Props) {
                   <td><span className="text-gray-400">{mapData.mappings.client.headers[1][index].substring(0,20)}</span></td>
                   <td className='mx-4 px-4 py-3'>
                     <SelectField id={index} onChange={handleChange} className="form-select form-select-lg mb-3 appearance-none block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0" withBlank>
-                      {mapData.mappings.client.available.map((mapping: any) => (
-                        <option value={mapping}>
+                      {mapData.mappings.client.available.map((mapping: any, index: number) => (
+                        <option value={mapping} key={index}>
                           {decorateMapping(mapping)}
                         </option>
                       ))}
