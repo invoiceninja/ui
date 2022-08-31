@@ -90,7 +90,7 @@ export function UploadImport(props: Props) {
 
   return (
     <>
-    <Card title={t('upload')}>
+    <Card title={t('import')}>
       <Element leftSide={t('upload')}>
         <div
           {...getRootProps()}
@@ -108,32 +108,42 @@ export function UploadImport(props: Props) {
         </div>
       </Element>
     </Card>
-    {mapData && (
-      <div>
 
-      <ul>
-      {mapData.mappings.client.headers[0].map((mapping:any, index:number) => (
+    <Card title={t('')} className="mt-10">  
+      {mapData && (
+        <div>
+          <table className="table-auto py-3">
+            <thead>
+              <tr>
+                <th className='text-right'>Headers</th>
+                <th></th>
+                <th className='py-3 px-6'>Invoice Ninja Column</th>
+              </tr>
+            </thead>
+            <tbody>
+            {mapData.mappings.client.headers[0].map((mapping:any, index:number) => (
+                
+                <tr className='border-t-[1px] border-gray-300 py-3'>
+                  <td id="{index}" className='py-2 px-2 text-right'>{mapping}</td>
+                  <td><span className="text-gray-400">{mapData.mappings.client.headers[1][index].substring(0,20)}</span></td>
+                  <td className='mx-4 px-4'>
+                    <SelectField withBlank>
+                      {mapData.mappings.client.headers[0].map((mapping: any, index: number) => (
+                        <option key={index} value={index}>
+                          {mapping}
+                        </option>
+                      ))}
+                    </SelectField>
+                  </td>
+                </tr>
           
-          <li key={index}>{mapping} {mapData.mappings.client.headers[1][index]}</li>
-    
-      ))}
-      </ul>
-      <SelectField withBlank>
-        {mapData.mappings.client.headers[0].map((mapping: any, index: number) => (
-          <option key={index} value={index}>
-            {mapping}
-          </option>
-        ))}
-      </SelectField>
+            ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </Card>
 
-        <Element leftSide={t('billing_address1')}>
-        <InputField
-          id="address1"
-          value={mapData.hash}
-        />
-        </Element>
-      </div>
-    )}
     </>
   );
 }
