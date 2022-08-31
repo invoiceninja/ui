@@ -41,8 +41,6 @@ export function Contacts() {
                       </p>
 
                       <a href={`mailto:${contact.email}`}>{contact.email}</a>
-
-
                     </div>
                   )
                 )}
@@ -55,4 +53,3 @@ export function Contacts() {
     </>
   );
 }
-
