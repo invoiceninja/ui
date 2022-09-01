@@ -18,6 +18,7 @@ import { Edit } from './edit/Edit';
 import { Email } from './email/Email';
 import { Quotes } from './index/Quotes';
 import { Pdf } from './pdf/Pdf';
+import { Import } from 'pages/quotes/import/Import';
 
 export const quoteRoutes = (
   <Route path="/quotes">
@@ -27,6 +28,17 @@ export const quoteRoutes = (
         <Guard
           guards={[() => permission('view_quote')]}
           component={<Quotes />}
+        />
+      }
+    />
+     <Route
+      path="import"
+      element={
+        <Guard
+          guards={[
+            () => permission('create_quote') || permission('edit_quote'),
+          ]}
+          component={<Import />}
         />
       }
     />
