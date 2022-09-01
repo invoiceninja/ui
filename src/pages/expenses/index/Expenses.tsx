@@ -19,6 +19,7 @@ import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { ExpenseStatus } from '../common/components/ExpenseStatus';
 import { Status } from './components/Status';
 
 export function Expenses() {
@@ -37,9 +38,11 @@ export function Expenses() {
     {
       id: 'status_id',
       label: t('status'),
-      format: (value, expense) => (
+      format: (value, expense: Expense) => (
         <Link to={generatePath('/expenses/:id/edit', { id: expense.id })}>
-          <Status expense={expense} />
+          <span className="inline-flex items-center space-x-4">
+            <ExpenseStatus entity={expense} />
+          </span>
         </Link>
       ),
     },
