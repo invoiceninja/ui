@@ -49,6 +49,7 @@ export function RecurringInvoices() {
     {
       id: 'remaining_cycles',
       label: t('remaining_cycles'),
+      format: (value) => (Number(value) < 0 ? t('endless') : value),
     },
     {
       id: 'next_send_date',
