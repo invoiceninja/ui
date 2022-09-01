@@ -25,6 +25,7 @@ import { openClientPortal } from 'pages/invoices/common/helpers/open-client-port
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { QuoteStatus } from '../common/components/QuoteStatus';
 
 export function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -44,7 +45,11 @@ export function Quotes() {
     {
       id: 'status_id',
       label: t('status'),
-      format: (value) => <StatusBadge for={quoteStatus} code={value} />,
+      format: (value, quote) => (
+        <span className="inline-flex items-center space-x-4">
+          <QuoteStatus entity={quote} />
+        </span>
+      ),
     },
     {
       id: 'number',
@@ -82,7 +87,7 @@ export function Quotes() {
     {
       id: 'valid_until',
       label: t('valid_until'),
-      format: (value) => date(value, dateFormat),
+      format: (value, quote) => date(quote.due_date, dateFormat),
     },
   ];
 
