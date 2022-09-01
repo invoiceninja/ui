@@ -20,7 +20,6 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { ExpenseStatus } from '../common/components/ExpenseStatus';
-import { Status } from './components/Status';
 
 export function Expenses() {
   useTitle('expenses');
