@@ -21,7 +21,7 @@ import { UserSelector } from 'components/users/UserSelector';
 import { Upload } from 'pages/settings/company/documents/components';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useLocation, useParams } from 'react-router-dom';
 import { PurchaseOrderCardProps } from './Details';
 
 export function Footer(props: PurchaseOrderCardProps) {
@@ -30,6 +30,7 @@ export function Footer(props: PurchaseOrderCardProps) {
   const { purchaseOrder, handleChange } = props;
 
   const queryClient = useQueryClient();
+  const location = useLocation();
 
   const tabs = [
     t('terms'),
@@ -123,20 +124,24 @@ export function Footer(props: PurchaseOrderCardProps) {
           </div>
         </div>
 
-        <div>
-          <Upload
-            widgetOnly
-            endpoint={endpoint('/api/v1/purchase_orders/:id/upload', {
-              id,
-            })}
-            onSuccess={onSuccess}
-          />
+        {location.pathname.endsWith('/create') ? (
+          <div>Upload available after you create purchase order.</div>
+        ) : (
+          <div>
+            <Upload
+              widgetOnly
+              endpoint={endpoint('/api/v1/purchase_orders/:id/upload', {
+                id,
+              })}
+              onSuccess={onSuccess}
+            />
 
-          <DocumentsTable
-            documents={purchaseOrder?.documents || []}
-            onDocumentDelete={onSuccess}
-          />
-        </div>
+            <DocumentsTable
+              documents={purchaseOrder?.documents || []}
+              onDocumentDelete={onSuccess}
+            />
+          </div>
+        )}
       </TabGroup>
     </Card>
   );
