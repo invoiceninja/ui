@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { EntityState } from 'common/enums/entity-state';
-import { getEntityState } from 'common/helpers';
 import { Badge } from 'components/Badge';
 import { useTranslation } from 'react-i18next';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
