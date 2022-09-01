@@ -14,6 +14,17 @@ import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
+export function useBlankPurchaseOrderQuery() {
+  return useQuery<PurchaseOrder>(
+    generatePath('/api/v1/purchase_orders/create'),
+    () =>
+      request('GET', endpoint('/api/v1/purchase_orders/create')).then(
+        (response) => response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}
+
 export function usePurchaseOrderQuery(params: { id: string | undefined }) {
   return useQuery<PurchaseOrder>(
     generatePath('/api/v1/purchase_orders/:id', { id: params.id }),
