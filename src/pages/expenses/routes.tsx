@@ -16,6 +16,7 @@ import { Create } from './create/Create';
 import { Documents } from './documents/Documents';
 import { Edit } from './edit/Edit';
 import { Expenses } from './index/Expenses';
+import { Import } from 'pages/expenses/import/Import';
 
 export const expenseRoutes = (
   <Route path="expenses">
@@ -25,6 +26,17 @@ export const expenseRoutes = (
         <Guard
           guards={[() => permission('view_expense')]}
           component={<Expenses />}
+        />
+      }
+    />
+    <Route
+      path="import"
+      element={
+        <Guard
+          guards={[
+            () => permission('create_expense') || permission('edit_expense'),
+          ]}
+          component={<Import />}
         />
       }
     />

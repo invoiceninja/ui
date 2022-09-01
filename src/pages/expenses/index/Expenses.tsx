@@ -20,6 +20,8 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { ExpenseStatus } from '../common/components/ExpenseStatus';
+import { Link as ReactRouterLink } from 'react-router-dom';
+import { Download } from 'react-feather';
 
 export function Expenses() {
   useTitle('expenses');
@@ -32,6 +34,21 @@ export function Expenses() {
 
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
+
+ const importButton = (
+    <ReactRouterLink to="/expenses/import">
+      <button className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600">
+        <svg
+          className="w-4 h-4 mr-2"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="3 3 20 20"
+        >
+          <Download />
+        </svg>
+        <span>{t('import')}</span>
+      </button>
+    </ReactRouterLink>
+  );
 
   const columns: DataTableColumns<Expense> = [
     {
@@ -114,6 +131,7 @@ export function Expenses() {
         linkToCreate="/expenses/create"
         linkToEdit="/expenses/:id/edit"
         withResourcefulActions
+        rightSide={importButton}
       />
     </Default>
   );

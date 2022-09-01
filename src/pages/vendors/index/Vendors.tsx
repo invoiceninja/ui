@@ -32,7 +32,7 @@ export function Vendors() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
  const importButton = (
-    <ReactRouterLink to="/vendors/import">
+    <ReactRouterLink to="/expenses/import">
       <button className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600">
         <svg
           className="w-4 h-4 mr-2"
