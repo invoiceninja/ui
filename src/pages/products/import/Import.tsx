@@ -19,7 +19,7 @@ export function Import() {
   const { documentTitle } = useTitle('import');
 
   const pages: BreadcrumRecord[] = [
-    { name: t('products'), href: '/productsc' },
+    { name: t('products'), href: '/products' },
     { name: t('import'), href: '/products/import' },
   ];
 
