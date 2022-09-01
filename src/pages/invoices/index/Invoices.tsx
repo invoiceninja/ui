@@ -18,13 +18,13 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
-import { Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { InvoiceStatus } from '../common/components/InvoiceStatus';
 import { openClientPortal } from '../common/helpers/open-client-portal';
 import { useDownloadPdf } from '../common/hooks/useDownloadPdf';
 import { Link as ReactRouterLink } from 'react-router-dom';
+import { Download } from 'react-feather';
 
 export function Invoices() {
   useTitle('invoices');
