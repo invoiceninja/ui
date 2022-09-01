@@ -139,6 +139,7 @@ export function Clone() {
         {currentCredit && (
           <InvoiceTotals
             resource={currentCredit}
+            relationType="client_id"
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
               handleChange(property as keyof Credit, value)
@@ -150,6 +151,7 @@ export function Clone() {
       <div className="my-4">
         {currentCredit && (
           <InvoicePreview
+            relationType="client_id"
             for="invoice"
             resource={currentCredit}
             entity="credit"

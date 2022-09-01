@@ -142,6 +142,7 @@ export function CloneInvoiceToRecurringInvoice() {
 
         {currentRecurringInvoice && (
           <InvoiceTotals
+          relationType='client_id'
             resource={currentRecurringInvoice}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
@@ -155,6 +156,7 @@ export function CloneInvoiceToRecurringInvoice() {
         {currentRecurringInvoice && (
           <InvoicePreview
             for="invoice"
+            relationType='client_id'
             resource={currentRecurringInvoice}
             entity="recurring_invoice"
           />
