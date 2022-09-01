@@ -126,7 +126,7 @@ export function Footer(props: PurchaseOrderCardProps) {
         <div>
           <Upload
             widgetOnly
-            endpoint={endpoint('/api/v1/purchase_order/:id/upload', {
+            endpoint={endpoint('/api/v1/purchase_orders/:id/upload', {
               id,
             })}
             onSuccess={onSuccess}
