@@ -22,6 +22,7 @@ import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { InvoiceStatus } from '../common/components/InvoiceStatus';
 import { openClientPortal } from '../common/helpers/open-client-portal';
 import { useDownloadPdf } from '../common/hooks/useDownloadPdf';
 
@@ -41,7 +42,11 @@ export function Invoices() {
     {
       id: 'status_id',
       label: t('status'),
-      format: (value) => <StatusBadge for={invoiceStatus} code={value} />,
+      format: (value, invoice) => (
+        <span className="inline-flex items-center space-x-4">
+          <InvoiceStatus entity={invoice} />
+        </span>
+        ),
     },
     {
       id: 'number',

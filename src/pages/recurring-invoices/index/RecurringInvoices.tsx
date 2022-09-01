@@ -23,6 +23,7 @@ import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { RecurringInvoiceStatus } from '../common/components/RecurringInvoiceStatus';
 
 export function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -41,7 +42,11 @@ export function RecurringInvoices() {
     {
       id: 'status_id',
       label: t('status'),
-      format: (value) => <StatusBadge for={reccuringInvoice} code={value} />,
+      format: (value, recurringInvoice) => (
+        <span className="inline-flex items-center space-x-4">
+          <RecurringInvoiceStatus entity={recurringInvoice} />
+        </span>
+        ),
     },
     {
       id: 'number',
