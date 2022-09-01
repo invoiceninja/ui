@@ -40,7 +40,7 @@ export const invoiceRoutes = (
           guards={[
             () => permission('create_invoice') || permission('edit_invoice'),
           ]}
-          component={<Import entity="invoice"> />}
+          component={<Import entity="invoice" />}
         />
       }
     />
