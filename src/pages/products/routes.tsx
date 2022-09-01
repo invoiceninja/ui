@@ -39,7 +39,7 @@ export const productRoutes = (
           guards={[
             () => permission('create_product') || permission('edit_product'),
           ]}
-          component={<Import />}
+          component={<Import entity="product" />}
         />
       }
     />

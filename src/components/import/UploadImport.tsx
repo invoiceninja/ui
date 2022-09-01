@@ -114,7 +114,7 @@ export function UploadImport(props: Props) {
 
   return (
     <>
-      <Card title={t(props.entity)}>
+      <Card title={`${t(props.entity)}`}>
         <Element leftSide={t('csv_file')}>
           <div
             {...getRootProps()}

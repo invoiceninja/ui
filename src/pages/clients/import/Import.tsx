@@ -14,20 +14,24 @@ import { UploadImport } from 'components/import/UploadImport';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 
-export function Import() {
+interface Props {
+  entity: string;
+}
+
+export function Import(props: Props) {
   const { t } = useTranslation();
   const { documentTitle } = useTitle('import');
 
   const pages: BreadcrumRecord[] = [
-    { name: t('clients'), href: '/clients' },
-    { name: t('import'), href: '/clients/import' },
+    { name: t(`${props.entity}s`), href: `/${props.entity}s` },
+    { name: t('import'), href: `/${props.entity}s/import` },
   ];
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} onBackClick="/clients">
+    <Default title={documentTitle} breadcrumbs={pages} onBackClick={`/${props.entity}s`}>
       <div className="grid grid-cols-12">
         <div className="col-span-12 xl:col-span-10">
-          <UploadImport entity="client" onSuccess={false} type="csv" />
+          <UploadImport entity={props.entity} onSuccess={false} type="csv" />
         </div>
       </div>
     </Default>

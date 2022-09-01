@@ -56,7 +56,6 @@ export function Products() {
       format: (value, product) => (
         <span className="inline-flex items-center space-x-4">
           <EntityStatus entity={product} />
-
           <Link to={generatePath('/products/:id/edit', { id: product.id })}>
             {value}
           </Link>
