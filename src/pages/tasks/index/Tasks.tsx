@@ -13,7 +13,6 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
-import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import {
@@ -26,6 +25,7 @@ import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
 import { useInvoiceTask } from '../common/hooks/useInvoiceTask';
+import { TaskStatus } from '../common/components/TaskStatus';
 
 export function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -38,8 +38,10 @@ export function Tasks() {
       id: 'status_id',
       label: t('status'),
       format: (value, task: Task) => (
-        <StatusBadge for={{}} code={task.status?.name || 'logged'} />
-      ),
+        <span className="inline-flex items-center space-x-4">
+          <TaskStatus entity={task} />
+        </span>
+        ),
     },
     {
       id: 'number',
