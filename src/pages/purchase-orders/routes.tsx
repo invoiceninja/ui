@@ -9,6 +9,7 @@
  */
 
 import { Route } from 'react-router-dom';
+import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { PurchaseOrders } from './index/PurchaseOrders';
@@ -16,7 +17,10 @@ import { PurchaseOrders } from './index/PurchaseOrders';
 export const purchaseOrdersRoutes = (
   <Route path="/purchase_orders">
     <Route path="" element={<PurchaseOrders />} />
-    <Route path=":id/edit" element={<Edit />} />
+    <Route path=":id">
+      <Route path="edit" element={<Edit />} />
+      <Route path="clone" element={<Clone />} />
+    </Route>
     <Route path="create" element={<Create />} />
   </Route>
 );
