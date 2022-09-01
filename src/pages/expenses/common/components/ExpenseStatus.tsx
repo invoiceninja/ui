@@ -19,12 +19,6 @@ interface Props {
 export function ExpenseStatus(props: Props) {
   const [t] = useTranslation();
 
-  if(props.entity.is_deleted)
-    return <Badge variant="red">{t('deleted')}</Badge>;
-
-  if(props.entity.archived_at)
-    return <Badge variant="orange">{t('archived')}</Badge>;
-
   if(props.entity.should_be_invoiced && !props.entity.payment_date)
     return <Badge variant="dark-blue">{t('pending')}</Badge>;
 
