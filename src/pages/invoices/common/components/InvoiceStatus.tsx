@@ -39,10 +39,10 @@ export function InvoiceStatus(props: Props) {
       case "5":
         return <Badge variant="black">{t('cancelled')}</Badge>;
       case "6":
-        return <Badge variant="light-blue">{t('sent')}</Badge>;
+        return <Badge variant="purple">{t('reversed')}</Badge>;
 
       default:
-        return '';
+        return <Badge variant="light-blue">{t('reversed')}</Badge>;
         break;
     }
 

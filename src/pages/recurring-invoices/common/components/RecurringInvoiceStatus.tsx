@@ -48,7 +48,7 @@ export function RecurringInvoiceStatus(props: Props) {
         return <Badge variant="light-blue">{t('sent')}</Badge>;
 
       default:
-        return '';
+        return <Badge variant="light-blue">{t('sent')}</Badge>;
         break;
     }
 

@@ -9,7 +9,6 @@
  */
 
 import { Link } from '@invoiceninja/forms';
-import reccuringInvoice from 'common/constants/reccuring-invoice';
 import recurringInvoicesFrequency from 'common/constants/recurring-invoices-frequency';
 import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
