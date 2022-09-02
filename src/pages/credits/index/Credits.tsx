@@ -42,11 +42,7 @@ export function Credits() {
     {
       id: 'status_id',
       label: t('status'),
-      format: (value, credit) => (
-        <span className="inline-flex items-center space-x-4">
-          <CreditStatus entity={credit} />
-        </span>
-        ),
+      format: (value, credit) => <CreditStatus entity={credit} />,
     },
     {
       id: 'number',
