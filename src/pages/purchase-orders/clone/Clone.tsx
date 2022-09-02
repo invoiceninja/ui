@@ -117,6 +117,7 @@ export function Clone() {
           onContactCheckboxChange={(id, checked) =>
             purchaseOrder && handleInvitationChange(purchaseOrder, id, checked)
           }
+          errorMessage={errors?.errors.vendor_id}
         />
 
         <Details
