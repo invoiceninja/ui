@@ -53,16 +53,11 @@ export function Invoices() {
     </ReactRouterLink>
   );
 
-
   const columns: DataTableColumns<Invoice> = [
     {
       id: 'status_id',
       label: t('status'),
-      format: (value, invoice) => (
-        <span className="inline-flex items-center space-x-4">
-          <InvoiceStatus entity={invoice} />
-        </span>
-        ),
+      format: (value, invoice) => <InvoiceStatus entity={invoice} />,
     },
     {
       id: 'number',
