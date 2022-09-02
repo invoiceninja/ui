@@ -31,7 +31,7 @@ export function Vendors() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
- const importButton = (
+  const importButton = (
     <ReactRouterLink to="/expenses/import">
       <button className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600">
         <svg
@@ -45,7 +45,6 @@ export function Vendors() {
       </button>
     </ReactRouterLink>
   );
-
 
   const columns: DataTableColumns<Vendor> = [
     {

@@ -13,7 +13,18 @@ import { useAccentColor } from 'common/hooks/useAccentColor';
 import CommonProps from '../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
-  variant?: 'primary' | 'white' | 'yellow' | 'red' | 'generic' | 'light-blue' | 'orange' | 'dark-blue' | 'green' | 'black' | 'purple';
+  variant?:
+    | 'primary'
+    | 'white'
+    | 'yellow'
+    | 'red'
+    | 'generic'
+    | 'light-blue'
+    | 'orange'
+    | 'dark-blue'
+    | 'green'
+    | 'black'
+    | 'purple';
 }
 
 const defaultProps: Props = {
@@ -45,7 +56,7 @@ export function Badge(props: Props) {
         'bg-orange-500 text-white': props.variant === 'orange',
         'bg-green-500 text-white': props.variant === 'green',
         'bg-black text-white': props.variant === 'black',
-        'bg-purple text-white': props.variant === 'purple'
+        'bg-purple text-white': props.variant === 'purple',
       })}
     >
       {props.children}

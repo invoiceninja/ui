@@ -24,7 +24,11 @@ export function Import() {
   ];
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} onBackClick={'/${props.entity}s'}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onBackClick={'/${props.entity}s'}
+    >
       <div className="grid grid-cols-12">
         <div className="col-span-12 xl:col-span-10">
           <UploadImport entity="client" onSuccess={false} type="csv" />

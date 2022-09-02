@@ -19,13 +19,13 @@ interface Props {
 export function ExpenseStatus(props: Props) {
   const [t] = useTranslation();
 
-  if(props.entity.should_be_invoiced && !props.entity.payment_date)
+  if (props.entity.should_be_invoiced && !props.entity.payment_date)
     return <Badge variant="dark-blue">{t('pending')}</Badge>;
 
-  if(props.entity.payment_date)
+  if (props.entity.payment_date)
     return <Badge variant="light-blue">{t('paid')}</Badge>;
 
-    return <Badge variant="generic">{t('logged')}</Badge>;
+  return <Badge variant="generic">{t('logged')}</Badge>;
 
-    return <></>;
+  return <></>;
 }

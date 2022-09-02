@@ -44,7 +44,8 @@ export function UploadImport(props: Props) {
   });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    payload.column_map[props.entity].mapping[event.target.id] = event.target.value;
+    payload.column_map[props.entity].mapping[event.target.id] =
+      event.target.value;
     setPayloadData(payload);
   };
 
@@ -147,10 +148,9 @@ export function UploadImport(props: Props) {
                     <span>{mapping}</span>
 
                     <span className="text-gray-400">
-                      {mapData.mappings[props.entity].headers[1][index].substring(
-                        0,
-                        20
-                      )}
+                      {mapData.mappings[props.entity].headers[1][
+                        index
+                      ].substring(0, 20)}
                     </span>
                   </Td>
                   <Td>
