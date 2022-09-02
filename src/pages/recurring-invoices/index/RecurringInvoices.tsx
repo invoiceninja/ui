@@ -42,10 +42,8 @@ export function RecurringInvoices() {
       id: 'status_id',
       label: t('status'),
       format: (value, recurringInvoice) => (
-        <span className="inline-flex items-center space-x-4">
-          <RecurringInvoiceStatus entity={recurringInvoice} />
-        </span>
-        ),
+        <RecurringInvoiceStatus entity={recurringInvoice} />
+      ),
     },
     {
       id: 'number',
