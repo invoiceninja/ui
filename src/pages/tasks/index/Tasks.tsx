@@ -37,16 +37,12 @@ export function Tasks() {
     {
       id: 'status_id',
       label: t('status'),
-      format: (value, task: Task) => (
-        <span className="inline-flex items-center space-x-4">
-          <TaskStatus entity={task} />
-        </span>
-        ),
+      format: (value, task) => <TaskStatus entity={task} />,
     },
     {
       id: 'number',
       label: t('number'),
-      format: (value, task: Task) => (
+      format: (value, task) => (
         <Link to={generatePath('/tasks/:id/edit', { id: task.id })}>
           {value}
         </Link>
@@ -55,7 +51,7 @@ export function Tasks() {
     {
       id: 'client_id',
       label: t('client'),
-      format: (value, task: Task) =>
+      format: (value, task) =>
         task.client && (
           <Link to={generatePath('/clients/:id', { id: value.toString() })}>
             {task.client.display_name}
@@ -75,7 +71,7 @@ export function Tasks() {
     {
       id: 'id', // This is calculated column, so real mapping doesn't matter.
       label: t('entity_state'),
-      format: (value, resource: Task) => t(calculateEntityState(resource)),
+      format: (value, task) => t(calculateEntityState(task)),
     },
   ];
 
