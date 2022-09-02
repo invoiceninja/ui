@@ -15,4 +15,5 @@ export interface GenericSelectorProps<T> {
   clearButton?: boolean;
   onChange: (resource: T) => unknown;
   onClearButtonClick?: () => unknown;
+  errorMessage?: string | string[];
 }
