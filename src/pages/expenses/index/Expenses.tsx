@@ -54,7 +54,7 @@ export function Expenses() {
     {
       id: 'status_id',
       label: t('status'),
-      format: (value, expense: Expense) => (
+      format: (value, expense) => (
         <Link to={generatePath('/expenses/:id/edit', { id: expense.id })}>
           <span className="inline-flex items-center space-x-4">
             <ExpenseStatus entity={expense} />
