@@ -19,19 +19,15 @@ export function Import() {
   const { documentTitle } = useTitle('import');
 
   const pages: BreadcrumRecord[] = [
-    { name: t('clients'), href: '/clients' },
-    { name: t('import'), href: '/clients/import' },
+    { name: t('invoices'), href: '/invoices' },
+    { name: t('import'), href: '/invoices/import' },
   ];
 
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      onBackClick={'/${props.entity}s'}
-    >
+    <Default title={documentTitle} breadcrumbs={pages} onBackClick="/invoices">
       <div className="grid grid-cols-12">
         <div className="col-span-12 xl:col-span-10">
-          <UploadImport entity="client" onSuccess={false} type="csv" />
+          <UploadImport entity="invoice" onSuccess={false} type="csv" />
         </div>
       </div>
     </Default>

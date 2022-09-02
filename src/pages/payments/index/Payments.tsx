@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import paymentStatus from 'common/constants/payment-status';
 import paymentType from 'common/constants/payment-type';
 import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
@@ -24,6 +23,7 @@ import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { PaymentStatus } from '../common/components/PaymentStatus';
 import { useEmailPayment } from '../common/hooks/useEmailPayment';
 
 export function Payments() {
@@ -43,7 +43,7 @@ export function Payments() {
     {
       id: 'status_id',
       label: t('status'),
-      format: (value) => <StatusBadge for={paymentStatus} code={value} />,
+      format: (value, payment) => <PaymentStatus entity={payment} />,
     },
     {
       id: 'number',

@@ -9,7 +9,6 @@
  */
 
 import { Link } from '@invoiceninja/forms';
-import quoteStatus from 'common/constants/quote-status';
 import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
@@ -20,11 +19,13 @@ import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
-import { StatusBadge } from 'components/StatusBadge';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { QuoteStatus } from '../common/components/QuoteStatus';
+import { Link as ReactRouterLink } from 'react-router-dom';
+import { Download } from 'react-feather';
 
 export function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -40,11 +41,26 @@ export function Quotes() {
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
   const company = useCurrentCompany();
 
+  const importButton = (
+    <ReactRouterLink to="/quotes/import">
+      <button className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600">
+        <svg
+          className="w-4 h-4 mr-2"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="3 3 20 20"
+        >
+          <Download />
+        </svg>
+        <span>{t('import')}</span>
+      </button>
+    </ReactRouterLink>
+  );
+
   const columns: DataTableColumns<Quote> = [
     {
       id: 'status_id',
       label: t('status'),
-      format: (value) => <StatusBadge for={quoteStatus} code={value} />,
+      format: (value, quote) => <QuoteStatus entity={quote} />,
     },
     {
       id: 'number',
@@ -82,7 +98,7 @@ export function Quotes() {
     {
       id: 'valid_until',
       label: t('valid_until'),
-      format: (value) => date(value, dateFormat),
+      format: (value, quote) => date(quote.due_date, dateFormat),
     },
   ];
 
@@ -120,6 +136,7 @@ export function Quotes() {
         bulkRoute="/api/v1/quotes/bulk"
         customActions={actions}
         withResourcefulActions
+        rightSide={importButton}
       />
     </Default>
   );

@@ -40,11 +40,12 @@ export function UploadImport(props: Props) {
     hash: '',
     import_type: props.type,
     skip_header: true,
-    column_map: { client: { mapping: {} } },
+    column_map: { [props.entity]: { mapping: {} } },
   });
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    payload.column_map.client.mapping[event.target.id] = event.target.value;
+    payload.column_map[props.entity].mapping[event.target.id] =
+      event.target.value;
     setPayloadData(payload);
   };
 
@@ -140,22 +141,21 @@ export function UploadImport(props: Props) {
             <Th>{t('columns')}</Th>
           </Thead>
           <Tbody>
-            {mapData.mappings.client.headers[0].map(
+            {mapData.mappings[props.entity].headers[0].map(
               (mapping: any, index: number) => (
                 <Tr key={index}>
                   <Td className="space-x-2">
                     <span>{mapping}</span>
 
                     <span className="text-gray-400">
-                      {mapData.mappings.client.headers[1][index].substring(
-                        0,
-                        20
-                      )}
+                      {mapData.mappings[props.entity].headers[1][
+                        index
+                      ].substring(0, 20)}
                     </span>
                   </Td>
                   <Td>
                     <SelectField id={index} onChange={handleChange} withBlank>
-                      {mapData.mappings.client.available.map(
+                      {mapData.mappings[props.entity].available.map(
                         (mapping: any, index: number) => (
                           <option value={mapping} key={index}>
                             {decorateMapping(mapping)}

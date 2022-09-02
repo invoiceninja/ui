@@ -19,6 +19,7 @@ import { Expenses } from './show/pages/Expenses';
 import { PurchaseOrders } from './show/pages/PurchaseOrders';
 import { RecurringExpenses } from './show/pages/RecurringExpenses';
 import { Vendor } from './Vendor';
+import { Import } from 'pages/vendors/import/Import';
 
 export const vendorRoutes = (
   <Route path="vendors">
@@ -28,6 +29,17 @@ export const vendorRoutes = (
         <Guard
           guards={[() => permission('view_vendor')]}
           component={<Vendors />}
+        />
+      }
+    />
+    <Route
+      path="import"
+      element={
+        <Guard
+          guards={[
+            () => permission('create_vendor') || permission('edit_vendor'),
+          ]}
+          component={<Import />}
         />
       }
     />

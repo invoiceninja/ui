@@ -16,6 +16,7 @@ import { Create } from './create/Create';
 import { Documents } from './documents/Documents';
 import { Edit } from './edit/Edit';
 import { ProductFields } from './edit/ProductFields';
+import { Import } from './import/Import';
 import { Products } from './index/Products';
 import { Product } from './Product';
 import { Show } from './show/Show';
@@ -28,6 +29,17 @@ export const productRoutes = (
         <Guard
           guards={[() => permission('view_product')]}
           component={<Products />}
+        />
+      }
+    />
+    <Route
+      path="import"
+      element={
+        <Guard
+          guards={[
+            () => permission('create_product') || permission('edit_product'),
+          ]}
+          component={<Import />}
         />
       }
     />
