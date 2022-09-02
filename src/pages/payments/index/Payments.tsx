@@ -43,11 +43,7 @@ export function Payments() {
     {
       id: 'status_id',
       label: t('status'),
-      format: (value, payment) => (
-        <span className="inline-flex items-center space-x-4">
-          <PaymentStatus entity={payment} />
-        </span>
-        ),
+      format: (value, payment) => <PaymentStatus entity={payment} />,
     },
     {
       id: 'number',
