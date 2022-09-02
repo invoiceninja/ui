@@ -56,16 +56,11 @@ export function Quotes() {
     </ReactRouterLink>
   );
 
-
   const columns: DataTableColumns<Quote> = [
     {
       id: 'status_id',
       label: t('status'),
-      format: (value, quote) => (
-        <span className="inline-flex items-center space-x-4">
-          <QuoteStatus entity={quote} />
-        </span>
-      ),
+      format: (value, quote) => <QuoteStatus entity={quote} />,
     },
     {
       id: 'number',
