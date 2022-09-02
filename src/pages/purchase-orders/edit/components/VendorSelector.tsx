@@ -23,6 +23,7 @@ interface Props {
   onClearButtonClick: () => unknown;
   onContactCheckboxChange: (id: string, checked: boolean) => unknown;
   readonly?: boolean;
+  errorMessage?: string | string[];
 }
 
 export function VendorSelector(props: Props) {
@@ -57,6 +58,7 @@ export function VendorSelector(props: Props) {
           readonly={props.readonly}
           clearButton={Boolean(props.resource?.vendor_id)}
           onClearButtonClick={props.onClearButtonClick}
+          errorMessage={props.errorMessage}
         />
       </div>
 
