@@ -38,13 +38,16 @@ export function Clients() {
     {
       id: 'number',
       label: t('number'),
+    },
+    { 
+      id: 'display_name', 
+      label: t('name') ,
       format: (value, resource) => (
         <Link to={generatePath('/clients/:id', { id: resource.id })}>
           {value}
         </Link>
       ),
     },
-    { id: 'display_name', label: t('name') },
     {
       id: 'balance',
       label: t('balance'),
