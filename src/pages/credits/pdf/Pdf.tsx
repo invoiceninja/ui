@@ -29,7 +29,7 @@ export function Pdf() {
     id,
   });
 
-  const url = useGeneratePdfUrl({ resource: 'credit' });
+  const url = useGeneratePdfUrl({ resourceType: 'credit' });
   const downloadPdf = useDownloadPdf({ resource: 'credit' });
 
   return (

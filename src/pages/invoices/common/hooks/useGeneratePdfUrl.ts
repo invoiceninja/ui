@@ -15,7 +15,6 @@ import {
 } from 'pages/invoices/email/components/Mailer';
 
 interface Props {
-  resource: MailerResourceType;
   resourceType: MailerResourceType;
 }
 
@@ -30,14 +29,14 @@ export function useGeneratePdfUrl(props: Props) {
       props.resourceType === 'purchaseOrder'
     ) {
       return endpoint('/vendor/purchase_order/:invitation/download', {
-        resource: props.resource,
+        resource: props.resourceType,
         invitation: resource.invitations[0].key,
       });
     }
 
     if (resource.invitations.length > 0) {
       return endpoint('/client/:resource/:invitation/download_pdf', {
-        resource: props.resource,
+        resource: props.resourceType,
         invitation: resource.invitations[0].key,
       });
     }

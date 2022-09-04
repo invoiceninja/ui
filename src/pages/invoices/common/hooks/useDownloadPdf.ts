@@ -21,7 +21,7 @@ interface Props {
 
 export function useDownloadPdf(props: Props) {
   const queryClient = useQueryClient();
-  const url = useGeneratePdfUrl({ resource: props.resource });
+  const url = useGeneratePdfUrl({ resourceType: props.resource });
 
   return (resource: Invoice | RecurringInvoice | Quote) => {
     const downloadableUrl = url(resource);

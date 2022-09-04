@@ -88,7 +88,6 @@ export function Mailer(props: Props) {
   );
 
   const pdfUrl = useGeneratePdfUrl({
-    resource: props.resourceType,
     resourceType: props.resourceType,
   });
 
