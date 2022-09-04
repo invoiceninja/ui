@@ -14,6 +14,7 @@ import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Email } from './email/Email';
 import { PurchaseOrders } from './index/PurchaseOrders';
+import { Pdf } from './pdf/Pdf';
 
 export const purchaseOrdersRoutes = (
   <Route path="/purchase_orders">
@@ -22,6 +23,7 @@ export const purchaseOrdersRoutes = (
       <Route path="edit" element={<Edit />} />
       <Route path="clone" element={<Clone />} />
       <Route path="email" element={<Email />} />
+      <Route path="pdf" element={<Pdf />} />
     </Route>
     <Route path="create" element={<Create />} />
   </Route>

@@ -26,6 +26,13 @@ export function useActions(purchaseOrder: PurchaseOrder) {
           generatePath('/purchase_orders/:id/email', { id: purchaseOrder.id })
         ),
     },
+    {
+      label: t('view_pdf'),
+      onClick: () =>
+        navigate(
+          generatePath('/purchase_orders/:id/pdf', { id: purchaseOrder.id })
+        ),
+    },
   ];
 }
 
