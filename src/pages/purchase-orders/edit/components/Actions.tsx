@@ -16,6 +16,7 @@ import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { BulkAction } from 'pages/expenses/edit/hooks/useBulk';
+import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -120,6 +121,10 @@ export function useActions(purchaseOrder: PurchaseOrder) {
           navigate(
             generatePath('/purchase_orders/:id/clone', { id: purchaseOrder.id })
           ),
+      },
+      {
+        label: t('vendor_portal'),
+        onClick: () => openClientPortal(purchaseOrder),
       },
       {
         label: t('archive'),

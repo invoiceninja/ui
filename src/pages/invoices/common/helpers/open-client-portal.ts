@@ -10,11 +10,12 @@
 
 import { Credit } from 'common/interfaces/credit';
 import { Invoice } from 'common/interfaces/invoice';
+import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Quote } from 'common/interfaces/quote';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 
 export function openClientPortal(
-  resource: Invoice | RecurringInvoice | Quote | Credit
+  resource: Invoice | RecurringInvoice | Quote | Credit | PurchaseOrder
 ) {
   if (resource.invitations.length > 0) {
     window.open(resource.invitations[0].link, '_blank')?.focus();
