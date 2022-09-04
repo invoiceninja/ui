@@ -125,7 +125,7 @@ export function Footer(props: PurchaseOrderCardProps) {
         </div>
 
         {location.pathname.endsWith('/create') ? (
-          <div>Upload available after you create purchase order.</div>
+          <div>{t('upload_available_after_creation_of_resource')}</div>
         ) : (
           <div>
             <Upload
