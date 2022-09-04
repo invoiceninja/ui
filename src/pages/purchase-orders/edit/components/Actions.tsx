@@ -133,6 +133,18 @@ export function useActions(purchaseOrder: PurchaseOrder) {
             .finally(() => invalidateCache(purchaseOrder.id)),
         hideIf: purchaseOrder.archived_at > 0,
       },
+      {
+        label: t('restore'),
+        onClick: () =>
+          bulk([purchaseOrder.id], 'restore')
+            .then(() => toast.success('restored_purchase_order'))
+            .catch((error) => {
+              console.error(error);
+              toast.error();
+            })
+            .finally(() => invalidateCache(purchaseOrder.id)),
+        hideIf: purchaseOrder.archived_at === 0,
+      },
     ];
 
     return actions.filter((action) => !action.hideIf);
