@@ -15,31 +15,41 @@ import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router-dom';
 
+interface Action {
+  label: string;
+  onClick: () => unknown;
+  hideIf?: boolean;
+}
+
 export function useActions(purchaseOrder: PurchaseOrder) {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'purchaseOrder' });
 
-  return () => [
-    {
-      label: t('send_email'),
-      onClick: () =>
-        navigate(
-          generatePath('/purchase_orders/:id/email', { id: purchaseOrder.id })
-        ),
-    },
-    {
-      label: t('view_pdf'),
-      onClick: () =>
-        navigate(
-          generatePath('/purchase_orders/:id/pdf', { id: purchaseOrder.id })
-        ),
-    },
-    {
-      label: t('download'),
-      onClick: () => downloadPdf(purchaseOrder),
-    },
-  ];
+  return () => {
+    const actions: Action[] = [
+      {
+        label: t('send_email'),
+        onClick: () =>
+          navigate(
+            generatePath('/purchase_orders/:id/email', { id: purchaseOrder.id })
+          ),
+      },
+      {
+        label: t('view_pdf'),
+        onClick: () =>
+          navigate(
+            generatePath('/purchase_orders/:id/pdf', { id: purchaseOrder.id })
+          ),
+      },
+      {
+        label: t('download'),
+        onClick: () => downloadPdf(purchaseOrder),
+      },
+    ];
+
+    return actions.filter((action) => !action.hideIf);
+  };
 }
 
 interface Props {
