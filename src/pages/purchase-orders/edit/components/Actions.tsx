@@ -15,6 +15,7 @@ import { toast } from 'common/helpers/toast/toast';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { BulkAction } from 'pages/expenses/edit/hooks/useBulk';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -32,6 +33,23 @@ export function useActions(purchaseOrder: PurchaseOrder) {
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'purchaseOrder' });
   const queryClient = useQueryClient();
+
+  const invalidateCache = (id: string) => {
+    queryClient.invalidateQueries(
+      generatePath('/api/v1/purchase_orders/:id', {
+        id,
+      })
+    );
+  };
+
+  const bulk = (ids: string[], action: BulkAction | 'expense') => {
+    toast.processing();
+
+    return request('POST', endpoint('/api/v1/purchase_orders/bulk'), {
+      action,
+      ids,
+    });
+  };
 
   return () => {
     const actions: Action[] = [
@@ -71,15 +89,30 @@ export function useActions(purchaseOrder: PurchaseOrder) {
 
               toast.error();
             })
-            .finally(() =>
-              queryClient.invalidateQueries(
-                generatePath('/api/v1/purchase_orders/:id', {
-                  id: purchaseOrder.id,
-                })
-              )
-            );
+            .finally(() => invalidateCache(purchaseOrder.id));
         },
         hideIf: purchaseOrder.status_id === PurchaseOrderStatus.Sent,
+      },
+      {
+        label: t('convert_to_expense'),
+        onClick: () =>
+          bulk([purchaseOrder.id], 'expense')
+            .then(() => toast.success('converted_to_expense'))
+            .catch((error) => {
+              console.error(error);
+
+              toast.error();
+            })
+            .finally(() => invalidateCache(purchaseOrder.id)),
+        hideIf: purchaseOrder.expense_id.length > 0,
+      },
+      {
+        label: t('view_expense_label'),
+        onClick: () =>
+          navigate(
+            generatePath('/expenses/:id/edit', { id: purchaseOrder.expense_id })
+          ),
+        hideIf: purchaseOrder.expense_id.length <= 0,
       },
     ];
 
