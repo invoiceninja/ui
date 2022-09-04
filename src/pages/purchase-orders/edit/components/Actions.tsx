@@ -121,6 +121,18 @@ export function useActions(purchaseOrder: PurchaseOrder) {
             generatePath('/purchase_orders/:id/clone', { id: purchaseOrder.id })
           ),
       },
+      {
+        label: t('archive'),
+        onClick: () =>
+          bulk([purchaseOrder.id], 'archive')
+            .then(() => toast.success('archived_purchase_order'))
+            .catch((error) => {
+              console.error(error);
+              toast.error();
+            })
+            .finally(() => invalidateCache(purchaseOrder.id)),
+        hideIf: purchaseOrder.archived_at > 0,
+      },
     ];
 
     return actions.filter((action) => !action.hideIf);
