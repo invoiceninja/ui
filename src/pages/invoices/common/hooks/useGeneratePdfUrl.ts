@@ -9,18 +9,30 @@
  */
 
 import { endpoint } from 'common/helpers';
-import { Invoice } from 'common/interfaces/invoice';
-import { Quote } from 'common/interfaces/quote';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import {
+  MailerResource,
+  MailerResourceType,
+} from 'pages/invoices/email/components/Mailer';
 
 interface Props {
-  resource: 'invoice' | 'recurring_invoice' | 'quote' | 'credit';
+  resource: MailerResourceType;
+  resourceType: MailerResourceType;
 }
 
 export function useGeneratePdfUrl(props: Props) {
-  return (resource: Invoice | RecurringInvoice | Quote) => {
+  return (resource: MailerResource) => {
     if (resource.invitations.length === 0) {
       return;
+    }
+
+    if (
+      resource.invitations.length > 0 &&
+      props.resourceType === 'purchaseOrder'
+    ) {
+      return endpoint('/vendor/purchase_order/:invitation/download', {
+        resource: props.resource,
+        invitation: resource.invitations[0].key,
+      });
     }
 
     if (resource.invitations.length > 0) {

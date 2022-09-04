@@ -87,7 +87,10 @@ export function Mailer(props: Props) {
     templateId
   );
 
-  const pdfUrl = useGeneratePdfUrl({ resource: props.resourceType });
+  const pdfUrl = useGeneratePdfUrl({
+    resource: props.resourceType,
+    resourceType: props.resourceType,
+  });
 
   const handleSend = useHandleSend();
 
