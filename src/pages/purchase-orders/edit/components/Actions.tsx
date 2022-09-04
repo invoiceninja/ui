@@ -145,6 +145,18 @@ export function useActions(purchaseOrder: PurchaseOrder) {
             .finally(() => invalidateCache(purchaseOrder.id)),
         hideIf: purchaseOrder.archived_at === 0,
       },
+      {
+        label: t('delete'),
+        onClick: () =>
+          bulk([purchaseOrder.id], 'delete')
+            .then(() => toast.success('deleted_purchase_order'))
+            .catch((error) => {
+              console.error(error);
+              toast.error();
+            })
+            .finally(() => invalidateCache(purchaseOrder.id)),
+        hideIf: purchaseOrder.is_deleted,
+      },
     ];
 
     return actions.filter((action) => !action.hideIf);
