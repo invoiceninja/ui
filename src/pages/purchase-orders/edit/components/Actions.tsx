@@ -22,13 +22,13 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate } from 'react-router-dom';
 
-interface Action {
+export type Action = (po: PurchaseOrder) => {
   label: string;
   onClick: () => unknown;
   hideIf?: boolean;
-}
+};
 
-export function useActions(purchaseOrder: PurchaseOrder) {
+export function useActions() {
   const { t } = useTranslation();
 
   const navigate = useNavigate();
@@ -54,25 +54,21 @@ export function useActions(purchaseOrder: PurchaseOrder) {
 
   return () => {
     const actions: Action[] = [
-      {
+      (po) => ({
         label: t('send_email'),
         onClick: () =>
-          navigate(
-            generatePath('/purchase_orders/:id/email', { id: purchaseOrder.id })
-          ),
-      },
-      {
+          navigate(generatePath('/purchase_orders/:id/email', { id: po.id })),
+      }),
+      (po) => ({
         label: t('view_pdf'),
         onClick: () =>
-          navigate(
-            generatePath('/purchase_orders/:id/pdf', { id: purchaseOrder.id })
-          ),
-      },
-      {
+          navigate(generatePath('/purchase_orders/:id/pdf', { id: po.id })),
+      }),
+      (po) => ({
         label: t('download'),
-        onClick: () => downloadPdf(purchaseOrder),
-      },
-      {
+        onClick: () => downloadPdf(po),
+      }),
+      (po) => ({
         label: t('mark_sent'),
         onClick: () => {
           toast.processing();
@@ -80,9 +76,9 @@ export function useActions(purchaseOrder: PurchaseOrder) {
           request(
             'PUT',
             endpoint('/api/v1/purchase_orders/:id?mark_sent=true', {
-              id: purchaseOrder.id,
+              id: po.id,
             }),
-            purchaseOrder
+            po
           )
             .then(() => toast.success('notification_purchase_order_sent'))
             .catch((error) => {
@@ -90,81 +86,77 @@ export function useActions(purchaseOrder: PurchaseOrder) {
 
               toast.error();
             })
-            .finally(() => invalidateCache(purchaseOrder.id));
+            .finally(() => invalidateCache(po.id));
         },
-        hideIf: purchaseOrder.status_id === PurchaseOrderStatus.Sent,
-      },
-      {
+        hideIf: po.status_id === PurchaseOrderStatus.Sent,
+      }),
+      (po) => ({
         label: t('convert_to_expense'),
         onClick: () =>
-          bulk([purchaseOrder.id], 'expense')
+          bulk([po.id], 'expense')
             .then(() => toast.success('converted_to_expense'))
             .catch((error) => {
               console.error(error);
 
               toast.error();
             })
-            .finally(() => invalidateCache(purchaseOrder.id)),
-        hideIf: purchaseOrder.expense_id.length > 0,
-      },
-      {
+            .finally(() => invalidateCache(po.id)),
+        hideIf: po.expense_id.length > 0,
+      }),
+      (po) => ({
         label: `${t('view')} ${t('expense')}`,
         onClick: () =>
-          navigate(
-            generatePath('/expenses/:id/edit', { id: purchaseOrder.expense_id })
-          ),
-        hideIf: purchaseOrder.expense_id.length <= 0,
-      },
-      {
+          navigate(generatePath('/expenses/:id/edit', { id: po.expense_id })),
+        hideIf: po.expense_id.length <= 0,
+      }),
+      (po) => ({
         label: t('clone_to_purchase_order'),
         onClick: () =>
-          navigate(
-            generatePath('/purchase_orders/:id/clone', { id: purchaseOrder.id })
-          ),
-      },
-      {
+          navigate(generatePath('/purchase_orders/:id/clone', { id: po.id })),
+      }),
+      (po) => ({
         label: t('vendor_portal'),
-        onClick: () => openClientPortal(purchaseOrder),
-      },
-      {
+        onClick: () => openClientPortal(po),
+      }),
+      (po) => ({
         label: t('archive'),
         onClick: () =>
-          bulk([purchaseOrder.id], 'archive')
+          bulk([po.id], 'archive')
             .then(() => toast.success('archived_purchase_order'))
             .catch((error) => {
               console.error(error);
               toast.error();
             })
-            .finally(() => invalidateCache(purchaseOrder.id)),
-        hideIf: purchaseOrder.archived_at > 0,
-      },
-      {
+            .finally(() => invalidateCache(po.id)),
+        hideIf: po.archived_at > 0,
+      }),
+      (po) => ({
         label: t('restore'),
         onClick: () =>
-          bulk([purchaseOrder.id], 'restore')
+          bulk([po.id], 'restore')
             .then(() => toast.success('restored_purchase_order'))
             .catch((error) => {
               console.error(error);
               toast.error();
             })
-            .finally(() => invalidateCache(purchaseOrder.id)),
-        hideIf: purchaseOrder.archived_at === 0,
-      },
-      {
+            .finally(() => invalidateCache(po.id)),
+        hideIf: po.archived_at === 0,
+      }),
+      (po) => ({
         label: t('delete'),
         onClick: () =>
-          bulk([purchaseOrder.id], 'delete')
+          bulk([po.id], 'delete')
             .then(() => toast.success('deleted_purchase_order'))
             .catch((error) => {
               console.error(error);
               toast.error();
             })
-            .finally(() => invalidateCache(purchaseOrder.id)),
-        hideIf: purchaseOrder.is_deleted,
-      },
+            .finally(() => invalidateCache(po.id)),
+        hideIf: po.is_deleted,
+      }),
     ];
 
-    return actions.filter((action) => !action.hideIf);
+    return actions;
   };
 }
 
@@ -175,15 +167,21 @@ interface Props {
 export function Actions(props: Props) {
   const { t } = useTranslation();
 
-  const actions = useActions(props.purchaseOrder);
+  const actions = useActions();
 
   return (
     <Dropdown label={t('more_actions')}>
-      {actions().map((action, index) => (
-        <DropdownElement onClick={action.onClick} key={index}>
-          {action.label}
-        </DropdownElement>
-      ))}
+      {actions().map(
+        (action, index) =>
+          !action(props.purchaseOrder).hideIf && (
+            <DropdownElement
+              key={index}
+              onClick={action(props.purchaseOrder).onClick}
+            >
+              {action(props.purchaseOrder).label}
+            </DropdownElement>
+          )
+      )}
     </Dropdown>
   );
 }
