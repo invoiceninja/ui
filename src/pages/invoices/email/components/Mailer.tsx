@@ -19,6 +19,7 @@ import { useHandleSend } from 'common/hooks/emails/useHandleSend';
 import { useResolveTemplate } from 'common/hooks/emails/useResolveTemplate';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Invoice } from 'common/interfaces/invoice';
+import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Quote } from 'common/interfaces/quote';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { Contact } from 'components/emails/Contact';
@@ -28,9 +29,19 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 
+export type MailerResourceType =
+  | 'invoice'
+  | 'recurring_invoice'
+  | 'quote'
+  | 'credit'
+  | 'purchaseOrder';
+
+export type MailerResource = Invoice | RecurringInvoice | Quote | PurchaseOrder;
+
+export type MailerContactProperty = 'client_id' | 'vendor_id';
 interface Props {
-  resource: Invoice | RecurringInvoice | Quote;
-  resourceType: 'invoice' | 'recurring_invoice' | 'quote' | 'credit';
+  resource: MailerResource;
+  resourceType: MailerResourceType;
   list: Record<string, string>;
   defaultEmail: string;
 }
@@ -60,6 +71,8 @@ export function Mailer(props: Props) {
         return '/quotes/:id/edit';
       case 'credit':
         return '/credits/:id/edit';
+      case 'purchaseOrder':
+        return '/purchase_orders/:id/edit';
       default:
         return '';
         break;
@@ -107,13 +120,10 @@ export function Mailer(props: Props) {
         <div className="col-span-12 lg:col-span-5 space-y-4">
           <Card>
             <Element leftSide={t('to')}>
-              {props.resource?.invitations.map((invitation, index) => (
-                <Contact
-                  key={index}
-                  contactId={invitation.client_contact_id}
-                  clientId={props.resource.client_id}
-                />
-              ))}
+              <Contact
+                resource={props.resource}
+                resourceType={props.resourceType}
+              />
             </Element>
 
             <Element leftSide={t('template')}>
