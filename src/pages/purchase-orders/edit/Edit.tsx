@@ -25,6 +25,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { Actions } from './components/Actions';
 import { Details } from './components/Details';
 import { Footer } from './components/Footer';
 import { VendorSelector } from './components/VendorSelector';
@@ -100,6 +101,7 @@ export function Edit() {
       breadcrumbs={pages}
       onBackClick="/purchase_orders"
       onSaveClick={() => purchaseOrder && onSave(purchaseOrder)}
+      navigationTopRight={purchaseOrder && <Actions purchaseOrder={purchaseOrder} />}
     >
       <div className="grid grid-cols-12 gap-4">
         <VendorSelector
