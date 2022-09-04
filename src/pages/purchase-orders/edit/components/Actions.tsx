@@ -8,11 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { PurchaseOrderStatus } from 'common/enums/purchase-order-status';
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate } from 'react-router-dom';
 
 interface Action {
@@ -23,8 +28,10 @@ interface Action {
 
 export function useActions(purchaseOrder: PurchaseOrder) {
   const { t } = useTranslation();
+
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'purchaseOrder' });
+  const queryClient = useQueryClient();
 
   return () => {
     const actions: Action[] = [
@@ -45,6 +52,34 @@ export function useActions(purchaseOrder: PurchaseOrder) {
       {
         label: t('download'),
         onClick: () => downloadPdf(purchaseOrder),
+      },
+      {
+        label: t('mark_sent'),
+        onClick: () => {
+          toast.processing();
+
+          request(
+            'PUT',
+            endpoint('/api/v1/purchase_orders/:id?mark_sent=true', {
+              id: purchaseOrder.id,
+            }),
+            purchaseOrder
+          )
+            .then(() => toast.success('notification_purchase_order_sent'))
+            .catch((error) => {
+              console.error(error);
+
+              toast.error();
+            })
+            .finally(() =>
+              queryClient.invalidateQueries(
+                generatePath('/api/v1/purchase_orders/:id', {
+                  id: purchaseOrder.id,
+                })
+              )
+            );
+        },
+        hideIf: purchaseOrder.status_id === PurchaseOrderStatus.Sent,
       },
     ];
 
