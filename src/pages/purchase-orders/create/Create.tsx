@@ -35,14 +35,14 @@ import { useHandleProductChange } from '../edit/hooks/useHandleProductChange';
 import { useSave } from './hooks/useSave';
 
 export function Create() {
-  const { documentTitle } = useTitle('create_purchase_order');
+  const { documentTitle } = useTitle('new_purchase_order');
   const { t } = useTranslation();
   const { data } = useBlankPurchaseOrderQuery();
 
   const pages: BreadcrumRecord[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
     {
-      name: t('create_purchase_order'),
+      name: t('new_purchase_order'),
       href: '/purchase_orders/create',
     },
   ];

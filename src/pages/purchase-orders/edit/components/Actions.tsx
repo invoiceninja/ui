@@ -107,7 +107,7 @@ export function useActions(purchaseOrder: PurchaseOrder) {
         hideIf: purchaseOrder.expense_id.length > 0,
       },
       {
-        label: t('view_expense_label'),
+        label: `${t('view')} ${t('expense')}`,
         onClick: () =>
           navigate(
             generatePath('/expenses/:id/edit', { id: purchaseOrder.expense_id })
