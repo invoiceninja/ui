@@ -9,21 +9,22 @@
  */
 
 import { request } from 'common/helpers/request';
-import { Invoice } from 'common/interfaces/invoice';
-import { Quote } from 'common/interfaces/quote';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import {
+  MailerResource,
+  MailerResourceType,
+} from 'pages/invoices/email/components/Mailer';
 import { useQueryClient } from 'react-query';
 import { useGeneratePdfUrl } from './useGeneratePdfUrl';
 
 interface Props {
-  resource: 'invoice' | 'recurring_invoice' | 'quote' | 'credit';
+  resource: MailerResourceType;
 }
 
 export function useDownloadPdf(props: Props) {
   const queryClient = useQueryClient();
   const url = useGeneratePdfUrl({ resourceType: props.resource });
 
-  return (resource: Invoice | RecurringInvoice | Quote) => {
+  return (resource: MailerResource) => {
     const downloadableUrl = url(resource);
 
     if (downloadableUrl) {

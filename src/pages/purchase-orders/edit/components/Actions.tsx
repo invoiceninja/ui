@@ -11,12 +11,14 @@
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useNavigate } from 'react-router-dom';
 
 export function useActions(purchaseOrder: PurchaseOrder) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const downloadPdf = useDownloadPdf({ resource: 'purchaseOrder' });
 
   return () => [
     {
@@ -32,6 +34,10 @@ export function useActions(purchaseOrder: PurchaseOrder) {
         navigate(
           generatePath('/purchase_orders/:id/pdf', { id: purchaseOrder.id })
         ),
+    },
+    {
+      label: t('download'),
+      onClick: () => downloadPdf(purchaseOrder),
     },
   ];
 }
