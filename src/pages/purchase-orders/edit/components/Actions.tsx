@@ -114,6 +114,13 @@ export function useActions(purchaseOrder: PurchaseOrder) {
           ),
         hideIf: purchaseOrder.expense_id.length <= 0,
       },
+      {
+        label: t('clone_to_purchase_order'),
+        onClick: () =>
+          navigate(
+            generatePath('/purchase_orders/:id/clone', { id: purchaseOrder.id })
+          ),
+      },
     ];
 
     return actions.filter((action) => !action.hideIf);
