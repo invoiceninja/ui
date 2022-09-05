@@ -32,7 +32,7 @@ export function useActions() {
   const { t } = useTranslation();
 
   const navigate = useNavigate();
-  const downloadPdf = useDownloadPdf({ resource: 'purchaseOrder' });
+  const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
   const queryClient = useQueryClient();
 
   const invalidateCache = (id: string) => {

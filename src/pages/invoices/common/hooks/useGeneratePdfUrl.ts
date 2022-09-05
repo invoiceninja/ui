@@ -26,7 +26,7 @@ export function useGeneratePdfUrl(props: Props) {
 
     if (
       resource.invitations.length > 0 &&
-      props.resourceType === 'purchaseOrder'
+      props.resourceType === 'purchase_order'
     ) {
       return endpoint('/vendor/purchase_order/:invitation/download', {
         resource: props.resourceType,

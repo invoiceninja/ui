@@ -45,7 +45,7 @@ export function Email() {
       {purchaseOrder && (
         <Mailer
           resource={purchaseOrder}
-          resourceType="purchaseOrder"
+          resourceType="purchase_order"
           list={list}
           defaultEmail="email_template_purchase_order"
         />

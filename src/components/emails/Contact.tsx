@@ -32,7 +32,7 @@ export function Contact(props: Props) {
 
   useEffect(() => {
     if (
-      props.resourceType === 'purchaseOrder' &&
+      props.resourceType === 'purchase_order' &&
       props.resource.vendor_id.length >= 1
     ) {
       vendorResolver
@@ -41,7 +41,7 @@ export function Contact(props: Props) {
     }
 
     if (
-      props.resourceType !== 'purchaseOrder' &&
+      props.resourceType !== 'purchase_order' &&
       props.resource.client_id.length >= 1
     ) {
       clientResolver

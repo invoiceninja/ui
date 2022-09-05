@@ -34,7 +34,7 @@ export type MailerResourceType =
   | 'recurring_invoice'
   | 'quote'
   | 'credit'
-  | 'purchaseOrder';
+  | 'purchase_order';
 
 export type MailerResource = Invoice | RecurringInvoice | Quote | PurchaseOrder;
 
@@ -71,7 +71,7 @@ export function Mailer(props: Props) {
         return '/quotes/:id/edit';
       case 'credit':
         return '/credits/:id/edit';
-      case 'purchaseOrder':
+      case 'purchase_order':
         return '/purchase_orders/:id/edit';
       default:
         return '';

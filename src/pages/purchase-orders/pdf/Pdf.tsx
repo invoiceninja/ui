@@ -20,7 +20,7 @@ export function Pdf() {
   const { id } = useParams();
   const { data: purchaseOrder } = usePurchaseOrderQuery({ id });
 
-  const url = useGeneratePdfUrl({ resourceType: 'purchaseOrder' });
+  const url = useGeneratePdfUrl({ resourceType: 'purchase_order' });
 
   return (
     <Default
