@@ -111,7 +111,7 @@ export function Edit() {
               items={currentQuote.line_items.filter(
                 (item) => item.type_id == InvoiceItemType.Product
               )}
-              onProductChange={(index, lineItem) =>
+              onLineItemChange={(index, lineItem) =>
                 dispatch(setCurrentQuoteLineItem({ index, lineItem }))
               }
               onLineItemPropertyChange={(key, value, index) =>

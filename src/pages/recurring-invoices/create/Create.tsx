@@ -163,7 +163,7 @@ export function Create() {
                 (item) => item.type_id === InvoiceItemType.Product
               )}
               resource={currentRecurringInvoice}
-              onProductChange={(index, lineItem) =>
+              onLineItemChange={(index, lineItem) =>
                 dispatch(
                   setCurrentRecurringInvoiceLineItem({ index, lineItem })
                 )

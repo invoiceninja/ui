@@ -101,7 +101,9 @@ export function Edit() {
       breadcrumbs={pages}
       onBackClick="/purchase_orders"
       onSaveClick={() => purchaseOrder && onSave(purchaseOrder)}
-      navigationTopRight={purchaseOrder && <Actions purchaseOrder={purchaseOrder} />}
+      navigationTopRight={
+        purchaseOrder && <Actions purchaseOrder={purchaseOrder} />
+      }
     >
       <div className="grid grid-cols-12 gap-4">
         <VendorSelector
@@ -129,7 +131,7 @@ export function Edit() {
               items={purchaseOrder.line_items}
               columns={productColumns}
               relationType="vendor_id"
-              onProductChange={(index, lineItem) =>
+              onLineItemChange={(index, lineItem) =>
                 handleProductChange(purchaseOrder, index, lineItem)
               }
               onSort={(lineItems) => handleChange('line_items', lineItems)}

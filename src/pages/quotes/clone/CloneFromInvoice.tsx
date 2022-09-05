@@ -112,7 +112,7 @@ export function CloneInvoiceToQuote() {
                 (item) => item.type_id == InvoiceItemType.Product
               )}
               resource={currentQuote}
-              onProductChange={(index, lineItem) =>
+              onLineItemChange={(index, lineItem) =>
                 dispatch(setCurrentQuoteLineItem({ index, lineItem }))
               }
               onLineItemPropertyChange={(key, value, index) =>

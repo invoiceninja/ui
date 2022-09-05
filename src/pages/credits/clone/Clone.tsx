@@ -111,7 +111,7 @@ export function Clone() {
                 (item) => item.type_id === InvoiceItemType.Product
               )}
               resource={currentCredit}
-              onProductChange={(index, lineItem) =>
+              onLineItemChange={(index, lineItem) =>
                 dispatch(setCurrentCreditLineItem({ index, lineItem }))
               }
               onLineItemPropertyChange={(key, value, index) =>

@@ -31,7 +31,7 @@ interface Props {
   items: InvoiceItem[];
   columns: string[];
   relationType: RelationType;
-  onProductChange: (index: number, lineItem: InvoiceItem) => unknown;
+  onLineItemChange: (index: number, lineItem: InvoiceItem) => unknown;
   onSort: (lineItems: InvoiceItem[]) => unknown;
   onLineItemPropertyChange: (
     key: keyof InvoiceItem,
@@ -52,7 +52,7 @@ export function ProductsTable(props: Props) {
   const resolveInputField = useResolveInputField({
     type: props.type,
     resource: props.resource,
-    onProductChange: props.onProductChange,
+    onLineItemChange: props.onLineItemChange,
     onLineItemPropertyChange: props.onLineItemPropertyChange,
     relationType,
   });

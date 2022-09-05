@@ -134,7 +134,7 @@ export function Clone() {
               items={purchaseOrder.line_items}
               columns={productColumns}
               relationType="vendor_id"
-              onProductChange={(index, lineItem) =>
+              onLineItemChange={(index, lineItem) =>
                 handleProductChange(purchaseOrder, index, lineItem)
               }
               onSort={(lineItems) => handleChange('line_items', lineItems)}
