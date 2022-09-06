@@ -115,6 +115,7 @@ export function PurchaseOrders() {
       <DataTable
         resource="purchase_order"
         endpoint="/api/v1/purchase_orders?include=vendor,expense"
+        bulkRoute="/api/v1/purchase_orders/bulk"
         linkToCreate="/purchase_orders/create"
         linkToEdit="/purchase_orders/:id/edit"
         columns={columns}
