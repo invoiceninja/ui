@@ -45,7 +45,7 @@ export function ProductCreate(props: Props) {
     initialValues: {
       product_key: product?.data.data.product_key || '',
       notes: product?.data.datanotes || '',
-      cost: product?.data.data.cost || '',
+      cost: product?.data.data.cost || 0,
       quantity: product?.data.data.quantity || 1,
       tax_name1: product?.data.data.tax_name1 || '',
       tax_name2: product?.data.data.tax_name2 || '',
@@ -113,11 +113,11 @@ export function ProductCreate(props: Props) {
       />
 
       <InputField
-        id="cost"
-        value={formik.initialValues.cost}
+        id="price"
+        value={formik.initialValues.price}
         onChange={formik.handleChange}
-        label={t('cost')}
-        errorMessage={errors?.cost}
+        label={t('price')}
+        errorMessage={errors?.price}
       />
 
       <InputField
