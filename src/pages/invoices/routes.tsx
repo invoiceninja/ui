@@ -16,11 +16,11 @@ import { CloneInvoiceToQuote } from 'pages/quotes/clone/CloneFromInvoice';
 import { CloneInvoiceToRecurringInvoice } from 'pages/recurring-invoices/clone/CloneInvoiceToRecurringInvoice';
 import { Route } from 'react-router-dom';
 import { Clone } from './clone/Clone';
-import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Email } from './email/Email';
 import { Invoices } from './index/Invoices';
 import { Pdf } from './pdf/Pdf';
+import { CreateNext } from './create/CreateNext';
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -49,7 +49,7 @@ export const invoiceRoutes = (
       element={
         <Guard
           guards={[() => permission('create_invoice')]}
-          component={<Create />}
+          component={<CreateNext />}
         />
       }
     />
