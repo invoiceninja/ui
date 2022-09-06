@@ -23,6 +23,12 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { invoiceAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
+import { InvoiceDetails } from '../common/components/InvoiceDetails';
+
+export type ChangeHandler = <T extends keyof Invoice>(
+  property: T,
+  value: Invoice[typeof property]
+) => void;
 
 export function CreateNext() {
   const { documentTitle } = useTitle('new_invoice');
@@ -35,10 +41,7 @@ export function CreateNext() {
   const [invoice, setInvoice] = useAtom(invoiceAtom);
   const [errors] = useState<ValidationBag>();
 
-  const handleChange = <T extends keyof Invoice>(
-    property: T,
-    value: Invoice[typeof property]
-  ) => {
+  const handleChange: ChangeHandler = (property, value) => {
     console.log('[Change]: ', property, value);
 
     setInvoice((current) => current && { ...current, [property]: value });
@@ -89,7 +92,7 @@ export function CreateNext() {
     }
 
     return () => {
-      setInvoice(undefined);
+      // setInvoice(undefined);
     };
   }, [data]);
 
@@ -123,6 +126,8 @@ export function CreateNext() {
           readonly={searchParams.get('table') === 'tasks'}
           errorMessage={errors?.errors.client_id}
         />
+
+        <InvoiceDetails invoice={invoice} handleChange={handleChange} />
       </div>
     </Default>
   );
