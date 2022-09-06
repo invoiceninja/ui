@@ -108,13 +108,14 @@ export function CloneToInvoice() {
         <div className="col-span-12">
           {currentInvoice ? (
             <ProductsTable
+              relationType="client_id"
               type="product"
               columns={productColumns}
               items={currentInvoice.line_items.filter(
                 (item) => item.type_id == InvoiceItemType.Product
               )}
               resource={currentInvoice}
-              onProductChange={(index, lineItem) =>
+              onLineItemChange={(index, lineItem) =>
                 dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
               }
               onLineItemPropertyChange={(key, value, index) =>
@@ -145,6 +146,7 @@ export function CloneToInvoice() {
 
         {currentInvoice && (
           <InvoiceTotals
+          relationType='client_id'
             resource={currentInvoice}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
@@ -158,6 +160,7 @@ export function CloneToInvoice() {
         {currentInvoice && (
           <InvoicePreview
             for="invoice"
+            relationType='client_id'
             resource={currentInvoice}
             entity="invoice"
           />

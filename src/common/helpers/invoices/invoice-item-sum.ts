@@ -12,6 +12,7 @@ import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { Currency } from 'common/interfaces/currency';
+import { PurchaseOrder } from 'common/interfaces/purchase-order';
 
 export class InvoiceItemSum {
   public taxCollection = collect();
@@ -25,7 +26,7 @@ export class InvoiceItemSum {
   public totalTaxes = 0;
 
   constructor(
-    protected invoice: Invoice | RecurringInvoice,
+    protected invoice: Invoice | RecurringInvoice | PurchaseOrder,
     protected currency: Currency
   ) {}
 

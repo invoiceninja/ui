@@ -8,58 +8,83 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
 import { Number } from 'common/helpers/number';
-import { request } from 'common/helpers/request';
-import { useResolveClientCurrency } from 'common/hooks/useResolveClientCurrency';
+import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useResolveCountry } from 'common/hooks/useResolveCountry';
+import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
+import { useVendorResolver } from 'common/hooks/vendors/useVendorResolver';
 import { Client } from 'common/interfaces/client';
 import { Country } from 'common/interfaces/country';
 import { Currency } from 'common/interfaces/currency';
-import { Invoice } from 'common/interfaces/invoice';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { Vendor } from 'common/interfaces/vendor';
 import { useEffect, useState } from 'react';
-import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import {
+  ProductTableResource,
+  RelationType,
+} from '../components/ProductsTable';
 
 interface Props {
-  resource: Invoice | RecurringInvoice | undefined;
+  resource: ProductTableResource | undefined;
+  relationType: RelationType;
 }
 
 export function useFormatMoney(props: Props) {
-  const resolveCurrency = useResolveClientCurrency();
-  const resolveCountry = useResolveCountry();
+  const company = useCurrentCompany();
 
-  const resource = props.resource;
-  const queryClient = useQueryClient();
+  const currencyResolver = useResolveCurrency();
+  const countryResolver = useResolveCountry();
+  const vendorResolver = useVendorResolver();
+  const clientResolver = useClientResolver();
+
+  const { resource, relationType } = props;
 
   const [country, setCountry] = useState<Country>();
   const [currency, setCurrency] = useState<Currency>();
-  const [client, setClient] = useState<Client>();
+
+  const [relation, setRelation] = useState<Client | Vendor>();
 
   useEffect(() => {
-    if (resource?.client_id) {
-      queryClient
-        .fetchQuery(
-          generatePath('/api/v1/clients/:id', { id: resource.client_id }),
-          () =>
-            request(
-              'GET',
-              endpoint('/api/v1/clients/:id', { id: resource.client_id })
-            ),
-          { staleTime: Infinity }
-        )
-        .then((response) => setClient(response.data.data))
-        .catch((error) => console.error(error));
+    if (resource?.[relationType] && relationType === 'client_id') {
+      clientResolver
+        .find(resource.client_id)
+        .then((client) => setRelation(client));
+    }
+
+    if (resource?.[relationType] && relationType === 'vendor_id') {
+      vendorResolver
+        .find(resource.vendor_id)
+        .then((vendor) => setRelation(vendor));
     }
   }, [resource]);
 
   useEffect(() => {
-    if (client) {
-      setCurrency(resolveCurrency(client));
-      setCountry(resolveCountry(client.country_id));
+    if (relation && relationType === 'client_id') {
+      const client = relation as Client;
+
+      setCurrency(
+        currencyResolver(
+          client.settings.currency_id || company?.settings.currency_id
+        )
+      );
+
+      setCountry(
+        countryResolver(client.country_id || company?.settings.country_id)
+      );
     }
-  }, [client]);
+
+    if (relation && relationType === 'vendor_id') {
+      const vendor = relation as Vendor;
+
+      setCurrency(
+        currencyResolver(vendor.currency_id || company?.settings.currency_id)
+      );
+
+      setCountry(
+        countryResolver(vendor.country_id || company?.settings.country_id)
+      );
+    }
+  }, [relation]);
 
   return (value: number | string) => {
     if (currency && country) {

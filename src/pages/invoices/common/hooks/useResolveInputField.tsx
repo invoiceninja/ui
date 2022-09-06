@@ -25,8 +25,11 @@ import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-
 import { ProductSelector } from 'components/products/ProductSelector';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
-import { Invoice } from 'common/interfaces/invoice';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import {
+  ProductTableResource,
+  RelationType,
+} from '../components/ProductsTable';
+import { useHandleTaxRateChange } from './useHandleTaxRateChange';
 
 const numberInputs = [
   'discount',
@@ -40,9 +43,10 @@ const numberInputs = [
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];
 
 interface Props {
-  resource: Invoice | RecurringInvoice;
+  resource: ProductTableResource;
   type: 'product' | 'task';
-  onProductChange: (index: number, lineItem: InvoiceItem) => unknown;
+  relationType: RelationType;
+  onLineItemChange: (index: number, lineItem: InvoiceItem) => unknown;
   onLineItemPropertyChange: (
     key: keyof InvoiceItem,
     value: unknown,
@@ -62,7 +66,13 @@ export function useResolveInputField(props: Props) {
   const handleProductChange = useHandleProductChange({
     resource: props.resource,
     type: props.type,
-    onChange: props.onProductChange,
+    onChange: props.onLineItemChange,
+  });
+
+  const handleTaxRateChange = useHandleTaxRateChange({
+    resource: props.resource,
+    type: props.type,
+    onChange: props.onLineItemChange,
   });
 
   const onChange = (key: keyof InvoiceItem, value: unknown, index: number) =>
@@ -70,14 +80,18 @@ export function useResolveInputField(props: Props) {
 
   const company = useCurrentCompany();
   const resource = props.resource;
-  const formatMoney = useFormatMoney({ resource: props.resource });
+
+  const formatMoney = useFormatMoney({
+    resource: props.resource,
+    relationType: props.relationType,
+  });
+
   const getCurrency = useGetCurrencySeparators(setInputCurrencySeparators);
 
   useEffect(() => {
-    if (resource?.client_id) {
-      getCurrency(resource?.client_id);
-    }
-  }, [resource?.client_id]);
+    resource[props.relationType] &&
+      getCurrency(resource[props.relationType], props.relationType);
+  }, [resource?.[props.relationType]]);
 
   return (key: string, _id: string) => {
     const property = resolveProperty(key);
@@ -134,15 +148,9 @@ export function useResolveInputField(props: Props) {
     if (taxInputs.includes(property)) {
       return (
         <TaxRateSelector
-          onChange={(value) => {
-            value.resource && onChange(property, value.resource.rate, index);
-            value.resource &&
-              onChange(
-                property.replace('rate', 'name') as keyof InvoiceItem,
-                value.resource.name,
-                index
-              );
-          }}
+          onChange={(value) =>
+            value.resource && handleTaxRateChange(property,index, value.resource)
+          }
           className="w-auto"
           defaultValue={resource?.line_items[index][property]}
           onInputFocus={() => {

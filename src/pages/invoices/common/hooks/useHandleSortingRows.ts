@@ -9,13 +9,12 @@
  */
 
 import { arrayMoveImmutable } from 'array-move';
-import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { DropResult } from 'react-beautiful-dnd';
+import { ProductTableResource } from '../components/ProductsTable';
 
 interface Props {
-  resource: Invoice | RecurringInvoice;
+  resource: ProductTableResource;
   onSort: (lineItems: InvoiceItem[]) => unknown;
 }
 

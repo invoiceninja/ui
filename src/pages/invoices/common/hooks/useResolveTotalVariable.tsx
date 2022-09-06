@@ -14,25 +14,29 @@ import { CustomField } from 'components/CustomField';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Element } from '@invoiceninja/cards';
 import { useResolveTranslation } from './useResolveTranslation';
-import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import {
+  ProductTableResource,
+  RelationType,
+} from '../components/ProductsTable';
 
 interface Props {
-  resource?: Invoice | RecurringInvoice;
+  resource?: ProductTableResource;
+  relationType: RelationType;
   invoiceSum?: InvoiceSum;
-  onChange: (property: keyof Invoice, value: unknown) => unknown;
+  onChange: (property: keyof ProductTableResource, value: unknown) => unknown;
 }
 
 export function useResolveTotalVariable(props: Props) {
   const formatMoney = useFormatMoney({
-    resource: props.resource as unknown as Invoice,
+    resource: props.resource,
+    relationType: props.relationType,
   });
 
   const resource = props.resource;
   const company = useCurrentCompany();
 
-  const handleChange = (property: keyof Invoice, value: unknown) =>
+  const handleChange = (property: keyof ProductTableResource, value: unknown) =>
     props.onChange(property, value);
 
   const resolveTranslation = useResolveTranslation();

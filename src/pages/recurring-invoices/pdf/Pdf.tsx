@@ -24,7 +24,7 @@ export function Pdf() {
     id,
   });
 
-  const url = useGeneratePdfUrl({ resource: 'recurring_invoice' });
+  const url = useGeneratePdfUrl({ resourceType: 'recurring_invoice' });
 
   return (
     <Default

@@ -28,7 +28,7 @@ export function Pdf() {
   const [blobUrl, setBlobUrl] = useState('');
   const [invoice, setInvoice] = useState<Invoice>();
 
-  const url = useGeneratePdfUrl({ resource: 'invoice' });
+  const url = useGeneratePdfUrl({ resourceType: 'invoice' });
 
   useEffect(() => {
     if (data?.data.data) {
