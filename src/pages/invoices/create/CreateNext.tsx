@@ -35,33 +35,6 @@ export function CreateNext() {
   const [invoice, setInvoice] = useAtom(invoiceAtom);
   const [errors] = useState<ValidationBag>();
 
-  useEffect(() => {
-    if (data && typeof invoice === 'undefined') {
-      const _invoice = cloneDeep(data);
-
-      if (company && company.enabled_tax_rates > 0) {
-        _invoice.tax_name1 = company.settings.tax_name1;
-        _invoice.tax_rate1 = company.settings.tax_rate1;
-      }
-
-      if (company && company.enabled_tax_rates > 1) {
-        _invoice.tax_name2 = company.settings.tax_name2;
-        _invoice.tax_rate2 = company.settings.tax_rate2;
-      }
-
-      if (company && company.enabled_tax_rates > 2) {
-        _invoice.tax_name3 = company.settings.tax_name3;
-        _invoice.tax_rate3 = company.settings.tax_rate3;
-      }
-
-      setInvoice(_invoice);
-    }
-
-    return () => {
-      setInvoice(undefined);
-    };
-  }, [data]);
-
   const handleChange = <T extends keyof Invoice>(
     property: T,
     value: Invoice[typeof property]
@@ -92,6 +65,33 @@ export function CreateNext() {
 
     handleChange('invitations', invitations);
   };
+
+  useEffect(() => {
+    if (data && typeof invoice === 'undefined') {
+      const _invoice = cloneDeep(data);
+
+      if (company && company.enabled_tax_rates > 0) {
+        _invoice.tax_name1 = company.settings.tax_name1;
+        _invoice.tax_rate1 = company.settings.tax_rate1;
+      }
+
+      if (company && company.enabled_tax_rates > 1) {
+        _invoice.tax_name2 = company.settings.tax_name2;
+        _invoice.tax_rate2 = company.settings.tax_rate2;
+      }
+
+      if (company && company.enabled_tax_rates > 2) {
+        _invoice.tax_name3 = company.settings.tax_name3;
+        _invoice.tax_rate3 = company.settings.tax_rate3;
+      }
+
+      setInvoice(_invoice);
+    }
+
+    return () => {
+      setInvoice(undefined);
+    };
+  }, [data]);
 
   useEffect(() => {
     invoice &&
