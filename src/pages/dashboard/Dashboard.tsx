@@ -24,7 +24,7 @@ export function Dashboard() {
 
   useTitle('dashboard');
 
-  const pages = [{ name: t('dashboard'), href: '/dashboard' }];
+  // const pages = [{ name: t('dashboard'), href: '/dashboard' }];
   const user = useCurrentUser();
 
   return (
