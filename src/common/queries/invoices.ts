@@ -11,6 +11,8 @@
 import { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { Invoice } from 'common/interfaces/invoice';
 import { useQuery } from 'react-query';
 import { generatePath } from 'react-router-dom';
 
@@ -25,11 +27,14 @@ export function useInvoiceQuery(
   );
 }
 
-export function useBlankInvoiceQuery(options: Record<string, any> = {}) {
-  return useQuery(
+export function useBlankInvoiceQuery() {
+  return useQuery<Invoice>(
     generatePath('/api/v1/invoices/create'),
-    () => request('GET', endpoint('/api/v1/invoices/create')),
-    { ...options, staleTime: Infinity }
+    () =>
+      request('GET', endpoint('/api/v1/invoices/create')).then(
+        (response: GenericSingleResourceResponse<Invoice>) => response.data.data
+      ),
+    { staleTime: Infinity }
   );
 }
 
