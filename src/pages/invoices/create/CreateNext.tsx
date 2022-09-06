@@ -8,21 +8,32 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
+import { Invoice } from 'common/interfaces/invoice';
+import { Invitation } from 'common/interfaces/purchase-order';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankInvoiceQuery } from 'common/queries/invoices';
+import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
 import { Default } from 'components/layouts/Default';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { invoiceAtom } from '../common/atoms';
+import { ClientSelector } from '../common/components/ClientSelector';
 
 export function CreateNext() {
   const { documentTitle } = useTitle('new_invoice');
   const { data } = useBlankInvoiceQuery();
 
   const company = useCurrentCompany();
+  const clientResolver = useClientResolver();
+
+  const [searchParams] = useSearchParams();
   const [invoice, setInvoice] = useAtom(invoiceAtom);
+  const [errors] = useState<ValidationBag>();
 
   useEffect(() => {
     if (data && typeof invoice === 'undefined') {
@@ -51,7 +62,68 @@ export function CreateNext() {
     };
   }, [data]);
 
-  console.log(invoice);
+  const handleChange = <T extends keyof Invoice>(
+    property: T,
+    value: Invoice[typeof property]
+  ) => {
+    console.log('[Change]: ', property, value);
 
-  return <Default title={documentTitle}></Default>;
+    setInvoice((current) => current && { ...current, [property]: value });
+  };
+
+  const handleInvitationChange = (id: string, checked: boolean) => {
+    let invitations = [...invoice!.invitations];
+
+    const potential =
+      invitations?.find((invitation) => invitation.client_contact_id === id) ||
+      -1;
+
+    if (potential !== -1 && checked === false) {
+      invitations = invitations.filter((i) => i.client_contact_id !== id);
+    }
+
+    if (potential === -1) {
+      const invitation: Partial<Invitation> = {
+        client_contact_id: id,
+      };
+
+      invitations.push(invitation as Invitation);
+    }
+
+    handleChange('invitations', invitations);
+  };
+
+  useEffect(() => {
+    invoice &&
+      invoice.client_id.length > 1 &&
+      clientResolver.find(invoice.client_id).then((client) => {
+        const invitations: Record<string, unknown>[] = [];
+
+        client.contacts.map((contact) => {
+          if (contact.send_email) {
+            const invitation = cloneDeep(blankInvitation);
+
+            invitation.client_contact_id = contact.id;
+            invitations.push(invitation);
+          }
+        });
+
+        handleChange('invitations', invitations);
+      });
+  }, [invoice?.client_id]);
+
+  return (
+    <Default title={documentTitle}>
+      <div className="grid grid-cols-12 gap-4">
+        <ClientSelector
+          resource={invoice}
+          onChange={(id) => handleChange('client_id', id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          onContactCheckboxChange={handleInvitationChange}
+          readonly={searchParams.get('table') === 'tasks'}
+          errorMessage={errors?.errors.client_id}
+        />
+      </div>
+    </Default>
+  );
 }
