@@ -24,13 +24,12 @@ export function Dashboard() {
 
   useTitle('dashboard');
 
-  const pages = [{ name: t('dashboard'), href: '/dashboard' }];
+  // const pages = [{ name: t('dashboard'), href: '/dashboard' }];
   const user = useCurrentUser();
 
   return (
     <Default
       title={t('dashboard')}
-      breadcrumbs={pages}
       navigationTopRight={
         (user?.company_user?.is_admin || user?.company_user?.is_owner) && (
           <SwitchToFlutter />
@@ -44,7 +43,7 @@ export function Dashboard() {
           <Activity />
         </div>
 
-        <div className="col-span-12 lg:gap-4 lg:col-span-6">
+        <div className="col-span-12 lg:col-span-6">
           <RecentPayments />
         </div>
 
