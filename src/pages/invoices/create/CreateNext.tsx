@@ -137,7 +137,13 @@ export function CreateNext() {
     value: unknown,
     index: number
   ) => {
-    console.log(key, value, index);
+    const lineItems = invoice?.line_items || [];
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    lineItems[index][key] = value;
+
+    setInvoice((invoice) => invoice && { ...invoice, line_items: lineItems });
   };
 
   const handleCreateLineItem = () => {
@@ -153,6 +159,8 @@ export function CreateNext() {
   const handleDeleteLineItem = (index: number) => {
     console.log('Delete line item', index);
   };
+
+  console.log(invoice);
 
   return (
     <Default title={documentTitle}>
