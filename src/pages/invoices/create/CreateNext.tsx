@@ -17,11 +17,12 @@ import { Invitation } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankInvoiceQuery } from 'common/queries/invoices';
 import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
+import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { TabGroup } from 'components/TabGroup';
 import { useAtom } from 'jotai';
-import { cloneDeep } from 'lodash';
+import { cloneDeep, tap } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -140,7 +141,13 @@ export function CreateNext() {
   };
 
   const handleCreateLineItem = () => {
-    console.log('Create a line item');
+    setInvoice(
+      (invoice) =>
+        invoice && {
+          ...invoice,
+          line_items: [...invoice.line_items, blankLineItem()],
+        }
+    );
   };
 
   const handleDeleteLineItem = (index: number) => {
