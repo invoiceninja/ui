@@ -129,7 +129,11 @@ export function CreateNext() {
   }, [invoice?.client_id]);
 
   const handleLineItemChange = (index: number, lineItem: InvoiceItem) => {
-    console.log(index, lineItem);
+    const lineItems = invoice?.line_items || [];
+
+    lineItems[index] = lineItem;
+
+    setInvoice((invoice) => invoice && { ...invoice, line_items: lineItems });
   };
 
   const handleLineItemPropertyChange = (
@@ -157,7 +161,11 @@ export function CreateNext() {
   };
 
   const handleDeleteLineItem = (index: number) => {
-    console.log('Delete line item', index);
+    const lineItems = invoice?.line_items || [];
+
+    lineItems.splice(index, 1);
+
+    setInvoice((invoice) => invoice && { ...invoice, line_items: lineItems });
   };
 
   console.log(invoice);
