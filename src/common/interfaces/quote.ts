@@ -20,6 +20,7 @@ export interface Quote {
   balance: number;
   client_id: string;
   vendor_id: string;
+  invoice_id: string;
   status_id: string;
   design_id: string;
   recurring_id: string;

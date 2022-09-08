@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import invoiceStatus from 'common/constants/invoice-status';
 import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
@@ -19,11 +18,13 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
-import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { InvoiceStatus } from '../common/components/InvoiceStatus';
 import { openClientPortal } from '../common/helpers/open-client-portal';
 import { useDownloadPdf } from '../common/hooks/useDownloadPdf';
+import { Link as ReactRouterLink } from 'react-router-dom';
+import { Download } from 'react-feather';
 
 export function Invoices() {
   useTitle('invoices');
@@ -37,11 +38,26 @@ export function Invoices() {
 
   const pages = [{ name: t('invoices'), href: '/invoices' }];
 
+  const importButton = (
+    <ReactRouterLink to="/invoices/import">
+      <button className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600">
+        <svg
+          className="w-4 h-4 mr-2"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="3 3 20 20"
+        >
+          <Download />
+        </svg>
+        <span>{t('import')}</span>
+      </button>
+    </ReactRouterLink>
+  );
+
   const columns: DataTableColumns<Invoice> = [
     {
       id: 'status_id',
       label: t('status'),
-      format: (value) => <StatusBadge for={invoiceStatus} code={value} />,
+      format: (value, invoice) => <InvoiceStatus entity={invoice} />,
     },
     {
       id: 'number',
@@ -161,6 +177,7 @@ export function Invoices() {
         linkToEdit="/invoices/:id/edit"
         withResourcefulActions
         customActions={actions}
+        rightSide={importButton}
       />
     </Default>
   );

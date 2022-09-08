@@ -10,6 +10,7 @@
 
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
+import { Import } from 'pages/invoices/import/Import';
 import { CloneInvoiceToCredit } from 'pages/credits/clone/CloneInvoiceToCredit';
 import { CloneInvoiceToQuote } from 'pages/quotes/clone/CloneFromInvoice';
 import { CloneInvoiceToRecurringInvoice } from 'pages/recurring-invoices/clone/CloneInvoiceToRecurringInvoice';
@@ -29,6 +30,17 @@ export const invoiceRoutes = (
         <Guard
           guards={[() => permission('view_invoice')]}
           component={<Invoices />}
+        />
+      }
+    />
+    <Route
+      path="import"
+      element={
+        <Guard
+          guards={[
+            () => permission('create_invoice') || permission('edit_invoice'),
+          ]}
+          component={<Import />}
         />
       }
     />

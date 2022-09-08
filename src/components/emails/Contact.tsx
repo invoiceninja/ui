@@ -8,24 +8,61 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useResolveClientContact } from 'pages/clients/common/hooks/useResolveClientContact';
+import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { useVendorResolver } from 'common/hooks/vendors/useVendorResolver';
+import { Client } from 'common/interfaces/client';
+import { Vendor } from 'common/interfaces/vendor';
+
+import {
+  MailerResource,
+  MailerResourceType,
+} from 'pages/invoices/email/components/Mailer';
+import { useEffect, useState } from 'react';
 
 interface Props {
-  contactId: string;
-  clientId: string;
+  resource: MailerResource;
+  resourceType: MailerResourceType;
 }
 
 export function Contact(props: Props) {
-  const resolveClientContact = useResolveClientContact(props.clientId);
-  const contact = resolveClientContact(props.contactId);
+  const clientResolver = useClientResolver();
+  const vendorResolver = useVendorResolver();
+
+  const [relation, setRelation] = useState<Vendor | Client>();
+
+  useEffect(() => {
+    if (
+      props.resourceType === 'purchase_order' &&
+      props.resource.vendor_id.length >= 1
+    ) {
+      vendorResolver
+        .find(props.resource.vendor_id)
+        .then((vendor) => setRelation(vendor));
+    }
+
+    if (
+      props.resourceType !== 'purchase_order' &&
+      props.resource.client_id.length >= 1
+    ) {
+      clientResolver
+        .find(props.resource.client_id)
+        .then((client) => setRelation(client));
+    }
+  }, []);
+
+  console.log(relation?.contacts);
 
   return (
     <>
-      {contact && (
-        <p>
-          {contact?.first_name} {contact?.last_name} &#183;
-          <span className="font-semibold"> {contact?.email}</span>
-        </p>
+      {relation && (
+        <div>
+          {relation.contacts.map((contact, index) => (
+            <p key={index}>
+              {contact.first_name} {contact.last_name} &#183;
+              <span className="font-semibold"> {contact.email}</span>
+            </p>
+          ))}
+        </div>
       )}
     </>
   );

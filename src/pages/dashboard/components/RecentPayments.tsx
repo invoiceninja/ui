@@ -58,7 +58,7 @@ export function RecentPayments() {
       id: 'invoice_number',
       label: t('invoice_number'),
       format: (value, payment) =>
-        payment.invoices && payment.invoices[0].number,
+        payment.invoices && payment.invoices[0]?.number,
     },
     {
       id: 'date',
@@ -69,7 +69,7 @@ export function RecentPayments() {
 
   return (
     <div className="bg-white rounded shadow">
-      <div className="px-4 py-6 sm:px-6 border-b border-gray-200">
+      <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
         <h3 className="text-lg leading-6 font-medium text-gray-900">
           {t('recent_payments')}
         </h3>

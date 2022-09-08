@@ -13,7 +13,6 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
-import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import {
@@ -26,6 +25,7 @@ import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
 import { useInvoiceTask } from '../common/hooks/useInvoiceTask';
+import { TaskStatus } from '../common/components/TaskStatus';
 
 export function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -37,14 +37,12 @@ export function Tasks() {
     {
       id: 'status_id',
       label: t('status'),
-      format: (value, task: Task) => (
-        <StatusBadge for={{}} code={task.status?.name || 'logged'} />
-      ),
+      format: (value, task) => <TaskStatus entity={task} />,
     },
     {
       id: 'number',
       label: t('number'),
-      format: (value, task: Task) => (
+      format: (value, task) => (
         <Link to={generatePath('/tasks/:id/edit', { id: task.id })}>
           {value}
         </Link>
@@ -53,7 +51,7 @@ export function Tasks() {
     {
       id: 'client_id',
       label: t('client'),
-      format: (value, task: Task) =>
+      format: (value, task) =>
         task.client && (
           <Link to={generatePath('/clients/:id', { id: value.toString() })}>
             {task.client.display_name}
@@ -73,7 +71,7 @@ export function Tasks() {
     {
       id: 'id', // This is calculated column, so real mapping doesn't matter.
       label: t('entity_state'),
-      format: (value, resource: Task) => t(calculateEntityState(resource)),
+      format: (value, task) => t(calculateEntityState(task)),
     },
   ];
 

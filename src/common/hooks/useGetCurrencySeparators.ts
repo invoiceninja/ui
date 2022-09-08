@@ -8,15 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ClientResolver } from 'common/helpers/clients/client-resolver';
 import { CurrencyResolver } from 'common/helpers/currencies/currency-resolver';
 import { Client } from 'common/interfaces/client';
 import { Currency } from 'common/interfaces/currency';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
+import { Vendor } from 'common/interfaces/vendor';
+import { RelationType } from 'pages/invoices/common/components/ProductsTable';
 import React from 'react';
+import { useClientResolver } from './clients/useClientResolver';
 import { useCurrentCompany } from './useCurrentCompany';
-import { useCurrentInvoice } from './useCurrentInvoice';
 import { useResolveCountry } from './useResolveCountry';
+import { useVendorResolver } from './vendors/useVendorResolver';
 
 export function useGetCurrencySeparators(
   setInputCurrencySeparators: React.Dispatch<
@@ -24,17 +26,37 @@ export function useGetCurrencySeparators(
   >
 ) {
   const company = useCurrentCompany();
-  const invoice = useCurrentInvoice();
 
-  const clientResolver = new ClientResolver();
-  const currencyresolver = new CurrencyResolver();
+  const clientResolver = useClientResolver();
+  const vendorResolver = useVendorResolver();
+
+  const currencyResolver = new CurrencyResolver();
   const resolveCountry = useResolveCountry();
 
-  return (client_id: string) => {
-    if (invoice?.client_id) {
-      clientResolver.find(client_id).then((client: Client) =>
-        currencyresolver
-          .find(client.settings.currency_id)
+  return (relationId: string, relationType: RelationType) => {
+    if (relationId.length >= 1 && relationType === 'client_id') {
+      clientResolver.find(relationId).then((client: Client) =>
+        currencyResolver
+          .find(client.settings.currency_id || company.settings?.currency_id)
+          .then((currency: Currency | undefined) => {
+            const companyCountry = resolveCountry(company.settings.country_id);
+
+            currency &&
+              setInputCurrencySeparators({
+                thousandSeparator:
+                  companyCountry?.thousand_separator ||
+                  currency.thousand_separator,
+                decimalSeparator:
+                  companyCountry?.decimal_separator ||
+                  currency.decimal_separator,
+                precision: currency.precision,
+              });
+          })
+      );
+    } else if (relationId.length >= 1 && relationType === 'vendor_id') {
+      vendorResolver.find(relationId).then((vendor: Vendor) =>
+        currencyResolver
+          .find(vendor.currency_id || company.settings?.currency_id)
           .then((currency: Currency | undefined) => {
             const companyCountry = resolveCountry(company.settings.country_id);
 
@@ -51,7 +73,7 @@ export function useGetCurrencySeparators(
           })
       );
     } else {
-      currencyresolver
+      currencyResolver
         .find(company.settings?.currency_id)
         .then((currency: Currency | undefined) => {
           const companyCountry = resolveCountry(company.settings.country_id);

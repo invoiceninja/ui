@@ -30,6 +30,7 @@ export function VendorSelector(props: GenericSelectorProps<Vendor>) {
       }
       actionLabel={t('new_vendor')}
       onActionClick={() => navigate('/vendors/create')}
+      disabled={props.readonly}
     />
   );
 }

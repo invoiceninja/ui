@@ -29,7 +29,9 @@ export function RecurringInvoices() {
       label: t('frequency'),
       format: (value, recurringInvoice) => (
         <Link
-          to={generatePath('/recurring_invoices/:id/edit', { id: recurringInvoice.id })}
+          to={generatePath('/recurring_invoices/:id/edit', {
+            id: recurringInvoice.id,
+          })}
         >
           <StatusBadge headless for={frequency} code={value} />
         </Link>
@@ -47,6 +49,7 @@ export function RecurringInvoices() {
     {
       id: 'remaining_cycles',
       label: t('remaining_cycles'),
+      format: (value) => (Number(value) < 0 ? t('endless') : value),
     },
     {
       id: 'next_send_date',

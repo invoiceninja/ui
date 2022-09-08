@@ -175,13 +175,14 @@ export function Create() {
             <div>
               {currentInvoice ? (
                 <ProductsTable
+                  relationType="client_id"
                   type="product"
                   resource={currentInvoice}
                   columns={productColumns}
                   items={currentInvoice.line_items.filter(
                     (item) => item.type_id == InvoiceItemType.Product
                   )}
-                  onProductChange={(index, lineItem) =>
+                  onLineItemChange={(index, lineItem) =>
                     dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
                   }
                   onLineItemPropertyChange={(key, value, index) =>
@@ -213,13 +214,14 @@ export function Create() {
             <div>
               {currentInvoice ? (
                 <ProductsTable
+                  relationType="client_id"
                   type="task"
                   resource={currentInvoice}
                   columns={taskColumns}
                   items={currentInvoice.line_items.filter(
                     (item) => item.type_id == InvoiceItemType.Task
                   )}
-                  onProductChange={(index, lineItem) =>
+                  onLineItemChange={(index, lineItem) =>
                     dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
                   }
                   onLineItemPropertyChange={(key, value, index) =>
@@ -252,6 +254,7 @@ export function Create() {
 
         {currentInvoice && (
           <InvoiceTotals
+          relationType='client_id'
             resource={currentInvoice}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
@@ -265,6 +268,7 @@ export function Create() {
         {currentInvoice && (
           <InvoicePreview
             for="create"
+            relationType='client_id'
             resource={currentInvoice}
             entity="invoice"
           />

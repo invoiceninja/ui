@@ -14,6 +14,7 @@ import { useClientQuery } from 'common/queries/clients';
 import { InfoCard } from 'components/InfoCard';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import React from 'react';
 
 export function Contacts() {
   const [t] = useTranslation();

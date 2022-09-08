@@ -9,7 +9,6 @@
  */
 
 import { Link } from '@invoiceninja/forms';
-import creditStatus from 'common/constants/credit-status';
 import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
@@ -19,11 +18,11 @@ import { Credit } from 'common/interfaces/credit';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
-import { StatusBadge } from 'components/StatusBadge';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { CreditStatus } from '../common/components/CreditStatus';
 
 export function Credits() {
   useTitle('credits');
@@ -43,7 +42,7 @@ export function Credits() {
     {
       id: 'status_id',
       label: t('status'),
-      format: (value) => <StatusBadge for={creditStatus} code={value} />,
+      format: (value, credit) => <CreditStatus entity={credit} />,
     },
     {
       id: 'number',

@@ -8,13 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
 import { Product } from 'common/interfaces/product';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { ProductTableResource } from '../components/ProductsTable';
 
 interface Props {
-  resource: Invoice | RecurringInvoice;
+  resource: ProductTableResource;
   type: 'product' | 'task';
   onChange: (index: number, lineItem: InvoiceItem) => unknown;
 }

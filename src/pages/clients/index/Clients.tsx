@@ -18,8 +18,10 @@ import { BreadcrumRecord } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
+import { Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
+import { Link as ReactRouterLink } from 'react-router-dom';
 
 export function Clients() {
   useTitle('clients');
@@ -36,13 +38,16 @@ export function Clients() {
     {
       id: 'number',
       label: t('number'),
+    },
+    { 
+      id: 'display_name', 
+      label: t('name') ,
       format: (value, resource) => (
         <Link to={generatePath('/clients/:id', { id: resource.id })}>
           {value}
         </Link>
       ),
     },
-    { id: 'display_name', label: t('name') },
     {
       id: 'balance',
       label: t('balance'),
@@ -69,6 +74,21 @@ export function Clients() {
       format: (value) => date(value, dateFormat),
     },
   ];
+
+  const importButton = (
+    <ReactRouterLink to="/clients/import">
+      <button className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600">
+        <svg
+          className="w-4 h-4 mr-2"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="3 3 20 20"
+        >
+          <Download />
+        </svg>
+        <span>{t('import')}</span>
+      </button>
+    </ReactRouterLink>
+  );
 
   const actions = [
     (resource: Client) => (
@@ -123,6 +143,7 @@ export function Clients() {
         linkToEdit="/clients/:id/edit"
         withResourcefulActions
         customActions={actions}
+        rightSide={importButton}
       />
     </Default>
   );

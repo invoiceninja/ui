@@ -110,13 +110,14 @@ export function Edit() {
         <div className="col-span-12">
           {currentRecurringInvoice ? (
             <ProductsTable
+              relationType="client_id"
               type="product"
               columns={productColumns}
               items={currentRecurringInvoice.line_items.filter(
                 (item) => item.type_id === InvoiceItemType.Product
               )}
               resource={currentRecurringInvoice}
-              onProductChange={(index, lineItem) =>
+              onLineItemChange={(index, lineItem) =>
                 dispatch(
                   setCurrentRecurringInvoiceLineItem({ index, lineItem })
                 )
@@ -145,6 +146,7 @@ export function Edit() {
 
         {currentRecurringInvoice && (
           <InvoiceTotals
+          relationType='client_id'
             resource={currentRecurringInvoice}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
@@ -158,6 +160,7 @@ export function Edit() {
         {currentRecurringInvoice && (
           <InvoicePreview
             for="invoice"
+            relationType='client_id'
             resource={currentRecurringInvoice}
             entity="recurring_invoice"
           />
