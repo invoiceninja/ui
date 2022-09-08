@@ -8,36 +8,47 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
-import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { InvoiceDocuments } from './InvoiceDocuments';
-import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { MarkdownEditor } from 'components/forms/MarkdownEditor';
 import { Card } from '@invoiceninja/cards';
-import { InputLabel, InputField } from '@invoiceninja/forms';
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
+import { InputField } from '@invoiceninja/forms';
 import { TabGroup } from 'components/TabGroup';
 import { Field } from 'pages/settings/custom-fields/components';
 import { Element } from '@invoiceninja/cards';
 import { useHandleCustomSurchargeFieldChange } from 'common/hooks/useHandleCustomSurchargeFieldChange';
 import { Divider } from 'components/cards/Divider';
 import { useSetSurchageTaxValue } from '../hooks/useSetSurchargeTaxValue';
+import { Invoice } from 'common/interfaces/invoice';
+import { ChangeHandler } from 'pages/invoices/create/CreateNext';
+import { generatePath, useLocation, useParams } from 'react-router-dom';
+import { Upload } from 'pages/settings/company/documents/components';
+import { endpoint } from 'common/helpers';
+import { useQueryClient } from 'react-query';
+import { DocumentsTable } from 'components/DocumentsTable';
+import { ProjectSelector } from 'components/projects/ProjectSelector';
+import { DesignSelector } from 'common/generic/DesignSelector';
+import { UserSelector } from 'components/users/UserSelector';
+import { VendorSelector } from 'components/vendors/VendorSelector';
 
 interface Props {
-  page: 'create' | 'edit';
+  invoice?: Invoice;
+  handleChange: ChangeHandler;
 }
 
 export function InvoiceFooter(props: Props) {
-  const [t] = useTranslation();
+  const { t } = useTranslation();
+
+  const queryClient = useQueryClient();
 
   const company = useCurrentCompany();
-  const invoice = useCurrentInvoice();
+  const location = useLocation();
 
-  const handleChange = useSetCurrentInvoiceProperty();
+  const { invoice, handleChange } = props;
+  const { id } = useParams();
+
   const handleCustomFieldChange = useHandleCustomFieldChange();
   const handleCustomSurchargeFieldChange =
     useHandleCustomSurchargeFieldChange();
@@ -57,7 +68,7 @@ export function InvoiceFooter(props: Props) {
 
   const setSurchargeTaxValue = useSetSurchageTaxValue();
 
-  const [tabs, setTabs] = useState([
+  const tabs = [
     t('public_notes'),
     t('private_notes'),
     t('terms'),
@@ -65,13 +76,11 @@ export function InvoiceFooter(props: Props) {
     t('documents'),
     t('settings'),
     t('custom_fields'),
-  ]);
+  ];
 
-  useEffect(() => {
-    if (props.page === 'create') {
-      setTabs((current) => current.filter((tab) => tab !== t('documents')));
-    }
-  }, []);
+  const onSuccess = () => {
+    queryClient.invalidateQueries(generatePath('/api/v1/invoices/:id', { id }));
+  };
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
@@ -104,32 +113,41 @@ export function InvoiceFooter(props: Props) {
           />
         </div>
 
-        {props.page === 'edit' ? (
-          <div>
-            <InvoiceDocuments />
-          </div>
+        {location.pathname.endsWith('/create') ? (
+          <div className="text-sm">{t('save_to_upload_documents')}.</div>
         ) : (
-          <></>
+          <div>
+            <Upload
+              widgetOnly
+              endpoint={endpoint('/api/v1/invoices/:id/upload', {
+                id,
+              })}
+              onSuccess={onSuccess}
+            />
+
+            <DocumentsTable
+              documents={invoice?.documents || []}
+              onDocumentDelete={onSuccess}
+            />
+          </div>
         )}
 
         <div>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
-                <InputLabel>{t('project')}</InputLabel>
-                <DebouncedCombobox
-                  endpoint="/api/v1/projects"
-                  label="name"
-                  onChange={(value) => handleChange('project_id', value.value)}
-                  defaultValue={invoice?.project_id}
+                <ProjectSelector
+                  inputLabel={t('project')}
+                  value={invoice?.project_id}
+                  onChange={(project) => handleChange('project_id', project.id)}
                 />
               </div>
 
               <InputField
                 label={t('exchange_rate')}
                 value={invoice?.exchange_rate || '1.00'}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  handleChange('exchange_rate', parseFloat(event.target.value))
+                onValueChange={(value) =>
+                  handleChange('exchange_rate', parseFloat(value) || 1)
                 }
               />
 
@@ -140,40 +158,28 @@ export function InvoiceFooter(props: Props) {
               />
 
               <div className="space-y-2">
-                <InputLabel>{t('design')}</InputLabel>
-
-                <DebouncedCombobox
-                  endpoint="/api/v1/designs"
-                  label="name"
-                  placeholder={t('search_designs')}
-                  onChange={(payload) =>
-                    handleChange('design_id', payload.value)
-                  }
-                  defaultValue={company?.settings?.invoice_design_id}
+                <DesignSelector
+                  inputLabel={t('design')}
+                  value={company?.settings?.invoice_design_id}
+                  onChange={(design) => handleChange('design_id', design.id)}
                 />
               </div>
             </div>
 
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
-                <InputLabel>{t('user')}</InputLabel>
-                <DebouncedCombobox
-                  endpoint="/api/v1/users"
-                  label="first_name"
-                  onChange={(value) =>
-                    handleChange('assigned_user_id', value.value)
-                  }
-                  defaultValue={invoice?.assigned_user_id}
+                <UserSelector
+                  inputLabel={t('user')}
+                  value={invoice?.assigned_user_id}
+                  onChange={(user) => handleChange('assigned_user_id', user.id)}
                 />
               </div>
 
               <div className="space-y-2">
-                <InputLabel>{t('vendor')}</InputLabel>
-                <DebouncedCombobox
-                  endpoint="/api/v1/vendors"
-                  label="name"
-                  onChange={(value) => handleChange('vendor_id', value.value)}
-                  defaultValue={invoice?.vendor_id}
+                <VendorSelector
+                  inputLabel={t('vendor')}
+                  value={invoice?.vendor_id}
+                  onChange={(vendor) => handleChange('vendor_id', vendor.id)}
                 />
               </div>
 

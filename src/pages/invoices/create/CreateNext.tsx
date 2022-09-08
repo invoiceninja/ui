@@ -32,6 +32,7 @@ import { useSearchParams } from 'react-router-dom';
 import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
+import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
@@ -272,6 +273,8 @@ export function CreateNext() {
             </div>
           </TabGroup>
         </div>
+
+        <InvoiceFooter invoice={invoice} handleChange={handleChange} />
 
         {invoice && (
           <InvoiceTotals
