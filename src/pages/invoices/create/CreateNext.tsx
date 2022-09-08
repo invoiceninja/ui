@@ -8,9 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { useTitle } from 'common/hooks/useTitle';
+import { Client } from 'common/interfaces/client';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
 import { Invitation } from 'common/interfaces/purchase-order';
@@ -22,13 +25,14 @@ import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { TabGroup } from 'components/TabGroup';
 import { useAtom } from 'jotai';
-import { cloneDeep, tap } from 'lodash';
+import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
-import { invoiceAtom } from '../common/atoms';
+import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
+import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 
@@ -43,12 +47,19 @@ export function CreateNext() {
   const { data } = useBlankInvoiceQuery();
 
   const company = useCurrentCompany();
+
   const clientResolver = useClientResolver();
+  const currencyResolver = useResolveCurrency();
+
   const productColumns = useProductColumns();
 
-  const [searchParams] = useSearchParams();
   const [invoice, setInvoice] = useAtom(invoiceAtom);
+  const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
+
+  const [searchParams] = useSearchParams();
   const [errors] = useState<ValidationBag>();
+
+  const [client, setClient] = useState<Client | undefined>();
 
   const handleChange: ChangeHandler = (property, value) => {
     console.log('[Change]: ', property, value);
@@ -78,55 +89,17 @@ export function CreateNext() {
     handleChange('invitations', invitations);
   };
 
-  useEffect(() => {
-    if (data && typeof invoice === 'undefined') {
-      const _invoice = cloneDeep(data);
+  const calculateInvoiceSum = () => {
+    const currency = currencyResolver(
+      client?.settings.currency_id || company?.settings.currency_id
+    );
 
-      if (company && company.enabled_tax_rates > 0) {
-        _invoice.tax_name1 = company.settings.tax_name1;
-        _invoice.tax_rate1 = company.settings.tax_rate1;
-      }
+    if (currency && invoice) {
+      const invoiceSum = new InvoiceSum(invoice, currency).build();
 
-      if (company && company.enabled_tax_rates > 1) {
-        _invoice.tax_name2 = company.settings.tax_name2;
-        _invoice.tax_rate2 = company.settings.tax_rate2;
-      }
-
-      if (company && company.enabled_tax_rates > 2) {
-        _invoice.tax_name3 = company.settings.tax_name3;
-        _invoice.tax_rate3 = company.settings.tax_rate3;
-      }
-
-      if (typeof _invoice.line_items === 'string') {
-        _invoice.line_items = [];
-      }
-
-      setInvoice(_invoice);
+      setInvoiceSum(invoiceSum);
     }
-
-    return () => {
-      setInvoice(undefined);
-    };
-  }, [data]);
-
-  useEffect(() => {
-    invoice &&
-      invoice.client_id.length > 1 &&
-      clientResolver.find(invoice.client_id).then((client) => {
-        const invitations: Record<string, unknown>[] = [];
-
-        client.contacts.map((contact) => {
-          if (contact.send_email) {
-            const invitation = cloneDeep(blankInvitation);
-
-            invitation.client_contact_id = contact.id;
-            invitations.push(invitation);
-          }
-        });
-
-        handleChange('invitations', invitations);
-      });
-  }, [invoice?.client_id]);
+  };
 
   const handleLineItemChange = (index: number, lineItem: InvoiceItem) => {
     const lineItems = invoice?.line_items || [];
@@ -168,7 +141,65 @@ export function CreateNext() {
     setInvoice((invoice) => invoice && { ...invoice, line_items: lineItems });
   };
 
-  console.log(invoice);
+  useEffect(() => {
+    if (data && typeof invoice === 'undefined') {
+      const _invoice = cloneDeep(data);
+
+      if (company && company.enabled_tax_rates > 0) {
+        _invoice.tax_name1 = company.settings.tax_name1;
+        _invoice.tax_rate1 = company.settings.tax_rate1;
+      }
+
+      if (company && company.enabled_tax_rates > 1) {
+        _invoice.tax_name2 = company.settings.tax_name2;
+        _invoice.tax_rate2 = company.settings.tax_rate2;
+      }
+
+      if (company && company.enabled_tax_rates > 2) {
+        _invoice.tax_name3 = company.settings.tax_name3;
+        _invoice.tax_rate3 = company.settings.tax_rate3;
+      }
+
+      if (typeof _invoice.line_items === 'string') {
+        _invoice.line_items = [];
+      }
+
+      setInvoice(_invoice);
+    }
+
+    return () => {
+      setInvoice(undefined);
+    };
+  }, [data]);
+
+  useEffect(() => {
+    invoice &&
+      invoice.client_id.length > 1 &&
+      clientResolver.find(invoice.client_id).then((client) => {
+        setClient(client);
+
+        const invitations: Record<string, unknown>[] = [];
+
+        client.contacts.map((contact) => {
+          if (contact.send_email) {
+            const invitation = cloneDeep(blankInvitation);
+
+            invitation.client_contact_id = contact.id;
+            invitations.push(invitation);
+          }
+        });
+
+        handleChange('invitations', invitations);
+      });
+  }, [invoice?.client_id]);
+
+  useEffect(() => {
+    // The InvoiceSum takes exact same reference to the `invoice` object
+    // which is the reason we don't have to set a freshly built invoice,
+    // rather just modified version.
+
+    invoice && calculateInvoiceSum();
+  }, [invoice]);
 
   return (
     <Default title={documentTitle}>
@@ -212,6 +243,17 @@ export function CreateNext() {
             <div>tasks</div>
           </TabGroup>
         </div>
+
+        {invoice && (
+          <InvoiceTotals
+            relationType="client_id"
+            resource={invoice}
+            invoiceSum={invoiceSum}
+            onChange={(property, value) =>
+              handleChange(property, value as string)
+            }
+          />
+        )}
       </div>
     </Default>
   );
