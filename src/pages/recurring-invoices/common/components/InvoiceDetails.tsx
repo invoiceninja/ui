@@ -52,7 +52,7 @@ export function InvoiceDetails(props: Props) {
           <InputField
             type="date"
             onValueChange={(value) => handleChange('next_send_date', value)}
-            value={invoice?.date || new Date().toISOString().split('T')[0]}
+            value={invoice?.next_send_date ? invoice?.next_send_date.slice(0,10) : new Date().toISOString().split('T')[0]}
             min={new Date().toISOString().split('T')[0]}
           />
         </Element>
