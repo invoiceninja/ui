@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { Invoice } from 'common/interfaces/invoice';
 import { atom } from 'jotai';
 
 export const invoiceAtom = atom<Invoice | undefined>(undefined);
+export const invoiceSumAtom = atom<InvoiceSum | undefined>(undefined);
