@@ -35,6 +35,7 @@ import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
+import { useTaskColumns } from '../common/hooks/useTaskColumns';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -52,6 +53,7 @@ export function CreateNext() {
   const currencyResolver = useResolveCurrency();
 
   const productColumns = useProductColumns();
+  const taskColumns = useTaskColumns();
 
   const [invoice, setInvoice] = useAtom(invoiceAtom);
   const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
@@ -123,12 +125,15 @@ export function CreateNext() {
     setInvoice((invoice) => invoice && { ...invoice, line_items: lineItems });
   };
 
-  const handleCreateLineItem = () => {
+  const handleCreateLineItem = (typeId: InvoiceItemType) => {
     setInvoice(
       (invoice) =>
         invoice && {
           ...invoice,
-          line_items: [...invoice.line_items, blankLineItem()],
+          line_items: [
+            ...invoice.line_items,
+            { ...blankLineItem(), type_id: typeId },
+          ],
         }
     );
   };
@@ -233,14 +238,38 @@ export function CreateNext() {
                   onLineItemChange={handleLineItemChange}
                   onSort={(lineItems) => handleChange('line_items', lineItems)}
                   onLineItemPropertyChange={handleLineItemPropertyChange}
-                  onCreateItemClick={handleCreateLineItem}
+                  onCreateItemClick={() =>
+                    handleCreateLineItem(InvoiceItemType.Product)
+                  }
                   onDeleteRowClick={handleDeleteLineItem}
                 />
               ) : (
                 <Spinner />
               )}
             </div>
-            <div>tasks</div>
+
+            <div>
+              {invoice ? (
+                <ProductsTable
+                  type="task"
+                  resource={invoice}
+                  items={invoice.line_items.filter(
+                    (item) => item.type_id === InvoiceItemType.Task
+                  )}
+                  columns={taskColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
+                  onSort={(lineItems) => handleChange('line_items', lineItems)}
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
+                  onCreateItemClick={() =>
+                    handleCreateLineItem(InvoiceItemType.Task)
+                  }
+                  onDeleteRowClick={handleDeleteLineItem}
+                />
+              ) : (
+                <Spinner />
+              )}
+            </div>
           </TabGroup>
         </div>
 
