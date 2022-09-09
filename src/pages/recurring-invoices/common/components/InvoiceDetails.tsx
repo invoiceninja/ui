@@ -17,6 +17,7 @@ import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSetCurrentRecurringInvoiceProperty } from '../hooks/useSetCurrentRecurringInvoiceProperty';
 import frequencies from 'common/constants/frequency';
+import dayjs from 'dayjs';
 
 interface Props {
   autoBill?: string;
@@ -52,7 +53,7 @@ export function InvoiceDetails(props: Props) {
           <InputField
             type="date"
             onValueChange={(value) => handleChange('next_send_date', value)}
-            value={invoice?.date || new Date().toISOString().split('T')[0]}
+            value={invoice?.next_send_date ? dayjs(invoice?.next_send_date).format('YYYY-MM-DD') : new Date().toISOString().split('T')[0]}
             min={new Date().toISOString().split('T')[0]}
           />
         </Element>
