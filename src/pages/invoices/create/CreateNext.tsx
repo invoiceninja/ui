@@ -17,6 +17,7 @@ import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankInvoiceQuery } from 'common/queries/invoices';
 import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { TabGroup } from 'components/TabGroup';
@@ -60,6 +61,14 @@ export function CreateNext() {
   const [errors] = useState<ValidationBag>();
 
   const [client, setClient] = useState<Client | undefined>();
+
+  const pages: Page[] = [
+    { name: t('invoices'), href: '/invoices' },
+    {
+      name: t('new_invoice'),
+      href: '/invoices/create',
+    },
+  ];
 
   const {
     handleChange,

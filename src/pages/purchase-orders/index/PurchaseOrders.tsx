@@ -16,7 +16,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
@@ -28,7 +28,7 @@ export function PurchaseOrders() {
 
   const [t] = useTranslation();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
   ];
 

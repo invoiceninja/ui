@@ -15,7 +15,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Payment } from 'common/interfaces/payment';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Link } from 'components/forms/Link';
@@ -37,7 +37,7 @@ export function Payments() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
+  const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
 
   const columns: DataTableColumns<Payment> = [
     {

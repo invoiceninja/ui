@@ -14,7 +14,7 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
@@ -32,7 +32,7 @@ export function Clients() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const pages: BreadcrumRecord[] = [{ name: t('clients'), href: '/clients' }];
+  const pages: Page[] = [{ name: t('clients'), href: '/clients' }];
 
   const columns: DataTableColumns = [
     {

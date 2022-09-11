@@ -22,7 +22,7 @@ import { deleteQuoteLineItem } from 'common/stores/slices/quotes/extra-reducers/
 import { setCurrentLineItemProperty } from 'common/stores/slices/quotes/extra-reducers/set-current-line-item-property';
 import { setCurrentQuote } from 'common/stores/slices/quotes/extra-reducers/set-current-quote';
 import { setCurrentQuoteLineItem } from 'common/stores/slices/quotes/extra-reducers/set-current-quote-line-item';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { ValidationAlert } from 'components/ValidationAlert';
@@ -59,7 +59,7 @@ export function CloneInvoiceToQuote() {
   const invoiceSum = useInvoiceSum();
   const productColumns = useProductColumns();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
     {
       name: t('clone_to_quote'),

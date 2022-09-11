@@ -10,7 +10,7 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { useInvoiceQuery } from 'common/queries/invoices';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Mailer } from 'pages/invoices/email/components/Mailer';
 import { useTranslation } from 'react-i18next';
@@ -31,7 +31,7 @@ export function Email() {
     email_template_reminder3: 'third_reminder',
   };
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
     {
       name: t('email_invoice'),

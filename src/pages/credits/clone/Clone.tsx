@@ -22,7 +22,7 @@ import { deleteCreditLineItem } from 'common/stores/slices/credits/extra-reducer
 import { setCurrentCredit } from 'common/stores/slices/credits/extra-reducers/set-current-credit';
 import { setCurrentCreditLineItem } from 'common/stores/slices/credits/extra-reducers/set-current-credit-line-item';
 import { setCurrentLineItemProperty } from 'common/stores/slices/credits/extra-reducers/set-current-line-item-property';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { ValidationAlert } from 'components/ValidationAlert';
@@ -59,7 +59,7 @@ export function Clone() {
   const invoiceSum = useInvoiceSum();
   const productColumns = useProductColumns();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
     {
       name: t('new_credit'),

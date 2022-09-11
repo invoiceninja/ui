@@ -11,9 +11,9 @@
 import { ChevronRight, Home } from 'react-feather';
 import { Link } from 'react-router-dom';
 
-export type BreadcrumRecord = { name: string; href: string };
+export type Page = { name: string; href: string };
 
-export function Breadcrumbs(props: { pages: BreadcrumRecord[] }) {
+export function Breadcrumbs(props: { pages: Page[] }) {
   return (
     <nav className="flex" aria-label="Breadcrumb">
       <ol role="list" className="flex items-center space-x-4">

@@ -10,7 +10,7 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { useProjectQuery } from 'common/queries/projects';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
@@ -29,7 +29,7 @@ export function Project() {
     data?.name && setDocumentTitle(data.name);
   }, [data]);
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('projects'), href: '/projects' },
     {
       name: documentTitle,

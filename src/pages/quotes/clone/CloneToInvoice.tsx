@@ -9,7 +9,7 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -58,7 +58,7 @@ export function CloneToInvoice() {
 
   const currentInvoice = useCurrentInvoice();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
     {
       name: t('new_invoice'),

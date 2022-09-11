@@ -11,7 +11,7 @@
 import { Button } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { useClientQuery } from 'common/queries/clients';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { Tabs } from 'components/Tabs';
@@ -41,7 +41,7 @@ export function Client() {
     setDocumentTitle(client?.data?.data?.display_name || 'view_client');
   }, [client]);
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
     {
       name: documentTitle,

@@ -13,7 +13,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { usePurchaseOrderQuery } from 'common/queries/purchase-orders';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { cloneDeep } from 'lodash';
@@ -41,7 +41,7 @@ export function Clone() {
   const { id } = useParams();
   const { data } = usePurchaseOrderQuery({ id });
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
     {
       name: t('purchase_order'),

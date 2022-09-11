@@ -10,7 +10,7 @@
 
 import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { proPlan } from 'common/guards/guards/pro-plan';
-import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
+import { Breadcrumbs, Page } from 'components/Breadcrumbs';
 import { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
@@ -23,7 +23,7 @@ interface Props {
   children: ReactNode;
   onSaveClick?: any;
   onCancelClick?: any;
-  breadcrumbs?: BreadcrumRecord[];
+  breadcrumbs?: Page[];
   docsLink?: string;
   navigationTopRight?: ReactNode;
 }

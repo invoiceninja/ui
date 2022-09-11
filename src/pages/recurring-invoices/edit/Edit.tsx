@@ -21,7 +21,7 @@ import { deleteRecurringInvoiceItem } from 'common/stores/slices/recurring-invoi
 import { setCurrentLineItemProperty } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-line-item-property';
 import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
 import { setCurrentRecurringInvoiceLineItem } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice-line-item';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
@@ -58,7 +58,7 @@ export function Edit() {
 
   const productColumns = useProductColumns();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
       name: t('edit_recurring_invoice'),

@@ -17,7 +17,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Vendor } from 'common/interfaces/vendor';
 import { useVendorQuery } from 'common/queries/vendor';
 import { updateRecord } from 'common/stores/slices/company-users';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -40,7 +40,7 @@ export function Edit() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('vendors'), href: '/vendors' },
     { name: t('edit_vendor'), href: generatePath('/vendors/:id/edit', { id }) },
   ];

@@ -11,7 +11,7 @@
 import { endpoint } from 'common/helpers';
 import { useTitle } from 'common/hooks/useTitle';
 import { useExpenseQuery } from 'common/queries/expenses';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { DocumentsTable } from 'components/DocumentsTable';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
@@ -26,7 +26,7 @@ export function Documents() {
   const { documentTitle } = useTitle('documents');
   const { id } = useParams();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('expenses'), href: '/expenses' },
     { name: t('expense'), href: generatePath('/expenses/:id/edit', { id }) },
     {

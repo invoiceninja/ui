@@ -13,7 +13,7 @@ import { useAccentColor } from 'common/hooks/useAccentColor';
 import { useCountries } from 'common/hooks/useCountries';
 import { useTitle } from 'common/hooks/useTitle';
 import { useVendorQuery } from 'common/queries/vendor';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { InfoCard } from 'components/InfoCard';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
@@ -38,7 +38,7 @@ export function Vendor() {
     }
   }, [vendor]);
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('vendors'), href: '/vendors' },
     { name: documentTitle, href: generatePath('/vendors/:id', { id }) },
   ];

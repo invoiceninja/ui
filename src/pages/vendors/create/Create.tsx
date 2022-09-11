@@ -17,7 +17,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Vendor } from 'common/interfaces/vendor';
 import { useBlankVendorQuery } from 'common/queries/vendor';
 import { updateRecord } from 'common/stores/slices/company-users';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,7 +38,7 @@ export function Create() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('vendors'), href: '/vendors' },
     {
       name: t('create_vendor'),

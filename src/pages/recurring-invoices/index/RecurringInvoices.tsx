@@ -16,7 +16,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
@@ -33,7 +33,7 @@ export function RecurringInvoices() {
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
   ];
 

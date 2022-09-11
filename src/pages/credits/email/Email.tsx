@@ -10,7 +10,7 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { useCreditQuery } from 'common/queries/credits';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Mailer } from 'pages/invoices/email/components/Mailer';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,7 @@ export function Email() {
     email_template_credit: 'initial_email',
   };
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
     {
       name: t('email_credit'),

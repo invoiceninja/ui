@@ -12,7 +12,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Expense } from 'common/interfaces/expense';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useExpenseQuery } from 'common/queries/expenses';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
@@ -34,7 +34,7 @@ export function Edit() {
 
   const [t] = useTranslation();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('expenses'), href: '/expenses' },
     { name: t('edit_expense'), href: generatePath('/expenses/:id', { id }) },
   ];

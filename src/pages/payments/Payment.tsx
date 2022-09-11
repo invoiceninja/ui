@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
@@ -19,7 +19,7 @@ export function Payment() {
   const { id } = useParams();
   const [t] = useTranslation();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('payments'), href: '/payments' },
     {
       name: t('edit_payment'),

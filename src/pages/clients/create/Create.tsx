@@ -15,7 +15,7 @@ import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { set } from 'lodash';
@@ -32,7 +32,7 @@ export function Create() {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
     {
       name: t('new_client'),

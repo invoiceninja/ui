@@ -13,7 +13,7 @@ import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Vendor } from 'common/interfaces/vendor';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
@@ -27,7 +27,7 @@ export function Vendors() {
 
   const [t] = useTranslation();
 
-  const pages: BreadcrumRecord[] = [{ name: t('vendors'), href: '/vendors' }];
+  const pages: Page[] = [{ name: t('vendors'), href: '/vendors' }];
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 

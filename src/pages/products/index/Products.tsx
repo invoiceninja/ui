@@ -10,7 +10,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { useTitle } from 'common/hooks/useTitle';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Link } from '@invoiceninja/forms';
 import { generatePath, useNavigate } from 'react-router-dom';
@@ -32,7 +32,7 @@ export function Products() {
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
-  const pages: BreadcrumRecord[] = [{ name: t('products'), href: '/products' }];
+  const pages: Page[] = [{ name: t('products'), href: '/products' }];
 
   const importButton = (
     <ReactRouterLink to="/products/import">

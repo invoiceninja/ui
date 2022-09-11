@@ -10,7 +10,7 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { useQuoteQuery } from 'common/queries/quotes';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Mailer } from 'pages/invoices/email/components/Mailer';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +28,7 @@ export function Email() {
     email_template_quote: 'initial_email',
   };
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('quotes'), href: '/quotes' },
     {
       name: t('email_quote'),

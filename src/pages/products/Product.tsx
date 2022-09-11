@@ -10,7 +10,7 @@
 
 import { useTitle } from 'common/hooks/useTitle';
 import { useProductQuery } from 'common/queries/products';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
@@ -28,7 +28,7 @@ export function Product() {
     setDocumentTitle(product?.data?.data?.product_key || 'product');
   }, [product]);
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('products'), href: '/products' },
     {
       name: documentTitle,
