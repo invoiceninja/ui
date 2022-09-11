@@ -35,6 +35,7 @@ import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
+import { useHandleCreate } from './hooks/useHandleCreate';
 import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
 
 export type ChangeHandler = <T extends keyof Invoice>(
@@ -58,7 +59,7 @@ export function CreateNext() {
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [searchParams] = useSearchParams();
-  const [errors] = useState<ValidationBag>();
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const [client, setClient] = useState<Client | undefined>();
 
@@ -79,6 +80,8 @@ export function CreateNext() {
     handleCreateLineItem,
     handleDeleteLineItem,
   } = useInvoiceUtilities({ client });
+
+  const save = useHandleCreate(setErrors);
 
   useEffect(() => {
     if (data && typeof invoice === 'undefined') {
@@ -141,7 +144,13 @@ export function CreateNext() {
   }, [invoice]);
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onBackClick="/invoices"
+      onSaveClick={() => save(invoice as Invoice)}
+      disableSaveButton={invoice?.client_id.length === 0}
+    >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector
           resource={invoice}

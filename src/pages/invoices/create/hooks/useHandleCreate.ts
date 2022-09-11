@@ -8,41 +8,38 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { Invoice } from 'common/interfaces/invoice';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { AxiosError } from "axios";
+import { endpoint } from "common/helpers";
+import { request } from "common/helpers/request";
+import { toast } from "common/helpers/toast/toast";
+import { GenericSingleResourceResponse } from "common/interfaces/generic-api-response";
+import { Invoice } from "common/interfaces/invoice";
+import { ValidationBag } from "common/interfaces/validation-bag";
+import { generatePath, useNavigate } from "react-router-dom";
 
 export function useHandleCreate(
-  setErrors: (errors: ValidationBag | undefined) => unknown
+  setErrors: (errors: ValidationBag | undefined) => unknown,
 ) {
-  const [t] = useTranslation();
   const navigate = useNavigate();
 
   return (invoice: Invoice) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
     setErrors(undefined);
 
-    request('POST', endpoint('/api/v1/invoices'), invoice)
-      .then((response) => {
-        toast.success(t('created_invoice'), { id: toastId });
+    request("POST", endpoint("/api/v1/invoices"), invoice)
+      .then((response: GenericSingleResourceResponse<Invoice>) => {
+        toast.success("created_invoice");
 
         navigate(
-          generatePath('/invoices/:id/edit', { id: response.data.data.id })
+          generatePath("/invoices/:id/edit", { id: response.data.data.id }),
         );
       })
       .catch((error: AxiosError) => {
         console.error(error);
 
-        if (error.response?.status === 422) {
-          setErrors(error.response.data);
-        }
-
-        toast.error(t('error_title'), { id: toastId });
+        error.response?.status === 422
+          ? toast.dismiss() && setErrors(error.response.data)
+          : toast.error();
       });
   };
 }
