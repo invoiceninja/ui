@@ -33,6 +33,7 @@ import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
+import { InvoicePreview } from '../common/components/InvoicePreview';
 import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
@@ -284,6 +285,18 @@ export function CreateNext() {
             onChange={(property, value) =>
               handleChange(property, value as string)
             }
+          />
+        )}
+      </div>
+      
+      <div className="my-4">
+        {invoice && (
+          <InvoicePreview
+            for="create"
+            resource={invoice}
+            entity="invoice"
+            relationType="client_id"
+            endpoint="/api/v1/live_preview?entity=:entity"
           />
         )}
       </div>
