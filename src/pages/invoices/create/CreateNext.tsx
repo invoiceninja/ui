@@ -66,8 +66,6 @@ export function CreateNext() {
   const [client, setClient] = useState<Client | undefined>();
 
   const handleChange: ChangeHandler = (property, value) => {
-    console.log('[Change]: ', property, value);
-
     setInvoice((current) => current && { ...current, [property]: value });
   };
 
@@ -288,7 +286,7 @@ export function CreateNext() {
           />
         )}
       </div>
-      
+
       <div className="my-4">
         {invoice && (
           <InvoicePreview
