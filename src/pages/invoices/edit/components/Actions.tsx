@@ -9,11 +9,12 @@
  */
 
 import { InvoiceStatus } from 'common/enums/invoice-status';
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Divider } from 'components/cards/Divider';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Spinner } from 'components/Spinner';
+import { useAtom } from 'jotai';
+import { invoiceAtom } from 'pages/invoices/common/atoms';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
@@ -28,7 +29,7 @@ import { useMarkSent } from '../hooks/useMarkSent';
 export function Actions() {
   const [t] = useTranslation();
   const { id } = useParams();
-  const invoice = useCurrentInvoice();
+  const [invoice] = useAtom(invoiceAtom);
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
 
   const markSent = useMarkSent();

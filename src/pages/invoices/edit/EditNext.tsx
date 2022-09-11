@@ -34,7 +34,7 @@ import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
-import { Actions } from './components/Actions';
+import { ActionsNext } from './components/ActionsNext';
 import { useHandleSave } from './hooks/useInvoiceSave';
 
 export function EditNext() {
@@ -80,10 +80,6 @@ export function EditNext() {
 
       setInvoice(_invoice);
     }
-
-    return () => {
-      setInvoice(undefined);
-    };
   }, [data]);
 
   useEffect(() => {
@@ -106,7 +102,7 @@ export function EditNext() {
         invoice &&
         (invoice.status_id === InvoiceStatus.Cancelled || invoice.is_deleted)
       }
-      navigationTopRight={invoice && <Actions />}
+      navigationTopRight={invoice && <ActionsNext />}
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector
