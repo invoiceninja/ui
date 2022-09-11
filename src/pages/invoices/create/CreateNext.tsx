@@ -8,19 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { Invoice } from 'common/interfaces/invoice';
-import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
-import { Invitation } from 'common/interfaces/purchase-order';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankInvoiceQuery } from 'common/queries/invoices';
 import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
-import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { TabGroup } from 'components/TabGroup';
@@ -38,6 +34,7 @@ import { InvoiceTotals } from '../common/components/InvoiceTotals';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
+import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
 
 export type ChangeHandler = <T extends keyof Invoice>(
   property: T,
@@ -52,99 +49,27 @@ export function CreateNext() {
   const company = useCurrentCompany();
 
   const clientResolver = useClientResolver();
-  const currencyResolver = useResolveCurrency();
 
   const productColumns = useProductColumns();
   const taskColumns = useTaskColumns();
 
   const [invoice, setInvoice] = useAtom(invoiceAtom);
-  const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
+  const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [searchParams] = useSearchParams();
   const [errors] = useState<ValidationBag>();
 
   const [client, setClient] = useState<Client | undefined>();
 
-  const handleChange: ChangeHandler = (property, value) => {
-    setInvoice((current) => current && { ...current, [property]: value });
-  };
-
-  const handleInvitationChange = (id: string, checked: boolean) => {
-    let invitations = [...invoice!.invitations];
-
-    const potential =
-      invitations?.find((invitation) => invitation.client_contact_id === id) ||
-      -1;
-
-    if (potential !== -1 && checked === false) {
-      invitations = invitations.filter((i) => i.client_contact_id !== id);
-    }
-
-    if (potential === -1) {
-      const invitation: Partial<Invitation> = {
-        client_contact_id: id,
-      };
-
-      invitations.push(invitation as Invitation);
-    }
-
-    handleChange('invitations', invitations);
-  };
-
-  const calculateInvoiceSum = () => {
-    const currency = currencyResolver(
-      client?.settings.currency_id || company?.settings.currency_id
-    );
-
-    if (currency && invoice) {
-      const invoiceSum = new InvoiceSum(invoice, currency).build();
-
-      setInvoiceSum(invoiceSum);
-    }
-  };
-
-  const handleLineItemChange = (index: number, lineItem: InvoiceItem) => {
-    const lineItems = invoice?.line_items || [];
-
-    lineItems[index] = lineItem;
-
-    setInvoice((invoice) => invoice && { ...invoice, line_items: lineItems });
-  };
-
-  const handleLineItemPropertyChange = (
-    key: keyof InvoiceItem,
-    value: unknown,
-    index: number
-  ) => {
-    const lineItems = invoice?.line_items || [];
-
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    lineItems[index][key] = value;
-
-    setInvoice((invoice) => invoice && { ...invoice, line_items: lineItems });
-  };
-
-  const handleCreateLineItem = (typeId: InvoiceItemType) => {
-    setInvoice(
-      (invoice) =>
-        invoice && {
-          ...invoice,
-          line_items: [
-            ...invoice.line_items,
-            { ...blankLineItem(), type_id: typeId },
-          ],
-        }
-    );
-  };
-
-  const handleDeleteLineItem = (index: number) => {
-    const lineItems = invoice?.line_items || [];
-
-    lineItems.splice(index, 1);
-
-    setInvoice((invoice) => invoice && { ...invoice, line_items: lineItems });
-  };
+  const {
+    handleChange,
+    calculateInvoiceSum,
+    handleInvitationChange,
+    handleLineItemChange,
+    handleLineItemPropertyChange,
+    handleCreateLineItem,
+    handleDeleteLineItem,
+  } = useInvoiceUtilities({ client });
 
   useEffect(() => {
     if (data && typeof invoice === 'undefined') {
