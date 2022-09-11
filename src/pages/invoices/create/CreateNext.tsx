@@ -141,7 +141,7 @@ export function CreateNext() {
   }, [invoice]);
 
   return (
-    <Default title={documentTitle}>
+    <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector
           resource={invoice}
