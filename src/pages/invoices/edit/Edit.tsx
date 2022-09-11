@@ -21,7 +21,7 @@ import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { ProductsTable } from '../common/components/ProductsTable';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
-import { useInvoiceSave } from './hooks/useInvoiceSave';
+import { useHandleSave } from './hooks/useInvoiceSave';
 import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
 import { Invoice } from 'common/interfaces/invoice';
 import { Actions } from './components/Actions';
@@ -55,7 +55,7 @@ export function Edit() {
   const dispatch = useDispatch();
   const currentInvoice = useCurrentInvoice();
 
-  const handleInvoiceSave = useInvoiceSave();
+  const handleInvoiceSave = useHandleSave();
   const handleChange = useSetCurrentInvoiceProperty();
 
   const invoiceSum = useInvoiceSum();
