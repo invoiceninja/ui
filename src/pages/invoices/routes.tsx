@@ -21,6 +21,7 @@ import { Email } from './email/Email';
 import { Invoices } from './index/Invoices';
 import { Pdf } from './pdf/Pdf';
 import { CreateNext } from './create/CreateNext';
+import { EditNext } from './edit/EditNext';
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -61,7 +62,7 @@ export const invoiceRoutes = (
             () => permission('view_invoice'),
             () => permission('edit_invoice'),
           ]}
-          component={<Edit />}
+          component={<EditNext />}
         />
       }
     />
