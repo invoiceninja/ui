@@ -9,16 +9,17 @@
  */
 
 import { InvoiceStatus } from 'common/enums/invoice-status';
+import { Invoice } from 'common/interfaces/invoice';
 import { Divider } from 'components/cards/Divider';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Spinner } from 'components/Spinner';
 import { useAtom } from 'jotai';
 import { invoiceAtom } from 'pages/invoices/common/atoms';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { useHandleArchive } from '../hooks/useHandleArchive';
 import { useHandleCancel } from '../hooks/useHandleCancel';
 import { useHandleDelete } from '../hooks/useHandleDelete';
@@ -26,12 +27,11 @@ import { useHandleRestore } from '../hooks/useHandleRestore';
 import { useMarkPaid } from '../hooks/useMarkPaid';
 import { useMarkSent } from '../hooks/useMarkSent';
 
-export function Actions() {
-  const [t] = useTranslation();
-  const { id } = useParams();
-  const [invoice] = useAtom(invoiceAtom);
-  const downloadPdf = useDownloadPdf({ resource: 'invoice' });
+export function useActions() {
+  const { t } = useTranslation();
 
+  const navigate = useNavigate();
+  const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
 
@@ -40,38 +40,49 @@ export function Actions() {
   const destroy = useHandleDelete();
   const cancel = useHandleCancel();
 
-  if (!invoice) {
-    return <Spinner />;
-  }
+  const [, setInvoice] = useAtom(invoiceAtom);
 
-  return (
-    <Dropdown label={t('more_actions')}>
-      <DropdownElement to={generatePath('/invoices/:id/email', { id })}>
+  const cloneToInvoice = (invoice: Invoice) => {
+    setInvoice({ ...invoice, documents: [], number: '' });
+    navigate('/invoices/create');
+  };
+
+  return [
+    (invoice: Invoice) => (
+      <DropdownElement
+        to={generatePath('/invoices/:id/email', { id: invoice.id })}
+      >
         {t('email_invoice')}
       </DropdownElement>
-
-      <DropdownElement to={generatePath('/invoices/:id/pdf', { id })}>
+    ),
+    (invoice: Invoice) => (
+      <DropdownElement
+        to={generatePath('/invoices/:id/pdf', { id: invoice.id })}
+      >
         {t('view_pdf')}
       </DropdownElement>
-
+    ),
+    (invoice: Invoice) => (
       <DropdownElement onClick={() => downloadPdf(invoice)}>
         {t('download')}
       </DropdownElement>
-
-      {invoice.status_id === InvoiceStatus.Draft && !invoice.is_deleted && (
+    ),
+    (invoice: Invoice) =>
+      invoice.status_id === InvoiceStatus.Draft &&
+      !invoice.is_deleted && (
         <DropdownElement onClick={() => markSent(invoice)}>
           {t('mark_sent')}
         </DropdownElement>
-      )}
-
-      {parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
-        !invoice.is_deleted && (
-          <DropdownElement onClick={() => markPaid(invoice)}>
-            {t('mark_paid')}
-          </DropdownElement>
-        )}
-
-      {invoice && parseInt(invoice.status_id) < 4 && (
+      ),
+    (invoice: Invoice) =>
+      parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
+      !invoice.is_deleted && (
+        <DropdownElement onClick={() => markPaid(invoice)}>
+          {t('mark_paid')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      parseInt(invoice.status_id) < 4 && (
         <DropdownElement
           to={generatePath(
             '/payments/create?invoice=:invoiceId&client=:clientId',
@@ -80,65 +91,86 @@ export function Actions() {
         >
           {t('enter_payment')}
         </DropdownElement>
-      )}
-
+      ),
+    (invoice: Invoice) => (
       <DropdownElement onClick={() => invoice && openClientPortal(invoice)}>
         {t('client_portal')}
       </DropdownElement>
-
-      {invoice && <Divider withoutPadding />}
-
-      <DropdownElement
-        to={generatePath('/invoices/:id/clone', { id: invoice.id })}
-      >
+    ),
+    () => <Divider withoutPadding />,
+    (invoice: Invoice) => (
+      <DropdownElement onClick={() => cloneToInvoice(invoice)}>
         {t('clone_to_invoice')}
       </DropdownElement>
-
-      <DropdownElement
-        to={generatePath('/invoices/:id/clone/quote', { id: invoice.id })}
-      >
-        {t('clone_to_quote')}
-      </DropdownElement>
-
-      <DropdownElement
-        to={generatePath('/invoices/:id/clone/credit', { id: invoice.id })}
-      >
-        {t('clone_to_credit')}
-      </DropdownElement>
-
-      <DropdownElement
-        to={generatePath('/invoices/:id/clone/recurring_invoice', {
-          id: invoice.id,
-        })}
-      >
-        {t('clone_to_recurring')}
-      </DropdownElement>
-
-      <Divider withoutPadding />
-
-      {invoice.status_id === InvoiceStatus.Sent && (
+    ),
+    // (invoice: Invoice) => (
+    //   <DropdownElement
+    //     to={generatePath('/invoices/:id/clone/quote', { id: invoice.id })}
+    //   >
+    //     {t('clone_to_quote')}
+    //   </DropdownElement>
+    // ),
+    // (invoice: Invoice) => (
+    //   <DropdownElement
+    //     to={generatePath('/invoices/:id/clone/credit', { id: invoice.id })}
+    //   >
+    //     {t('clone_to_credit')}
+    //   </DropdownElement>
+    // ),
+    // (invoice: Invoice) => (
+    //   <DropdownElement
+    //     to={generatePath('/invoices/:id/clone/recurring_invoice', {
+    //       id: invoice.id,
+    //     })}
+    //   >
+    //     {t('clone_to_recurring')}
+    //   </DropdownElement>
+    // ),
+    () => <Divider withoutPadding />,
+    (invoice: Invoice) =>
+      invoice.status_id === InvoiceStatus.Sent && (
         <DropdownElement onClick={() => cancel(invoice)}>
           {t('cancel')}
         </DropdownElement>
-      )}
-
-      {invoice.archived_at === 0 && (
+      ),
+    (invoice: Invoice) =>
+      invoice.archived_at === 0 && (
         <DropdownElement onClick={() => archive(invoice)}>
           {t('archive')}
         </DropdownElement>
-      )}
-
-      {invoice.archived_at > 0 &&
-        invoice.status_id !== InvoiceStatus.Cancelled && (
-          <DropdownElement onClick={() => restore(invoice)}>
-            {t('restore')}
-          </DropdownElement>
-        )}
-
-      {!invoice.is_deleted && (
+      ),
+    (invoice: Invoice) =>
+      invoice.archived_at > 0 &&
+      invoice.status_id !== InvoiceStatus.Cancelled && (
+        <DropdownElement onClick={() => restore(invoice)}>
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      !invoice.is_deleted && (
         <DropdownElement onClick={() => destroy(invoice)}>
           {t('delete')}
         </DropdownElement>
+      ),
+  ];
+}
+
+export function Actions() {
+  const { t } = useTranslation();
+
+  const [invoice] = useAtom(invoiceAtom);
+
+  const actions = useActions();
+
+  return (
+    <Dropdown label={t('more_actions')}>
+      {actions.map(
+        (dropdownElement, index) =>
+          invoice && (
+            <React.Fragment key={index}>
+              {dropdownElement(invoice)}
+            </React.Fragment>
+          )
       )}
     </Dropdown>
   );

@@ -34,7 +34,7 @@ import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
-import { ActionsNext } from './components/ActionsNext';
+import { Actions } from './components/Actions';
 import { useHandleSave } from './hooks/useInvoiceSave';
 
 export function Edit() {
@@ -102,7 +102,7 @@ export function Edit() {
         invoice &&
         (invoice.status_id === InvoiceStatus.Cancelled || invoice.is_deleted)
       }
-      navigationTopRight={invoice && <ActionsNext />}
+      navigationTopRight={invoice && <Actions />}
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector

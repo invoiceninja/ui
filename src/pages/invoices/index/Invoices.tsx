@@ -20,10 +20,9 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { InvoiceStatus } from '../common/components/InvoiceStatus';
-import { useDownloadPdf } from '../common/hooks/useDownloadPdf';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
-import { useActions } from '../edit/components/ActionsNext';
+import { useActions } from '../edit/components/Actions';
 
 export function Invoices() {
   useTitle('invoices');
