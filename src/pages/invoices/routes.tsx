@@ -11,9 +11,6 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Import } from 'pages/invoices/import/Import';
-import { CloneInvoiceToCredit } from 'pages/credits/clone/CloneInvoiceToCredit';
-import { CloneInvoiceToQuote } from 'pages/quotes/clone/CloneFromInvoice';
-import { CloneInvoiceToRecurringInvoice } from 'pages/recurring-invoices/clone/CloneInvoiceToRecurringInvoice';
 import { Route } from 'react-router-dom';
 import { Email } from './email/Email';
 import { Invoices } from './index/Invoices';
@@ -74,12 +71,11 @@ export const invoiceRoutes = (
       }
     />
     <Route path=":id/email" element={<Email />} />
-    <Route path=":id/clone" element={<Clone />} />
-    <Route path=":id/clone/quote" element={<CloneInvoiceToQuote />} />
+    {/* <Route path=":id/clone/quote" element={<CloneInvoiceToQuote />} />
     <Route path=":id/clone/credit" element={<CloneInvoiceToCredit />} />
     <Route
       path=":id/clone/recurring_invoice"
       element={<CloneInvoiceToRecurringInvoice />}
-    />
+    /> */}
   </Route>
 );
