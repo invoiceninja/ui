@@ -12,7 +12,6 @@ import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Clone } from './clone/Clone';
-import { CloneToInvoice } from './clone/CloneToInvoice';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Email } from './email/Email';
@@ -58,7 +57,6 @@ export const quoteRoutes = (
       }
     />
     <Route path=":id/clone" element={<Clone />} />
-    <Route path=":id/clone/invoice" element={<CloneToInvoice />} />
     <Route
       path=":id/pdf"
       element={

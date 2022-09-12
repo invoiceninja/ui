@@ -9,8 +9,11 @@
  */
 
 import { QuoteStatus } from 'common/enums/quote-status';
+import { Quote } from 'common/interfaces/quote';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { useAtom } from 'jotai';
+import { invoiceAtom } from 'pages/invoices/common/atoms';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useApprove } from 'pages/quotes/common/hooks/useApprove';
@@ -18,7 +21,7 @@ import { useBulkAction } from 'pages/quotes/common/hooks/useBulkAction';
 import { useCurrentQuote } from 'pages/quotes/common/hooks/useCurrentQuote';
 import { useMarkSent } from 'pages/quotes/common/hooks/useMarkSent';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 
 export function Actions() {
   const [t] = useTranslation();
@@ -27,10 +30,18 @@ export function Actions() {
 
   const quote = useCurrentQuote();
 
+  const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
   const markSent = useMarkSent();
   const approve = useApprove();
   const bulk = useBulkAction();
+
+  const [, setInvoice] = useAtom(invoiceAtom);
+
+  const cloneToInvoice = (quote: Quote) => {
+    setInvoice({ ...quote, number: '', documents: [] });
+    navigate('/invoices/create');
+  };
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
@@ -59,7 +70,7 @@ export function Actions() {
           {t('clone_to_quote')}
         </DropdownElement>
 
-        <DropdownElement to={generatePath('/quotes/:id/clone/invoice', { id })}>
+        <DropdownElement onClick={() => quote && cloneToInvoice(quote)}>
           {t('clone_to_invoice')}
         </DropdownElement>
       </div>
