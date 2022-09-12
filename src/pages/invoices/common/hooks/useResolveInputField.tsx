@@ -20,8 +20,6 @@ import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
 import { useGetCurrencySeparators } from 'common/hooks/useGetCurrencySeparators';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
-import { useDispatch } from 'react-redux';
-import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
 import { ProductSelector } from 'components/products/ProductSelector';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
@@ -55,13 +53,8 @@ interface Props {
 }
 
 export function useResolveInputField(props: Props) {
-  const dispatch = useDispatch();
-
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
-
-  const [currentLineItemIndex, setCurrentLineItemIndex] = useState(0);
-  const [currentTaxRate, setCurrentTaxRate] = useState('tax_rate1');
 
   const handleProductChange = useHandleProductChange({
     resource: props.resource,
@@ -104,7 +97,6 @@ export function useResolveInputField(props: Props) {
             handleProductChange(index, value.label, value.resource)
           }
           className="w-auto"
-          onInputFocus={() => setCurrentLineItemIndex(index)}
           defaultValue={resource?.line_items[index][property]}
           onProductCreated={(product) =>
             handleProductChange(index, product.product_key, product)
@@ -157,10 +149,6 @@ export function useResolveInputField(props: Props) {
           }
           className="w-auto"
           defaultValue={resource?.line_items[index][property]}
-          onInputFocus={() => {
-            setCurrentLineItemIndex(index);
-            setCurrentTaxRate(property);
-          }}
           onClearButtonClick={() => {
             onChange(property, '', index);
 
