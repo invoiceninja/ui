@@ -149,7 +149,11 @@ export function useResolveInputField(props: Props) {
       return (
         <TaxRateSelector
           onChange={(value) =>
-            value.resource && handleTaxRateChange(property,index, value.resource)
+            value.resource &&
+            handleTaxRateChange(property, index, value.resource)
+          }
+          onTaxCreated={(taxRate) =>
+            handleTaxRateChange(property, index, taxRate)
           }
           className="w-auto"
           defaultValue={resource?.line_items[index][property]}
@@ -167,23 +171,6 @@ export function useResolveInputField(props: Props) {
             );
           }}
           clearButton={Boolean(resource?.line_items[index][property])}
-          onTaxCreated={(taxRate) => {
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: currentTaxRate,
-                value: taxRate.rate,
-              })
-            );
-
-            dispatch(
-              setCurrentLineItemProperty({
-                position: currentLineItemIndex,
-                property: currentTaxRate.replace('rate', 'name'),
-                value: taxRate.name,
-              })
-            );
-          }}
         />
       );
     }
