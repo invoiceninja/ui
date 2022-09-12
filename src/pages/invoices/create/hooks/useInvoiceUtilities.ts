@@ -17,7 +17,7 @@ import { Invitation } from "common/interfaces/purchase-order";
 import { blankLineItem } from "common/stores/slices/invoices/constants/blank-line-item";
 import { useAtom } from "jotai";
 import { invoiceAtom, invoiceSumAtom } from "pages/invoices/common/atoms";
-import { ChangeHandler } from "../CreateNext";
+import { ChangeHandler } from "../Create";
 
 interface Props {
   client?: Client;

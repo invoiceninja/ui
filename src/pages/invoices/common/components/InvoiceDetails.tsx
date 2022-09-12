@@ -13,7 +13,7 @@ import { InputField, SelectField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Invoice } from 'common/interfaces/invoice';
 import { CustomField } from 'components/CustomField';
-import { ChangeHandler } from 'pages/invoices/create/CreateNext';
+import { ChangeHandler } from 'pages/invoices/create/Create';
 import { useTranslation } from 'react-i18next';
 
 interface Props {

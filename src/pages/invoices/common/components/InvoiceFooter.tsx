@@ -22,7 +22,7 @@ import { useHandleCustomSurchargeFieldChange } from 'common/hooks/useHandleCusto
 import { Divider } from 'components/cards/Divider';
 import { useSetSurchageTaxValue } from '../hooks/useSetSurchargeTaxValue';
 import { Invoice } from 'common/interfaces/invoice';
-import { ChangeHandler } from 'pages/invoices/create/CreateNext';
+import { ChangeHandler } from 'pages/invoices/create/Create';
 import { generatePath, useLocation, useParams } from 'react-router-dom';
 import { Upload } from 'pages/settings/company/documents/components';
 import { endpoint } from 'common/helpers';

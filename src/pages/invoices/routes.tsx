@@ -15,12 +15,11 @@ import { CloneInvoiceToCredit } from 'pages/credits/clone/CloneInvoiceToCredit';
 import { CloneInvoiceToQuote } from 'pages/quotes/clone/CloneFromInvoice';
 import { CloneInvoiceToRecurringInvoice } from 'pages/recurring-invoices/clone/CloneInvoiceToRecurringInvoice';
 import { Route } from 'react-router-dom';
-import { Clone } from './clone/Clone';
 import { Email } from './email/Email';
 import { Invoices } from './index/Invoices';
 import { Pdf } from './pdf/Pdf';
-import { CreateNext } from './create/CreateNext';
-import { EditNext } from './edit/EditNext';
+import { Create } from './create/Create';
+import { Edit } from './edit/Edit';
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -49,7 +48,7 @@ export const invoiceRoutes = (
       element={
         <Guard
           guards={[() => permission('create_invoice')]}
-          component={<CreateNext />}
+          component={<Create />}
         />
       }
     />
@@ -61,7 +60,7 @@ export const invoiceRoutes = (
             () => permission('view_invoice'),
             () => permission('edit_invoice'),
           ]}
-          component={<EditNext />}
+          component={<Edit />}
         />
       }
     />
