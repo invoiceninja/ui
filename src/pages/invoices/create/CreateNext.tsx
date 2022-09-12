@@ -46,21 +46,23 @@ export type ChangeHandler = <T extends keyof Invoice>(
 export function CreateNext() {
   const { t } = useTranslation();
   const { documentTitle } = useTitle('new_invoice');
-  const { data } = useBlankInvoiceQuery();
 
-  const company = useCurrentCompany();
+  const [invoice, setInvoice] = useAtom(invoiceAtom);
+
+  const { data } = useBlankInvoiceQuery({
+    enabled: typeof invoice === 'undefined',
+  });
 
   const clientResolver = useClientResolver();
+  const company = useCurrentCompany();
 
   const productColumns = useProductColumns();
   const taskColumns = useTaskColumns();
 
-  const [invoice, setInvoice] = useAtom(invoiceAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<ValidationBag>();
-
   const [client, setClient] = useState<Client | undefined>();
 
   const pages: Page[] = [
@@ -84,7 +86,10 @@ export function CreateNext() {
   const save = useHandleCreate(setErrors);
 
   useEffect(() => {
-    if (data && typeof invoice === 'undefined') {
+    console.log(typeof invoice);
+    console.log(data);
+
+    if (typeof data !== 'undefined' && typeof invoice === 'undefined') {
       const _invoice = cloneDeep(data);
 
       if (company && company.enabled_tax_rates > 0) {
