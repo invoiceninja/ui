@@ -16,6 +16,10 @@ import { Invoice } from "common/interfaces/invoice";
 import { useQuery } from "react-query";
 import { generatePath } from "react-router-dom";
 
+export interface GenericQueryOptions {
+  enabled: boolean;
+}
+
 export function useInvoiceQuery(
   params: { id: string | undefined },
 ) {
@@ -29,7 +33,7 @@ export function useInvoiceQuery(
   );
 }
 
-export function useBlankInvoiceQuery() {
+export function useBlankInvoiceQuery(options?: GenericQueryOptions) {
   return useQuery<Invoice>(
     generatePath("/api/v1/invoices/create"),
     () =>
@@ -37,7 +41,7 @@ export function useBlankInvoiceQuery() {
         (response: GenericSingleResourceResponse<Invoice>) =>
           response.data.data,
       ),
-    { staleTime: Infinity },
+    { ...options, staleTime: Infinity },
   );
 }
 
