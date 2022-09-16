@@ -9,20 +9,17 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
-import { useRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
 import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
 import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
 import { generatePath, useParams } from 'react-router-dom';
+import { useRecurringInvoiceQuery } from '../common/queries';
 
 export function Pdf() {
   const { documentTitle } = useTitle('view_pdf');
   const { id } = useParams();
-  const { data: recurringInvoice, isLoading } = useRecurringInvoiceQuery({
-    id,
-  });
+
+  const { data: recurringInvoice } = useRecurringInvoiceQuery({ id: id! });
 
   const url = useGeneratePdfUrl({ resourceType: 'recurring_invoice' });
 
@@ -31,13 +28,8 @@ export function Pdf() {
       title={documentTitle}
       onBackClick={generatePath('/recurring_invoices/:id/edit', { id })}
     >
-      {isLoading && <Spinner />}
-
       {recurringInvoice && (
-        <InvoiceViewer
-          link={url(recurringInvoice.data.data as RecurringInvoice) as string}
-          method="GET"
-        />
+        <InvoiceViewer link={url(recurringInvoice) as string} method="GET" />
       )}
     </Default>
   );
