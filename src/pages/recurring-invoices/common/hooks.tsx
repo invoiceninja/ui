@@ -17,6 +17,7 @@ import { toast } from 'common/helpers/toast/toast';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { Client } from 'common/interfaces/client';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
 import { Invitation } from 'common/interfaces/purchase-order';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
@@ -274,4 +275,31 @@ export function useActions() {
   ];
 
   return actions;
+}
+
+export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
+  const navigate = useNavigate();
+
+  return (recurringInvoice: RecurringInvoice) => {
+    setErrors(undefined);
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/recurring_invoices'), recurringInvoice)
+      .then((response: GenericSingleResourceResponse<RecurringInvoice>) => {
+        toast.success('created_recurring_invoice');
+
+        navigate(
+          generatePath('/recurring_invoices/:id/edit', {
+            id: response.data.data.id,
+          })
+        );
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+
+        error.response?.status === 422
+          ? toast.dismiss() && setErrors(error.response.data)
+          : toast.error();
+      });
+  };
 }

@@ -13,6 +13,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
 import { Page } from 'components/Breadcrumbs';
@@ -30,7 +31,7 @@ import { useTranslation } from 'react-i18next';
 import { invoiceSumAtom, recurringInvoiceAtom } from '../common/atoms';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
-import { useRecurringInvoiceUtilities } from '../common/hooks';
+import { useCreate, useRecurringInvoiceUtilities } from '../common/hooks';
 import { useBlankRecurringInvoiceQuery } from '../common/queries';
 
 export function Create() {
@@ -134,13 +135,15 @@ export function Create() {
       });
   }, [recurringInvoice?.client_id]);
 
+  const save = useCreate({ setErrors });
+
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
       onBackClick="/recurring_invoices"
-      // onSaveClick={() => save(invoice as Invoice)}
-      // disableSaveButton={invoice?.client_id.length === 0}
+      onSaveClick={() => save(recurringInvoice as RecurringInvoice)}
+      disableSaveButton={recurringInvoice?.client_id.length === 0}
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector
