@@ -9,6 +9,7 @@
  */
 
 import { AxiosError } from 'axios';
+import { RecurringInvoiceStatus } from 'common/enums/recurring-invoice-status';
 import { endpoint } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { request } from 'common/helpers/request';
@@ -21,9 +22,12 @@ import { Invitation } from 'common/interfaces/purchase-order';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Action } from 'components/ResourceActions';
 import { useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
 
 interface RecurringInvoiceUtilitiesProps {
@@ -181,4 +185,91 @@ export function useSave(props: RecurringInvoiceSaveProps) {
           : toast.error();
       });
   };
+}
+
+export function useToggleStartStop() {
+  const [t] = useTranslation();
+  const queryClient = useQueryClient();
+
+  return (recurringInvoice: RecurringInvoice, action: 'start' | 'stop') => {
+    toast.processing();
+
+    const url =
+      action === 'start'
+        ? '/api/v1/recurring_invoices/:id?start=true'
+        : '/api/v1/recurring_invoices/:id?stop=true';
+
+    request('PUT', endpoint(url, { id: recurringInvoice.id }), recurringInvoice)
+      .then(() => {
+        queryClient.invalidateQueries(
+          generatePath('/api/v1/recurring_invoices/:id', {
+            id: recurringInvoice.id,
+          })
+        );
+
+        toast.success(
+          action === 'start'
+            ? t('started_recurring_invoice')
+            : t('stopped_recurring_invoice')
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.error();
+      });
+  };
+}
+
+export function useActions() {
+  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
+
+  const { t } = useTranslation();
+
+  const navigate = useNavigate();
+  const toggleStartStop = useToggleStartStop();
+
+  const cloneToRecurringInvoice = (recurringInvoice: RecurringInvoice) => {
+    setRecurringInvoice({ ...recurringInvoice, documents: [], number: '' });
+
+    navigate('/recurring_invoices/create');
+  };
+
+  const actions: Action<RecurringInvoice>[] = [
+    (recurringInvoice) => (
+      <DropdownElement
+        to={generatePath('/recurring_invoices/:id/pdf', {
+          id: recurringInvoice.id,
+        })}
+      >
+        {t('view_pdf')}
+      </DropdownElement>
+    ),
+    (recurringInvoice) =>
+      (recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT ||
+        recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED) && (
+        <DropdownElement
+          onClick={() => toggleStartStop(recurringInvoice, 'start')}
+        >
+          {t('start')}
+        </DropdownElement>
+      ),
+    (recurringInvoice) =>
+      recurringInvoice.status_id === RecurringInvoiceStatus.ACTIVE && (
+        <DropdownElement
+          onClick={() => toggleStartStop(recurringInvoice, 'stop')}
+        >
+          {t('stop')}
+        </DropdownElement>
+      ),
+    (recurringInvoice) => (
+      <DropdownElement
+        onClick={() => cloneToRecurringInvoice(recurringInvoice)}
+      >
+        {t('clone_to_recurring')}
+      </DropdownElement>
+    ),
+  ];
+
+  return actions;
 }

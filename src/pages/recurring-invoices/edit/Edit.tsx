@@ -14,6 +14,7 @@ import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { ResourceActions } from 'components/ResourceActions';
 import { Spinner } from 'components/Spinner';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
@@ -29,7 +30,11 @@ import { v4 } from 'uuid';
 import { invoiceSumAtom, recurringInvoiceAtom } from '../common/atoms';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
-import { useRecurringInvoiceUtilities, useSave } from '../common/hooks';
+import {
+  useActions,
+  useRecurringInvoiceUtilities,
+  useSave,
+} from '../common/hooks';
 import { useRecurringInvoiceQuery } from '../common/queries';
 
 export function Edit() {
@@ -82,6 +87,7 @@ export function Edit() {
     recurringInvoice && calculateInvoiceSum();
   }, [recurringInvoice]);
 
+  const actions = useActions();
   const save = useSave({ setErrors });
 
   return (
@@ -90,6 +96,15 @@ export function Edit() {
       breadcrumbs={pages}
       onBackClick="/recurring_invoices"
       onSaveClick={() => recurringInvoice && save(recurringInvoice)}
+      navigationTopRight={
+        recurringInvoice && (
+          <ResourceActions
+            resource={recurringInvoice}
+            label={t('more_actions')}
+            actions={actions}
+          />
+        )
+      }
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector
