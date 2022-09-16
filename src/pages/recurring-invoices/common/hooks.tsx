@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from "axios";
-import { endpoint } from "common/helpers";
-import { InvoiceSum } from "common/helpers/invoices/invoice-sum";
-import { request } from "common/helpers/request";
-import { toast } from "common/helpers/toast/toast";
-import { useCurrentCompany } from "common/hooks/useCurrentCompany";
-import { useResolveCurrency } from "common/hooks/useResolveCurrency";
-import { Client } from "common/interfaces/client";
-import { InvoiceItem, InvoiceItemType } from "common/interfaces/invoice-item";
-import { Invitation } from "common/interfaces/purchase-order";
-import { RecurringInvoice } from "common/interfaces/recurring-invoice";
-import { ValidationBag } from "common/interfaces/validation-bag";
-import { blankLineItem } from "common/stores/slices/invoices/constants/blank-line-item";
-import { useAtom } from "jotai";
-import { useQueryClient } from "react-query";
-import { generatePath } from "react-router-dom";
-import { invoiceSumAtom, recurringInvoiceAtom } from "./atoms";
+import { AxiosError } from 'axios';
+import { endpoint } from 'common/helpers';
+import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
+import { Client } from 'common/interfaces/client';
+import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
+import { Invitation } from 'common/interfaces/purchase-order';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { ValidationBag } from 'common/interfaces/validation-bag';
+import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
+import { useAtom } from 'jotai';
+import { useQueryClient } from 'react-query';
+import { generatePath } from 'react-router-dom';
+import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -32,11 +32,11 @@ interface RecurringInvoiceUtilitiesProps {
 
 export type ChangeHandler = <T extends keyof RecurringInvoice>(
   property: T,
-  value: RecurringInvoice[typeof property],
+  value: RecurringInvoice[typeof property]
 ) => void;
 
 export function useRecurringInvoiceUtilities(
-  props: RecurringInvoiceUtilitiesProps,
+  props: RecurringInvoiceUtilitiesProps
 ) {
   const currencyResolver = useResolveCurrency();
   const company = useCurrentCompany();
@@ -45,8 +45,8 @@ export function useRecurringInvoiceUtilities(
   const [, setInvoiceSum] = useAtom(invoiceSumAtom);
 
   const handleChange: ChangeHandler = (property, value) => {
-    setRecurringInvoice((current) =>
-      current && { ...current, [property]: value }
+    setRecurringInvoice(
+      (current) => current && { ...current, [property]: value }
     );
   };
 
@@ -69,7 +69,7 @@ export function useRecurringInvoiceUtilities(
       invitations.push(invitation as Invitation);
     }
 
-    handleChange("invitations", invitations);
+    handleChange('invitations', invitations);
   };
 
   const handleLineItemChange = (index: number, lineItem: InvoiceItem) => {
@@ -77,15 +77,16 @@ export function useRecurringInvoiceUtilities(
 
     lineItems[index] = lineItem;
 
-    setRecurringInvoice((recurringInvoice) =>
-      recurringInvoice && { ...recurringInvoice, line_items: lineItems }
+    setRecurringInvoice(
+      (recurringInvoice) =>
+        recurringInvoice && { ...recurringInvoice, line_items: lineItems }
     );
   };
 
   const handleLineItemPropertyChange = (
     key: keyof InvoiceItem,
     value: unknown,
-    index: number,
+    index: number
   ) => {
     const lineItems = recurringInvoice?.line_items || [];
 
@@ -93,8 +94,9 @@ export function useRecurringInvoiceUtilities(
     // @ts-ignore
     lineItems[index][key] = value;
 
-    setRecurringInvoice((recurringInvoice) =>
-      recurringInvoice && { ...recurringInvoice, line_items: lineItems }
+    setRecurringInvoice(
+      (recurringInvoice) =>
+        recurringInvoice && { ...recurringInvoice, line_items: lineItems }
     );
   };
 
@@ -107,7 +109,7 @@ export function useRecurringInvoiceUtilities(
             ...recurringInvoice.line_items,
             { ...blankLineItem(), type_id: InvoiceItemType.Product },
           ],
-        },
+        }
     );
   };
 
@@ -116,14 +118,15 @@ export function useRecurringInvoiceUtilities(
 
     lineItems.splice(index, 1);
 
-    setRecurringInvoice((recurringInvoice) =>
-      recurringInvoice && { ...recurringInvoice, line_items: lineItems }
+    setRecurringInvoice(
+      (recurringInvoice) =>
+        recurringInvoice && { ...recurringInvoice, line_items: lineItems }
     );
   };
 
   const calculateInvoiceSum = () => {
     const currency = currencyResolver(
-      props.client?.settings.currency_id || company?.settings.currency_id,
+      props.client?.settings.currency_id || company?.settings.currency_id
     );
 
     if (currency && recurringInvoice) {
@@ -157,23 +160,25 @@ export function useSave(props: RecurringInvoiceSaveProps) {
     setErrors(undefined);
 
     request(
-      "PUT",
-      endpoint("/api/v1/recurring_invoices/:id", { id: recurringInvoice.id }),
-      recurringInvoice,
-    ).then(() => {
-      queryClient.invalidateQueries(
-        generatePath("/api/v1/recurring_invoices/:id", {
-          id: recurringInvoice.id,
-        }),
-      );
+      'PUT',
+      endpoint('/api/v1/recurring_invoices/:id', { id: recurringInvoice.id }),
+      recurringInvoice
+    )
+      .then(() => {
+        queryClient.invalidateQueries(
+          generatePath('/api/v1/recurring_invoices/:id', {
+            id: recurringInvoice.id,
+          })
+        );
 
-      toast.success("updated_recurring_invoice");
-    }).catch((error: AxiosError) => {
-      console.error(error);
+        toast.success('updated_recurring_invoice');
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
 
-      error.response?.status === 422
-        ? toast.dismiss() && setErrors(error.response.data)
-        : toast.error();
-    });
+        error.response?.status === 422
+          ? toast.dismiss() && setErrors(error.response.data)
+          : toast.error();
+      });
   };
 }
