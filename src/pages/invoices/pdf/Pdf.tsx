@@ -31,8 +31,8 @@ export function Pdf() {
   const url = useGeneratePdfUrl({ resourceType: 'invoice' });
 
   useEffect(() => {
-    if (data?.data.data) {
-      setInvoice(data.data.data);
+    if (data) {
+      setInvoice(data);
     }
   }, [data]);
 

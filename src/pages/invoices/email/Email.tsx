@@ -43,7 +43,7 @@ export function Email() {
     <Default title={documentTitle} breadcrumbs={pages}>
       {invoice && (
         <Mailer
-          resource={invoice.data.data}
+          resource={invoice}
           resourceType="invoice"
           list={list}
           defaultEmail="email_template_invoice"
