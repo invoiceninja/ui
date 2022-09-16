@@ -8,8 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTitle } from 'common/hooks/useTitle';
+import { useRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
 import { Default } from 'components/layouts/Default';
+import { useParams } from 'react-router-dom';
 
 export function Edit() {
-  return <Default></Default>;
+  const { id } = useParams();
+  const { documentTitle } = useTitle('edit_recurring_invoice');
+  const { data } = useRecurringInvoiceQuery({ id });
+
+  return <Default title={documentTitle}></Default>;
 }
