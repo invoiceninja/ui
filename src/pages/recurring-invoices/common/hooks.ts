@@ -16,13 +16,14 @@ import { toast } from "common/helpers/toast/toast";
 import { useCurrentCompany } from "common/hooks/useCurrentCompany";
 import { useResolveCurrency } from "common/hooks/useResolveCurrency";
 import { Client } from "common/interfaces/client";
-import { GenericSingleResourceResponse } from "common/interfaces/generic-api-response";
 import { InvoiceItem, InvoiceItemType } from "common/interfaces/invoice-item";
 import { Invitation } from "common/interfaces/purchase-order";
 import { RecurringInvoice } from "common/interfaces/recurring-invoice";
 import { ValidationBag } from "common/interfaces/validation-bag";
 import { blankLineItem } from "common/stores/slices/invoices/constants/blank-line-item";
 import { useAtom } from "jotai";
+import { useQueryClient } from "react-query";
+import { generatePath } from "react-router-dom";
 import { invoiceSumAtom, recurringInvoiceAtom } from "./atoms";
 
 interface RecurringInvoiceUtilitiesProps {
@@ -149,7 +150,7 @@ interface RecurringInvoiceSaveProps {
 
 export function useSave(props: RecurringInvoiceSaveProps) {
   const { setErrors } = props;
-  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
+  const queryClient = useQueryClient();
 
   return (recurringInvoice: RecurringInvoice) => {
     toast.processing();
@@ -159,8 +160,12 @@ export function useSave(props: RecurringInvoiceSaveProps) {
       "PUT",
       endpoint("/api/v1/recurring_invoices/:id", { id: recurringInvoice.id }),
       recurringInvoice,
-    ).then((response: GenericSingleResourceResponse<RecurringInvoice>) => {
-      setRecurringInvoice(response.data.data);
+    ).then(() => {
+      queryClient.invalidateQueries(
+        generatePath("/api/v1/recurring_invoices/:id", {
+          id: recurringInvoice.id,
+        }),
+      );
 
       toast.success("updated_recurring_invoice");
     }).catch((error: AxiosError) => {
