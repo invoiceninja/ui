@@ -11,7 +11,6 @@
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Task } from 'common/interfaces/task';
 import { useBlankInvoiceQuery } from 'common/queries/invoices';
-import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
 import { useNavigate } from 'react-router-dom';
 import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
 import { parseTimeLog } from '../helpers/calculate-time';
