@@ -23,6 +23,7 @@ import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { RecurringInvoiceStatus } from '../common/components/RecurringInvoiceStatus';
+import { useActions } from '../common/hooks';
 
 export function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -113,6 +114,8 @@ export function RecurringInvoices() {
     },
   ];
 
+  const actions = useActions();
+
   return (
     <Default
       title={t('recurring_invoices')}
@@ -126,6 +129,7 @@ export function RecurringInvoices() {
         linkToCreate="/recurring_invoices/create"
         linkToEdit="/recurring_invoices/:id/edit"
         bulkRoute="/api/v1/recurring_invoices/bulk"
+        customActions={actions}
         withResourcefulActions
       />
     </Default>

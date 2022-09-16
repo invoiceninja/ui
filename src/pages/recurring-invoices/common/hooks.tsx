@@ -201,6 +201,8 @@ export function useToggleStartStop() {
 
     request('PUT', endpoint(url, { id: recurringInvoice.id }), recurringInvoice)
       .then(() => {
+        queryClient.invalidateQueries('/api/v1/recurring_invoices');
+
         queryClient.invalidateQueries(
           generatePath('/api/v1/recurring_invoices/:id', {
             id: recurringInvoice.id,
