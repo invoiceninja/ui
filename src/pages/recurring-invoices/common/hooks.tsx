@@ -18,14 +18,17 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { Client } from 'common/interfaces/client';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
 import { Invitation } from 'common/interfaces/purchase-order';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
+import { Divider } from 'components/cards/Divider';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Action } from 'components/ResourceActions';
 import { useAtom } from 'jotai';
+import { invoiceAtom } from 'pages/invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate } from 'react-router-dom';
@@ -226,6 +229,7 @@ export function useToggleStartStop() {
 
 export function useActions() {
   const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
+  const [, setInvoice] = useAtom(invoiceAtom);
 
   const { t } = useTranslation();
 
@@ -236,6 +240,16 @@ export function useActions() {
     setRecurringInvoice({ ...recurringInvoice, documents: [], number: '' });
 
     navigate('/recurring_invoices/create');
+  };
+
+  const cloneToInvoice = (recurringInvoice: RecurringInvoice) => {
+    setInvoice({
+      ...(recurringInvoice as unknown as Invoice),
+      documents: [],
+      number: '',
+    });
+
+    navigate('/invoices/create');
   };
 
   const actions: Action<RecurringInvoice>[] = [
@@ -265,11 +279,17 @@ export function useActions() {
           {t('stop')}
         </DropdownElement>
       ),
+    () => <Divider withoutPadding />,
     (recurringInvoice) => (
       <DropdownElement
         onClick={() => cloneToRecurringInvoice(recurringInvoice)}
       >
         {t('clone_to_recurring')}
+      </DropdownElement>
+    ),
+    (recurringInvoice) => (
+      <DropdownElement onClick={() => cloneToInvoice(recurringInvoice)}>
+        {t('clone_to_invoice')}
       </DropdownElement>
     ),
   ];
