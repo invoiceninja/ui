@@ -8,11 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from "axios";
+import { endpoint } from "common/helpers";
+import { InvoiceSum } from "common/helpers/invoices/invoice-sum";
+import { request } from "common/helpers/request";
+import { toast } from "common/helpers/toast/toast";
+import { useCurrentCompany } from "common/hooks/useCurrentCompany";
+import { useResolveCurrency } from "common/hooks/useResolveCurrency";
 import { Client } from "common/interfaces/client";
+import { GenericSingleResourceResponse } from "common/interfaces/generic-api-response";
+import { InvoiceItem, InvoiceItemType } from "common/interfaces/invoice-item";
 import { Invitation } from "common/interfaces/purchase-order";
 import { RecurringInvoice } from "common/interfaces/recurring-invoice";
+import { ValidationBag } from "common/interfaces/validation-bag";
+import { blankLineItem } from "common/stores/slices/invoices/constants/blank-line-item";
 import { useAtom } from "jotai";
-import { recurringInvoiceAtom } from "./atoms";
+import { invoiceSumAtom, recurringInvoiceAtom } from "./atoms";
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -26,7 +37,11 @@ export type ChangeHandler = <T extends keyof RecurringInvoice>(
 export function useRecurringInvoiceUtilities(
   props: RecurringInvoiceUtilitiesProps,
 ) {
+  const currencyResolver = useResolveCurrency();
+  const company = useCurrentCompany();
+
   const [recurringInvoice, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
+  const [, setInvoiceSum] = useAtom(invoiceSumAtom);
 
   const handleChange: ChangeHandler = (property, value) => {
     setRecurringInvoice((current) =>
@@ -56,5 +71,104 @@ export function useRecurringInvoiceUtilities(
     handleChange("invitations", invitations);
   };
 
-  return { handleChange, handleInvitationChange };
+  const handleLineItemChange = (index: number, lineItem: InvoiceItem) => {
+    const lineItems = recurringInvoice?.line_items || [];
+
+    lineItems[index] = lineItem;
+
+    setRecurringInvoice((recurringInvoice) =>
+      recurringInvoice && { ...recurringInvoice, line_items: lineItems }
+    );
+  };
+
+  const handleLineItemPropertyChange = (
+    key: keyof InvoiceItem,
+    value: unknown,
+    index: number,
+  ) => {
+    const lineItems = recurringInvoice?.line_items || [];
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    lineItems[index][key] = value;
+
+    setRecurringInvoice((recurringInvoice) =>
+      recurringInvoice && { ...recurringInvoice, line_items: lineItems }
+    );
+  };
+
+  const handleCreateLineItem = () => {
+    setRecurringInvoice(
+      (recurringInvoice) =>
+        recurringInvoice && {
+          ...recurringInvoice,
+          line_items: [
+            ...recurringInvoice.line_items,
+            { ...blankLineItem(), type_id: InvoiceItemType.Product },
+          ],
+        },
+    );
+  };
+
+  const handleDeleteLineItem = (index: number) => {
+    const lineItems = recurringInvoice?.line_items || [];
+
+    lineItems.splice(index, 1);
+
+    setRecurringInvoice((recurringInvoice) =>
+      recurringInvoice && { ...recurringInvoice, line_items: lineItems }
+    );
+  };
+
+  const calculateInvoiceSum = () => {
+    const currency = currencyResolver(
+      props.client?.settings.currency_id || company?.settings.currency_id,
+    );
+
+    if (currency && recurringInvoice) {
+      const invoiceSum = new InvoiceSum(recurringInvoice, currency).build();
+
+      setInvoiceSum(invoiceSum);
+    }
+  };
+
+  return {
+    handleChange,
+    handleInvitationChange,
+    handleLineItemChange,
+    handleLineItemPropertyChange,
+    handleCreateLineItem,
+    handleDeleteLineItem,
+    calculateInvoiceSum,
+  };
+}
+
+interface RecurringInvoiceSaveProps {
+  setErrors: (errors: ValidationBag | undefined) => unknown;
+}
+
+export function useSave(props: RecurringInvoiceSaveProps) {
+  const { setErrors } = props;
+  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
+
+  return (recurringInvoice: RecurringInvoice) => {
+    toast.processing();
+    setErrors(undefined);
+
+    request(
+      "PUT",
+      endpoint("/api/v1/recurring_invoices/:id", { id: recurringInvoice.id }),
+      recurringInvoice,
+    ).then((response: GenericSingleResourceResponse<RecurringInvoice>) => {
+      setRecurringInvoice(response.data.data);
+
+      toast.success("updated_recurring_invoice");
+    }).catch((error: AxiosError) => {
+      console.error(error);
+
+      error.response?.status === 422
+        ? toast.dismiss() && setErrors(error.response.data)
+        : toast.error();
+    });
+  };
 }
