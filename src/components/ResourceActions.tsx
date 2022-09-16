@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Fragment } from 'react';
+import { Fragment, ReactNode } from 'react';
 import { Dropdown } from './dropdown/Dropdown';
 
-export type Action<T = unknown> = (resource: T) => unknown;
+export type Action<T = unknown> = (resource: T) => ReactNode;
 
 interface Props {
   resource: unknown;
