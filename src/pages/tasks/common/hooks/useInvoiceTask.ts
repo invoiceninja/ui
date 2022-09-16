@@ -12,7 +12,6 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Task } from 'common/interfaces/task';
 import { useBlankInvoiceQuery } from 'common/queries/invoices';
 import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
-import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
 import { parseTimeLog } from '../helpers/calculate-time';
@@ -22,18 +21,21 @@ import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
 import collect from 'collect.js';
 import toast from 'react-hot-toast';
+import { useAtom } from 'jotai';
+import { invoiceAtom } from 'pages/invoices/common/atoms';
 
 export function useInvoiceTask() {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
   const company = useCurrentCompany();
+  
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const { data } = useBlankInvoiceQuery();
 
-  const { data: invoiceQuery } = useBlankInvoiceQuery();
+  const [, setInvoice] = useAtom(invoiceAtom);
 
   return (tasks: Task[]) => {
-    if (invoiceQuery?.data.data) {
-      const invoice: Invoice = { ...invoiceQuery.data.data };
+    if (data) {
+      const invoice: Invoice = { ...data };
 
       if (company && company.enabled_tax_rates > 0) {
         invoice.tax_name1 = company.settings?.tax_name1;
@@ -87,9 +89,9 @@ export function useInvoiceTask() {
         invoice.line_items = [item];
       });
 
-      dispatch(setCurrentInvoice(invoice));
-
-      navigate('/invoices/create?preload=true&table=tasks');
+      setInvoice(invoice);
+      
+      navigate('/invoices/create&table=tasks');
     }
   };
 }

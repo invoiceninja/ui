@@ -68,9 +68,9 @@ export function CloneInvoiceToQuote() {
   ];
 
   useEffect(() => {
-    if (invoice?.data.data) {
+    if (invoice) {
       dispatch(
-        setCurrentQuote({ ...invoice.data.data, number: '', documents: [] })
+        setCurrentQuote({ ...invoice as Quote, number: '', documents: [] })
       );
     }
 
