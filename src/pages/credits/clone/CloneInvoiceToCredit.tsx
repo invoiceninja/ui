@@ -70,9 +70,7 @@ export function CloneInvoiceToCredit() {
 
   useEffect(() => {
     if (invoice) {
-      dispatch(
-        setCurrentCredit({ ...invoice, documents: [], number: '' })
-      );
+      dispatch(setCurrentCredit({ ...invoice, documents: [], number: '' }));
     }
 
     return () => {

@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from "common/helpers";
-import { Invoice } from "common/interfaces/invoice";
-import { request } from "common/helpers/request";
-import { toast } from "common/helpers/toast/toast";
-import { useQueryClient } from "react-query";
-import { generatePath } from "react-router-dom";
+import { endpoint } from 'common/helpers';
+import { Invoice } from 'common/interfaces/invoice';
+import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
+import { useQueryClient } from 'react-query';
+import { generatePath } from 'react-router-dom';
 
 export function useMarkPaid() {
   const queryClient = useQueryClient();
@@ -22,17 +22,17 @@ export function useMarkPaid() {
     toast.processing();
 
     request(
-      "PUT",
-      endpoint("/api/v1/invoices/:id?paid=true", { id: invoice.id }),
-      invoice,
+      'PUT',
+      endpoint('/api/v1/invoices/:id?paid=true', { id: invoice.id }),
+      invoice
     )
       .then(() => {
-        toast.success("invoice_paid");
+        toast.success('invoice_paid');
 
-        queryClient.invalidateQueries("/api/v1/invoices");
+        queryClient.invalidateQueries('/api/v1/invoices');
 
         queryClient.invalidateQueries(
-          generatePath("/api/v1/invoices/:id", { id: invoice.id }),
+          generatePath('/api/v1/invoices/:id', { id: invoice.id })
         );
       })
       .catch((error) => {

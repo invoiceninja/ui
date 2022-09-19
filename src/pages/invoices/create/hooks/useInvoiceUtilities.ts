@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceSum } from "common/helpers/invoices/invoice-sum";
-import { useCurrentCompany } from "common/hooks/useCurrentCompany";
-import { useResolveCurrency } from "common/hooks/useResolveCurrency";
-import { Client } from "common/interfaces/client";
-import { InvoiceItem, InvoiceItemType } from "common/interfaces/invoice-item";
-import { Invitation } from "common/interfaces/purchase-order";
-import { blankLineItem } from "common/constants/blank-line-item";
-import { useAtom } from "jotai";
-import { invoiceAtom, invoiceSumAtom } from "pages/invoices/common/atoms";
-import { ChangeHandler } from "../Create";
+import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
+import { Client } from 'common/interfaces/client';
+import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
+import { Invitation } from 'common/interfaces/purchase-order';
+import { blankLineItem } from 'common/constants/blank-line-item';
+import { useAtom } from 'jotai';
+import { invoiceAtom, invoiceSumAtom } from 'pages/invoices/common/atoms';
+import { ChangeHandler } from '../Create';
 
 interface Props {
   client?: Client;
@@ -54,12 +54,12 @@ export function useInvoiceUtilities(props: Props) {
       invitations.push(invitation as Invitation);
     }
 
-    handleChange("invitations", invitations);
+    handleChange('invitations', invitations);
   };
 
   const calculateInvoiceSum = () => {
     const currency = currencyResolver(
-      props.client?.settings.currency_id || company?.settings.currency_id,
+      props.client?.settings.currency_id || company?.settings.currency_id
     );
 
     if (currency && invoice) {
@@ -80,7 +80,7 @@ export function useInvoiceUtilities(props: Props) {
   const handleLineItemPropertyChange = (
     key: keyof InvoiceItem,
     value: unknown,
-    index: number,
+    index: number
   ) => {
     const lineItems = invoice?.line_items || [];
 
@@ -100,7 +100,7 @@ export function useInvoiceUtilities(props: Props) {
             ...invoice.line_items,
             { ...blankLineItem(), type_id: typeId },
           ],
-        },
+        }
     );
   };
 

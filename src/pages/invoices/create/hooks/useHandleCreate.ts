@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from "axios";
-import { endpoint } from "common/helpers";
-import { request } from "common/helpers/request";
-import { toast } from "common/helpers/toast/toast";
-import { GenericSingleResourceResponse } from "common/interfaces/generic-api-response";
-import { Invoice } from "common/interfaces/invoice";
-import { ValidationBag } from "common/interfaces/validation-bag";
-import { generatePath, useNavigate } from "react-router-dom";
+import { AxiosError } from 'axios';
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { Invoice } from 'common/interfaces/invoice';
+import { ValidationBag } from 'common/interfaces/validation-bag';
+import { generatePath, useNavigate } from 'react-router-dom';
 
 export function useHandleCreate(
-  setErrors: (errors: ValidationBag | undefined) => unknown,
+  setErrors: (errors: ValidationBag | undefined) => unknown
 ) {
   const navigate = useNavigate();
 
@@ -26,12 +26,12 @@ export function useHandleCreate(
     toast.processing();
     setErrors(undefined);
 
-    request("POST", endpoint("/api/v1/invoices"), invoice)
+    request('POST', endpoint('/api/v1/invoices'), invoice)
       .then((response: GenericSingleResourceResponse<Invoice>) => {
-        toast.success("created_invoice");
+        toast.success('created_invoice');
 
         navigate(
-          generatePath("/invoices/:id/edit", { id: response.data.data.id }),
+          generatePath('/invoices/:id/edit', { id: response.data.data.id })
         );
       })
       .catch((error: AxiosError) => {

@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from "common/helpers";
-import { request } from "common/helpers/request";
-import { GenericSingleResourceResponse } from "common/interfaces/generic-api-response";
-import { Quote } from "common/interfaces/quote";
-import { GenericQueryOptions } from "common/queries/invoices";
-import { useQuery } from "react-query";
-import { generatePath } from "react-router-dom";
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { Quote } from 'common/interfaces/quote';
+import { GenericQueryOptions } from 'common/queries/invoices';
+import { useQuery } from 'react-query';
+import { generatePath } from 'react-router-dom';
 
 export function useBlankQuoteQuery(options?: GenericQueryOptions) {
   return useQuery<Quote>(
-    "/api/v1/quotes/create",
+    '/api/v1/quotes/create',
     () =>
-      request("GET", endpoint("/api/v1/quotes/create")).then((
-        response: GenericSingleResourceResponse<Quote>,
-      ) => response.data.data),
-    { ...options, staleTime: Infinity },
+      request('GET', endpoint('/api/v1/quotes/create')).then(
+        (response: GenericSingleResourceResponse<Quote>) => response.data.data
+      ),
+    { ...options, staleTime: Infinity }
   );
 }
 
@@ -33,11 +33,11 @@ interface QuoteQueryParams {
 
 export function useQuoteQuery({ id }: QuoteQueryParams) {
   return useQuery<Quote>(
-    generatePath("/api/v1/quotes/:id", { id }),
+    generatePath('/api/v1/quotes/:id', { id }),
     () =>
-      request("GET", endpoint("/api/v1/quotes/:id", { id })).then((
-        response: GenericSingleResourceResponse<Quote>,
-      ) => response.data.data),
-    { staleTime: Infinity },
+      request('GET', endpoint('/api/v1/quotes/:id', { id })).then(
+        (response: GenericSingleResourceResponse<Quote>) => response.data.data
+      ),
+    { staleTime: Infinity }
   );
 }

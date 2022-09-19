@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceSum } from "common/helpers/invoices/invoice-sum";
-import { RecurringInvoice } from "common/interfaces/recurring-invoice";
-import { atom } from "jotai";
+import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { atom } from 'jotai';
 
 export const recurringInvoiceAtom = atom<RecurringInvoice | undefined>(
-  undefined,
+  undefined
 );
 
 export const invoiceSumAtom = atom<InvoiceSum | undefined>(undefined);

@@ -135,7 +135,7 @@ export function Edit() {
 
         {currentCredit && (
           <InvoiceTotals
-          relationType='client_id'
+            relationType="client_id"
             resource={currentCredit}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
@@ -149,7 +149,7 @@ export function Edit() {
         {currentCredit && (
           <InvoicePreview
             for="invoice"
-            relationType='client_id'
+            relationType="client_id"
             resource={currentCredit}
             entity="credit"
           />

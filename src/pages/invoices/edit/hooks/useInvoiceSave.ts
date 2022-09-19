@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from "axios";
-import { endpoint } from "common/helpers";
-import { Invoice } from "common/interfaces/invoice";
-import { useQueryClient } from "react-query";
-import { useDispatch } from "react-redux";
-import { generatePath } from "react-router-dom";
-import { useInjectCompanyChanges } from "common/hooks/useInjectCompanyChanges";
-import { updateRecord } from "common/stores/slices/company-users";
-import { request } from "common/helpers/request";
-import { ValidationBag } from "common/interfaces/validation-bag";
-import { toast } from "common/helpers/toast/toast";
+import axios from 'axios';
+import { endpoint } from 'common/helpers';
+import { Invoice } from 'common/interfaces/invoice';
+import { useQueryClient } from 'react-query';
+import { useDispatch } from 'react-redux';
+import { generatePath } from 'react-router-dom';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { updateRecord } from 'common/stores/slices/company-users';
+import { request } from 'common/helpers/request';
+import { ValidationBag } from 'common/interfaces/validation-bag';
+import { toast } from 'common/helpers/toast/toast';
 
 export function useHandleSave(
-  setErrors: (errors: ValidationBag | undefined) => unknown,
+  setErrors: (errors: ValidationBag | undefined) => unknown
 ) {
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
@@ -34,21 +34,21 @@ export function useHandleSave(
     axios
       .all([
         request(
-          "PUT",
-          endpoint("/api/v1/invoices/:id", { id: invoice.id }),
-          invoice,
+          'PUT',
+          endpoint('/api/v1/invoices/:id', { id: invoice.id }),
+          invoice
         ),
         request(
-          "PUT",
-          endpoint("/api/v1/companies/:id", { id: company?.id }),
-          company,
+          'PUT',
+          endpoint('/api/v1/companies/:id', { id: company?.id }),
+          company
         ),
       ])
       .then((response) => {
-        toast.success("updated_invoice");
+        toast.success('updated_invoice');
 
         dispatch(
-          updateRecord({ object: "company", data: response[1].data.data }),
+          updateRecord({ object: 'company', data: response[1].data.data })
         );
       })
       .catch((error) => {
@@ -60,7 +60,7 @@ export function useHandleSave(
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath("/api/v1/invoices/:id", { id: invoice.id }),
+          generatePath('/api/v1/invoices/:id', { id: invoice.id })
         )
       );
   };

@@ -26,7 +26,7 @@ import { invoiceAtom } from 'pages/invoices/common/atoms';
 export function useInvoiceTask() {
   const navigate = useNavigate();
   const company = useCurrentCompany();
-  
+
   const { dateFormat } = useCurrentCompanyDateFormats();
   const { data } = useBlankInvoiceQuery();
 
@@ -89,7 +89,7 @@ export function useInvoiceTask() {
       });
 
       setInvoice(invoice);
-      
+
       navigate('/invoices/create&table=tasks');
     }
   };
