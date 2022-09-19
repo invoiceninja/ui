@@ -32,7 +32,7 @@ import { openClientPortal } from 'pages/invoices/common/helpers/open-client-port
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { generatePath, useLocation, useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, quoteAtom } from './atoms';
 import { useApprove } from './hooks/useApprove';
 import { useBulkAction } from './hooks/useBulkAction';
@@ -210,6 +210,7 @@ export function useActions() {
 
   const { t } = useTranslation();
 
+  const location = useLocation();
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
   const markSent = useMarkSent();
@@ -277,20 +278,23 @@ export function useActions() {
           {t('approve')}
         </DropdownElement>
       ),
-    () => <Divider withoutPadding />,
+    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
     (quote) =>
+      location.pathname.endsWith('/edit') &&
       quote.archived_at === 0 && (
         <DropdownElement onClick={() => bulk(quote.id, 'archive')}>
           {t('archive_quote')}
         </DropdownElement>
       ),
     (quote) =>
+      location.pathname.endsWith('/edit') &&
       quote.archived_at > 0 && (
         <DropdownElement onClick={() => bulk(quote.id, 'restore')}>
           {t('restore_quote')}
         </DropdownElement>
       ),
     (quote) =>
+      location.pathname.endsWith('/edit') &&
       !quote?.is_deleted && (
         <DropdownElement onClick={() => bulk(quote.id, 'delete')}>
           {t('delete_quote')}

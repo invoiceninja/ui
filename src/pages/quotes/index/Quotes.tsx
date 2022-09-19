@@ -17,15 +17,13 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Quote } from 'common/interfaces/quote';
 import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
-import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
-import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { QuoteStatus } from '../common/components/QuoteStatus';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
+import { useActions } from '../common/hooks';
 
 export function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -33,12 +31,9 @@ export function Quotes() {
 
   const [t] = useTranslation();
 
-  const pages: Page[] = [
-    { name: t('quotes'), href: generatePath('/quotes') },
-  ];
+  const pages: Page[] = [{ name: t('quotes'), href: generatePath('/quotes') }];
 
   const formatMoney = useFormatMoney();
-  const downloadPdf = useDownloadPdf({ resource: 'quote' });
   const company = useCurrentCompany();
 
   const importButton = (
@@ -102,28 +97,7 @@ export function Quotes() {
     },
   ];
 
-  const actions = [
-    (quote: Quote) => (
-      <DropdownElement to={generatePath('/quotes/:id/pdf', { id: quote.id })}>
-        {t('view_pdf')}
-      </DropdownElement>
-    ),
-    (quote: Quote) => (
-      <DropdownElement onClick={() => downloadPdf(quote)}>
-        {t('download_pdf')}
-      </DropdownElement>
-    ),
-    (quote: Quote) => (
-      <DropdownElement to={generatePath('/quotes/:id/email', { id: quote.id })}>
-        {t('email_quote')}
-      </DropdownElement>
-    ),
-    (quote: Quote) => (
-      <DropdownElement onClick={() => openClientPortal(quote)}>
-        {t('client_portal')}
-      </DropdownElement>
-    ),
-  ];
+  const actions = useActions();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
