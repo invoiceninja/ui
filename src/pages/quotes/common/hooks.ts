@@ -23,6 +23,7 @@ import { Quote } from "common/interfaces/quote";
 import { ValidationBag } from "common/interfaces/validation-bag";
 import { blankLineItem } from "common/stores/slices/invoices/constants/blank-line-item";
 import { useAtom } from "jotai";
+import { useQueryClient } from "react-query";
 import { generatePath, useNavigate } from "react-router-dom";
 import { invoiceSumAtom, quoteAtom } from "./atoms";
 
@@ -157,7 +158,7 @@ export function useCreate(props: CreateProps) {
 
     request("POST", endpoint("/api/v1/quotes"), quote).then(
       (response: GenericSingleResourceResponse<Quote>) => {
-        toast.success('created_quote');
+        toast.success("created_quote");
 
         navigate(
           generatePath("/quotes/:id/edit", { id: response.data.data.id }),
@@ -170,5 +171,31 @@ export function useCreate(props: CreateProps) {
         ? toast.dismiss() && setErrors(error.response.data)
         : toast.error();
     });
+  };
+}
+
+export function useSave(props: CreateProps) {
+  const { setErrors } = props;
+
+  const queryClient = useQueryClient();
+
+  return (quote: Quote) => {
+    toast.processing();
+    setErrors(undefined);
+
+    request("PUT", endpoint("/api/v1/quotes/:id", { id: quote.id }), quote)
+      .then(() => {
+        toast.success('updated_quote');
+
+        queryClient.invalidateQueries(
+          generatePath("/api/v1/quotes/:id", { id: quote.id }),
+        );
+      }).catch((error: AxiosError) => {
+        console.error(error);
+
+        error.response?.status === 422
+          ? toast.dismiss() && setErrors(error.response.data)
+          : toast.error();
+      });
   };
 }
