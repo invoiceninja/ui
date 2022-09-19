@@ -96,6 +96,7 @@ export function Edit() {
   return (
     <Default
       title={documentTitle}
+      breadcrumbs={pages}
       onBackClick="/quotes"
       onSaveClick={() => quote && save(quote)}
     >
