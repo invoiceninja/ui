@@ -196,7 +196,7 @@ export function Create() {
           <InvoicePreview
             for="create"
             resource={recurringInvoice}
-            entity="invoice"
+            entity="recurring_invoice"
             relationType="client_id"
             endpoint="/api/v1/live_preview?entity=:entity"
           />
