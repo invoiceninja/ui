@@ -29,7 +29,7 @@ export function useMarkSent() {
       quote,
     )
       .then(() => {
-        toast.success(t("updated_quote"), { id: toastId });
+        toast.success(t("quote_sent"), { id: toastId });
 
         queryClient.invalidateQueries("/api/v1/quotes");
 
