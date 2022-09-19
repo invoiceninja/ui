@@ -8,24 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { setCurrentQuote } from 'common/stores/slices/quotes/extra-reducers/set-current-quote';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
+import { AxiosError } from "axios";
+import { endpoint } from "common/helpers";
+import { request } from "common/helpers/request";
+import { setCurrentQuote } from "common/stores/slices/quotes/extra-reducers/set-current-quote";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { useQueryClient } from "react-query";
+import { useDispatch } from "react-redux";
+import { generatePath } from "react-router-dom";
 
 export function useBulkAction() {
   const [t] = useTranslation();
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
-    const toastId = toast.loading(t('processing'));
+  return (id: string, action: "archive" | "restore" | "delete") => {
+    const toastId = toast.loading(t("processing"));
 
-    request('POST', endpoint('/api/v1/quotes/bulk'), {
+    request("POST", endpoint("/api/v1/quotes/bulk"), {
       action,
       ids: [id],
     })
@@ -40,12 +41,16 @@ export function useBulkAction() {
         console.log(error);
         console.error(error.response?.data);
 
-        toast.error(t('error_title'), {
+        toast.error(t("error_title"), {
           id: toastId,
         });
       })
       .finally(() => {
-        queryClient.invalidateQueries('/api/v1/quotes');
+        queryClient.invalidateQueries("/api/v1/quotes");
+
+        queryClient.invalidateQueries(
+          generatePath("/api/v1/quotes/:id", { id }),
+        );
       });
   };
 }
