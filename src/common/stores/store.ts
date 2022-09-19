@@ -10,14 +10,11 @@
 
 import { configureStore } from '@reduxjs/toolkit';
 import { setupListeners } from '@reduxjs/toolkit/dist/query';
-import { invoiceSlice } from './slices/invoices';
 import { companyDocumentSlice } from './slices/company-documents';
 import { productsSlice } from './slices/products';
 import { settingsSlice } from './slices/settings';
 import { userSlice } from './slices/user';
 import { companyUserSlice } from './slices/company-users';
-import { recurringInvoiceSlice } from './slices/recurring-invoices';
-import { quoteSlice } from './slices/quotes';
 import { creditSlice } from './slices/credits';
 
 export const store = configureStore({
@@ -27,9 +24,6 @@ export const store = configureStore({
     user: userSlice.reducer,
     products: productsSlice.reducer,
     settings: settingsSlice.reducer,
-    invoices: invoiceSlice.reducer,
-    recurringInvoices: recurringInvoiceSlice.reducer,
-    quotes: quoteSlice.reducer,
     credits: creditSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>

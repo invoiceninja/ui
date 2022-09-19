@@ -12,7 +12,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Task } from 'common/interfaces/task';
 import { useBlankInvoiceQuery } from 'common/queries/invoices';
 import { useNavigate } from 'react-router-dom';
-import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
+import { blankLineItem } from 'common/constants/blank-line-item';
 import { parseTimeLog } from '../helpers/calculate-time';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import dayjs from 'dayjs';

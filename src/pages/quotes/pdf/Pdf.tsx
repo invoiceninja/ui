@@ -9,7 +9,6 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { useQuoteQuery } from 'common/queries/quotes';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
@@ -19,6 +18,7 @@ import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
+import { useQuoteQuery } from '../common/queries';
 
 export function Pdf() {
   const [t] = useTranslation();
@@ -26,7 +26,7 @@ export function Pdf() {
   const { documentTitle } = useTitle('view_pdf');
   const { id } = useParams();
   const { data: quote, isLoading } = useQuoteQuery({
-    id,
+    id: id!,
   });
 
   const url = useGeneratePdfUrl({ resourceType: 'quote' });
@@ -39,12 +39,12 @@ export function Pdf() {
       navigationTopRight={
         quote && (
           <Dropdown label={t('more_actions')}>
-            <DropdownElement onClick={() => downloadPdf(quote.data.data)}>
+            <DropdownElement onClick={() => downloadPdf(quote)}>
               {t('download')}
             </DropdownElement>
 
             <DropdownElement
-              to={generatePath('/quotes/:id/email', { id: quote.data.data.id })}
+              to={generatePath('/quotes/:id/email', { id: quote.id })}
             >
               {t('email_quote')}
             </DropdownElement>
@@ -54,9 +54,7 @@ export function Pdf() {
     >
       {isLoading && <Spinner />}
 
-      {quote && (
-        <InvoiceViewer link={url(quote.data.data) as string} method="GET" />
-      )}
+      {quote && <InvoiceViewer link={url(quote) as string} method="GET" />}
     </Default>
   );
 }

@@ -9,12 +9,12 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { useQuoteQuery } from 'common/queries/quotes';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Mailer } from 'pages/invoices/email/components/Mailer';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
+import { useQuoteQuery } from '../common/queries';
 
 export function Email() {
   const [t] = useTranslation();
@@ -22,7 +22,7 @@ export function Email() {
   const { documentTitle } = useTitle('email_quote');
   const { id } = useParams();
 
-  const { data: quote } = useQuoteQuery({ id });
+  const { data: quote } = useQuoteQuery({ id: id! });
 
   const list = {
     email_template_quote: 'initial_email',
@@ -40,7 +40,7 @@ export function Email() {
     <Default title={documentTitle} breadcrumbs={pages}>
       {quote && (
         <Mailer
-          resource={quote.data.data}
+          resource={quote}
           resourceType="quote"
           list={list}
           defaultEmail="email_template_quote"

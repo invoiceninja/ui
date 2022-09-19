@@ -18,8 +18,8 @@ import { setCurrentCredit } from './credits/extra-reducers/set-current-credit';
 import { setCurrentCreditLineItem } from './credits/extra-reducers/set-current-credit-line-item';
 import { setCurrentLineItemProperty } from './credits/extra-reducers/set-current-line-item-property';
 import { setCurrentCreditProperty } from './credits/extra-reducers/set-current-quote-property';
-import { blankInvitation } from './invoices/constants/blank-invitation';
-import { blankLineItem } from './invoices/constants/blank-line-item';
+import { blankInvitation } from '../../constants/blank-invitation';
+import { blankLineItem } from '../../constants/blank-line-item';
 
 interface CreditState {
   api?: any;

@@ -14,7 +14,7 @@ import { useResolveCurrency } from "common/hooks/useResolveCurrency";
 import { Client } from "common/interfaces/client";
 import { InvoiceItem, InvoiceItemType } from "common/interfaces/invoice-item";
 import { Invitation } from "common/interfaces/purchase-order";
-import { blankLineItem } from "common/stores/slices/invoices/constants/blank-line-item";
+import { blankLineItem } from "common/constants/blank-line-item";
 import { useAtom } from "jotai";
 import { invoiceAtom, invoiceSumAtom } from "pages/invoices/common/atoms";
 import { ChangeHandler } from "../Create";

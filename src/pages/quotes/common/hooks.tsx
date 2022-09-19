@@ -22,7 +22,7 @@ import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
 import { Invitation } from 'common/interfaces/purchase-order';
 import { Quote } from 'common/interfaces/quote';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
+import { blankLineItem } from 'common/constants/blank-line-item';
 import { Divider } from 'components/cards/Divider';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Action } from 'components/ResourceActions';
