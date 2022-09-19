@@ -15,6 +15,7 @@ import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { ResourceActions } from 'components/ResourceActions';
 import { Spinner } from 'components/Spinner';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
@@ -30,7 +31,7 @@ import { v4 } from 'uuid';
 import { invoiceSumAtom, quoteAtom } from '../common/atoms';
 import { QuoteDetails } from '../common/components/QuoteDetails';
 import { QuoteFooter } from '../common/components/QuoteFooter';
-import { useQuoteUtilities, useSave } from '../common/hooks';
+import { useActions, useQuoteUtilities, useSave } from '../common/hooks';
 import { useQuoteQuery } from '../common/queries';
 
 export function Edit() {
@@ -91,6 +92,7 @@ export function Edit() {
     quote && calculateInvoiceSum();
   }, [quote]);
 
+  const actions = useActions();
   const save = useSave({ setErrors });
 
   return (
@@ -99,6 +101,15 @@ export function Edit() {
       breadcrumbs={pages}
       onBackClick="/quotes"
       onSaveClick={() => quote && save(quote)}
+      navigationTopRight={
+        quote && (
+          <ResourceActions
+            resource={quote}
+            label={t('more_actions')}
+            actions={actions}
+          />
+        )
+      }
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector
