@@ -268,7 +268,7 @@ export function useActions() {
         {t('clone_to_credit')}
       </DropdownElement>
     ),
-    () => <Divider withoutPadding />,
+    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
     (credit) =>
       location.pathname.endsWith('/edit') &&
       credit.archived_at === 0 && (

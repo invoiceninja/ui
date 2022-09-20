@@ -23,6 +23,7 @@ import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { CreditStatus } from '../common/components/CreditStatus';
+import { useActions } from '../common/hooks';
 
 export function Credits() {
   useTitle('credits');
@@ -90,30 +91,7 @@ export function Credits() {
     },
   ];
 
-  const actions = [
-    (credit: Credit) => (
-      <DropdownElement to={generatePath('/credits/:id/pdf', { id: credit.id })}>
-        {t('view_pdf')}
-      </DropdownElement>
-    ),
-    (credit: Credit) => (
-      <DropdownElement onClick={() => downloadPdf(credit)}>
-        {t('download_pdf')}
-      </DropdownElement>
-    ),
-    (credit: Credit) => (
-      <DropdownElement
-        to={generatePath('/credits/:id/email', { id: credit.id })}
-      >
-        {t('email_credit')}
-      </DropdownElement>
-    ),
-    (credit: Credit) => (
-      <DropdownElement onClick={() => openClientPortal(credit)}>
-        {t('client_portal')}
-      </DropdownElement>
-    ),
-  ];
+  const actions = useActions();
 
   return (
     <Default title={t('credits')} breadcrumbs={pages} docsLink="docs/credits/">
