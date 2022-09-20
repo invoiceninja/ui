@@ -12,17 +12,22 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
+import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { useCurrentCredit } from '../hooks/useCurrentCredit';
-import { useSetCurrentCreditProperty } from '../hooks/useSetCurrentCreditProperty';
+import { creditAtom } from '../atoms';
+import { ChangeHandler } from '../hooks';
 
-export function CreditDetails() {
-  const [t] = useTranslation();
+interface Props {
+  handleChange: ChangeHandler;
+}
 
-  const credits = useCurrentCredit();
+export function CreditDetails(props: Props) {
+  const { t } = useTranslation();
+  const { handleChange } = props;
+
   const company = useCurrentCompany();
 
-  const handleChange = useSetCurrentCreditProperty();
+  const [credits] = useAtom(creditAtom);
 
   return (
     <>
