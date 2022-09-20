@@ -10,6 +10,7 @@
 
 import { AxiosError } from 'axios';
 import { blankLineItem } from 'common/constants/blank-line-item';
+import { CreditStatus } from 'common/enums/credit-status';
 import { endpoint } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { request } from 'common/helpers/request';
@@ -22,10 +23,18 @@ import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-res
 import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
 import { Invitation } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { Divider } from 'components/cards/Divider';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Action } from 'components/ResourceActions';
 import { useAtom } from 'jotai';
+import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
+import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { generatePath, useLocation, useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
+import { useBulkAction } from './hooks/useBulkAction';
+import { useMarkSent } from './hooks/useMarkSent';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -191,4 +200,97 @@ export function useSave(props: CreateProps) {
           : toast.error();
       });
   };
+}
+
+export function useActions() {
+  const [, setCredit] = useAtom(creditAtom);
+
+  const { t } = useTranslation();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const downloadPdf = useDownloadPdf({ resource: 'credit' });
+  const markSent = useMarkSent();
+  const bulk = useBulkAction();
+
+  const cloneToCredit = (credit: Credit) => {
+    setCredit({ ...credit, number: '', documents: [] });
+    navigate('/credits/create');
+  };
+
+  const actions: Action<Credit>[] = [
+    (credit) => (
+      <DropdownElement to={generatePath('/credits/:id/pdf', { id: credit.id })}>
+        {t('view_pdf')}
+      </DropdownElement>
+    ),
+    (credit) => (
+      <DropdownElement onClick={() => downloadPdf(credit)}>
+        {t('download_pdf')}
+      </DropdownElement>
+    ),
+    (credit) => (
+      <DropdownElement
+        to={generatePath('/credits/:id/email', { id: credit.id })}
+      >
+        {t('email_credit')}
+      </DropdownElement>
+    ),
+    (credit) => (
+      <DropdownElement onClick={() => credit && openClientPortal(credit)}>
+        {t('client_portal')}
+      </DropdownElement>
+    ),
+    (credit) =>
+      credit.client_id &&
+      credit.amount > 0 && (
+        <DropdownElement
+          to={generatePath(
+            '/payments/create?client=:clientId&credit=:creditId&type=1',
+            { clientId: credit.client_id, creditId: credit.id }
+          )}
+        >
+          {t('apply_credit')}
+        </DropdownElement>
+      ),
+    (credit) =>
+      credit.status_id === CreditStatus.Draft && (
+        <div>
+          <DropdownElement onClick={() => markSent(credit)}>
+            {t('mark_sent')}
+          </DropdownElement>
+        </div>
+      ),
+    () => <Divider withoutPadding />,
+    (credit) => (
+      <DropdownElement onClick={() => cloneToCredit(credit)}>
+        {t('clone_to_credit')}
+      </DropdownElement>
+    ),
+    () => <Divider withoutPadding />,
+    (credit) =>
+      location.pathname.endsWith('/edit') &&
+      credit.archived_at === 0 && (
+        <DropdownElement onClick={() => bulk(credit.id, 'archive')}>
+          {t('archive_credit')}
+        </DropdownElement>
+      ),
+    (credit) =>
+      location.pathname.endsWith('/edit') &&
+      credit.archived_at > 0 && (
+        <DropdownElement onClick={() => bulk(credit.id, 'restore')}>
+          {t('restore_credit')}
+        </DropdownElement>
+      ),
+    (credit) =>
+      location.pathname.endsWith('/edit') &&
+      !credit?.is_deleted && (
+        <DropdownElement onClick={() => bulk(credit.id, 'delete')}>
+          {t('delete_credit')}
+        </DropdownElement>
+      ),
+  ];
+
+  return actions;
 }
