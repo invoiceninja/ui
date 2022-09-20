@@ -16,10 +16,7 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import { useTitle } from 'common/hooks/useTitle';
 import { Credit } from 'common/interfaces/credit';
 import { DataTable, DataTableColumns } from 'components/DataTable';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
-import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
-import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { generatePath } from 'react-router-dom';
 import { CreditStatus } from '../common/components/CreditStatus';
@@ -33,7 +30,6 @@ export function Credits() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-  const downloadPdf = useDownloadPdf({ resource: 'credit' });
 
   const pages = [{ name: t('credits'), href: '/credits' }];
 
