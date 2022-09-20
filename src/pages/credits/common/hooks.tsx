@@ -23,6 +23,7 @@ import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
 import { Invitation } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useAtom } from 'jotai';
+import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
 
@@ -153,6 +154,33 @@ export function useCreate(props: CreateProps) {
 
         navigate(
           generatePath('/credits/:id/edit', { id: response.data.data.id })
+        );
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+
+        error.response?.status === 422
+          ? toast.dismiss() && setErrors(error.response.data)
+          : toast.error();
+      });
+  };
+}
+
+export function useSave(props: CreateProps) {
+  const { setErrors } = props;
+
+  const queryClient = useQueryClient();
+
+  return (credit: Credit) => {
+    toast.processing();
+    setErrors(undefined);
+
+    request('PUT', endpoint('/api/v1/credits/:id', { id: credit.id }), credit)
+      .then(() => {
+        toast.success('updated_credit');
+
+        queryClient.invalidateQueries(
+          generatePath('/api/v1/credits/:id', { id: credit.id })
         );
       })
       .catch((error: AxiosError) => {
