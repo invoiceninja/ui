@@ -9,12 +9,12 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { useCreditQuery } from 'common/queries/credits';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Mailer } from 'pages/invoices/email/components/Mailer';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
+import { useCreditQuery } from '../common/queries';
 
 export function Email() {
   const [t] = useTranslation();
@@ -22,7 +22,7 @@ export function Email() {
   const { documentTitle } = useTitle('email_credit');
   const { id } = useParams();
 
-  const { data: credit } = useCreditQuery({ id });
+  const { data: credit } = useCreditQuery({ id: id! });
 
   const list = {
     email_template_credit: 'initial_email',
@@ -40,7 +40,7 @@ export function Email() {
     <Default title={documentTitle} breadcrumbs={pages}>
       {credit && (
         <Mailer
-          resource={credit.data.data}
+          resource={credit}
           resourceType="credit"
           list={list}
           defaultEmail="email_template_credit"

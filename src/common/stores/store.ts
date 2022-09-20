@@ -15,7 +15,6 @@ import { productsSlice } from './slices/products';
 import { settingsSlice } from './slices/settings';
 import { userSlice } from './slices/user';
 import { companyUserSlice } from './slices/company-users';
-import { creditSlice } from './slices/credits';
 
 export const store = configureStore({
   reducer: {
@@ -24,7 +23,6 @@ export const store = configureStore({
     user: userSlice.reducer,
     products: productsSlice.reducer,
     settings: settingsSlice.reducer,
-    credits: creditSlice.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
