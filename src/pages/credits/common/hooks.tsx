@@ -22,13 +22,18 @@ import { Credit } from 'common/interfaces/credit';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
 import { Invitation } from 'common/interfaces/purchase-order';
+import { Quote } from 'common/interfaces/quote';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Divider } from 'components/cards/Divider';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Action } from 'components/ResourceActions';
 import { useAtom } from 'jotai';
+import { invoiceAtom } from 'pages/invoices/common/atoms';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
+import { quoteAtom } from 'pages/quotes/common/atoms';
+import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useLocation, useNavigate } from 'react-router-dom';
@@ -204,6 +209,9 @@ export function useSave(props: CreateProps) {
 
 export function useActions() {
   const [, setCredit] = useAtom(creditAtom);
+  const [, setInvoice] = useAtom(invoiceAtom);
+  const [, setQuote] = useAtom(quoteAtom);
+  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
 
   const { t } = useTranslation();
 
@@ -216,7 +224,30 @@ export function useActions() {
 
   const cloneToCredit = (credit: Credit) => {
     setCredit({ ...credit, number: '', documents: [] });
+    
     navigate('/credits/create');
+  };
+
+  const cloneToInvoice = (credit: Credit) => {
+    setInvoice({ ...credit, number: '', documents: [] });
+
+    navigate('/invoices/create');
+  };
+
+  const cloneToQuote = (credit: Credit) => {
+    setQuote({ ...(credit as Quote), number: '', documents: [] });
+
+    navigate('/quotes/create');
+  };
+
+  const cloneToRecurringInvoice = (credit: Credit) => {
+    setRecurringInvoice({
+      ...(credit as unknown as RecurringInvoice),
+      number: '',
+      documents: [],
+    });
+
+    navigate('/recurring_invoices/create')
   };
 
   const actions: Action<Credit>[] = [
@@ -266,6 +297,21 @@ export function useActions() {
     (credit) => (
       <DropdownElement onClick={() => cloneToCredit(credit)}>
         {t('clone_to_credit')}
+      </DropdownElement>
+    ),
+    (credit) => (
+      <DropdownElement onClick={() => cloneToInvoice(credit)}>
+        {t('clone_to_invoice')}
+      </DropdownElement>
+    ),
+    (credit) => (
+      <DropdownElement onClick={() => cloneToQuote(credit)}>
+        {t('clone_to_quote')}
+      </DropdownElement>
+    ),
+    (credit) => (
+      <DropdownElement onClick={() => cloneToRecurringInvoice(credit)}>
+        {t('clone_to_recurring_invoice')}
       </DropdownElement>
     ),
     () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
