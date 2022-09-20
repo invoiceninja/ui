@@ -14,6 +14,7 @@ import { Credit } from "common/interfaces/credit";
 import { GenericSingleResourceResponse } from "common/interfaces/generic-api-response";
 import { GenericQueryOptions } from "common/queries/invoices";
 import { useQuery } from "react-query";
+import { generatePath } from "react-router-dom";
 
 export function useBlankCreditQuery(options?: GenericQueryOptions) {
   return useQuery<Credit>(
@@ -23,5 +24,20 @@ export function useBlankCreditQuery(options?: GenericQueryOptions) {
         response: GenericSingleResourceResponse<Credit>,
       ) => response.data.data),
     { ...options, staleTime: Infinity },
+  );
+}
+
+interface CreditQueryProps {
+  id: string;
+}
+
+export function useCreditQuery({ id }: CreditQueryProps) {
+  return useQuery<Credit>(
+    generatePath("/api/v1/credits/:id", { id }),
+    () =>
+      request("GET", endpoint("/api/v1/credits/:id", { id })).then(
+        (response: GenericSingleResourceResponse<Credit>) => response.data.data,
+      ),
+    { staleTime: Infinity },
   );
 }
