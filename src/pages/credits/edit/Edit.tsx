@@ -15,6 +15,7 @@ import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { ResourceActions } from 'components/ResourceActions';
 import { Spinner } from 'components/Spinner';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
@@ -30,7 +31,7 @@ import { v4 } from 'uuid';
 import { creditAtom, invoiceSumAtom } from '../common/atoms';
 import { CreditDetails } from '../common/components/CreditDetails';
 import { CreditFooter } from '../common/components/CreditFooter';
-import { useCreditUtilities, useSave } from '../common/hooks';
+import { useActions, useCreditUtilities, useSave } from '../common/hooks';
 import { useCreditQuery } from '../common/queries';
 
 export function Edit() {
@@ -91,6 +92,7 @@ export function Edit() {
     credit && calculateInvoiceSum();
   }, [credit]);
 
+  const actions = useActions();
   const save = useSave({ setErrors });
 
   return (
@@ -99,6 +101,15 @@ export function Edit() {
       breadcrumbs={pages}
       onBackClick="/credits"
       onSaveClick={() => credit && save(credit)}
+      navigationTopRight={
+        credit && (
+          <ResourceActions
+            resource={credit}
+            label={t('more_actions')}
+            actions={actions}
+          />
+        )
+      }
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector
