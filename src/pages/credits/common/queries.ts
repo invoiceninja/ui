@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from "common/helpers";
-import { request } from "common/helpers/request";
-import { Credit } from "common/interfaces/credit";
-import { GenericSingleResourceResponse } from "common/interfaces/generic-api-response";
-import { GenericQueryOptions } from "common/queries/invoices";
-import { useQuery } from "react-query";
-import { generatePath } from "react-router-dom";
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
+import { Credit } from 'common/interfaces/credit';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { GenericQueryOptions } from 'common/queries/invoices';
+import { useQuery } from 'react-query';
+import { generatePath } from 'react-router-dom';
 
 export function useBlankCreditQuery(options?: GenericQueryOptions) {
   return useQuery<Credit>(
-    "/api/v1/credits/create",
+    '/api/v1/credits/create',
     () =>
-      request("GET", endpoint("/api/v1/credits/create")).then((
-        response: GenericSingleResourceResponse<Credit>,
-      ) => response.data.data),
-    { ...options, staleTime: Infinity },
+      request('GET', endpoint('/api/v1/credits/create')).then(
+        (response: GenericSingleResourceResponse<Credit>) => response.data.data
+      ),
+    { ...options, staleTime: Infinity }
   );
 }
 
@@ -33,11 +33,11 @@ interface CreditQueryProps {
 
 export function useCreditQuery({ id }: CreditQueryProps) {
   return useQuery<Credit>(
-    generatePath("/api/v1/credits/:id", { id }),
+    generatePath('/api/v1/credits/:id', { id }),
     () =>
-      request("GET", endpoint("/api/v1/credits/:id", { id })).then(
-        (response: GenericSingleResourceResponse<Credit>) => response.data.data,
+      request('GET', endpoint('/api/v1/credits/:id', { id })).then(
+        (response: GenericSingleResourceResponse<Credit>) => response.data.data
       ),
-    { staleTime: Infinity },
+    { staleTime: Infinity }
   );
 }

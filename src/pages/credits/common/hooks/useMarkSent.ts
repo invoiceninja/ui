@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from "common/helpers";
-import { request } from "common/helpers/request";
-import { toast } from "common/helpers/toast/toast";
-import { Credit } from "common/interfaces/credit";
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
+import { Credit } from 'common/interfaces/credit';
 
 export function useMarkSent() {
   return (credit: Credit) => {
     toast.processing();
 
     request(
-      "PUT",
-      endpoint("/api/v1/credits/:id?mark_sent=true", { id: credit.id }),
-      credit,
+      'PUT',
+      endpoint('/api/v1/credits/:id?mark_sent=true', { id: credit.id }),
+      credit
     )
       .then(() => {
-        toast.success("updated_credit");
+        toast.success('updated_credit');
       })
       .catch((error) => {
         console.error(error);

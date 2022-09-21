@@ -213,7 +213,7 @@ export function useActions() {
   const [, setInvoice] = useAtom(invoiceAtom);
   const [, setQuote] = useAtom(quoteAtom);
   const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
-  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom)
+  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const { t } = useTranslation();
 
@@ -226,7 +226,7 @@ export function useActions() {
 
   const cloneToCredit = (credit: Credit) => {
     setCredit({ ...credit, number: '', documents: [] });
-    
+
     navigate('/credits/create');
   };
 
@@ -249,7 +249,7 @@ export function useActions() {
       documents: [],
     });
 
-    navigate('/recurring_invoices/create')
+    navigate('/recurring_invoices/create');
   };
 
   const cloneToPurchaseOrder = (credit: Credit) => {
@@ -259,7 +259,7 @@ export function useActions() {
       documents: [],
     });
 
-    navigate('/purchase_orders/create')
+    navigate('/purchase_orders/create');
   };
 
   const actions: Action<Credit>[] = [
