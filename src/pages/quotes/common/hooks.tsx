@@ -19,7 +19,7 @@ import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { Client } from 'common/interfaces/client';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
-import { Invitation } from 'common/interfaces/purchase-order';
+import { Invitation, PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Quote } from 'common/interfaces/quote';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { blankLineItem } from 'common/constants/blank-line-item';
@@ -37,6 +37,10 @@ import { invoiceSumAtom, quoteAtom } from './atoms';
 import { useApprove } from './hooks/useApprove';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useMarkSent } from './hooks/useMarkSent';
+import { creditAtom } from 'pages/credits/common/atoms';
+import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -207,6 +211,9 @@ export function useSave(props: CreateProps) {
 export function useActions() {
   const [, setQuote] = useAtom(quoteAtom);
   const [, setInvoice] = useAtom(invoiceAtom);
+  const [, setCredit] = useAtom(creditAtom);
+  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
+  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const { t } = useTranslation();
 
@@ -219,7 +226,34 @@ export function useActions() {
 
   const cloneToQuote = (quote: Quote) => {
     setQuote({ ...quote, number: '', documents: [] });
+
     navigate('/quotes/create');
+  };
+
+  const cloneToCredit = (quote: Quote) => {
+    setCredit({ ...quote, number: '', documents: [] });
+
+    navigate('/credits/create');
+  };
+
+  const cloneToRecurringInvoice = (quote: Quote) => {
+    setRecurringInvoice({
+      ...(quote as unknown as RecurringInvoice),
+      number: '',
+      documents: [],
+    });
+
+    navigate('/recurring_invoices/create');
+  };
+
+  const cloneToPurchaseOrder = (quote: Quote) => {
+    setPurchaseOrder({
+      ...(quote as unknown as PurchaseOrder),
+      number: '',
+      documents: [],
+    });
+
+    navigate('/purchase_orders/create');
   };
 
   const cloneToInvoice = (quote: Quote) => {
@@ -257,6 +291,21 @@ export function useActions() {
     (quote) => (
       <DropdownElement onClick={() => cloneToInvoice(quote)}>
         {t('clone_to_invoice')}
+      </DropdownElement>
+    ),
+    (quote) => (
+      <DropdownElement onClick={() => cloneToCredit(quote)}>
+        {t('clone_to_credit')}
+      </DropdownElement>
+    ),
+    (quote) => (
+      <DropdownElement onClick={() => cloneToRecurringInvoice(quote)}>
+        {t('clone_to_recurring_invoice')}
+      </DropdownElement>
+    ),
+    (quote) => (
+      <DropdownElement onClick={() => cloneToPurchaseOrder(quote)}>
+        {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
     () => <Divider withoutPadding />,
