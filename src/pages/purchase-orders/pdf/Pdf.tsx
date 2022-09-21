@@ -9,11 +9,11 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { usePurchaseOrderQuery } from 'common/queries/purchase-orders';
 import { Default } from 'components/layouts/Default';
 import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
 import { generatePath, useParams } from 'react-router-dom';
+import { usePurchaseOrderQuery } from '../common/queries';
 
 export function Pdf() {
   const { documentTitle } = useTitle('view_pdf');

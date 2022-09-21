@@ -9,12 +9,12 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { usePurchaseOrderQuery } from 'common/queries/purchase-orders';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Mailer } from 'pages/invoices/email/components/Mailer';
 import { useTranslation } from 'react-i18next';
 import { generatePath, useParams } from 'react-router-dom';
+import { usePurchaseOrderQuery } from '../common/queries';
 
 export function Email() {
   const [t] = useTranslation();
