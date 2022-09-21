@@ -55,7 +55,7 @@ export function Create() {
   });
 
   useEffect(() => {
-    if (data) {
+    if (typeof data !== 'undefined' && typeof purchaseOrder === 'undefined') {
       const po = cloneDeep(data);
 
       if (typeof po.line_items === 'string') {
@@ -71,6 +71,10 @@ export function Create() {
 
       setPurchaseOrder(po);
     }
+
+    return () => {
+      setPurchaseOrder(undefined);
+    };
   }, [data]);
 
   const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();

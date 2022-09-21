@@ -20,7 +20,7 @@ import { Client } from 'common/interfaces/client';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
-import { Invitation } from 'common/interfaces/purchase-order';
+import { Invitation, PurchaseOrder } from 'common/interfaces/purchase-order';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { blankLineItem } from 'common/constants/blank-line-item';
@@ -33,6 +33,11 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { generatePath, useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
+import { quoteAtom } from 'pages/quotes/common/atoms';
+import { Quote } from 'common/interfaces/quote';
+import { creditAtom } from 'pages/credits/common/atoms';
+import { Credit } from 'common/interfaces/credit';
+import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -230,6 +235,9 @@ export function useToggleStartStop() {
 export function useActions() {
   const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
   const [, setInvoice] = useAtom(invoiceAtom);
+  const [, setQuote] = useAtom(quoteAtom);
+  const [, setCredit] = useAtom(creditAtom);
+  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const { t } = useTranslation();
 
@@ -250,6 +258,36 @@ export function useActions() {
     });
 
     navigate('/invoices/create');
+  };
+
+  const cloneToQuote = (recurringInvoice: RecurringInvoice) => {
+    setQuote({
+      ...(recurringInvoice as unknown as Quote),
+      number: '',
+      documents: [],
+    });
+
+    navigate('/quotes/create');
+  };
+
+  const cloneToCredit = (recurringInvoice: RecurringInvoice) => {
+    setCredit({
+      ...(recurringInvoice as unknown as Credit),
+      number: '',
+      documents: [],
+    });
+
+    navigate('/credits/create');
+  };
+
+  const cloneToPurchaseOrder = (recurringInvoice: RecurringInvoice) => {
+    setPurchaseOrder({
+      ...(recurringInvoice as unknown as PurchaseOrder),
+      number: '',
+      documents: [],
+    });
+
+    navigate('/purchase_orders/create');
   };
 
   const actions: Action<RecurringInvoice>[] = [
@@ -290,6 +328,21 @@ export function useActions() {
     (recurringInvoice) => (
       <DropdownElement onClick={() => cloneToInvoice(recurringInvoice)}>
         {t('clone_to_invoice')}
+      </DropdownElement>
+    ),
+    (recurringInvoice) => (
+      <DropdownElement onClick={() => cloneToQuote(recurringInvoice)}>
+        {t('clone_to_quote')}
+      </DropdownElement>
+    ),
+    (recurringInvoice) => (
+      <DropdownElement onClick={() => cloneToCredit(recurringInvoice)}>
+        {t('clone_to_credit')}
+      </DropdownElement>
+    ),
+    (recurringInvoice) => (
+      <DropdownElement onClick={() => cloneToPurchaseOrder(recurringInvoice)}>
+        {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
   ];
