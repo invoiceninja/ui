@@ -21,7 +21,7 @@ import { Client } from 'common/interfaces/client';
 import { Credit } from 'common/interfaces/credit';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
-import { Invitation } from 'common/interfaces/purchase-order';
+import { Invitation, PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Quote } from 'common/interfaces/quote';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -32,6 +32,7 @@ import { useAtom } from 'jotai';
 import { invoiceAtom } from 'pages/invoices/common/atoms';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
+import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
 import { quoteAtom } from 'pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
@@ -212,6 +213,7 @@ export function useActions() {
   const [, setInvoice] = useAtom(invoiceAtom);
   const [, setQuote] = useAtom(quoteAtom);
   const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
+  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom)
 
   const { t } = useTranslation();
 
@@ -248,6 +250,16 @@ export function useActions() {
     });
 
     navigate('/recurring_invoices/create')
+  };
+
+  const cloneToPurchaseOrder = (credit: Credit) => {
+    setPurchaseOrder({
+      ...(credit as unknown as PurchaseOrder),
+      number: '',
+      documents: [],
+    });
+
+    navigate('/purchase_orders/create')
   };
 
   const actions: Action<Credit>[] = [
@@ -312,6 +324,11 @@ export function useActions() {
     (credit) => (
       <DropdownElement onClick={() => cloneToRecurringInvoice(credit)}>
         {t('clone_to_recurring_invoice')}
+      </DropdownElement>
+    ),
+    (credit) => (
+      <DropdownElement onClick={() => cloneToPurchaseOrder(credit)}>
+        {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
     () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
