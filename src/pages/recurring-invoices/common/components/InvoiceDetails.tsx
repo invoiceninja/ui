@@ -53,7 +53,11 @@ export function InvoiceDetails(props: Props) {
           <InputField
             type="date"
             onValueChange={(value) => handleChange('next_send_date', value)}
-            value={invoice?.next_send_date ? dayjs(invoice?.next_send_date).format('YYYY-MM-DD') : new Date().toISOString().split('T')[0]}
+            value={
+              recurringInvoice?.next_send_date
+                ? dayjs(recurringInvoice?.next_send_date).format('YYYY-MM-DD')
+                : new Date().toISOString().split('T')[0]
+            }
             min={new Date().toISOString().split('T')[0]}
           />
         </Element>
