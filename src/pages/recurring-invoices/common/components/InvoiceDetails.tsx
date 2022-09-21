@@ -17,6 +17,7 @@ import frequencies from 'common/constants/frequency';
 import { ChangeHandler } from '../hooks';
 import { useAtom } from 'jotai';
 import { recurringInvoiceAtom } from '../atoms';
+import dayjs from 'dayjs';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -52,9 +53,7 @@ export function InvoiceDetails(props: Props) {
           <InputField
             type="date"
             onValueChange={(value) => handleChange('next_send_date', value)}
-            value={
-              recurringInvoice?.date || new Date().toISOString().split('T')[0]
-            }
+            value={invoice?.next_send_date ? dayjs(invoice?.next_send_date).format('YYYY-MM-DD') : new Date().toISOString().split('T')[0]}
             min={new Date().toISOString().split('T')[0]}
           />
         </Element>

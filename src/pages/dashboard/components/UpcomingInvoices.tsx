@@ -63,7 +63,7 @@ export function UpcomingInvoices() {
 
   return (
     <div className="bg-white rounded shadow">
-      <div className="px-4 py-6 sm:px-6 border-b border-gray-200">
+      <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
         <h3 className="text-lg leading-6 font-medium text-gray-900">
           {t('upcoming_invoices')}
         </h3>
