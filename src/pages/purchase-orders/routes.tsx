@@ -9,7 +9,6 @@
  */
 
 import { Route } from 'react-router-dom';
-import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Email } from './email/Email';
@@ -21,7 +20,6 @@ export const purchaseOrdersRoutes = (
     <Route path="" element={<PurchaseOrders />} />
     <Route path=":id">
       <Route path="edit" element={<Edit />} />
-      <Route path="clone" element={<Clone />} />
       <Route path="email" element={<Email />} />
       <Route path="pdf" element={<Pdf />} />
     </Route>

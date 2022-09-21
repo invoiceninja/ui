@@ -12,10 +12,10 @@ import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankPurchaseOrderQuery } from 'common/queries/purchase-orders';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
+import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
@@ -24,6 +24,9 @@ import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { v4 } from 'uuid';
+import { purchaseOrderAtom } from '../common/atoms';
+import { useCreate } from '../common/hooks';
+import { useBlankPurchaseOrderQuery } from '../common/queries';
 import { Details } from '../edit/components/Details';
 import { Footer } from '../edit/components/Footer';
 import { VendorSelector } from '../edit/components/VendorSelector';
@@ -32,12 +35,10 @@ import { useHandleDeleteLineItem } from '../edit/hooks/useHandleDeleteLineItem';
 import { useHandleInvitationChange } from '../edit/hooks/useHandleInvitationChange';
 import { useHandleLineItemPropertyChange } from '../edit/hooks/useHandleLineItemPropertyChange';
 import { useHandleProductChange } from '../edit/hooks/useHandleProductChange';
-import { useSave } from './hooks/useSave';
 
 export function Create() {
   const { documentTitle } = useTitle('new_purchase_order');
   const { t } = useTranslation();
-  const { data } = useBlankPurchaseOrderQuery();
 
   const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
@@ -47,7 +48,11 @@ export function Create() {
     },
   ];
 
-  const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder>();
+  const [purchaseOrder, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+
+  const { data } = useBlankPurchaseOrderQuery({
+    enabled: typeof purchaseOrder === 'undefined',
+  });
 
   useEffect(() => {
     if (data) {
@@ -94,7 +99,7 @@ export function Create() {
     setInvoiceSum
   );
 
-  const onSave = useSave(setErrors);
+  const onSave = useCreate({ setErrors });
 
   return (
     <Default
