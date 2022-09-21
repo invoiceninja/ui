@@ -9,17 +9,23 @@
  */
 
 import { InvoiceStatus } from 'common/enums/invoice-status';
+import { Credit } from 'common/interfaces/credit';
 import { Invoice } from 'common/interfaces/invoice';
+import { PurchaseOrder } from 'common/interfaces/purchase-order';
+import { Quote } from 'common/interfaces/quote';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { Divider } from 'components/cards/Divider';
-import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useAtom } from 'jotai';
+import { creditAtom } from 'pages/credits/common/atoms';
 import { invoiceAtom } from 'pages/invoices/common/atoms';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
-import React from 'react';
+import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
+import { quoteAtom } from 'pages/quotes/common/atoms';
+import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { generatePath, useLocation, useNavigate } from 'react-router-dom';
 import { useHandleArchive } from '../hooks/useHandleArchive';
 import { useHandleCancel } from '../hooks/useHandleCancel';
 import { useHandleDelete } from '../hooks/useHandleDelete';
@@ -30,6 +36,7 @@ import { useMarkSent } from '../hooks/useMarkSent';
 export function useActions() {
   const { t } = useTranslation();
 
+  const location = useLocation();
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const markSent = useMarkSent();
@@ -41,10 +48,47 @@ export function useActions() {
   const cancel = useHandleCancel();
 
   const [, setInvoice] = useAtom(invoiceAtom);
+  const [, setQuote] = useAtom(quoteAtom);
+  const [, setCredit] = useAtom(creditAtom);
+  const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
+  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const cloneToInvoice = (invoice: Invoice) => {
-    setInvoice({ ...invoice, documents: [], number: '' });
+    setInvoice({ ...invoice, number: '', documents: [] });
+
     navigate('/invoices/create');
+  };
+
+  const cloneToQuote = (invoice: Invoice) => {
+    setQuote({ ...(invoice as unknown as Quote), number: '', documents: [] });
+
+    navigate('/quotes/create');
+  };
+
+  const cloneToCredit = (invoice: Invoice) => {
+    setCredit({ ...(invoice as unknown as Credit), number: '', documents: [] });
+
+    navigate('/credits/create');
+  };
+
+  const cloneToRecurringInvoice = (invoice: Invoice) => {
+    setRecurringInvoice({
+      ...(invoice as unknown as RecurringInvoice),
+      number: '',
+      documents: [],
+    });
+
+    navigate('/recurring_invoices/create');
+  };
+
+  const cloneToPurchaseOrder = (invoice: Invoice) => {
+    setPurchaseOrder({
+      ...(invoice as unknown as PurchaseOrder),
+      number: '',
+      documents: [],
+    });
+
+    navigate('/purchase_orders/create');
   };
 
   return [
@@ -97,49 +141,48 @@ export function useActions() {
         {t('client_portal')}
       </DropdownElement>
     ),
+    (invoice: Invoice) =>
+      invoice.status_id === InvoiceStatus.Sent && (
+        <DropdownElement onClick={() => cancel(invoice)}>
+          {t('cancel_invoice')}
+        </DropdownElement>
+      ),
     () => <Divider withoutPadding />,
     (invoice: Invoice) => (
       <DropdownElement onClick={() => cloneToInvoice(invoice)}>
         {t('clone_to_invoice')}
       </DropdownElement>
     ),
-    // (invoice: Invoice) => (
-    //   <DropdownElement
-    //     to={generatePath('/invoices/:id/clone/quote', { id: invoice.id })}
-    //   >
-    //     {t('clone_to_quote')}
-    //   </DropdownElement>
-    // ),
-    // (invoice: Invoice) => (
-    //   <DropdownElement
-    //     to={generatePath('/invoices/:id/clone/credit', { id: invoice.id })}
-    //   >
-    //     {t('clone_to_credit')}
-    //   </DropdownElement>
-    // ),
-    // (invoice: Invoice) => (
-    //   <DropdownElement
-    //     to={generatePath('/invoices/:id/clone/recurring_invoice', {
-    //       id: invoice.id,
-    //     })}
-    //   >
-    //     {t('clone_to_recurring')}
-    //   </DropdownElement>
-    // ),
-    () => <Divider withoutPadding />,
+    (invoice: Invoice) => (
+      <DropdownElement onClick={() => cloneToQuote(invoice)}>
+        {t('clone_to_quote')}
+      </DropdownElement>
+    ),
+    (invoice: Invoice) => (
+      <DropdownElement onClick={() => cloneToCredit(invoice)}>
+        {t('clone_to_credit')}
+      </DropdownElement>
+    ),
+    (invoice: Invoice) => (
+      <DropdownElement onClick={() => cloneToRecurringInvoice(invoice)}>
+        {t('clone_to_recurring_invoices')}
+      </DropdownElement>
+    ),
+    (invoice: Invoice) => (
+      <DropdownElement onClick={() => cloneToPurchaseOrder(invoice)}>
+        {t('clone_to_purchase_orders')}
+      </DropdownElement>
+    ),
+    () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
     (invoice: Invoice) =>
-      invoice.status_id === InvoiceStatus.Sent && (
-        <DropdownElement onClick={() => cancel(invoice)}>
-          {t('cancel')}
-        </DropdownElement>
-      ),
-    (invoice: Invoice) =>
+      location.pathname.endsWith('/edit') &&
       invoice.archived_at === 0 && (
         <DropdownElement onClick={() => archive(invoice)}>
           {t('archive')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
+      location.pathname.endsWith('/edit') &&
       invoice.archived_at > 0 &&
       invoice.status_id !== InvoiceStatus.Cancelled && (
         <DropdownElement onClick={() => restore(invoice)}>
@@ -147,31 +190,11 @@ export function useActions() {
         </DropdownElement>
       ),
     (invoice: Invoice) =>
+      location.pathname.endsWith('/edit') &&
       !invoice.is_deleted && (
         <DropdownElement onClick={() => destroy(invoice)}>
           {t('delete')}
         </DropdownElement>
       ),
   ];
-}
-
-export function Actions() {
-  const { t } = useTranslation();
-
-  const [invoice] = useAtom(invoiceAtom);
-
-  const actions = useActions();
-
-  return (
-    <Dropdown label={t('more_actions')}>
-      {actions.map(
-        (dropdownElement, index) =>
-          invoice && (
-            <React.Fragment key={index}>
-              {dropdownElement(invoice)}
-            </React.Fragment>
-          )
-      )}
-    </Dropdown>
-  );
 }

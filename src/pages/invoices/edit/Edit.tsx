@@ -16,6 +16,7 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useInvoiceQuery } from 'common/queries/invoices';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { ResourceActions } from 'components/ResourceActions';
 import { Spinner } from 'components/Spinner';
 import { TabGroup } from 'components/TabGroup';
 import { useAtom } from 'jotai';
@@ -34,7 +35,7 @@ import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
 import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
-import { Actions } from './components/Actions';
+import { useActions } from './components/Actions';
 import { useHandleSave } from './hooks/useInvoiceSave';
 
 export function Edit() {
@@ -90,6 +91,7 @@ export function Edit() {
     invoice && calculateInvoiceSum();
   }, [invoice]);
 
+  const actions = useActions();
   const save = useHandleSave(setErrors);
 
   return (
@@ -102,7 +104,15 @@ export function Edit() {
         invoice &&
         (invoice.status_id === InvoiceStatus.Cancelled || invoice.is_deleted)
       }
-      navigationTopRight={invoice && <Actions />}
+      navigationTopRight={
+        invoice && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={invoice}
+            actions={actions}
+          />
+        )
+      }
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector
