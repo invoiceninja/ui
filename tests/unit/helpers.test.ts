@@ -38,4 +38,8 @@ describe("route", () => {
       "/api/v1/invoices/1?include=client",
     );
   });
+
+  test("using for generic single replacement (translations)", () => {
+    expect(route(":count Hours", { count: "30" })).toEqual("30 Hours");
+  });
 });
