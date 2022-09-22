@@ -27,7 +27,7 @@ import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { creditAtom, invoiceSumAtom } from '../common/atoms';
 import { CreditDetails } from '../common/components/CreditDetails';

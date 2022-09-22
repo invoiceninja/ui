@@ -25,7 +25,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';

@@ -32,7 +32,7 @@ import { openClientPortal } from 'pages/invoices/common/helpers/open-client-port
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, quoteAtom } from './atoms';
 import { useApprove } from './hooks/useApprove';
 import { useBulkAction } from './hooks/useBulkAction';

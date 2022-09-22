@@ -16,7 +16,7 @@ import { DropdownElement } from 'components/dropdown/DropdownElement';
 import Toggle from 'components/forms/Toggle';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 interface Props {
   blobUrl: string;

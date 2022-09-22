@@ -20,7 +20,7 @@ import Toggle from 'components/forms/Toggle';
 import { ChangeHandler } from '../hooks';
 import { useAtom } from 'jotai';
 import { creditAtom } from '../atoms';
-import { generatePath, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Upload } from 'pages/settings/company/documents/components';
 import { endpoint } from 'common/helpers';
 import { useQueryClient } from 'react-query';

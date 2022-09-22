@@ -14,7 +14,7 @@ import { route } from 'common/helpers/route';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function Quotes() {
   const [t] = useTranslation();

@@ -16,7 +16,7 @@ import { toast } from 'common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;

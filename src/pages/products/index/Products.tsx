@@ -13,7 +13,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Link } from '@invoiceninja/forms';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Default } from 'components/layouts/Default';
 import { EntityStatus } from 'components/EntityStatus';
 import { DropdownElement } from 'components/dropdown/DropdownElement';

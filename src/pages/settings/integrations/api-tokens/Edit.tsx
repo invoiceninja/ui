@@ -17,7 +17,7 @@ import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { AxiosError } from 'axios';
 import { date, endpoint } from 'common/helpers';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useApiTokenQuery } from 'common/queries/api-tokens';
 import { useQueryClient } from 'react-query';

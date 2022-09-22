@@ -23,7 +23,7 @@ import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AdditionalInfo } from '../edit/components/AdditionalInfo';
 import { Address } from '../edit/components/Address';
 import { Contacts } from '../edit/components/Contacts';

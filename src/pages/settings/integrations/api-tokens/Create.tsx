@@ -17,7 +17,7 @@ import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useTitle } from 'common/hooks/useTitle';
 import { request } from 'common/helpers/request';

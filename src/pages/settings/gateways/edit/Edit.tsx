@@ -17,7 +17,7 @@ import { useCompanyGatewayQuery } from 'common/queries/company-gateways';
 import { Settings } from 'components/layouts/Settings';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from '../create/components/Credentials';
 import { LimitsAndFees } from '../create/components/LimitsAndFees';

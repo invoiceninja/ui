@@ -20,7 +20,7 @@ import { AdditionalInfo } from './components/AdditionalInfo';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { TaxSettings } from './components/Taxes';
 import { ValidationBag } from 'common/interfaces/validation-bag';

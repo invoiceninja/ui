@@ -9,7 +9,7 @@
  */
 
 import { route } from 'common/helpers/route';
-import { generatePath, Navigate, useParams } from 'react-router-dom';
+import { Navigate, useParams } from 'react-router-dom';
 
 export function Show() {
   const { id } = useParams();

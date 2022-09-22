@@ -15,7 +15,7 @@ import { bulk, useTaskStatusQuery } from 'common/queries/task-statuses';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function Restore() {
   const [t] = useTranslation();

@@ -27,7 +27,7 @@ import { Upload } from 'pages/settings/company/documents/components';
 import { Field } from 'pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { quoteAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
 

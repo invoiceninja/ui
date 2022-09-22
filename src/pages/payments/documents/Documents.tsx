@@ -14,7 +14,7 @@ import { usePaymentQuery } from 'common/queries/payments';
 import { DocumentsTable } from 'components/DocumentsTable';
 import { Upload } from 'pages/settings/company/documents/components';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function Documents() {
   const { id } = useParams();

@@ -20,7 +20,7 @@ import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { AdditionalInfo } from '../create/components/AdditionalInfo';
 import { Details } from '../create/components/Details';
 import { Notes } from '../create/components/Notes';

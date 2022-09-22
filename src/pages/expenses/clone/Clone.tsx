@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Details } from '../create/components/Details';
 import { Notes } from '../create/components/Notes';

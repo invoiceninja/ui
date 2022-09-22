@@ -18,7 +18,7 @@ import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQuoteQuery } from '../common/queries';
 
 export function Pdf() {

@@ -34,7 +34,7 @@ import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useHandleCredit } from './hooks/useHandleCredit';
 import { useHandleInvoice } from './hooks/useHandleInvoice';

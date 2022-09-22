@@ -20,7 +20,7 @@ import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Details } from '../edit/components/Details';
 import { Notifications } from '../edit/components/Notifications';
 import { Permissions } from '../edit/components/Permissions';

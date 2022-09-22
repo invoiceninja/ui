@@ -17,7 +17,7 @@ import { Credit } from 'common/interfaces/credit';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function Credits() {
   const [t] = useTranslation();

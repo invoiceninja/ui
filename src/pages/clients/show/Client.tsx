@@ -17,7 +17,7 @@ import { Spinner } from 'components/Spinner';
 import { Tabs } from 'components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import { Tab } from 'components/Tabs';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';

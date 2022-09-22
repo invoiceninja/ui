@@ -15,7 +15,7 @@ import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { InvoiceViewer } from '../common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { Actions } from './components/Actions';

@@ -20,7 +20,7 @@ import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import { Actions } from './components/Actions';
 
 export function Vendor() {

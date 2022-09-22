@@ -15,7 +15,7 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import { Project } from 'common/interfaces/project';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function Projects() {
   const [t] = useTranslation();

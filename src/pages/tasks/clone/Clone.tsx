@@ -18,7 +18,7 @@ import { useTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
 import { isOverlapping } from '../common/helpers/is-overlapping';

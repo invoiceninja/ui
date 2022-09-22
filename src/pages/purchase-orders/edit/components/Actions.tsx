@@ -21,7 +21,7 @@ import { openClientPortal } from 'pages/invoices/common/helpers/open-client-port
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export type Action = (po: PurchaseOrder) => {
   label: string;

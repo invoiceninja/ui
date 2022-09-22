@@ -38,7 +38,7 @@ import { quoteAtom } from 'pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useMarkSent } from './hooks/useMarkSent';

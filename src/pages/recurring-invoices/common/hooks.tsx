@@ -31,7 +31,7 @@ import { useAtom } from 'jotai';
 import { invoiceAtom } from 'pages/invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
 import { quoteAtom } from 'pages/quotes/common/atoms';
 import { Quote } from 'common/interfaces/quote';

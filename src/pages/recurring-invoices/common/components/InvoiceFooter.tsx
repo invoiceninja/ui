@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import { recurringInvoiceAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
 import { MarkdownEditor } from 'components/forms/MarkdownEditor';
-import { generatePath, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Upload } from 'pages/settings/company/documents/components';
 import { endpoint } from 'common/helpers';
 import { useQueryClient } from 'react-query';

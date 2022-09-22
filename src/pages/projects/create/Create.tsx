@@ -26,7 +26,7 @@ import { Default } from 'components/layouts/Default';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export function Create() {
   const { documentTitle } = useTitle('new_project');

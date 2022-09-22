@@ -13,7 +13,7 @@ import { useFormik } from 'formik';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { InputField } from '@invoiceninja/forms';
 import { endpoint } from 'common/helpers';
 import { Card, Element } from '@invoiceninja/cards';

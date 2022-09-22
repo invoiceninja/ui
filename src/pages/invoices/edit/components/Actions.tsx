@@ -26,7 +26,7 @@ import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
 import { quoteAtom } from 'pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useHandleArchive } from '../hooks/useHandleArchive';
 import { useHandleCancel } from '../hooks/useHandleCancel';
 import { useHandleDelete } from '../hooks/useHandleDelete';

@@ -22,7 +22,7 @@ import { UserSelector } from 'components/users/UserSelector';
 import { Upload } from 'pages/settings/company/documents/components';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { PurchaseOrderCardProps } from './Details';
 
 export function Footer(props: PurchaseOrderCardProps) {
