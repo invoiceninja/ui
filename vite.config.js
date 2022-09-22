@@ -1,14 +1,9 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import jotaiDebugLabel from 'jotai/babel/plugin-debug-label';
-import jotaiReactRefresh from 'jotai/babel/plugin-react-refresh';
 
 export default defineConfig({
-  plugins: [
-    tsconfigPaths(),
-    react({ babel: { plugins: [jotaiDebugLabel, jotaiReactRefresh] } }),
-  ],
+  plugins: [tsconfigPaths(), react()],
   build: {
     assetsDir: 'react',
     chunkSizeWarningLimit: 1500,
