@@ -11,6 +11,7 @@
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Invoice } from 'common/interfaces/invoice';
@@ -31,7 +32,7 @@ export function useHandleCreate(
         toast.success('created_invoice');
 
         navigate(
-          generatePath('/invoices/:id/edit', { id: response.data.data.id })
+          route('/invoices/:id/edit', { id: response.data.data.id })
         );
       })
       .catch((error: AxiosError) => {

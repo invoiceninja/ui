@@ -9,6 +9,7 @@
  */
 
 import { endpoint } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { useVendorQuery } from 'common/queries/vendor';
 import { DocumentsTable } from 'components/DocumentsTable';
 import { Upload } from 'pages/settings/company/documents/components';
@@ -22,7 +23,7 @@ export function Documents() {
   const queryClient = useQueryClient();
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(generatePath('/api/v1/vendors/:id', { id }));
+    queryClient.invalidateQueries(route('/api/v1/vendors/:id', { id }));
   };
 
   return (

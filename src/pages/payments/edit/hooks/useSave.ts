@@ -16,7 +16,7 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useSave(
   setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
@@ -48,7 +48,7 @@ export function useSave(
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/payments/:id', { id: payment.id })
+          route('/api/v1/payments/:id', { id: payment.id })
         )
       );
   };

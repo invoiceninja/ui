@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
@@ -32,7 +33,7 @@ export function Email() {
     { name: t('credits'), href: '/credits' },
     {
       name: t('email_credit'),
-      href: generatePath('/credits/:id/email', { id }),
+      href: route('/credits/:id/email', { id }),
     },
   ];
 

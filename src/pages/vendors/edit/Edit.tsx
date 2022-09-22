@@ -11,6 +11,7 @@
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
@@ -42,7 +43,7 @@ export function Edit() {
 
   const pages: Page[] = [
     { name: t('vendors'), href: '/vendors' },
-    { name: t('edit_vendor'), href: generatePath('/vendors/:id/edit', { id }) },
+    { name: t('edit_vendor'), href: route('/vendors/:id/edit', { id }) },
   ];
 
   useEffect(() => {
@@ -77,7 +78,7 @@ export function Edit() {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/vendors/:id', { id })
+          route('/api/v1/vendors/:id', { id })
         )
       );
   };

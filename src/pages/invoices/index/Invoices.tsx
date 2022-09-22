@@ -18,7 +18,7 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { InvoiceStatus } from '../common/components/InvoiceStatus';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
@@ -60,7 +60,7 @@ export function Invoices() {
       id: 'number',
       label: t('number'),
       format: (value, invoice) => (
-        <Link to={generatePath('/invoices/:id/edit', { id: invoice.id })}>
+        <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
           {invoice.number}
         </Link>
       ),
@@ -69,7 +69,7 @@ export function Invoices() {
       id: 'client_id',
       label: t('client'),
       format: (value, invoice) => (
-        <Link to={generatePath('/clients/:id', { id: invoice.client_id })}>
+        <Link to={route('/clients/:id', { id: invoice.client_id })}>
           {invoice.client?.display_name}
         </Link>
       ),

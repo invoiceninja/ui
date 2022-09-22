@@ -7,9 +7,11 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
@@ -80,11 +82,11 @@ export function Edit() {
     { name: t('clients'), href: '/clients' },
     {
       name: documentTitle,
-      href: generatePath('/clients/:id', { id }),
+      href: route('/clients/:id', { id }),
     },
     {
       name: t('edit'),
-      href: generatePath('/clients/:id', { id }),
+      href: route('/clients/:id', { id }),
     },
   ];
 
@@ -111,10 +113,10 @@ export function Edit() {
         toast.success(t('updated_client'), { id: toastId });
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/clients/:id', { id })
+          route('/api/v1/clients/:id', { id })
         );
 
-        navigate(generatePath('/clients/:id', { id }));
+        navigate(route('/clients/:id', { id }));
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -129,7 +131,7 @@ export function Edit() {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/clients/:id', { id })
+          route('/api/v1/clients/:id', { id })
         )
       );
   };
@@ -144,7 +146,7 @@ export function Edit() {
           openPurgeModal={setPasswordConfirmModalOpen}
         />
       }
-      onBackClick={generatePath('/clients/:id', { id })}
+      onBackClick={route('/clients/:id', { id })}
       onSaveClick={onSave}
     >
       {isLoading && <Spinner />}

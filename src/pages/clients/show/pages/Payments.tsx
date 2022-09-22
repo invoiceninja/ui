@@ -11,6 +11,7 @@
 import { Link } from '@invoiceninja/forms';
 import paymentStatus from 'common/constants/payment-status';
 import { date } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { StatusBadge } from 'components/StatusBadge';
@@ -27,7 +28,7 @@ export function Payments() {
       id: 'number',
       label: t('number'),
       format: (value, resource) => (
-        <Link to={generatePath('/payments/:id/edit', { id: resource.id })}>
+        <Link to={route('/payments/:id/edit', { id: resource.id })}>
           {value}
         </Link>
       ),
@@ -56,7 +57,7 @@ export function Payments() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/payments/bulk"
-      linkToCreate={generatePath('/payments/create?client=:id', { id: id })}
+      linkToCreate={route('/payments/create?client=:id', { id: id })}
     />
   );
 }

@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
@@ -35,7 +36,7 @@ export function Pdf() {
   return (
     <Default
       title={documentTitle}
-      onBackClick={generatePath('/quotes/:id/edit', { id })}
+      onBackClick={route('/quotes/:id/edit', { id })}
       navigationTopRight={
         quote && (
           <Dropdown label={t('more_actions')}>
@@ -44,7 +45,7 @@ export function Pdf() {
             </DropdownElement>
 
             <DropdownElement
-              to={generatePath('/quotes/:id/email', { id: quote.id })}
+              to={route('/quotes/:id/email', { id: quote.id })}
             >
               {t('email_quote')}
             </DropdownElement>

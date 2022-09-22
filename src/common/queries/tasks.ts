@@ -13,11 +13,11 @@ import { request } from 'common/helpers/request';
 import { GenericManyResponse } from 'common/interfaces/generic-many-response';
 import { Task } from 'common/interfaces/task';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useTaskQuery(params: { id: string | undefined }) {
   return useQuery<Task>(
-    generatePath('/api/v1/tasks/:id', { id: params.id }),
+    route('/api/v1/tasks/:id', { id: params.id }),
     () =>
       request('GET', endpoint('/api/v1/tasks/:id', { id: params.id })).then(
         (response) => response.data.data
@@ -27,7 +27,7 @@ export function useTaskQuery(params: { id: string | undefined }) {
 }
 
 export function useBlankTaskQuery() {
-  return useQuery<Task>(generatePath('/api/v1/tasks/create'), () =>
+  return useQuery<Task>(route('/api/v1/tasks/create'), () =>
     request('GET', endpoint('/api/v1/tasks/create')).then(
       (response) => response.data.data
     )
@@ -36,7 +36,7 @@ export function useBlankTaskQuery() {
 
 export function useTasksQuery(options = { limit: 10 }) {
   return useQuery<GenericManyResponse<Task>>(
-    generatePath('/api/v1/tasks'),
+    route('/api/v1/tasks'),
     () =>
       request(
         'GET',

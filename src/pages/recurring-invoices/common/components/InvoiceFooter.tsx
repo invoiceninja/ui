@@ -24,6 +24,7 @@ import { DocumentsTable } from 'components/DocumentsTable';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { UserSelector } from 'components/users/UserSelector';
 import { VendorSelector } from 'components/vendors/VendorSelector';
+import { route } from 'common/helpers/route';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -50,7 +51,7 @@ export function InvoiceFooter(props: Props) {
 
   const onSuccess = () => {
     queryClient.invalidateQueries(
-      generatePath('/api/v1/recurring_invoices/:id', { id })
+      route('/api/v1/recurring_invoices/:id', { id })
     );
   };
 

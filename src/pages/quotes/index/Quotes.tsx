@@ -19,7 +19,7 @@ import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { QuoteStatus } from '../common/components/QuoteStatus';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
@@ -31,7 +31,7 @@ export function Quotes() {
 
   const [t] = useTranslation();
 
-  const pages: Page[] = [{ name: t('quotes'), href: generatePath('/quotes') }];
+  const pages: Page[] = [{ name: t('quotes'), href: route('/quotes') }];
 
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
@@ -61,7 +61,7 @@ export function Quotes() {
       id: 'number',
       label: t('number'),
       format: (field, quote) => (
-        <Link to={generatePath('/quotes/:id/edit', { id: quote.id })}>
+        <Link to={route('/quotes/:id/edit', { id: quote.id })}>
           {field}
         </Link>
       ),
@@ -70,7 +70,7 @@ export function Quotes() {
       id: 'client_id',
       label: t('client'),
       format: (_, quote) => (
-        <Link to={generatePath('/clients/:id', { id: quote.client_id })}>
+        <Link to={route('/clients/:id', { id: quote.client_id })}>
           {quote.client?.display_name}
         </Link>
       ),

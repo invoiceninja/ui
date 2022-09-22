@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import MDEditor from '@uiw/react-md-editor';
 import { endpoint } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { useCurrencies } from 'common/hooks/useCurrencies';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
@@ -72,7 +73,7 @@ export function AdditionalInfo(props: Props) {
   }, []);
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(generatePath('/api/v1/clients/:id', { id }));
+    queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
   };
 
   return (

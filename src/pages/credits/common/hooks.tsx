@@ -14,6 +14,7 @@ import { CreditStatus } from 'common/enums/credit-status';
 import { endpoint } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
@@ -168,7 +169,7 @@ export function useCreate(props: CreateProps) {
         toast.success('created_credit');
 
         navigate(
-          generatePath('/credits/:id/edit', { id: response.data.data.id })
+          route('/credits/:id/edit', { id: response.data.data.id })
         );
       })
       .catch((error: AxiosError) => {
@@ -195,7 +196,7 @@ export function useSave(props: CreateProps) {
         toast.success('updated_credit');
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/credits/:id', { id: credit.id })
+          route('/api/v1/credits/:id', { id: credit.id })
         );
       })
       .catch((error: AxiosError) => {
@@ -264,7 +265,7 @@ export function useActions() {
 
   const actions: Action<Credit>[] = [
     (credit) => (
-      <DropdownElement to={generatePath('/credits/:id/pdf', { id: credit.id })}>
+      <DropdownElement to={route('/credits/:id/pdf', { id: credit.id })}>
         {t('view_pdf')}
       </DropdownElement>
     ),
@@ -275,7 +276,7 @@ export function useActions() {
     ),
     (credit) => (
       <DropdownElement
-        to={generatePath('/credits/:id/email', { id: credit.id })}
+        to={route('/credits/:id/email', { id: credit.id })}
       >
         {t('email_credit')}
       </DropdownElement>
@@ -289,7 +290,7 @@ export function useActions() {
       credit.client_id &&
       credit.amount > 0 && (
         <DropdownElement
-          to={generatePath(
+          to={route(
             '/payments/create?client=:clientId&credit=:creditId&type=1',
             { clientId: credit.client_id, creditId: credit.id }
           )}

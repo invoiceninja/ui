@@ -32,6 +32,7 @@ import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { DesignSelector } from 'common/generic/DesignSelector';
 import { UserSelector } from 'components/users/UserSelector';
 import { VendorSelector } from 'components/vendors/VendorSelector';
+import { route } from 'common/helpers/route';
 
 interface Props {
   invoice?: Invoice;
@@ -79,7 +80,7 @@ export function InvoiceFooter(props: Props) {
   ];
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(generatePath('/api/v1/invoices/:id', { id }));
+    queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id }));
   };
 
   return (

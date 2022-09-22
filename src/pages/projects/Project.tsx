@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { useProjectQuery } from 'common/queries/projects';
 import { Page } from 'components/Breadcrumbs';
@@ -33,18 +34,18 @@ export function Project() {
     { name: t('projects'), href: '/projects' },
     {
       name: documentTitle,
-      href: generatePath('/projects/:id', { id }),
+      href: route('/projects/:id', { id }),
     },
   ];
 
   const tabs: Tab[] = [
     {
       name: t('edit'),
-      href: generatePath('/projects/:id/edit', { id }),
+      href: route('/projects/:id/edit', { id }),
     },
     {
       name: t('documents'),
-      href: generatePath('/projects/:id/documents', { id }),
+      href: route('/projects/:id/documents', { id }),
     },
   ];
 

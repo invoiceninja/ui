@@ -13,7 +13,7 @@ import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { Quote } from 'common/interfaces/quote';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useApprove() {
   const queryClient = useQueryClient();
@@ -30,7 +30,7 @@ export function useApprove() {
         toast.success('approved_quote');
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/quotes/:id', { id: quote.id })
+          route('/api/v1/quotes/:id', { id: quote.id })
         );
 
         queryClient.invalidateQueries('/api/v1/quotes');

@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { useProductQuery } from 'common/queries/products';
 import { Page } from 'components/Breadcrumbs';
@@ -32,22 +33,22 @@ export function Product() {
     { name: t('products'), href: '/products' },
     {
       name: documentTitle,
-      href: generatePath('/products/:id', { id }),
+      href: route('/products/:id', { id }),
     },
   ];
 
   const tabs: Tab[] = [
     {
       name: t('edit'),
-      href: generatePath('/products/:id/edit', { id }),
+      href: route('/products/:id/edit', { id }),
     },
     {
       name: t('documents'),
-      href: generatePath('/products/:id/documents', { id }),
+      href: route('/products/:id/documents', { id }),
     },
     {
       name: t('product_fields'),
-      href: generatePath('/products/:id/product_fields', { id }),
+      href: route('/products/:id/product_fields', { id }),
     },
   ];
 

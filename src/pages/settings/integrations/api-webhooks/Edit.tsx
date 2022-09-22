@@ -13,6 +13,7 @@ import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { useApiWebhookQuery } from 'common/queries/api-webhooks';
 import { Divider } from 'components/cards/Divider';
@@ -37,7 +38,7 @@ export function Edit() {
     { name: t('api_webhooks'), href: '/settings/integrations/api_webhooks' },
     {
       name: t('edit_webhook'),
-      href: generatePath('/settings/integrations/api_webhooks/:id/edit', {
+      href: route('/settings/integrations/api_webhooks/:id/edit', {
         id,
       }),
     },
@@ -144,7 +145,7 @@ export function Edit() {
           formik.setSubmitting(false);
 
           queryClient.invalidateQueries(
-            generatePath('/api/v1/webhooks/:id', { id })
+            route('/api/v1/webhooks/:id', { id })
           );
         });
     },

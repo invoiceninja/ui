@@ -25,6 +25,7 @@ import { generatePath, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -35,7 +36,7 @@ export function Edit() {
     { name: t('tax_settings'), href: '/settings/tax_settings' },
     {
       name: t('edit_tax_rate'),
-      href: generatePath('/settings/tax_rates/:id/edit', { id }),
+      href: route('/settings/tax_rates/:id/edit', { id }),
     },
   ];
 
@@ -51,7 +52,7 @@ export function Edit() {
 
   const invalidatePaymentTermCache = () => {
     queryClient.invalidateQueries(
-      generatePath('/api/v1/tax_rates/:id', { id })
+      route('/api/v1/tax_rates/:id', { id })
     );
   };
 

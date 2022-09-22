@@ -14,7 +14,7 @@ import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 interface Props {
   clientId: string | undefined;
@@ -70,7 +70,7 @@ export function CustomResourcefulActions(props: Props) {
 
       <div>
         <DropdownElement
-          to={generatePath('/invoices/create?client=:id', {
+          to={route('/invoices/create?client=:id', {
             id: props.clientId,
           })}
         >
@@ -78,7 +78,7 @@ export function CustomResourcefulActions(props: Props) {
         </DropdownElement>
 
         <DropdownElement
-          to={generatePath('/payments/create?client=:id', {
+          to={route('/payments/create?client=:id', {
             id: props.clientId,
           })}
         >
@@ -86,14 +86,14 @@ export function CustomResourcefulActions(props: Props) {
         </DropdownElement>
 
         <DropdownElement
-          to={generatePath('/quotes/create?client=:id', {
+          to={route('/quotes/create?client=:id', {
             id: props.clientId,
           })}
         >
           {t('new_quote')}
         </DropdownElement>
         <DropdownElement
-          to={generatePath('/credits/create?client=:id', {
+          to={route('/credits/create?client=:id', {
             id: props.clientId,
           })}
         >

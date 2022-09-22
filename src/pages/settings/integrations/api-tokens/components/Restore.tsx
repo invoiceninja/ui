@@ -10,6 +10,7 @@
 
 import { ActionCard } from '@invoiceninja/cards';
 import { Button } from '@invoiceninja/forms';
+import { route } from 'common/helpers/route';
 import { bulk, useApiTokenQuery } from 'common/queries/api-tokens';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -38,7 +39,7 @@ export function Restore() {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/tokens/:id', { id })
+          route('/api/v1/tokens/:id', { id })
         )
       );
   };

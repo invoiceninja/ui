@@ -11,6 +11,7 @@
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
@@ -36,7 +37,7 @@ export function Create() {
     { name: t('clients'), href: '/clients' },
     {
       name: t('new_client'),
-      href: generatePath('/clients/create'),
+      href: route('/clients/create'),
     },
   ];
 
@@ -87,7 +88,7 @@ export function Create() {
       .then((response) => {
         toast.success(t('created_client'), { id: toastId });
 
-        navigate(generatePath('/clients/:id', { id: response.data.data.id }));
+        navigate(route('/clients/:id', { id: response.data.data.id }));
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -105,7 +106,7 @@ export function Create() {
       title={t('new_client')}
       breadcrumbs={pages}
       onSaveClick={onSave}
-      onBackClick={generatePath('/clients')}
+      onBackClick={route('/clients')}
     >
       {isLoading && <Spinner />}
 

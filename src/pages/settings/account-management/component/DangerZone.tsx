@@ -16,7 +16,7 @@ import { Modal } from 'components/Modal';
 import { ChangeEvent, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function DangerZone() {
   const [t] = useTranslation();
@@ -79,7 +79,7 @@ export function DangerZone() {
         onClose={setIsPurgeModalOpen}
       >
         <InputField
-          label={generatePath(t('please_type_to_confirm'), {
+          label={route(t('please_type_to_confirm'), {
             value: 'purge',
           })}
           id="purge_data"
@@ -111,7 +111,7 @@ export function DangerZone() {
         onClose={setIsDeleteModalOpen}
       >
         <InputField
-          label={generatePath(t('please_type_to_confirm'), {
+          label={route(t('please_type_to_confirm'), {
             value: 'delete',
           })}
           id="cancel_account"

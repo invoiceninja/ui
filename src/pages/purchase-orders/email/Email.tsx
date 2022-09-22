@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
@@ -32,11 +33,11 @@ export function Email() {
     { name: t('purchase_orders'), href: '/purchase_orders' },
     {
       name: t('purchase_order'),
-      href: generatePath('/purchase_orders/:id', { id }),
+      href: route('/purchase_orders/:id', { id }),
     },
     {
       name: t('email_purchase_order'),
-      href: generatePath('/purchase_orders/:id/email', { id }),
+      href: route('/purchase_orders/:id/email', { id }),
     },
   ];
 

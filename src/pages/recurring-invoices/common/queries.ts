@@ -14,7 +14,7 @@ import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-res
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { GenericQueryOptions } from 'common/queries/invoices';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 interface RecurringInvoiceQueryParams {
   id: string;
@@ -22,7 +22,7 @@ interface RecurringInvoiceQueryParams {
 
 export function useRecurringInvoiceQuery(params: RecurringInvoiceQueryParams) {
   return useQuery<RecurringInvoice>(
-    generatePath('/api/v1/recurring_invoices/:id', { id: params.id }),
+    route('/api/v1/recurring_invoices/:id', { id: params.id }),
     () =>
       request(
         'GET',

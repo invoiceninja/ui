@@ -13,7 +13,7 @@ import { endpoint } from 'common/helpers';
 import { Invoice } from 'common/interfaces/invoice';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { request } from 'common/helpers/request';
@@ -60,7 +60,7 @@ export function useHandleSave(
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/invoices/:id', { id: invoice.id })
+          route('/api/v1/invoices/:id', { id: invoice.id })
         )
       );
   };

@@ -10,6 +10,7 @@
 
 import { Link } from '@invoiceninja/forms';
 import { date } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { Project } from 'common/interfaces/project';
 import { DataTable, DataTableColumns } from 'components/DataTable';
@@ -26,7 +27,7 @@ export function Projects() {
       id: 'name',
       label: t('name'),
       format: (value, project) => (
-        <Link to={generatePath('/projects/:id', { id: project.id })}>
+        <Link to={route('/projects/:id', { id: project.id })}>
           {value}
         </Link>
       ),
@@ -61,7 +62,7 @@ export function Projects() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/projects/bulk"
-      linkToCreate={generatePath('/projects/create?client=:id', { id: id })}
+      linkToCreate={route('/projects/create?client=:id', { id: id })}
     />
   );
 }

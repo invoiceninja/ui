@@ -9,6 +9,7 @@
  */
 
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -48,7 +49,7 @@ export function Edit() {
     { name: t('purchase_orders'), href: '/purchase_orders' },
     {
       name: t('edit_purchase_order'),
-      href: generatePath('/purchase_orders/:id/edit', { id }),
+      href: route('/purchase_orders/:id/edit', { id }),
     },
   ];
 

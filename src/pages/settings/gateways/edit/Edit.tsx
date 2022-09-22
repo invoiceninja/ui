@@ -9,6 +9,7 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { Gateway } from 'common/interfaces/statics';
@@ -37,7 +38,7 @@ export function Edit() {
     { name: t('online_payments'), href: '/settings/online_payments' },
     {
       name: t('edit_gateway'),
-      href: generatePath('/settings/gateways/:id/edit', { id }),
+      href: route('/settings/gateways/:id/edit', { id }),
     },
   ];
 

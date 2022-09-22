@@ -14,7 +14,7 @@ import { Quote } from 'common/interfaces/quote';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useMarkSent() {
   const [t] = useTranslation();
@@ -34,7 +34,7 @@ export function useMarkSent() {
         queryClient.invalidateQueries('/api/v1/quotes');
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/quotes/:id', { id: quote.id })
+          route('/api/v1/quotes/:id', { id: quote.id })
         );
       })
       .catch((error) => {

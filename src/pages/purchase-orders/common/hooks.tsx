@@ -11,6 +11,7 @@
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
@@ -35,7 +36,7 @@ export function useCreate(props: CreateProps) {
         toast.success('created_purchase_order');
 
         navigate(
-          generatePath('/purchase_orders/:id/edit', {
+          route('/purchase_orders/:id/edit', {
             id: response.data.data.id,
           })
         );

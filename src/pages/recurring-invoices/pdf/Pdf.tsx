@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Default } from 'components/layouts/Default';
 import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
@@ -26,7 +27,7 @@ export function Pdf() {
   return (
     <Default
       title={documentTitle}
-      onBackClick={generatePath('/recurring_invoices/:id/edit', { id })}
+      onBackClick={route('/recurring_invoices/:id/edit', { id })}
     >
       {recurringInvoice && (
         <InvoiceViewer link={url(recurringInvoice) as string} method="GET" />

@@ -9,6 +9,7 @@
  */
 
 import { endpoint } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { Invoice } from 'common/interfaces/invoice';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
@@ -48,7 +49,7 @@ export function Actions(props: Props) {
       </span>
 
       <Dropdown label={t('more_actions')}>
-        <DropdownElement to={generatePath('/invoices/:id/email', { id })}>
+        <DropdownElement to={route('/invoices/:id/email', { id })}>
           {t('email_invoice')}
         </DropdownElement>
 

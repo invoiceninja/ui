@@ -22,7 +22,7 @@ import { toast } from 'common/helpers/toast/toast';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -114,7 +114,7 @@ export function Kanban() {
         toast.error();
       })
       .finally(() =>
-        queryClient.invalidateQueries(generatePath('/api/v1/tasks'))
+        queryClient.invalidateQueries(route('/api/v1/tasks'))
       );
   };
 

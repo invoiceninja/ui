@@ -13,6 +13,7 @@ import { InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
@@ -81,7 +82,7 @@ export function Clone() {
         toast.success(t('created_project'), { id: toastId });
 
         navigate(
-          generatePath('/projects/:id/edit', { id: response.data.data.id })
+          route('/projects/:id/edit', { id: response.data.data.id })
         );
       })
       .catch((error: AxiosError) => {

@@ -14,7 +14,7 @@ import { request } from 'common/helpers/request';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useBulkAction() {
   const [t] = useTranslation();
@@ -41,7 +41,7 @@ export function useBulkAction() {
       })
       .finally(() => {
         queryClient.invalidateQueries(
-          generatePath('/api/v1/projects/:id', { id })
+          route('/api/v1/projects/:id', { id })
         );
       });
   };

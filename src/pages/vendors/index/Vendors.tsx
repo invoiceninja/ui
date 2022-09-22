@@ -18,7 +18,7 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
 
@@ -51,7 +51,7 @@ export function Vendors() {
       id: 'number',
       label: t('number'),
       format: (value, vendor) => (
-        <Link to={generatePath('/vendors/:id', { id: vendor.id })}>
+        <Link to={route('/vendors/:id', { id: vendor.id })}>
           {value}
         </Link>
       ),
@@ -60,7 +60,7 @@ export function Vendors() {
       id: 'name',
       label: t('name'),
       format: (value, vendor) => (
-        <Link to={generatePath('/vendors/:id', { id: vendor.id })}>
+        <Link to={route('/vendors/:id', { id: vendor.id })}>
           {value}
         </Link>
       ),

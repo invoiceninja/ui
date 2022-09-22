@@ -14,7 +14,7 @@ import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-res
 import { Quote } from 'common/interfaces/quote';
 import { GenericQueryOptions } from 'common/queries/invoices';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useBlankQuoteQuery(options?: GenericQueryOptions) {
   return useQuery<Quote>(
@@ -33,7 +33,7 @@ interface QuoteQueryParams {
 
 export function useQuoteQuery({ id }: QuoteQueryParams) {
   return useQuery<Quote>(
-    generatePath('/api/v1/quotes/:id', { id }),
+    route('/api/v1/quotes/:id', { id }),
     () =>
       request('GET', endpoint('/api/v1/quotes/:id', { id })).then(
         (response: GenericSingleResourceResponse<Quote>) => response.data.data

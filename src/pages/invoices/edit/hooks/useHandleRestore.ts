@@ -13,7 +13,7 @@ import { bulk } from 'common/queries/invoices';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useHandleRestore() {
   const [t] = useTranslation();
@@ -33,7 +33,7 @@ export function useHandleRestore() {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/invoices/:id', { id: invoice.id })
+          route('/api/v1/invoices/:id', { id: invoice.id })
         )
       );
   };

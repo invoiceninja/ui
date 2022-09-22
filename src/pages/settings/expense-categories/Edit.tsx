@@ -12,6 +12,7 @@ import { InputField, InputLabel } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useExpenseCategoryQuery } from 'common/queries/expense-categories';
 import { Badge } from 'components/Badge';
 import { Breadcrumbs } from 'components/Breadcrumbs';
@@ -40,7 +41,7 @@ export function Edit() {
     { name: t('expense_settings'), href: '/settings/expense_settings' },
     {
       name: t('edit_expense_category'),
-      href: generatePath('/settings/expense_categories/:id/edit', { id }),
+      href: route('/settings/expense_categories/:id/edit', { id }),
     },
   ];
 
@@ -77,7 +78,7 @@ export function Edit() {
         .finally(() => {
           formik.setSubmitting(false);
           queryClient.invalidateQueries(
-            generatePath('/api/v1/expense_categories/:id', { id })
+            route('/api/v1/expense_categories/:id', { id })
           );
         });
     },

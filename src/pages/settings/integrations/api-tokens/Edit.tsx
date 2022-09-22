@@ -28,6 +28,7 @@ import { Restore } from './components/Restore';
 import { Delete } from './components/Delete';
 import { useTitle } from 'common/hooks/useTitle';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -40,7 +41,7 @@ export function Edit() {
     { name: t('api_tokens'), href: '/settings/integrations/api_tokens' },
     {
       name: t('edit_token'),
-      href: generatePath('/settings/integrations/api_tokens/:id/edit', { id }),
+      href: route('/settings/integrations/api_tokens/:id/edit', { id }),
     },
   ];
 
@@ -80,7 +81,7 @@ export function Edit() {
           formik.setSubmitting(false);
 
           queryClient.invalidateQueries(
-            generatePath('/api/v1/tokens/:id', { id })
+            route('/api/v1/tokens/:id', { id })
           );
         });
     },

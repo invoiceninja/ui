@@ -13,6 +13,7 @@ import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Divider } from 'components/cards/Divider';
 import { Settings } from 'components/layouts/Settings';
@@ -120,7 +121,7 @@ export function Create() {
           toast.success(t('created_webhook'), { id: toastId });
 
           navigate(
-            generatePath('/settings/integrations/api_webhooks/:id/edit', {
+            route('/settings/integrations/api_webhooks/:id/edit', {
               id: response.data.data.id,
             })
           );

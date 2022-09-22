@@ -29,6 +29,7 @@ import { UserSelector } from 'components/users/UserSelector';
 import { VendorSelector } from 'components/vendors/VendorSelector';
 import { DesignSelector } from 'common/generic/DesignSelector';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
+import { route } from 'common/helpers/route';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -47,7 +48,7 @@ export function CreditFooter(props: Props) {
   const [credit] = useAtom(creditAtom);
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(generatePath('/api/v1/credits/:id', { id }));
+    queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }));
   };
 
   const tabs = [

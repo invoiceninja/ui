@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
@@ -43,7 +44,7 @@ export function Edit() {
     { name: t('quotes'), href: '/quotes' },
     {
       name: t('edit_quote'),
-      href: generatePath('/quotes/:id/edit', { id }),
+      href: route('/quotes/:id/edit', { id }),
     },
   ];
 

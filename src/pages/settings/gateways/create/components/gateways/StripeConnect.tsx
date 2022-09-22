@@ -13,7 +13,7 @@ import { Button } from '@invoiceninja/forms';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function StripeConnect() {
   const [t] = useTranslation();
@@ -25,7 +25,7 @@ export function StripeConnect() {
       .then((response) =>
         window
           .open(
-            generatePath('https://invoicing.co/stripe/signup/:token', {
+            route('https://invoicing.co/stripe/signup/:token', {
               token: response.data.hash,
             }),
             '_blank'

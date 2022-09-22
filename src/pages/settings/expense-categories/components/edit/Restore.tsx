@@ -10,6 +10,7 @@
 
 import { ActionCard } from '@invoiceninja/cards';
 import { Button } from '@invoiceninja/forms';
+import { route } from 'common/helpers/route';
 import {
   bulk,
   useExpenseCategoryQuery,
@@ -41,7 +42,7 @@ export function Restore() {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/expense_categories/:id', { id })
+          route('/api/v1/expense_categories/:id', { id })
         )
       );
   };

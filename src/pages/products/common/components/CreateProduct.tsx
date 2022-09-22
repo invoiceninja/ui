@@ -22,6 +22,7 @@ import { CustomField } from 'components/CustomField';
 import { useTitle } from 'common/hooks/useTitle';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 
 export interface CreateProductDto {
   product_key: string;
@@ -79,7 +80,7 @@ export function CreateProduct(props: Props) {
           toast.success(t('created_product'));
 
           navigate(
-            generatePath('/products/:id/edit', {
+            route('/products/:id/edit', {
               id: response.data.data.id,
             }),
             { state: { message: t('created_product') } }

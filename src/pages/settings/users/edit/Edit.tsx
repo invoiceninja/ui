@@ -10,6 +10,7 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { User } from 'common/interfaces/user';
 import { useUserQuery } from 'common/queries/users';
@@ -37,7 +38,7 @@ export function Edit() {
     { name: t('user_management'), href: '/settings/users' },
     {
       name: t('edit_user'),
-      href: generatePath('/settings/users/:id/edit', { id }),
+      href: route('/settings/users/:id/edit', { id }),
     },
   ];
 
@@ -65,7 +66,7 @@ export function Edit() {
         toast.success(t('updated_user'), { id: toastId });
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/users/:id', { id })
+          route('/api/v1/users/:id', { id })
         );
       })
       .catch((error) => {

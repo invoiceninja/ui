@@ -11,7 +11,7 @@
 import { AxiosRequestHeaders, AxiosResponse, Method } from 'axios';
 import dayjs from 'dayjs';
 import { t } from 'i18next';
-import { generatePath } from 'react-router';
+import { route } from 'common/helpers/route';
 import entityState from './constants/entity-state';
 import { request } from './helpers/request';
 
@@ -36,7 +36,7 @@ export function apiEndpoint(): string {
 }
 
 export function endpoint(endpoint: string, params = {}): string {
-  return apiEndpoint() + generatePath(endpoint, params);
+  return apiEndpoint() + route(endpoint, params);
 }
 
 export function fetcher(
@@ -92,8 +92,8 @@ export function trans(key: string, replace: Record<string, unknown>) {
 
 export function previewEndpoint(endpoint: string, params = {}): string {
   if (isHosted()) {
-    return 'https://preview.invoicing.co' + generatePath(endpoint, params);
+    return 'https://preview.invoicing.co' + route(endpoint, params);
   }
 
-  return apiEndpoint() + generatePath(endpoint, params);
+  return apiEndpoint() + route(endpoint, params);
 }

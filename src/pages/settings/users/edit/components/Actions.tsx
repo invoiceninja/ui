@@ -10,6 +10,7 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { User } from 'common/interfaces/user';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
@@ -83,7 +84,7 @@ export function Actions(props: Props) {
       .then(() => {
         toast.success(t(`${action}d_user`), { id: toastId });
         queryClient.invalidateQueries(
-          generatePath('/api/v1/users/:id', { id })
+          route('/api/v1/users/:id', { id })
         );
       })
       .catch((error) => {

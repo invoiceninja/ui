@@ -38,6 +38,7 @@ import { Quote } from 'common/interfaces/quote';
 import { creditAtom } from 'pages/credits/common/atoms';
 import { Credit } from 'common/interfaces/credit';
 import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
+import { route } from 'common/helpers/route';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -179,7 +180,7 @@ export function useSave(props: RecurringInvoiceSaveProps) {
     )
       .then(() => {
         queryClient.invalidateQueries(
-          generatePath('/api/v1/recurring_invoices/:id', {
+          route('/api/v1/recurring_invoices/:id', {
             id: recurringInvoice.id,
           })
         );
@@ -213,7 +214,7 @@ export function useToggleStartStop() {
         queryClient.invalidateQueries('/api/v1/recurring_invoices');
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/recurring_invoices/:id', {
+          route('/api/v1/recurring_invoices/:id', {
             id: recurringInvoice.id,
           })
         );
@@ -293,7 +294,7 @@ export function useActions() {
   const actions: Action<RecurringInvoice>[] = [
     (recurringInvoice) => (
       <DropdownElement
-        to={generatePath('/recurring_invoices/:id/pdf', {
+        to={route('/recurring_invoices/:id/pdf', {
           id: recurringInvoice.id,
         })}
       >
@@ -362,7 +363,7 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
         toast.success('created_recurring_invoice');
 
         navigate(
-          generatePath('/recurring_invoices/:id/edit', {
+          route('/recurring_invoices/:id/edit', {
             id: response.data.data.id,
           })
         );

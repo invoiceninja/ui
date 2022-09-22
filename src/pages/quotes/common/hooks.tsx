@@ -41,6 +41,7 @@ import { creditAtom } from 'pages/credits/common/atoms';
 import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
+import { route } from 'common/helpers/route';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -168,7 +169,7 @@ export function useCreate(props: CreateProps) {
         toast.success('created_quote');
 
         navigate(
-          generatePath('/quotes/:id/edit', { id: response.data.data.id })
+          route('/quotes/:id/edit', { id: response.data.data.id })
         );
       })
       .catch((error: AxiosError) => {
@@ -195,7 +196,7 @@ export function useSave(props: CreateProps) {
         toast.success('updated_quote');
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/quotes/:id', { id: quote.id })
+          route('/api/v1/quotes/:id', { id: quote.id })
         );
       })
       .catch((error: AxiosError) => {
@@ -263,7 +264,7 @@ export function useActions() {
 
   const actions: Action<Quote>[] = [
     (quote) => (
-      <DropdownElement to={generatePath('/quotes/:id/pdf', { id: quote.id })}>
+      <DropdownElement to={route('/quotes/:id/pdf', { id: quote.id })}>
         {t('view_pdf')}
       </DropdownElement>
     ),
@@ -273,7 +274,7 @@ export function useActions() {
       </DropdownElement>
     ),
     (quote) => (
-      <DropdownElement to={generatePath('/quotes/:id/email', { id: quote.id })}>
+      <DropdownElement to={route('/quotes/:id/email', { id: quote.id })}>
         {t('email_quote')}
       </DropdownElement>
     ),

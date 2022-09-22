@@ -13,6 +13,7 @@ import { InputField, InputLabel } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
@@ -55,7 +56,7 @@ export function Create() {
           toast.success(t('created_expense_category'));
 
           navigate(
-            generatePath('/settings/expense_categories/:id/edit', {
+            route('/settings/expense_categories/:id/edit', {
               id: response.data.data.id,
             })
           );

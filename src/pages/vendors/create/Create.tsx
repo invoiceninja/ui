@@ -11,6 +11,7 @@
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
@@ -94,7 +95,7 @@ export function Create() {
         console.log(response);
 
         navigate(
-          generatePath('/vendors/:id', { id: response[0].data.data.id })
+          route('/vendors/:id', { id: response[0].data.data.id })
         );
       })
       .catch((error) => {

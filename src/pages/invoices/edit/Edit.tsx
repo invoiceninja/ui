@@ -9,6 +9,7 @@
  */
 
 import { InvoiceStatus } from 'common/enums/invoice-status';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -47,7 +48,7 @@ export function Edit() {
     { name: t('invoices'), href: '/invoices' },
     {
       name: t('edit_invoice'),
-      href: generatePath('/invoices/:id/edit', { id }),
+      href: route('/invoices/:id/edit', { id }),
     },
   ];
 

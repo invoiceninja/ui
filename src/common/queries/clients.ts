@@ -12,7 +12,7 @@ import { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useClientsQuery() {
   return useQuery(['/api/v1/clients?filter_deleted_clients=true'], () =>
@@ -25,7 +25,7 @@ export function useClientQuery(
   options: Record<string, any> = {}
 ) {
   return useQuery(
-    generatePath('/api/v1/clients/:id', { id: params.id }),
+    route('/api/v1/clients/:id', { id: params.id }),
     () => request('GET', endpoint('/api/v1/clients/:id', { id: params.id })),
     { ...options, staleTime: Infinity }
   );

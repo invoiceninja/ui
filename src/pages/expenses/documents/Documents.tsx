@@ -9,6 +9,7 @@
  */
 
 import { endpoint } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { useExpenseQuery } from 'common/queries/expenses';
 import { Page } from 'components/Breadcrumbs';
@@ -28,21 +29,21 @@ export function Documents() {
 
   const pages: Page[] = [
     { name: t('expenses'), href: '/expenses' },
-    { name: t('expense'), href: generatePath('/expenses/:id/edit', { id }) },
+    { name: t('expense'), href: route('/expenses/:id/edit', { id }) },
     {
       name: t('documents'),
-      href: generatePath('/expenses/:id/documents', { id }),
+      href: route('/expenses/:id/documents', { id }),
     },
   ];
 
   const tabs: Tab[] = [
     {
       name: t('edit'),
-      href: generatePath('/expenses/:id/edit', { id }),
+      href: route('/expenses/:id/edit', { id }),
     },
     {
       name: t('documents'),
-      href: generatePath('/expenses/:id/documents', { id }),
+      href: route('/expenses/:id/documents', { id }),
     },
   ];
 
@@ -51,7 +52,7 @@ export function Documents() {
   const queryClient = useQueryClient();
 
   const invalidateCache = () => {
-    queryClient.invalidateQueries(generatePath('/api/v1/expenses/:id', { id }));
+    queryClient.invalidateQueries(route('/api/v1/expenses/:id', { id }));
   };
 
   return (

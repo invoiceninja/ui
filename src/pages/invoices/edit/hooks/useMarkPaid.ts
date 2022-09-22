@@ -13,7 +13,7 @@ import { Invoice } from 'common/interfaces/invoice';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useMarkPaid() {
   const queryClient = useQueryClient();
@@ -32,7 +32,7 @@ export function useMarkPaid() {
         queryClient.invalidateQueries('/api/v1/invoices');
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/invoices/:id', { id: invoice.id })
+          route('/api/v1/invoices/:id', { id: invoice.id })
         );
       })
       .catch((error) => {

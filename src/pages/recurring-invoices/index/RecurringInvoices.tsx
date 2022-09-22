@@ -21,7 +21,7 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { RecurringInvoiceStatus } from '../common/components/RecurringInvoiceStatus';
 import { useActions } from '../common/hooks';
 
@@ -51,7 +51,7 @@ export function RecurringInvoices() {
       label: t('number'),
       format: (value, recurringInvoice) => (
         <Link
-          to={generatePath('/recurring_invoices/:id/edit', {
+          to={route('/recurring_invoices/:id/edit', {
             id: recurringInvoice.id,
           })}
         >
@@ -64,7 +64,7 @@ export function RecurringInvoices() {
       label: t('client'),
       format: (value, recurringInvoice) => (
         <Link
-          to={generatePath('/clients/:id', { id: recurringInvoice.client_id })}
+          to={route('/clients/:id', { id: recurringInvoice.client_id })}
         >
           {recurringInvoice.client?.display_name}
         </Link>

@@ -21,7 +21,7 @@ import React, {
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { Divider } from './cards/Divider';
 import { Actions, SelectOption } from './datatables/Actions';
 import { Dropdown } from './dropdown/Dropdown';
@@ -298,7 +298,7 @@ export function DataTable(props: Props) {
 
                       {props.linkToEdit && (
                         <DropdownElement
-                          to={generatePath(props.linkToEdit, {
+                          to={route(props.linkToEdit, {
                             id: resource?.id,
                           })}
                         >

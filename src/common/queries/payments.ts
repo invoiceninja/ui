@@ -11,12 +11,12 @@
 import { AxiosResponse } from 'axios';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { endpoint } from '../helpers';
 
 export function usePaymentQuery(params: { id: string | undefined }) {
   return useQuery(
-    generatePath('/api/v1/payments/:id?include=client,invoices,paymentables', {
+    route('/api/v1/payments/:id?include=client,invoices,paymentables', {
       id: params.id,
     }),
     () =>
@@ -32,7 +32,7 @@ export function usePaymentQuery(params: { id: string | undefined }) {
 
 export function useBlankPaymentQuery() {
   return useQuery(
-    generatePath('/api/v1/payments/create'),
+    route('/api/v1/payments/create'),
     () => request('GET', endpoint('/api/v1/payments/create')),
     { staleTime: Infinity }
   );

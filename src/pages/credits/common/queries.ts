@@ -14,7 +14,7 @@ import { Credit } from 'common/interfaces/credit';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { GenericQueryOptions } from 'common/queries/invoices';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useBlankCreditQuery(options?: GenericQueryOptions) {
   return useQuery<Credit>(
@@ -33,7 +33,7 @@ interface CreditQueryProps {
 
 export function useCreditQuery({ id }: CreditQueryProps) {
   return useQuery<Credit>(
-    generatePath('/api/v1/credits/:id', { id }),
+    route('/api/v1/credits/:id', { id }),
     () =>
       request('GET', endpoint('/api/v1/credits/:id', { id })).then(
         (response: GenericSingleResourceResponse<Credit>) => response.data.data

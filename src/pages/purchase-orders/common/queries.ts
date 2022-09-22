@@ -14,7 +14,7 @@ import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-res
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { GenericQueryOptions } from 'common/queries/invoices';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
   return useQuery<PurchaseOrder>(
@@ -30,7 +30,7 @@ export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
 
 export function usePurchaseOrderQuery(params: { id: string | undefined }) {
   return useQuery<PurchaseOrder>(
-    generatePath('/api/v1/purchase_orders/:id', { id: params.id }),
+    route('/api/v1/purchase_orders/:id', { id: params.id }),
     () =>
       request(
         'GET',

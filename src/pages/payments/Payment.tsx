@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { Page } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
@@ -23,22 +24,22 @@ export function Payment() {
     { name: t('payments'), href: '/payments' },
     {
       name: t('edit_payment'),
-      href: generatePath('/payments/:id/edit', { id: id }),
+      href: route('/payments/:id/edit', { id: id }),
     },
   ];
 
   const tabs: Tab[] = [
     {
       name: t('edit'),
-      href: generatePath('/payments/:id/edit', { id }),
+      href: route('/payments/:id/edit', { id }),
     },
     {
       name: t('documents'),
-      href: generatePath('/payments/:id/documents', { id }),
+      href: route('/payments/:id/documents', { id }),
     },
     {
       name: t('custom_fields'),
-      href: generatePath('/payments/:id/payment_fields', { id }),
+      href: route('/payments/:id/payment_fields', { id }),
     },
   ];
 

@@ -9,6 +9,7 @@
  */
 
 import { InvoiceStatus } from 'common/enums/invoice-status';
+import { route } from 'common/helpers/route';
 import { Credit } from 'common/interfaces/credit';
 import { Invoice } from 'common/interfaces/invoice';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
@@ -94,14 +95,14 @@ export function useActions() {
   return [
     (invoice: Invoice) => (
       <DropdownElement
-        to={generatePath('/invoices/:id/email', { id: invoice.id })}
+        to={route('/invoices/:id/email', { id: invoice.id })}
       >
         {t('email_invoice')}
       </DropdownElement>
     ),
     (invoice: Invoice) => (
       <DropdownElement
-        to={generatePath('/invoices/:id/pdf', { id: invoice.id })}
+        to={route('/invoices/:id/pdf', { id: invoice.id })}
       >
         {t('view_pdf')}
       </DropdownElement>
@@ -128,7 +129,7 @@ export function useActions() {
     (invoice: Invoice) =>
       parseInt(invoice.status_id) < 4 && (
         <DropdownElement
-          to={generatePath(
+          to={route(
             '/payments/create?invoice=:invoiceId&client=:clientId',
             { invoiceId: invoice.id, clientId: invoice.client_id }
           )}

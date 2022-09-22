@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import collect from 'collect.js';
 import paymentType from 'common/constants/payment-type';
+import { route } from 'common/helpers/route';
 import { useCreditResolver } from 'common/hooks/credits/useCreditResolver';
 import { useInvoiceResolver } from 'common/hooks/invoices/useInvoiceResolver';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
@@ -235,7 +236,7 @@ export function Create() {
                   <DebouncedCombobox
                     className="w-1/2"
                     inputLabel={t('invoice')}
-                    endpoint={generatePath(
+                    endpoint={route(
                       '/api/v1/invoices?payable=:clientId',
                       { clientId: payment.client_id }
                     )}
@@ -272,7 +273,7 @@ export function Create() {
           {payment?.client_id && (
             <Element leftSide={t('invoices')}>
               <DebouncedCombobox
-                endpoint={generatePath('/api/v1/invoices?payable=:clientId', {
+                endpoint={route('/api/v1/invoices?payable=:clientId', {
                   clientId: payment.client_id,
                 })}
                 label="number"
@@ -306,7 +307,7 @@ export function Create() {
                   <DebouncedCombobox
                     className="w-1/2"
                     inputLabel={t('credit')}
-                    endpoint={generatePath(
+                    endpoint={route(
                       '/api/v1/credits?client_id=:clientId',
                       { clientId: payment.client_id }
                     )}
@@ -343,7 +344,7 @@ export function Create() {
           {payment?.client_id && (
             <Element leftSide={t('credits')}>
               <DebouncedCombobox
-                endpoint={generatePath('/api/v1/credits?client_id=:clientId', {
+                endpoint={route('/api/v1/credits?client_id=:clientId', {
                   clientId: payment.client_id,
                 })}
                 label="number"

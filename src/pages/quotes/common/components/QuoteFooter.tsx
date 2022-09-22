@@ -12,6 +12,7 @@ import { Card } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import { DesignSelector } from 'common/generic/DesignSelector';
 import { endpoint } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { DocumentsTable } from 'components/DocumentsTable';
@@ -58,7 +59,7 @@ export function QuoteFooter(props: Props) {
   ];
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(generatePath('/api/v1/quotes/:id', { id }));
+    queryClient.invalidateQueries(route('/api/v1/quotes/:id', { id }));
   };
 
   return (

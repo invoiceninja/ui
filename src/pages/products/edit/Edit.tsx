@@ -28,6 +28,7 @@ import { useQueryClient } from 'react-query';
 import { generatePath, useParams } from 'react-router-dom';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 
 export function Edit() {
   const { id } = useParams();
@@ -74,7 +75,7 @@ export function Edit() {
           formik.setSubmitting(false);
 
           queryClient.invalidateQueries(
-            generatePath('/api/v1/products/:id', { id })
+            route('/api/v1/products/:id', { id })
           );
         });
     },
@@ -95,7 +96,7 @@ export function Edit() {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/products/:id', { id })
+          route('/api/v1/products/:id', { id })
         )
       );
   };
@@ -266,7 +267,7 @@ export function Edit() {
       {product && (
         <div className="flex justify-end">
           <Dropdown label={t('more_actions')}>
-            <DropdownElement to={generatePath('/products/:id/clone', { id })}>
+            <DropdownElement to={route('/products/:id/clone', { id })}>
               {t('clone_product')}
             </DropdownElement>
 

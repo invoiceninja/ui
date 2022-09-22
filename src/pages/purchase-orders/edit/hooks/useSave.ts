@@ -15,7 +15,7 @@ import { toast } from 'common/helpers/toast/toast';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useSave(setErrors: (errors: ValidationBag) => unknown) {
   const queryClient = useQueryClient();
@@ -36,7 +36,7 @@ export function useSave(setErrors: (errors: ValidationBag) => unknown) {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/purchase_orders/:id', { id: purchaseOrder.id })
+          route('/api/v1/purchase_orders/:id', { id: purchaseOrder.id })
         )
       );
   };

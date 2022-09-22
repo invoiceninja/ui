@@ -10,6 +10,7 @@
 
 import { ActionCard } from '@invoiceninja/cards';
 import { Button } from '@invoiceninja/forms';
+import { route } from 'common/helpers/route';
 import { bulk, useTaskStatusQuery } from 'common/queries/task-statuses';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -38,7 +39,7 @@ export function Archive() {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/task_statuses/:id', { id })
+          route('/api/v1/task_statuses/:id', { id })
         )
       );
   };

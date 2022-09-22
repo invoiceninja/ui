@@ -23,6 +23,7 @@ import { Details } from '../create/components/Details';
 import { Notes } from '../create/components/Notes';
 import { AdditionalInfo } from '../create/components/AdditionalInfo';
 import { TaxSettings } from '../create/components/Taxes';
+import { route } from 'common/helpers/route';
 
 export function Clone() {
   const [t] = useTranslation();
@@ -35,8 +36,8 @@ export function Clone() {
 
   const pages = [
     { name: t('expenses'), href: '/expenses' },
-    { name: t('expense'), href: generatePath('/expenses/:id/edit', { id }) },
-    { name: t('clone'), href: generatePath('/expenses/:id/clone', { id }) },
+    { name: t('expense'), href: route('/expenses/:id/edit', { id }) },
+    { name: t('clone'), href: route('/expenses/:id/clone', { id }) },
   ];
 
   const [expense, setExpense] = useState<Expense>();
@@ -65,7 +66,7 @@ export function Clone() {
         toast.success('created_expense');
 
         navigate(
-          generatePath('/expenses/:id/edit', { id: response.data.data.id })
+          route('/expenses/:id/edit', { id: response.data.data.id })
         );
       })
       .catch((error) => {

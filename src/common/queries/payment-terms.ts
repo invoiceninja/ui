@@ -12,7 +12,7 @@ import { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 
@@ -34,7 +34,7 @@ export function usePaymentTermsQuery(params: Params) {
 
 export function usePaymentTermQuery(params: { id: string | undefined }) {
   return useQuery(
-    generatePath('/api/v1/payment_terms/:id', params),
+    route('/api/v1/payment_terms/:id', params),
     () =>
       request('GET', endpoint('/api/v1/payment_terms/:id', params), {
         headers: defaultHeaders(),

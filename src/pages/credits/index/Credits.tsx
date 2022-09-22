@@ -18,7 +18,7 @@ import { Credit } from 'common/interfaces/credit';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { CreditStatus } from '../common/components/CreditStatus';
 import { useActions } from '../common/hooks';
 
@@ -45,7 +45,7 @@ export function Credits() {
       id: 'number',
       label: t('number'),
       format: (field, credit) => (
-        <Link to={generatePath('/credits/:id/edit', { id: credit.id })}>
+        <Link to={route('/credits/:id/edit', { id: credit.id })}>
           {field}
         </Link>
       ),
@@ -54,7 +54,7 @@ export function Credits() {
       id: 'client_id',
       label: t('client'),
       format: (_, credit) => (
-        <Link to={generatePath('/clients/:id', { id: credit.client_id })}>
+        <Link to={route('/clients/:id', { id: credit.client_id })}>
           {credit.client?.display_name}
         </Link>
       ),

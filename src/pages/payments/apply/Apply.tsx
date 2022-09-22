@@ -13,6 +13,7 @@ import { Button, InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { Invoice } from 'common/interfaces/invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { usePaymentQuery } from 'common/queries/payments';
@@ -57,7 +58,7 @@ export function Apply() {
         .finally(() => {
           formik.setSubmitting(false);
           queryClient.invalidateQueries(
-            generatePath('/api/v1/payments/:id', { id })
+            route('/api/v1/payments/:id', { id })
           );
         });
     },

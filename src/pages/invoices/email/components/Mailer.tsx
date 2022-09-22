@@ -27,7 +27,7 @@ import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export type MailerResourceType =
   | 'invoice'
@@ -98,7 +98,7 @@ export function Mailer(props: Props) {
       <div className="flex justify-end">
         <Button
           className="mx-2"
-          to={generatePath(backPath(), { id: props.resource.id })}
+          to={route(backPath(), { id: props.resource.id })}
           type="secondary"
         >
           {t('back')}

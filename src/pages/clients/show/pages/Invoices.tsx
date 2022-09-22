@@ -10,6 +10,7 @@
 
 import { Link } from '@invoiceninja/forms';
 import invoiceStatus from 'common/constants/invoice-status';
+import { route } from 'common/helpers/route';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
@@ -24,7 +25,7 @@ export function Invoices() {
       id: 'number',
       label: t('invoice_number'),
       format: (value, resource) => (
-        <Link to={generatePath('/invoices/:id/edit', { id: resource.id })}>
+        <Link to={route('/invoices/:id/edit', { id: resource.id })}>
           {value}
         </Link>
       ),
@@ -47,7 +48,7 @@ export function Invoices() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/invoices/bulk"
-      linkToCreate={generatePath('/invoices/create?client=:id', { id: id })}
+      linkToCreate={route('/invoices/create?client=:id', { id: id })}
     />
   );
 }

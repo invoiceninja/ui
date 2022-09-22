@@ -14,7 +14,7 @@ import { request } from 'common/helpers/request';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Invoice } from 'common/interfaces/invoice';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export interface GenericQueryOptions {
   enabled: boolean;
@@ -22,7 +22,7 @@ export interface GenericQueryOptions {
 
 export function useInvoiceQuery(params: { id: string | undefined }) {
   return useQuery<Invoice>(
-    generatePath('/api/v1/invoices/:id', { id: params.id }),
+    route('/api/v1/invoices/:id', { id: params.id }),
     () =>
       request('GET', endpoint('/api/v1/invoices/:id', { id: params.id })).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
@@ -33,7 +33,7 @@ export function useInvoiceQuery(params: { id: string | undefined }) {
 
 export function useBlankInvoiceQuery(options?: GenericQueryOptions) {
   return useQuery<Invoice>(
-    generatePath('/api/v1/invoices/create'),
+    route('/api/v1/invoices/create'),
     () =>
       request('GET', endpoint('/api/v1/invoices/create')).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data

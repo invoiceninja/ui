@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { useInvoiceQuery } from 'common/queries/invoices';
 import { Page } from 'components/Breadcrumbs';
@@ -35,7 +36,7 @@ export function Email() {
     { name: t('invoices'), href: '/invoices' },
     {
       name: t('email_invoice'),
-      href: generatePath('/invoices/:id/email', { id }),
+      href: route('/invoices/:id/email', { id }),
     },
   ];
 

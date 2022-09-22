@@ -14,11 +14,11 @@ import { request } from 'common/helpers/request';
 import { GenericManyResponse } from 'common/interfaces/generic-many-response';
 import { TaskStatus } from 'common/interfaces/task-status';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useTaskStatusesQuery() {
   return useQuery<GenericManyResponse<TaskStatus>>(
-    generatePath('/api/v1/task_statuses'),
+    route('/api/v1/task_statuses'),
     () =>
       request('GET', endpoint('/api/v1/task_statuses')).then(
         (response) => response.data
@@ -28,7 +28,7 @@ export function useTaskStatusesQuery() {
 
 export function useTaskStatusQuery(params: { id: string | undefined }) {
   return useQuery(
-    generatePath('/api/v1/task_statuses/:id', { id: params.id }),
+    route('/api/v1/task_statuses/:id', { id: params.id }),
     () =>
       request('GET', endpoint('/api/v1/task_statuses/:id', { id: params.id })),
     { staleTime: Infinity }

@@ -10,6 +10,7 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { User } from 'common/interfaces/user';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -81,7 +82,7 @@ export function Create() {
         toast.success(t('created_user'), { id: toastId });
 
         navigate(
-          generatePath('/settings/users/:id/edit', {
+          route('/settings/users/:id/edit', {
             id: response.data.data.id,
           })
         );

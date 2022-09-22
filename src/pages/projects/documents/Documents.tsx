@@ -9,6 +9,7 @@
  */
 
 import { endpoint } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { useProjectQuery } from 'common/queries/projects';
 import { DocumentsTable } from 'components/DocumentsTable';
 import { Upload } from 'pages/settings/company/documents/components';
@@ -22,7 +23,7 @@ export function Documents() {
   const queryClient = useQueryClient();
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(generatePath('/api/v1/projects/:id', { id }));
+    queryClient.invalidateQueries(route('/api/v1/projects/:id', { id }));
   };
 
   return (

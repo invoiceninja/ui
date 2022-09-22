@@ -14,7 +14,7 @@ import { Invoice } from 'common/interfaces/invoice';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useMarkSent() {
   const [t] = useTranslation();
@@ -34,7 +34,7 @@ export function useMarkSent() {
         queryClient.invalidateQueries('/api/v1/invoices');
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/invoices/:id', { id: invoice.id })
+          route('/api/v1/invoices/:id', { id: invoice.id })
         );
       })
       .catch((error) => {

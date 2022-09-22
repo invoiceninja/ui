@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -47,7 +48,7 @@ export function Edit() {
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
       name: t('edit_recurring_invoice'),
-      href: generatePath('/recurring_invoices/:id/edit', { id }),
+      href: route('/recurring_invoices/:id/edit', { id }),
     },
   ];
 

@@ -13,6 +13,7 @@ import { InputField, InputLabel } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
@@ -58,7 +59,7 @@ export function Create() {
           queryClient.invalidateQueries('/api/v1/task_statuses');
 
           navigate(
-            generatePath('/settings/task_statuses/:id/edit', {
+            route('/settings/task_statuses/:id/edit', {
               id: response.data.data.id,
             })
           );

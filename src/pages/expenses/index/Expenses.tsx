@@ -18,7 +18,7 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { ExpenseStatus } from '../common/components/ExpenseStatus';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
@@ -55,7 +55,7 @@ export function Expenses() {
       id: 'status_id',
       label: t('status'),
       format: (value, expense) => (
-        <Link to={generatePath('/expenses/:id/edit', { id: expense.id })}>
+        <Link to={route('/expenses/:id/edit', { id: expense.id })}>
           <span className="inline-flex items-center space-x-4">
             <ExpenseStatus entity={expense} />
           </span>
@@ -66,7 +66,7 @@ export function Expenses() {
       id: 'number',
       label: t('number'),
       format: (field, expense) => (
-        <Link to={generatePath('/expenses/:id/edit', { id: expense.id })}>
+        <Link to={route('/expenses/:id/edit', { id: expense.id })}>
           {field}
         </Link>
       ),
@@ -76,7 +76,7 @@ export function Expenses() {
       label: t('client'),
       format: (value, expense) =>
         expense.client && (
-          <Link to={generatePath('/clients/:id', { id: value.toString() })}>
+          <Link to={route('/clients/:id', { id: value.toString() })}>
             {expense.client.display_name}
           </Link>
         ),
@@ -86,7 +86,7 @@ export function Expenses() {
       label: t('vendor'),
       format: (value, expense) =>
         expense.vendor && (
-          <Link to={generatePath('/vendors/:id', { id: value.toString() })}>
+          <Link to={route('/vendors/:id', { id: value.toString() })}>
             {expense.vendor.name}
           </Link>
         ),
