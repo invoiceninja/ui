@@ -13,7 +13,7 @@ import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { Task } from 'common/interfaces/task';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useStart() {
   const queryClient = useQueryClient();
@@ -36,7 +36,7 @@ export function useStart() {
         queryClient.invalidateQueries('/api/v1/tasks');
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/tasks/:id', { id: task.id })
+          route('/api/v1/tasks/:id', { id: task.id })
         );
       });
   };

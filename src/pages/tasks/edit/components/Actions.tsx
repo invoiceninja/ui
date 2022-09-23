@@ -17,7 +17,7 @@ import { useInvoiceTask } from 'pages/tasks/common/hooks/useInvoiceTask';
 import { useStart } from 'pages/tasks/common/hooks/useStart';
 import { useStop } from 'pages/tasks/common/hooks/useStop';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 interface Props {
   task: Task;
@@ -47,7 +47,7 @@ export function Actions(props: Props) {
           </DropdownElement>
         )}
 
-        <DropdownElement to={generatePath('/tasks/:id/clone', { id: task.id })}>
+        <DropdownElement to={route('/tasks/:id/clone', { id: task.id })}>
           {t('clone')}
         </DropdownElement>
 

@@ -10,6 +10,7 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { User } from 'common/interfaces/user';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
@@ -18,7 +19,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface Props {
   user: User;
@@ -83,7 +84,7 @@ export function Actions(props: Props) {
       .then(() => {
         toast.success(t(`${action}d_user`), { id: toastId });
         queryClient.invalidateQueries(
-          generatePath('/api/v1/users/:id', { id })
+          route('/api/v1/users/:id', { id })
         );
       })
       .catch((error) => {

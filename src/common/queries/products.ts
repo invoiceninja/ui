@@ -11,7 +11,7 @@
 import { AxiosResponse } from 'axios';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { endpoint } from '../helpers';
 import { Params } from './common/params.interface';
 
@@ -35,14 +35,14 @@ export function useProductsQuery(params: Params) {
 
 export function useProductQuery(params: { id: string | undefined }) {
   return useQuery(
-    generatePath('/api/v1/products/:id', { id: params.id }),
+    route('/api/v1/products/:id', { id: params.id }),
     () => request('GET', endpoint('/api/v1/products/:id', { id: params.id })),
     { staleTime: Infinity }
   );
 }
 export function useBlankProductQuery() {
   return useQuery(
-    generatePath('/api/v1/products/create'),
+    route('/api/v1/products/create'),
     () => request('GET', endpoint('/api/v1/products/create')),
     { staleTime: Infinity }
   );

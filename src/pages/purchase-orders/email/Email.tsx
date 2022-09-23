@@ -8,13 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
-import { usePurchaseOrderQuery } from 'common/queries/purchase-orders';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Mailer } from 'pages/invoices/email/components/Mailer';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { usePurchaseOrderQuery } from '../common/queries';
 
 export function Email() {
   const [t] = useTranslation();
@@ -28,15 +29,15 @@ export function Email() {
     email_template_purchase_order: 'initial_email',
   };
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
     {
       name: t('purchase_order'),
-      href: generatePath('/purchase_orders/:id', { id }),
+      href: route('/purchase_orders/:id', { id }),
     },
     {
       name: t('email_purchase_order'),
-      href: generatePath('/purchase_orders/:id/email', { id }),
+      href: route('/purchase_orders/:id/email', { id }),
     },
   ];
 

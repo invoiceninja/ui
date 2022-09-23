@@ -9,34 +9,49 @@
  */
 
 import { Card } from '@invoiceninja/cards';
-import { InputField, InputLabel } from '@invoiceninja/forms';
+import { InputField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { MarkdownEditor } from 'components/forms/MarkdownEditor';
 import { TabGroup } from 'components/TabGroup';
-import { useCurrentCredit } from 'pages/credits/common/hooks/useCurrentCredit';
-import { useSetCurrentCreditProperty } from 'pages/credits/common/hooks/useSetCurrentCreditProperty';
 import { Field } from 'pages/settings/custom-fields/components';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Toggle from 'components/forms/Toggle';
-import { CreditDocuments } from './CreditDocuments';
+import { ChangeHandler } from '../hooks';
+import { useAtom } from 'jotai';
+import { creditAtom } from '../atoms';
+import { useLocation, useParams } from 'react-router-dom';
+import { Upload } from 'pages/settings/company/documents/components';
+import { endpoint } from 'common/helpers';
+import { useQueryClient } from 'react-query';
+import { DocumentsTable } from 'components/DocumentsTable';
+import { UserSelector } from 'components/users/UserSelector';
+import { VendorSelector } from 'components/vendors/VendorSelector';
+import { DesignSelector } from 'common/generic/DesignSelector';
+import { ProjectSelector } from 'components/projects/ProjectSelector';
+import { route } from 'common/helpers/route';
 
 interface Props {
-  page: 'create' | 'edit';
+  handleChange: ChangeHandler;
 }
 
 export function CreditFooter(props: Props) {
-  const [t] = useTranslation();
+  const { t } = useTranslation();
+  const { id } = useParams();
+  const { handleChange } = props;
 
   const company = useCurrentCompany();
-  const credit = useCurrentCredit();
-
-  const handleChange = useSetCurrentCreditProperty();
+  const location = useLocation();
+  const queryClient = useQueryClient();
   const handleCustomFieldChange = useHandleCustomFieldChange();
 
-  const [tabs, setTabs] = useState([
+  const [credit] = useAtom(creditAtom);
+
+  const onSuccess = () => {
+    queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }));
+  };
+
+  const tabs = [
     t('terms'),
     t('footer'),
     t('public_notes'),
@@ -44,13 +59,7 @@ export function CreditFooter(props: Props) {
     t('documents'),
     t('settings'),
     t('custom_fields'),
-  ]);
-
-  useEffect(() => {
-    if (props.page === 'create') {
-      setTabs((current) => current.filter((tab) => tab !== t('documents')));
-    }
-  }, []);
+  ];
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
@@ -83,64 +92,59 @@ export function CreditFooter(props: Props) {
           />
         </div>
 
-        {props.page === 'edit' ? (
-          <div>
-            <CreditDocuments />
-          </div>
+        {location.pathname.endsWith('/create') ? (
+          <div className="text-sm">{t('save_to_upload_documents')}.</div>
         ) : (
-          <></>
+          <div>
+            <Upload
+              widgetOnly
+              endpoint={endpoint('/api/v1/credits/:id/upload', {
+                id,
+              })}
+              onSuccess={onSuccess}
+            />
+
+            <DocumentsTable
+              documents={credit?.documents || []}
+              onDocumentDelete={onSuccess}
+            />
+          </div>
         )}
 
         <div>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
-                <InputLabel>{t('user')}</InputLabel>
-                <DebouncedCombobox
-                  endpoint="/api/v1/users"
-                  label="first_name"
-                  onChange={(value) =>
-                    handleChange('assigned_user_id', value.value)
-                  }
-                  defaultValue={credit?.assigned_user_id}
+                <UserSelector
+                  inputLabel={t('user')}
+                  value={credit?.assigned_user_id}
+                  onChange={(user) => handleChange('assigned_user_id', user.id)}
                 />
               </div>
 
               <div className="space-y-2">
-                <InputLabel>{t('vendor')}</InputLabel>
-                <DebouncedCombobox
-                  endpoint="/api/v1/vendors"
-                  label="name"
-                  onChange={(value) => handleChange('vendor_id', value.value)}
-                  defaultValue={credit?.vendor_id}
+                <VendorSelector
+                  inputLabel={t('vendor')}
+                  value={credit?.vendor_id}
+                  onChange={(vendor) => handleChange('vendor_id', vendor.id)}
                 />
               </div>
 
               <div className="space-y-2">
-                <InputLabel>{t('design')}</InputLabel>
-
-                <DebouncedCombobox
-                  endpoint="/api/v1/designs"
-                  label="name"
-                  placeholder={t('search_designs')}
-                  onChange={(payload) =>
-                    handleChange('design_id', payload.value)
-                  }
-                  defaultValue={
-                    credit?.design_id ?? company?.settings?.invoice_design_id
-                  }
+                <DesignSelector
+                  inputLabel={t('design')}
+                  value={company?.settings?.invoice_design_id}
+                  onChange={(design) => handleChange('design_id', design.id)}
                 />
               </div>
             </div>
 
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
-                <InputLabel>{t('project')}</InputLabel>
-                <DebouncedCombobox
-                  endpoint="/api/v1/projects"
-                  label="name"
-                  onChange={(value) => handleChange('project_id', value.value)}
-                  defaultValue={credit?.project_id}
+                <ProjectSelector
+                  inputLabel={t('project')}
+                  value={credit?.project_id}
+                  onChange={(project) => handleChange('project_id', project.id)}
                 />
               </div>
 

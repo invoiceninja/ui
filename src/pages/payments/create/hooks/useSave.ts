@@ -11,12 +11,13 @@
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { Payment } from 'common/interfaces/payment';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export function useSave(
   setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
@@ -39,7 +40,7 @@ export function useSave(
     )
       .then((data) => {
         toast.success(t('created_payment'), { id: toastId });
-        navigate(generatePath('/payments/:id/edit', { id: data.data.data.id }));
+        navigate(route('/payments/:id/edit', { id: data.data.data.id }));
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -50,7 +51,7 @@ export function useSave(
         }
       })
       .finally(() => {
-        queryClient.invalidateQueries(generatePath('/api/v1/payments'));
+        queryClient.invalidateQueries(route('/api/v1/payments'));
       });
   };
 }

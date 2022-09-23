@@ -13,6 +13,7 @@ import { Button, InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { Invoice } from 'common/interfaces/invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { usePaymentQuery } from 'common/queries/payments';
@@ -24,7 +25,7 @@ import { X } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 
 export function Apply() {
@@ -57,7 +58,7 @@ export function Apply() {
         .finally(() => {
           formik.setSubmitting(false);
           queryClient.invalidateQueries(
-            generatePath('/api/v1/payments/:id', { id })
+            route('/api/v1/payments/:id', { id })
           );
         });
     },

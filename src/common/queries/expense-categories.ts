@@ -12,7 +12,7 @@ import { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { Params } from './common/params.interface';
 
 export function useExpenseCategoriesQuery(params: Params) {
@@ -33,7 +33,7 @@ export function useExpenseCategoriesQuery(params: Params) {
 
 export function useExpenseCategoryQuery(params: { id: string | undefined }) {
   return useQuery(
-    generatePath('/api/v1/expense_categories/:id', params),
+    route('/api/v1/expense_categories/:id', params),
     () => request('GET', endpoint('/api/v1/expense_categories/:id', params)),
     { staleTime: Infinity }
   );

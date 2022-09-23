@@ -17,10 +17,11 @@ import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useTitle } from 'common/hooks/useTitle';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 
 export function Create() {
   const [t] = useTranslation();
@@ -58,7 +59,7 @@ export function Create() {
           toast.success(t('created_token'), { id: toastId });
 
           navigate(
-            generatePath('/settings/integrations/api_tokens/:id/edit', {
+            route('/settings/integrations/api_tokens/:id/edit', {
               id: response.data.data.id,
             })
           );

@@ -12,7 +12,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export type BulkAction = 'archive' | 'restore' | 'delete';
 
@@ -20,7 +20,7 @@ export function useBulk() {
   const queryClient = useQueryClient();
 
   const invalidateCache = (id: string) =>
-    queryClient.invalidateQueries(generatePath('/api/v1/expenses/:id', { id }));
+    queryClient.invalidateQueries(route('/api/v1/expenses/:id', { id }));
 
   return (ids: string[], action: BulkAction) => {
     toast.processing();

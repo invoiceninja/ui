@@ -18,7 +18,7 @@ import { Check, ChevronDown } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { useLogo } from 'common/hooks/useLogo';
 import { useCompanyName } from 'common/hooks/useLogo';
@@ -45,7 +45,7 @@ export function CompanySwitcher() {
 
     queryClient.invalidateQueries();
 
-    window.location.href = generatePath('/');
+    window.location.href = route('/');
   };
 
   return (
@@ -98,14 +98,14 @@ export function CompanySwitcher() {
           <div className="py-1">
             <Menu.Item>
               <DropdownElement
-                to={generatePath('/settings/account_management')}
+                to={route('/settings/account_management')}
               >
                 {t('account_management')}
               </DropdownElement>
             </Menu.Item>
 
             <Menu.Item>
-              <DropdownElement to={generatePath('/logout')}>
+              <DropdownElement to={route('/logout')}>
                 {t('logout')}
               </DropdownElement>
             </Menu.Item>

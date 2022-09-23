@@ -13,7 +13,7 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { t } from 'i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { Link } from 'components/forms/Link';
 import { Payment } from 'common/interfaces/payment';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
@@ -29,7 +29,7 @@ export function RecentPayments() {
       label: t('number'),
       format: (value, payment) => {
         return (
-          <Link to={generatePath('/payments/:id/edit', { id: payment.id })}>
+          <Link to={route('/payments/:id/edit', { id: payment.id })}>
             {payment.number}
           </Link>
         );
@@ -39,7 +39,7 @@ export function RecentPayments() {
       id: 'client_id',
       label: t('client'),
       format: (value, payment) => (
-        <Link to={generatePath('/clients/:id', { id: payment.client_id })}>
+        <Link to={route('/clients/:id', { id: payment.client_id })}>
           {payment.client?.display_name}
         </Link>
       ),

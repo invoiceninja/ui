@@ -12,6 +12,7 @@ import { Card } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import { DesignSelector } from 'common/generic/DesignSelector';
 import { endpoint } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { ClientSelector } from 'components/clients/ClientSelector';
 import { DocumentsTable } from 'components/DocumentsTable';
 import { MarkdownEditor } from 'components/forms/MarkdownEditor';
@@ -21,7 +22,7 @@ import { UserSelector } from 'components/users/UserSelector';
 import { Upload } from 'pages/settings/company/documents/components';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { PurchaseOrderCardProps } from './Details';
 
 export function Footer(props: PurchaseOrderCardProps) {
@@ -43,7 +44,7 @@ export function Footer(props: PurchaseOrderCardProps) {
 
   const onSuccess = () => {
     queryClient.invalidateQueries(
-      generatePath('/api/v1/purchase_orders/:id', { id })
+      route('/api/v1/purchase_orders/:id', { id })
     );
   };
 

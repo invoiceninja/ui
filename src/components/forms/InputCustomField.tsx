@@ -17,7 +17,7 @@ export interface Props {
   defaultValue: any;
   field: string;
   value: string;
-  onChange: (value: string | number | boolean) => unknown;
+  onValueChange: (value: string | number | boolean) => unknown;
 }
 
 export function InputCustomField(props: Props) {
@@ -37,9 +37,7 @@ export function InputCustomField(props: Props) {
         <InputField
           type="text"
           id={props.field}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            props.onChange(event.target.value)
-          }
+          onValueChange={props.onValueChange}
           value={props.defaultValue || ''}
         />
       )}
@@ -48,24 +46,20 @@ export function InputCustomField(props: Props) {
         <InputField
           element="textarea"
           id={props.field}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            props.onChange(event.target.value)
-          }
+          onValueChange={props.onValueChange}
           value={props.defaultValue || ''}
         />
       )}
 
       {type === AvailableTypes.Switch && (
-        <Toggle onChange={props.onChange} checked={props.defaultValue} />
+        <Toggle onChange={props.onValueChange} checked={props.defaultValue} />
       )}
 
       {type === AvailableTypes.Date && (
         <InputField
           type="date"
           id={props.field}
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            props.onChange(event.target.value)
-          }
+          onValueChange={props.onValueChange}
           value={props.defaultValue || ''}
         />
       )}
@@ -74,7 +68,7 @@ export function InputCustomField(props: Props) {
         <SelectField
           defaultValue={props.defaultValue || ''}
           onChange={(event: ChangeEvent<HTMLSelectElement>) =>
-            props.onChange(event.target.value)
+            props.onValueChange(event.target.value)
           }
         >
           <option value=""></option>

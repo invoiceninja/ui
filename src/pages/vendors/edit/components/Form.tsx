@@ -139,7 +139,7 @@ export function Form(props: Props) {
               field="contact1"
               defaultValue={vendor.custom_value1}
               value={company.custom_fields.vendor1}
-              onChange={(value) => handleChange('custom_value1', value)}
+              onValueChange={(value) => handleChange('custom_value1', value)}
             />
           )}
 
@@ -148,7 +148,7 @@ export function Form(props: Props) {
               field="vendor2"
               defaultValue={vendor.custom_value2}
               value={company.custom_fields.vendor2}
-              onChange={(value) => handleChange('custom_value2', value)}
+              onValueChange={(value) => handleChange('custom_value2', value)}
             />
           )}
 
@@ -157,7 +157,7 @@ export function Form(props: Props) {
               field="vendor3"
               defaultValue={vendor.custom_value3}
               value={company.custom_fields.vendor3}
-              onChange={(value) => handleChange('custom_value3', value)}
+              onValueChange={(value) => handleChange('custom_value3', value)}
             />
           )}
 
@@ -166,7 +166,7 @@ export function Form(props: Props) {
               field="vendor4"
               defaultValue={vendor.custom_value4}
               value={company.custom_fields.vendor4}
-              onChange={(value) => handleChange('custom_value4', value)}
+              onValueChange={(value) => handleChange('custom_value4', value)}
             />
           )}
         </Card>

@@ -10,10 +10,10 @@
 
 import { useTranslation } from 'react-i18next';
 import { useTitle } from 'common/hooks/useTitle';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Link } from '@invoiceninja/forms';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Default } from 'components/layouts/Default';
 import { EntityStatus } from 'components/EntityStatus';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
@@ -22,6 +22,7 @@ import { Product } from 'common/interfaces/product';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
+import { route } from 'common/helpers/route';
 
 export function Products() {
   useTitle('products');
@@ -32,7 +33,7 @@ export function Products() {
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
-  const pages: BreadcrumRecord[] = [{ name: t('products'), href: '/products' }];
+  const pages: Page[] = [{ name: t('products'), href: '/products' }];
 
   const importButton = (
     <ReactRouterLink to="/products/import">
@@ -56,7 +57,7 @@ export function Products() {
       format: (value, product) => (
         <span className="inline-flex items-center space-x-4">
           <EntityStatus entity={product} />
-          <Link to={generatePath('/products/:id/edit', { id: product.id })}>
+          <Link to={route('/products/:id/edit', { id: product.id })}>
             {value}
           </Link>
         </span>
@@ -86,7 +87,7 @@ export function Products() {
     (product: Product) => (
       <DropdownElement
         onClick={() =>
-          navigate(generatePath('/products/:id/clone', { id: product.id }))
+          navigate(route('/products/:id/clone', { id: product.id }))
         }
       >
         {t('clone')}

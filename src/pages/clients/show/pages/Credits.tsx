@@ -11,12 +11,13 @@
 import { Link } from '@invoiceninja/forms';
 import creditStatus from 'common/constants/credit-status';
 import { date } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { Credit } from 'common/interfaces/credit';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function Credits() {
   const [t] = useTranslation();
@@ -28,7 +29,7 @@ export function Credits() {
       id: 'number',
       label: t('number'),
       format: (value, credit) => (
-        <Link to={generatePath('/credits/:id/edit', { id: credit.id })}>
+        <Link to={route('/credits/:id/edit', { id: credit.id })}>
           {value}
         </Link>
       ),
@@ -61,7 +62,7 @@ export function Credits() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/credits/bulk"
-      linkToCreate={generatePath('/credits/create?client=:id', { id: id })}
+      linkToCreate={route('/credits/create?client=:id', { id: id })}
     />
   );
 }

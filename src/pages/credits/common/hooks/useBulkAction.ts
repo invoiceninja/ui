@@ -11,41 +11,32 @@
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
-import { setCurrentCredit } from 'common/stores/slices/credits/extra-reducers/set-current-credit';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
+import { toast } from 'common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
-import { useDispatch } from 'react-redux';
+import { route } from 'common/helpers/route';
 
 export function useBulkAction() {
-  const [t] = useTranslation();
   const queryClient = useQueryClient();
-  const dispatch = useDispatch();
 
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request('POST', endpoint('/api/v1/credits/bulk'), {
       action,
       ids: [id],
     })
-      .then((response) => {
-        toast.success(t(`${action}d_credit`), {
-          id: toastId,
-        });
-
-        dispatch(setCurrentCredit(response.data.data[0]));
-      })
+      .then(() => toast.success(`${action}d_credit`))
       .catch((error: AxiosError) => {
-        console.log(error);
-        console.error(error.response?.data);
+        console.error(error);
 
-        toast.error(t('error_title'), {
-          id: toastId,
-        });
+        toast.error();
       })
       .finally(() => {
         queryClient.invalidateQueries('/api/v1/credits');
+
+        queryClient.invalidateQueries(
+          route('/api/v1/credits/:id', { id })
+        );
       });
   };
 }

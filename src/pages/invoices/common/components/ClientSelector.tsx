@@ -24,6 +24,7 @@ interface Props {
   onChange: (id: string) => unknown;
   onClearButtonClick: () => unknown;
   onContactCheckboxChange: (contactId: string, value: boolean) => unknown;
+  errorMessage?: string | string[];
 }
 
 export function ClientSelector(props: Props) {
@@ -60,6 +61,7 @@ export function ClientSelector(props: Props) {
           clearButton={Boolean(resource?.client_id)}
           onClearButtonClick={props.onClearButtonClick}
           initiallyVisible={!resource?.client_id}
+          errorMessage={props.errorMessage}
         />
       </div>
 

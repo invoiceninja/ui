@@ -13,6 +13,7 @@ import { InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
@@ -21,7 +22,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export function Create() {
   const [t] = useTranslation();
@@ -57,7 +58,7 @@ export function Create() {
           queryClient.invalidateQueries('/api/v1/payment_terms');
 
           navigate(
-            generatePath('/settings/tax_rates/:id/edit', {
+            route('/settings/tax_rates/:id/edit', {
               id: response.data.data.id,
             })
           );

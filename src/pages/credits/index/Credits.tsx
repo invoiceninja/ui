@@ -16,13 +16,11 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import { useTitle } from 'common/hooks/useTitle';
 import { Credit } from 'common/interfaces/credit';
 import { DataTable, DataTableColumns } from 'components/DataTable';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
-import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
-import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { CreditStatus } from '../common/components/CreditStatus';
+import { useActions } from '../common/hooks';
 
 export function Credits() {
   useTitle('credits');
@@ -32,7 +30,6 @@ export function Credits() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-  const downloadPdf = useDownloadPdf({ resource: 'credit' });
 
   const pages = [{ name: t('credits'), href: '/credits' }];
 
@@ -48,7 +45,7 @@ export function Credits() {
       id: 'number',
       label: t('number'),
       format: (field, credit) => (
-        <Link to={generatePath('/credits/:id/edit', { id: credit.id })}>
+        <Link to={route('/credits/:id/edit', { id: credit.id })}>
           {field}
         </Link>
       ),
@@ -57,7 +54,7 @@ export function Credits() {
       id: 'client_id',
       label: t('client'),
       format: (_, credit) => (
-        <Link to={generatePath('/clients/:id', { id: credit.client_id })}>
+        <Link to={route('/clients/:id', { id: credit.client_id })}>
           {credit.client?.display_name}
         </Link>
       ),
@@ -90,30 +87,7 @@ export function Credits() {
     },
   ];
 
-  const actions = [
-    (credit: Credit) => (
-      <DropdownElement to={generatePath('/credits/:id/pdf', { id: credit.id })}>
-        {t('view_pdf')}
-      </DropdownElement>
-    ),
-    (credit: Credit) => (
-      <DropdownElement onClick={() => downloadPdf(credit)}>
-        {t('download_pdf')}
-      </DropdownElement>
-    ),
-    (credit: Credit) => (
-      <DropdownElement
-        to={generatePath('/credits/:id/email', { id: credit.id })}
-      >
-        {t('email_credit')}
-      </DropdownElement>
-    ),
-    (credit: Credit) => (
-      <DropdownElement onClick={() => openClientPortal(credit)}>
-        {t('client_portal')}
-      </DropdownElement>
-    ),
-  ];
+  const actions = useActions();
 
   return (
     <Default title={t('credits')} breadcrumbs={pages} docsLink="docs/credits/">

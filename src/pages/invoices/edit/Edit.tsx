@@ -8,150 +8,147 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { useInvoiceQuery } from 'common/queries/invoices';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { generatePath, useParams } from 'react-router-dom';
-import { ClientSelector } from '../common/components/ClientSelector';
-import { InvoiceFooter } from '../common/components/InvoiceFooter';
-import { InvoiceDetails } from '../common/components/InvoiceDetails';
-import { ProductsTable } from '../common/components/ProductsTable';
-import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
-import { useInvoiceSave } from './hooks/useInvoiceSave';
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { Invoice } from 'common/interfaces/invoice';
-import { Actions } from './components/Actions';
 import { InvoiceStatus } from 'common/enums/invoice-status';
-import {
-  dismissCurrentInvoice,
-  injectBlankItemIntoCurrent,
-  toggleCurrentInvoiceInvitation,
-} from 'common/stores/slices/invoices';
-import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoiceProperty';
-import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
-import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
-import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
-import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
+import { route } from 'common/helpers/route';
+import { useTitle } from 'common/hooks/useTitle';
+import { Client } from 'common/interfaces/client';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
+import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useInvoiceQuery } from 'common/queries/invoices';
+import { Page } from 'components/Breadcrumbs';
+import { Default } from 'components/layouts/Default';
+import { ResourceActions } from 'components/ResourceActions';
+import { Spinner } from 'components/Spinner';
 import { TabGroup } from 'components/TabGroup';
+import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
+import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { v4 } from 'uuid';
+import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
+import { ClientSelector } from '../common/components/ClientSelector';
+import { InvoiceDetails } from '../common/components/InvoiceDetails';
+import { InvoiceFooter } from '../common/components/InvoiceFooter';
+import { InvoicePreview } from '../common/components/InvoicePreview';
+import { InvoiceTotals } from '../common/components/InvoiceTotals';
+import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
-import { InvoiceItemType } from 'common/interfaces/invoice-item';
-import { uuid4 } from '@sentry/utils';
-import { InvoiceTotals } from '../common/components/InvoiceTotals';
-import { InvoicePreview } from '../common/components/InvoicePreview';
-import { Spinner } from 'components/Spinner';
+import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
+import { useActions } from './components/Actions';
+import { useHandleSave } from './hooks/useInvoiceSave';
 
 export function Edit() {
+  const { t } = useTranslation();
   const { id } = useParams();
-  const { documentTitle } = useTitle('edit_invoice');
-  const { data: invoice } = useInvoiceQuery({ id });
+  const [searchParams] = useSearchParams();
 
-  const [t] = useTranslation();
-
-  const dispatch = useDispatch();
-  const currentInvoice = useCurrentInvoice();
-
-  const handleInvoiceSave = useInvoiceSave();
-  const handleChange = useSetCurrentInvoiceProperty();
-
-  const invoiceSum = useInvoiceSum();
+  const pages: Page[] = [
+    { name: t('invoices'), href: '/invoices' },
+    {
+      name: t('edit_invoice'),
+      href: route('/invoices/:id/edit', { id }),
+    },
+  ];
 
   const productColumns = useProductColumns();
   const taskColumns = useTaskColumns();
 
-  const pages: BreadcrumRecord[] = [
-    { name: t('invoices'), href: '/invoices' },
-    {
-      name: t('edit_invoice'),
-      href: generatePath('/invoices/:id/edit', { id }),
-    },
-  ];
+  const { documentTitle } = useTitle('edit_invoice');
+  const { data } = useInvoiceQuery({ id });
+
+  const [invoice, setInvoice] = useAtom(invoiceAtom);
+  const [invoiceSum] = useAtom(invoiceSumAtom);
+
+  const [client] = useState<Client | undefined>();
+  const [errors, setErrors] = useState<ValidationBag>();
+
+  const {
+    handleChange,
+    handleInvitationChange,
+    calculateInvoiceSum,
+    handleLineItemChange,
+    handleLineItemPropertyChange,
+    handleCreateLineItem,
+    handleDeleteLineItem,
+  } = useInvoiceUtilities({ client });
 
   useEffect(() => {
-    if (invoice?.data.data) {
-      const data: Invoice = { ...invoice.data.data };
+    if (data) {
+      const _invoice = cloneDeep(data);
 
-      data.line_items.forEach((item) => (item._id = uuid4()));
+      _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
 
-      dispatch(setCurrentInvoice(data));
+      setInvoice(_invoice);
     }
+  }, [data]);
 
-    return () => {
-      dispatch(dismissCurrentInvoice());
-    };
+  useEffect(() => {
+    // The InvoiceSum takes exact same reference to the `invoice` object
+    // which is the reason we don't have to set a freshly built invoice,
+    // rather just modified version.
+
+    invoice && calculateInvoiceSum();
   }, [invoice]);
+
+  const actions = useActions();
+  const save = useHandleSave(setErrors);
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() =>
-        handleInvoiceSave(
-          currentInvoice?.id as string,
-          currentInvoice as Invoice
-        )
-      }
-      navigationTopRight={currentInvoice && <Actions />}
+      onBackClick="/invoices"
+      onSaveClick={() => invoice && save(invoice)}
       disableSaveButton={
-        currentInvoice &&
-        (currentInvoice.status_id === InvoiceStatus.Cancelled ||
-          currentInvoice.is_deleted)
+        invoice &&
+        (invoice.status_id === InvoiceStatus.Cancelled || invoice.is_deleted)
+      }
+      navigationTopRight={
+        invoice && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={invoice}
+            actions={actions}
+          />
+        )
       }
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector
-          resource={currentInvoice}
-          readonly
+          resource={invoice}
           onChange={(id) => handleChange('client_id', id)}
           onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={(contactId, value) =>
-            dispatch(
-              toggleCurrentInvoiceInvitation({ contactId, checked: value })
-            )
-          }
+          onContactCheckboxChange={handleInvitationChange}
+          errorMessage={errors?.errors.client_id}
+          readonly
         />
 
-        <InvoiceDetails />
+        <InvoiceDetails invoice={invoice} handleChange={handleChange} />
 
         <div className="col-span-12">
-          <TabGroup tabs={[t('products'), t('tasks')]}>
+          <TabGroup
+            tabs={[t('products'), t('tasks')]}
+            defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
+          >
             <div>
-              {currentInvoice ? (
+              {invoice ? (
                 <ProductsTable
-                  relationType="client_id"
                   type="product"
-                  resource={currentInvoice}
-                  columns={productColumns}
-                  items={currentInvoice.line_items.filter(
-                    (item) => item.type_id == InvoiceItemType.Product
+                  resource={invoice}
+                  items={invoice.line_items.filter(
+                    (item) => item.type_id === InvoiceItemType.Product
                   )}
-                  onLineItemChange={(index, lineItem) =>
-                    dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
-                  }
-                  onLineItemPropertyChange={(key, value, index) =>
-                    dispatch(
-                      setCurrentLineItemProperty({
-                        position: index,
-                        property: key,
-                        value,
-                      })
-                    )
-                  }
+                  columns={productColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
                   onSort={(lineItems) => handleChange('line_items', lineItems)}
-                  onDeleteRowClick={(index) =>
-                    dispatch(deleteInvoiceLineItem(index))
-                  }
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
                   onCreateItemClick={() =>
-                    dispatch(
-                      injectBlankItemIntoCurrent({
-                        type: InvoiceItemType.Product,
-                      })
-                    )
+                    handleCreateLineItem(InvoiceItemType.Product)
                   }
+                  onDeleteRowClick={handleDeleteLineItem}
                 />
               ) : (
                 <Spinner />
@@ -159,36 +156,22 @@ export function Edit() {
             </div>
 
             <div>
-              {currentInvoice ? (
+              {invoice ? (
                 <ProductsTable
-                  relationType="client_id"
                   type="task"
-                  resource={currentInvoice}
-                  columns={taskColumns}
-                  items={currentInvoice.line_items.filter(
-                    (item) => item.type_id == InvoiceItemType.Task
+                  resource={invoice}
+                  items={invoice.line_items.filter(
+                    (item) => item.type_id === InvoiceItemType.Task
                   )}
-                  onLineItemChange={(index, lineItem) =>
-                    dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
-                  }
-                  onLineItemPropertyChange={(key, value, index) =>
-                    dispatch(
-                      setCurrentLineItemProperty({
-                        position: index,
-                        property: key,
-                        value,
-                      })
-                    )
-                  }
+                  columns={taskColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
                   onSort={(lineItems) => handleChange('line_items', lineItems)}
-                  onDeleteRowClick={(index) =>
-                    dispatch(deleteInvoiceLineItem(index))
-                  }
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
                   onCreateItemClick={() =>
-                    dispatch(
-                      injectBlankItemIntoCurrent({ type: InvoiceItemType.Task })
-                    )
+                    handleCreateLineItem(InvoiceItemType.Task)
                   }
+                  onDeleteRowClick={handleDeleteLineItem}
                 />
               ) : (
                 <Spinner />
@@ -197,27 +180,28 @@ export function Edit() {
           </TabGroup>
         </div>
 
-        <InvoiceFooter page="edit" />
+        <InvoiceFooter invoice={invoice} handleChange={handleChange} />
 
-        {currentInvoice && (
+        {invoice && (
           <InvoiceTotals
-          relationType='client_id'
-            resource={currentInvoice}
+            relationType="client_id"
+            resource={invoice}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
-              handleChange(property as keyof Invoice, value)
+              handleChange(property, value as string)
             }
           />
         )}
       </div>
 
       <div className="my-4">
-        {currentInvoice && (
+        {invoice && (
           <InvoicePreview
             for="invoice"
-            relationType='client_id'
-            resource={currentInvoice}
+            resource={invoice}
             entity="invoice"
+            relationType="client_id"
+            endpoint="/api/v1/live_preview?entity=:entity"
           />
         )}
       </div>

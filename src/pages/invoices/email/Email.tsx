@@ -8,13 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { useInvoiceQuery } from 'common/queries/invoices';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Mailer } from 'pages/invoices/email/components/Mailer';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function Email() {
   const [t] = useTranslation();
@@ -31,11 +32,11 @@ export function Email() {
     email_template_reminder3: 'third_reminder',
   };
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
     {
       name: t('email_invoice'),
-      href: generatePath('/invoices/:id/email', { id }),
+      href: route('/invoices/:id/email', { id }),
     },
   ];
 
@@ -43,7 +44,7 @@ export function Email() {
     <Default title={documentTitle} breadcrumbs={pages}>
       {invoice && (
         <Mailer
-          resource={invoice.data.data}
+          resource={invoice}
           resourceType="invoice"
           list={list}
           defaultEmail="email_template_invoice"

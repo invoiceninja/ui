@@ -11,12 +11,13 @@
 import { Link } from '@invoiceninja/forms';
 import frequency from 'common/constants/frequency';
 import { date } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function RecurringInvoices() {
   const [t] = useTranslation();
@@ -29,7 +30,7 @@ export function RecurringInvoices() {
       label: t('frequency'),
       format: (value, recurringInvoice) => (
         <Link
-          to={generatePath('/recurring_invoices/:id/edit', {
+          to={route('/recurring_invoices/:id/edit', {
             id: recurringInvoice.id,
           })}
         >
@@ -70,7 +71,7 @@ export function RecurringInvoices() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/recurring_invoices/bulk"
-      linkToCreate={generatePath('/recurring_invoices/create?client=:id', {
+      linkToCreate={route('/recurring_invoices/create?client=:id', {
         id: id,
       })}
     />

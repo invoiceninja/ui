@@ -8,28 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { blankInvitation } from 'common/constants/blank-invitation';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
+import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankRecurringInvoiceQuery } from 'common/queries/recurring-invoices';
-import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
-import {
-  dismissCurrentRecurringInvoice,
-  injectBlankItemIntoCurrent,
-  setCurrentRecurringInvoicePropertySync,
-  toggleCurrentRecurringInvoiceInvitation,
-} from 'common/stores/slices/recurring-invoices';
-import { deleteRecurringInvoiceItem } from 'common/stores/slices/recurring-invoices/extra-reducers/delete-recurring-invoice-item';
-import { setCurrentLineItemProperty } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-line-item-property';
-import { setCurrentRecurringInvoice } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice';
-import { setCurrentRecurringInvoiceLineItem } from 'common/stores/slices/recurring-invoices/extra-reducers/set-current-recurring-invoice-line-item';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
-import { ValidationAlert } from 'components/ValidationAlert';
+import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
@@ -38,177 +28,177 @@ import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { generatePath } from 'react-router-dom';
+import { invoiceSumAtom, recurringInvoiceAtom } from '../common/atoms';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
-import { useCurrentRecurringInvoice } from '../common/hooks/useCurrentRecurringInvoice';
-import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
-import { useSetCurrentRecurringInvoiceProperty } from '../common/hooks/useSetCurrentRecurringInvoiceProperty';
-import { useHandleCreate } from '../create/hooks/useHandleCreate';
+import { useCreate, useRecurringInvoiceUtilities } from '../common/hooks';
+import { useBlankRecurringInvoiceQuery } from '../common/queries';
 
 export function Create() {
   const { documentTitle } = useTitle('new_recurring_invoice');
-  const { data: recurringInvoice } = useBlankRecurringInvoiceQuery();
+  const { t } = useTranslation();
 
-  const [t] = useTranslation();
-  const [errors, setErrors] = useState<ValidationBag>();
-
-  const dispatch = useDispatch();
-
-  const handleChange = useSetCurrentRecurringInvoiceProperty();
-  const handleCreate = useHandleCreate(setErrors);
-
-  const currentRecurringInvoice = useCurrentRecurringInvoice();
-  const company = useCurrentCompany();
-  const clientResolver = useClientResolver();
-  const invoiceSum = useInvoiceSum();
-
-  const productColumns = useProductColumns();
-
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
     {
       name: t('new_recurring_invoice'),
-      href: generatePath('/recurring_invoices/create'),
+      href: '/recurring_invoices/create',
     },
   ];
 
+  const [recurringInvoice, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
+  const [invoiceSum] = useAtom(invoiceSumAtom);
+
+  const [client, setClient] = useState<Client>();
+  const [errors, setErrors] = useState<ValidationBag>();
+
+  const clientResolver = useClientResolver();
+  const company = useCurrentCompany();
+  const productColumns = useProductColumns();
+
+  const {
+    handleChange,
+    calculateInvoiceSum,
+    handleInvitationChange,
+    handleLineItemChange,
+    handleLineItemPropertyChange,
+    handleCreateLineItem,
+    handleDeleteLineItem,
+  } = useRecurringInvoiceUtilities({
+    client,
+  });
+
+  const { data } = useBlankRecurringInvoiceQuery({
+    enabled: typeof recurringInvoice === 'undefined',
+  });
+
   useEffect(() => {
-    if (recurringInvoice?.data.data) {
-      dispatch(setCurrentRecurringInvoice(recurringInvoice.data.data));
+    if (
+      typeof data !== 'undefined' &&
+      typeof recurringInvoice === 'undefined'
+    ) {
+      const _recurringInvoice = cloneDeep(data);
 
       if (company && company.enabled_tax_rates > 0) {
-        handleChange('tax_name1', company.settings?.tax_name1);
-        handleChange('tax_rate1', company.settings?.tax_rate1);
+        _recurringInvoice.tax_name1 = company.settings.tax_name1;
+        _recurringInvoice.tax_rate1 = company.settings.tax_rate1;
       }
+
       if (company && company.enabled_tax_rates > 1) {
-        handleChange('tax_name2', company.settings?.tax_name2);
-        handleChange('tax_rate2', company.settings?.tax_rate2);
+        _recurringInvoice.tax_name2 = company.settings.tax_name2;
+        _recurringInvoice.tax_rate2 = company.settings.tax_rate2;
       }
+
       if (company && company.enabled_tax_rates > 2) {
-        handleChange('tax_name3', company.settings?.tax_name3);
-        handleChange('tax_rate3', company.settings?.tax_rate3);
+        _recurringInvoice.tax_name3 = company.settings.tax_name3;
+        _recurringInvoice.tax_rate3 = company.settings.tax_rate3;
       }
+
+      if (typeof _recurringInvoice.line_items === 'string') {
+        _recurringInvoice.line_items = [];
+      }
+
+      setRecurringInvoice(_recurringInvoice);
     }
 
     return () => {
-      dispatch(dismissCurrentRecurringInvoice());
+      setRecurringInvoice(undefined);
     };
+  }, [data]);
+
+  useEffect(() => {
+    // The InvoiceSum takes exact same reference to the `invoice` object
+    // which is the reason we don't have to set a freshly built invoice,
+    // rather just modified version.
+
+    recurringInvoice && calculateInvoiceSum();
   }, [recurringInvoice]);
 
   useEffect(() => {
-    if (currentRecurringInvoice?.client_id) {
-      clientResolver
-        .find(currentRecurringInvoice.client_id)
-        .then((client) => {
-          const invitations: Record<string, unknown>[] = [];
+    recurringInvoice &&
+      recurringInvoice.client_id.length > 1 &&
+      clientResolver.find(recurringInvoice.client_id).then((client) => {
+        setClient(client);
 
-          client.contacts.map((contact) => {
-            if (contact.send_email) {
-              const invitation = cloneDeep(blankInvitation);
+        const invitations: Record<string, unknown>[] = [];
 
-              invitation.client_contact_id = contact.id;
-              invitations.push(invitation);
-            }
-          });
+        client.contacts.map((contact) => {
+          if (contact.send_email) {
+            const invitation = cloneDeep(blankInvitation);
 
-          dispatch(
-            setCurrentRecurringInvoicePropertySync({
-              property: 'invitations',
-              value: invitations,
-            })
-          );
-        })
-        .catch((error) => console.error(error));
-    }
-  }, [currentRecurringInvoice?.client_id]);
+            invitation.client_contact_id = contact.id;
+            invitations.push(invitation);
+          }
+        });
+
+        handleChange('invitations', invitations);
+      });
+  }, [recurringInvoice?.client_id]);
+
+  const save = useCreate({ setErrors });
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick={generatePath('/recurring_invoices')}
-      onSaveClick={() =>
-        handleCreate(currentRecurringInvoice as RecurringInvoice)
-      }
-      disableSaveButton={currentRecurringInvoice?.client_id.length === 0}
+      onBackClick="/recurring_invoices"
+      onSaveClick={() => save(recurringInvoice as RecurringInvoice)}
+      disableSaveButton={recurringInvoice?.client_id.length === 0}
     >
-      {errors && <ValidationAlert errors={errors} />}
-
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector
-          resource={currentRecurringInvoice}
+          resource={recurringInvoice}
           onChange={(id) => handleChange('client_id', id)}
           onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={(contactId, value) =>
-            dispatch(
-              toggleCurrentRecurringInvoiceInvitation({
-                contactId,
-                checked: value,
-              })
-            )
-          }
+          onContactCheckboxChange={handleInvitationChange}
+          errorMessage={errors?.errors.client_id}
         />
 
-        <InvoiceDetails autoBill={company?.settings?.auto_bill} />
+        <InvoiceDetails handleChange={handleChange} />
 
         <div className="col-span-12">
-          {currentRecurringInvoice ? (
+          {recurringInvoice ? (
             <ProductsTable
-              relationType="client_id"
               type="product"
-              columns={productColumns}
-              items={currentRecurringInvoice.line_items.filter(
+              resource={recurringInvoice}
+              items={recurringInvoice.line_items.filter(
                 (item) => item.type_id === InvoiceItemType.Product
               )}
-              resource={currentRecurringInvoice}
-              onLineItemChange={(index, lineItem) =>
-                dispatch(
-                  setCurrentRecurringInvoiceLineItem({ index, lineItem })
-                )
-              }
-              onLineItemPropertyChange={(key, value, index) =>
-                dispatch(
-                  setCurrentLineItemProperty({
-                    position: index,
-                    property: key,
-                    value,
-                  })
-                )
-              }
+              columns={productColumns}
+              relationType="client_id"
+              onLineItemChange={handleLineItemChange}
               onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onDeleteRowClick={(index) =>
-                dispatch(deleteRecurringInvoiceItem(index))
-              }
-              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+              onLineItemPropertyChange={handleLineItemPropertyChange}
+              onCreateItemClick={handleCreateLineItem}
+              onDeleteRowClick={handleDeleteLineItem}
             />
           ) : (
             <Spinner />
           )}
         </div>
 
-        <InvoiceFooter page="create" />
+        <InvoiceFooter handleChange={handleChange} />
 
-        {currentRecurringInvoice && (
+        {recurringInvoice && (
           <InvoiceTotals
-          relationType='client_id'
-            resource={currentRecurringInvoice}
+            relationType="client_id"
+            resource={recurringInvoice}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
-              handleChange(property as keyof RecurringInvoice, value)
+              handleChange(property, value as string)
             }
           />
         )}
       </div>
 
       <div className="my-4">
-        {currentRecurringInvoice && (
+        {recurringInvoice && (
           <InvoicePreview
             for="create"
-            relationType='client_id'
-            resource={currentRecurringInvoice}
+            resource={recurringInvoice}
             entity="recurring_invoice"
+            relationType="client_id"
+            endpoint="/api/v1/live_preview?entity=:entity"
           />
         )}
       </div>

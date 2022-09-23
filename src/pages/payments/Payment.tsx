@@ -8,37 +8,38 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { route } from 'common/helpers/route';
+import { Page } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
 import { useTranslation } from 'react-i18next';
-import { generatePath, Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 
 export function Payment() {
   const { id } = useParams();
   const [t] = useTranslation();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('payments'), href: '/payments' },
     {
       name: t('edit_payment'),
-      href: generatePath('/payments/:id/edit', { id: id }),
+      href: route('/payments/:id/edit', { id: id }),
     },
   ];
 
   const tabs: Tab[] = [
     {
       name: t('edit'),
-      href: generatePath('/payments/:id/edit', { id }),
+      href: route('/payments/:id/edit', { id }),
     },
     {
       name: t('documents'),
-      href: generatePath('/payments/:id/documents', { id }),
+      href: route('/payments/:id/documents', { id }),
     },
     {
       name: t('custom_fields'),
-      href: generatePath('/payments/:id/payment_fields', { id }),
+      href: route('/payments/:id/payment_fields', { id }),
     },
   ];
 

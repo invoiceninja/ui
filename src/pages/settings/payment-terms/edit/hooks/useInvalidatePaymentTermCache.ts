@@ -9,14 +9,14 @@
  */
 
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useInvalidatePaymentTermCache() {
   const queryClient = useQueryClient();
 
   return (id: string) => {
     queryClient.invalidateQueries(
-      generatePath('/api/v1/payment_terms/:id', { id })
+      route('/api/v1/payment_terms/:id', { id })
     );
   };
 }

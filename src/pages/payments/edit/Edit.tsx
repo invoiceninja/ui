@@ -139,7 +139,7 @@ export function Edit() {
           field="custom_value1"
           defaultValue={payment?.custom_value1}
           value={company?.custom_fields?.payment1}
-          onChange={(value) => handleChange('custom_value1', value.toString())}
+          onValueChange={(value) => handleChange('custom_value1', value.toString())}
         />
       )}
 
@@ -148,7 +148,7 @@ export function Edit() {
           field="custom_value2"
           defaultValue={payment?.custom_value2}
           value={company?.custom_fields?.payment2}
-          onChange={(value) => handleChange('custom_value2', value.toString())}
+          onValueChange={(value) => handleChange('custom_value2', value.toString())}
         />
       )}
 
@@ -157,7 +157,7 @@ export function Edit() {
           field="custom_value3"
           defaultValue={payment?.custom_value3}
           value={company?.custom_fields?.payment3}
-          onChange={(value) => handleChange('custom_value3', value.toString())}
+          onValueChange={(value) => handleChange('custom_value3', value.toString())}
         />
       )}
 
@@ -166,7 +166,7 @@ export function Edit() {
           field="custom_value4"
           defaultValue={payment?.custom_value4}
           value={company?.custom_fields?.payment4}
-          onChange={(value) => handleChange('custom_value4', value.toString())}
+          onValueChange={(value) => handleChange('custom_value4', value.toString())}
         />
       )}
 

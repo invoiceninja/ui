@@ -14,13 +14,13 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
 import { Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { Link as ReactRouterLink } from 'react-router-dom';
 
 export function Clients() {
@@ -32,18 +32,18 @@ export function Clients() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const pages: BreadcrumRecord[] = [{ name: t('clients'), href: '/clients' }];
+  const pages: Page[] = [{ name: t('clients'), href: '/clients' }];
 
   const columns: DataTableColumns = [
     {
       id: 'number',
       label: t('number'),
     },
-    { 
-      id: 'display_name', 
-      label: t('name') ,
+    {
+      id: 'display_name',
+      label: t('name'),
       format: (value, resource) => (
-        <Link to={generatePath('/clients/:id', { id: resource.id })}>
+        <Link to={route('/clients/:id', { id: resource.id })}>
           {value}
         </Link>
       ),
@@ -102,7 +102,7 @@ export function Clients() {
     (resource: Client) => (
       <DropdownElement
         key={'new_invoice'}
-        to={generatePath('/invoices/create?client=:id', { id: resource.id })}
+        to={route('/invoices/create?client=:id', { id: resource.id })}
       >
         {t('new_invoice')}
       </DropdownElement>
@@ -110,7 +110,7 @@ export function Clients() {
     (resource: Client) => (
       <DropdownElement
         key={'new_payment'}
-        to={generatePath('/payments/create?client=:id', { id: resource.id })}
+        to={route('/payments/create?client=:id', { id: resource.id })}
       >
         {t('new_payment')}
       </DropdownElement>
@@ -118,7 +118,7 @@ export function Clients() {
     (resource: Client) => (
       <DropdownElement
         key={'new_quote'}
-        to={generatePath('/quotes/create?client=:id', { id: resource.id })}
+        to={route('/quotes/create?client=:id', { id: resource.id })}
       >
         {t('new_quote')}
       </DropdownElement>
@@ -126,7 +126,7 @@ export function Clients() {
     (resource: Client) => (
       <DropdownElement
         key={'new_credit'}
-        to={generatePath('/credits/create?client=:id', { id: resource.id })}
+        to={route('/credits/create?client=:id', { id: resource.id })}
       >
         {t('new_credit')}
       </DropdownElement>

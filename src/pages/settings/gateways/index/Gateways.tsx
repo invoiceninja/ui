@@ -13,7 +13,7 @@ import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function Gateways() {
   const [t] = useTranslation();
@@ -24,7 +24,7 @@ export function Gateways() {
       label: t('label'),
       format: (field, resource) => (
         <Link
-          to={generatePath('/settings/gateways/:id/edit', { id: resource.id })}
+          to={route('/settings/gateways/:id/edit', { id: resource.id })}
         >
           {field}
         </Link>

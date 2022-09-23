@@ -16,19 +16,19 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
 
   const [t] = useTranslation();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
   ];
 
@@ -43,7 +43,7 @@ export function PurchaseOrders() {
       label: t('status'),
       format: (field, purchaseOrder) => (
         <Link
-          to={generatePath('/purchase_orders/:id/edit', {
+          to={route('/purchase_orders/:id/edit', {
             id: purchaseOrder.id,
           })}
         >
@@ -56,7 +56,7 @@ export function PurchaseOrders() {
       label: t('number'),
       format: (field, purchaseOrder) => (
         <Link
-          to={generatePath('/purchase_orders/:id/edit', {
+          to={route('/purchase_orders/:id/edit', {
             id: purchaseOrder.id,
           })}
         >
@@ -70,7 +70,7 @@ export function PurchaseOrders() {
       format: (field, purchaseOrder) =>
         purchaseOrder.vendor && (
           <Link
-            to={generatePath('/vendors/:id', { id: purchaseOrder.vendor.id })}
+            to={route('/vendors/:id', { id: purchaseOrder.vendor.id })}
           >
             {purchaseOrder.vendor.name}
           </Link>
@@ -82,7 +82,7 @@ export function PurchaseOrders() {
       format: (field, purchaseOrder) =>
         purchaseOrder.expense && (
           <Link
-            to={generatePath('/expenses/:id', { id: purchaseOrder.expense.id })}
+            to={route('/expenses/:id', { id: purchaseOrder.expense.id })}
           >
             {purchaseOrder.expense.number}
           </Link>

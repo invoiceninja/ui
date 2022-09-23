@@ -11,7 +11,7 @@
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useUsersQuery() {
   return useQuery('/api/v1/users', () =>
@@ -21,7 +21,7 @@ export function useUsersQuery() {
 
 export function useUserQuery(params: { id: string | undefined }) {
   return useQuery(
-    generatePath('/api/v1/users/:id', params),
+    route('/api/v1/users/:id', params),
     () =>
       request(
         'GET',
@@ -33,7 +33,7 @@ export function useUserQuery(params: { id: string | undefined }) {
 
 export function useBlankUserQuery() {
   return useQuery(
-    generatePath('/api/v1/users/create'),
+    route('/api/v1/users/create'),
     () => request('GET', endpoint('/api/v1/users/create')),
     { staleTime: Infinity }
   );

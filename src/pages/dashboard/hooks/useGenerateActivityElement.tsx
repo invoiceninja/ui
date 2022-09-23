@@ -12,7 +12,7 @@ import { ClickableElement } from '@invoiceninja/cards';
 import { date, trans } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { ActivityRecord } from 'common/interfaces/activity-record';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { resolveActivityResource } from '../helprs/resolve-activity-resource';
 
 export function useGenerateActivityElement() {
@@ -23,7 +23,7 @@ export function useGenerateActivityElement() {
 
     return (
       <ClickableElement
-        to={generatePath(`/${resource}s/:id/edit`, {
+        to={route(`/${resource}s/:id/edit`, {
           // eslint-disable-next-line @typescript-eslint/ban-ts-comment
           // @ts-ignore
           id: activity[resource]?.hashed_id ?? '',

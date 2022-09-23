@@ -8,18 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Expense } from 'common/interfaces/expense';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useExpenseQuery } from 'common/queries/expenses';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { AdditionalInfo } from '../create/components/AdditionalInfo';
 import { Details } from '../create/components/Details';
 import { Notes } from '../create/components/Notes';
@@ -34,19 +35,19 @@ export function Edit() {
 
   const [t] = useTranslation();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('expenses'), href: '/expenses' },
-    { name: t('edit_expense'), href: generatePath('/expenses/:id', { id }) },
+    { name: t('edit_expense'), href: route('/expenses/:id', { id }) },
   ];
 
   const tabs: Tab[] = [
     {
       name: t('edit'),
-      href: generatePath('/expenses/:id/edit', { id }),
+      href: route('/expenses/:id/edit', { id }),
     },
     {
       name: t('documents'),
-      href: generatePath('/expenses/:id/documents', { id }),
+      href: route('/expenses/:id/documents', { id }),
     },
   ];
 
@@ -102,7 +103,7 @@ export function Edit() {
 
             <div>
               <DropdownElement
-                to={generatePath('/expenses/:id/clone', { id: expense.id })}
+                to={route('/expenses/:id/clone', { id: expense.id })}
               >
                 {t('clone_to_expense')}
               </DropdownElement>
@@ -111,7 +112,7 @@ export function Edit() {
           </Dropdown>
         )
       }
-      onBackClick={generatePath('/expenses')}
+      onBackClick={route('/expenses')}
       onSaveClick={() => expense && save(expense)}
     >
       <div className="space-y-4">

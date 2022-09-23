@@ -13,6 +13,7 @@ import { InputField, InputLabel } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useTaskStatusQuery } from 'common/queries/task-statuses';
 import { Badge } from 'components/Badge';
 import { Breadcrumbs } from 'components/Breadcrumbs';
@@ -24,7 +25,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Archive } from './components/edit/Archive';
 import { Delete } from './components/edit/Delete';
 import { Restore } from './components/edit/Restore';
@@ -38,7 +39,7 @@ export function Edit() {
     { name: t('task_settings'), href: '/settings/task_settings' },
     {
       name: t('edit_task_status'),
-      href: generatePath('/settings/task_statuses/:id/edit', { id }),
+      href: route('/settings/task_statuses/:id/edit', { id }),
     },
   ];
 
@@ -55,7 +56,7 @@ export function Edit() {
 
   const invalidateTaskStatusCache = () => {
     queryClient.invalidateQueries(
-      generatePath('/api/v1/task_statuses/:id', { id })
+      route('/api/v1/task_statuses/:id', { id })
     );
   };
 

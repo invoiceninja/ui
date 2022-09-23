@@ -13,6 +13,7 @@ import { InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { usePaymentTermQuery } from 'common/queries/payment-terms';
@@ -25,7 +26,7 @@ import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Actions } from './components/Actions';
 
 export function Edit() {
@@ -40,7 +41,7 @@ export function Edit() {
     { name: t('payment_terms'), href: '/settings/payment_terms' },
     {
       name: t('edit_payment_term'),
-      href: generatePath('/settings/payment_terms/:id/edit', { id }),
+      href: route('/settings/payment_terms/:id/edit', { id }),
     },
   ];
 
@@ -49,7 +50,7 @@ export function Edit() {
 
   const invalidatePaymentTermCache = () => {
     queryClient.invalidateQueries(
-      generatePath('/api/v1/payment_terms/:id', { id })
+      route('/api/v1/payment_terms/:id', { id })
     );
   };
 

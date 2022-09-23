@@ -26,7 +26,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function TaxRates() {
   const [t] = useTranslation();
@@ -78,7 +78,7 @@ export function TaxRates() {
               <Tr key={taxRate.id}>
                 <Td>
                   <Link
-                    to={generatePath('/settings/tax_rates/:id/edit', {
+                    to={route('/settings/tax_rates/:id/edit', {
                       id: taxRate.id,
                     })}
                   >
@@ -89,7 +89,7 @@ export function TaxRates() {
                 <Td>
                   <Dropdown label={t('actions')}>
                     <DropdownElement
-                      to={generatePath('/settings/tax_rates/:id/edit', {
+                      to={route('/settings/tax_rates/:id/edit', {
                         id: taxRate.id,
                       })}
                     >

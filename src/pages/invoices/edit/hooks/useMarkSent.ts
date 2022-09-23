@@ -11,14 +11,14 @@
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { Invoice } from 'common/interfaces/invoice';
-import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useQueryClient } from 'react-query';
+import { route } from 'common/helpers/route';
 
 export function useMarkSent() {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   return (invoice: Invoice) => {
     const toastId = toast.loading(t('processing'));
@@ -28,10 +28,14 @@ export function useMarkSent() {
       endpoint('/api/v1/invoices/:id?mark_sent=true', { id: invoice.id }),
       invoice
     )
-      .then((response) => {
+      .then(() => {
         toast.success(t('notification_invoice_sent'), { id: toastId });
 
-        dispatch(setCurrentInvoice(response.data.data));
+        queryClient.invalidateQueries('/api/v1/invoices');
+
+        queryClient.invalidateQueries(
+          route('/api/v1/invoices/:id', { id: invoice.id })
+        );
       })
       .catch((error) => {
         toast.error(t('error_title'), { id: toastId });

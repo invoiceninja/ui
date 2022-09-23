@@ -11,12 +11,12 @@
 import { request } from 'common/helpers/request';
 import { Vendor } from 'common/interfaces/vendor';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { endpoint } from '../helpers';
 
 export function useVendorQuery(params: { id: string | undefined }) {
   return useQuery<Vendor>(
-    generatePath('/api/v1/vendors/:id', { id: params.id }),
+    route('/api/v1/vendors/:id', { id: params.id }),
     () =>
       request('GET', endpoint('/api/v1/vendors/:id', { id: params.id })).then(
         (response) => response.data.data

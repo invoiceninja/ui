@@ -12,17 +12,22 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
+import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { useCurrentCredit } from '../hooks/useCurrentCredit';
-import { useSetCurrentCreditProperty } from '../hooks/useSetCurrentCreditProperty';
+import { creditAtom } from '../atoms';
+import { ChangeHandler } from '../hooks';
 
-export function CreditDetails() {
-  const [t] = useTranslation();
+interface Props {
+  handleChange: ChangeHandler;
+}
 
-  const credits = useCurrentCredit();
+export function CreditDetails(props: Props) {
+  const { t } = useTranslation();
+  const { handleChange } = props;
+
   const company = useCurrentCompany();
 
-  const handleChange = useSetCurrentCreditProperty();
+  const [credit] = useAtom(creditAtom);
 
   return (
     <>
@@ -31,7 +36,7 @@ export function CreditDetails() {
           <InputField
             type="date"
             onValueChange={(value) => handleChange('date', value)}
-            value={credits?.date || ''}
+            value={credit?.date || ''}
           />
         </Element>
 
@@ -39,7 +44,7 @@ export function CreditDetails() {
           <InputField
             type="date"
             onValueChange={(value) => handleChange('due_date', value)}
-            value={credits?.due_date || ''}
+            value={credit?.due_date || ''}
           />
         </Element>
 
@@ -47,36 +52,38 @@ export function CreditDetails() {
           <InputField
             id="partial"
             type="number"
-            onValueChange={(value) => handleChange('partial', value)}
-            value={credits?.partial || ''}
+            onValueChange={(value) =>
+              handleChange('partial', parseFloat(value))
+            }
+            value={credit?.partial || ''}
           />
         </Element>
 
-        {credits && credits.partial > 0 && (
+        {credit && credit.partial > 0 && (
           <Element leftSide={t('partial_due_date')}>
             <InputField
               type="date"
               onValueChange={(value) => handleChange('partial_due_date', value)}
-              value={credits?.partial_due_date || ''}
+              value={credit?.partial_due_date || ''}
             />
           </Element>
         )}
 
-        {credits && company?.custom_fields?.credit1 && (
+        {credit && company?.custom_fields?.credit1 && (
           <CustomField
             field="credit1"
-            defaultValue={credits?.custom_value1 || ''}
+            defaultValue={credit?.custom_value1 || ''}
             value={company.custom_fields.credit1}
-            onChange={(value) => handleChange('custom_value1', value)}
+            onValueChange={(value) => handleChange('custom_value1', String(value))}
           />
         )}
 
-        {credits && company?.custom_fields?.credit2 && (
+        {credit && company?.custom_fields?.credit2 && (
           <CustomField
             field="credit2"
-            defaultValue={credits?.custom_value2 || ''}
+            defaultValue={credit?.custom_value2 || ''}
             value={company.custom_fields.credit2}
-            onChange={(value) => handleChange('custom_value2', value)}
+            onValueChange={(value) => handleChange('custom_value2', String(value))}
           />
         )}
       </Card>
@@ -86,7 +93,7 @@ export function CreditDetails() {
           <InputField
             id="number"
             onValueChange={(value) => handleChange('number', value)}
-            value={credits?.number || ''}
+            value={credit?.number || ''}
           />
         </Element>
 
@@ -94,7 +101,7 @@ export function CreditDetails() {
           <InputField
             id="po_number"
             onValueChange={(value) => handleChange('po_number', value)}
-            value={credits?.po_number || ''}
+            value={credit?.po_number || ''}
           />
         </Element>
 
@@ -106,16 +113,16 @@ export function CreditDetails() {
                 onValueChange={(value) =>
                   handleChange('discount', parseFloat(value))
                 }
-                value={credits?.discount || ''}
+                value={credit?.discount || ''}
               />
             </div>
 
             <div className="w-full lg:w-1/2">
               <SelectField
                 onValueChange={(value) =>
-                  handleChange('is_amount_discount', value)
+                  handleChange('is_amount_discount', JSON.parse(value))
                 }
-                value={credits?.is_amount_discount.toString()}
+                value={credit?.is_amount_discount.toString()}
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
@@ -124,21 +131,21 @@ export function CreditDetails() {
           </div>
         </Element>
 
-        {credits && company?.custom_fields?.credit3 && (
+        {credit && company?.custom_fields?.credit3 && (
           <CustomField
             field="credit3"
-            defaultValue={credits?.custom_value3 || ''}
+            defaultValue={credit?.custom_value3 || ''}
             value={company.custom_fields.credit3}
-            onChange={(value) => handleChange('custom_value3', value)}
+            onValueChange={(value) => handleChange('custom_value3', String(value))}
           />
         )}
 
-        {credits && company?.custom_fields?.credit4 && (
+        {credit && company?.custom_fields?.credit4 && (
           <CustomField
             field="credit4"
-            defaultValue={credits?.custom_value4 || ''}
+            defaultValue={credit?.custom_value4 || ''}
             value={company.custom_fields.credit4}
-            onChange={(value) => handleChange('custom_value4', value)}
+            onValueChange={(value) => handleChange('custom_value4', String(value))}
           />
         )}
       </Card>

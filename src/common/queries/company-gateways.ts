@@ -11,17 +11,17 @@
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useCompanyGatewaysQuery() {
-  return useQuery(generatePath('/api/v1/company_gateways'), () =>
+  return useQuery(route('/api/v1/company_gateways'), () =>
     request('GET', endpoint('/api/v1/company_gateways'))
   );
 }
 
 export function useCompanyGatewayQuery(params: { id: string | undefined }) {
   return useQuery(
-    generatePath('/api/v1/company_gateways/:id', { id: params.id }),
+    route('/api/v1/company_gateways/:id', { id: params.id }),
     () =>
       request(
         'GET',
@@ -33,7 +33,7 @@ export function useCompanyGatewayQuery(params: { id: string | undefined }) {
 
 export function useBlankCompanyGatewayQuery() {
   return useQuery(
-    generatePath('/api/v1/company_gateways/create'),
+    route('/api/v1/company_gateways/create'),
     () => request('GET', endpoint('/api/v1/company_gateways/create')),
     { staleTime: Infinity }
   );

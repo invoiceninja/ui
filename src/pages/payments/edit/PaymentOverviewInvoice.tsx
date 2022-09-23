@@ -15,7 +15,8 @@ import { Payment, Paymentable } from 'common/interfaces/payment';
 import { Invoice } from 'common/interfaces/invoice';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { date as formatDate } from 'common/helpers';
-import { Link, generatePath } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 interface Props {
   payment: Payment;
@@ -42,7 +43,7 @@ export function PaymentOverviewInvoice(props: Props) {
         <span className="text-gray-800">
           {`${t('invoice')} `}
           <Link
-            to={generatePath('/invoices/:id/edit', {
+            to={route('/invoices/:id/edit', {
               id: props.paymentable.invoice_id,
             })}
           >

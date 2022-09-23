@@ -10,6 +10,7 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { User } from 'common/interfaces/user';
 import { defaultHeaders } from 'common/queries/common/headers';
@@ -19,7 +20,7 @@ import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Details } from '../edit/components/Details';
 import { Notifications } from '../edit/components/Notifications';
 import { Permissions } from '../edit/components/Permissions';
@@ -81,7 +82,7 @@ export function Create() {
         toast.success(t('created_user'), { id: toastId });
 
         navigate(
-          generatePath('/settings/users/:id/edit', {
+          route('/settings/users/:id/edit', {
             id: response.data.data.id,
           })
         );

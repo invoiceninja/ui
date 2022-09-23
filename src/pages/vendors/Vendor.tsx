@@ -9,17 +9,18 @@
  */
 
 import { Button, Link } from '@invoiceninja/forms';
+import { route } from 'common/helpers/route';
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import { useCountries } from 'common/hooks/useCountries';
 import { useTitle } from 'common/hooks/useTitle';
 import { useVendorQuery } from 'common/queries/vendor';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { InfoCard } from 'components/InfoCard';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import { Actions } from './components/Actions';
 
 export function Vendor() {
@@ -38,27 +39,27 @@ export function Vendor() {
     }
   }, [vendor]);
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('vendors'), href: '/vendors' },
-    { name: documentTitle, href: generatePath('/vendors/:id', { id }) },
+    { name: documentTitle, href: route('/vendors/:id', { id }) },
   ];
 
   const tabs: Tab[] = [
     {
       name: t('purchase_orders'),
-      href: generatePath('/vendors/:id/purchase_orders', { id }),
+      href: route('/vendors/:id/purchase_orders', { id }),
     },
     {
       name: t('expenses'),
-      href: generatePath('/vendors/:id/expenses', { id }),
+      href: route('/vendors/:id/expenses', { id }),
     },
     {
       name: t('recurring_expenses'),
-      href: generatePath('/vendors/:id/recurring_expenses', { id }),
+      href: route('/vendors/:id/recurring_expenses', { id }),
     },
     {
       name: t('documents'),
-      href: generatePath('/vendors/:id/documents', { id }),
+      href: route('/vendors/:id/documents', { id }),
     },
   ];
 
@@ -68,7 +69,7 @@ export function Vendor() {
       breadcrumbs={pages}
       topRight={
         <div className="inline-flex items-center space-x-2">
-          <Button to={generatePath('/vendors/:id/edit', { id })}>
+          <Button to={route('/vendors/:id/edit', { id })}>
             {t('edit_vendor')}
           </Button>
 

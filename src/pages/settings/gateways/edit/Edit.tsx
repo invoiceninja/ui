@@ -9,6 +9,7 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { Gateway } from 'common/interfaces/statics';
@@ -16,7 +17,7 @@ import { useCompanyGatewayQuery } from 'common/queries/company-gateways';
 import { Settings } from 'components/layouts/Settings';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from '../create/components/Credentials';
 import { LimitsAndFees } from '../create/components/LimitsAndFees';
@@ -37,7 +38,7 @@ export function Edit() {
     { name: t('online_payments'), href: '/settings/online_payments' },
     {
       name: t('edit_gateway'),
-      href: generatePath('/settings/gateways/:id/edit', { id }),
+      href: route('/settings/gateways/:id/edit', { id }),
     },
   ];
 

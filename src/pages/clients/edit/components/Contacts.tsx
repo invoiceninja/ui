@@ -135,7 +135,7 @@ export function Contacts(props: Props) {
               field="contact1"
               defaultValue={contact.custom_value1}
               value={company.custom_fields.contact1}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 handleChange(value, 'custom_value1', contact.id as string)
               }
             />
@@ -146,7 +146,7 @@ export function Contacts(props: Props) {
               field="contact2"
               defaultValue={contact.custom_value2}
               value={company.custom_fields.contact2}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 handleChange(value, 'custom_value2', contact.id as string)
               }
             />
@@ -157,7 +157,7 @@ export function Contacts(props: Props) {
               field="contact3"
               defaultValue={contact.custom_value3}
               value={company.custom_fields.contact3}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 handleChange(value, 'custom_value3', contact.id as string)
               }
             />
@@ -168,7 +168,7 @@ export function Contacts(props: Props) {
               field="contact4"
               defaultValue={contact.custom_value4}
               value={company.custom_fields.contact4}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 handleChange(value, 'custom_value4', contact.id as string)
               }
             />
