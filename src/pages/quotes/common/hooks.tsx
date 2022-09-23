@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { QuoteStatus } from 'common/enums/quote-status';
 import { endpoint } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
@@ -42,6 +42,9 @@ import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
 import { route } from 'common/helpers/route';
+import { useDispatch } from 'react-redux';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { updateRecord } from 'common/stores/slices/company-users';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -168,9 +171,7 @@ export function useCreate(props: CreateProps) {
       .then((response: GenericSingleResourceResponse<Quote>) => {
         toast.success('created_quote');
 
-        navigate(
-          route('/quotes/:id/edit', { id: response.data.data.id })
-        );
+        navigate(route('/quotes/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -186,14 +187,28 @@ export function useSave(props: CreateProps) {
   const { setErrors } = props;
 
   const queryClient = useQueryClient();
+  const dispatch = useDispatch();
+  const company = useInjectCompanyChanges();
 
   return (quote: Quote) => {
     toast.processing();
     setErrors(undefined);
 
-    request('PUT', endpoint('/api/v1/quotes/:id', { id: quote.id }), quote)
-      .then(() => {
+    axios
+      .all([
+        request('PUT', endpoint('/api/v1/quotes/:id', { id: quote.id }), quote),
+        request(
+          'PUT',
+          endpoint('/api/v1/companies/:id', { id: company?.id }),
+          company
+        ),
+      ])
+      .then((response) => {
         toast.success('updated_quote');
+
+        dispatch(
+          updateRecord({ object: 'company', data: response[1].data.data })
+        );
 
         queryClient.invalidateQueries(
           route('/api/v1/quotes/:id', { id: quote.id })
