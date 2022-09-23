@@ -74,7 +74,7 @@ export function CreditDetails(props: Props) {
             field="credit1"
             defaultValue={credit?.custom_value1 || ''}
             value={company.custom_fields.credit1}
-            onChange={(value) => handleChange('custom_value1', String(value))}
+            onValueChange={(value) => handleChange('custom_value1', String(value))}
           />
         )}
 
@@ -83,7 +83,7 @@ export function CreditDetails(props: Props) {
             field="credit2"
             defaultValue={credit?.custom_value2 || ''}
             value={company.custom_fields.credit2}
-            onChange={(value) => handleChange('custom_value2', String(value))}
+            onValueChange={(value) => handleChange('custom_value2', String(value))}
           />
         )}
       </Card>
@@ -136,7 +136,7 @@ export function CreditDetails(props: Props) {
             field="credit3"
             defaultValue={credit?.custom_value3 || ''}
             value={company.custom_fields.credit3}
-            onChange={(value) => handleChange('custom_value3', String(value))}
+            onValueChange={(value) => handleChange('custom_value3', String(value))}
           />
         )}
 
@@ -145,7 +145,7 @@ export function CreditDetails(props: Props) {
             field="credit4"
             defaultValue={credit?.custom_value4 || ''}
             value={company.custom_fields.credit4}
-            onChange={(value) => handleChange('custom_value4', String(value))}
+            onValueChange={(value) => handleChange('custom_value4', String(value))}
           />
         )}
       </Card>

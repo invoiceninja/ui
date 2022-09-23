@@ -97,7 +97,7 @@ export function InvoiceDetails(props: Props) {
             field="invoice1"
             defaultValue={recurringInvoice?.custom_value1 || ''}
             value={company.custom_fields.invoice1}
-            onChange={(value) => handleChange('custom_value1', String(value))}
+            onValueChange={(value) => handleChange('custom_value1', String(value))}
           />
         )}
 
@@ -106,7 +106,7 @@ export function InvoiceDetails(props: Props) {
             field="invoice2"
             defaultValue={recurringInvoice?.custom_value2 || ''}
             value={company.custom_fields.invoice2}
-            onChange={(value) => handleChange('custom_value2', String(value))}
+            onValueChange={(value) => handleChange('custom_value2', String(value))}
           />
         )}
       </Card>
@@ -173,7 +173,7 @@ export function InvoiceDetails(props: Props) {
             field="invoice3"
             defaultValue={recurringInvoice?.custom_value3 || ''}
             value={company.custom_fields.invoice3}
-            onChange={(value) => handleChange('custom_value3', String(value))}
+            onValueChange={(value) => handleChange('custom_value3', String(value))}
           />
         )}
 
@@ -182,7 +182,7 @@ export function InvoiceDetails(props: Props) {
             field="invoice4"
             defaultValue={recurringInvoice?.custom_value4 || ''}
             value={company.custom_fields.invoice4}
-            onChange={(value) => handleChange('custom_value4', String(value))}
+            onValueChange={(value) => handleChange('custom_value4', String(value))}
           />
         )}
       </Card>

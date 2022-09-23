@@ -72,7 +72,7 @@ export function InvoiceDetails(props: Props) {
             field="invoice1"
             defaultValue={invoice?.custom_value1 || ''}
             value={company.custom_fields.invoice1}
-            onChange={(value) =>
+            onValueChange={(value) =>
               handleChange('custom_value1', value.toString())
             }
           />
@@ -83,7 +83,7 @@ export function InvoiceDetails(props: Props) {
             field="invoice2"
             defaultValue={invoice?.custom_value2 || ''}
             value={company.custom_fields.invoice2}
-            onChange={(value) =>
+            onValueChange={(value) =>
               handleChange('custom_value2', value.toString())
             }
           />
@@ -138,7 +138,7 @@ export function InvoiceDetails(props: Props) {
             field="invoice3"
             defaultValue={invoice?.custom_value3 || ''}
             value={company.custom_fields.invoice3}
-            onChange={(value) =>
+            onValueChange={(value) =>
               handleChange('custom_value3', value.toString())
             }
           />
@@ -149,7 +149,7 @@ export function InvoiceDetails(props: Props) {
             field="invoice4"
             defaultValue={invoice?.custom_value4 || ''}
             value={company.custom_fields.invoice4}
-            onChange={(value) =>
+            onValueChange={(value) =>
               handleChange('custom_value4', value.toString())
             }
           />

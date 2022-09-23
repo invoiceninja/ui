@@ -416,7 +416,7 @@ export function Create() {
               field="payment1"
               defaultValue={payment?.custom_value1}
               value={company?.custom_fields?.payment1}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 handleChange('custom_value1', value.toString())
               }
             />
@@ -427,7 +427,7 @@ export function Create() {
               field="payment2"
               defaultValue={payment?.custom_value2}
               value={company?.custom_fields?.payment2}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 handleChange('custom_value2', value.toString())
               }
             />
@@ -438,7 +438,7 @@ export function Create() {
               field="payment3"
               defaultValue={payment?.custom_value3}
               value={company?.custom_fields?.payment3}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 handleChange('custom_value3', value.toString())
               }
             />
@@ -449,7 +449,7 @@ export function Create() {
               field="payment4"
               defaultValue={payment?.custom_value4}
               value={company?.custom_fields?.payment4}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 handleChange('custom_value4', value.toString())
               }
             />

@@ -178,7 +178,7 @@ export function useResolveInputField(props: Props) {
           field={property}
           defaultValue={resource?.line_items[index][field]}
           value={company.custom_fields?.[property]}
-          onChange={(value) => onChange(field, value, index)}
+          onValueChange={(value) => onChange(field, value, index)}
           fieldOnly
         />
       ) : (

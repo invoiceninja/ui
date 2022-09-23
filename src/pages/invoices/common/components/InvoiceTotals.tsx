@@ -57,7 +57,7 @@ export function InvoiceTotals(props: Props) {
           field="surcharge1"
           defaultValue={resource?.custom_surcharge1}
           value={resource?.custom_surcharge1.toString() || ''}
-          onChange={(value) => handleChange('custom_surcharge1', value)}
+          onValueChange={(value) => handleChange('custom_surcharge1', value)}
         />
       )}
 
@@ -66,7 +66,7 @@ export function InvoiceTotals(props: Props) {
           field="surcharge2"
           defaultValue={resource?.custom_surcharge2}
           value={resource?.custom_surcharge2.toString() || ''}
-          onChange={(value) => handleChange('custom_surcharge2', value)}
+          onValueChange={(value) => handleChange('custom_surcharge2', value)}
         />
       )}
 
@@ -75,7 +75,7 @@ export function InvoiceTotals(props: Props) {
           field="surcharge3"
           defaultValue={resource?.custom_surcharge3}
           value={resource?.custom_surcharge3.toString() || ''}
-          onChange={(value) => handleChange('custom_surcharge3', value)}
+          onValueChange={(value) => handleChange('custom_surcharge3', value)}
         />
       )}
 
@@ -84,7 +84,7 @@ export function InvoiceTotals(props: Props) {
           field="surcharge4"
           defaultValue={resource?.custom_surcharge4}
           value={resource?.custom_surcharge4.toString() || ''}
-          onChange={(value) => handleChange('custom_surcharge4', value)}
+          onValueChange={(value) => handleChange('custom_surcharge4', value)}
         />
       )}
 
