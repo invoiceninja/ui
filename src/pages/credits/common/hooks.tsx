@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { blankLineItem } from 'common/constants/blank-line-item';
 import { CreditStatus } from 'common/enums/credit-status';
 import { endpoint } from 'common/helpers';
@@ -17,6 +17,7 @@ import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { Client } from 'common/interfaces/client';
 import { Credit } from 'common/interfaces/credit';
@@ -26,6 +27,7 @@ import { Invitation, PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Quote } from 'common/interfaces/quote';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { updateRecord } from 'common/stores/slices/company-users';
 import { Divider } from 'components/cards/Divider';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Action } from 'components/ResourceActions';
@@ -38,6 +40,7 @@ import { quoteAtom } from 'pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
+import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
@@ -168,9 +171,7 @@ export function useCreate(props: CreateProps) {
       .then((response: GenericSingleResourceResponse<Credit>) => {
         toast.success('created_credit');
 
-        navigate(
-          route('/credits/:id/edit', { id: response.data.data.id })
-        );
+        navigate(route('/credits/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -185,15 +186,33 @@ export function useCreate(props: CreateProps) {
 export function useSave(props: CreateProps) {
   const { setErrors } = props;
 
+  const dispatch = useDispatch();
   const queryClient = useQueryClient();
+  const company = useInjectCompanyChanges();
 
   return (credit: Credit) => {
     toast.processing();
     setErrors(undefined);
 
-    request('PUT', endpoint('/api/v1/credits/:id', { id: credit.id }), credit)
-      .then(() => {
+    axios
+      .all([
+        request(
+          'PUT',
+          endpoint('/api/v1/credits/:id', { id: credit.id }),
+          credit
+        ),
+        request(
+          'PUT',
+          endpoint('/api/v1/companies/:id', { id: company?.id }),
+          company
+        ),
+      ])
+      .then((response) => {
         toast.success('updated_credit');
+
+        dispatch(
+          updateRecord({ object: 'company', data: response[1].data.data })
+        );
 
         queryClient.invalidateQueries(
           route('/api/v1/credits/:id', { id: credit.id })
@@ -275,9 +294,7 @@ export function useActions() {
       </DropdownElement>
     ),
     (credit) => (
-      <DropdownElement
-        to={route('/credits/:id/email', { id: credit.id })}
-      >
+      <DropdownElement to={route('/credits/:id/email', { id: credit.id })}>
         {t('email_credit')}
       </DropdownElement>
     ),
