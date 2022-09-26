@@ -24,7 +24,7 @@ export function useInvoiceQuery(params: { id: string | undefined }) {
   return useQuery<Invoice>(
     route('/api/v1/invoices/:id', { id: params.id }),
     () =>
-      request('GET', endpoint('/api/v1/invoices/:id', { id: params.id })).then(
+      request('GET', endpoint('/api/v1/invoices/:id?include=client', { id: params.id })).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
     { staleTime: Infinity }
