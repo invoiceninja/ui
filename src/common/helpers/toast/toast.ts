@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { trans } from 'common/helpers';
 import { t } from 'i18next';
 import { toast as helper } from 'react-hot-toast';
 
@@ -22,8 +23,10 @@ class Toast {
     return this;
   }
 
-  success(message = 'success'): Toast {
-    this.currentId = helper.success(t(message), { id: this.currentId });
+  success(message = 'success', replaceable = {}): Toast {
+    this.currentId = helper.success(trans(message, replaceable), {
+      id: this.currentId,
+    });
 
     return this;
   }
