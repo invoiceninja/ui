@@ -50,8 +50,6 @@ export function Contact(props: Props) {
     }
   }, []);
 
-  console.log(relation?.contacts);
-
   return (
     <>
       {relation && (

@@ -86,9 +86,6 @@ export function Create() {
   const save = useHandleCreate(setErrors);
 
   useEffect(() => {
-    console.log(typeof invoice);
-    console.log(data);
-
     if (typeof data !== 'undefined' && typeof invoice === 'undefined') {
       const _invoice = cloneDeep(data);
 
@@ -174,7 +171,7 @@ export function Create() {
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
           >
             <div>
-              {invoice ? (
+              {invoice && client ? (
                 <ProductsTable
                   type="product"
                   resource={invoice}
@@ -197,7 +194,7 @@ export function Create() {
             </div>
 
             <div>
-              {invoice ? (
+              {invoice && client ? (
                 <ProductsTable
                   type="task"
                   resource={invoice}

@@ -27,7 +27,7 @@ export function useBulkAction() {
     })
       .then(() => toast.success(`${action}d_task`))
       .catch((error: AxiosError) => {
-        console.log(error);
+        console.error(error);
         console.error(error.response?.data);
 
         toast.error();
