@@ -157,7 +157,7 @@ export function Create() {
         <InvoiceDetails handleChange={handleChange} />
 
         <div className="col-span-12">
-          {recurringInvoice ? (
+          {recurringInvoice && client ? (
             <ProductsTable
               type="product"
               resource={recurringInvoice}

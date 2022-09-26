@@ -9,6 +9,7 @@
  */
 
 import { route } from 'common/helpers/route';
+import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -55,8 +56,10 @@ export function Edit() {
   const [recurringInvoice, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
-  const [client] = useState<Client>();
+  const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+
+  const clientResolver = useClientResolver();
 
   const {
     handleChange,
@@ -77,6 +80,12 @@ export function Edit() {
       ri.line_items.map((item) => (item._id = v4()));
 
       setRecurringInvoice(ri);
+
+      if (ri && ri.client) {
+        setClient(ri.client);
+
+        clientResolver.cache(ri.client);
+      }
     }
   }, [data]);
 
@@ -120,7 +129,7 @@ export function Edit() {
         <InvoiceDetails handleChange={handleChange} />
 
         <div className="col-span-12">
-          {recurringInvoice ? (
+          {recurringInvoice && client ? (
             <ProductsTable
               type="product"
               resource={recurringInvoice}
