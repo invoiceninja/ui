@@ -10,6 +10,7 @@
 
 import { InvoiceStatus } from 'common/enums/invoice-status';
 import { route } from 'common/helpers/route';
+import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -61,8 +62,10 @@ export function Edit() {
   const [invoice, setInvoice] = useAtom(invoiceAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
-  const [client] = useState<Client | undefined>();
+  const [client, setClient] = useState<Client | undefined>();
   const [errors, setErrors] = useState<ValidationBag>();
+
+  const clientResolver = useClientResolver();
 
   const {
     handleChange,
@@ -81,6 +84,12 @@ export function Edit() {
       _invoice.line_items.map((lineItem) => (lineItem._id = v4()));
 
       setInvoice(_invoice);
+
+      if (_invoice?.client) {
+        setClient(_invoice.client);
+
+        clientResolver.cache(_invoice.client);
+      }
     }
   }, [data]);
 
@@ -133,7 +142,7 @@ export function Edit() {
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
           >
             <div>
-              {invoice ? (
+              {invoice && client ? (
                 <ProductsTable
                   type="product"
                   resource={invoice}
@@ -156,7 +165,7 @@ export function Edit() {
             </div>
 
             <div>
-              {invoice ? (
+              {invoice && client ? (
                 <ProductsTable
                   type="task"
                   resource={invoice}
