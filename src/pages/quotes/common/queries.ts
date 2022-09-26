@@ -35,7 +35,7 @@ export function useQuoteQuery({ id }: QuoteQueryParams) {
   return useQuery<Quote>(
     route('/api/v1/quotes/:id', { id }),
     () =>
-      request('GET', endpoint('/api/v1/quotes/:id', { id })).then(
+      request('GET', endpoint('/api/v1/quotes/:id?include=client', { id })).then(
         (response: GenericSingleResourceResponse<Quote>) => response.data.data
       ),
     { staleTime: Infinity }
