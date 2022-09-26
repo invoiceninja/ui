@@ -26,7 +26,7 @@ export function useRecurringInvoiceQuery(params: RecurringInvoiceQueryParams) {
     () =>
       request(
         'GET',
-        endpoint('/api/v1/recurring_invoices/:id', { id: params.id })
+        endpoint('/api/v1/recurring_invoices/:id?include=client', { id: params.id })
       ).then(
         (response: GenericSingleResourceResponse<RecurringInvoice>) =>
           response.data.data
