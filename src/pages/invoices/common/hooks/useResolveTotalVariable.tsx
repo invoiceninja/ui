@@ -109,7 +109,7 @@ export function useResolveTotalVariable(props: Props) {
           field="surcharge1"
           defaultValue={resource?.custom_surcharge1 || ''}
           value={company?.custom_fields.surcharge1 || ''}
-          onChange={(value) => handleChange('custom_surcharge1', value)}
+          onValueChange={(value) => handleChange('custom_surcharge1', value)}
         />
       );
     }
@@ -120,7 +120,7 @@ export function useResolveTotalVariable(props: Props) {
           field="surcharge2"
           defaultValue={resource?.custom_surcharge2 || ''}
           value={company?.custom_fields.surcharge2 || ''}
-          onChange={(value) => handleChange('custom_surcharge2', value)}
+          onValueChange={(value) => handleChange('custom_surcharge2', value)}
         />
       );
     }
@@ -131,7 +131,7 @@ export function useResolveTotalVariable(props: Props) {
           field="surcharge3"
           defaultValue={resource?.custom_surcharge3 || ''}
           value={company?.custom_fields.surcharge3 || ''}
-          onChange={(value) => handleChange('custom_surcharge3', value)}
+          onValueChange={(value) => handleChange('custom_surcharge3', value)}
         />
       );
     }
@@ -142,7 +142,7 @@ export function useResolveTotalVariable(props: Props) {
           field="surcharge4"
           defaultValue={resource?.custom_surcharge4 || ''}
           value={company?.custom_fields.surcharge4 || ''}
-          onChange={(value) => handleChange('custom_surcharge4', value)}
+          onValueChange={(value) => handleChange('custom_surcharge4', value)}
         />
       );
     }

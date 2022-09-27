@@ -12,7 +12,7 @@ import { AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { Params } from './common/params.interface';
 
 export function useTaxRatesQuery(params: Params) {
@@ -33,7 +33,7 @@ export function useTaxRatesQuery(params: Params) {
 
 export function useTaxRateQuery(params: { id: string | undefined }) {
   return useQuery(
-    generatePath('/api/v1/tax_rates/:id', { id: params.id }),
+    route('/api/v1/tax_rates/:id', { id: params.id }),
     () => request('GET', endpoint('/api/v1/tax_rates/:id', { id: params.id })),
     { staleTime: Infinity }
   );

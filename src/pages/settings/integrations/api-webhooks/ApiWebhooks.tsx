@@ -28,7 +28,7 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function ApiWebhooks() {
   const [t] = useTranslation();
@@ -90,7 +90,7 @@ export function ApiWebhooks() {
                 <Tr key={webhook.id}>
                   <Td>
                     <Link
-                      to={generatePath(
+                      to={route(
                         '/settings/integrations/api_webhooks/:id/edit',
                         { id: webhook.id }
                       )}
@@ -106,7 +106,7 @@ export function ApiWebhooks() {
                       </DropdownElement>
 
                       <DropdownElement
-                        to={generatePath(
+                        to={route(
                           '/settings/integrations/api_webhooks/:id/edit',
                           { id: webhook.id }
                         )}

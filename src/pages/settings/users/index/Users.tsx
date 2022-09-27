@@ -14,7 +14,7 @@ import { User } from 'common/interfaces/user';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function Users() {
   useTitle('user_management');
@@ -32,7 +32,7 @@ export function Users() {
       label: 'name',
       format: (field, resource) => (
         <Link
-          to={generatePath('/settings/users/:id/edit', { id: resource.id })}
+          to={route('/settings/users/:id/edit', { id: resource.id })}
         >
           {resource.first_name} {resource.last_name}
         </Link>

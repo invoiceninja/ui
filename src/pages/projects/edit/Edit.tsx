@@ -14,6 +14,7 @@ import { AxiosError } from 'axios';
 import { EntityState } from 'common/enums/entity-state';
 import { endpoint, getEntityState } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { Project } from 'common/interfaces/project';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useProjectQuery } from 'common/queries/projects';
@@ -24,7 +25,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useBulkAction } from '../common/hooks/useBulkAction';
 
 export function Edit() {
@@ -61,7 +62,7 @@ export function Edit() {
         toast.success(t('updated_project'), { id: toastId });
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/projects/:id', { id })
+          route('/api/v1/projects/:id', { id })
         );
       })
       .catch((error: AxiosError) => {
@@ -158,7 +159,7 @@ export function Edit() {
       {project && (
         <div className="flex justify-end">
           <Dropdown label={t('more_actions')}>
-            <DropdownElement to={generatePath('/projects/:id/clone', { id })}>
+            <DropdownElement to={route('/projects/:id/clone', { id })}>
               {t('clone')}
             </DropdownElement>
 

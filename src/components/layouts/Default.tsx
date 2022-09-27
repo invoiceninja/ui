@@ -28,7 +28,7 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { Button } from '@invoiceninja/forms';
-import { Breadcrumbs, BreadcrumRecord } from 'components/Breadcrumbs';
+import { Breadcrumbs, Page } from 'components/Breadcrumbs';
 import { useSelector } from 'react-redux';
 import { RootState } from 'common/stores/store';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
@@ -41,7 +41,7 @@ interface Props extends CommonProps {
   onSaveClick?: any;
   onCancelClick?: any;
   onBackClick?: string;
-  breadcrumbs?: BreadcrumRecord[];
+  breadcrumbs?: Page[];
   topRight?: ReactNode;
   docsLink?: string;
   navigationTopRight?: ReactNode;

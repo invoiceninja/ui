@@ -9,11 +9,12 @@
  */
 
 import { endpoint } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { useProductQuery } from 'common/queries/products';
 import { DocumentsTable } from 'components/DocumentsTable';
 import { Upload } from 'pages/settings/company/documents/components';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function Documents() {
   const { id } = useParams();
@@ -22,7 +23,7 @@ export function Documents() {
   const queryClient = useQueryClient();
 
   const invalidateQuery = () => {
-    queryClient.invalidateQueries(generatePath('/api/v1/products/:id', { id }));
+    queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
   };
 
   return (

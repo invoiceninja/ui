@@ -11,7 +11,6 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
-import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { RecurringInvoices } from './index/RecurringInvoices';
@@ -44,15 +43,6 @@ export const recurringInvoiceRoutes = (
           <Guard
             guards={[() => permission('edit_recurring_invoice')]}
             component={<Edit />}
-          />
-        }
-      />
-      <Route
-        path="clone"
-        element={
-          <Guard
-            guards={[() => permission('view_recurring_invoice')]}
-            component={<Clone />}
           />
         }
       />

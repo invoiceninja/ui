@@ -8,12 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { trans } from 'common/helpers';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { Divider } from 'components/cards/Divider';
+import { CopyToClipboard } from 'components/CopyToClipboard';
 import { useHandleCurrentCompanyChangeProperty } from 'pages/settings/common/hooks/useHandleCurrentCompanyChange';
-import { Copy } from 'react-feather';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
@@ -40,21 +38,7 @@ export function Settings() {
           </span>
         }
       >
-        <div className="inline-flex space-x-2">
-          <span>{company?.portal_domain}/client/login</span>
-          <button
-            type="button"
-            onClick={() => {
-              navigator.clipboard.writeText(
-                `${company?.portal_domain}/client/login`
-              );
-
-              toast.success(trans('copied_to_clipboard', { value: t('url') }));
-            }}
-          >
-            <Copy size={16} />
-          </button>
-        </div>
+        <CopyToClipboard text={`${company?.portal_domain}/client/login`} />
       </Element>
 
       <Divider />

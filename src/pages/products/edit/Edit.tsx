@@ -25,9 +25,10 @@ import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 
 export function Edit() {
   const { id } = useParams();
@@ -74,7 +75,7 @@ export function Edit() {
           formik.setSubmitting(false);
 
           queryClient.invalidateQueries(
-            generatePath('/api/v1/products/:id', { id })
+            route('/api/v1/products/:id', { id })
           );
         });
     },
@@ -95,7 +96,7 @@ export function Edit() {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/products/:id', { id })
+          route('/api/v1/products/:id', { id })
         )
       );
   };
@@ -231,7 +232,7 @@ export function Edit() {
               field="custom_value1"
               defaultValue={product?.data.data.custom_value1}
               value={company.custom_fields.product1}
-              onChange={(value) => formik.setFieldValue('custom_value1', value)}
+              onValueChange={(value) => formik.setFieldValue('custom_value1', value)}
             />
           )}
           {company?.custom_fields?.product2 && (
@@ -239,7 +240,7 @@ export function Edit() {
               field="custom_value2"
               defaultValue={product?.data.data.custom_value2}
               value={company.custom_fields.product2}
-              onChange={(value) => formik.setFieldValue('custom_value2', value)}
+              onValueChange={(value) => formik.setFieldValue('custom_value2', value)}
             />
           )}
 
@@ -248,7 +249,7 @@ export function Edit() {
               field="custom_value3"
               defaultValue={product?.data.data.custom_value3}
               value={company.custom_fields.product3}
-              onChange={(value) => formik.setFieldValue('custom_value3', value)}
+              onValueChange={(value) => formik.setFieldValue('custom_value3', value)}
             />
           )}
 
@@ -257,7 +258,7 @@ export function Edit() {
               field="custom_value4"
               defaultValue={product?.data.data.custom_value4}
               value={company.custom_fields.product4}
-              onChange={(value) => formik.setFieldValue('custom_value4', value)}
+              onValueChange={(value) => formik.setFieldValue('custom_value4', value)}
             />
           )}
         </Card>
@@ -266,7 +267,7 @@ export function Edit() {
       {product && (
         <div className="flex justify-end">
           <Dropdown label={t('more_actions')}>
-            <DropdownElement to={generatePath('/products/:id/clone', { id })}>
+            <DropdownElement to={route('/products/:id/clone', { id })}>
               {t('clone_product')}
             </DropdownElement>
 

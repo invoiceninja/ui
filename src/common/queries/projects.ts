@@ -12,7 +12,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { Project } from 'common/interfaces/project';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useBlankProjectQuery() {
   return useQuery<Project>(
@@ -27,7 +27,7 @@ export function useBlankProjectQuery() {
 
 export function useProjectQuery(params: { id: string | undefined }) {
   return useQuery<Project>(
-    generatePath('/api/v1/projects/:id', { id: params.id }),
+    route('/api/v1/projects/:id', { id: params.id }),
     () =>
       request('GET', endpoint('/api/v1/projects/:id', { id: params.id })).then(
         (response) => response.data.data

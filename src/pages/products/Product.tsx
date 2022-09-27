@@ -8,15 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { useProductQuery } from 'common/queries/products';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
 import { Tab, Tabs } from 'components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 
 export function Product() {
   const { documentTitle, setDocumentTitle } = useTitle('product');
@@ -28,26 +29,26 @@ export function Product() {
     setDocumentTitle(product?.data?.data?.product_key || 'product');
   }, [product]);
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('products'), href: '/products' },
     {
       name: documentTitle,
-      href: generatePath('/products/:id', { id }),
+      href: route('/products/:id', { id }),
     },
   ];
 
   const tabs: Tab[] = [
     {
       name: t('edit'),
-      href: generatePath('/products/:id/edit', { id }),
+      href: route('/products/:id/edit', { id }),
     },
     {
       name: t('documents'),
-      href: generatePath('/products/:id/documents', { id }),
+      href: route('/products/:id/documents', { id }),
     },
     {
       name: t('product_fields'),
-      href: generatePath('/products/:id/product_fields', { id }),
+      href: route('/products/:id/product_fields', { id }),
     },
   ];
 

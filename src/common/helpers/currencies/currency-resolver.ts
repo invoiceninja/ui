@@ -38,3 +38,9 @@ export class CurrencyResolver {
       );
   }
 }
+
+const currencyResolver = new CurrencyResolver();
+
+export function useCurrencyResolver() {
+  return currencyResolver;
+}

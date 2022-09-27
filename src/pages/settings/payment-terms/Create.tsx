@@ -13,6 +13,7 @@ import { InputField } from '@invoiceninja/forms';
 import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
@@ -21,7 +22,7 @@ import { useFormik } from 'formik';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export function Create() {
   const [t] = useTranslation();
@@ -55,7 +56,7 @@ export function Create() {
           toast.success(t('created_payment_term'));
 
           navigate(
-            generatePath('/settings/payment_terms/:id/edit', {
+            route('/settings/payment_terms/:id/edit', {
               id: response.data.data.id,
             })
           );

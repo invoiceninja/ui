@@ -8,10 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { generatePath, Navigate, useParams } from 'react-router-dom';
+import { route } from 'common/helpers/route';
+import { Navigate, useParams } from 'react-router-dom';
 
 export function Show() {
   const { id } = useParams();
 
-  return <Navigate to={generatePath('/products/:id/edit', { id })} />;
+  return <Navigate to={route('/products/:id/edit', { id })} />;
 }

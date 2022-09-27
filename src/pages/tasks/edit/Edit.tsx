@@ -11,6 +11,7 @@
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
@@ -21,7 +22,7 @@ import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
 import { isOverlapping } from '../common/helpers/is-overlapping';
@@ -78,7 +79,7 @@ export function Edit() {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/invoices/:id', { id })
+          route('/api/v1/invoices/:id', { id })
         )
       );
   };
@@ -86,7 +87,7 @@ export function Edit() {
   return (
     <Default
       title={documentTitle}
-      onBackClick={generatePath('/tasks')}
+      onBackClick={route('/tasks')}
       navigationTopRight={task && <Actions task={task} />}
       onSaveClick={() => task && handleSave(task)}
     >

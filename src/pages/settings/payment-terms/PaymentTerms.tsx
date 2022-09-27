@@ -31,7 +31,7 @@ import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function PaymentTerms() {
   const [t] = useTranslation();
@@ -102,7 +102,7 @@ export function PaymentTerms() {
               <Tr key={paymentTerm.id}>
                 <Td>
                   <Link
-                    to={generatePath('/settings/payment_terms/:id/edit', {
+                    to={route('/settings/payment_terms/:id/edit', {
                       id: paymentTerm.id,
                     })}
                   >
@@ -112,7 +112,7 @@ export function PaymentTerms() {
                 <Td>
                   <Dropdown label={t('actions')}>
                     <DropdownElement
-                      to={generatePath('/settings/payment_terms/:id/edit', {
+                      to={route('/settings/payment_terms/:id/edit', {
                         id: paymentTerm.id,
                       })}
                     >

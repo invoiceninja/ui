@@ -10,6 +10,7 @@
 
 import { ActionCard } from '@invoiceninja/cards';
 import { Button } from '@invoiceninja/forms';
+import { route } from 'common/helpers/route';
 import {
   bulk,
   useExpenseCategoryQuery,
@@ -17,7 +18,7 @@ import {
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function Archive() {
   const [t] = useTranslation();
@@ -41,7 +42,7 @@ export function Archive() {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/expense_categories/:id', { id })
+          route('/api/v1/expense_categories/:id', { id })
         )
       );
   };

@@ -193,7 +193,7 @@ export function ProductCreate(props: Props) {
           field="custom_value1"
           defaultValue={formik.values.custom_value1}
           value={company.custom_fields.product1}
-          onChange={(value) => formik.setFieldValue('custom_value1', value)}
+          onValueChange={(value) => formik.setFieldValue('custom_value1', value)}
         />
       )}
 
@@ -202,7 +202,7 @@ export function ProductCreate(props: Props) {
           field="custom_value2"
           defaultValue={formik.values.custom_value2}
           value={company.custom_fields.product2}
-          onChange={(value) => formik.setFieldValue('custom_value2', value)}
+          onValueChange={(value) => formik.setFieldValue('custom_value2', value)}
         />
       )}
 
@@ -211,7 +211,7 @@ export function ProductCreate(props: Props) {
           field="custom_value3"
           defaultValue={formik.values.custom_value3}
           value={company.custom_fields.product3}
-          onChange={(value) => formik.setFieldValue('custom_value3', value)}
+          onValueChange={(value) => formik.setFieldValue('custom_value3', value)}
         />
       )}
 
@@ -220,7 +220,7 @@ export function ProductCreate(props: Props) {
           field="custom_value4"
           defaultValue={formik.values.custom_value4}
           value={company.custom_fields.product4}
-          onChange={(value) => formik.setFieldValue('custom_value4', value)}
+          onValueChange={(value) => formik.setFieldValue('custom_value4', value)}
         />
       )}
 

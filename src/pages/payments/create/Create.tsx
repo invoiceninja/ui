@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import collect from 'collect.js';
 import paymentType from 'common/constants/payment-type';
+import { route } from 'common/helpers/route';
 import { useCreditResolver } from 'common/hooks/credits/useCreditResolver';
 import { useInvoiceResolver } from 'common/hooks/invoices/useInvoiceResolver';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
@@ -33,7 +34,7 @@ import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useHandleCredit } from './hooks/useHandleCredit';
 import { useHandleInvoice } from './hooks/useHandleInvoice';
@@ -235,7 +236,7 @@ export function Create() {
                   <DebouncedCombobox
                     className="w-1/2"
                     inputLabel={t('invoice')}
-                    endpoint={generatePath(
+                    endpoint={route(
                       '/api/v1/invoices?payable=:clientId',
                       { clientId: payment.client_id }
                     )}
@@ -272,7 +273,7 @@ export function Create() {
           {payment?.client_id && (
             <Element leftSide={t('invoices')}>
               <DebouncedCombobox
-                endpoint={generatePath('/api/v1/invoices?payable=:clientId', {
+                endpoint={route('/api/v1/invoices?payable=:clientId', {
                   clientId: payment.client_id,
                 })}
                 label="number"
@@ -306,7 +307,7 @@ export function Create() {
                   <DebouncedCombobox
                     className="w-1/2"
                     inputLabel={t('credit')}
-                    endpoint={generatePath(
+                    endpoint={route(
                       '/api/v1/credits?client_id=:clientId',
                       { clientId: payment.client_id }
                     )}
@@ -343,7 +344,7 @@ export function Create() {
           {payment?.client_id && (
             <Element leftSide={t('credits')}>
               <DebouncedCombobox
-                endpoint={generatePath('/api/v1/credits?client_id=:clientId', {
+                endpoint={route('/api/v1/credits?client_id=:clientId', {
                   clientId: payment.client_id,
                 })}
                 label="number"
@@ -415,7 +416,7 @@ export function Create() {
               field="payment1"
               defaultValue={payment?.custom_value1}
               value={company?.custom_fields?.payment1}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 handleChange('custom_value1', value.toString())
               }
             />
@@ -426,7 +427,7 @@ export function Create() {
               field="payment2"
               defaultValue={payment?.custom_value2}
               value={company?.custom_fields?.payment2}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 handleChange('custom_value2', value.toString())
               }
             />
@@ -437,7 +438,7 @@ export function Create() {
               field="payment3"
               defaultValue={payment?.custom_value3}
               value={company?.custom_fields?.payment3}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 handleChange('custom_value3', value.toString())
               }
             />
@@ -448,7 +449,7 @@ export function Create() {
               field="payment4"
               defaultValue={payment?.custom_value4}
               value={company?.custom_fields?.payment4}
-              onChange={(value) =>
+              onValueChange={(value) =>
                 handleChange('custom_value4', value.toString())
               }
             />

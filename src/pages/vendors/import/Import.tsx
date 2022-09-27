@@ -9,7 +9,7 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { UploadImport } from 'components/import/UploadImport';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
@@ -18,7 +18,7 @@ export function Import() {
   const { t } = useTranslation();
   const { documentTitle } = useTitle('import');
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('vendors'), href: '/vendors' },
     { name: t('import'), href: '/vendors/import' },
   ];

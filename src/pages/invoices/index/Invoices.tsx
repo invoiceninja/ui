@@ -15,16 +15,14 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import { useTitle } from 'common/hooks/useTitle';
 import { Invoice } from 'common/interfaces/invoice';
 import { DataTable, DataTableColumns } from 'components/DataTable';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { InvoiceStatus } from '../common/components/InvoiceStatus';
-import { openClientPortal } from '../common/helpers/open-client-portal';
-import { useDownloadPdf } from '../common/hooks/useDownloadPdf';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
+import { useActions } from '../edit/components/Actions';
 
 export function Invoices() {
   useTitle('invoices');
@@ -33,7 +31,6 @@ export function Invoices() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
-  const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const company = useCurrentCompany();
 
   const pages = [{ name: t('invoices'), href: '/invoices' }];
@@ -63,7 +60,7 @@ export function Invoices() {
       id: 'number',
       label: t('number'),
       format: (value, invoice) => (
-        <Link to={generatePath('/invoices/:id/edit', { id: invoice.id })}>
+        <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
           {invoice.number}
         </Link>
       ),
@@ -72,7 +69,7 @@ export function Invoices() {
       id: 'client_id',
       label: t('client'),
       format: (value, invoice) => (
-        <Link to={generatePath('/clients/:id', { id: invoice.client_id })}>
+        <Link to={route('/clients/:id', { id: invoice.client_id })}>
           {invoice.client?.display_name}
         </Link>
       ),
@@ -109,62 +106,7 @@ export function Invoices() {
     },
   ];
 
-  const actions = [
-    (invoice: Invoice) => (
-      <DropdownElement
-        to={generatePath('/invoices/:id/pdf', { id: invoice.id })}
-      >
-        {t('view_pdf')}
-      </DropdownElement>
-    ),
-    (invoice: Invoice) => (
-      <DropdownElement onClick={() => downloadPdf(invoice)}>
-        {t('download')}
-      </DropdownElement>
-    ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        to={generatePath('/invoices/:id/email', { id: invoice.id })}
-      >
-        {t('email_invoice')}
-      </DropdownElement>
-    ),
-    (invoice: Invoice) => (
-      <DropdownElement onClick={() => openClientPortal(invoice)}>
-        {t('client_portal')}
-      </DropdownElement>
-    ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        to={generatePath('/invoices/:id/clone', { id: invoice.id })}
-      >
-        {t('clone_to_invoice')}
-      </DropdownElement>
-    ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        to={generatePath('/invoices/:id/clone/quote', { id: invoice.id })}
-      >
-        {t('clone_to_quote')}
-      </DropdownElement>
-    ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        to={generatePath('/invoices/:id/clone/credit', { id: invoice.id })}
-      >
-        {t('clone_to_credit')}
-      </DropdownElement>
-    ),
-    (invoice: Invoice) => (
-      <DropdownElement
-        to={generatePath('/invoices/:id/clone/recurring_invoice', {
-          id: invoice.id,
-        })}
-      >
-        {t('clone_to_recurring')}
-      </DropdownElement>
-    ),
-  ];
+  const actions = useActions();
 
   return (
     <Default title={t('invoices')} breadcrumbs={pages} docsLink="docs/invoices">

@@ -82,7 +82,7 @@ export function TaskDetails(props: Props) {
             field="task1"
             defaultValue={task.custom_value1 || ''}
             value={company.custom_fields.task1}
-            onChange={(value) => handleChange('custom_value1', value)}
+            onValueChange={(value) => handleChange('custom_value1', value)}
           />
         )}
 
@@ -91,7 +91,7 @@ export function TaskDetails(props: Props) {
             field="task2"
             defaultValue={task.custom_value2 || ''}
             value={company.custom_fields.task2}
-            onChange={(value) => handleChange('custom_value2', value)}
+            onValueChange={(value) => handleChange('custom_value2', value)}
           />
         )}
       </Card>
@@ -128,7 +128,7 @@ export function TaskDetails(props: Props) {
             field="task3"
             defaultValue={task.custom_value3 || ''}
             value={company.custom_fields.task3}
-            onChange={(value) => handleChange('custom_value3', value)}
+            onValueChange={(value) => handleChange('custom_value3', value)}
           />
         )}
 
@@ -137,7 +137,7 @@ export function TaskDetails(props: Props) {
             field="task4"
             defaultValue={task.custom_value4 || ''}
             value={company.custom_fields.task4}
-            onChange={(value) => handleChange('custom_value4', value)}
+            onValueChange={(value) => handleChange('custom_value4', value)}
           />
         )}
       </Card>

@@ -8,24 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { blankInvitation } from 'common/constants/blank-invitation';
+import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useTitle } from 'common/hooks/useTitle';
-import { Credit } from 'common/interfaces/credit';
+import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankCreditQuery } from 'common/queries/credits';
-import {
-  dismissCurrentCredit,
-  injectBlankItemIntoCurrent,
-  toggleCurrentCreditInvitation,
-} from 'common/stores/slices/credits';
-import { deleteCreditLineItem } from 'common/stores/slices/credits/extra-reducers/delete-credit-line-item';
-import { setCurrentCredit } from 'common/stores/slices/credits/extra-reducers/set-current-credit';
-import { setCurrentCreditLineItem } from 'common/stores/slices/credits/extra-reducers/set-current-credit-line-item';
-import { setCurrentLineItemProperty } from 'common/stores/slices/credits/extra-reducers/set-current-line-item-property';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
-import { ValidationAlert } from 'components/ValidationAlert';
+import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
@@ -33,126 +26,158 @@ import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { generatePath } from 'react-router-dom';
+import { creditAtom, invoiceSumAtom } from '../common/atoms';
 import { CreditDetails } from '../common/components/CreditDetails';
 import { CreditFooter } from '../common/components/CreditFooter';
-import { useCurrentCredit } from '../common/hooks/useCurrentCredit';
-import { useHandleCreate } from '../common/hooks/useHandleCreate';
-import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
-import { useSetCurrentCreditProperty } from '../common/hooks/useSetCurrentCreditProperty';
+import { useCreate, useCreditUtilities } from '../common/hooks';
+import { useBlankCreditQuery } from '../common/queries';
 
 export function Create() {
   const { documentTitle } = useTitle('new_credit');
-  const { data: credit } = useBlankCreditQuery();
+  const { t } = useTranslation();
 
-  const [errors, setErrors] = useState<ValidationBag>();
-
-  const [t] = useTranslation();
-  const dispatch = useDispatch();
-  const handleChange = useSetCurrentCreditProperty();
-
-  const handleSave = useHandleCreate(setErrors);
-
-  const currentCredit = useCurrentCredit();
-  const invoiceSum = useInvoiceSum();
-
-  const productColumns = useProductColumns();
-
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
     {
       name: t('new_credit'),
-      href: generatePath('/credits/create'),
+      href: '/credits/create',
     },
   ];
 
+  const [credit, setCredit] = useAtom(creditAtom);
+  const [invoiceSum] = useAtom(invoiceSumAtom);
+
+  const [client, setClient] = useState<Client>();
+  const [errors, setErrors] = useState<ValidationBag>();
+
+  const clientResolver = useClientResolver();
+  const productColumns = useProductColumns();
+
+  const { data } = useBlankCreditQuery({
+    enabled: typeof credit === 'undefined',
+  });
+
+  const {
+    handleChange,
+    handleInvitationChange,
+    handleLineItemChange,
+    handleLineItemPropertyChange,
+    handleCreateLineItem,
+    handleDeleteLineItem,
+    calculateInvoiceSum,
+  } = useCreditUtilities({
+    client,
+  });
+
   useEffect(() => {
-    if (credit?.data.data) {
-      dispatch(setCurrentCredit(credit.data.data));
+    if (typeof data !== 'undefined' && typeof credit === 'undefined') {
+      const _credit = cloneDeep(data);
+
+      if (typeof _credit.line_items === 'string') {
+        _credit.line_items = [];
+      }
+
+      setCredit(_credit);
     }
 
     return () => {
-      dispatch(dismissCurrentCredit());
+      setCredit(undefined);
     };
+  }, [data]);
+
+  useEffect(() => {
+    credit &&
+      credit.client_id.length > 1 &&
+      clientResolver.find(credit.client_id).then((client) => {
+        setClient(client);
+
+        const invitations: Record<string, unknown>[] = [];
+
+        client.contacts.map((contact) => {
+          if (contact.send_email) {
+            const invitation = cloneDeep(blankInvitation);
+
+            invitation.client_contact_id = contact.id;
+            invitations.push(invitation);
+          }
+        });
+
+        handleChange('invitations', invitations);
+      });
+  }, [credit?.client_id]);
+
+  useEffect(() => {
+    // The InvoiceSum takes exact same reference to the `invoice` object
+    // which is the reason we don't have to set a freshly built invoice,
+    // rather just modified version.
+
+    credit && calculateInvoiceSum();
   }, [credit]);
+
+  const save = useCreate({ setErrors });
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onSaveClick={() => handleSave(currentCredit as Credit)}
+      onBackClick="/credits"
+      onSaveClick={() => save(credit!)}
+      disableSaveButton={credit?.client_id.length === 0}
     >
-      {errors && <ValidationAlert errors={errors} />}
-
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector
-          resource={currentCredit}
+          resource={credit}
           onChange={(id) => handleChange('client_id', id)}
           onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={(contactId, value) =>
-            dispatch(
-              toggleCurrentCreditInvitation({ contactId, checked: value })
-            )
-          }
+          onContactCheckboxChange={handleInvitationChange}
+          errorMessage={errors?.errors.client_id}
         />
 
-        <CreditDetails />
+        <CreditDetails handleChange={handleChange} />
 
         <div className="col-span-12">
-          {currentCredit ? (
+          {credit  && client ? (
             <ProductsTable
-              relationType="client_id"
               type="product"
-              columns={productColumns}
-              items={currentCredit.line_items.filter(
+              resource={credit}
+              items={credit.line_items.filter(
                 (item) => item.type_id === InvoiceItemType.Product
               )}
-              resource={currentCredit}
-              onLineItemChange={(index, lineItem) =>
-                dispatch(setCurrentCreditLineItem({ index, lineItem }))
-              }
-              onLineItemPropertyChange={(key, value, index) =>
-                dispatch(
-                  setCurrentLineItemProperty({
-                    position: index,
-                    property: key,
-                    value,
-                  })
-                )
-              }
+              columns={productColumns}
+              relationType="client_id"
+              onLineItemChange={handleLineItemChange}
               onSort={(lineItems) => handleChange('line_items', lineItems)}
-              onDeleteRowClick={(index) =>
-                dispatch(deleteCreditLineItem(index))
-              }
-              onCreateItemClick={() => dispatch(injectBlankItemIntoCurrent())}
+              onLineItemPropertyChange={handleLineItemPropertyChange}
+              onCreateItemClick={handleCreateLineItem}
+              onDeleteRowClick={handleDeleteLineItem}
             />
           ) : (
             <Spinner />
           )}
         </div>
 
-        <CreditFooter page="create" />
+        <CreditFooter handleChange={handleChange} />
 
-        {currentCredit && (
+        {credit && (
           <InvoiceTotals
-          relationType='client_id'
-            resource={currentCredit}
+            relationType="client_id"
+            resource={credit}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
-              handleChange(property as keyof Credit, value)
+              handleChange(property, value as string)
             }
           />
         )}
       </div>
 
       <div className="my-4">
-        {currentCredit && (
+        {credit && (
           <InvoicePreview
             for="create"
-            relationType='client_id'
-            resource={currentCredit}
+            resource={credit}
             entity="credit"
+            relationType="client_id"
+            endpoint="/api/v1/live_preview?entity=:entity"
           />
         )}
       </div>

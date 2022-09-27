@@ -139,7 +139,7 @@ export function Details(props: Props) {
           field="client1"
           defaultValue={props.client?.custom_value1}
           value={company.custom_fields.client1}
-          onChange={(value) => handleCustomFieldChange('custom_value1', value)}
+          onValueChange={(value) => handleCustomFieldChange('custom_value1', value)}
         />
       )}
 
@@ -148,7 +148,7 @@ export function Details(props: Props) {
           field="client2"
           defaultValue={props.client?.custom_value2}
           value={company.custom_fields.client2}
-          onChange={(value) => handleCustomFieldChange('custom_value2', value)}
+          onValueChange={(value) => handleCustomFieldChange('custom_value2', value)}
         />
       )}
 
@@ -157,7 +157,7 @@ export function Details(props: Props) {
           field="client3"
           defaultValue={props.client?.custom_value3}
           value={company.custom_fields.client3}
-          onChange={(value) => handleCustomFieldChange('custom_value3', value)}
+          onValueChange={(value) => handleCustomFieldChange('custom_value3', value)}
         />
       )}
 
@@ -166,7 +166,7 @@ export function Details(props: Props) {
           field="client4"
           defaultValue={props.client?.custom_value4}
           value={company.custom_fields.client4}
-          onChange={(value) => handleCustomFieldChange('custom_value4', value)}
+          onValueChange={(value) => handleCustomFieldChange('custom_value4', value)}
         />
       )}
     </Card>

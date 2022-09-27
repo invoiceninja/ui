@@ -14,7 +14,7 @@ import { Task } from 'common/interfaces/task';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import {
   calculateEntityState,
   isTaskRunning,
@@ -43,7 +43,7 @@ export function Tasks() {
       id: 'number',
       label: t('number'),
       format: (value, task) => (
-        <Link to={generatePath('/tasks/:id/edit', { id: task.id })}>
+        <Link to={route('/tasks/:id/edit', { id: task.id })}>
           {value}
         </Link>
       ),
@@ -53,7 +53,7 @@ export function Tasks() {
       label: t('client'),
       format: (value, task) =>
         task.client && (
-          <Link to={generatePath('/clients/:id', { id: value.toString() })}>
+          <Link to={route('/clients/:id', { id: value.toString() })}>
             {task.client.display_name}
           </Link>
         ),

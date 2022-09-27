@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
-import { useCreditQuery } from 'common/queries/credits';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
@@ -18,15 +18,17 @@ import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useCreditQuery } from '../common/queries';
 
 export function Pdf() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('view_pdf');
   const { id } = useParams();
+
   const { data: credit, isLoading } = useCreditQuery({
-    id,
+    id: id!,
   });
 
   const url = useGeneratePdfUrl({ resourceType: 'credit' });
@@ -35,17 +37,17 @@ export function Pdf() {
   return (
     <Default
       title={documentTitle}
-      onBackClick={generatePath('/credits/:id/edit', { id })}
+      onBackClick={route('/credits/:id/edit', { id })}
       navigationTopRight={
         credit && (
           <Dropdown label={t('more_actions')}>
-            <DropdownElement onClick={() => downloadPdf(credit.data.data)}>
+            <DropdownElement onClick={() => downloadPdf(credit)}>
               {t('download')}
             </DropdownElement>
 
             <DropdownElement
-              to={generatePath('/credits/:id/email', {
-                id: credit.data.data.id,
+              to={route('/credits/:id/email', {
+                id: credit.id,
               })}
             >
               {t('email_credit')}
@@ -56,9 +58,7 @@ export function Pdf() {
     >
       {isLoading && <Spinner />}
 
-      {credit && (
-        <InvoiceViewer link={url(credit.data.data) as string} method="GET" />
-      )}
+      {credit && <InvoiceViewer link={url(credit) as string} method="GET" />}
     </Default>
   );
 }

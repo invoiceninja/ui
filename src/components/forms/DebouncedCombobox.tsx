@@ -80,7 +80,7 @@ export function DebouncedCombobox(props: Props) {
     };
   }, [props.defaultValue]);
 
-  const request = async (query: string, staleTime = 10000) => {
+  const request = async (query: string, staleTime = Infinity) => {
     setIsLoading(true);
 
     const url = new URL(endpoint(props.endpoint));

@@ -9,121 +9,136 @@
  */
 
 import { Card } from '@invoiceninja/cards';
-import { InputField, InputLabel } from '@invoiceninja/forms';
-import MDEditor from '@uiw/react-md-editor';
-import { useCurrentRecurringInvoice } from 'common/hooks/useCurrentRecurringInvoice';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
+import { InputField } from '@invoiceninja/forms';
 import { TabGroup } from 'components/TabGroup';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { useSetCurrentRecurringInvoiceProperty } from '../hooks/useSetCurrentRecurringInvoiceProperty';
-import { InvoiceDocuments } from './InvoiceDocuments';
+import { recurringInvoiceAtom } from '../atoms';
+import { ChangeHandler } from '../hooks';
+import { MarkdownEditor } from 'components/forms/MarkdownEditor';
+import { useLocation, useParams } from 'react-router-dom';
+import { Upload } from 'pages/settings/company/documents/components';
+import { endpoint } from 'common/helpers';
+import { useQueryClient } from 'react-query';
+import { DocumentsTable } from 'components/DocumentsTable';
+import { ProjectSelector } from 'components/projects/ProjectSelector';
+import { UserSelector } from 'components/users/UserSelector';
+import { VendorSelector } from 'components/vendors/VendorSelector';
+import { route } from 'common/helpers/route';
 
 interface Props {
-  page: 'create' | 'edit';
+  handleChange: ChangeHandler;
 }
 
 export function InvoiceFooter(props: Props) {
-  const [t] = useTranslation();
-  const invoice = useCurrentRecurringInvoice();
-  const handleChange = useSetCurrentRecurringInvoiceProperty();
+  const [recurringInvoice] = useAtom(recurringInvoiceAtom);
 
-  const [tabs, setTabs] = useState([
+  const { id } = useParams();
+  const { t } = useTranslation();
+  const { handleChange } = props;
+
+  const location = useLocation();
+  const queryClient = useQueryClient();
+
+  const tabs = [
     t('public_notes'),
     t('private_notes'),
     t('terms'),
     t('footer'),
     t('documents'),
     t('settings'),
-  ]);
+  ];
 
-  useEffect(() => {
-    if (props.page === 'create') {
-      setTabs((current) => current.filter((tab) => tab !== t('documents')));
-    }
-  }, []);
+  const onSuccess = () => {
+    queryClient.invalidateQueries(
+      route('/api/v1/recurring_invoices/:id', { id })
+    );
+  };
 
   return (
     <Card className="col-span-12 xl:col-span-8 h-max px-6">
       <TabGroup tabs={tabs}>
         <div>
-          <MDEditor
-            value={invoice?.public_notes || ''}
+          <MarkdownEditor
+            value={recurringInvoice?.public_notes}
             onChange={(value) => handleChange('public_notes', value)}
           />
         </div>
 
         <div>
-          <MDEditor
-            value={invoice?.private_notes || ''}
+          <MarkdownEditor
+            value={recurringInvoice?.private_notes}
             onChange={(value) => handleChange('private_notes', value)}
           />
         </div>
 
         <div>
-          <MDEditor
-            value={invoice?.terms || ''}
+          <MarkdownEditor
+            value={recurringInvoice?.terms}
             onChange={(value) => handleChange('terms', value)}
           />
         </div>
 
         <div>
-          <MDEditor
-            value={invoice?.footer || ''}
+          <MarkdownEditor
+            value={recurringInvoice?.footer}
             onChange={(value) => handleChange('footer', value)}
           />
         </div>
 
-        {props.page === 'edit' ? (
-          <div>
-            <InvoiceDocuments />
-          </div>
+        {location.pathname.endsWith('/create') ? (
+          <div className="text-sm">{t('save_to_upload_documents')}.</div>
         ) : (
-          <></>
+          <div>
+            <Upload
+              widgetOnly
+              endpoint={endpoint('/api/v1/recurring_invoices/:id/upload', {
+                id,
+              })}
+              onSuccess={onSuccess}
+            />
+
+            <DocumentsTable
+              documents={recurringInvoice?.documents || []}
+              onDocumentDelete={onSuccess}
+            />
+          </div>
         )}
 
         <div>
           <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
-                <InputLabel>{t('project')}</InputLabel>
-                <DebouncedCombobox
-                  endpoint="/api/v1/projects"
-                  label="name"
-                  onChange={(value) => handleChange('project_id', value.value)}
-                  defaultValue={invoice?.project_id}
+                <ProjectSelector
+                  inputLabel={t('project')}
+                  value={recurringInvoice?.project_id}
+                  onChange={(project) => handleChange('project_id', project.id)}
                 />
               </div>
 
               <InputField
                 label={t('exchange_rate')}
-                value={invoice?.exchange_rate || '1.00'}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  handleChange('exchange_rate', parseFloat(event.target.value))
+                value={recurringInvoice?.exchange_rate || '1.00'}
+                onValueChange={(value) =>
+                  handleChange('exchange_rate', parseFloat(value))
                 }
               />
             </div>
 
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <div className="space-y-2">
-                <InputLabel>{t('user')}</InputLabel>
-                <DebouncedCombobox
-                  endpoint="/api/v1/users"
-                  label="first_name"
-                  onChange={(value) =>
-                    handleChange('assigned_user_id', value.value)
-                  }
-                  defaultValue={invoice?.assigned_user_id}
+                <UserSelector
+                  inputLabel={t('user')}
+                  value={recurringInvoice?.assigned_user_id}
+                  onChange={(user) => handleChange('assigned_user_id', user.id)}
                 />
               </div>
 
               <div className="space-y-2">
-                <InputLabel>{t('vendor')}</InputLabel>
-                <DebouncedCombobox
-                  endpoint="/api/v1/vendors"
-                  label="name"
-                  onChange={(value) => handleChange('vendor_id', value.value)}
-                  defaultValue={invoice?.vendor_id}
+                <VendorSelector
+                  inputLabel={t('vendor')}
+                  value={recurringInvoice?.vendor_id}
+                  onChange={(vendor) => handleChange('vendor_id', vendor.id)}
                 />
               </div>
             </div>

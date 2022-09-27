@@ -9,11 +9,12 @@
  */
 
 import { endpoint } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { usePaymentQuery } from 'common/queries/payments';
 import { DocumentsTable } from 'components/DocumentsTable';
 import { Upload } from 'pages/settings/company/documents/components';
 import { useQueryClient } from 'react-query';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function Documents() {
   const { id } = useParams();
@@ -23,7 +24,7 @@ export function Documents() {
 
   const invalidateQuery = () => {
     queryClient.invalidateQueries(
-      generatePath('/api/v1/payments/:id?include=client,invoices', { id })
+      route('/api/v1/payments/:id?include=client,invoices', { id })
     );
   };
 

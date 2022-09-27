@@ -12,11 +12,11 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { Expense } from 'common/interfaces/expense';
 import { useQuery } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useBlankExpenseQuery() {
   return useQuery<Expense>(
-    generatePath('/api/v1/expenses/create'),
+    route('/api/v1/expenses/create'),
     () =>
       request('GET', endpoint('/api/v1/expenses/create')).then(
         (response) => response.data.data
@@ -27,7 +27,7 @@ export function useBlankExpenseQuery() {
 
 export function useExpenseQuery(params: { id: string | undefined }) {
   return useQuery<Expense>(
-    generatePath('/api/v1/expenses/:id', { id: params.id }),
+    route('/api/v1/expenses/:id', { id: params.id }),
     () =>
       request('GET', endpoint('/api/v1/expenses/:id', { id: params.id })).then(
         (response) => response.data.data

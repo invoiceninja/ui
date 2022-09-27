@@ -29,7 +29,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function ApiTokens() {
   const [t] = useTranslation();
@@ -100,7 +100,7 @@ export function ApiTokens() {
                   <Tr key={token.id}>
                     <Td>
                       <Link
-                        to={generatePath(
+                        to={route(
                           '/settings/integrations/api_tokens/:id/edit',
                           { id: token.id }
                         )}
@@ -111,7 +111,7 @@ export function ApiTokens() {
                     <Td>
                       <Dropdown label={t('actions')}>
                         <DropdownElement
-                          to={generatePath(
+                          to={route(
                             '/settings/integrations/api_tokens/:id/edit',
                             { id: token.id }
                           )}

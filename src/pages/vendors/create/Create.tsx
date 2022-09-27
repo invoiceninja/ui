@@ -11,18 +11,19 @@
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Vendor } from 'common/interfaces/vendor';
 import { useBlankVendorQuery } from 'common/queries/vendor';
 import { updateRecord } from 'common/stores/slices/company-users';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Form } from '../edit/components/Form';
 
 export function Create() {
@@ -38,7 +39,7 @@ export function Create() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('vendors'), href: '/vendors' },
     {
       name: t('create_vendor'),
@@ -91,11 +92,9 @@ export function Create() {
           updateRecord({ object: 'company', data: response[1].data.data })
         );
 
-        console.log(response);
+        console.error(response);
 
-        navigate(
-          generatePath('/vendors/:id', { id: response[0].data.data.id })
-        );
+        navigate(route('/vendors/:id', { id: response[0].data.data.id }));
       })
       .catch((error) => {
         console.error(error);

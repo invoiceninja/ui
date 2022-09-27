@@ -11,13 +11,13 @@
 import { Button } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { useClientQuery } from 'common/queries/clients';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { Tabs } from 'components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, Outlet, useParams } from 'react-router-dom';
+import { Outlet, useParams } from 'react-router-dom';
 import { Tab } from 'components/Tabs';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
@@ -27,6 +27,7 @@ import { PasswordConfirmation } from 'components/PasswordConfirmation';
 
 import { CustomResourcefulActions } from '../common/components/CustomResourcefulActions';
 import { usePurgeClient } from '../common/hooks/usePurgeClient';
+import { route } from 'common/helpers/route';
 
 export function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -41,46 +42,46 @@ export function Client() {
     setDocumentTitle(client?.data?.data?.display_name || 'view_client');
   }, [client]);
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
     {
       name: documentTitle,
-      href: generatePath('/clients/:id', { id }),
+      href: route('/clients/:id', { id }),
     },
   ];
 
   const onSave = usePurgeClient(id);
 
   const tabs: Tab[] = [
-    { name: t('invoices'), href: generatePath('/clients/:id', { id }) },
-    { name: t('quotes'), href: generatePath('/clients/:id/quotes', { id }) },
+    { name: t('invoices'), href: route('/clients/:id', { id }) },
+    { name: t('quotes'), href: route('/clients/:id/quotes', { id }) },
     {
       name: t('payments'),
-      href: generatePath('/clients/:id/payments', { id }),
+      href: route('/clients/:id/payments', { id }),
     },
     {
       name: t('recurring_invoices'),
-      href: generatePath('/clients/:id/recurring_invoices', { id }),
+      href: route('/clients/:id/recurring_invoices', { id }),
     },
     {
       name: t('credits'),
-      href: generatePath('/clients/:id/credits', { id }),
+      href: route('/clients/:id/credits', { id }),
     },
     {
       name: t('projects'),
-      href: generatePath('/clients/:id/projects', { id }),
+      href: route('/clients/:id/projects', { id }),
     },
     {
       name: t('tasks'),
-      href: generatePath('/clients/:id/tasks', { id }),
+      href: route('/clients/:id/tasks', { id }),
     },
     {
       name: t('expenses'),
-      href: generatePath('/clients/:id/expenses', { id }),
+      href: route('/clients/:id/expenses', { id }),
     },
     {
       name: t('recurring_expenses'),
-      href: generatePath('/clients/:id/recurring_expenses', { id }),
+      href: route('/clients/:id/recurring_expenses', { id }),
     },
   ];
 
@@ -90,7 +91,7 @@ export function Client() {
       breadcrumbs={pages}
       topRight={
         <div className="inline-flex items-center space-x-2">
-          <Button to={generatePath('/clients/:id/edit', { id })}>
+          <Button to={route('/clients/:id/edit', { id })}>
             {t('edit_client')}
           </Button>
           <CustomResourcefulActions

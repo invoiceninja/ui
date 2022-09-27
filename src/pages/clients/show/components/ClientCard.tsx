@@ -8,10 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { Client } from 'common/interfaces/client';
 import { InfoCard } from 'components/InfoCard';
 import { useTranslation } from 'react-i18next';
-import { Link, generatePath } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 interface Props {
   client: Client;
@@ -27,7 +28,7 @@ export function ClientCard(props: Props) {
           <InfoCard
             title={t('client')}
             value={
-              <Link to={generatePath('/clients/:id', { id: props.client.id })}>
+              <Link to={route('/clients/:id', { id: props.client.id })}>
                 {props.client.display_name}
               </Link>
             }

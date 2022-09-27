@@ -12,17 +12,21 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CustomField } from 'components/CustomField';
+import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
-import { useCurrentQuote } from '../hooks/useCurrentQuote';
-import { useSetCurrentQuoteProperty } from '../hooks/useSetCurrentQuoteProperty';
+import { quoteAtom } from '../atoms';
+import { ChangeHandler } from '../hooks';
 
-export function QuoteDetails() {
-  const [t] = useTranslation();
+interface Props {
+  handleChange: ChangeHandler;
+}
 
-  const quote = useCurrentQuote();
+export function QuoteDetails(props: Props) {
+  const { t } = useTranslation();
+  const { handleChange } = props;
+
+  const [quote] = useAtom(quoteAtom);
   const company = useCurrentCompany();
-
-  const handleChange = useSetCurrentQuoteProperty();
 
   return (
     <>
@@ -47,7 +51,9 @@ export function QuoteDetails() {
           <InputField
             id="partial"
             type="number"
-            onValueChange={(value) => handleChange('partial', value)}
+            onValueChange={(value) =>
+              handleChange('partial', parseFloat(value))
+            }
             value={quote?.partial || ''}
           />
         </Element>
@@ -67,7 +73,7 @@ export function QuoteDetails() {
             field="quote1"
             defaultValue={quote?.custom_value1 || ''}
             value={company.custom_fields.quote1}
-            onChange={(value) => handleChange('custom_value1', value)}
+            onValueChange={(value) => handleChange('custom_value1', String(value))}
           />
         )}
 
@@ -76,7 +82,7 @@ export function QuoteDetails() {
             field="quote2"
             defaultValue={quote?.custom_value2 || ''}
             value={company.custom_fields.quote2}
-            onChange={(value) => handleChange('custom_value2', value)}
+            onValueChange={(value) => handleChange('custom_value2', String(value))}
           />
         )}
       </Card>
@@ -113,7 +119,7 @@ export function QuoteDetails() {
             <div className="w-full lg:w-1/2">
               <SelectField
                 onValueChange={(value) =>
-                  handleChange('is_amount_discount', value)
+                  handleChange('is_amount_discount', JSON.parse(value))
                 }
                 value={quote?.is_amount_discount.toString()}
               >
@@ -129,7 +135,7 @@ export function QuoteDetails() {
             field="quote3"
             defaultValue={quote?.custom_value3 || ''}
             value={company.custom_fields.quote3}
-            onChange={(value) => handleChange('custom_value3', value)}
+            onValueChange={(value) => handleChange('custom_value3', String(value))}
           />
         )}
 
@@ -138,7 +144,7 @@ export function QuoteDetails() {
             field="quote4"
             defaultValue={quote?.custom_value4 || ''}
             value={company.custom_fields.quote4}
-            onChange={(value) => handleChange('custom_value4', value)}
+            onValueChange={(value) => handleChange('custom_value4', String(value))}
           />
         )}
       </Card>

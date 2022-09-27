@@ -11,17 +11,21 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
+import { Invoice } from 'common/interfaces/invoice';
 import { CustomField } from 'components/CustomField';
-import { ChangeEvent } from 'react';
+import { ChangeHandler } from 'pages/invoices/create/Create';
 import { useTranslation } from 'react-i18next';
-import { useSetCurrentInvoiceProperty } from '../hooks/useSetCurrentInvoiceProperty';
 
-export function InvoiceDetails() {
-  const [t] = useTranslation();
-  const invoice = useCurrentInvoice();
+interface Props {
+  invoice?: Invoice;
+  handleChange: ChangeHandler;
+}
+
+export function InvoiceDetails(props: Props) {
+  const { t } = useTranslation();
+  const { invoice, handleChange } = props;
+
   const company = useCurrentCompany();
-  const handleChange = useSetCurrentInvoiceProperty();
 
   return (
     <>
@@ -29,9 +33,7 @@ export function InvoiceDetails() {
         <Element leftSide={t('invoice_date')}>
           <InputField
             type="date"
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              handleChange('date', event.target.value)
-            }
+            onValueChange={(value) => handleChange('date', value)}
             value={invoice?.date || ''}
           />
         </Element>
@@ -39,9 +41,7 @@ export function InvoiceDetails() {
         <Element leftSide={t('due_date')}>
           <InputField
             type="date"
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              handleChange('due_date', event.target.value)
-            }
+            onValueChange={(value) => handleChange('due_date', value)}
             value={invoice?.due_date || ''}
           />
         </Element>
@@ -50,8 +50,8 @@ export function InvoiceDetails() {
           <InputField
             id="partial"
             type="number"
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              handleChange('partial', parseFloat(event.target.value))
+            onValueChange={(value) =>
+              handleChange('partial', parseFloat(value) || 0)
             }
             value={invoice?.partial || ''}
           />
@@ -61,9 +61,7 @@ export function InvoiceDetails() {
           <Element leftSide={t('partial_due_date')}>
             <InputField
               type="date"
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                handleChange('partial_due_date', event.target.value)
-              }
+              onValueChange={(value) => handleChange('partial_due_date', value)}
               value={invoice?.partial_due_date || ''}
             />
           </Element>
@@ -74,7 +72,9 @@ export function InvoiceDetails() {
             field="invoice1"
             defaultValue={invoice?.custom_value1 || ''}
             value={company.custom_fields.invoice1}
-            onChange={(value) => handleChange('custom_value1', value)}
+            onValueChange={(value) =>
+              handleChange('custom_value1', value.toString())
+            }
           />
         )}
 
@@ -83,7 +83,9 @@ export function InvoiceDetails() {
             field="invoice2"
             defaultValue={invoice?.custom_value2 || ''}
             value={company.custom_fields.invoice2}
-            onChange={(value) => handleChange('custom_value2', value)}
+            onValueChange={(value) =>
+              handleChange('custom_value2', value.toString())
+            }
           />
         )}
       </Card>
@@ -92,9 +94,7 @@ export function InvoiceDetails() {
         <Element leftSide={t('invoice_number_short')}>
           <InputField
             id="number"
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              handleChange('number', event.target.value)
-            }
+            onValueChange={(value) => handleChange('number', value)}
             value={invoice?.number || ''}
           />
         </Element>
@@ -102,9 +102,7 @@ export function InvoiceDetails() {
         <Element leftSide={t('po_number_short')}>
           <InputField
             id="po_number"
-            onChange={(event: ChangeEvent<HTMLInputElement>) =>
-              handleChange('po_number', event.target.value)
-            }
+            onValueChange={(value) => handleChange('po_number', value)}
             value={invoice?.po_number || ''}
           />
         </Element>
@@ -114,8 +112,8 @@ export function InvoiceDetails() {
             <div className="w-full lg:w-1/2">
               <InputField
                 type="number"
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  handleChange('discount', parseFloat(event.target.value))
+                onValueChange={(value) =>
+                  handleChange('discount', parseFloat(value) || 0)
                 }
                 value={invoice?.discount || ''}
               />
@@ -123,11 +121,8 @@ export function InvoiceDetails() {
 
             <div className="w-full lg:w-1/2">
               <SelectField
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  handleChange(
-                    'is_amount_discount',
-                    JSON.parse(event.target.value)
-                  )
+                onValueChange={(value) =>
+                  handleChange('is_amount_discount', JSON.parse(value))
                 }
                 value={invoice?.is_amount_discount.toString()}
               >
@@ -143,7 +138,9 @@ export function InvoiceDetails() {
             field="invoice3"
             defaultValue={invoice?.custom_value3 || ''}
             value={company.custom_fields.invoice3}
-            onChange={(value) => handleChange('custom_value3', value)}
+            onValueChange={(value) =>
+              handleChange('custom_value3', value.toString())
+            }
           />
         )}
 
@@ -152,7 +149,9 @@ export function InvoiceDetails() {
             field="invoice4"
             defaultValue={invoice?.custom_value4 || ''}
             value={company.custom_fields.invoice4}
-            onChange={(value) => handleChange('custom_value4', value)}
+            onValueChange={(value) =>
+              handleChange('custom_value4', value.toString())
+            }
           />
         )}
       </Card>

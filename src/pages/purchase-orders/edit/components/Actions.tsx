@@ -11,6 +11,7 @@
 import { PurchaseOrderStatus } from 'common/enums/purchase-order-status';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Dropdown } from 'components/dropdown/Dropdown';
@@ -20,7 +21,7 @@ import { openClientPortal } from 'pages/invoices/common/helpers/open-client-port
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export type Action = (po: PurchaseOrder) => {
   label: string;
@@ -37,7 +38,7 @@ export function useActions() {
 
   const invalidateCache = (id: string) => {
     queryClient.invalidateQueries(
-      generatePath('/api/v1/purchase_orders/:id', {
+      route('/api/v1/purchase_orders/:id', {
         id,
       })
     );
@@ -57,12 +58,12 @@ export function useActions() {
       (po) => ({
         label: t('send_email'),
         onClick: () =>
-          navigate(generatePath('/purchase_orders/:id/email', { id: po.id })),
+          navigate(route('/purchase_orders/:id/email', { id: po.id })),
       }),
       (po) => ({
         label: t('view_pdf'),
         onClick: () =>
-          navigate(generatePath('/purchase_orders/:id/pdf', { id: po.id })),
+          navigate(route('/purchase_orders/:id/pdf', { id: po.id })),
       }),
       (po) => ({
         label: t('download'),
@@ -106,13 +107,13 @@ export function useActions() {
       (po) => ({
         label: `${t('view')} ${t('expense')}`,
         onClick: () =>
-          navigate(generatePath('/expenses/:id/edit', { id: po.expense_id })),
+          navigate(route('/expenses/:id/edit', { id: po.expense_id })),
         hideIf: po.expense_id.length <= 0,
       }),
       (po) => ({
         label: t('clone_to_purchase_order'),
         onClick: () =>
-          navigate(generatePath('/purchase_orders/:id/clone', { id: po.id })),
+          navigate(route('/purchase_orders/:id/clone', { id: po.id })),
       }),
       (po) => ({
         label: t('vendor_portal'),

@@ -20,7 +20,7 @@ import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function Projects() {
   useTitle('projects');
@@ -39,7 +39,7 @@ export function Projects() {
       id: 'name',
       label: t('name'),
       format: (value, project) => (
-        <Link to={generatePath('/projects/:id/edit', { id: project.id })}>
+        <Link to={route('/projects/:id/edit', { id: project.id })}>
           {value}
         </Link>
       ),
@@ -90,7 +90,7 @@ export function Projects() {
   const actions = [
     (project: Project) => (
       <DropdownElement
-        to={generatePath('/projects/:id/clone', { id: project.id })}
+        to={route('/projects/:id/clone', { id: project.id })}
       >
         {t('clone')}
       </DropdownElement>

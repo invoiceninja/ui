@@ -13,6 +13,7 @@ import { InputField, InputLabel } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
@@ -21,7 +22,7 @@ import { useFormik } from 'formik';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export function Create() {
   const [t] = useTranslation();
@@ -55,7 +56,7 @@ export function Create() {
           toast.success(t('created_expense_category'));
 
           navigate(
-            generatePath('/settings/expense_categories/:id/edit', {
+            route('/settings/expense_categories/:id/edit', {
               id: response.data.data.id,
             })
           );

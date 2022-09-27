@@ -13,7 +13,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useBulkAction() {
   const queryClient = useQueryClient();
@@ -27,7 +27,7 @@ export function useBulkAction() {
     })
       .then(() => toast.success(`${action}d_task`))
       .catch((error: AxiosError) => {
-        console.log(error);
+        console.error(error);
         console.error(error.response?.data);
 
         toast.error();
@@ -36,7 +36,7 @@ export function useBulkAction() {
         queryClient.invalidateQueries('/api/v1/tasks');
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/tasks/:id', { id })
+          route('/api/v1/tasks/:id', { id })
         );
       });
   };

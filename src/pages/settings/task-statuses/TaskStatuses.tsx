@@ -12,7 +12,7 @@ import { Link } from '@invoiceninja/forms';
 import { TaskStatus } from 'common/interfaces/task-status';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function TaskStatuses() {
   const [t] = useTranslation();
@@ -23,7 +23,7 @@ export function TaskStatuses() {
       label: t('name'),
       format: (value, taskStatus) => (
         <Link
-          to={generatePath('/settings/task_statuses/:id/edit', {
+          to={route('/settings/task_statuses/:id/edit', {
             id: taskStatus.id,
           })}
         >

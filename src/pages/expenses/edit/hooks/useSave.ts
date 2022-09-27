@@ -15,7 +15,7 @@ import { toast } from 'common/helpers/toast/toast';
 import { Expense } from 'common/interfaces/expense';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 interface Props {
   setErrors: (errors: ValidationBag | undefined) => unknown;
@@ -45,7 +45,7 @@ export function useSave(props: Props) {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/expenses/:id', { id: expense.id })
+          route('/api/v1/expenses/:id', { id: expense.id })
         )
       );
   };

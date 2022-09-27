@@ -9,7 +9,7 @@
  */
 
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { blankLineItem } from 'common/stores/slices/invoices/constants/blank-line-item';
+import { blankLineItem } from 'common/constants/blank-line-item';
 import { cloneDeep } from 'lodash';
 
 export function useHandleCreateLineItem(

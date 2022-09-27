@@ -7,9 +7,11 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
@@ -17,7 +19,7 @@ import { ClientContact } from 'common/interfaces/client-contact';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useClientQuery } from 'common/queries/clients';
 import { updateRecord } from 'common/stores/slices/company-users';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { Spinner } from 'components/Spinner';
@@ -28,7 +30,7 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { CustomResourcefulActions } from '../common/components/CustomResourcefulActions';
 import { usePurgeClient } from '../common/hooks/usePurgeClient';
 import { AdditionalInfo } from './components/AdditionalInfo';
@@ -76,15 +78,15 @@ export function Edit() {
     setClient((client) => set(client as Client, 'contacts', contacts));
   }, [contacts]);
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
     {
       name: documentTitle,
-      href: generatePath('/clients/:id', { id }),
+      href: route('/clients/:id', { id }),
     },
     {
       name: t('edit'),
-      href: generatePath('/clients/:id', { id }),
+      href: route('/clients/:id', { id }),
     },
   ];
 
@@ -111,10 +113,10 @@ export function Edit() {
         toast.success(t('updated_client'), { id: toastId });
 
         queryClient.invalidateQueries(
-          generatePath('/api/v1/clients/:id', { id })
+          route('/api/v1/clients/:id', { id })
         );
 
-        navigate(generatePath('/clients/:id', { id }));
+        navigate(route('/clients/:id', { id }));
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -129,7 +131,7 @@ export function Edit() {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/clients/:id', { id })
+          route('/api/v1/clients/:id', { id })
         )
       );
   };
@@ -144,7 +146,7 @@ export function Edit() {
           openPurgeModal={setPasswordConfirmModalOpen}
         />
       }
-      onBackClick={generatePath('/clients/:id', { id })}
+      onBackClick={route('/clients/:id', { id })}
       onSaveClick={onSave}
     >
       {isLoading && <Spinner />}

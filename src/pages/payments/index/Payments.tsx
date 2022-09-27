@@ -15,14 +15,14 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Payment } from 'common/interfaces/payment';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { PaymentStatus } from '../common/components/PaymentStatus';
 import { useEmailPayment } from '../common/hooks/useEmailPayment';
 
@@ -37,7 +37,7 @@ export function Payments() {
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const pages: BreadcrumRecord[] = [{ name: t('payments'), href: '/payments' }];
+  const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
 
   const columns: DataTableColumns<Payment> = [
     {
@@ -50,7 +50,7 @@ export function Payments() {
       label: t('number'),
       format: (value, payment) => {
         return (
-          <Link to={generatePath('/payments/:id/edit', { id: payment.id })}>
+          <Link to={route('/payments/:id/edit', { id: payment.id })}>
             {payment.number}
           </Link>
         );
@@ -60,7 +60,7 @@ export function Payments() {
       id: 'client_id',
       label: t('client'),
       format: (value, payment) => (
-        <Link to={generatePath('/clients/:id', { id: payment.client_id })}>
+        <Link to={route('/clients/:id', { id: payment.client_id })}>
           {payment.client?.display_name}
         </Link>
       ),
@@ -103,7 +103,7 @@ export function Payments() {
       resource.amount - resource.applied > 0 &&
       !resource.is_deleted && (
         <DropdownElement
-          to={generatePath('/payments/:id/apply', { id: resource.id })}
+          to={route('/payments/:id/apply', { id: resource.id })}
         >
           {t('apply_payment')}
         </DropdownElement>
@@ -112,7 +112,7 @@ export function Payments() {
       resource.amount !== resource.refunded &&
       !resource.is_deleted && (
         <DropdownElement
-          to={generatePath('/payments/:id/refund', { id: resource.id })}
+          to={route('/payments/:id/refund', { id: resource.id })}
         >
           {t('refund_payment')}
         </DropdownElement>

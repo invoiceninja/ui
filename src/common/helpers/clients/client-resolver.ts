@@ -13,9 +13,9 @@ import { Client } from 'common/interfaces/client';
 import { request } from '../request';
 
 export class ClientResolver {
-  protected declare client: Client;
+  declare client: Client;
 
-  public find(id: string): Promise<Client> {
+  find(id: string): Promise<Client> {
     return new Promise((resolve, reject) => {
       if (id === this.client?.id) {
         return resolve(this.client);
@@ -28,5 +28,11 @@ export class ClientResolver {
         })
         .catch((error) => reject(error));
     });
+  }
+
+  cache(client: Client): ClientResolver {
+    this.client = client;
+
+    return this;
   }
 }

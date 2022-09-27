@@ -10,10 +10,11 @@
 
 import { Link } from '@invoiceninja/forms';
 import quoteStatus from 'common/constants/quote-status';
+import { route } from 'common/helpers/route';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 export function Quotes() {
   const [t] = useTranslation();
@@ -24,7 +25,7 @@ export function Quotes() {
       id: 'number',
       label: t('quote_number'),
       format: (value, resource) => (
-        <Link to={generatePath('/quotes/:id/edit', { id: resource.id })}>
+        <Link to={route('/quotes/:id/edit', { id: resource.id })}>
           {value}
         </Link>
       ),
@@ -46,7 +47,7 @@ export function Quotes() {
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/quotes/bulk"
-      linkToCreate={generatePath('/quotes/create?client=:id', { id: id })}
+      linkToCreate={route('/quotes/create?client=:id', { id: id })}
     />
   );
 }

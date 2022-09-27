@@ -8,164 +8,162 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { blankInvitation } from 'common/constants/blank-invitation';
+import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
+import { Client } from 'common/interfaces/client';
+import { Invoice } from 'common/interfaces/invoice';
+import { InvoiceItemType } from 'common/interfaces/invoice-item';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankInvoiceQuery } from 'common/queries/invoices';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { Spinner } from 'components/Spinner';
+import { TabGroup } from 'components/TabGroup';
+import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
-import { generatePath, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
+import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
-import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
-import { ProductsTable } from '../common/components/ProductsTable';
-import { InvoiceTotals } from '../common/components/InvoiceTotals';
-import { setCurrentInvoice } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice';
+import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { InvoicePreview } from '../common/components/InvoicePreview';
-import { useHandleCreate } from './hooks/useHandleCreate';
-import { useCurrentInvoice } from 'common/hooks/useCurrentInvoice';
-import { Invoice } from 'common/interfaces/invoice';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { ValidationAlert } from 'components/ValidationAlert';
-import { useSetCurrentInvoiceProperty } from '../common/hooks/useSetCurrentInvoiceProperty';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useClientResolver } from 'common/hooks/clients/useClientResolver';
-import { cloneDeep } from 'lodash';
-import { blankInvitation } from 'common/stores/slices/invoices/constants/blank-invitation';
-import {
-  dismissCurrentInvoice,
-  injectBlankItemIntoCurrent,
-  setCurrentInvoicePropertySync,
-  toggleCurrentInvoiceInvitation,
-} from 'common/stores/slices/invoices';
-import { setCurrentInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/set-current-invoice-line-item';
-import { setCurrentLineItemProperty } from 'common/stores/slices/invoices/extra-reducers/set-current-line-item-property';
-import { deleteInvoiceLineItem } from 'common/stores/slices/invoices/extra-reducers/delete-invoice-item';
-import { useInvoiceSum } from '../common/hooks/useInvoiceSum';
+import { InvoiceTotals } from '../common/components/InvoiceTotals';
+import { ProductsTable } from '../common/components/ProductsTable';
 import { useProductColumns } from '../common/hooks/useProductColumns';
 import { useTaskColumns } from '../common/hooks/useTaskColumns';
-import { TabGroup } from 'components/TabGroup';
-import { InvoiceItemType } from 'common/interfaces/invoice-item';
-import { Spinner } from 'components/Spinner';
+import { useHandleCreate } from './hooks/useHandleCreate';
+import { useInvoiceUtilities } from './hooks/useInvoiceUtilities';
+
+export type ChangeHandler = <T extends keyof Invoice>(
+  property: T,
+  value: Invoice[typeof property]
+) => void;
 
 export function Create() {
+  const { t } = useTranslation();
   const { documentTitle } = useTitle('new_invoice');
-  const { data: invoice } = useBlankInvoiceQuery();
 
-  const [t] = useTranslation();
-  const [hasClientSet, setHasClientSet] = useState(false);
-  const [searchParams] = useSearchParams();
-  const [errors, setErrors] = useState<ValidationBag>();
+  const [invoice, setInvoice] = useAtom(invoiceAtom);
 
-  const dispatch = useDispatch();
+  const { data } = useBlankInvoiceQuery({
+    enabled: typeof invoice === 'undefined',
+  });
 
-  const handleCreate = useHandleCreate(setErrors);
-  const handleChange = useSetCurrentInvoiceProperty();
-
-  const currentInvoice = useCurrentInvoice();
-  const company = useCurrentCompany();
   const clientResolver = useClientResolver();
-  const invoiceSum = useInvoiceSum();
+  const company = useCurrentCompany();
 
   const productColumns = useProductColumns();
   const taskColumns = useTaskColumns();
 
-  const pages: BreadcrumRecord[] = [
+  const [invoiceSum] = useAtom(invoiceSumAtom);
+
+  const [searchParams] = useSearchParams();
+  const [errors, setErrors] = useState<ValidationBag>();
+  const [client, setClient] = useState<Client | undefined>();
+
+  const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
     {
       name: t('new_invoice'),
-      href: generatePath('/invoices/create'),
+      href: '/invoices/create',
     },
   ];
 
-  useEffect(() => {
-    const preload = searchParams.has('preload')
-      ? searchParams.get('preload') === 'true'
-      : false;
+  const {
+    handleChange,
+    calculateInvoiceSum,
+    handleInvitationChange,
+    handleLineItemChange,
+    handleLineItemPropertyChange,
+    handleCreateLineItem,
+    handleDeleteLineItem,
+  } = useInvoiceUtilities({ client });
 
-    if (invoice?.data.data && !preload) {
-      dispatch(setCurrentInvoice(invoice.data.data));
+  const save = useHandleCreate(setErrors);
+
+  useEffect(() => {
+    if (typeof data !== 'undefined' && typeof invoice === 'undefined') {
+      const _invoice = cloneDeep(data);
 
       if (company && company.enabled_tax_rates > 0) {
-        handleChange('tax_name1', company.settings?.tax_name1);
-        handleChange('tax_rate1', company.settings?.tax_rate1);
+        _invoice.tax_name1 = company.settings.tax_name1;
+        _invoice.tax_rate1 = company.settings.tax_rate1;
       }
 
       if (company && company.enabled_tax_rates > 1) {
-        handleChange('tax_name2', company.settings?.tax_name2);
-        handleChange('tax_rate2', company.settings?.tax_rate2);
+        _invoice.tax_name2 = company.settings.tax_name2;
+        _invoice.tax_rate2 = company.settings.tax_rate2;
       }
 
       if (company && company.enabled_tax_rates > 2) {
-        handleChange('tax_name3', company.settings?.tax_name3);
-        handleChange('tax_rate3', company.settings?.tax_rate3);
+        _invoice.tax_name3 = company.settings.tax_name3;
+        _invoice.tax_rate3 = company.settings.tax_rate3;
       }
+
+      if (typeof _invoice.line_items === 'string') {
+        _invoice.line_items = [];
+      }
+
+      setInvoice(_invoice);
     }
 
     return () => {
-      dispatch(dismissCurrentInvoice());
+      setInvoice(undefined);
     };
+  }, [data]);
+
+  useEffect(() => {
+    invoice &&
+      invoice.client_id.length > 1 &&
+      clientResolver.find(invoice.client_id).then((client) => {
+        setClient(client);
+
+        const invitations: Record<string, unknown>[] = [];
+
+        client.contacts.map((contact) => {
+          if (contact.send_email) {
+            const invitation = cloneDeep(blankInvitation);
+
+            invitation.client_contact_id = contact.id;
+            invitations.push(invitation);
+          }
+        });
+
+        handleChange('invitations', invitations);
+      });
+  }, [invoice?.client_id]);
+
+  useEffect(() => {
+    // The InvoiceSum takes exact same reference to the `invoice` object
+    // which is the reason we don't have to set a freshly built invoice,
+    // rather just modified version.
+
+    invoice && calculateInvoiceSum();
   }, [invoice]);
-
-  useEffect(() => {
-    if (currentInvoice?.client_id) {
-      clientResolver
-        .find(currentInvoice.client_id)
-        .then((client) => {
-          const invitations: Record<string, unknown>[] = [];
-
-          client.contacts.map((contact) => {
-            if (contact.send_email) {
-              const invitation = cloneDeep(blankInvitation);
-
-              invitation.client_contact_id = contact.id;
-              invitations.push(invitation);
-            }
-          });
-
-          dispatch(
-            setCurrentInvoicePropertySync({
-              property: 'invitations',
-              value: invitations,
-            })
-          );
-        })
-        .catch((error) => console.error(error));
-    }
-  }, [currentInvoice?.client_id]);
-
-  useEffect(() => {
-    if (searchParams.has('client') && !hasClientSet && currentInvoice) {
-      handleChange('client_id', searchParams.get('client'));
-      setHasClientSet(true);
-    }
-  }, [currentInvoice]);
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick={generatePath('/invoices')}
-      onSaveClick={() => handleCreate(currentInvoice as Invoice)}
-      disableSaveButton={currentInvoice?.client_id.length === 0}
+      onBackClick="/invoices"
+      onSaveClick={() => save(invoice as Invoice)}
+      disableSaveButton={invoice?.client_id.length === 0}
     >
-      {errors && <ValidationAlert errors={errors} />}
-
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector
-          readonly={searchParams.get('table') === 'tasks'}
-          resource={currentInvoice}
+          resource={invoice}
           onChange={(id) => handleChange('client_id', id)}
           onClearButtonClick={() => handleChange('client_id', '')}
-          onContactCheckboxChange={(contactId, value) =>
-            dispatch(
-              toggleCurrentInvoiceInvitation({ contactId, checked: value })
-            )
-          }
+          onContactCheckboxChange={handleInvitationChange}
+          readonly={searchParams.get('table') === 'tasks'}
+          errorMessage={errors?.errors.client_id}
         />
 
-        <InvoiceDetails />
+        <InvoiceDetails invoice={invoice} handleChange={handleChange} />
 
         <div className="col-span-12">
           <TabGroup
@@ -173,38 +171,22 @@ export function Create() {
             defaultTabIndex={searchParams.get('table') === 'tasks' ? 1 : 0}
           >
             <div>
-              {currentInvoice ? (
+              {invoice && client ? (
                 <ProductsTable
-                  relationType="client_id"
                   type="product"
-                  resource={currentInvoice}
-                  columns={productColumns}
-                  items={currentInvoice.line_items.filter(
-                    (item) => item.type_id == InvoiceItemType.Product
+                  resource={invoice}
+                  items={invoice.line_items.filter(
+                    (item) => item.type_id === InvoiceItemType.Product
                   )}
-                  onLineItemChange={(index, lineItem) =>
-                    dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
-                  }
-                  onLineItemPropertyChange={(key, value, index) =>
-                    dispatch(
-                      setCurrentLineItemProperty({
-                        position: index,
-                        property: key,
-                        value,
-                      })
-                    )
-                  }
+                  columns={productColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
                   onSort={(lineItems) => handleChange('line_items', lineItems)}
-                  onDeleteRowClick={(index) =>
-                    dispatch(deleteInvoiceLineItem(index))
-                  }
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
                   onCreateItemClick={() =>
-                    dispatch(
-                      injectBlankItemIntoCurrent({
-                        type: InvoiceItemType.Product,
-                      })
-                    )
+                    handleCreateLineItem(InvoiceItemType.Product)
                   }
+                  onDeleteRowClick={handleDeleteLineItem}
                 />
               ) : (
                 <Spinner />
@@ -212,36 +194,22 @@ export function Create() {
             </div>
 
             <div>
-              {currentInvoice ? (
+              {invoice && client ? (
                 <ProductsTable
-                  relationType="client_id"
                   type="task"
-                  resource={currentInvoice}
-                  columns={taskColumns}
-                  items={currentInvoice.line_items.filter(
-                    (item) => item.type_id == InvoiceItemType.Task
+                  resource={invoice}
+                  items={invoice.line_items.filter(
+                    (item) => item.type_id === InvoiceItemType.Task
                   )}
-                  onLineItemChange={(index, lineItem) =>
-                    dispatch(setCurrentInvoiceLineItem({ index, lineItem }))
-                  }
-                  onLineItemPropertyChange={(key, value, index) =>
-                    dispatch(
-                      setCurrentLineItemProperty({
-                        position: index,
-                        property: key,
-                        value,
-                      })
-                    )
-                  }
+                  columns={taskColumns}
+                  relationType="client_id"
+                  onLineItemChange={handleLineItemChange}
                   onSort={(lineItems) => handleChange('line_items', lineItems)}
-                  onDeleteRowClick={(index) =>
-                    dispatch(deleteInvoiceLineItem(index))
-                  }
+                  onLineItemPropertyChange={handleLineItemPropertyChange}
                   onCreateItemClick={() =>
-                    dispatch(
-                      injectBlankItemIntoCurrent({ type: InvoiceItemType.Task })
-                    )
+                    handleCreateLineItem(InvoiceItemType.Task)
                   }
+                  onDeleteRowClick={handleDeleteLineItem}
                 />
               ) : (
                 <Spinner />
@@ -250,27 +218,28 @@ export function Create() {
           </TabGroup>
         </div>
 
-        <InvoiceFooter page="create" />
+        <InvoiceFooter invoice={invoice} handleChange={handleChange} />
 
-        {currentInvoice && (
+        {invoice && (
           <InvoiceTotals
-          relationType='client_id'
-            resource={currentInvoice}
+            relationType="client_id"
+            resource={invoice}
             invoiceSum={invoiceSum}
             onChange={(property, value) =>
-              handleChange(property as keyof Invoice, value)
+              handleChange(property, value as string)
             }
           />
         )}
       </div>
 
       <div className="my-4">
-        {currentInvoice && (
+        {invoice && (
           <InvoicePreview
             for="create"
-            relationType='client_id'
-            resource={currentInvoice}
+            resource={invoice}
             entity="invoice"
+            relationType="client_id"
+            endpoint="/api/v1/live_preview?entity=:entity"
           />
         )}
       </div>

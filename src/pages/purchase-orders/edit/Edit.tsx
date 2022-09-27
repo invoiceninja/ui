@@ -9,13 +9,14 @@
  */
 
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { usePurchaseOrderQuery } from 'common/queries/purchase-orders';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
+import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
@@ -23,8 +24,10 @@ import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { purchaseOrderAtom } from '../common/atoms';
+import { usePurchaseOrderQuery } from '../common/queries';
 import { Actions } from './components/Actions';
 import { Details } from './components/Details';
 import { Footer } from './components/Footer';
@@ -42,15 +45,15 @@ export function Edit() {
   const { id } = useParams();
   const { data } = usePurchaseOrderQuery({ id });
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
     {
       name: t('edit_purchase_order'),
-      href: generatePath('/purchase_orders/:id/edit', { id }),
+      href: route('/purchase_orders/:id/edit', { id }),
     },
   ];
 
-  const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder>();
+  const [purchaseOrder, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   useEffect(() => {
     if (data) {

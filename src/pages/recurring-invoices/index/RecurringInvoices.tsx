@@ -16,13 +16,14 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { RecurringInvoiceStatus } from '../common/components/RecurringInvoiceStatus';
+import { useActions } from '../common/hooks';
 
 export function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -33,7 +34,7 @@ export function RecurringInvoices() {
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
   ];
 
@@ -50,7 +51,7 @@ export function RecurringInvoices() {
       label: t('number'),
       format: (value, recurringInvoice) => (
         <Link
-          to={generatePath('/recurring_invoices/:id/edit', {
+          to={route('/recurring_invoices/:id/edit', {
             id: recurringInvoice.id,
           })}
         >
@@ -63,7 +64,7 @@ export function RecurringInvoices() {
       label: t('client'),
       format: (value, recurringInvoice) => (
         <Link
-          to={generatePath('/clients/:id', { id: recurringInvoice.client_id })}
+          to={route('/clients/:id', { id: recurringInvoice.client_id })}
         >
           {recurringInvoice.client?.display_name}
         </Link>
@@ -113,6 +114,8 @@ export function RecurringInvoices() {
     },
   ];
 
+  const actions = useActions();
+
   return (
     <Default
       title={t('recurring_invoices')}
@@ -126,6 +129,7 @@ export function RecurringInvoices() {
         linkToCreate="/recurring_invoices/create"
         linkToEdit="/recurring_invoices/:id/edit"
         bulkRoute="/api/v1/recurring_invoices/bulk"
+        customActions={actions}
         withResourcefulActions
       />
     </Default>

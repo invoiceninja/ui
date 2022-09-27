@@ -11,19 +11,20 @@
 import axios from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Vendor } from 'common/interfaces/vendor';
 import { useVendorQuery } from 'common/queries/vendor';
 import { updateRecord } from 'common/stores/slices/company-users';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Form } from './components/Form';
 
 export function Edit() {
@@ -40,9 +41,9 @@ export function Edit() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('vendors'), href: '/vendors' },
-    { name: t('edit_vendor'), href: generatePath('/vendors/:id/edit', { id }) },
+    { name: t('edit_vendor'), href: route('/vendors/:id/edit', { id }) },
   ];
 
   useEffect(() => {
@@ -77,7 +78,7 @@ export function Edit() {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/vendors/:id', { id })
+          route('/api/v1/vendors/:id', { id })
         )
       );
   };

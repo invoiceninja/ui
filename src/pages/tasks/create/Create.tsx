@@ -10,6 +10,7 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
@@ -18,7 +19,7 @@ import { useBlankTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
 import { isOverlapping } from '../common/helpers/is-overlapping';
@@ -64,7 +65,7 @@ export function Create() {
         toast.success('created_task');
 
         navigate(
-          generatePath('/tasks/:id/edit', { id: response.data.data.id })
+          route('/tasks/:id/edit', { id: response.data.data.id })
         );
       })
       .catch((error) => {
@@ -77,7 +78,7 @@ export function Create() {
   return (
     <Default
       title={documentTitle}
-      onBackClick={generatePath('/tasks')}
+      onBackClick={route('/tasks')}
       onSaveClick={() => task && handleSave(task)}
       breadcrumbs={pages}
     >

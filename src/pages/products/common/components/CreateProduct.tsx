@@ -13,7 +13,7 @@ import { useFormik } from 'formik';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { InputField } from '@invoiceninja/forms';
 import { endpoint } from 'common/helpers';
 import { Card, Element } from '@invoiceninja/cards';
@@ -22,6 +22,7 @@ import { CustomField } from 'components/CustomField';
 import { useTitle } from 'common/hooks/useTitle';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 
 export interface CreateProductDto {
   product_key: string;
@@ -79,7 +80,7 @@ export function CreateProduct(props: Props) {
           toast.success(t('created_product'));
 
           navigate(
-            generatePath('/products/:id/edit', {
+            route('/products/:id/edit', {
               id: response.data.data.id,
             }),
             { state: { message: t('created_product') } }
@@ -220,7 +221,7 @@ export function CreateProduct(props: Props) {
           field="custom_value1"
           defaultValue={formik.values.custom_value1}
           value={company.custom_fields.product1}
-          onChange={(value) => formik.setFieldValue('custom_value1', value)}
+          onValueChange={(value) => formik.setFieldValue('custom_value1', value)}
         />
       )}
 
@@ -229,7 +230,7 @@ export function CreateProduct(props: Props) {
           field="custom_value2"
           defaultValue={formik.values.custom_value2}
           value={company.custom_fields.product2}
-          onChange={(value) => formik.setFieldValue('custom_value2', value)}
+          onValueChange={(value) => formik.setFieldValue('custom_value2', value)}
         />
       )}
 
@@ -238,7 +239,7 @@ export function CreateProduct(props: Props) {
           field="custom_value3"
           defaultValue={formik.values.custom_value3}
           value={company.custom_fields.product3}
-          onChange={(value) => formik.setFieldValue('custom_value3', value)}
+          onValueChange={(value) => formik.setFieldValue('custom_value3', value)}
         />
       )}
 
@@ -247,7 +248,7 @@ export function CreateProduct(props: Props) {
           field="custom_value4"
           defaultValue={formik.values.custom_value4}
           value={company.custom_fields.product4}
-          onChange={(value) => formik.setFieldValue('custom_value4', value)}
+          onValueChange={(value) => formik.setFieldValue('custom_value4', value)}
         />
       )}
     </Card>

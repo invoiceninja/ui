@@ -10,31 +10,33 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
 import { Quote } from 'common/interfaces/quote';
-import { setCurrentQuote } from 'common/stores/slices/quotes/extra-reducers/set-current-quote';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useQueryClient } from 'react-query';
+import { route } from 'common/helpers/route';
 
 export function useApprove() {
-  const [t] = useTranslation();
-  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
 
   return (quote: Quote) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request(
       'PUT',
       endpoint('/api/v1/quotes/:id?approve=true', { id: quote.id }),
       quote
     )
-      .then((response) => {
-        toast.success(t('updated_quote'), { id: toastId });
+      .then(() => {
+        toast.success('approved_quote');
 
-        dispatch(setCurrentQuote(response.data.data));
+        queryClient.invalidateQueries(
+          route('/api/v1/quotes/:id', { id: quote.id })
+        );
+
+        queryClient.invalidateQueries('/api/v1/quotes');
       })
       .catch((error) => {
-        toast.error(t('error_title'), { id: toastId });
+        toast.error();
 
         console.error(error);
       });

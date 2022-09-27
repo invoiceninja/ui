@@ -14,7 +14,7 @@ import { CompanyGateway } from 'common/interfaces/company-gateway';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function useHandleUpdate(companyGateway: CompanyGateway | undefined) {
   const [t] = useTranslation();
@@ -39,7 +39,7 @@ export function useHandleUpdate(companyGateway: CompanyGateway | undefined) {
       })
       .finally(() =>
         queryClient.invalidateQueries(
-          generatePath('/api/v1/company_gateways/:id', {
+          route('/api/v1/company_gateways/:id', {
             id: companyGateway.id,
           })
         )

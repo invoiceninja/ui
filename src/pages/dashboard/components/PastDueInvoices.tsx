@@ -13,7 +13,7 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { DataTable, DataTableColumns } from 'components/DataTable';
 import { t } from 'i18next';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 import { Link } from 'components/forms/Link';
 import { Invoice } from 'common/interfaces/invoice';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
@@ -29,7 +29,7 @@ export function PastDueInvoices() {
       label: t('number'),
       format: (value, invoice) => {
         return (
-          <Link to={generatePath('/invoices/:id/edit', { id: invoice.id })}>
+          <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
             {invoice.number}
           </Link>
         );
@@ -39,7 +39,7 @@ export function PastDueInvoices() {
       id: 'client_id',
       label: t('client'),
       format: (value, invoice) => (
-        <Link to={generatePath('/clients/:id', { id: invoice.client_id })}>
+        <Link to={route('/clients/:id', { id: invoice.client_id })}>
           {invoice.client?.display_name}
         </Link>
       ),

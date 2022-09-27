@@ -9,13 +9,14 @@
  */
 
 import { endpoint } from 'common/helpers';
+import { route } from 'common/helpers/route';
 import { Invoice } from 'common/interfaces/invoice';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import Toggle from 'components/forms/Toggle';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 
 interface Props {
   blobUrl: string;
@@ -48,7 +49,7 @@ export function Actions(props: Props) {
       </span>
 
       <Dropdown label={t('more_actions')}>
-        <DropdownElement to={generatePath('/invoices/:id/email', { id })}>
+        <DropdownElement to={route('/invoices/:id/email', { id })}>
           {t('email_invoice')}
         </DropdownElement>
 

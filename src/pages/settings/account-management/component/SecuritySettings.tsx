@@ -14,7 +14,7 @@ import Toggle from 'components/forms/Toggle';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { generatePath } from 'react-router';
+import { route } from 'common/helpers/route';
 import { Card, Element } from '../../../../components/cards';
 import { SelectField } from '../../../../components/forms';
 
@@ -26,27 +26,27 @@ export function SecuritySettings() {
   const options = [
     {
       value: 1_800_000,
-      label: generatePath(t('count_minutes'), { count: '30' }),
+      label: route(t('count_minutes'), { count: '30' }),
     },
     {
       value: 7_200_000,
-      label: generatePath(t('count_hours'), { count: '2' }),
+      label: route(t('count_hours'), { count: '2' }),
     },
     {
       value: 28_800_000,
-      label: generatePath(t('count_hours'), { count: '8' }),
+      label: route(t('count_hours'), { count: '8' }),
     },
     {
       value: 86_400_000,
-      label: generatePath(t('count_day'), { count: '1' }),
+      label: route(t('count_day'), { count: '1' }),
     },
     {
       value: 604_800_000,
-      label: generatePath(t('count_days'), { count: '7' }),
+      label: route(t('count_days'), { count: '7' }),
     },
     {
       value: 2_592_000_000,
-      label: generatePath(t('count_days'), { count: '30' }),
+      label: route(t('count_days'), { count: '30' }),
     },
     {
       value: 0,

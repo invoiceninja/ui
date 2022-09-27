@@ -8,13 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
-import { useQuoteQuery } from 'common/queries/quotes';
-import { BreadcrumRecord } from 'components/Breadcrumbs';
+import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Mailer } from 'pages/invoices/email/components/Mailer';
 import { useTranslation } from 'react-i18next';
-import { generatePath, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { useQuoteQuery } from '../common/queries';
 
 export function Email() {
   const [t] = useTranslation();
@@ -22,17 +23,17 @@ export function Email() {
   const { documentTitle } = useTitle('email_quote');
   const { id } = useParams();
 
-  const { data: quote } = useQuoteQuery({ id });
+  const { data: quote } = useQuoteQuery({ id: id! });
 
   const list = {
     email_template_quote: 'initial_email',
   };
 
-  const pages: BreadcrumRecord[] = [
+  const pages: Page[] = [
     { name: t('quotes'), href: '/quotes' },
     {
       name: t('email_quote'),
-      href: generatePath('/quotes/:id/email', { id }),
+      href: route('/quotes/:id/email', { id }),
     },
   ];
 
@@ -40,7 +41,7 @@ export function Email() {
     <Default title={documentTitle} breadcrumbs={pages}>
       {quote && (
         <Mailer
-          resource={quote.data.data}
+          resource={quote}
           resourceType="quote"
           list={list}
           defaultEmail="email_template_quote"

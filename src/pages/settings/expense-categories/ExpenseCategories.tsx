@@ -11,7 +11,7 @@
 import { Link } from '@invoiceninja/forms';
 import { ExpenseCategory } from 'common/interfaces/expense-category';
 import { DataTable, DataTableColumns } from 'components/DataTable';
-import { generatePath } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 export function ExpenseCategories() {
   const columns: DataTableColumns<ExpenseCategory> = [
@@ -20,7 +20,7 @@ export function ExpenseCategories() {
       label: 'name',
       format: (value, expenseCategory) => (
         <Link
-          to={generatePath('/settings/expense_categories/:id/edit', {
+          to={route('/settings/expense_categories/:id/edit', {
             id: expenseCategory.id,
           })}
         >
