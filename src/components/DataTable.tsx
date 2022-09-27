@@ -135,7 +135,7 @@ export function DataTable(props: Props) {
         mainCheckbox.current.checked = false;
       })
       .catch((error: AxiosError) => {
-        console.log(error);
+        console.error(error);
         console.error(error.response?.data);
 
         toast.error(t('error_title'), {

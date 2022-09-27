@@ -40,7 +40,7 @@ export function useHandleCompanySave() {
 
         toast.error(t('error_title'), { id: toastId });
 
-        console.log(error.response?.data);
+        console.error(error.response?.data);
 
         if (error.response?.status === 422) {
           const message = (

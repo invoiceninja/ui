@@ -76,14 +76,14 @@ export function Edit() {
       _credit.line_items.map((item) => (item._id = v4()));
 
       setQuote(_credit);
+
+      if (_credit && _credit.client) {
+        setClient(_credit.client);
+
+        clientResolver.cache(_credit.client);
+      }
     }
   }, [data]);
-
-  useEffect(() => {
-    credit &&
-      credit.client_id.length > 1 &&
-      clientResolver.find(credit.client_id).then((client) => setClient(client));
-  }, [credit?.client_id]);
 
   useEffect(() => {
     // The InvoiceSum takes exact same reference to the `invoice` object

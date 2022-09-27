@@ -134,7 +134,7 @@ export function Create() {
         <QuoteDetails handleChange={handleChange} />
 
         <div className="col-span-12">
-          {quote ? (
+          {quote && client ? (
             <ProductsTable
               type="product"
               resource={quote}

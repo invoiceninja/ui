@@ -92,11 +92,9 @@ export function Create() {
           updateRecord({ object: 'company', data: response[1].data.data })
         );
 
-        console.log(response);
+        console.error(response);
 
-        navigate(
-          route('/vendors/:id', { id: response[0].data.data.id })
-        );
+        navigate(route('/vendors/:id', { id: response[0].data.data.id }));
       })
       .catch((error) => {
         console.error(error);

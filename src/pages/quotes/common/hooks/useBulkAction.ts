@@ -27,7 +27,7 @@ export function useBulkAction() {
     })
       .then(() => toast.success(`${action}d_quote`))
       .catch((error: AxiosError) => {
-        console.log(error);
+        console.error(error);
 
         toast.error();
       })

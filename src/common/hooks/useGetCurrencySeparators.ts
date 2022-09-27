@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CurrencyResolver } from 'common/helpers/currencies/currency-resolver';
+import React from 'react';
+import { useCurrencyResolver } from 'common/helpers/currencies/currency-resolver';
 import { Client } from 'common/interfaces/client';
 import { Currency } from 'common/interfaces/currency';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 import { Vendor } from 'common/interfaces/vendor';
 import { RelationType } from 'pages/invoices/common/components/ProductsTable';
-import React from 'react';
 import { useClientResolver } from './clients/useClientResolver';
 import { useCurrentCompany } from './useCurrentCompany';
 import { useResolveCountry } from './useResolveCountry';
@@ -30,7 +30,7 @@ export function useGetCurrencySeparators(
   const clientResolver = useClientResolver();
   const vendorResolver = useVendorResolver();
 
-  const currencyResolver = new CurrencyResolver();
+  const currencyResolver = useCurrencyResolver();
   const resolveCountry = useResolveCountry();
 
   return (relationId: string, relationType: RelationType) => {

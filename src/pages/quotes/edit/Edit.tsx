@@ -76,14 +76,14 @@ export function Edit() {
       _quote.line_items.map((item) => (item._id = v4()));
 
       setQuote(_quote);
+
+      if (_quote && _quote.client) {
+        setClient(_quote.client);
+
+        clientResolver.cache(_quote.client);
+      }
     }
   }, [data]);
-
-  useEffect(() => {
-    quote &&
-      quote.client_id.length > 1 &&
-      clientResolver.find(quote.client_id).then((client) => setClient(client));
-  }, [quote?.client_id]);
 
   useEffect(() => {
     // The InvoiceSum takes exact same reference to the `invoice` object
@@ -125,7 +125,7 @@ export function Edit() {
         <QuoteDetails handleChange={handleChange} />
 
         <div className="col-span-12">
-          {quote ? (
+          {quote && client ? (
             <ProductsTable
               type="product"
               resource={quote}
