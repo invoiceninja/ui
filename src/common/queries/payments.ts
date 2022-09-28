@@ -16,9 +16,7 @@ import { endpoint } from '../helpers';
 
 export function usePaymentQuery(params: { id: string | undefined }) {
   return useQuery(
-    route('/api/v1/payments/:id?include=client,invoices,paymentables', {
-      id: params.id,
-    }),
+    route('/api/v1/payments/:id', { id: params.id }),
     () =>
       request(
         'GET',
