@@ -46,9 +46,9 @@ export function Chart(props: Props) {
   useEffect(() => {
     const completeChartData: {
       name: string;
-      invoices: string;
-      expenses: string;
-      payments: string;
+      invoices: number;
+      expenses: number;
+      payments: number;
     }[] = [];
 
     switch (props.chartSensitivity) {
@@ -60,9 +60,9 @@ export function Chart(props: Props) {
         ) {
           completeChartData.push({
             name: formatDate(date.toString(), dateFormat),
-            invoices: '0',
-            expenses: '0',
-            payments: '0',
+            invoices: 0,
+            expenses: 0,
+            payments: 0,
           });
         }
         break;
@@ -75,9 +75,9 @@ export function Chart(props: Props) {
         ) {
           completeChartData.push({
             name: formatDate(date.toString(), dateFormat),
-            invoices: '0',
-            expenses: '0',
-            payments: '0',
+            invoices: 0,
+            expenses: 0,
+            payments: 0,
           });
         }
         break;
@@ -90,9 +90,9 @@ export function Chart(props: Props) {
         ) {
           completeChartData.push({
             name: formatDate(date.toString(), dateFormat),
-            invoices: '0',
-            expenses: '0',
-            payments: '0',
+            invoices: 0,
+            expenses: 0,
+            payments: 0,
           });
         }
         break;
@@ -103,16 +103,16 @@ export function Chart(props: Props) {
       let itemAdded = false;
       completeChartData.forEach((element) => {
         if (element.name === item.date) {
-          element.expenses = item.total;
+          element.expenses = parseFloat(item.total);
           itemAdded = true;
         }
       });
       if (!itemAdded) {
         completeChartData.push({
           name: item.date,
-          invoices: '0',
-          expenses: item.total,
-          payments: '0',
+          invoices: 0,
+          expenses: parseFloat(item.total),
+          payments: 0,
         });
       }
     });
@@ -121,16 +121,17 @@ export function Chart(props: Props) {
 
       completeChartData.forEach((element) => {
         if (element.name === item.date) {
-          element.payments = item.total;
+          element.payments = parseFloat(item.total);
           itemAdded = true;
         }
       });
+
       if (!itemAdded) {
         completeChartData.push({
           name: item.date,
-          invoices: '0',
-          expenses: '0',
-          payments: item.total,
+          invoices: 0,
+          expenses: 0,
+          payments: parseFloat(item.total),
         });
       }
     });
@@ -139,16 +140,16 @@ export function Chart(props: Props) {
 
       completeChartData.forEach((element) => {
         if (element.name === item.date) {
-          element.invoices = item.total;
+          element.invoices = parseFloat(item.total);
           itemAdded = true;
         }
       });
       if (!itemAdded) {
         completeChartData.push({
           name: item.date,
-          invoices: item.total,
-          expenses: '0',
-          payments: '0',
+          invoices: parseFloat(item.total),
+          expenses: 0,
+          payments: 0,
         });
       }
     });
@@ -158,6 +159,8 @@ export function Chart(props: Props) {
     });
     setchartData(completeChartData);
   }, [props]);
+
+  console.log(chartData);
 
   return (
     <ResponsiveContainer width="100%" height={250}>
