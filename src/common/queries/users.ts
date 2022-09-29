@@ -12,6 +12,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
+import { GenericQueryOptions } from './invoices';
 
 export function useUsersQuery() {
   return useQuery('/api/v1/users', () =>
@@ -19,15 +20,19 @@ export function useUsersQuery() {
   );
 }
 
-export function useUserQuery(params: { id: string | undefined }) {
+interface UserQueryProps extends GenericQueryOptions {
+  id: string;
+}
+
+export function useUserQuery(options: UserQueryProps) {
   return useQuery(
-    route('/api/v1/users/:id', params),
+    route('/api/v1/users/:id', { id: options.id }),
     () =>
       request(
         'GET',
-        endpoint('/api/v1/users/:id?include=company_user', params)
+        endpoint('/api/v1/users/:id?include=company_user', { id: options.id })
       ),
-    { staleTime: Infinity }
+    { enabled: options.enabled, staleTime: Infinity }
   );
 }
 
