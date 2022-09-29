@@ -23,9 +23,7 @@ export function Documents() {
   const queryClient = useQueryClient();
 
   const invalidateQuery = () => {
-    queryClient.invalidateQueries(
-      route('/api/v1/payments/:id?include=client,invoices', { id })
-    );
+    queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
   };
 
   return (
