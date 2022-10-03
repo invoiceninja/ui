@@ -158,7 +158,7 @@ export function InvoiceDetails(props: Props) {
           <SelectField
             value={recurringInvoice?.auto_bill || false}
             onValueChange={(value) =>
-              handleChange('auto_bill', JSON.parse(value))
+              handleChange('auto_bill', value)
             }
           >
             <option value="always">{t('enabled')}</option>
