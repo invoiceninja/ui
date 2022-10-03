@@ -8,39 +8,39 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
+import { endpoint, isHosted } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
 import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { Flutter } from './icons';
 
 export function SwitchToFlutter() {
-  const [t] = useTranslation();
-
   const account = useCurrentAccount();
 
   const onClick = () => {
-    const toastId = toast.loading(t('processing'));
+    if (isHosted()) {
+      return (window.location.href = 'https://invoicing.co');
+    }
+
+    toast.processing();
 
     request('PUT', endpoint('/api/v1/accounts/:id', { id: account.id }), {
       set_react_as_default_ap: false,
     })
       .then(() => (window.location.href = window.location.origin))
-      .catch((error: AxiosError) => {
+      .catch((error) => {
         console.error(error);
 
         error.response?.status === 400
-          ? toast.error(error.response.data.message, { id: toastId })
-          : toast.error(t('error_title'), { id: toastId });
+          ? toast.error(error.response.data.message)
+          : toast.error('error_title');
       });
   };
 
   return (
     <>
-      <button onClick={onClick}>
-        <Flutter width={32} height={32} />
+      <button title="Switch to Flutter version of the app" onClick={onClick}>
+        <Flutter width={24} height={24} />
       </button>
     </>
   );
