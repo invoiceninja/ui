@@ -147,6 +147,8 @@ export function Statement() {
   };
 
   useEffect(() => {
+    toast.processing();
+
     request('POST', endpoint('/api/v1/client_statement'), statement, {
       responseType: 'arraybuffer',
     })
@@ -157,8 +159,13 @@ export function Statement() {
         if (iframeRef.current) {
           iframeRef.current.src = url;
         }
+
+        toast.dismiss();
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        console.error(error);
+        toast.error();
+      });
   }, [statement]);
 
   return (
