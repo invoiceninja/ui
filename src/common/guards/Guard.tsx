@@ -18,15 +18,31 @@ interface Props {
 }
 
 export function Guard(props: Props) {
-  const [pass, setPass] = useState(true);
+  const [pass, setPass] = useState(false);
   const user = useCurrentUser();
 
+  const check = () => {
+    for (let index = 0; index < props.guards.length; index++) {
+      const pass = props.guards[index]();
+
+      if (pass) {
+        setPass(true);
+
+        continue;
+      }
+
+      setPass(false);
+
+      break;
+    }
+  };
+
   useEffect(() => {
-    props.guards.forEach((guard) => setPass(guard()));
+    check();
   }, [user]);
 
   useEffect(() => {
-    props.guards.forEach((guard) => setPass(guard()));
+    check();
   });
 
   if (pass) {
