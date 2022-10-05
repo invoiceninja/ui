@@ -14,6 +14,7 @@ import { trans } from 'common/helpers';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Divider } from 'components/cards/Divider';
+import { MarkdownEditor } from 'components/forms/MarkdownEditor';
 import Toggle from 'components/forms/Toggle';
 import { Settings } from 'components/layouts/Settings';
 import dayjs from 'dayjs';
@@ -143,10 +144,9 @@ export function EmailSettings() {
         )}
 
         <Element leftSide={t('signature')}>
-          <InputField
-            element="textarea"
+          <MarkdownEditor
             value={company?.settings.email_signature}
-            onValueChange={(value) =>
+            onChange={(value) =>
               handleChange('settings.email_signature', value)
             }
           />
