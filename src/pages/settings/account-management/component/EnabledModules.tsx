@@ -20,21 +20,39 @@ interface Module {
   bitmask: number;
 }
 
+export enum ModuleBitmask {
+  Invoices = 4096,
+  RecurringInvoices = 1,
+  Quotes = 4,
+  Credits = 2,
+  Projects = 32,
+  Tasks = 8,
+  Vendors = 64,
+  Expenses = 16,
+  RecurringExpenses = 512,
+}
+
 export function EnabledModules() {
   const [t] = useTranslation();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
 
   const modules: Module[] = [
-    { label: t('invoices'), bitmask: 4096 },
-    { label: t('recurring_invoices'), bitmask: 1 },
-    { label: t('quotes'), bitmask: 4 },
-    { label: t('credits'), bitmask: 2 },
-    { label: t('projects'), bitmask: 32 },
-    { label: t('tasks'), bitmask: 8 },
-    { label: t('vendors'), bitmask: 64 },
-    { label: t('expenses'), bitmask: 16 },
-    { label: t('recurring_expenses'), bitmask: 512 },
+    { label: t('invoices'), bitmask: ModuleBitmask.Invoices },
+    {
+      label: t('recurring_invoices'),
+      bitmask: ModuleBitmask.RecurringInvoices,
+    },
+    { label: t('quotes'), bitmask: ModuleBitmask.Quotes },
+    { label: t('credits'), bitmask: ModuleBitmask.Credits },
+    { label: t('projects'), bitmask: ModuleBitmask.Projects },
+    { label: t('tasks'), bitmask: ModuleBitmask.Tasks },
+    { label: t('vendors'), bitmask: ModuleBitmask.Vendors },
+    { label: t('expenses'), bitmask: ModuleBitmask.Expenses },
+    {
+      label: t('recurring_expenses'),
+      bitmask: ModuleBitmask.RecurringExpenses,
+    },
 
     // { label: t('tickets'), bitmask: 128 },
     // { label: t('proposals'), bitmask: 256 },
