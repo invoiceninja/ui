@@ -17,6 +17,8 @@ import { Invoices } from './index/Invoices';
 import { Pdf } from './pdf/Pdf';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
+import { enabled } from 'common/guards/guards/enabled';
+import { ModuleBitmask } from 'pages/settings/account-management/component';
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -24,7 +26,10 @@ export const invoiceRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_invoice')]}
+          guards={[
+            () => enabled(ModuleBitmask.Invoices),
+            () => permission('view_invoice'),
+          ]}
           component={<Invoices />}
         />
       }
@@ -34,6 +39,7 @@ export const invoiceRoutes = (
       element={
         <Guard
           guards={[
+            () => enabled(ModuleBitmask.Invoices),
             () => permission('create_invoice') || permission('edit_invoice'),
           ]}
           component={<Import />}
@@ -44,7 +50,10 @@ export const invoiceRoutes = (
       path="create"
       element={
         <Guard
-          guards={[() => permission('create_invoice')]}
+          guards={[
+            () => enabled(ModuleBitmask.Invoices),
+            () => permission('create_invoice'),
+          ]}
           component={<Create />}
         />
       }
@@ -54,6 +63,7 @@ export const invoiceRoutes = (
       element={
         <Guard
           guards={[
+            () => enabled(ModuleBitmask.Invoices),
             () => permission('view_invoice'),
             () => permission('edit_invoice'),
           ]}
@@ -65,17 +75,14 @@ export const invoiceRoutes = (
       path=":id/pdf"
       element={
         <Guard
-          guards={[() => permission('view_invoice')]}
+          guards={[
+            () => enabled(ModuleBitmask.Invoices),
+            () => permission('view_invoice'),
+          ]}
           component={<Pdf />}
         />
       }
     />
     <Route path=":id/email" element={<Email />} />
-    {/* <Route path=":id/clone/quote" element={<CloneInvoiceToQuote />} />
-    <Route path=":id/clone/credit" element={<CloneInvoiceToCredit />} />
-    <Route
-      path=":id/clone/recurring_invoice"
-      element={<CloneInvoiceToRecurringInvoice />}
-    /> */}
   </Route>
 );
