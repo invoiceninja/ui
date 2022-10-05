@@ -43,9 +43,7 @@ export function Clients() {
       id: 'display_name',
       label: t('name'),
       format: (value, resource) => (
-        <Link to={route('/clients/:id', { id: resource.id })}>
-          {value}
-        </Link>
+        <Link to={route('/clients/:id', { id: resource.id })}>{value}</Link>
       ),
     },
     {
@@ -93,7 +91,13 @@ export function Clients() {
   const actions = [
     (resource: Client) => (
       <DropdownElement
-        key={'client portal'}
+        to={route('/clients/:id/statement', { id: resource.id })}
+      >
+        {t('view_statement')}
+      </DropdownElement>
+    ),
+    (resource: Client) => (
+      <DropdownElement
         onClick={() => window.open(resource.contacts[0].link, '__blank')}
       >
         {t('client_portal')}
@@ -101,7 +105,6 @@ export function Clients() {
     ),
     (resource: Client) => (
       <DropdownElement
-        key={'new_invoice'}
         to={route('/invoices/create?client=:id', { id: resource.id })}
       >
         {t('new_invoice')}
@@ -109,7 +112,6 @@ export function Clients() {
     ),
     (resource: Client) => (
       <DropdownElement
-        key={'new_payment'}
         to={route('/payments/create?client=:id', { id: resource.id })}
       >
         {t('new_payment')}
@@ -117,7 +119,6 @@ export function Clients() {
     ),
     (resource: Client) => (
       <DropdownElement
-        key={'new_quote'}
         to={route('/quotes/create?client=:id', { id: resource.id })}
       >
         {t('new_quote')}
@@ -125,7 +126,6 @@ export function Clients() {
     ),
     (resource: Client) => (
       <DropdownElement
-        key={'new_credit'}
         to={route('/credits/create?client=:id', { id: resource.id })}
       >
         {t('new_credit')}
