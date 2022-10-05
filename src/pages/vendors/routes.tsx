@@ -20,6 +20,8 @@ import { PurchaseOrders } from './show/pages/PurchaseOrders';
 import { RecurringExpenses } from './show/pages/RecurringExpenses';
 import { Vendor } from './Vendor';
 import { Import } from 'pages/vendors/import/Import';
+import { enabled } from 'common/guards/guards/enabled';
+import { ModuleBitmask } from 'pages/settings/account-management/component';
 
 export const vendorRoutes = (
   <Route path="vendors">
@@ -27,7 +29,10 @@ export const vendorRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_vendor')]}
+          guards={[
+            () => enabled(ModuleBitmask.Vendors),
+            () => permission('view_vendor'),
+          ]}
           component={<Vendors />}
         />
       }
@@ -37,6 +42,7 @@ export const vendorRoutes = (
       element={
         <Guard
           guards={[
+            () => enabled(ModuleBitmask.Vendors),
             () => permission('create_vendor') || permission('edit_vendor'),
           ]}
           component={<Import />}
@@ -47,7 +53,10 @@ export const vendorRoutes = (
       path=":id"
       element={
         <Guard
-          guards={[() => permission('view_vendor')]}
+          guards={[
+            () => enabled(ModuleBitmask.Vendors),
+            () => permission('view_vendor'),
+          ]}
           component={<Vendor />}
         />
       }
@@ -62,7 +71,10 @@ export const vendorRoutes = (
       path=":id/edit"
       element={
         <Guard
-          guards={[() => permission('edit_vendor')]}
+          guards={[
+            () => enabled(ModuleBitmask.Vendors),
+            () => permission('edit_vendor'),
+          ]}
           component={<Edit />}
         />
       }
@@ -71,7 +83,10 @@ export const vendorRoutes = (
       path="create"
       element={
         <Guard
-          guards={[() => permission('create_vendor')]}
+          guards={[
+            () => enabled(ModuleBitmask.Vendors),
+            () => permission('create_vendor'),
+          ]}
           component={<Create />}
         />
       }
