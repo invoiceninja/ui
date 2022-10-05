@@ -17,6 +17,8 @@ import { Email } from './email/Email';
 import { Quotes } from './index/Quotes';
 import { Pdf } from './pdf/Pdf';
 import { Import } from 'pages/quotes/import/Import';
+import { enabled } from 'common/guards/guards/enabled';
+import { ModuleBitmask } from 'pages/settings/account-management/component';
 
 export const quoteRoutes = (
   <Route path="/quotes">
@@ -24,7 +26,10 @@ export const quoteRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_quote')]}
+          guards={[
+            () => enabled(ModuleBitmask.Quotes),
+            () => permission('view_quote'),
+          ]}
           component={<Quotes />}
         />
       }
@@ -34,6 +39,7 @@ export const quoteRoutes = (
       element={
         <Guard
           guards={[
+            () => enabled(ModuleBitmask.Quotes),
             () => permission('create_quote') || permission('edit_quote'),
           ]}
           component={<Import />}
@@ -43,14 +49,23 @@ export const quoteRoutes = (
     <Route
       path=":id/edit"
       element={
-        <Guard guards={[() => permission('edit_quote')]} component={<Edit />} />
+        <Guard
+          guards={[
+            () => enabled(ModuleBitmask.Quotes),
+            () => permission('edit_quote'),
+          ]}
+          component={<Edit />}
+        />
       }
     />
     <Route
       path="create"
       element={
         <Guard
-          guards={[() => permission('create_quote')]}
+          guards={[
+            () => enabled(ModuleBitmask.Quotes),
+            () => permission('create_quote'),
+          ]}
           component={<Create />}
         />
       }
@@ -58,7 +73,13 @@ export const quoteRoutes = (
     <Route
       path=":id/pdf"
       element={
-        <Guard guards={[() => permission('view_quote')]} component={<Pdf />} />
+        <Guard
+          guards={[
+            () => enabled(ModuleBitmask.Quotes),
+            () => permission('view_quote'),
+          ]}
+          component={<Pdf />}
+        />
       }
     />
     <Route path=":id/email" element={<Email />} />
