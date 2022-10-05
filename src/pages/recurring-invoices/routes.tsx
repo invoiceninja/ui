@@ -9,7 +9,9 @@
  */
 
 import { Guard } from 'common/guards/Guard';
+import { enabled } from 'common/guards/guards/enabled';
 import { permission } from 'common/guards/guards/permission';
+import { ModuleBitmask } from 'pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
@@ -22,7 +24,10 @@ export const recurringInvoiceRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_recurring_invoice')]}
+          guards={[
+            () => enabled(ModuleBitmask.RecurringInvoices),
+            () => permission('view_recurring_invoice'),
+          ]}
           component={<RecurringInvoices />}
         />
       }
@@ -31,7 +36,10 @@ export const recurringInvoiceRoutes = (
       path="create"
       element={
         <Guard
-          guards={[() => permission('create_recurring_invoice')]}
+          guards={[
+            () => enabled(ModuleBitmask.RecurringInvoices),
+            () => permission('create_recurring_invoice'),
+          ]}
           component={<Create />}
         />
       }
@@ -41,7 +49,10 @@ export const recurringInvoiceRoutes = (
         path="edit"
         element={
           <Guard
-            guards={[() => permission('edit_recurring_invoice')]}
+            guards={[
+              () => enabled(ModuleBitmask.RecurringInvoices),
+              () => permission('edit_recurring_invoice'),
+            ]}
             component={<Edit />}
           />
         }
@@ -50,7 +61,10 @@ export const recurringInvoiceRoutes = (
         path="pdf"
         element={
           <Guard
-            guards={[() => permission('view_recurring_invoice')]}
+            guards={[
+              () => enabled(ModuleBitmask.RecurringInvoices),
+              () => permission('view_recurring_invoice'),
+            ]}
             component={<Pdf />}
           />
         }
