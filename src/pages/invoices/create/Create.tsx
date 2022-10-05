@@ -108,6 +108,10 @@ export function Create() {
         _invoice.line_items = [];
       }
 
+      if (searchParams.get('client')) {
+        _invoice.client_id = searchParams.get('client')!;
+      }
+
       setInvoice(_invoice);
     }
 
