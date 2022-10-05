@@ -35,6 +35,8 @@ import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
 import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
+import { enabled } from 'common/guards/guards/enabled';
+import { ModuleBitmask } from 'pages/settings/account-management/component';
 
 interface Props extends CommonProps {
   title?: string;
@@ -101,7 +103,7 @@ export function Default(props: Props) {
       href: '/invoices',
       icon: FileText,
       current: location.pathname.startsWith('/invoices'),
-      visible: hasPermission('view_invoice'),
+      visible: enabled(ModuleBitmask.Invoices) && hasPermission('view_invoice'),
       rightButton: {
         icon: PlusCircle,
         to: '/invoices/create',
@@ -114,7 +116,9 @@ export function Default(props: Props) {
       href: '/recurring_invoices',
       icon: Repeat,
       current: location.pathname.startsWith('/recurring_invoices'),
-      visible: hasPermission('view_recurring_invoice'),
+      visible:
+        enabled(ModuleBitmask.RecurringInvoices) &&
+        hasPermission('view_recurring_invoice'),
       rightButton: {
         icon: PlusCircle,
         to: '/recurring_invoices/create',
@@ -140,7 +144,7 @@ export function Default(props: Props) {
       href: '/quotes',
       icon: File,
       current: location.pathname.startsWith('/quotes'),
-      visible: hasPermission('view_quote'),
+      visible: enabled(ModuleBitmask.Quotes) && hasPermission('view_quote'),
       rightButton: {
         icon: PlusCircle,
         to: '/quotes/create',
@@ -153,7 +157,7 @@ export function Default(props: Props) {
       href: '/credits',
       icon: FileText,
       current: location.pathname.startsWith('/credits'),
-      visible: hasPermission('view_credit'),
+      visible: enabled(ModuleBitmask.Credits) && hasPermission('view_credit'),
       rightButton: {
         icon: PlusCircle,
         to: '/credits/create',
@@ -166,7 +170,7 @@ export function Default(props: Props) {
       href: '/projects',
       icon: Briefcase,
       current: location.pathname.startsWith('/projects'),
-      visible: hasPermission('view_project'),
+      visible: enabled(ModuleBitmask.Projects) && hasPermission('view_project'),
       rightButton: {
         icon: PlusCircle,
         to: '/projects/create',
@@ -179,7 +183,7 @@ export function Default(props: Props) {
       href: '/tasks',
       icon: Clock,
       current: location.pathname.startsWith('/tasks'),
-      visible: hasPermission('view_task'),
+      visible: enabled(ModuleBitmask.Tasks) && hasPermission('view_task'),
       rightButton: {
         icon: PlusCircle,
         to: '/tasks/create',
@@ -192,7 +196,7 @@ export function Default(props: Props) {
       href: '/vendors',
       icon: BiBuildings,
       current: location.pathname.startsWith('/vendors'),
-      visible: hasPermission('view_vendor'),
+      visible: enabled(ModuleBitmask.Vendors) && hasPermission('view_vendor'),
       rightButton: {
         icon: PlusCircle,
         to: '/vendors/create',
@@ -218,7 +222,7 @@ export function Default(props: Props) {
       href: '/expenses',
       icon: BiWallet,
       current: location.pathname.startsWith('/expenses'),
-      visible: hasPermission('view_expense'),
+      visible: enabled(ModuleBitmask.Expenses) && hasPermission('view_expense'),
       rightButton: {
         icon: PlusCircle,
         to: '/expenses/create',
