@@ -10,29 +10,32 @@
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
+import { toast } from 'common/helpers/toast/toast';
 import { useNavigate } from 'react-router-dom';
 
 export function usePurgeClient(clientId: string | undefined) {
-  const [t] = useTranslation();
   const navigate = useNavigate();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  return (password: string, passwordIsRequired: boolean) => {
-    const toastId = toast.loading(t('processing'));
+  return (password: string) => {
+    toast.processing();
 
-    request('POST', endpoint('/api/v1/clients/:id/purge', { id: clientId }))
+    request(
+      'POST',
+      endpoint('/api/v1/clients/:id/purge', { id: clientId }),
+      {},
+      { headers: { 'X-Api-Password': password } }
+    )
       .then(() => {
-        toast.success(t('purged_client'), { id: toastId });
+        toast.success('purged_client');
+
         navigate('/clients');
       })
       .catch((error: AxiosError) => {
         console.error(error);
 
         error.response?.status === 412
-          ? toast.error(t('password_error_incorrect'), { id: toastId })
-          : toast.error(t('error_title'), { id: toastId });
+          ? toast.error('password_error_incorrect')
+          : toast.error();
       })
       .finally(() => {});
   };
