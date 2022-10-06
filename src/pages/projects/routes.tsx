@@ -9,7 +9,9 @@
  */
 
 import { Guard } from 'common/guards/Guard';
+import { enabled } from 'common/guards/guards/enabled';
 import { permission } from 'common/guards/guards/permission';
+import { ModuleBitmask } from 'pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
 import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
@@ -24,7 +26,10 @@ export const projectRoutes = (
       path="/projects"
       element={
         <Guard
-          guards={[() => permission('view_project')]}
+          guards={[
+            () => enabled(ModuleBitmask.Projects),
+            () => permission('view_project'),
+          ]}
           component={<Projects />}
         />
       }
@@ -33,7 +38,10 @@ export const projectRoutes = (
       path="/projects/create"
       element={
         <Guard
-          guards={[() => permission('create_project')]}
+          guards={[
+            () => enabled(ModuleBitmask.Projects),
+            () => permission('create_project'),
+          ]}
           component={<Create />}
         />
       }
@@ -42,7 +50,10 @@ export const projectRoutes = (
       path="/projects/:id"
       element={
         <Guard
-          guards={[() => permission('edit_project')]}
+          guards={[
+            () => enabled(ModuleBitmask.Projects),
+            () => permission('edit_project'),
+          ]}
           component={<Project />}
         />
       }

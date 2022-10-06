@@ -9,7 +9,9 @@
  */
 
 import { Guard } from 'common/guards/Guard';
+import { enabled } from 'common/guards/guards/enabled';
 import { permission } from 'common/guards/guards/permission';
+import { ModuleBitmask } from 'pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
@@ -23,7 +25,10 @@ export const creditRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_credit')]}
+          guards={[
+            () => enabled(ModuleBitmask.Credits),
+            () => permission('view_credit'),
+          ]}
           component={<Credits />}
         />
       }
@@ -32,7 +37,10 @@ export const creditRoutes = (
       path="create"
       element={
         <Guard
-          guards={[() => permission('create_credit')]}
+          guards={[
+            () => enabled(ModuleBitmask.Credits),
+            () => permission('create_credit'),
+          ]}
           component={<Create />}
         />
       }
@@ -41,7 +49,10 @@ export const creditRoutes = (
       path=":id/edit"
       element={
         <Guard
-          guards={[() => permission('edit_credit')]}
+          guards={[
+            () => enabled(ModuleBitmask.Credits),
+            () => permission('edit_credit'),
+          ]}
           component={<Edit />}
         />
       }
@@ -49,7 +60,13 @@ export const creditRoutes = (
     <Route
       path=":id/pdf"
       element={
-        <Guard guards={[() => permission('view_credit')]} component={<Pdf />} />
+        <Guard
+          guards={[
+            () => enabled(ModuleBitmask.Credits),
+            () => permission('view_credit'),
+          ]}
+          component={<Pdf />}
+        />
       }
     />
     <Route path=":id/email" element={<Email />} />
