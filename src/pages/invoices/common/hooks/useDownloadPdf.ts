@@ -9,6 +9,7 @@
  */
 
 import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
 import {
   MailerResource,
   MailerResourceType,
@@ -28,6 +29,8 @@ export function useDownloadPdf(props: Props) {
     const downloadableUrl = url(resource);
 
     if (downloadableUrl) {
+      toast.processing();
+
       queryClient.fetchQuery(downloadableUrl, () =>
         request('GET', downloadableUrl, {}, { responseType: 'arraybuffer' })
           .then((response) => {
@@ -45,8 +48,14 @@ export function useDownloadPdf(props: Props) {
             link.click();
 
             document.body.removeChild(link);
+
+            toast.dismiss();
           })
-          .catch((error) => console.error(error))
+          .catch((error) => {
+            console.error(error);
+            
+            toast.error();
+          })
       );
     }
   };

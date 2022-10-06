@@ -25,6 +25,7 @@ import { Quotes } from './show/pages/Quotes';
 import { RecurringExpenses } from './show/pages/RecurringExpenses';
 import { RecurringInvoices } from './show/pages/RecurringInvoices';
 import { Tasks } from './show/pages/Tasks';
+import { Statement } from './statement/Statement';
 
 export const clientRoutes = (
   <Route path="clients">
@@ -85,5 +86,6 @@ export const clientRoutes = (
       <Route path="expenses" element={<Expenses />} />
       <Route path="recurring_expenses" element={<RecurringExpenses />} />
     </Route>
+    <Route path=":id/statement" element={<Statement />} />
   </Route>
 );

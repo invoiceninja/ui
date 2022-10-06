@@ -70,6 +70,14 @@ export function CustomResourcefulActions(props: Props) {
 
       <div>
         <DropdownElement
+          to={route('/clients/:id/statement', {
+            id: props.clientId,
+          })}
+        >
+          {t('view_statement')}
+        </DropdownElement>
+
+        <DropdownElement
           to={route('/invoices/create?client=:id', {
             id: props.clientId,
           })}

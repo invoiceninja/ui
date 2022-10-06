@@ -160,8 +160,6 @@ export function Chart(props: Props) {
     setchartData(completeChartData);
   }, [props]);
 
-  console.log(chartData);
-
   return (
     <ResponsiveContainer width="100%" height={250}>
       <AreaChart height={200} data={chartData}>
