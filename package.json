@@ -43,6 +43,7 @@
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.2.1",
     "react-select": "^5.2.2",
+    "react-use": "^17.4.0",
     "recharts": "^2.1.9",
     "remove": "^0.1.5",
     "uuid": "^8.3.2"
