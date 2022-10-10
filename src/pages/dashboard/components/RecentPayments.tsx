@@ -17,6 +17,7 @@ import { route } from 'common/helpers/route';
 import { Link } from 'components/forms/Link';
 import { Payment } from 'common/interfaces/payment';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { Card } from '@invoiceninja/cards';
 
 export function RecentPayments() {
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -68,22 +69,20 @@ export function RecentPayments() {
   ];
 
   return (
-    <div className="bg-white rounded shadow">
-      <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">
-          {t('recent_payments')}
-        </h3>
-      </div>
-
-      <div className="-mt-2">
-        <DataTable
-          resource="payment"
-          columns={columns}
-          endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&page=1"
-          withoutActions
-          withoutPagination
-        />
-      </div>
-    </div>
+    <Card
+      title={t('recent_payments')}
+      className="h-96"
+      withoutBodyPadding
+      withScrollableBody
+    >
+      <DataTable
+        resource="payment"
+        columns={columns}
+        endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&page=1"
+        withoutActions
+        withoutPagination
+        withoutPadding
+      />
+    </Card>
   );
 }
