@@ -8,14 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
-type Props = CommonProps;
+interface Props extends CommonProps {
+  withoutPadding?: boolean;
+}
 
 export function Table(props: Props) {
   return (
-    <div className="flex flex-col mt-2">
-      <div className="py-1.5 align-middle inline-block min-w-full">
+    <div
+      className={classNames('flex flex-col', { 'mt-2': !props.withoutPadding })}
+    >
+      <div
+        className={classNames('align-middle inline-block min-w-full', {
+          'py-1.5': !props.withoutPadding,
+        })}
+      >
         <div className="overflow-hidden border border-gray-200 dark:border-transparent rounded border-b border-t">
           <div className="overflow-y-auto">
             <table className="min-w-full table-auto divide-y divide-gray-200">

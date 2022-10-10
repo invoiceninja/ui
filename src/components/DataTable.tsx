@@ -58,6 +58,7 @@ interface Props {
   withoutActions?: boolean;
   withoutPagination?: boolean;
   rightSide?: ReactNode;
+  withoutPadding?: boolean;
 }
 
 export function DataTable(props: Props) {
@@ -187,7 +188,7 @@ export function DataTable(props: Props) {
         </Actions>
       )}
 
-      <Table>
+      <Table withoutPadding={props.withoutPadding}>
         <Thead>
           {!props.withoutActions && (
             <Th>
