@@ -59,7 +59,6 @@ export function Selector() {
                 id="settings.tax_rate1"
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name1 || '0'}
-                onValueChange={(value) => console.log(value)}
               >
                 <option
                   data-rate={0}
