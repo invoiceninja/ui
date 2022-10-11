@@ -39,6 +39,8 @@ import {
   Thead,
   Tr,
 } from './tables';
+import { atomWithStorage } from 'jotai/utils';
+import { useAtom } from 'jotai';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -60,6 +62,8 @@ interface Props {
   rightSide?: ReactNode;
 }
 
+export const datatablePerPageAtom = atomWithStorage('perPage', '10');
+
 export function DataTable(props: Props) {
   const [t] = useTranslation();
 
@@ -71,7 +75,7 @@ export function DataTable(props: Props) {
 
   const [filter, setFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState('10');
+  const [perPage, setPerPage] = useAtom(datatablePerPageAtom);
   const [sort, setSort] = useState('id|asc');
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState(['active']);
