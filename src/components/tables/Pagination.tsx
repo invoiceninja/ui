@@ -9,6 +9,8 @@
  */
 
 import { trans } from 'common/helpers';
+import { datatablePerPageAtom } from 'components/DataTable';
+import { useAtom } from 'jotai';
 import { ChevronLeft, ChevronRight } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -33,6 +35,7 @@ export function Pagination(props: Props) {
   props = { ...defaultProps, ...props };
 
   const [t] = useTranslation();
+  const [perPage] = useAtom(datatablePerPageAtom);
 
   const next = () => {
     if (props.currentPage + 1 <= props.totalPages) {
@@ -55,7 +58,7 @@ export function Pagination(props: Props) {
             id="location"
             name="location"
             className="block pl-3 pr-10 py-2 text-base border-gray-300 sm:text-sm rounded-md"
-            defaultValue="10"
+            defaultValue={perPage}
             onChange={(element) => props.onRowsChange(element.target.value)}
           >
             <option value="10">10</option>
