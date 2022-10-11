@@ -50,6 +50,7 @@ interface Props {
   queryAdditional?: boolean;
   initiallyVisible?: boolean;
   withProperty?: string;
+  sortBy?: string;
 }
 
 export function DebouncedCombobox(props: Props) {
@@ -68,6 +69,7 @@ export function DebouncedCombobox(props: Props) {
     withoutEvents: true,
   });
 
+  const [sortBy] = useState(props.sortBy || 'created_at|desc');
   const [defaultValueProperty, setDefaultValueProperty] = useState('');
   const openDropdownButton = useRef<HTMLButtonElement | undefined>();
   const queryClient = useQueryClient();
@@ -93,7 +95,7 @@ export function DebouncedCombobox(props: Props) {
       url.searchParams.set('with', props.defaultValue.toString());
     }
 
-    url.searchParams.set('sort', 'created_at|desc');
+    url.searchParams.set('sort', sortBy);
     url.searchParams.set('is_deleted', 'false');
 
     const array: Record[] = [];
