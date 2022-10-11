@@ -43,6 +43,7 @@ export function ProductSelector(props: Props) {
         clearButton={props.clearButton}
         onClearButtonClick={props.onClearButtonClick}
         onInputFocus={props.onInputFocus}
+        sortBy="product_key|asc"
         withShadowRecord
       />
 
