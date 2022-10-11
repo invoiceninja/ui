@@ -46,6 +46,7 @@ export function ClientSelector(props: ClientSelectorProps) {
         initiallyVisible={props.initiallyVisible}
         actionLabel={t('new_client')}
         onActionClick={() => setIsModalOpen(true)}
+        sortBy="display_name|asc"
       />
     </>
   );
