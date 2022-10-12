@@ -51,8 +51,6 @@ export function ClientSelector(props: Props) {
         .then((client) => setClient(client));
   }, [resource?.client_id]);
 
-  console.log(client?.contacts);
-
   return (
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex  flex-col justify-between space-y-2">
