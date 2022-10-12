@@ -35,26 +35,37 @@ export function Details() {
                   {client.data.data.website}
                 </Link>
 
-                <p>
-                  {t('vat_number')}: {client.data.data.vat_number}
-                </p>
-                <p>
-                  {t('phone')}: {client.data.data.phone}
-                </p>
-                <p>
-                  {t('task_rate')}:{' '}
-                  {client.data.data.settings.default_task_rate
-                    ? formatMoney(
-                        client.data.data.settings.default_task_rate,
-                        client.data.data.country_id,
-                        client.data.data.settings.currency_id
-                      )
-                    : formatMoney(
-                        company.settings.default_task_rate,
-                        client.data.data.country_id,
-                        company.settings.currency_id
-                      )}
-                </p>
+                {client.data.data.vat_number.length > 1 && (
+                  <p>
+                    {t('vat_number')}: {client.data.data.vat_number}
+                  </p>
+                )}
+
+                {client.data.data.phone.length > 1 && (
+                  <p>
+                    {t('phone')}: {client.data.data.phone}
+                  </p>
+                )}
+
+                {parseFloat(client.data.data.settings.default_task_rate) >
+                  0 && (
+                  <p className="space-x-1">
+                    <span>{t('task_rate')}:</span>
+                    <span>
+                      {client.data.data.settings.default_task_rate
+                        ? formatMoney(
+                            client.data.data.settings.default_task_rate,
+                            client.data.data.country_id,
+                            client.data.data.settings.currency_id
+                          )
+                        : formatMoney(
+                            company.settings.default_task_rate,
+                            client.data.data.country_id,
+                            company.settings.currency_id
+                          )}
+                    </span>
+                  </p>
+                )}
               </>
             }
             className="h-full"

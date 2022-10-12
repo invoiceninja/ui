@@ -37,56 +37,56 @@ export function RequiredFields(props: Props) {
     <Card title={t('required_fields')}>
       <Element leftSide={t('client_name')}>
         <Toggle
-          value={props.companyGateway.require_client_name}
+          checked={props.companyGateway.require_client_name}
           onChange={(value) => handleChange('require_client_name', value)}
         />
       </Element>
 
       <Element leftSide={t('client_phone')}>
         <Toggle
-          value={props.companyGateway.require_client_phone}
+          checked={props.companyGateway.require_client_phone}
           onChange={(value) => handleChange('require_client_phone', value)}
         />
       </Element>
 
       <Element leftSide={t('contact_name')}>
         <Toggle
-          value={props.companyGateway.require_contact_name}
+          checked={props.companyGateway.require_contact_name}
           onChange={(value) => handleChange('require_contact_name', value)}
         />
       </Element>
 
       <Element leftSide={t('contact_email')}>
         <Toggle
-          value={props.companyGateway.require_contact_email}
+          checked={props.companyGateway.require_contact_email}
           onChange={(value) => handleChange('require_contact_email', value)}
         />
       </Element>
 
       <Element leftSide={t('postal_code')}>
         <Toggle
-          value={props.companyGateway.require_postal_code}
+          checked={props.companyGateway.require_postal_code}
           onChange={(value) => handleChange('require_postal_code', value)}
         />
       </Element>
 
       <Element leftSide={t('cvv')}>
         <Toggle
-          value={props.companyGateway.require_cvv}
+          checked={props.companyGateway.require_cvv}
           onChange={(value) => handleChange('require_cvv', value)}
         />
       </Element>
 
       <Element leftSide={t('billing_address')}>
         <Toggle
-          value={props.companyGateway.require_billing_address}
+          checked={props.companyGateway.require_billing_address}
           onChange={(value) => handleChange('require_billing_address', value)}
         />
       </Element>
 
       <Element leftSide={t('shipping_address')}>
         <Toggle
-          value={props.companyGateway.require_shipping_address}
+          checked={props.companyGateway.require_shipping_address}
           onChange={(value) => handleChange('require_shipping_address', value)}
         />
       </Element>
@@ -96,7 +96,7 @@ export function RequiredFields(props: Props) {
       <Element leftSide={t('update_address')}>
         <Toggle
           label={t('update_address_help')}
-          value={props.companyGateway.update_details}
+          checked={props.companyGateway.update_details}
           onChange={(value) => handleChange('update_details', value)}
         />
       </Element>

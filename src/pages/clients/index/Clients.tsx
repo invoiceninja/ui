@@ -34,17 +34,27 @@ export function Clients() {
 
   const pages: Page[] = [{ name: t('clients'), href: '/clients' }];
 
-  const columns: DataTableColumns = [
-    {
-      id: 'number',
-      label: t('number'),
-    },
+  const columns: DataTableColumns<Client> = [
     {
       id: 'display_name',
       label: t('name'),
       format: (value, resource) => (
         <Link to={route('/clients/:id', { id: resource.id })}>{value}</Link>
       ),
+    },
+    {
+      id: 'email',
+      label: t('email'),
+      format: (value, resource) =>
+        resource.contacts.length > 0 && (
+          <Link to={route('/clients/:id', { id: resource.id })}>
+            {resource.contacts[0].email}
+          </Link>
+        ),
+    },
+    {
+      id: 'number',
+      label: t('id_number'),
     },
     {
       id: 'balance',
@@ -65,6 +75,11 @@ export function Clients() {
           resource?.country_id,
           resource?.settings.currency_id
         ),
+    },
+    {
+      id: 'created_at',
+      label: t('created_at'),
+      format: (value) => date(value, dateFormat),
     },
     {
       id: 'last_login',

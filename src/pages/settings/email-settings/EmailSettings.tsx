@@ -49,6 +49,35 @@ export function EmailSettings() {
       onCancelClick={onCancel}
     >
       <Card title={t('settings')}>
+        <Element leftSide={t('attach_pdf')}>
+          <Toggle
+            checked={company?.settings.pdf_email_attachment}
+            onValueChange={(value) =>
+              handleChange('settings.pdf_email_attachment', value)
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('attach_documents')}>
+          <Toggle
+            checked={company?.settings.document_email_attachment}
+            onValueChange={(value) =>
+              handleChange('settings.document_email_attachment', value)
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('attach_ubl')}>
+          <Toggle
+            checked={company?.settings.ubl_email_attachment}
+            onValueChange={(value) =>
+              handleChange('settings.ubl_email_attachment', value)
+            }
+          />
+        </Element>
+
+        <Divider />
+
         <Element leftSide={t('from_name')}>
           <InputField
             value={company?.settings.email_from_name}
@@ -148,35 +177,6 @@ export function EmailSettings() {
             value={company?.settings.email_signature}
             onChange={(value) =>
               handleChange('settings.email_signature', value)
-            }
-          />
-        </Element>
-
-        <Divider />
-
-        <Element leftSide={t('attach_pdf')}>
-          <Toggle
-            checked={company?.settings.pdf_email_attachment}
-            onValueChange={(value) =>
-              handleChange('settings.pdf_email_attachment', value)
-            }
-          />
-        </Element>
-
-        <Element leftSide={t('attach_documents')}>
-          <Toggle
-            checked={company?.settings.document_email_attachment}
-            onValueChange={(value) =>
-              handleChange('settings.document_email_attachment', value)
-            }
-          />
-        </Element>
-
-        <Element leftSide={t('attach_ubl')}>
-          <Toggle
-            checked={company?.settings.ubl_email_attachment}
-            onValueChange={(value) =>
-              handleChange('settings.ubl_email_attachment', value)
             }
           />
         </Element>

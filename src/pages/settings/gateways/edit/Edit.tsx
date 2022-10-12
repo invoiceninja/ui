@@ -61,6 +61,12 @@ export function Edit() {
     }
   }, [data]);
 
+  useEffect(() => {
+    return () => {
+      setCompanyGateway(undefined);
+    };
+  }, []);
+
   return (
     <Settings
       title={documentTitle}

@@ -17,6 +17,7 @@ import { route } from 'common/helpers/route';
 import { Link } from 'components/forms/Link';
 import { Invoice } from 'common/interfaces/invoice';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { Card } from '@invoiceninja/cards';
 
 export function PastDueInvoices() {
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -62,22 +63,20 @@ export function PastDueInvoices() {
   ];
 
   return (
-    <div className="bg-white rounded shadow">
-      <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-        <h3 className="text-lg leading-6 font-medium text-gray-900">
-          {t('past_due_invoices')}
-        </h3>
-      </div>
-
-      <div className="-mt-2">
-        <DataTable
-          resource="invoice"
-          columns={columns}
-          endpoint="/api/v1/invoices?include=client&overdue=true&per_page=50&page=1"
-          withoutActions
-          withoutPagination
-        />
-      </div>
-    </div>
+    <Card
+      title={t('past_due_invoices')}
+      className="h-96"
+      withScrollableBody
+      withoutBodyPadding
+    >
+      <DataTable
+        resource="invoice"
+        columns={columns}
+        endpoint="/api/v1/invoices?include=client&overdue=true&per_page=50&page=1"
+        withoutActions
+        withoutPagination
+        withoutPadding
+      />
+    </Card>
   );
 }

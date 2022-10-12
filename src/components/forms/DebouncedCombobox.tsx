@@ -51,6 +51,7 @@ interface Props {
   initiallyVisible?: boolean;
   withProperty?: string;
   sortBy?: string;
+  staleTime?: number; // in ms
 }
 
 export function DebouncedCombobox(props: Props) {
@@ -82,7 +83,10 @@ export function DebouncedCombobox(props: Props) {
     };
   }, [props.defaultValue]);
 
-  const request = async (query: string, staleTime = Infinity) => {
+  const request = async (
+    query: string,
+    staleTime = props.staleTime || Infinity
+  ) => {
     setIsLoading(true);
 
     const url = new URL(endpoint(props.endpoint));
