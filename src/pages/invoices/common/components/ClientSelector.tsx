@@ -51,6 +51,8 @@ export function ClientSelector(props: Props) {
         .then((client) => setClient(client));
   }, [resource?.client_id]);
 
+  console.log(client?.contacts);
+
   return (
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex  flex-col justify-between space-y-2">
@@ -70,7 +72,7 @@ export function ClientSelector(props: Props) {
             <Link to={route('/clients/:id/edit', { id: client.id })}>
               {t('edit_client')}
             </Link>
-            
+
             <span className="text-sm text-gray-800">/</span>
 
             <Link to={route('/clients/:id', { id: client.id })}>
@@ -101,7 +103,13 @@ export function ClientSelector(props: Props) {
               }
             />
 
-            <span className="text-sm text-gray-700">{contact.email}</span>
+            <div>
+              <p className="text-sm text-gray-700">{contact.email}</p>
+
+              <Link to={contact.link} external>
+                {t('view_in_portal')}
+              </Link>
+            </div>
           </div>
         ))}
     </Card>
