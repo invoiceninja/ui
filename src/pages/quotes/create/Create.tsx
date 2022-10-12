@@ -26,6 +26,7 @@ import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { invoiceSumAtom, quoteAtom } from '../common/atoms';
 import { QuoteDetails } from '../common/components/QuoteDetails';
 import { QuoteFooter } from '../common/components/QuoteFooter';
@@ -43,6 +44,8 @@ export function Create() {
       href: '/quotes/create',
     },
   ];
+
+  const [searchParams] = useSearchParams();
 
   const [quote, setQuote] = useAtom(quoteAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
@@ -73,6 +76,10 @@ export function Create() {
 
       if (typeof _quote.line_items === 'string') {
         _quote.line_items = [];
+      }
+
+      if (searchParams.get('client')) {
+        _quote.client_id = searchParams.get('client')!;
       }
 
       setQuote(_quote);

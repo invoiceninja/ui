@@ -26,6 +26,7 @@ import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { creditAtom, invoiceSumAtom } from '../common/atoms';
 import { CreditDetails } from '../common/components/CreditDetails';
 import { CreditFooter } from '../common/components/CreditFooter';
@@ -43,6 +44,8 @@ export function Create() {
       href: '/credits/create',
     },
   ];
+
+  const [searchParams] = useSearchParams();
 
   const [credit, setCredit] = useAtom(creditAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
@@ -75,6 +78,10 @@ export function Create() {
 
       if (typeof _credit.line_items === 'string') {
         _credit.line_items = [];
+      }
+
+      if (searchParams.get('client')) {
+        _credit.client_id = searchParams.get('client')!;
       }
 
       setCredit(_credit);
@@ -136,7 +143,7 @@ export function Create() {
         <CreditDetails handleChange={handleChange} />
 
         <div className="col-span-12">
-          {credit  && client ? (
+          {credit && client ? (
             <ProductsTable
               type="product"
               resource={credit}
