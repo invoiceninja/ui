@@ -9,7 +9,7 @@
  */
 
 import { Card } from '@invoiceninja/cards';
-import { Checkbox } from '@invoiceninja/forms';
+import { Checkbox, Link } from '@invoiceninja/forms';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { Client } from 'common/interfaces/client';
 import { Invoice } from 'common/interfaces/invoice';
@@ -17,6 +17,7 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ClientSelector as Selector } from 'components/clients/ClientSelector';
+import { route } from 'common/helpers/route';
 
 interface Props {
   readonly?: boolean;
@@ -52,7 +53,7 @@ export function ClientSelector(props: Props) {
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
-      <div className="flex items-center justify-between">
+      <div className="flex  flex-col justify-between space-y-2">
         <Selector
           inputLabel={t('client')}
           onChange={(client) => props.onChange(client.id)}
@@ -63,6 +64,20 @@ export function ClientSelector(props: Props) {
           initiallyVisible={!resource?.client_id}
           errorMessage={props.errorMessage}
         />
+
+        {client && (
+          <div className="space-x-2">
+            <Link to={route('/clients/:id/edit', { id: client.id })}>
+              {t('edit_client')}
+            </Link>
+            
+            <span className="text-sm text-gray-800">/</span>
+
+            <Link to={route('/clients/:id', { id: client.id })}>
+              {t('view_client')}
+            </Link>
+          </div>
+        )}
       </div>
 
       {resource?.client_id &&
