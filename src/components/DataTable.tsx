@@ -169,9 +169,7 @@ export function DataTable(props: Props) {
             </Inline>
           }
         >
-          <span className="text-sm">{t('with_selected')}</span>
-
-          <Dropdown label={t('actions')}>
+          <Dropdown label={t('bulk_action')}>
             <DropdownElement onClick={() => bulk('archive')}>
               {t('archive')}
             </DropdownElement>
