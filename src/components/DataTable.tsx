@@ -174,7 +174,7 @@ export function DataTable(props: Props) {
             </Inline>
           }
         >
-          <Dropdown label={t('bulk_action')}>
+          <Dropdown label={t('more_actions')}>
             <DropdownElement onClick={() => bulk('archive')}>
               {t('archive')}
             </DropdownElement>
