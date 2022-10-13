@@ -12,7 +12,6 @@ import { date, trans } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { ActivityRecord } from 'common/interfaces/activity-record';
 import { route } from 'common/helpers/route';
-import { resolveActivityResource } from '../helprs/resolve-activity-resource';
 import { useCallback } from 'react';
 import { NonClickableElement } from 'components/cards/NonClickableElement';
 import reactStringReplace from 'react-string-replace';
@@ -133,17 +132,13 @@ export function useGenerateActivityElement() {
     return text;
   }, []);
 
-  return (activity: ActivityRecord) => {
-    const resource = resolveActivityResource(activity);
+  return (activity: ActivityRecord) => (
+    <NonClickableElement>
+      {generate(activity)}
 
-    return (
-      <NonClickableElement>
-        {generate(activity)}
-
-        <p className="text-gray-500 text-xs">
-          {date(activity.created_at, dateFormat)} &#183; {activity.ip}
-        </p>
-      </NonClickableElement>
-    );
-  };
+      <p className="text-gray-500 text-xs">
+        {date(activity.created_at, dateFormat)} &#183; {activity.ip}
+      </p>
+    </NonClickableElement>
+  );
 }
