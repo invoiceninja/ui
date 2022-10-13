@@ -20,6 +20,10 @@ import { RecurringInvoice } from './recurring-invoice';
 import { Task } from './task';
 import { Vendor } from './vendor';
 
+interface WithHashId {
+  hashed_id: string;
+}
+
 export interface ActivityRecord {
   id: string;
   activity_type_id: string;
@@ -42,15 +46,15 @@ export interface ActivityRecord {
   token_id: string;
   notes: string;
   ip: string;
-  client: Client;
+  client: Client & WithHashId;
   task: Task;
   contact: ClientContact;
-  user: User;
-  expense: Expense;
-  invoice: Invoice;
-  recurring_invoice: RecurringInvoice;
-  payment: Payment;
-  credit: Credit;
-  quote: Quote;
-  vendor: Vendor;
+  user: User & WithHashId;
+  expense?: Expense & WithHashId;
+  invoice?: Invoice & WithHashId;
+  recurring_invoice?: RecurringInvoice & WithHashId;
+  payment?: Payment & WithHashId;
+  credit?: Credit & WithHashId;
+  quote?: Quote & WithHashId;
+  vendor?: Vendor & WithHashId;
 }
