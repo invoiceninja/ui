@@ -44,6 +44,7 @@
     "react-router-dom": "^6.2.1",
     "react-select": "^5.2.2",
     "react-use": "^17.4.0",
+    "react-string-replace": "^1.1.0",
     "recharts": "^2.1.9",
     "remove": "^0.1.5",
     "uuid": "^8.3.2"
