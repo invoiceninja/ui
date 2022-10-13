@@ -17,7 +17,7 @@ interface Props extends CommonProps {
 export function NonClickableElement(props: Props) {
   return (
     <div
-      className={`w-full text-left px-4 sm:px-6 block hover:bg-gray-50 py-4 space-x-3 text-gray-700 hover:text-gray-900 text-sm ${props.className}`}
+      className={`w-full text-left px-4 sm:px-6 block hover:bg-gray-50 py-4 text-gray-700 hover:text-gray-900 text-sm ${props.className}`}
     >
       {props.children}
     </div>
