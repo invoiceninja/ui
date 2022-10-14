@@ -17,10 +17,15 @@ import { NonClickableElement } from 'components/cards/NonClickableElement';
 import reactStringReplace from 'react-string-replace';
 import { Link } from '@invoiceninja/forms';
 import { useTranslation } from 'react-i18next';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 
 export function useGenerateActivityElement() {
   const { dateFormat } = useCurrentCompanyDateFormats();
   const { t } = useTranslation();
+
+  const formatMoney = useFormatMoney();
+  const company = useCurrentCompany();
 
   const contact = (activity: ActivityRecord) => {
     if (!activity.client) {
@@ -84,13 +89,6 @@ export function useGenerateActivityElement() {
           {activity?.expense?.number}
         </Link>
       ),
-      invoice: (
-        <Link
-          to={route('/invoices/:id/edit', { id: activity.invoice?.hashed_id })}
-        >
-          {activity?.invoice?.number}
-        </Link>
-      ),
       recurring_invoice: (
         <Link
           to={route('/recurring_invoices/:id/edit', {
@@ -100,6 +98,20 @@ export function useGenerateActivityElement() {
           {activity?.recurring_invoice?.number}
         </Link>
       ),
+      invoice: (
+        <Link
+          to={route('/invoices/:id/edit', { id: activity.invoice?.hashed_id })}
+        >
+          {activity?.invoice?.number}
+        </Link>
+      ),
+      payment_amount:
+        activity.payment &&
+        formatMoney(
+          activity.payment.amount,
+          activity.client?.country_id || company?.settings.country_id,
+          activity.client?.settings.currency_id || company?.settings.currency_id
+        ),
       payment: (
         <Link to={route('/payments/:id', { id: activity.payment?.hashed_id })}>
           {activity?.payment?.number}
@@ -122,6 +134,7 @@ export function useGenerateActivityElement() {
           {activity?.vendor?.name}
         </Link>
       ),
+      adjustment: '$10',
     };
 
     for (const [variable, value] of Object.entries(replacements)) {
