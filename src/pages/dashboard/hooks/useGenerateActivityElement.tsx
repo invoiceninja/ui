@@ -134,7 +134,13 @@ export function useGenerateActivityElement() {
           {activity?.vendor?.name}
         </Link>
       ),
-      adjustment: '$10',
+      adjustment:
+        activity.payment &&
+        formatMoney(
+          activity.payment.refunded,
+          activity.client?.country_id || company?.settings.country_id,
+          activity.client?.settings.currency_id || company?.settings.currency_id
+        ),
     };
 
     for (const [variable, value] of Object.entries(replacements)) {
