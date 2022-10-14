@@ -150,7 +150,7 @@ export function useGenerateActivityElement() {
     }
 
     return text;
-  }, []);
+  }, [company]);
 
   return (activity: ActivityRecord) => (
     <NonClickableElement>
