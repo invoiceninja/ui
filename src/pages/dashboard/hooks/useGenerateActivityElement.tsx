@@ -12,7 +12,6 @@ import { date, trans } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { ActivityRecord } from 'common/interfaces/activity-record';
 import { route } from 'common/helpers/route';
-import { useCallback } from 'react';
 import { NonClickableElement } from 'components/cards/NonClickableElement';
 import reactStringReplace from 'react-string-replace';
 import { Link } from '@invoiceninja/forms';
@@ -52,7 +51,7 @@ export function useGenerateActivityElement() {
     return activity.client.display_name;
   };
 
-  const generate = useCallback((activity: ActivityRecord) => {
+  const generate = (activity: ActivityRecord) => {
     let text = trans(`activity_${activity.activity_type_id}`, {});
 
     const replacements = {
@@ -150,7 +149,7 @@ export function useGenerateActivityElement() {
     }
 
     return text;
-  }, [company]);
+  };
 
   return (activity: ActivityRecord) => (
     <NonClickableElement>
