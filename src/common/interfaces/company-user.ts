@@ -15,7 +15,7 @@ import { User } from './user';
 export interface CompanyUser {
   permissions: string;
   notifications: Notifications;
-  settings: Record<string, unknown>;
+  settings: Record<string, any>;
   is_owner: boolean;
   is_admin: boolean;
   is_locked: boolean;
