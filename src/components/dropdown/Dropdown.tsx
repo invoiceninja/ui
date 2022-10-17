@@ -11,18 +11,24 @@
 import Tippy from '@tippyjs/react/headless';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { ChevronDown } from 'react-feather';
-import { cloneElement, useState } from 'react';
+import { cloneElement, useRef, useState } from 'react';
 import { DropdownElement } from './DropdownElement';
+import { useClickAway } from 'react-use';
 
 interface Props extends CommonProps {
   label?: string;
 }
 
 export function Dropdown(props: Props) {
+  const ref = useRef(null);
   const [visible, setVisible] = useState(false);
 
+  useClickAway(ref, () => {
+    visible && setVisible(false);
+  });
+
   return (
-    <div>
+    <div ref={ref}>
       <Tippy
         disabled={props.disabled}
         placement="bottom"

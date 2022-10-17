@@ -8,15 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useResolveCountry } from 'common/hooks/useResolveCountry';
 import { useClientQuery } from 'common/queries/clients';
 import { InfoCard } from 'components/InfoCard';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
 export function Address() {
-  const [t] = useTranslation();
+  const { t } = useTranslation();
   const { id } = useParams();
   const { data: client } = useClientQuery({ id });
+  const resolveCountry = useResolveCountry();
 
   return (
     <>
@@ -27,12 +29,18 @@ export function Address() {
             value={
               <>
                 <p>
-                  {client.data.data.address1}, {client.data.data.address2}
+                  {client.data.data.address1.length > 0 &&
+                    `${client.data.data.address1}, `}
+                  {client.data.data.address2}
                 </p>
 
                 <p>
-                  {client.data.data.city}, {client.data.data.state}
+                  {client.data.data.city.length > 0 &&
+                    `${client.data.data.city}, `}
+                  {client.data.data.state}
                 </p>
+
+                <p>{resolveCountry(client.data.data.country_id)?.full_name}</p>
               </>
             }
             className="h-full"

@@ -39,6 +39,8 @@ import {
   Thead,
   Tr,
 } from './tables';
+import { atomWithStorage } from 'jotai/utils';
+import { useAtom } from 'jotai';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -58,7 +60,10 @@ interface Props {
   withoutActions?: boolean;
   withoutPagination?: boolean;
   rightSide?: ReactNode;
+  withoutPadding?: boolean;
 }
+
+export const datatablePerPageAtom = atomWithStorage('perPage', '10');
 
 export function DataTable(props: Props) {
   const [t] = useTranslation();
@@ -71,7 +76,7 @@ export function DataTable(props: Props) {
 
   const [filter, setFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [perPage, setPerPage] = useState('10');
+  const [perPage, setPerPage] = useAtom(datatablePerPageAtom);
   const [sort, setSort] = useState('id|asc');
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState(['active']);
@@ -169,9 +174,7 @@ export function DataTable(props: Props) {
             </Inline>
           }
         >
-          <span className="text-sm">{t('with_selected')}</span>
-
-          <Dropdown label={t('actions')}>
+          <Dropdown label={t('more_actions')}>
             <DropdownElement onClick={() => bulk('archive')}>
               {t('archive')}
             </DropdownElement>
@@ -187,7 +190,7 @@ export function DataTable(props: Props) {
         </Actions>
       )}
 
-      <Table>
+      <Table withoutPadding={props.withoutPadding}>
         <Thead>
           {!props.withoutActions && (
             <Th>

@@ -54,13 +54,17 @@ export function Selector() {
       {companyChanges?.enabled_tax_rates > 0 && (
         <Card>
           {companyChanges?.enabled_tax_rates > 0 && (
-            <Element leftSide={t('tax_rate1')}>
+            <Element leftSide={t('default_tax_rate')}>
               <SelectField
                 id="settings.tax_rate1"
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name1 || '0'}
               >
-                <option value="0"></option>
+                <option
+                  data-rate={0}
+                  data-rate-name="settings.tax_name1"
+                  value="0"
+                />
                 {data &&
                   data.data.data.map((taxRate: TaxRate) => (
                     <option
@@ -77,13 +81,17 @@ export function Selector() {
           )}
 
           {companyChanges?.enabled_tax_rates > 1 && (
-            <Element leftSide={t('tax_rate2')}>
+            <Element leftSide={t('default_tax_rate')}>
               <SelectField
                 id="settings.tax_rate2"
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name2 || '0'}
               >
-                <option value="0"></option>
+                <option
+                  data-rate={0}
+                  data-rate-name="settings.tax_name2"
+                  value="0"
+                />
                 {data &&
                   data.data.data.map((taxRate: TaxRate) => (
                     <option
@@ -100,13 +108,17 @@ export function Selector() {
           )}
 
           {companyChanges?.enabled_tax_rates > 2 && (
-            <Element leftSide={t('tax_rate3')}>
+            <Element leftSide={t('default_tax_rate')}>
               <SelectField
                 id="settings.tax_rate3"
                 onChange={handleChange}
                 value={companyChanges?.settings?.tax_name3 || '0'}
               >
-                <option value="0"></option>
+                <option
+                  data-rate={0}
+                  data-rate-name="settings.tax_name3"
+                  value="0"
+                />
                 {data &&
                   data.data.data.map((taxRate: TaxRate) => (
                     <option

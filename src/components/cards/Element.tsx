@@ -36,11 +36,17 @@ export function Element(props: Props) {
           {props.leftSide}
           {props.required && <span className="ml-1 text-red-600">*</span>}
         </span>
-        {props.leftSideHelp && (
-          <span className="text-gray-400 mt-2 text-xs">
-            {props.leftSideHelp}
-          </span>
-        )}
+        {props.leftSideHelp &&
+          (typeof props.leftSideHelp === 'object' ? (
+            props.leftSideHelp
+          ) : (
+            <span
+              className="text-xs text-gray-500"
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              dangerouslySetInnerHTML={{ __html: props.leftSideHelp }}
+            ></span>
+          ))}
       </dt>
       <dd
         className={classNames(

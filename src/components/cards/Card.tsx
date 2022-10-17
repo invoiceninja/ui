@@ -31,6 +31,7 @@ interface Props {
   withScrollableBody?: boolean;
   additionalAction?: ReactNode;
   isLoading?: boolean;
+  withoutBodyPadding?: boolean;
 }
 
 export function Card(props: Props) {
@@ -63,16 +64,14 @@ export function Card(props: Props) {
           </div>
         )}
 
-        <div className="py-0">
-          <dl className="py-4">
-            {props.isLoading && <Element leftSide={<Spinner />} />}
+        <div className={classNames({ 'py-4': !props.withoutBodyPadding })}>
+          {props.isLoading && <Element leftSide={<Spinner />} />}
 
-            {props.withContainer ? (
-              <CardContainer>{props.children}</CardContainer>
-            ) : (
-              props.children
-            )}
-          </dl>
+          {props.withContainer ? (
+            <CardContainer>{props.children}</CardContainer>
+          ) : (
+            props.children
+          )}
         </div>
 
         {(props.withSaveButton || props.additionalAction) && (
