@@ -20,6 +20,15 @@ interface Props extends InputCustomFieldProps {
   noExternalPadding?: boolean;
 }
 
+export function customField(value: string) {
+  const [field, type] = value.includes('|') ? value.split('|') : [value, ''];
+
+  return {
+    label: () => field,
+    type: () => type,
+  };
+}
+
 export function CustomField(props: Props) {
   const [label, setLabel] = useState('');
 
