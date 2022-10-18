@@ -20,6 +20,7 @@ import { Invoice } from 'common/interfaces/invoice';
 import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
 import { DataTableColumns } from 'components/DataTable';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 
@@ -41,14 +42,11 @@ const allColumns = [
   // 'auto_bill_enabled',
   // 'client_postal_code',
   // 'archived_at',
-  // 'assigned_to',
   // 'client_city',
   // 'client_country',
   // 'client_state',
   // 'contact_email',
   // 'contact_name',
-  // 'created_at',
-  // 'created_by',
   // 'custom1',
   // 'custom2',
   // 'custom3',
@@ -66,17 +64,13 @@ const allColumns = [
   // 'partial_due_date',
   // 'po_number',
   // 'private_notes',
-  // 'project',
   // 'public_notes',
-  // 'quote',
-  // 'recurring_invoice',
   // 'reminder1_sent',
   // 'reminder2_sent',
   // 'reminder3_sent',
   // 'reminder_last_sent',
   // 'tax_amount',
   // 'updated_at',
-  // 'vendor',
 ];
 
 const defaultColumns = [
@@ -97,6 +91,18 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const company = useCurrentCompany();
   const companyUser = useCurrentCompanyUser();
   const resolveCountry = useResolveCountry();
+
+  const invoiceViewedAt = useCallback((invoice: Invoice) => {
+    let viewed = '';
+
+    invoice.invitations.map((invitation) => {
+      if (invitation.viewed_date) {
+        viewed = invitation.viewed_date;
+      }
+    });
+
+    return viewed;
+  }, []);
 
   const columns: DataTableColumnsExtended<Invoice> = [
     {
@@ -123,7 +129,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
         formatMoney(
           value,
           invoice.client?.country_id || company?.settings.country_id,
-
           invoice.client?.settings.currency_id || company?.settings.currency_id
         ),
     },
@@ -180,12 +185,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'assigned_to',
-      id: 'assigned_user_id',
-      label: t('assigned_to'),
-      format: (value) => '', // Need to fetch the user with the invoice.
-    },
-    {
       column: 'client_city',
       id: 'client_id',
       label: t('client_city'),
@@ -231,12 +230,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'created_by',
-      id: 'user_id',
-      label: t('created_by'),
-      format: (value) => '', // Need to fetch the user with the invoice.
-    },
-    {
       column: 'custom1',
       id: 'custom_value1',
       label: customField(company?.custom_fields.invoice1).label(),
@@ -277,7 +270,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'entity_state',
       id: 'id',
       label: t('entity_state'),
-      format: (value) => '', // Need to calculate manually
+      format: (value, invoice) => (
+        <span>
+          {invoice.archived_at === null && t('active')}
+          {invoice.archived_at !== null && t('archived')}
+          {invoice.is_deleted && t('deleted')}
+        </span>
+      ),
     },
     {
       column: 'exchange_rate',
@@ -294,7 +293,10 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'is_viewed',
       id: 'id',
       label: t('is_viewed'),
-      format: (value, invoice) => '', // Need to calculate manually
+      format: (value, invoice) =>
+        invoiceViewedAt(invoice).length > 0
+          ? date(invoiceViewedAt(invoice), dateFormat)
+          : t('No'),
     },
     {
       column: 'last_sent_date',
@@ -343,28 +345,10 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value) => <span className="truncate">{value}</span>,
     },
     {
-      column: 'project',
-      id: 'project_id',
-      label: t('project'),
-      format: (value) => value, // Need to include the project with the invoices
-    },
-    {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
       format: (value) => <span className="truncate">{value}</span>,
-    },
-    {
-      column: 'quote',
-      id: 'quote_id',
-      label: t('quote'),
-      format: (value) => value, // Need to include the quote with the invoices
-    },
-    {
-      column: 'recurring',
-      id: 'recurring_id',
-      label: t('recurring'),
-      format: (value) => value, // Need to include the recurring with the invoices
     },
     {
       column: 'reminder1_sent',
@@ -406,12 +390,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'updated_at',
       label: t('last_updated'),
       format: (value) => date(value, dateFormat),
-    },
-    {
-      column: 'vendor',
-      id: 'vendor_id',
-      label: t('vendor'),
-      format: (value) => value, // Need to include the vendor with the invoices
     },
   ];
 
