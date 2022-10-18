@@ -9,6 +9,7 @@
  */
 import { Client } from './client';
 import { InvoiceItem } from './invoice-item';
+import { Invitation } from './purchase-order';
 
 export interface Invoice {
   id: string;
@@ -72,7 +73,7 @@ export interface Invoice {
   paid_to_date: number;
   subscription_id: string;
   auto_bill_enabled: boolean;
-  invitations: any[];
+  invitations: Invitation[];
   documents: any[];
   client?: Client;
 }
