@@ -15,7 +15,12 @@ import { useTranslation } from 'react-i18next';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
 import { useActions } from '../edit/components/Actions';
-import { useInvoiceColumns } from '../common/hooks/useInvoiceColumns';
+import {
+  defaultColumns,
+  invoiceColumns,
+  useInvoiceColumns,
+} from '../common/hooks/useInvoiceColumns';
+import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 
 export function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -53,6 +58,13 @@ export function Invoices() {
         withResourcefulActions
         customActions={actions}
         rightSide={importButton}
+        leftSideChevrons={
+          <DataTableColumnsPicker
+            table="invoice"
+            columns={invoiceColumns}
+            defaultColumns={defaultColumns}
+          />
+        }
       />
     </Default>
   );
