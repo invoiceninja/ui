@@ -114,13 +114,13 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'status',
       id: 'status_id',
       label: t('status'),
-      format: (value, invoice) => <InvoiceStatus entity={invoice} />,
+      format: (_value, invoice) => <InvoiceStatus entity={invoice} />,
     },
     {
       column: 'number',
       id: 'number',
       label: t('number'),
-      format: (value, invoice) => (
+      format: (_value, invoice) => (
         <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
           {invoice.number}
         </Link>
@@ -313,7 +313,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'last_sent_template',
       id: 'id',
       label: t('last_sent_template'),
-      format: (value) => '', // Need to calculate manually
+      format: () => '', // Need to calculate manually
     },
     {
       column: 'next_send_date',
