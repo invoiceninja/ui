@@ -46,12 +46,13 @@ export function DataTableColumnsPicker(props: Props) {
   const dispatch = useDispatch();
 
   const { t } = useTranslation();
-  const { table } = props;
+  const { table, defaultColumns } = props;
 
   const [filteredColumns, setFilteredColumns] = useState(props.columns);
 
   const [currentColumns, setCurrentColumns] = useState<string[]>(
-    currentUser?.company_user?.settings?.react_table_columns?.[table] || []
+    currentUser?.company_user?.settings?.react_table_columns?.[table] ||
+      defaultColumns
   );
 
   const [isModalVisible, setIsModalVisible] = useState(false);
