@@ -10,12 +10,16 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
+import { CompanyUser } from 'common/interfaces/company-user';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { User } from 'common/interfaces/user';
+import { updateUser } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { cloneDeep, set } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Button, SelectField } from './forms';
 import { Inline } from './Inline';
 import { Modal } from './Modal';
@@ -30,6 +34,8 @@ export function DataTableColumnsPicker(props: Props) {
   const currentUser = useSelector((state: RootState) => state.user.user) as
     | User
     | undefined;
+
+  const dispatch = useDispatch();
 
   const { t } = useTranslation();
   const { table } = props;
@@ -63,11 +69,20 @@ export function DataTableColumnsPicker(props: Props) {
       currentColumns
     );
 
-    // toast.processing();
+    toast.processing();
 
     request('PUT', endpoint('/api/v1/company_users/:id', { id: user.id }), user)
-      .then((response) => console.log(response))
-      .catch((error) => console.error(error));
+      .then((response: GenericSingleResourceResponse<CompanyUser>) => {
+        set(user, 'company_user', response.data.data);
+        dispatch(updateUser(user));
+
+        toast.success('saved_settings');
+      })
+      .catch((error) => {
+        toast.error();
+
+        console.error(error);
+      });
   };
 
   return (
