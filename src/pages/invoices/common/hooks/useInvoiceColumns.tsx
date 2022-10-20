@@ -14,14 +14,16 @@ import { route } from 'common/helpers/route';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentCompanyUser } from 'common/hooks/useCurrentCompanyUser';
 import { useResolveCountry } from 'common/hooks/useResolveCountry';
 import { Invoice } from 'common/interfaces/invoice';
+import { User } from 'common/interfaces/user';
+import { RootState } from 'common/stores/store';
 import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
 import { DataTableColumns } from 'components/DataTable';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSelector } from 'react-redux';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 
 export type DataTableColumnsExtended<T = any> = {
@@ -89,8 +91,11 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
 
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
-  const companyUser = useCurrentCompanyUser();
   const resolveCountry = useResolveCountry();
+
+  const currentUser = useSelector((state: RootState) => state.user.user) as
+    | User
+    | undefined;
 
   const invoiceViewedAt = useCallback((invoice: Invoice) => {
     let viewed = '';
@@ -394,7 +399,10 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   ];
 
   const list: string[] =
-    companyUser?.settings?.table_columns?.invoice || defaultColumns;
+    currentUser?.company_user?.settings?.react_table_columns?.invoice ||
+    defaultColumns;
 
-  return columns.filter((column) => list.includes(column.column));
+  return columns
+    .filter((column) => list.includes(column.column))
+    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
 }
