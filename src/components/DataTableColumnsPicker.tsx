@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Button, SelectField } from './forms';
 import { Inline } from './Inline';
 import { Modal } from './Modal';
+import { MdDragHandle, MdClose } from 'react-icons/md';
 
 interface Props {
   columns: string[];
@@ -61,8 +62,6 @@ export function DataTableColumnsPicker(props: Props) {
   const onSave = () => {
     const user = cloneDeep(currentUser) as User;
 
-    console.log(user);
-
     set(
       user,
       `company_user.settings.react_table_columns.${table}`,
@@ -83,6 +82,12 @@ export function DataTableColumnsPicker(props: Props) {
 
         console.error(error);
       });
+  };
+
+  const handleDelete = (column: string) => {
+    setCurrentColumns((current) =>
+      current.filter((columns) => !columns.includes(column))
+    );
   };
 
   return (
@@ -107,7 +112,20 @@ export function DataTableColumnsPicker(props: Props) {
 
         <div className="max-h-64 overflow-y-auto">
           {currentColumns.map((column, index) => (
-            <p key={index}>{t(column)}</p>
+            <div
+              key={index}
+              className="w-full inline-flex items-center justify-between pr-4 my-2"
+            >
+              <div className="space-x-2 inline-flex items-center">
+                <button onClick={() => handleDelete(column)}>
+                  <MdClose size={20} />
+                </button>
+                <button className="cursor-grab">{t(column)}</button>
+              </div>
+              <button>
+                <MdDragHandle size={20} />
+              </button>
+            </div>
           ))}
         </div>
 
