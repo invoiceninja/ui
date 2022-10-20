@@ -24,6 +24,13 @@ import { Button, SelectField } from './forms';
 import { Inline } from './Inline';
 import { Modal } from './Modal';
 import { MdDragHandle, MdClose } from 'react-icons/md';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from 'react-beautiful-dnd';
+import { arrayMoveImmutable } from 'array-move';
 
 interface Props {
   columns: string[];
@@ -90,6 +97,16 @@ export function DataTableColumnsPicker(props: Props) {
     );
   };
 
+  const onDragEnd = (result: DropResult) => {
+    const sorted = arrayMoveImmutable(
+      currentColumns,
+      result.source.index,
+      result.destination?.index as unknown as number
+    );
+
+    setCurrentColumns(sorted);
+  };
+
   return (
     <>
       <Modal
@@ -111,22 +128,41 @@ export function DataTableColumnsPicker(props: Props) {
         </SelectField>
 
         <div className="max-h-64 overflow-y-auto">
-          {currentColumns.map((column, index) => (
-            <div
-              key={index}
-              className="w-full inline-flex items-center justify-between pr-4 my-2"
-            >
-              <div className="space-x-2 inline-flex items-center">
-                <button onClick={() => handleDelete(column)}>
-                  <MdClose size={20} />
-                </button>
-                <button className="cursor-grab">{t(column)}</button>
-              </div>
-              <button>
-                <MdDragHandle size={20} />
-              </button>
-            </div>
-          ))}
+          <DragDropContext onDragEnd={onDragEnd}>
+            <Droppable droppableId="columns">
+              {(provided) => (
+                <div {...provided.droppableProps} ref={provided.innerRef}>
+                  {currentColumns.map((column, index) => (
+                    <Draggable
+                      key={index}
+                      draggableId={`item-${index}`}
+                      index={index}
+                    >
+                      {(provided) => (
+                        <div
+                          ref={provided.innerRef}
+                          {...provided.draggableProps}
+                          {...provided.dragHandleProps}
+                          className="w-full inline-flex items-center justify-between pr-4 my-2"
+                        >
+                          <div className="space-x-2 inline-flex items-center">
+                            <button onClick={() => handleDelete(column)}>
+                              <MdClose size={20} />
+                            </button>
+                            <p>{t(column)}</p>
+                          </div>
+                          <button className="cursor-grab">
+                            <MdDragHandle size={20} />
+                          </button>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </div>
+              )}
+            </Droppable>
+          </DragDropContext>
         </div>
 
         <div className="flex lg:flex-row lg:justify-end">
