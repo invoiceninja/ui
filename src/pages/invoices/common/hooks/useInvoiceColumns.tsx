@@ -237,22 +237,30 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
     {
       column: 'custom1',
       id: 'custom_value1',
-      label: customField(company?.custom_fields.invoice1).label(),
+      label:
+        company?.custom_fields.invoice1 &&
+        customField(company?.custom_fields.invoice1).label(),
     },
     {
       column: 'custom2',
       id: 'custom_value2',
-      label: customField(company?.custom_fields.invoice2).label(),
+      label:
+        company?.custom_fields.invoice2 &&
+        customField(company?.custom_fields.invoice2).label(),
     },
     {
       column: 'custom3',
       id: 'custom_value3',
-      label: customField(company?.custom_fields.invoice3).label(),
+      label:
+        company?.custom_fields.invoice3 &&
+        customField(company?.custom_fields.invoice3).label(),
     },
     {
       column: 'custom4',
       id: 'custom_value4',
-      label: customField(company?.custom_fields.invoice4).label(),
+      label:
+        company?.custom_fields.invoice4 &&
+        customField(company?.custom_fields.invoice4).label(),
     },
     {
       column: 'discount',
