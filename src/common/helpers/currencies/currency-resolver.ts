@@ -11,6 +11,7 @@
 import { endpoint } from 'common/helpers';
 import { Currency } from 'common/interfaces/currency';
 import { Statics } from 'common/interfaces/statics';
+import { useState } from 'react';
 import { QueryClient } from 'react-query';
 import { request } from '../request';
 
@@ -43,4 +44,15 @@ const currencyResolver = new CurrencyResolver();
 
 export function useCurrencyResolver() {
   return currencyResolver;
+}
+
+export function useResolveCurrency() {
+  const currencyResolver = useCurrencyResolver();
+  const [currency, setCurrency] = useState<Currency>();
+
+  return (id: string) => {
+    currencyResolver.find(id).then((currency) => setCurrency(currency));
+
+    return currency;
+  };
 }
