@@ -73,9 +73,11 @@ export const invoiceColumns = [
   'reminder_last_sent',
   'tax_amount',
   'updated_at',
-];
+] as const;
 
-export const defaultColumns = [
+type InvoiceColumns = typeof invoiceColumns[number];
+
+export const defaultColumns: InvoiceColumns[] = [
   'status',
   'number',
   'client',
@@ -238,8 +240,9 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'custom1',
       id: 'custom_value1',
       label:
-        company?.custom_fields.invoice1 &&
-        customField(company?.custom_fields.invoice1).label() || t('first_custom'),
+        (company?.custom_fields.invoice1 &&
+          customField(company?.custom_fields.invoice1).label()) ||
+        t('first_custom'),
     },
     {
       column: 'custom2',
