@@ -18,7 +18,12 @@ import { Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { route } from 'common/helpers/route';
 import { Link as ReactRouterLink } from 'react-router-dom';
-import { useClientColumns } from '../common/hooks/useClientColumns';
+import {
+  clientColumns,
+  defaultColumns,
+  useClientColumns,
+} from '../common/hooks/useClientColumns';
+import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 
 export function Clients() {
   useTitle('clients');
@@ -100,6 +105,13 @@ export function Clients() {
         withResourcefulActions
         customActions={actions}
         rightSide={importButton}
+        leftSideChevrons={
+          <DataTableColumnsPicker
+            table="client"
+            columns={clientColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+          />
+        }
       />
     </Default>
   );
