@@ -110,6 +110,10 @@ export function DataTableColumnsPicker(props: Props) {
     setCurrentColumns(sorted);
   };
 
+  const handleReset = useCallback(() => {
+    setCurrentColumns(defaultColumns);
+  }, []);
+
   return (
     <>
       <Modal
@@ -170,6 +174,10 @@ export function DataTableColumnsPicker(props: Props) {
 
         <div className="flex lg:flex-row lg:justify-end">
           <Inline>
+            <Button type="minimal" className="mx-2" onClick={handleReset}>
+              {t('reset')}
+            </Button>
+            
             <Button onClick={onSave}>{t('save')}</Button>
           </Inline>
         </div>
