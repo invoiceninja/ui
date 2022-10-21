@@ -8,85 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { Page } from 'components/Breadcrumbs';
-import { DataTable, DataTableColumns } from 'components/DataTable';
+import { DataTable } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
 import { Download } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { route } from 'common/helpers/route';
 import { Link as ReactRouterLink } from 'react-router-dom';
+import { useClientColumns } from '../common/hooks/useClientColumns';
 
 export function Clients() {
   useTitle('clients');
 
   const [t] = useTranslation();
 
-  const formatMoney = useFormatMoney();
-
-  const { dateFormat } = useCurrentCompanyDateFormats();
-
   const pages: Page[] = [{ name: t('clients'), href: '/clients' }];
-
-  const columns: DataTableColumns<Client> = [
-    {
-      id: 'display_name',
-      label: t('name'),
-      format: (value, resource) => (
-        <Link to={route('/clients/:id', { id: resource.id })}>{value}</Link>
-      ),
-    },
-    {
-      id: 'email',
-      label: t('email'),
-      format: (value, resource) =>
-        resource.contacts.length > 0 && (
-          <Link to={route('/clients/:id', { id: resource.id })}>
-            {resource.contacts[0].email}
-          </Link>
-        ),
-    },
-    {
-      id: 'number',
-      label: t('id_number'),
-    },
-    {
-      id: 'balance',
-      label: t('balance'),
-      format: (value, resource) =>
-        formatMoney(
-          value,
-          resource?.country_id,
-          resource?.settings.currency_id
-        ),
-    },
-    {
-      id: 'paid_to_date',
-      label: t('paid_to_date'),
-      format: (value, resource) =>
-        formatMoney(
-          value,
-          resource?.country_id,
-          resource?.settings.currency_id
-        ),
-    },
-    {
-      id: 'created_at',
-      label: t('created_at'),
-      format: (value) => date(value, dateFormat),
-    },
-    {
-      id: 'last_login',
-      label: t('last_login'),
-      format: (value) => date(value, dateFormat),
-    },
-  ];
 
   const importButton = (
     <ReactRouterLink to="/clients/import">
@@ -147,6 +86,8 @@ export function Clients() {
       </DropdownElement>
     ),
   ];
+
+  const columns = useClientColumns();
 
   return (
     <Default breadcrumbs={pages} title={t('clients')} docsLink="docs/clients">
