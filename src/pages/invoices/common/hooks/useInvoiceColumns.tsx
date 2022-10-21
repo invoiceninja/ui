@@ -222,7 +222,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
     {
       column: 'contact_name',
       id: 'client_id',
-      label: t('contact_email'),
+      label: t('contact_name'),
       format: (value, invoice) =>
         invoice.client &&
         invoice.client.contacts.length > 0 &&
@@ -239,7 +239,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       id: 'custom_value1',
       label:
         company?.custom_fields.invoice1 &&
-        customField(company?.custom_fields.invoice1).label(),
+        customField(company?.custom_fields.invoice1).label() || t('first_custom'),
     },
     {
       column: 'custom2',
