@@ -21,16 +21,17 @@ import { RootState } from 'common/stores/store';
 import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
 import { DataTableColumns } from 'components/DataTable';
+import { EntityStatus } from 'components/EntityStatus';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 
-export type DataTableColumnsExtended<T = any> = {
-  column: string;
-  id: string;
+export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
+  column: TColumn;
+  id: keyof TResource;
   label: string;
-  format?: (field: string | number, resource: T) => unknown;
+  format?: (field: string | number, resource: TResource) => unknown;
 }[];
 
 export const invoiceColumns = [
@@ -72,6 +73,7 @@ export const invoiceColumns = [
   'reminder3_sent',
   'reminder_last_sent',
   'tax_amount',
+  'created_at',
   'updated_at',
 ] as const;
 
@@ -111,7 +113,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
     return viewed;
   }, []);
 
-  const columns: DataTableColumnsExtended<Invoice> = [
+  const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
       column: 'status',
       id: 'status_id',
@@ -248,22 +250,25 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'custom2',
       id: 'custom_value2',
       label:
-        company?.custom_fields.invoice2 &&
-        customField(company?.custom_fields.invoice2).label(),
+        (company?.custom_fields.invoice2 &&
+          customField(company?.custom_fields.invoice2).label()) ||
+        t('second_custom'),
     },
     {
       column: 'custom3',
       id: 'custom_value3',
       label:
-        company?.custom_fields.invoice3 &&
-        customField(company?.custom_fields.invoice3).label(),
+        (company?.custom_fields.invoice3 &&
+          customField(company?.custom_fields.invoice3).label()) ||
+        t('third_custom'),
     },
     {
       column: 'custom4',
       id: 'custom_value4',
       label:
-        company?.custom_fields.invoice4 &&
-        customField(company?.custom_fields.invoice4).label(),
+        (company?.custom_fields.invoice4 &&
+          customField(company?.custom_fields.invoice4).label()) ||
+        t('forth_custom'),
     },
     {
       column: 'discount',
@@ -286,13 +291,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'entity_state',
       id: 'id',
       label: t('entity_state'),
-      format: (value, invoice) => (
-        <span>
-          {invoice.archived_at === null && t('active')}
-          {invoice.archived_at !== null && t('archived')}
-          {invoice.is_deleted && t('deleted')}
-        </span>
-      ),
+      format: (value, invoice) => <EntityStatus entity={invoice} />,
     },
     {
       column: 'exchange_rate',
@@ -333,7 +332,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'partial',
+      column: 'partial_due',
       id: 'partial',
       label: t('partial'),
       format: (value, invoice) =>
