@@ -81,6 +81,8 @@ export function DataTableColumnsPicker(props: Props) {
     request('PUT', endpoint('/api/v1/company_users/:id', { id: user.id }), user)
       .then((response: GenericSingleResourceResponse<CompanyUser>) => {
         set(user, 'company_user', response.data.data);
+        setIsModalVisible(false);
+
         dispatch(updateUser(user));
 
         toast.success('saved_settings');
