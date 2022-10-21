@@ -61,7 +61,7 @@ export function Invoices() {
         leftSideChevrons={
           <DataTableColumnsPicker
             table="invoice"
-            columns={invoiceColumns}
+            columns={invoiceColumns as unknown as string[]}
             defaultColumns={defaultColumns}
           />
         }

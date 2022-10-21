@@ -31,11 +31,11 @@ export function Logout() {
     localStorage.removeItem('X-NINJA-TOKEN');
     localStorage.removeItem('X-CURRENT-INDEX');
 
-    if (isHosted() && user.oauth_provider_id === 'microsoft' && msalInstance) {
+    if (isHosted() && user?.oauth_provider_id === 'microsoft' && msalInstance) {
       msalInstance.logout();
     }
 
-    if (isHosted() && user.oauth_provider_id === 'google') {
+    if (isHosted() && user?.oauth_provider_id === 'google') {
       signOut();
     }
 

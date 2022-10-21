@@ -52,7 +52,7 @@ export function UserDetails() {
 
     request(
       'PUT',
-      endpoint('/api/v1/users/:id?include=company_user', { id: user.id }),
+      endpoint('/api/v1/users/:id?include=company_user', { id: user!.id }),
       userState.changes,
       { headers: { 'X-Api-Password': password } }
     )
