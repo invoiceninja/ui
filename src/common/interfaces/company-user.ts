@@ -34,10 +34,12 @@ export type ReactTableColumns =
   | 'invoice'
   | 'client'
   | 'product'
-  | 'recurringInvoice';
+  | 'recurringInvoice'
+  | 'payment';
 
 export interface Settings {
   accent_color: string;
+  table_columns?: Record<ReactTableColumns, string[]>;
   react_table_columns?: Record<ReactTableColumns, string[]>;
 }
 

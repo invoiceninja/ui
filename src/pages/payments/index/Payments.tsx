@@ -8,103 +8,38 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import paymentType from 'common/constants/payment-type';
-import { date } from 'common/helpers';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
 import { Payment } from 'common/interfaces/payment';
 import { Page } from 'components/Breadcrumbs';
-import { DataTable, DataTableColumns } from 'components/DataTable';
+import { DataTable } from 'components/DataTable';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Link } from 'components/forms/Link';
 import { Default } from 'components/layouts/Default';
-import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { route } from 'common/helpers/route';
-import { PaymentStatus } from '../common/components/PaymentStatus';
 import { useEmailPayment } from '../common/hooks/useEmailPayment';
+import {
+  defaultColumns,
+  paymentColumns,
+  usePaymentColumns,
+} from '../common/hooks/usePaymentColumns';
+import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 
 export function Payments() {
   useTitle('payments');
 
   const [t] = useTranslation();
 
-  const formatMoney = useFormatMoney();
   const emailPayment = useEmailPayment();
-  const company = useCurrentCompany();
-
-  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
 
-  const columns: DataTableColumns<Payment> = [
-    {
-      id: 'status_id',
-      label: t('status'),
-      format: (value, payment) => <PaymentStatus entity={payment} />,
-    },
-    {
-      id: 'number',
-      label: t('number'),
-      format: (value, payment) => {
-        return (
-          <Link to={route('/payments/:id/edit', { id: payment.id })}>
-            {payment.number}
-          </Link>
-        );
-      },
-    },
-    {
-      id: 'client_id',
-      label: t('client'),
-      format: (value, payment) => (
-        <Link to={route('/clients/:id', { id: payment.client_id })}>
-          {payment.client?.display_name}
-        </Link>
-      ),
-    },
-    {
-      id: 'amount',
-      label: t('amount'),
-      format: (value, payment) =>
-        formatMoney(
-          value,
-          payment.client?.country_id || company.settings.country_id,
-          payment.client?.settings.currency_id || company.settings.currency_id
-        ),
-    },
-    {
-      id: 'invoice_number',
-      label: t('invoice_number'),
-      format: (value, payment) => payment.invoices?.[0]?.number,
-    },
-    {
-      id: 'date',
-      label: t('date'),
-      format: (value) => date(value, dateFormat),
-    },
-    {
-      id: 'type_id',
-      label: t('type'),
-      format: (value) => (
-        <StatusBadge for={paymentType} code={value} headless />
-      ),
-    },
-    {
-      id: 'transaction_reference',
-      label: t('transaction_reference'),
-    },
-  ];
+  const columns = usePaymentColumns();
 
   const actions = [
     (resource: Payment) =>
       resource.amount - resource.applied > 0 &&
       !resource.is_deleted && (
-        <DropdownElement
-          to={route('/payments/:id/apply', { id: resource.id })}
-        >
+        <DropdownElement to={route('/payments/:id/apply', { id: resource.id })}>
           {t('apply_payment')}
         </DropdownElement>
       ),
@@ -139,6 +74,13 @@ export function Payments() {
         linkToEdit="/payments/:id/edit"
         withResourcefulActions
         customActions={actions}
+        leftSideChevrons={
+          <DataTableColumnsPicker
+            columns={paymentColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+            table="payment"
+          />
+        }
       />
     </Default>
   );
