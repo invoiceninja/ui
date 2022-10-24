@@ -10,7 +10,7 @@
 
 import axios, { AxiosError } from 'axios';
 import { QuoteStatus } from 'common/enums/quote-status';
-import { endpoint } from 'common/helpers';
+import { date, endpoint } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
@@ -45,6 +45,17 @@ import { route } from 'common/helpers/route';
 import { useDispatch } from 'react-redux';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { updateRecord } from 'common/stores/slices/company-users';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
+import { Link } from '@invoiceninja/forms';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { useResolveCountry } from 'common/hooks/useResolveCountry';
+import { CopyToClipboard } from 'components/CopyToClipboard';
+import { customField } from 'components/CustomField';
+import { EntityStatus } from 'components/EntityStatus';
+import { useCallback } from 'react';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -368,4 +379,323 @@ export function useActions() {
   ];
 
   return actions;
+}
+
+export const quoteColumns = [
+  'status',
+  'number',
+  'client',
+  'amount',
+  'date',
+  'valid_until',
+  'archived_at',
+  // 'assigned_to',  @Todo: Need to fetch the relationship
+  'client_city',
+  'client_country',
+  'client_postal_code',
+  'client_state',
+  'contact_email',
+  'contact_name',
+  'created_at',
+  // 'created_by', @Todo: Need to resolve relationship
+  'custom1',
+  'custom2',
+  'custom3',
+  'custom4',
+  'discount',
+  'documents',
+  'entity_state',
+  'exchange_rate',
+  'is_deleted',
+  'is_viewed',
+  'last_sent_date',
+  'partial',
+  'partial_due_date',
+  'po_number',
+  'private_notes',
+  // 'project', @Todo: Need to resolve relationship
+  'public_notes',
+  'tax_amount',
+  'updated_at',
+  // 'vendor', @Todo: Need to resolve relationship
+] as const;
+
+type QuoteColumns = typeof quoteColumns[number];
+
+export const defaultColumns: QuoteColumns[] = [
+  'status',
+  'number',
+  'client',
+  'amount',
+  'date',
+  'valid_until',
+];
+
+export function useQuoteColumns() {
+  const { t } = useTranslation();
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const currentUser = useCurrentUser();
+  const company = useCurrentCompany();
+  const formatMoney = useFormatMoney();
+  const resolveCountry = useResolveCountry();
+
+  const quoteViewedAt = useCallback((quote: Quote) => {
+    let viewed = '';
+
+    quote.invitations.map((invitation) => {
+      if (invitation.viewed_date) {
+        viewed = invitation.viewed_date;
+      }
+    });
+
+    return viewed;
+  }, []);
+
+  const columns: DataTableColumnsExtended<Quote, QuoteColumns> = [
+    {
+      column: 'status',
+      id: 'status_id',
+      label: t('status'),
+      format: (value, quote) => <QuoteStatusBadge entity={quote} />,
+    },
+    {
+      column: 'number',
+      id: 'number',
+      label: t('number'),
+      format: (field, quote) => (
+        <Link to={route('/quotes/:id/edit', { id: quote.id })}>{field}</Link>
+      ),
+    },
+    {
+      column: 'client',
+      id: 'client_id',
+      label: t('client'),
+      format: (_, quote) => (
+        <Link to={route('/clients/:id', { id: quote.client_id })}>
+          {quote.client?.display_name}
+        </Link>
+      ),
+    },
+    {
+      column: 'amount',
+      id: 'amount',
+      label: t('amount'),
+      format: (value, quote) =>
+        formatMoney(
+          value,
+          quote.client?.country_id || company.settings.country_id,
+          quote.client?.settings.currency_id || company.settings.currency_id
+        ),
+    },
+    {
+      column: 'date',
+      id: 'date',
+      label: t('date'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'valid_until',
+      id: 'due_date',
+      label: t('valid_until'),
+      format: (value, quote) => date(quote.due_date, dateFormat),
+    },
+    {
+      column: 'archived_at',
+      id: 'archived_at',
+      label: t('archived_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'client_city',
+      id: 'client_id',
+      label: t('client_city'),
+      format: (value, quote) => quote.client?.city,
+    },
+    {
+      column: 'client_country',
+      id: 'client_id',
+      label: t('client_country'),
+      format: (value, quote) =>
+        quote.client?.country_id &&
+        resolveCountry(quote.client?.country_id)?.name,
+    },
+    {
+      column: 'client_postal_code',
+      id: 'client_id',
+      label: t('client_postal_code'),
+      format: (value, quote) => quote.client?.postal_code,
+    },
+    {
+      column: 'client_state',
+      id: 'client_id',
+      label: t('client_state'),
+      format: (value, quote) => quote.client?.state,
+    },
+    {
+      column: 'contact_email',
+      id: 'client_id',
+      label: t('contact_email'),
+      format: (value, quote) =>
+        quote.client &&
+        quote.client.contacts.length > 0 && (
+          <CopyToClipboard text={quote.client?.contacts[0].email} />
+        ),
+    },
+    {
+      column: 'contact_name',
+      id: 'client_id',
+      label: t('contact_name'),
+      format: (value, quote) =>
+        quote.client &&
+        quote.client.contacts.length > 0 &&
+        `${quote.client?.contacts[0].first_name} ${quote.client?.contacts[0].last_name}`,
+    },
+    {
+      column: 'created_at',
+      id: 'created_at',
+      label: t('created_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'custom1',
+      id: 'custom_value1',
+      label:
+        (company?.custom_fields.quote1 &&
+          customField(company?.custom_fields.quote1).label()) ||
+        t('first_custom'),
+    },
+    {
+      column: 'custom2',
+      id: 'custom_value2',
+      label:
+        (company?.custom_fields.quote2 &&
+          customField(company?.custom_fields.quote2).label()) ||
+        t('second_custom'),
+    },
+    {
+      column: 'custom3',
+      id: 'custom_value3',
+      label:
+        (company?.custom_fields.quote3 &&
+          customField(company?.custom_fields.quote3).label()) ||
+        t('third_custom'),
+    },
+    {
+      column: 'custom4',
+      id: 'custom_value4',
+      label:
+        (company?.custom_fields.quote4 &&
+          customField(company?.custom_fields.quote4).label()) ||
+        t('forth_custom'),
+    },
+    {
+      column: 'discount',
+      id: 'discount',
+      label: t('discount'),
+      format: (value, quote) =>
+        formatMoney(
+          value,
+          quote.client?.country_id || company?.settings.country_id,
+          quote.client?.settings.currency_id || company?.settings.currency_id
+        ),
+    },
+    {
+      column: 'documents',
+      id: 'documents',
+      label: t('documents'),
+      format: (value, quote) => quote.documents.length,
+    },
+    {
+      column: 'entity_state',
+      id: 'id',
+      label: t('entity_state'),
+      format: (value, quote) => <EntityStatus entity={quote} />,
+    },
+    {
+      column: 'exchange_rate',
+      id: 'exchange_rate',
+      label: t('exchange_rate'),
+    },
+    {
+      column: 'is_deleted',
+      id: 'is_deleted',
+      label: t('is_deleted'),
+      format: (value, quote) => (quote.is_deleted ? t('yes') : t('no')),
+    },
+    {
+      column: 'is_viewed',
+      id: 'id',
+      label: t('is_viewed'),
+      format: (value, quote) =>
+        quoteViewedAt(quote).length > 0
+          ? date(quoteViewedAt(quote), dateFormat)
+          : t('no'),
+    },
+    {
+      column: 'last_sent_date',
+      id: 'last_sent_date',
+      label: t('last_sent_date'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'partial',
+      id: 'partial',
+      label: t('partial'),
+      format: (value, quote) =>
+        formatMoney(
+          value,
+          quote.client?.country_id || company?.settings.country_id,
+          quote.client?.settings.currency_id || company?.settings.currency_id
+        ),
+    },
+    {
+      column: 'partial_due_date',
+      id: 'partial_due_date',
+      label: t('partial_due_date'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'po_number',
+      id: 'po_number',
+      label: t('po_number'),
+    },
+    {
+      column: 'private_notes',
+      id: 'private_notes',
+      label: t('private_notes'),
+      format: (value) => <span className="truncate">{value}</span>,
+    },
+    {
+      column: 'public_notes',
+      id: 'public_notes',
+      label: t('public_notes'),
+      format: (value) => <span className="truncate">{value}</span>,
+    },
+    {
+      column: 'tax_amount',
+      id: 'total_taxes',
+      label: t('total_taxes'),
+      format: (value, quote) =>
+        formatMoney(
+          value,
+          quote.client?.country_id || company?.settings.country_id,
+          quote.client?.settings.currency_id || company?.settings.currency_id
+        ),
+    },
+    {
+      column: 'updated_at',
+      id: 'updated_at',
+      label: t('last_updated'),
+      format: (value) => date(value, dateFormat),
+    },
+  ];
+
+  const list: string[] =
+    currentUser?.company_user?.settings?.react_table_columns?.quote ||
+    defaultColumns;
+
+  return columns
+    .filter((column) => list.includes(column.column))
+    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
 }

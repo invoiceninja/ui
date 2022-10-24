@@ -35,7 +35,8 @@ export type ReactTableColumns =
   | 'client'
   | 'product'
   | 'recurringInvoice'
-  | 'payment';
+  | 'payment'
+  | 'quote';
 
 export interface Settings {
   accent_color: string;
