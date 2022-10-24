@@ -10,7 +10,8 @@
 
 import { AxiosError } from 'axios';
 import { RecurringInvoiceStatus } from 'common/enums/recurring-invoice-status';
-import { endpoint } from 'common/helpers';
+import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
+import { date, endpoint } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
@@ -39,6 +40,15 @@ import { creditAtom } from 'pages/credits/common/atoms';
 import { Credit } from 'common/interfaces/credit';
 import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
 import { route } from 'common/helpers/route';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { Link } from '@invoiceninja/forms';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { StatusBadge } from 'components/StatusBadge';
+import recurringInvoicesFrequency from 'common/constants/recurring-invoices-frequency';
+import { customField } from 'components/CustomField';
+import { EntityStatus } from 'components/EntityStatus';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -376,4 +386,264 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
           : toast.error();
       });
   };
+}
+
+export const recurringInvoiceColumns = [
+  'status',
+  'number',
+  'client',
+  'amount',
+  'remaining_cycles',
+  'next_send_date',
+  'frequency',
+  'due_date_days',
+  'auto_bill',
+  'archived_at',
+  // 'assigned_to', @Todo: Need to fetch the relationship.
+  'created_at',
+  // 'created_by', @Todo: Need to fetch the relationship.
+  'custom1',
+  'custom2',
+  'custom3',
+  'custom4',
+  'discount',
+  'documents',
+  'entity_state',
+  'exchange_rate',
+  'is_deleted',
+  'po_number',
+  'private_notes',
+  'public_notes',
+  'tax_amount',
+  'updated_at',
+] as const;
+
+type RecurringInvoiceColumns = typeof recurringInvoiceColumns[number];
+
+export const defaultColumns: RecurringInvoiceColumns[] = [
+  'status',
+  'number',
+  'client',
+  'amount',
+  'remaining_cycles',
+  'next_send_date',
+  'frequency',
+  'due_date_days',
+  'auto_bill',
+];
+
+export function useRecurringInvoiceColumns() {
+  const { t } = useTranslation();
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const company = useCurrentCompany();
+  const currentUser = useCurrentUser();
+  const formatMoney = useFormatMoney();
+
+  const columns: DataTableColumnsExtended<
+    RecurringInvoice,
+    RecurringInvoiceColumns
+  > = [
+    {
+      column: 'status',
+      id: 'status_id',
+      label: t('status'),
+      format: (value, recurringInvoice) => (
+        <RecurringInvoiceStatusBadge entity={recurringInvoice} />
+      ),
+    },
+    {
+      column: 'number',
+      id: 'number',
+      label: t('number'),
+      format: (value, recurringInvoice) => (
+        <Link
+          to={route('/recurring_invoices/:id/edit', {
+            id: recurringInvoice.id,
+          })}
+        >
+          {value}
+        </Link>
+      ),
+    },
+    {
+      column: 'client',
+      id: 'client_id',
+      label: t('client'),
+      format: (value, recurringInvoice) => (
+        <Link to={route('/clients/:id', { id: recurringInvoice.client_id })}>
+          {recurringInvoice.client?.display_name}
+        </Link>
+      ),
+    },
+    {
+      column: 'amount',
+      id: 'amount',
+      label: t('amount'),
+      format: (value, recurringInvoice) =>
+        formatMoney(
+          value,
+          recurringInvoice.client?.country_id || company.settings.country_id,
+          recurringInvoice.client?.settings.currency_id ||
+            company.settings.currency_id
+        ),
+    },
+    {
+      column: 'remaining_cycles',
+      id: 'remaining_cycles',
+      label: t('remaining_cycles'),
+      format: (value) => (Number(value) < 0 ? t('endless') : value),
+    },
+    {
+      column: 'next_send_date',
+      id: 'next_send_date',
+      label: t('next_send_date'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'frequency',
+      id: 'frequency_id',
+      label: t('frequency'),
+      format: (value) => (
+        <StatusBadge for={recurringInvoicesFrequency} code={value} headless />
+      ),
+    },
+    {
+      column: 'due_date_days',
+      id: 'due_date_days',
+      label: t('due_date'),
+      format: (value) => {
+        if (value === 'terms') return t('use_payment_terms');
+        else if (Number(value) === 1) return t('first_day_of_the_month');
+        else return value;
+      },
+    },
+    {
+      column: 'auto_bill',
+      id: 'auto_bill',
+      label: t('auto_bill'),
+      format: (value) => t(String(value)),
+    },
+    {
+      column: 'archived_at',
+      id: 'archived_at',
+      label: t('archived_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'created_at',
+      id: 'created_at',
+      label: t('created_at'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'custom1',
+      id: 'custom_value1',
+      label:
+        (company?.custom_fields.invoice1 &&
+          customField(company?.custom_fields.invoice1).label()) ||
+        t('first_custom'),
+    },
+    {
+      column: 'custom2',
+      id: 'custom_value2',
+      label:
+        (company?.custom_fields.invoice2 &&
+          customField(company?.custom_fields.invoice2).label()) ||
+        t('second_custom'),
+    },
+    {
+      column: 'custom3',
+      id: 'custom_value3',
+      label:
+        (company?.custom_fields.invoice3 &&
+          customField(company?.custom_fields.invoice3).label()) ||
+        t('third_custom'),
+    },
+    {
+      column: 'custom4',
+      id: 'custom_value4',
+      label:
+        (company?.custom_fields.invoice4 &&
+          customField(company?.custom_fields.invoice4).label()) ||
+        t('forth_custom'),
+    },
+    {
+      column: 'discount',
+      id: 'discount',
+      label: t('discount'),
+      format: (value, recurringInvoice) =>
+        recurringInvoice.is_amount_discount
+          ? formatMoney(
+              value,
+              recurringInvoice.client?.country_id ||
+                company?.settings.country_id,
+              recurringInvoice.client?.settings.currency_id ||
+                company?.settings.currency_id
+            )
+          : `${recurringInvoice.discount}%`,
+    },
+    {
+      column: 'documents',
+      id: 'documents',
+      label: t('documents'),
+      format: (value, recurringInvoice) => recurringInvoice.documents.length,
+    },
+    {
+      column: 'entity_state',
+      id: 'id',
+      label: t('entity_state'),
+      format: (value, recurringInvoice) => (
+        <EntityStatus entity={recurringInvoice} />
+      ),
+    },
+    {
+      column: 'exchange_rate',
+      id: 'exchange_rate',
+      label: t('exchange_rate'),
+    },
+    {
+      column: 'is_deleted',
+      id: 'is_deleted',
+      label: t('is_deleted'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'po_number',
+      id: 'po_number',
+      label: t('po_number'),
+    },
+    {
+      column: 'public_notes',
+      id: 'public_notes',
+      label: t('public_notes'),
+      format: (value) => <span className="truncate">{value}</span>,
+    },
+    {
+      column: 'private_notes',
+      id: 'private_notes',
+      label: t('private_notes'),
+      format: (value) => <span className="truncate">{value}</span>,
+    },
+    {
+      column: 'tax_amount',
+      id: 'id',
+      label: t('tax_amount'),
+      format: () => '', // @Todo: Need to calculate.
+    },
+    {
+      column: 'updated_at',
+      id: 'updated_at',
+      label: t('updated_at'),
+      format: (value) => date(value, dateFormat),
+    },
+  ];
+
+  const list: string[] =
+    currentUser?.company_user?.settings?.react_table_columns
+      ?.recurringInvoice || defaultColumns;
+
+  return columns
+    .filter((column) => list.includes(column.column))
+    .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
 }
