@@ -30,9 +30,14 @@ export interface CompanyUser {
   account: Account;
 }
 
-export type ReactTableColumns = 'invoice' | 'client' | 'product';
+export type ReactTableColumns =
+  | 'invoice'
+  | 'client'
+  | 'product'
+  | 'recurringInvoice';
 
 export interface Settings {
+  accent_color: string;
   react_table_columns?: Record<ReactTableColumns, string[]>;
 }
 
