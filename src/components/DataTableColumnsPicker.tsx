@@ -11,7 +11,7 @@
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
-import { CompanyUser } from 'common/interfaces/company-user';
+import { CompanyUser, ReactTableColumns } from 'common/interfaces/company-user';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { User } from 'common/interfaces/user';
 import { updateUser } from 'common/stores/slices/user';
@@ -35,7 +35,7 @@ import { arrayMoveImmutable } from 'array-move';
 interface Props {
   columns: string[];
   defaultColumns: string[];
-  table: string;
+  table: ReactTableColumns;
 }
 
 export function DataTableColumnsPicker(props: Props) {
@@ -51,8 +51,9 @@ export function DataTableColumnsPicker(props: Props) {
   const [filteredColumns, setFilteredColumns] = useState(props.columns);
 
   const [currentColumns, setCurrentColumns] = useState<string[]>(
-    currentUser?.company_user?.settings?.react_table_columns?.[table] ||
-      defaultColumns
+    currentUser?.company_user?.settings?.react_table_columns?.[
+      table as ReactTableColumns
+    ] || defaultColumns
   );
 
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -177,7 +178,7 @@ export function DataTableColumnsPicker(props: Props) {
             <Button type="minimal" className="mx-2" onClick={handleReset}>
               {t('reset')}
             </Button>
-            
+
             <Button onClick={onSave}>{t('save')}</Button>
           </Inline>
         </div>
