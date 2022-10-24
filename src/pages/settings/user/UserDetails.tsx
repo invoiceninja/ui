@@ -15,12 +15,13 @@ import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTitle } from 'common/hooks/useTitle';
 import {
   deletePassword,
+  injectInChanges,
   resetChanges,
   updateUser,
 } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -75,6 +76,10 @@ export function UserDetails() {
       })
       .finally(() => dispatch(deletePassword()));
   };
+
+  useEffect(() => {
+    dispatch(injectInChanges());
+  }, [user]);
 
   return (
     <Settings
