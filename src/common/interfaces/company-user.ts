@@ -15,7 +15,7 @@ import { User } from './user';
 export interface CompanyUser {
   permissions: string;
   notifications: Notifications;
-  settings: Record<string, any>;
+  settings: Settings;
   is_owner: boolean;
   is_admin: boolean;
   is_locked: boolean;
@@ -28,6 +28,12 @@ export interface CompanyUser {
   company: Company;
   token: Token;
   account: Account;
+}
+
+export type ReactTableColumns = 'invoice' | 'client' | 'product';
+
+export interface Settings {
+  react_table_columns?: Record<ReactTableColumns, string[]>;
 }
 
 export interface Notifications {
