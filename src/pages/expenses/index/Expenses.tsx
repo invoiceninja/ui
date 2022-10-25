@@ -7,33 +7,26 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+
 import { useTitle } from 'common/hooks/useTitle';
-import { Expense } from 'common/interfaces/expense';
-import { DataTable, DataTableColumns } from 'components/DataTable';
-import { EntityStatus } from 'components/EntityStatus';
+import { DataTable } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
-import { ExpenseStatus } from '../common/components/ExpenseStatus';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
+import {
+  defaultColumns,
+  expenseColumns,
+  useExpenseColumns,
+} from '../common/hooks';
+import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 
 export function Expenses() {
   useTitle('expenses');
 
   const [t] = useTranslation();
 
-  const { dateFormat } = useCurrentCompanyDateFormats();
-
   const pages = [{ name: t('expenses'), href: '/expenses' }];
-
-  const company = useCurrentCompany();
-  const formatMoney = useFormatMoney();
 
   const importButton = (
     <ReactRouterLink to="/expenses/import">
@@ -50,73 +43,8 @@ export function Expenses() {
     </ReactRouterLink>
   );
 
-  const columns: DataTableColumns<Expense> = [
-    {
-      id: 'status_id',
-      label: t('status'),
-      format: (value, expense) => (
-        <Link to={route('/expenses/:id/edit', { id: expense.id })}>
-          <span className="inline-flex items-center space-x-4">
-            <ExpenseStatus entity={expense} />
-          </span>
-        </Link>
-      ),
-    },
-    {
-      id: 'number',
-      label: t('number'),
-      format: (field, expense) => (
-        <Link to={route('/expenses/:id/edit', { id: expense.id })}>
-          {field}
-        </Link>
-      ),
-    },
-    {
-      id: 'client_id',
-      label: t('client'),
-      format: (value, expense) =>
-        expense.client && (
-          <Link to={route('/clients/:id', { id: value.toString() })}>
-            {expense.client.display_name}
-          </Link>
-        ),
-    },
-    {
-      id: 'vendor_id',
-      label: t('vendor'),
-      format: (value, expense) =>
-        expense.vendor && (
-          <Link to={route('/vendors/:id', { id: value.toString() })}>
-            {expense.vendor.name}
-          </Link>
-        ),
-    },
-    {
-      id: 'date',
-      label: t('date'),
-      format: (value) => date(value, dateFormat),
-    },
-    {
-      id: 'amount',
-      label: t('amount'),
-      format: (value) =>
-        formatMoney(
-          value,
-          company?.settings.country_id,
-          company?.settings.currency_id
-        ),
-    },
-    {
-      id: 'public_notes',
-      label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
-    },
-    {
-      id: 'entity_status',
-      label: t('entity_state'),
-      format: (value, resource) => <EntityStatus entity={resource} />,
-    },
-  ];
+  const columns = useExpenseColumns();
+
   return (
     <Default
       title={t('expenses')}
@@ -132,6 +60,13 @@ export function Expenses() {
         linkToEdit="/expenses/:id/edit"
         withResourcefulActions
         rightSide={importButton}
+        leftSideChevrons={
+          <DataTableColumnsPicker
+            columns={expenseColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+            table="expense"
+          />
+        }
       />
     </Default>
   );
