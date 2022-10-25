@@ -38,7 +38,11 @@ export type ReactTableColumns =
   | 'payment'
   | 'quote'
   | 'credit'
-  | 'project';
+  | 'project'
+  | 'task'
+  | 'vendor'
+  | 'purchaseOrder'
+  | 'expense';
 
 export interface Settings {
   accent_color: string;

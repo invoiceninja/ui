@@ -11,21 +11,17 @@
 import { Link } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
-import { DataTable, DataTableColumns } from 'components/DataTable';
+import { DataTable } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
-import {
-  calculateEntityState,
-  isTaskRunning,
-} from '../common/helpers/calculate-entity-state';
-import { calculateTime } from '../common/helpers/calculate-time';
+import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import { BsKanban } from 'react-icons/bs';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
 import { useInvoiceTask } from '../common/hooks/useInvoiceTask';
-import { TaskStatus } from '../common/components/TaskStatus';
+import { defaultColumns, taskColumns, useTaskColumns } from '../common/hooks';
+import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 
 export function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -33,47 +29,7 @@ export function Tasks() {
 
   const pages = [{ name: t('tasks'), href: '/tasks' }];
 
-  const columns: DataTableColumns<Task> = [
-    {
-      id: 'status_id',
-      label: t('status'),
-      format: (value, task) => <TaskStatus entity={task} />,
-    },
-    {
-      id: 'number',
-      label: t('number'),
-      format: (value, task) => (
-        <Link to={route('/tasks/:id/edit', { id: task.id })}>
-          {value}
-        </Link>
-      ),
-    },
-    {
-      id: 'client_id',
-      label: t('client'),
-      format: (value, task) =>
-        task.client && (
-          <Link to={route('/clients/:id', { id: value.toString() })}>
-            {task.client.display_name}
-          </Link>
-        ),
-    },
-    {
-      id: 'description',
-      label: t('description'),
-      format: (value) => <span className="truncate">{value}</span>,
-    },
-    {
-      id: 'time_log',
-      label: t('duration'),
-      format: (value) => calculateTime(value.toString()),
-    },
-    {
-      id: 'id', // This is calculated column, so real mapping doesn't matter.
-      label: t('entity_state'),
-      format: (value, task) => t(calculateEntityState(task)),
-    },
-  ];
+  const columns = useTaskColumns();
 
   const start = useStart();
   const stop = useStop();
@@ -120,6 +76,13 @@ export function Tasks() {
         linkToEdit="/tasks/:id/edit"
         linkToCreate="/tasks/create"
         withResourcefulActions
+        leftSideChevrons={
+          <DataTableColumnsPicker
+            columns={taskColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+            table="task"
+          />
+        }
       />
     </Default>
   );
