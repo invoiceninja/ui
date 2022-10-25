@@ -15,6 +15,7 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useResolveCountry } from 'common/hooks/useResolveCountry';
+import { Credit } from 'common/interfaces/credit';
 import { Invoice } from 'common/interfaces/invoice';
 import { User } from 'common/interfaces/user';
 import { RootState } from 'common/stores/store';
@@ -22,7 +23,6 @@ import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
 import { DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
-import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { InvoiceStatus } from '../components/InvoiceStatus';
@@ -77,7 +77,7 @@ export const invoiceColumns = [
   'updated_at',
 ] as const;
 
-type InvoiceColumns = typeof invoiceColumns[number]
+type InvoiceColumns = typeof invoiceColumns[number];
 
 export const defaultColumns: InvoiceColumns[] = [
   'status',
@@ -88,6 +88,18 @@ export const defaultColumns: InvoiceColumns[] = [
   'date',
   'due_date',
 ];
+
+export function resourceViewedAt(resource: Invoice | Credit) {
+  let viewed = '';
+
+  resource.invitations.map((invitation) => {
+    if (invitation.viewed_date) {
+      viewed = invitation.viewed_date;
+    }
+  });
+
+  return viewed;
+}
 
 export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const { t } = useTranslation();
@@ -100,18 +112,6 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const currentUser = useSelector((state: RootState) => state.user.user) as
     | User
     | undefined;
-
-  const invoiceViewedAt = useCallback((invoice: Invoice) => {
-    let viewed = '';
-
-    invoice.invitations.map((invitation) => {
-      if (invitation.viewed_date) {
-        viewed = invitation.viewed_date;
-      }
-    });
-
-    return viewed;
-  }, []);
 
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
@@ -302,16 +302,16 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'is_deleted',
       id: 'is_deleted',
       label: t('is_deleted'),
-      format: (value, invoice) => (invoice.is_deleted ? t('Yes') : t('No')),
+      format: (value, invoice) => (invoice.is_deleted ? t('yes') : t('no')),
     },
     {
       column: 'is_viewed',
       id: 'id',
       label: t('is_viewed'),
       format: (value, invoice) =>
-        invoiceViewedAt(invoice).length > 0
-          ? date(invoiceViewedAt(invoice), dateFormat)
-          : t('No'),
+        resourceViewedAt(invoice).length > 0
+          ? date(resourceViewedAt(invoice), dateFormat)
+          : t('no'),
     },
     {
       column: 'last_sent_date',
