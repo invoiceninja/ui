@@ -73,7 +73,9 @@ export function QuoteDetails(props: Props) {
             field="quote1"
             defaultValue={quote?.custom_value1 || ''}
             value={company.custom_fields.quote1}
-            onValueChange={(value) => handleChange('custom_value1', String(value))}
+            onValueChange={(value) =>
+              handleChange('custom_value1', String(value))
+            }
           />
         )}
 
@@ -82,7 +84,9 @@ export function QuoteDetails(props: Props) {
             field="quote2"
             defaultValue={quote?.custom_value2 || ''}
             value={company.custom_fields.quote2}
-            onValueChange={(value) => handleChange('custom_value2', String(value))}
+            onValueChange={(value) =>
+              handleChange('custom_value2', String(value))
+            }
           />
         )}
       </Card>
@@ -135,7 +139,9 @@ export function QuoteDetails(props: Props) {
             field="quote3"
             defaultValue={quote?.custom_value3 || ''}
             value={company.custom_fields.quote3}
-            onValueChange={(value) => handleChange('custom_value3', String(value))}
+            onValueChange={(value) =>
+              handleChange('custom_value3', String(value))
+            }
           />
         )}
 
@@ -144,7 +150,9 @@ export function QuoteDetails(props: Props) {
             field="quote4"
             defaultValue={quote?.custom_value4 || ''}
             value={company.custom_fields.quote4}
-            onValueChange={(value) => handleChange('custom_value4', String(value))}
+            onValueChange={(value) =>
+              handleChange('custom_value4', String(value))
+            }
           />
         )}
       </Card>

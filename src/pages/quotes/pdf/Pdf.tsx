@@ -44,9 +44,7 @@ export function Pdf() {
               {t('download')}
             </DropdownElement>
 
-            <DropdownElement
-              to={route('/quotes/:id/email', { id: quote.id })}
-            >
+            <DropdownElement to={route('/quotes/:id/email', { id: quote.id })}>
               {t('email_quote')}
             </DropdownElement>
           </Dropdown>

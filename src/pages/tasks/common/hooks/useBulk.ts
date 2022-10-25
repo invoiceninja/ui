@@ -35,9 +35,7 @@ export function useBulkAction() {
       .finally(() => {
         queryClient.invalidateQueries('/api/v1/tasks');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks/:id', { id })
-        );
+        queryClient.invalidateQueries(route('/api/v1/tasks/:id', { id }));
       });
   };
 }

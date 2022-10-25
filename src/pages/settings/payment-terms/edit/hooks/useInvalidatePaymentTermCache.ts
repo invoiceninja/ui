@@ -15,8 +15,6 @@ export function useInvalidatePaymentTermCache() {
   const queryClient = useQueryClient();
 
   return (id: string) => {
-    queryClient.invalidateQueries(
-      route('/api/v1/payment_terms/:id', { id })
-    );
+    queryClient.invalidateQueries(route('/api/v1/payment_terms/:id', { id }));
   };
 }

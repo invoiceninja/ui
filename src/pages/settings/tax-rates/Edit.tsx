@@ -51,9 +51,7 @@ export function Edit() {
   }, [data]);
 
   const invalidatePaymentTermCache = () => {
-    queryClient.invalidateQueries(
-      route('/api/v1/tax_rates/:id', { id })
-    );
+    queryClient.invalidateQueries(route('/api/v1/tax_rates/:id', { id }));
   };
 
   const formik = useFormik({

@@ -74,9 +74,7 @@ export function Edit() {
         .finally(() => {
           formik.setSubmitting(false);
 
-          queryClient.invalidateQueries(
-            route('/api/v1/products/:id', { id })
-          );
+          queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
         });
     },
   });
@@ -95,9 +93,7 @@ export function Edit() {
         toast.error(t('error_title'), { id: toastId });
       })
       .finally(() =>
-        queryClient.invalidateQueries(
-          route('/api/v1/products/:id', { id })
-        )
+        queryClient.invalidateQueries(route('/api/v1/products/:id', { id }))
       );
   };
 
@@ -232,7 +228,9 @@ export function Edit() {
               field="custom_value1"
               defaultValue={product?.data.data.custom_value1}
               value={company.custom_fields.product1}
-              onValueChange={(value) => formik.setFieldValue('custom_value1', value)}
+              onValueChange={(value) =>
+                formik.setFieldValue('custom_value1', value)
+              }
             />
           )}
           {company?.custom_fields?.product2 && (
@@ -240,7 +238,9 @@ export function Edit() {
               field="custom_value2"
               defaultValue={product?.data.data.custom_value2}
               value={company.custom_fields.product2}
-              onValueChange={(value) => formik.setFieldValue('custom_value2', value)}
+              onValueChange={(value) =>
+                formik.setFieldValue('custom_value2', value)
+              }
             />
           )}
 
@@ -249,7 +249,9 @@ export function Edit() {
               field="custom_value3"
               defaultValue={product?.data.data.custom_value3}
               value={company.custom_fields.product3}
-              onValueChange={(value) => formik.setFieldValue('custom_value3', value)}
+              onValueChange={(value) =>
+                formik.setFieldValue('custom_value3', value)
+              }
             />
           )}
 
@@ -258,7 +260,9 @@ export function Edit() {
               field="custom_value4"
               defaultValue={product?.data.data.custom_value4}
               value={company.custom_fields.product4}
-              onValueChange={(value) => formik.setFieldValue('custom_value4', value)}
+              onValueChange={(value) =>
+                formik.setFieldValue('custom_value4', value)
+              }
             />
           )}
         </Card>

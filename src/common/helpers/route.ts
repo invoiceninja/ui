@@ -10,7 +10,7 @@
 
 export function route(
   path: string,
-  parts: Record<string, unknown> = {},
+  parts: Record<string, unknown> = {}
 ): string {
   let url = path;
 

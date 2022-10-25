@@ -94,16 +94,12 @@ export function useActions() {
 
   return [
     (invoice: Invoice) => (
-      <DropdownElement
-        to={route('/invoices/:id/email', { id: invoice.id })}
-      >
+      <DropdownElement to={route('/invoices/:id/email', { id: invoice.id })}>
         {t('email_invoice')}
       </DropdownElement>
     ),
     (invoice: Invoice) => (
-      <DropdownElement
-        to={route('/invoices/:id/pdf', { id: invoice.id })}
-      >
+      <DropdownElement to={route('/invoices/:id/pdf', { id: invoice.id })}>
         {t('view_pdf')}
       </DropdownElement>
     ),
@@ -129,10 +125,10 @@ export function useActions() {
     (invoice: Invoice) =>
       parseInt(invoice.status_id) < 4 && (
         <DropdownElement
-          to={route(
-            '/payments/create?invoice=:invoiceId&client=:clientId',
-            { invoiceId: invoice.id, clientId: invoice.client_id }
-          )}
+          to={route('/payments/create?invoice=:invoiceId&client=:clientId', {
+            invoiceId: invoice.id,
+            clientId: invoice.client_id,
+          })}
         >
           {t('enter_payment')}
         </DropdownElement>

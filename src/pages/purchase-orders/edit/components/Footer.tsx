@@ -43,9 +43,7 @@ export function Footer(props: PurchaseOrderCardProps) {
   ];
 
   const onSuccess = () => {
-    queryClient.invalidateQueries(
-      route('/api/v1/purchase_orders/:id', { id })
-    );
+    queryClient.invalidateQueries(route('/api/v1/purchase_orders/:id', { id }));
   };
 
   return (

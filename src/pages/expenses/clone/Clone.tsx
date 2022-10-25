@@ -65,9 +65,7 @@ export function Clone() {
       .then((response: GenericSingleResourceResponse<Expense>) => {
         toast.success('created_expense');
 
-        navigate(
-          route('/expenses/:id/edit', { id: response.data.data.id })
-        );
+        navigate(route('/expenses/:id/edit', { id: response.data.data.id }));
       })
       .catch((error) => {
         console.error(error);

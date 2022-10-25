@@ -236,10 +236,9 @@ export function Create() {
                   <DebouncedCombobox
                     className="w-1/2"
                     inputLabel={t('invoice')}
-                    endpoint={route(
-                      '/api/v1/invoices?payable=:clientId',
-                      { clientId: payment.client_id }
-                    )}
+                    endpoint={route('/api/v1/invoices?payable=:clientId', {
+                      clientId: payment.client_id,
+                    })}
                     label="number"
                     onChange={(value: Record<Invoice>) =>
                       value.resource &&
@@ -307,10 +306,9 @@ export function Create() {
                   <DebouncedCombobox
                     className="w-1/2"
                     inputLabel={t('credit')}
-                    endpoint={route(
-                      '/api/v1/credits?client_id=:clientId',
-                      { clientId: payment.client_id }
-                    )}
+                    endpoint={route('/api/v1/credits?client_id=:clientId', {
+                      clientId: payment.client_id,
+                    })}
                     label="number"
                     onChange={(value: Record<Credit>) =>
                       value.resource &&

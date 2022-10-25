@@ -97,9 +97,7 @@ export function CompanySwitcher() {
           </div>
           <div className="py-1">
             <Menu.Item>
-              <DropdownElement
-                to={route('/settings/account_management')}
-              >
+              <DropdownElement to={route('/settings/account_management')}>
                 {t('account_management')}
               </DropdownElement>
             </Menu.Item>

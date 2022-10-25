@@ -49,9 +49,7 @@ export function Edit() {
   const queryClient = useQueryClient();
 
   const invalidatePaymentTermCache = () => {
-    queryClient.invalidateQueries(
-      route('/api/v1/payment_terms/:id', { id })
-    );
+    queryClient.invalidateQueries(route('/api/v1/payment_terms/:id', { id }));
   };
 
   const formik = useFormik({
