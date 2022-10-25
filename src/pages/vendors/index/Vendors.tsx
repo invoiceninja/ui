@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
-import { Vendor } from 'common/interfaces/vendor';
 import { Page } from 'components/Breadcrumbs';
-import { DataTable, DataTableColumns } from 'components/DataTable';
-import { EntityStatus } from 'components/EntityStatus';
+import { DataTable } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
+import {
+  defaultColumns,
+  useVendorColumns,
+  vendorColumns,
+} from '../common/hooks';
+import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 
 export function Vendors() {
   const { documentTitle } = useTitle('vendors');
@@ -28,8 +28,6 @@ export function Vendors() {
   const [t] = useTranslation();
 
   const pages: Page[] = [{ name: t('vendors'), href: '/vendors' }];
-
-  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const importButton = (
     <ReactRouterLink to="/expenses/import">
@@ -46,44 +44,7 @@ export function Vendors() {
     </ReactRouterLink>
   );
 
-  const columns: DataTableColumns<Vendor> = [
-    {
-      id: 'number',
-      label: t('number'),
-      format: (value, vendor) => (
-        <Link to={route('/vendors/:id', { id: vendor.id })}>
-          {value}
-        </Link>
-      ),
-    },
-    {
-      id: 'name',
-      label: t('name'),
-      format: (value, vendor) => (
-        <Link to={route('/vendors/:id', { id: vendor.id })}>
-          {value}
-        </Link>
-      ),
-    },
-    {
-      id: 'city',
-      label: t('city'),
-    },
-    {
-      id: 'phone',
-      label: t('phone'),
-    },
-    {
-      id: 'entiy_state',
-      label: t('entity_state'),
-      format: (value, vendor) => <EntityStatus entity={vendor} />,
-    },
-    {
-      id: 'created_at',
-      label: t('created_at'),
-      format: (value) => date(value, dateFormat),
-    },
-  ];
+  const columns = useVendorColumns();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
@@ -95,6 +56,13 @@ export function Vendors() {
         linkToEdit="/vendors/:id/edit"
         withResourcefulActions
         rightSide={importButton}
+        leftSideChevrons={
+          <DataTableColumnsPicker
+            columns={vendorColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+            table="vendor"
+          />
+        }
       />
     </Default>
   );

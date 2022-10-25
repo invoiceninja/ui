@@ -269,7 +269,7 @@ export function useClientColumns() {
       column: 'is_deleted',
       id: 'is_deleted',
       label: t('is_deleted'),
-      format: (value, client) => (client.is_deleted ? t('Yes') : t('No')),
+      format: (value, client) => (client.is_deleted ? t('yes') : t('no')),
     },
     {
       column: 'language',
