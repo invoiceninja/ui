@@ -162,7 +162,7 @@ export function useProductColumns() {
       column: 'is_deleted',
       id: 'is_deleted',
       label: t('is_deleted'),
-      format: (valuem, product) => (product.is_deleted ? t('Yes') : t('No')),
+      format: (value, product) => (product.is_deleted ? t('yes') : t('no')),
     },
     {
       column: 'notification_threshold',

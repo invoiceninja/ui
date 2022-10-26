@@ -20,7 +20,10 @@ import { customField } from 'components/CustomField';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import { TaskStatus } from './components/TaskStatus';
-import { calculateEntityState } from './helpers/calculate-entity-state';
+import {
+  calculateEntityState,
+  isTaskRunning,
+} from './helpers/calculate-entity-state';
 import { calculateTime } from './helpers/calculate-time';
 
 export const taskColumns = [
@@ -45,9 +48,8 @@ export const taskColumns = [
   //   'invoice', @Todo: Need to fetch the relationship
   'is_deleted',
   'is_invoiced',
-  //   'is_running', @Todo: Need manual calc
+  'is_running',
   'rate',
-  //   'time_log', @Todo: Need manual calc (nice output)
   'updated_at',
 ] as const;
 
@@ -180,6 +182,12 @@ export function useTaskColumns() {
       id: 'invoice_id',
       label: t('is_invoiced'),
       format: (value, task) => (task.invoice_id ? t('yes') : t('no')),
+    },
+    {
+      column: 'is_running',
+      id: 'is_running',
+      label: t('is_running'),
+      format: (value, task) => (isTaskRunning(task) ? t('yes') : t('no')),
     },
     {
       column: 'rate',
