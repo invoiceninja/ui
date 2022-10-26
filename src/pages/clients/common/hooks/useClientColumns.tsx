@@ -313,7 +313,13 @@ export function useClientColumns() {
       column: 'task_rate',
       id: 'id',
       label: t('task_rate'),
-      format: () => '', // @Todo: Need to resolve
+      format: (value, client) =>
+        formatMoney(
+          client.settings.default_task_rate ||
+            company.settings.default_task_rate,
+          client?.country_id,
+          client?.settings.currency_id
+        ),
     },
     {
       column: 'updated_at',
