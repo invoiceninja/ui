@@ -689,14 +689,14 @@ export function useCreditColumns() {
     {
       column: 'updated_at',
       id: 'updated_at',
-      label: t('last_updated'),
+      label: t('updated_at'),
       format: (value) => date(value, dateFormat),
     },
     {
       column: 'valid_until',
       id: 'id',
-      label: t('last_updated'),
-      format: () => '', // @Todo: Need to calculate
+      label: t('valid_until'),
+      format: (value, credit) => date(credit.due_date, dateFormat),
     },
   ];
 
