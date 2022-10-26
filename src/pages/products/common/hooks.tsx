@@ -37,7 +37,7 @@ export const productColumns = [
   'documents',
   'entity_state',
   'is_deleted',
-  // 'notification_threshold', @Todo
+  'notification_threshold',
   'stock_quantity',
   'tax_name1',
   'tax_name2',
@@ -163,6 +163,11 @@ export function useProductColumns() {
       id: 'is_deleted',
       label: t('is_deleted'),
       format: (valuem, product) => (product.is_deleted ? t('Yes') : t('No')),
+    },
+    {
+      column: 'notification_threshold',
+      id: 'stock_notification_threshold',
+      label: t('notification_threshold'),
     },
     {
       column: 'stock_quantity',
