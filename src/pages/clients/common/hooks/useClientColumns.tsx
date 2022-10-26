@@ -17,6 +17,7 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useResolveCountry } from 'common/hooks/useResolveCountry';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
+import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
 import { Client } from 'common/interfaces/client';
 import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
@@ -89,6 +90,7 @@ export function useClientColumns() {
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
+  const resolveLanguage = useResolveLanguage();
 
   const getContactsColumns = useCallback((client: Client) => {
     const names: string[] = [];
@@ -275,7 +277,10 @@ export function useClientColumns() {
       column: 'language',
       id: 'id',
       label: t('language'),
-      format: () => '', // @Todo: Need to resolve
+      format: (value, client) =>
+        resolveLanguage(
+          client.settings.language_id || company.settings.language_id
+        )?.name,
     },
     {
       column: 'phone',
