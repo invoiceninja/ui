@@ -51,6 +51,12 @@ interface ChartData {
   }[];
 }
 
+export enum TotalColors {
+  Green = '#54B434',
+  Blue = '#2596BE',
+  Red = '#BE4D25',
+}
+
 export function Totals() {
   const [t] = useTranslation();
 
@@ -181,7 +187,8 @@ export function Totals() {
       {totalsData[currency] && company && (
         <div className="grid grid-cols-12 gap-4 mt-4">
           <InfoCard
-            className="col-span-12 lg:col-span-4"
+            style={{ borderColor: TotalColors.Green }}
+            className="col-span-12 lg:col-span-4 border-t-4"
             title={`${t('total')} ${t('revenue')}`}
             value={formatMoney(
               totalsData[currency].revenue.paid_to_date || 0,
@@ -191,7 +198,8 @@ export function Totals() {
           />
 
           <InfoCard
-            className="col-span-12 lg:col-span-4"
+            style={{ borderColor: TotalColors.Red }}
+            className="col-span-12 lg:col-span-4 border-t-4"
             title={`${t('total')} ${t('expenses')}`}
             value={formatMoney(
               totalsData[currency].expenses.amount || 0,
@@ -201,7 +209,8 @@ export function Totals() {
           />
 
           <InfoCard
-            className="col-span-12 lg:col-span-4"
+            style={{ borderColor: TotalColors.Blue }}
+            className="col-span-12 lg:col-span-4 border-t-4"
             title={`${t('total')} ${t('outstanding')}`}
             value={formatMoney(
               totalsData[currency].outstanding.amount || 0,
