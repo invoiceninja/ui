@@ -414,7 +414,6 @@ export const recurringInvoiceColumns = [
   'po_number',
   'private_notes',
   'public_notes',
-  'tax_amount',
   'updated_at',
 ] as const;
 
@@ -624,12 +623,6 @@ export function useRecurringInvoiceColumns() {
       id: 'private_notes',
       label: t('private_notes'),
       format: (value) => <span className="truncate">{value}</span>,
-    },
-    {
-      column: 'tax_amount',
-      id: 'id',
-      label: t('tax_amount'),
-      format: () => '', // @Todo: Need to calculate.
     },
     {
       column: 'updated_at',
