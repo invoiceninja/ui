@@ -23,9 +23,7 @@ export function Gateways() {
       id: 'label',
       label: t('label'),
       format: (field, resource) => (
-        <Link
-          to={route('/settings/gateways/:id/edit', { id: resource.id })}
-        >
+        <Link to={route('/settings/gateways/:id/edit', { id: resource.id })}>
           {field}
         </Link>
       ),

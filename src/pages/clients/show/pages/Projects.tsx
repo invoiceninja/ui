@@ -27,9 +27,7 @@ export function Projects() {
       id: 'name',
       label: t('name'),
       format: (value, project) => (
-        <Link to={route('/projects/:id', { id: project.id })}>
-          {value}
-        </Link>
+        <Link to={route('/projects/:id', { id: project.id })}>{value}</Link>
       ),
     },
     {

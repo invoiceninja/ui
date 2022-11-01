@@ -34,9 +34,7 @@ export function useBulkAction() {
       .finally(() => {
         queryClient.invalidateQueries('/api/v1/credits');
 
-        queryClient.invalidateQueries(
-          route('/api/v1/credits/:id', { id })
-        );
+        queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }));
       });
   };
 }

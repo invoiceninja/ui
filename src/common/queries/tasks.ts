@@ -35,14 +35,12 @@ export function useBlankTaskQuery() {
 }
 
 export function useTasksQuery(options = { limit: 10 }) {
-  return useQuery<GenericManyResponse<Task>>(
-    route('/api/v1/tasks'),
-    () =>
-      request(
-        'GET',
-        endpoint('/api/v1/tasks?limit=:limit', {
-          limit: options.limit.toString(),
-        })
-      ).then((response) => response.data)
+  return useQuery<GenericManyResponse<Task>>(route('/api/v1/tasks'), () =>
+    request(
+      'GET',
+      endpoint('/api/v1/tasks?limit=:limit', {
+        limit: options.limit.toString(),
+      })
+    ).then((response) => response.data)
   );
 }

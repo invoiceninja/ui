@@ -150,6 +150,7 @@ const invoice: Invoice = {
       created_at: 1643198561,
       email_status: '',
       email_error: '',
+      vendor_contact_id: '',
     },
     {
       id: 'Wpmbk5ezJn',
@@ -164,6 +165,7 @@ const invoice: Invoice = {
       created_at: 1643198561,
       email_status: '',
       email_error: '',
+      vendor_contact_id: '',
     },
   ],
   documents: [],

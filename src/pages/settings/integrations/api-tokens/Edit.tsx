@@ -80,9 +80,7 @@ export function Edit() {
         .finally(() => {
           formik.setSubmitting(false);
 
-          queryClient.invalidateQueries(
-            route('/api/v1/tokens/:id', { id })
-          );
+          queryClient.invalidateQueries(route('/api/v1/tokens/:id', { id }));
         });
     },
   });

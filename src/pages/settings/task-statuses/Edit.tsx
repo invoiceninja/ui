@@ -55,9 +55,7 @@ export function Edit() {
   }, [data]);
 
   const invalidateTaskStatusCache = () => {
-    queryClient.invalidateQueries(
-      route('/api/v1/task_statuses/:id', { id })
-    );
+    queryClient.invalidateQueries(route('/api/v1/task_statuses/:id', { id }));
   };
 
   const formik = useFormik({

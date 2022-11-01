@@ -144,7 +144,7 @@ export function TwoFactorAuthentication() {
 
       <Card title={t('enable_two_factor')}>
         <Element leftSide="2FA">
-          {!user.google_2fa_secret && (
+          {!user?.google_2fa_secret && (
             <Button
               behavior="button"
               type="minimal"
@@ -154,7 +154,7 @@ export function TwoFactorAuthentication() {
             </Button>
           )}
 
-          {user.google_2fa_secret && (
+          {user?.google_2fa_secret && (
             <Button
               behavior="button"
               type="minimal"

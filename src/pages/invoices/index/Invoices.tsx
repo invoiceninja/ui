@@ -8,30 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date } from 'common/helpers';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
-import { Invoice } from 'common/interfaces/invoice';
-import { DataTable, DataTableColumns } from 'components/DataTable';
-import { Link } from 'components/forms/Link';
+import { DataTable } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
-import { InvoiceStatus } from '../common/components/InvoiceStatus';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
 import { useActions } from '../edit/components/Actions';
+import {
+  defaultColumns,
+  invoiceColumns,
+  useInvoiceColumns,
+} from '../common/hooks/useInvoiceColumns';
+import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 
 export function Invoices() {
-  useTitle('invoices');
-
-  const [t] = useTranslation();
-  const { dateFormat } = useCurrentCompanyDateFormats();
-
-  const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
+  const { documentTitle } = useTitle('invoices');
+  const { t } = useTranslation();
 
   const pages = [{ name: t('invoices'), href: '/invoices' }];
 
@@ -50,66 +43,11 @@ export function Invoices() {
     </ReactRouterLink>
   );
 
-  const columns: DataTableColumns<Invoice> = [
-    {
-      id: 'status_id',
-      label: t('status'),
-      format: (value, invoice) => <InvoiceStatus entity={invoice} />,
-    },
-    {
-      id: 'number',
-      label: t('number'),
-      format: (value, invoice) => (
-        <Link to={route('/invoices/:id/edit', { id: invoice.id })}>
-          {invoice.number}
-        </Link>
-      ),
-    },
-    {
-      id: 'client_id',
-      label: t('client'),
-      format: (value, invoice) => (
-        <Link to={route('/clients/:id', { id: invoice.client_id })}>
-          {invoice.client?.display_name}
-        </Link>
-      ),
-    },
-    {
-      id: 'amount',
-      label: t('amount'),
-      format: (value, invoice) =>
-        formatMoney(
-          value,
-          invoice.client?.country_id || company?.settings.country_id,
-          invoice.client?.settings.currency_id || company?.settings.currency_id
-        ),
-    },
-    {
-      id: 'balance',
-      label: t('balance'),
-      format: (value, invoice) =>
-        formatMoney(
-          value,
-          invoice.client?.country_id || company?.settings.country_id,
-          invoice.client?.settings.currency_id || company?.settings.currency_id
-        ),
-    },
-    {
-      id: 'date',
-      label: t('date'),
-      format: (value) => date(value, dateFormat),
-    },
-    {
-      id: 'due_date',
-      label: t('due_date'),
-      format: (value) => date(value, dateFormat),
-    },
-  ];
-
+  const columns = useInvoiceColumns();
   const actions = useActions();
 
   return (
-    <Default title={t('invoices')} breadcrumbs={pages} docsLink="docs/invoices">
+    <Default title={documentTitle} breadcrumbs={pages} docsLink="docs/invoices">
       <DataTable
         resource="invoice"
         endpoint="/api/v1/invoices?include=client&without_deleted_clients=true"
@@ -120,6 +58,13 @@ export function Invoices() {
         withResourcefulActions
         customActions={actions}
         rightSide={importButton}
+        leftSideChevrons={
+          <DataTableColumnsPicker
+            table="invoice"
+            columns={invoiceColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+          />
+        }
       />
     </Default>
   );

@@ -9,6 +9,7 @@
  */
 
 export const blankInvitation = {
+  vendor_contact_id: '',
   client_contact_id: '',
   is_deleted: false,
   isChanged: false,

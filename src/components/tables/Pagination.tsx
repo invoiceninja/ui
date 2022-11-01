@@ -11,6 +11,7 @@
 import { trans } from 'common/helpers';
 import { datatablePerPageAtom } from 'components/DataTable';
 import { useAtom } from 'jotai';
+import { ReactNode } from 'react';
 import { ChevronLeft, ChevronRight } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -21,6 +22,7 @@ interface Props extends CommonProps {
   onPageChange: any;
   onRowsChange: (rows: string) => any;
   totalRecords?: number;
+  leftSideChevrons?: ReactNode;
 }
 
 const defaultProps: Props = {
@@ -88,6 +90,8 @@ export function Pagination(props: Props) {
       </p>
 
       <nav className="flex justify-center md:justify-end my-4 md:my-0 items-center">
+        {props.leftSideChevrons}
+
         <button
           onClick={previous}
           className="py-1.5 px-2 bg-white border-b border-t rounded-l hover:bg-gray-50 border"

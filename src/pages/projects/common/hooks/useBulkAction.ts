@@ -40,9 +40,7 @@ export function useBulkAction() {
         });
       })
       .finally(() => {
-        queryClient.invalidateQueries(
-          route('/api/v1/projects/:id', { id })
-        );
+        queryClient.invalidateQueries(route('/api/v1/projects/:id', { id }));
       });
   };
 }

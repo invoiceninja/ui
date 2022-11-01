@@ -32,6 +32,9 @@ export interface Product {
   custom_value3: string;
   custom_value4: string;
   is_deleted: boolean;
+  in_stock_quantity: number;
+  stock_notification: boolean;
+  stock_notification_threshold: number;
   documents: any[];
   company?: Company;
 }

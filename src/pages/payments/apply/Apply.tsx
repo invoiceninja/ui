@@ -57,9 +57,7 @@ export function Apply() {
         })
         .finally(() => {
           formik.setSubmitting(false);
-          queryClient.invalidateQueries(
-            route('/api/v1/payments/:id', { id })
-          );
+          queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
         });
     },
   });

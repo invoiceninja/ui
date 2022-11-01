@@ -105,7 +105,7 @@ export function HelpSidebarIcons(props: Props) {
         <InputField
           label={t('from')}
           id="from"
-          value={`${user.first_name} - ${user.email}`}
+          value={`${user?.first_name} - ${user?.email}`}
           disabled
         />
 
@@ -162,10 +162,10 @@ export function HelpSidebarIcons(props: Props) {
       >
         <section>
           <p className="text-gray-800">
-            {user.first_name} {user.last_name}
+            {user?.first_name} {user?.last_name}
           </p>
 
-          <p>{user.email}</p>
+          <p>{user?.email}</p>
         </section>
 
         <div className="flex flex-wrap justify-center items-center space-x-4 pt-6">

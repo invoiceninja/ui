@@ -61,9 +61,7 @@ export function Edit() {
       .then(() => {
         toast.success(t('updated_project'), { id: toastId });
 
-        queryClient.invalidateQueries(
-          route('/api/v1/projects/:id', { id })
-        );
+        queryClient.invalidateQueries(route('/api/v1/projects/:id', { id }));
       })
       .catch((error: AxiosError) => {
         console.error(error);

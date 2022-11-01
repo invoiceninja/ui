@@ -11,18 +11,20 @@
 import { useTranslation } from 'react-i18next';
 import { useTitle } from 'common/hooks/useTitle';
 import { Page } from 'components/Breadcrumbs';
-import { DataTable, DataTableColumns } from 'components/DataTable';
-import { Link } from '@invoiceninja/forms';
+import { DataTable } from 'components/DataTable';
 import { useNavigate } from 'react-router-dom';
 import { Default } from 'components/layouts/Default';
-import { EntityStatus } from 'components/EntityStatus';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { Product } from 'common/interfaces/product';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Download } from 'react-feather';
 import { route } from 'common/helpers/route';
+import {
+  defaultColumns,
+  productColumns,
+  useProductColumns,
+} from '../common/hooks';
+import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 
 export function Products() {
   useTitle('products');
@@ -30,8 +32,6 @@ export function Products() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-  const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
 
   const pages: Page[] = [{ name: t('products'), href: '/products' }];
 
@@ -50,39 +50,6 @@ export function Products() {
     </ReactRouterLink>
   );
 
-  const columns: DataTableColumns<Product> = [
-    {
-      id: 'product_key',
-      label: t('product_key'),
-      format: (value, product) => (
-        <span className="inline-flex items-center space-x-4">
-          <EntityStatus entity={product} />
-          <Link to={route('/products/:id/edit', { id: product.id })}>
-            {value}
-          </Link>
-        </span>
-      ),
-    },
-    {
-      id: 'notes',
-      label: t('notes'),
-    },
-    {
-      id: 'price',
-      label: t('price'),
-      format: (value, product) =>
-        formatMoney(
-          value,
-          product.company?.settings.country_id || company.settings.country_id,
-          product.company?.settings.currency_id || company.settings.currency_id
-        ),
-    },
-    {
-      id: 'quantity',
-      label: t('quantity'),
-    },
-  ];
-
   const actions = [
     (product: Product) => (
       <DropdownElement
@@ -94,6 +61,8 @@ export function Products() {
       </DropdownElement>
     ),
   ];
+
+  const columns = useProductColumns();
 
   return (
     <Default title={t('products')} breadcrumbs={pages} docsLink="docs/products">
@@ -107,6 +76,13 @@ export function Products() {
         withResourcefulActions
         customActions={actions}
         rightSide={importButton}
+        leftSideChevrons={
+          <DataTableColumnsPicker
+            table="product"
+            columns={productColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+          />
+        }
       />
     </Default>
   );

@@ -48,9 +48,7 @@ export function Pdf() {
   return (
     <Default
       title={t('view_pdf')}
-      onBackClick={
-        invoice && route('/invoices/:id/edit', { id: invoice.id })
-      }
+      onBackClick={invoice && route('/invoices/:id/edit', { id: invoice.id })}
       navigationTopRight={
         invoice && (
           <Actions

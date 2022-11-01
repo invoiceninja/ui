@@ -29,9 +29,7 @@ export function Credits() {
       id: 'number',
       label: t('number'),
       format: (value, credit) => (
-        <Link to={route('/credits/:id/edit', { id: credit.id })}>
-          {value}
-        </Link>
+        <Link to={route('/credits/:id/edit', { id: credit.id })}>{value}</Link>
       ),
     },
     {

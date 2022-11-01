@@ -112,9 +112,7 @@ export function Edit() {
 
         toast.success(t('updated_client'), { id: toastId });
 
-        queryClient.invalidateQueries(
-          route('/api/v1/clients/:id', { id })
-        );
+        queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
 
         navigate(route('/clients/:id', { id }));
       })
@@ -130,9 +128,7 @@ export function Edit() {
           : toast.error(t('error_title'), { id: toastId });
       })
       .finally(() =>
-        queryClient.invalidateQueries(
-          route('/api/v1/clients/:id', { id })
-        )
+        queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }))
       );
   };
 

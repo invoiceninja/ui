@@ -23,7 +23,7 @@ describe('Test Valid Task TimeLog', () => {
             time_log: "",
             number: "x",
             rate: 10,
-            invoice_documents: false,
+            documents: [],
             is_date_based: true,
             status_order: 1,
             is_deleted: false,
