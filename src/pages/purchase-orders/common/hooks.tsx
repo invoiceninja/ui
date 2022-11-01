@@ -23,6 +23,7 @@ import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-res
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { CopyToClipboard } from 'components/CopyToClipboard';
+import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
 import { StatusBadge } from 'components/StatusBadge';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
@@ -77,10 +78,10 @@ export const purchaseOrderColumns = [
   'contact_name',
   'created_at',
   // 'created_by', @Todo: Need to resolve relationship
-  // 'custom1',
-  // 'custom2',
-  // 'custom3',
-  // 'custom4', @Todo: No custom fields?
+  'custom1',
+  'custom2',
+  'custom3',
+  'custom4',
   'discount',
   'documents',
   'entity_state',
@@ -216,6 +217,38 @@ export function usePurchaseOrderColumns() {
         id: 'created_at',
         label: t('created_at'),
         format: (value) => date(value, dateFormat),
+      },
+      {
+        column: 'custom1',
+        id: 'custom_value1',
+        label:
+          (company?.custom_fields.invoice1 &&
+            customField(company?.custom_fields.invoice1).label()) ||
+          t('first_custom'),
+      },
+      {
+        column: 'custom2',
+        id: 'custom_value2',
+        label:
+          (company?.custom_fields.invoice2 &&
+            customField(company?.custom_fields.invoice2).label()) ||
+          t('second_custom'),
+      },
+      {
+        column: 'custom3',
+        id: 'custom_value3',
+        label:
+          (company?.custom_fields.invoice3 &&
+            customField(company?.custom_fields.invoice3).label()) ||
+          t('third_custom'),
+      },
+      {
+        column: 'custom4',
+        id: 'custom_value4',
+        label:
+          (company?.custom_fields.invoice4 &&
+            customField(company?.custom_fields.invoice4).label()) ||
+          t('forth_custom'),
       },
       {
         column: 'discount',
