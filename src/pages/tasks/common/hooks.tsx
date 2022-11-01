@@ -17,14 +17,16 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Task } from 'common/interfaces/task';
 import { customField } from 'components/CustomField';
+import dayjs from 'dayjs';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TaskStatus } from './components/TaskStatus';
 import {
   calculateEntityState,
   isTaskRunning,
 } from './helpers/calculate-entity-state';
-import { calculateTime } from './helpers/calculate-time';
+import { calculateTime, parseTimeLog } from './helpers/calculate-time';
 
 export const taskColumns = [
   'status',
@@ -43,8 +45,8 @@ export const taskColumns = [
   'custom2',
   'custom3',
   'custom4',
-  //   'date', @Todo: What column does this map to?
-  //   'documents', @Todo: Does this map to `invoice_documents`?
+  'date',
+  'documents',
   //   'invoice', @Todo: Need to fetch the relationship
   'is_deleted',
   'is_invoiced',
@@ -71,6 +73,18 @@ export function useTaskColumns() {
   const currentUser = useCurrentUser();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
+
+  const calculateDate = (task: Task) => {
+    const timeLog = parseTimeLog(task.time_log);
+
+    if (timeLog.length === 0) {
+      return '';
+    }
+
+    const [startTime] = timeLog[0];
+
+    return dayjs.unix(startTime).format(dateFormat);
+  };
 
   const columns: DataTableColumnsExtended<Task, TaskColumns> = [
     {
@@ -170,6 +184,12 @@ export function useTaskColumns() {
         (company?.custom_fields.task4 &&
           customField(company?.custom_fields.task4).label()) ||
         t('forth_custom'),
+    },
+    {
+      column: 'date',
+      id: 'id',
+      label: t('date'),
+      format: (value, task) => calculateDate(task),
     },
     {
       column: 'is_deleted',
