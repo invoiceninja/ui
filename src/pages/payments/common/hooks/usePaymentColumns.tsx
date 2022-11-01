@@ -16,6 +16,7 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { Payment } from 'common/interfaces/payment';
 import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
@@ -72,6 +73,23 @@ export function usePaymentColumns() {
   const currentUser = useCurrentUser();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
+  const resolveCurrency = useResolveCurrency();
+
+  const calculateConvertedAmount = (payment: Payment) => {
+    if (payment.exchange_rate) {
+      return payment.amount * payment.exchange_rate;
+    }
+
+    if (payment.client && payment.client.settings.currency_id?.length > 1) {
+      const currency = resolveCurrency(payment.currency_id);
+
+      if (currency) {
+        return payment.amount * currency.exchange_rate;
+      }
+    }
+
+    return payment.amount;
+  };
 
   const columns: DataTableColumnsExtended<Payment, PaymentColumns> = [
     {
@@ -148,7 +166,7 @@ export function usePaymentColumns() {
       label: t('amount'),
       format: (value, payment) =>
         formatMoney(
-          value,
+          calculateConvertedAmount(payment),
           payment.client?.country_id || company?.settings.country_id,
           payment.client?.settings.currency_id || company?.settings.currency_id
         ),
