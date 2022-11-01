@@ -192,6 +192,12 @@ export function useTaskColumns() {
       format: (value, task) => calculateDate(task),
     },
     {
+      column: 'documents',
+      id: 'documents',
+      label: t('documents'),
+      format: (value, task) => task.documents.length,
+    },
+    {
       column: 'is_deleted',
       id: 'is_deleted',
       label: t('is_deleted'),
