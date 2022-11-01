@@ -19,7 +19,6 @@ import { Task } from 'common/interfaces/task';
 import { customField } from 'components/CustomField';
 import dayjs from 'dayjs';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
-import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TaskStatus } from './components/TaskStatus';
 import {
@@ -38,7 +37,7 @@ export const taskColumns = [
   'entity_state',
   'archived_at',
   //   'assigned_to', @Todo: Need to fetch relationship
-  //   'calculated_rate', @Todo: Diff vs `rate`?
+  'calculated_rate',
   'created_at',
   //   'created_by', @Todo: Need to fetch relationship
   'custom1',
@@ -136,17 +135,17 @@ export function useTaskColumns() {
       label: t('archived_at'),
       format: (value) => date(value, dateFormat),
     },
-    // {
-    //   column: 'calculated_rate',
-    //   id: 'rate',
-    //   label: t('calculated_rate'),
-    //   format: (value, task) =>
-    //     formatMoney(
-    //       value,
-    //       task.client?.country_id || company?.settings.country_id,
-    //       task.client?.settings.currency_id || company?.settings.currency_id
-    //     ),
-    // },
+    {
+      column: 'calculated_rate',
+      id: 'rate',
+      label: t('calculated_rate'),
+      format: (value, task) =>
+        formatMoney(
+          task.rate || company.settings.default_task_rate,
+          task.client?.country_id || company?.settings.country_id,
+          task.client?.settings.currency_id || company?.settings.currency_id
+        ),
+    },
     {
       column: 'created_at',
       id: 'created_at',
