@@ -14,6 +14,7 @@ import { Design } from 'common/interfaces/design';
 import { useDesignsQuery } from 'common/queries/designs';
 import { updateChanges } from 'common/stores/slices/company-users';
 import { Divider } from 'components/cards/Divider';
+import { ColorPicker } from 'components/forms/ColorPicker';
 import { range } from 'lodash';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -930,20 +931,32 @@ export function GeneralSettings() {
       </Element>
 
       <Element leftSide={t('primary_color')}>
-        <input
-          type="color"
-          id="settings.primary_color"
+        <ColorPicker
           value={company?.settings?.primary_color || colors.primary}
-          onChange={handleChange}
+          onValueChange={(color) =>
+            dispatch(
+              updateChanges({
+                object: 'company',
+                property: 'settings.primary_color',
+                value: color,
+              })
+            )
+          }
         />
       </Element>
 
       <Element leftSide={t('secondary_color')}>
-        <input
-          type="color"
-          id="settings.secondary_color"
+        <ColorPicker
           value={company?.settings?.secondary_color || colors.secondary}
-          onChange={handleChange}
+          onValueChange={(color) =>
+            dispatch(
+              updateChanges({
+                object: 'company',
+                property: 'settings.secondary_color',
+                value: color,
+              })
+            )
+          }
         />
       </Element>
 

@@ -15,6 +15,7 @@ import { updateChanges } from 'common/stores/slices/user';
 import { RootState } from '../../../../common/stores/store';
 import colors from 'common/constants/colors';
 import { DebounceInput } from 'react-debounce-input';
+import { ColorPicker } from 'components/forms/ColorPicker';
 
 export function AccentColor() {
   const [t] = useTranslation();
@@ -25,16 +26,15 @@ export function AccentColor() {
   return (
     <Card>
       <Element leftSide={t('accent_color')}>
-        <DebounceInput
+        <ColorPicker
           value={
             userChanges?.company_user?.settings?.accent_color || colors.primary
           }
-          type="color"
-          onChange={(event) =>
+          onValueChange={(color) =>
             dispatch(
               updateChanges({
                 property: 'company_user.settings.accent_color',
-                value: event.target.value,
+                value: color,
               })
             )
           }

@@ -9,7 +9,7 @@
  */
 
 import { Modal } from 'components/Modal';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { HexColorPicker, HexColorInput } from 'react-colorful';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
@@ -26,6 +26,10 @@ export function ColorPicker(props: Props) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useDebounce(() => props.onValueChange?.(color), 500, [color]);
+
+  useEffect(() => {
+    props.value && setColor(props.value);
+  }, [props.value]);
 
   return (
     <div>
