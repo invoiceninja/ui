@@ -29,6 +29,7 @@ export function parseTimeLog(log: string) {
 
 export function calculateTime(log: string) {
   const times = parseTimeLog(log);
+
   let seconds = 0;
 
   times.map(([start, stop]) => {
@@ -40,3 +41,4 @@ export function calculateTime(log: string) {
 
   return new Date(seconds * 1000).toISOString().slice(11, 19);
 }
+

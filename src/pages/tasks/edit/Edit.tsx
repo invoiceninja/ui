@@ -78,9 +78,7 @@ export function Edit() {
         toast.error();
       })
       .finally(() =>
-        queryClient.invalidateQueries(
-          route('/api/v1/invoices/:id', { id })
-        )
+        queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id }))
       );
   };
 

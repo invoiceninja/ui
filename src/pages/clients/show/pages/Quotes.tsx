@@ -25,9 +25,7 @@ export function Quotes() {
       id: 'number',
       label: t('quote_number'),
       format: (value, resource) => (
-        <Link to={route('/quotes/:id/edit', { id: resource.id })}>
-          {value}
-        </Link>
+        <Link to={route('/quotes/:id/edit', { id: resource.id })}>{value}</Link>
       ),
     },
     { id: 'date', label: t('date') },

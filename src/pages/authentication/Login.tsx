@@ -111,23 +111,23 @@ export function Login() {
               errorMessage={errors?.email}
             />
 
+            <InputField
+              type="password"
+              label={t('password')}
+              id="password"
+              onChange={form.handleChange}
+              errorMessage={errors?.password}
+            />
+
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <InputLabel>{t('password')}</InputLabel>
+              <div className="flex flex-col lg:flex-row items-center justify-between">
+                <InputLabel>{`2FA - ${t('one_time_password')}`}</InputLabel>
                 <Link to="/recover_password">{t('forgot_password')}</Link>
               </div>
-
-              <InputField
-                type="password"
-                id="password"
-                onChange={form.handleChange}
-                errorMessage={errors?.password}
-              />
             </div>
 
             <InputField
               type="text"
-              label={`2FA - ${t('one_time_password')}`}
               id="one_time_password"
               onChange={form.handleChange}
               placeholder={t('plaid_optional')}

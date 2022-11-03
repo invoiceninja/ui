@@ -31,9 +31,7 @@ export function Users() {
       id: 'name',
       label: 'name',
       format: (field, resource) => (
-        <Link
-          to={route('/settings/users/:id/edit', { id: resource.id })}
-        >
+        <Link to={route('/settings/users/:id/edit', { id: resource.id })}>
           {resource.first_name} {resource.last_name}
         </Link>
       ),

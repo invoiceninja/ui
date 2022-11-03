@@ -145,7 +145,7 @@ export function DangerZone() {
         )}
       </Modal>
 
-      <Card title="Danger zone">
+      <Card title="Danger Zone">
         <ClickableElement
           onClick={() => setIsPurgeModalOpen(true)}
           className="text-red-500 hover:text-red-600"

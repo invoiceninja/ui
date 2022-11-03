@@ -113,9 +113,7 @@ export function Kanban() {
 
         toast.error();
       })
-      .finally(() =>
-        queryClient.invalidateQueries(route('/api/v1/tasks'))
-      );
+      .finally(() => queryClient.invalidateQueries(route('/api/v1/tasks')));
   };
 
   return (

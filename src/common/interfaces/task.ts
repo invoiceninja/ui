@@ -30,7 +30,6 @@ export interface Task {
   time_log: string;
   number: string;
   rate: number;
-  invoice_documents: boolean;
   is_date_based: boolean;
   status_order: number;
   is_deleted: boolean;
@@ -39,4 +38,5 @@ export interface Task {
   updated_at: number;
   client?: Client;
   status?: TaskStatus;
+  documents: any[];
 }

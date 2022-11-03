@@ -53,7 +53,7 @@ export function useDownloadPdf(props: Props) {
           })
           .catch((error) => {
             console.error(error);
-            
+
             toast.error();
           })
       );

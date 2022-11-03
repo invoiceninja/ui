@@ -35,7 +35,10 @@ export function useCreditQuery({ id }: CreditQueryProps) {
   return useQuery<Credit>(
     route('/api/v1/credits/:id', { id }),
     () =>
-      request('GET', endpoint('/api/v1/credits/:id?include=client', { id })).then(
+      request(
+        'GET',
+        endpoint('/api/v1/credits/:id?include=client', { id })
+      ).then(
         (response: GenericSingleResourceResponse<Credit>) => response.data.data
       ),
     { staleTime: Infinity }

@@ -38,9 +38,7 @@ export function Archive() {
         toast.success(t('error_title'));
       })
       .finally(() =>
-        queryClient.invalidateQueries(
-          route('/api/v1/tokens/:id', { id })
-        )
+        queryClient.invalidateQueries(route('/api/v1/tokens/:id', { id }))
       );
   };
 

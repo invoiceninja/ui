@@ -55,7 +55,10 @@ export function Edit() {
   const queryClient = useQueryClient();
 
   useEffect(() => {
-    if (response?.data.data && response.data.data.email === currentUser.email) {
+    if (
+      response?.data.data &&
+      response.data.data.email === currentUser?.email
+    ) {
       navigate('/settings/user_details');
     } else {
       setUser(response?.data.data);

@@ -8,18 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ReactNode } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 
 interface Props {
   title: string;
   value?: ReactNode;
   children?: ReactNode;
   className?: string;
+  style?: CSSProperties;
 }
 
 export function InfoCard(props: Props) {
   return (
     <div
+      style={props.style}
       className={`px-4 py-5 bg-white shadow rounded overflow-hidden sm:p-6 space-y-2 ${props.className}`}
     >
       <dd className="text-xl font-medium text-gray-900">{props.title}</dd>

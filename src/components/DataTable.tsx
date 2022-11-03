@@ -61,6 +61,7 @@ interface Props {
   withoutPagination?: boolean;
   rightSide?: ReactNode;
   withoutPadding?: boolean;
+  leftSideChevrons?: ReactNode;
 }
 
 export const datatablePerPageAtom = atomWithStorage('perPage', '10');
@@ -347,6 +348,7 @@ export function DataTable(props: Props) {
           onRowsChange={setPerPage}
           totalPages={data.data.meta.pagination.total_pages}
           totalRecords={data.data.meta.pagination.total}
+          leftSideChevrons={props.leftSideChevrons}
         />
       )}
     </>

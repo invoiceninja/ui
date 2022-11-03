@@ -97,7 +97,9 @@ export function InvoiceDetails(props: Props) {
             field="invoice1"
             defaultValue={recurringInvoice?.custom_value1 || ''}
             value={company.custom_fields.invoice1}
-            onValueChange={(value) => handleChange('custom_value1', String(value))}
+            onValueChange={(value) =>
+              handleChange('custom_value1', String(value))
+            }
           />
         )}
 
@@ -106,7 +108,9 @@ export function InvoiceDetails(props: Props) {
             field="invoice2"
             defaultValue={recurringInvoice?.custom_value2 || ''}
             value={company.custom_fields.invoice2}
-            onValueChange={(value) => handleChange('custom_value2', String(value))}
+            onValueChange={(value) =>
+              handleChange('custom_value2', String(value))
+            }
           />
         )}
       </Card>
@@ -157,9 +161,7 @@ export function InvoiceDetails(props: Props) {
         <Element leftSide={t('auto_bill')}>
           <SelectField
             value={recurringInvoice?.auto_bill || false}
-            onValueChange={(value) =>
-              handleChange('auto_bill', value)
-            }
+            onValueChange={(value) => handleChange('auto_bill', value)}
           >
             <option value="always">{t('enabled')}</option>
             <option value="optout">{t('optout')}</option>
@@ -173,7 +175,9 @@ export function InvoiceDetails(props: Props) {
             field="invoice3"
             defaultValue={recurringInvoice?.custom_value3 || ''}
             value={company.custom_fields.invoice3}
-            onValueChange={(value) => handleChange('custom_value3', String(value))}
+            onValueChange={(value) =>
+              handleChange('custom_value3', String(value))
+            }
           />
         )}
 
@@ -182,7 +186,9 @@ export function InvoiceDetails(props: Props) {
             field="invoice4"
             defaultValue={recurringInvoice?.custom_value4 || ''}
             value={company.custom_fields.invoice4}
-            onValueChange={(value) => handleChange('custom_value4', String(value))}
+            onValueChange={(value) =>
+              handleChange('custom_value4', String(value))
+            }
           />
         )}
       </Card>

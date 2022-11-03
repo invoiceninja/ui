@@ -31,9 +31,7 @@ export function useHandleCreate(
       .then((response: GenericSingleResourceResponse<Invoice>) => {
         toast.success('created_invoice');
 
-        navigate(
-          route('/invoices/:id/edit', { id: response.data.data.id })
-        );
+        navigate(route('/invoices/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError) => {
         console.error(error);

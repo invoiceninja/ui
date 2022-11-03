@@ -34,9 +34,7 @@ export function useBulk() {
       })
       .finally(() => {
         ids.forEach((id) => {
-          queryClient.invalidateQueries(
-            route('/api/v1/vendors/:id', { id })
-          );
+          queryClient.invalidateQueries(route('/api/v1/vendors/:id', { id }));
         });
       });
   };

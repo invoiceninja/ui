@@ -8,86 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
-import { Credit } from 'common/interfaces/credit';
-import { DataTable, DataTableColumns } from 'components/DataTable';
+import { DataTable } from 'components/DataTable';
+import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
-import { CreditStatus } from '../common/components/CreditStatus';
-import { useActions } from '../common/hooks';
+import {
+  creditColumns,
+  defaultColumns,
+  useActions,
+  useCreditColumns,
+} from '../common/hooks';
 
 export function Credits() {
   useTitle('credits');
 
   const [t] = useTranslation();
 
-  const { dateFormat } = useCurrentCompanyDateFormats();
-
-  const formatMoney = useFormatMoney();
-
   const pages = [{ name: t('credits'), href: '/credits' }];
 
-  const company = useCurrentCompany();
-
-  const columns: DataTableColumns<Credit> = [
-    {
-      id: 'status_id',
-      label: t('status'),
-      format: (value, credit) => <CreditStatus entity={credit} />,
-    },
-    {
-      id: 'number',
-      label: t('number'),
-      format: (field, credit) => (
-        <Link to={route('/credits/:id/edit', { id: credit.id })}>
-          {field}
-        </Link>
-      ),
-    },
-    {
-      id: 'client_id',
-      label: t('client'),
-      format: (_, credit) => (
-        <Link to={route('/clients/:id', { id: credit.client_id })}>
-          {credit.client?.display_name}
-        </Link>
-      ),
-    },
-    {
-      id: 'amount',
-      label: t('amount'),
-      format: (value, credit) =>
-        formatMoney(
-          value,
-          credit.client?.country_id || company.settings.country_id,
-          credit.client?.settings.currency_id || company.settings.currency_id
-        ),
-    },
-    {
-      id: 'date',
-      label: t('date'),
-      format: (value) => date(value, dateFormat),
-    },
-    {
-      id: 'balance',
-      label: t('remaining'),
-      format: (_, credit) => {
-        return formatMoney(
-          credit.balance,
-          credit.client?.country_id || company.settings.country_id,
-          credit.client?.settings.currency_id || company.settings.currency_id
-        );
-      },
-    },
-  ];
-
   const actions = useActions();
+  const columns = useCreditColumns();
 
   return (
     <Default title={t('credits')} breadcrumbs={pages} docsLink="docs/credits/">
@@ -100,6 +41,13 @@ export function Credits() {
         linkToEdit="/credits/:id/edit"
         customActions={actions}
         withResourcefulActions
+        leftSideChevrons={
+          <DataTableColumnsPicker
+            columns={creditColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+            table="credit"
+          />
+        }
       />
     </Default>
   );

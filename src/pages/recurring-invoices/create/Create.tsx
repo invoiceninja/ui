@@ -28,6 +28,7 @@ import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from '../common/atoms';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
@@ -51,6 +52,7 @@ export function Create() {
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [searchParams] = useSearchParams();
 
   const clientResolver = useClientResolver();
   const company = useCurrentCompany();
@@ -96,6 +98,10 @@ export function Create() {
 
       if (typeof _recurringInvoice.line_items === 'string') {
         _recurringInvoice.line_items = [];
+      }
+
+      if (searchParams.get('client')) {
+        _recurringInvoice.client_id = searchParams.get('client')!;
       }
 
       setRecurringInvoice(_recurringInvoice);

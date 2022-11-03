@@ -64,9 +64,7 @@ export function Create() {
       .then((response) => {
         toast.success('created_task');
 
-        navigate(
-          route('/tasks/:id/edit', { id: response.data.data.id })
-        );
+        navigate(route('/tasks/:id/edit', { id: response.data.data.id }));
       })
       .catch((error) => {
         console.error(error);

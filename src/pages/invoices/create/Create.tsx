@@ -15,6 +15,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
+import { Invitation } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankInvoiceQuery } from 'common/queries/invoices';
 import { Page } from 'components/Breadcrumbs';
@@ -126,11 +127,13 @@ export function Create() {
       clientResolver.find(invoice.client_id).then((client) => {
         setClient(client);
 
-        const invitations: Record<string, unknown>[] = [];
+        const invitations: Invitation[] = [];
 
         client.contacts.map((contact) => {
           if (contact.send_email) {
-            const invitation = cloneDeep(blankInvitation);
+            const invitation = cloneDeep(
+              blankInvitation
+            ) as unknown as Invitation;
 
             invitation.client_contact_id = contact.id;
             invitations.push(invitation);
