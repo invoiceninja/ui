@@ -29,9 +29,11 @@ export function CopyToClipboard(props: Props) {
     <div className="inline-flex space-x-2">
       <span>{value}</span>
 
-      <button type="button" onClick={handleClick}>
-        <MdOutlineContentCopy size={18} />
-      </button>
+      {value.length > 0 && (
+        <button type="button" onClick={handleClick}>
+          <MdOutlineContentCopy size={18} />
+        </button>
+      )}
     </div>
   );
 }
