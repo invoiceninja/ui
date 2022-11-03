@@ -45,8 +45,8 @@ export function ClientPortal() {
       onCancelClick={onCancel}
     >
       <SettingsComponent />
-      <Registration />
       <Authorization />
+      <Registration />
       <Messages />
       <Customize />
     </Settings>
