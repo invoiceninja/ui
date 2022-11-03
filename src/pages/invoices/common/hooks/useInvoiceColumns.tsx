@@ -169,7 +169,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'date',
+      column: 'due_date',
       id: 'due_date',
       label: t('due_date'),
       format: (value) => date(value, dateFormat),
