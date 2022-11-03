@@ -59,6 +59,21 @@ export function Settings() {
           </SelectField>
         </Element>
 
+        <Element leftSide={t('decimal_comma')}>
+          <Toggle
+            checked={company?.settings.use_comma_as_decimal_place}
+            onChange={(value: boolean) =>
+              dispatch(
+                updateChanges({
+                  object: 'company',
+                  property: 'use_comma_as_decimal_place',
+                  value,
+                })
+              )
+            }
+          />
+        </Element>
+
         <Element leftSide={t('currency_format')}>
           <Radio
             onValueChange={(value) =>
@@ -126,21 +141,6 @@ export function Settings() {
                 updateChanges({
                   object: 'company',
                   property: 'settings.military_time',
-                  value,
-                })
-              )
-            }
-          />
-        </Element>
-
-        <Element leftSide={t('decimal_comma')}>
-          <Toggle
-            checked={company?.settings.use_comma_as_decimal_place}
-            onChange={(value: boolean) =>
-              dispatch(
-                updateChanges({
-                  object: 'company',
-                  property: 'use_comma_as_decimal_place',
                   value,
                 })
               )
