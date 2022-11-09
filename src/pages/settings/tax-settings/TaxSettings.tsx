@@ -83,7 +83,7 @@ export function TaxSettings() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('item_tax_rates')}>
+        <Element leftSide={t('line_item_tax_rates')}>
           <SelectField
             id="enabled_item_tax_rates"
             onChange={handleChange}
