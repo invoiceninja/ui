@@ -73,7 +73,13 @@ export function Card(props: Props) {
           </div>
         )}
 
-        <div className={classNames({ 'py-4': !props.withoutBodyPadding })}>
+        <div
+          className={classNames({
+            'py-0': props.withoutBodyPadding,
+            'py-4': padding == 'regular',
+            'py-2': padding == 'small',
+          })}
+        >
           {props.isLoading && <Element leftSide={<Spinner />} />}
 
           {props.withContainer ? (
