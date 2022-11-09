@@ -32,10 +32,13 @@ interface Props {
   additionalAction?: ReactNode;
   isLoading?: boolean;
   withoutBodyPadding?: boolean;
+  padding?: 'small' | 'regular';
 }
 
 export function Card(props: Props) {
   const [t] = useTranslation();
+
+  const { padding = 'regular' } = props;
 
   return (
     <div
@@ -48,12 +51,18 @@ export function Card(props: Props) {
       <form onSubmit={props.onFormSubmit}>
         {props.title && (
           <div
-            className={classNames(
-              'px-4 py-5 sm:px-6 border-b border-gray-200',
-              { 'bg-white sticky top-0': props.withScrollableBody }
-            )}
+            className={classNames('px-4 sm:px-6 border-b border-gray-200', {
+              'bg-white sticky top-0': props.withScrollableBody,
+              'py-3': padding == 'small',
+              'py-5': padding == 'regular',
+            })}
           >
-            <h3 className="text-lg leading-6 font-medium text-gray-900">
+            <h3
+              className={classNames('leading-6 font-medium text-gray-900', {
+                'text-lg': padding == 'regular',
+                'text-md': padding == 'small',
+              })}
+            >
               {props.title}
             </h3>
             {props.description && (
