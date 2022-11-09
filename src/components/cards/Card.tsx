@@ -51,10 +51,10 @@ export function Card(props: Props) {
       <form onSubmit={props.onFormSubmit}>
         {props.title && (
           <div
-            className={classNames('px-4 sm:px-6 border-b border-gray-200', {
+            className={classNames('border-b border-gray-200', {
               'bg-white sticky top-0': props.withScrollableBody,
-              'py-3': padding == 'small',
-              'py-5': padding == 'regular',
+              'px-4 py-3': padding == 'small',
+              'px-4 sm:px-6 py-5': padding == 'regular',
             })}
           >
             <h3
