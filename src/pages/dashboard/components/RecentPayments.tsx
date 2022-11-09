@@ -18,6 +18,7 @@ import { Link } from 'components/forms/Link';
 import { Payment } from 'common/interfaces/payment';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Card } from '@invoiceninja/cards';
+import { generatePath } from 'react-router-dom';
 
 export function RecentPayments() {
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -57,9 +58,18 @@ export function RecentPayments() {
     },
     {
       id: 'invoice_number',
-      label: t('invoice_number'),
+      label: t('invoice'),
       format: (value, payment) =>
-        payment.invoices && payment.invoices[0]?.number,
+        payment.invoices &&
+        payment.invoices[0] && (
+          <Link
+            to={generatePath('/invoices/:id/edit', {
+              id: payment.invoices[0].id,
+            })}
+          >
+            {payment.invoices[0].number}
+          </Link>
+        ),
     },
     {
       id: 'date',
@@ -72,6 +82,7 @@ export function RecentPayments() {
     <Card
       title={t('recent_payments')}
       className="h-96"
+      padding="small"
       withoutBodyPadding
       withScrollableBody
     >
