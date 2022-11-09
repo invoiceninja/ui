@@ -152,7 +152,7 @@ export function TaskSettings() {
 
         <Divider />
 
-        <Element leftSide={t('client_portal_tasks')}>
+        <Element leftSide={t('show_tasks_in_client_portal')}>
           <Toggle
             checked={companyChanges?.settings?.enable_client_portal_tasks}
             onChange={(value: boolean) =>
