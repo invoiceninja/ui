@@ -43,33 +43,6 @@ export function CustomResourcefulActions(props: Props) {
     <Dropdown label={t('more_actions')} className="divide-y">
       <div>
         <DropdownElement
-          key={'archive'}
-          onClick={() => {
-            handleResourcefulAction('archive');
-          }}
-        >
-          {t('archive')}
-        </DropdownElement>
-        <DropdownElement
-          key={'delete'}
-          onClick={() => {
-            handleResourcefulAction('delete');
-          }}
-        >
-          {t('delete')}
-        </DropdownElement>
-        <DropdownElement
-          key={'purge'}
-          onClick={() => {
-            props.openPurgeModal(true);
-          }}
-        >
-          {t('purge')}
-        </DropdownElement>
-      </div>
-
-      <div>
-        <DropdownElement
           to={route('/clients/:id/statement', {
             id: props.clientId,
           })}
@@ -106,6 +79,33 @@ export function CustomResourcefulActions(props: Props) {
           })}
         >
           {t('new_credit')}
+        </DropdownElement>
+      </div>
+
+      <div>
+        <DropdownElement
+          key={'archive'}
+          onClick={() => {
+            handleResourcefulAction('archive');
+          }}
+        >
+          {t('archive')}
+        </DropdownElement>
+        <DropdownElement
+          key={'delete'}
+          onClick={() => {
+            handleResourcefulAction('delete');
+          }}
+        >
+          {t('delete')}
+        </DropdownElement>
+        <DropdownElement
+          key={'purge'}
+          onClick={() => {
+            props.openPurgeModal(true);
+          }}
+        >
+          {t('purge')}
         </DropdownElement>
       </div>
     </Dropdown>

@@ -48,7 +48,7 @@ export function Details(props: Props) {
   const company = useCurrentCompany();
 
   return (
-    <Card title={t('details')}>
+    <Card title={t('company_details')}>
       <Element leftSide={t('name')}>
         <InputField
           id="name"
