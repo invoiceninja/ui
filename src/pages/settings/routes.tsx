@@ -105,6 +105,35 @@ export const settingsRoutes = (
         />
       }
     />
+    <Route path="bank_accounts">
+      <Route
+        path=""
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.BankAccounts />}
+          />
+        }
+      />
+      <Route
+        path=":id/details"
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.BankAccountDetails />}
+          />
+        }
+      />
+      <Route
+        path=":id/edit"
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.EditBankAccount />}
+          />
+        }
+      />
+    </Route>
     <Route path="group_settings" element={<Settings.GroupSettings />} />
     <Route path="subscriptions" element={<Settings.Subscriptions />} />
     <Route path="users">
