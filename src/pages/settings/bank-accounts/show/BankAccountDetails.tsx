@@ -32,7 +32,7 @@ const BankAccountDetails = () => {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('bank_account_details'), href: '/settings/bank_account_details' },
+    { name: t('bank_accounts'), href: '/settings/bank_accounts' },
   ];
 
   const fetchBankAccountDetails = async () => {
