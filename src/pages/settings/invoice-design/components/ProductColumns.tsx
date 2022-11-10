@@ -26,6 +26,7 @@ export function ProductColumns() {
     { value: '$product.product3', label: t('custom3') },
     { value: '$product.product4', label: t('custom4') },
     { value: '$product.gross_line_total', label: t('gross_line_total') },
+    { value: '$product.tax_amount', label: t('tax_amount') },
   ];
 
   return (
