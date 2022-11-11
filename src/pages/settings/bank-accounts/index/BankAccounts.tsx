@@ -28,7 +28,7 @@ const BankAccounts = () => {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('bank_accounts'), href: '/settings/bank-accounts' },
+    { name: t('bank_accounts'), href: '/settings/bank_accounts' },
   ];
 
   const columns: DataTableColumns<BankAccount> = [

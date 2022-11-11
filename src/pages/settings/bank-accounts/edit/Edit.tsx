@@ -39,7 +39,7 @@ const Edit = () => {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('edit_bank_account'), href: '/settings/edit_bank_account' },
+    { name: t('bank_accounts'), href: '/settings/bank_accounts' },
   ];
 
   const fetchBankAccountDetails = async () => {
@@ -54,7 +54,6 @@ const Edit = () => {
     } catch (error) {
       console.error(error);
       navigate(route('/settings/bank_accounts'));
-      return;
     }
     toast.dismiss();
   };
