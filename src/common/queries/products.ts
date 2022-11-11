@@ -14,6 +14,7 @@ import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { endpoint } from '../helpers';
 import { Params } from './common/params.interface';
+import { Product } from 'common/interfaces/product';
 
 export function useProductsQuery(params: Params) {
   return useQuery(['/api/v1/products', params], () => {
@@ -32,6 +33,17 @@ export function useProductsQuery(params: Params) {
     );
   });
 }
+
+export function useProductsQueryNoParams() {
+    return useQuery<Product[]>(
+      '/api/v1/products',
+      () =>
+        request('GET', endpoint('/api/v1/products?per_page=100&sort=product_key|asc')).then(
+          (response) => response.data.data
+        ),
+      { staleTime: Infinity }
+    );
+  }
 
 export function useProductQuery(params: { id: string | undefined }) {
   return useQuery(

@@ -106,7 +106,43 @@ export const settingsRoutes = (
       }
     />
     <Route path="group_settings" element={<Settings.GroupSettings />} />
-    <Route path="subscriptions" element={<Settings.Subscriptions />} />
+    <Route path="subscriptions">
+      <Route path="" element={
+            <Guard
+              guards={[() => enterprisePlan()]}
+              component={<Settings.Subscriptions />}
+            />
+          } 
+      />
+      <Route
+        path="create"
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.CreateSubscription />}
+          />
+        }
+      />
+      <Route
+        path=":id"
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.SubscriptionDetails />}
+          />
+        }
+      />
+      <Route
+        path=":id/edit"
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.EditSubscription />}
+          />
+        }
+      />
+    </Route> 
+    
     <Route path="users">
       <Route
         path=""

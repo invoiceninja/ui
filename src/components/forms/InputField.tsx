@@ -10,6 +10,7 @@
 
 import classNames from 'classnames';
 import { Alert } from 'components/Alert';
+import { MutableRefObject } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 
 import CommonProps from '../../common/interfaces/common-props.interface';
@@ -32,13 +33,14 @@ interface Props extends CommonProps {
   onValueChange?: (value: string) => unknown;
   textareaRows?: number;
   step?: string;
+  ref?: MutableRefObject<null>;
 }
 
 export function InputField(props: Props) {
   return (
     <section>
       {props.label && (
-        <InputLabel className="mb-2" for={props.id}>
+        <InputLabel className="mb-2" for={props.id} innerRef={props.ref}>
           {props.label}
           {props.required && <span className="ml-1 text-red-600">*</span>}
         </InputLabel>
