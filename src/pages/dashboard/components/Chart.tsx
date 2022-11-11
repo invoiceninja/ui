@@ -195,14 +195,14 @@ export function Chart(props: Props) {
         <Area
           name={t('payments')}
           dataKey="payments"
-          stroke={TotalColors.Red}
+          stroke={TotalColors.Green}
           fill="url(#payments)"
           fillOpacity={1}
         />
         <Area
           name={t('expenses')}
           dataKey="expenses"
-          stroke={TotalColors.Green}
+          stroke={TotalColors.Red}
           fill="url(#expenses)"
           fillOpacity={1}
         />

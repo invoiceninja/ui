@@ -66,6 +66,7 @@ export function UpcomingInvoices() {
     <Card
       title={t('upcoming_invoices')}
       className="h-96"
+      padding="small"
       withScrollableBody
       withoutBodyPadding
     >

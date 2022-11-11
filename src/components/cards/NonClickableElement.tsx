@@ -8,16 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import CommonProps from 'common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   className?: string;
+  padding?: 'small' | 'regular';
 }
 
 export function NonClickableElement(props: Props) {
+  const { padding = 'regular', className } = props;
+
   return (
     <div
-      className={`w-full text-left px-4 sm:px-6 block hover:bg-gray-50 py-4 text-gray-700 hover:text-gray-900 text-sm ${props.className}`}
+      className={classNames(
+        `w-full text-leftblock hover:bg-gray-50 text-gray-700 hover:text-gray-900 text-sm ${className}`,
+        {
+          'px-4 sm:px-6 py-4': padding == 'regular',
+          'px-4 py-2': padding == 'small',
+        }
+      )}
     >
       {props.children}
     </div>

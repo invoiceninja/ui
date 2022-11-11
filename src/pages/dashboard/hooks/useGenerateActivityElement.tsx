@@ -152,12 +152,12 @@ export function useGenerateActivityElement() {
   };
 
   return (activity: ActivityRecord) => (
-    <NonClickableElement>
-      {generate(activity)}
+    <NonClickableElement padding="small" className="space-x-1">
+      <span className="text-gray-500 text-xs italic">
+        {date(activity.created_at, dateFormat)} &#183;
+      </span>
 
-      <p className="text-gray-500 text-xs">
-        {date(activity.created_at, dateFormat)} &#183; {activity.ip}
-      </p>
+      <span>{generate(activity)}</span>
     </NonClickableElement>
   );
 }

@@ -66,6 +66,7 @@ export function PastDueInvoices() {
     <Card
       title={t('past_due_invoices')}
       className="h-96"
+      padding="small"
       withScrollableBody
       withoutBodyPadding
     >
