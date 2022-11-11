@@ -966,6 +966,7 @@
   "delete_bank_account": "Delete Bank Account",
   "deleted_bank_account": "Successfully deleted bank account",
   "archived_bank_account": "Successfully archived bank account",
+  "create_bank_account": "Create Bank Account",
   "created_bank_account": "Successfully created bank account",
   "validate_bank_account": "Validate Bank Account",
   "bank_password_help": "Note: your password is transmitted securely and never stored on our servers.",

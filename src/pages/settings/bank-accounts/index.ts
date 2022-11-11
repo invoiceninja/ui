@@ -10,4 +10,5 @@
 
 export { default as BankAccounts } from './index/BankAccounts';
 export { default as EditBankAccount } from './edit/Edit';
+export { default as CreateBankAccount } from './create/Create';
 export { default as BankAccountDetails } from './show/BankAccountDetails';
