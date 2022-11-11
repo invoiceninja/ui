@@ -125,6 +125,15 @@ export const settingsRoutes = (
         }
       />
       <Route
+        path="create"
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.CreateBankAccount />}
+          />
+        }
+      />
+      <Route
         path=":id/edit"
         element={
           <Guard
