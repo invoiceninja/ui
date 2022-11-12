@@ -231,6 +231,19 @@ export function Default(props: Props) {
       },
     },
     {
+      name: t('transactions'),
+      href: '/transactions',
+      icon: BiWallet,
+      current: location.pathname.startsWith('/transactions'),
+      visible: true,
+      rightButton: {
+        icon: PlusCircle,
+        to: '/transactions/create',
+        label: t('new_transaction'),
+        visible: hasPermission('create_transaction'),
+      },
+    },
+    {
       name: t('settings'),
       href: '/settings/company_details',
       icon: Settings,

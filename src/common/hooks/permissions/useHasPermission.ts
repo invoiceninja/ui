@@ -26,6 +26,10 @@ type ProjectPermissions = 'create_project' | 'view_project' | 'edit_project';
 type TaskPermissions = 'create_task' | 'view_task' | 'edit_task';
 type VendorPermissions = 'create_vendor' | 'view_vendor' | 'edit_vendor';
 type ExpensePermissions = 'create_expense' | 'view_expense' | 'edit_expense';
+type BankTransactionsPermissions =
+  | 'create_transaction'
+  | 'view_transaction'
+  | 'edit_transaction';
 
 export type Permissions =
   | ClientPermissions
@@ -38,7 +42,8 @@ export type Permissions =
   | ProjectPermissions
   | TaskPermissions
   | VendorPermissions
-  | ExpensePermissions;
+  | ExpensePermissions
+  | BankTransactionsPermissions;
 
 export function useHasPermission() {
   const user = useSelector(
