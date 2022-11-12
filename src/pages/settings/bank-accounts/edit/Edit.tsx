@@ -16,47 +16,31 @@ import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { BankAccDetails } from 'common/interfaces/bank-accounts';
+import { useBankAccountsQuery } from 'common/queries/bank-accounts';
 import { useFormik } from 'formik';
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Settings } from '../../../../components/layouts/Settings';
-import { BankAccountValidation } from '../common/ValidationInterface';
+import { useBankAccountPages } from '../common/hooks/useBankAccountPages';
+import { BankAccountValidation } from '../common/validation/ValidationInterface';
 
 const Edit = () => {
   useTitle('edit_bank_account');
   const [t] = useTranslation();
-  const { id: bankAccountId } = useParams<string>();
   const navigate = useNavigate();
+  const { id } = useParams<string>();
+  const pages = useBankAccountPages();
   const bankAccountForm = useRef<any>();
+  const { data: response } = useBankAccountsQuery({ id });
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [errors, setErrors] = useState<BankAccountValidation | undefined>(
     undefined
   );
   const [bankAccountDetails, setBankAccountDetails] = useState<BankAccDetails>(
     defaultAccountDetails
   );
-
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('bank_accounts'), href: '/settings/bank_accounts' },
-  ];
-
-  const fetchBankAccountDetails = async () => {
-    toast.loading(t('processing'));
-
-    try {
-      const { data: responseData } = await request(
-        'GET',
-        endpoint('/api/v1/bank_integrations/:id', { id: bankAccountId })
-      );
-      setBankAccountDetails(responseData?.data);
-    } catch (error) {
-      console.error(error);
-      navigate(route('/settings/bank_accounts'));
-    }
-    toast.dismiss();
-  };
 
   const form = useFormik({
     enableReinitialize: true,
@@ -66,16 +50,27 @@ const Edit = () => {
     onSubmit: async (values: any) => {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
+      setIsFormBusy(true);
+
+      if (values?.bank_account_name?.length < 4) {
+        setErrors({
+          bank_account_name: [
+            'Bank account name should be at least 4 characters long.',
+          ],
+        });
+        setIsFormBusy(false);
+        toast.dismiss();
+        return;
+      }
 
       try {
-        await request(
+        request(
           'PUT',
-          endpoint('/api/v1/bank_integrations/:id', { id: bankAccountId }),
+          endpoint('/api/v1/bank_integrations/:id', { id }),
           values
         );
         toast.success(t('updated_bank_account'), { id: toastId });
         navigate(route('/settings/bank_accounts'));
-        return;
       } catch (error: any) {
         console.error(error);
         toast.error(t('error_title'), { id: toastId });
@@ -83,23 +78,27 @@ const Edit = () => {
           setErrors(error?.response?.data);
         }
       }
+      setIsFormBusy(false);
       form.setSubmitting(false);
     },
   });
 
   const handleCancel = (): void => {
-    navigate(route('/settings/bank_accounts'));
-    return;
+    if (!isFormBusy) {
+      navigate(route('/settings/bank_accounts'));
+    }
   };
 
   const handleSave = (event: any): void => {
-    event?.preventDefault();
-    form?.handleSubmit(event);
+    if (!isFormBusy) {
+      event?.preventDefault();
+      form?.handleSubmit(event);
+    }
   };
 
   useEffect(() => {
-    fetchBankAccountDetails();
-  }, []);
+    setBankAccountDetails(response?.data?.data);
+  }, [response]);
 
   return (
     <Settings
@@ -110,7 +109,11 @@ const Edit = () => {
       onSaveClick={handleSave}
     >
       <Card title={t('edit_bank_account')}>
-        <form ref={bankAccountForm} className="my-6 space-y-4">
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          ref={bankAccountForm}
+          className="my-6 space-y-4"
+        >
           <Element leftSide={t('bank_account_name')}>
             <InputField
               id="bank_account_name"

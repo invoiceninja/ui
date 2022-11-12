@@ -20,21 +20,19 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Settings } from '../../../../components/layouts/Settings';
-import { BankAccountValidation } from '../common/ValidationInterface';
+import { useBankAccountPages } from '../common/hooks/useBankAccountPages';
+import { BankAccountValidation } from '../common/validation/ValidationInterface';
 
 const Create = () => {
   useTitle('create_bank_account');
   const [t] = useTranslation();
   const navigate = useNavigate();
+  const pages = useBankAccountPages();
   const bankAccountForm = useRef<any>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
   const [errors, setErrors] = useState<BankAccountValidation | undefined>(
     undefined
   );
-
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('bank_accounts'), href: '/settings/bank_accounts' },
-  ];
 
   const form = useFormik({
     enableReinitialize: true,
@@ -44,9 +42,21 @@ const Create = () => {
     onSubmit: async (values: any) => {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
+      setIsFormBusy(true);
+
+      if (values?.bank_account_name?.length < 4) {
+        setErrors({
+          bank_account_name: [
+            'Bank account name should be at least 4 characters long.',
+          ],
+        });
+        toast.dismiss();
+        setIsFormBusy(false);
+        return;
+      }
 
       try {
-        await request('POST', endpoint('/api/v1/bank_integrations'), values);
+        request('POST', endpoint('/api/v1/bank_integrations'), values);
         toast.success(t('created_bank_account'), { id: toastId });
         navigate(route('/settings/bank_accounts'));
       } catch (error: any) {
@@ -56,17 +66,22 @@ const Create = () => {
           setErrors(error?.response?.data);
         }
       }
+      setIsFormBusy(false);
       form.setSubmitting(false);
     },
   });
 
   const handleCancel = (): void => {
-    navigate(route('/settings/bank_accounts'));
+    if (!isFormBusy) {
+      navigate(route('/settings/bank_accounts'));
+    }
   };
 
   const handleSave = (event: any): void => {
-    event?.preventDefault();
-    form?.handleSubmit(event);
+    if (!isFormBusy) {
+      event?.preventDefault();
+      form?.handleSubmit(event);
+    }
   };
 
   return (
@@ -78,7 +93,11 @@ const Create = () => {
       onSaveClick={handleSave}
     >
       <Card title={t('create_bank_account')}>
-        <form ref={bankAccountForm} className="my-6 space-y-4">
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          ref={bankAccountForm}
+          className="my-6 space-y-4"
+        >
           <Element leftSide={t('bank_account_name')}>
             <InputField
               id="bank_account_name"

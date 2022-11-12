@@ -9,52 +9,29 @@
  */
 
 import { defaultAccountDetails } from 'common/constants/bank-accounts';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { BankAccDetails } from 'common/interfaces/bank-accounts';
+import { useBankAccountsQuery } from 'common/queries/bank-accounts';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Settings } from '../../../../components/layouts/Settings';
+import { useBankAccountPages } from '../common/hooks/useBankAccountPages';
 import { Details } from '../components';
 
 const BankAccountDetails = () => {
   useTitle('bank_account_details');
+  const { id } = useParams();
   const [t] = useTranslation();
-  const navigate = useNavigate();
-  const { id: bankAccountId } = useParams();
+  const pages = useBankAccountPages();
+  const { data: response } = useBankAccountsQuery({ id });
   const [bankAccountDetails, setBankAccountDetails] = useState<BankAccDetails>(
     defaultAccountDetails
   );
 
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('bank_accounts'), href: '/settings/bank_accounts' },
-  ];
-
-  const fetchBankAccountDetails = async () => {
-    toast.loading(t('processing'));
-
-    try {
-      const { data: responseData } = await request(
-        'GET',
-        endpoint('/api/v1/bank_integrations/:id', { id: bankAccountId })
-      );
-      setBankAccountDetails(responseData?.data);
-    } catch (error) {
-      console.error(error);
-      navigate(route('/settings/bank_accounts'));
-      return;
-    }
-    toast.dismiss();
-  };
-
   useEffect(() => {
-    fetchBankAccountDetails();
-  }, []);
+    setBankAccountDetails(response?.data?.data);
+  }, [response]);
 
   return (
     <Settings
@@ -66,4 +43,5 @@ const BankAccountDetails = () => {
     </Settings>
   );
 };
+
 export default BankAccountDetails;

@@ -8,55 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
-import { DataTable, DataTableColumns } from 'components/DataTable';
+import { DataTable } from 'components/DataTable';
 import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
-import { BankAccount } from 'common/interfaces/bank-accounts';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { ConnectAccounts } from '../components';
 import { isHosted } from 'common/helpers';
+import { useBankAccountColumns } from '../common/hooks/useBankAccountColumns';
+import { useBankAccountPages } from '../common/hooks/useBankAccountPages';
 
 const BankAccounts = () => {
   useTitle('bank_accounts');
   const [t] = useTranslation();
-  const company = useCurrentCompany();
-  const formatMoney = useFormatMoney();
-
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('bank_accounts'), href: '/settings/bank_accounts' },
-  ];
-
-  const columns: DataTableColumns<BankAccount> = [
-    {
-      id: 'bank_account_name',
-      label: 'Bank account name',
-      format: (field, resource) => (
-        <Link
-          to={route('/settings/bank_accounts/:id/details', {
-            id: resource?.id,
-          })}
-        >
-          {resource?.bank_account_name}
-        </Link>
-      ),
-    },
-    { id: 'bank_account_type', label: 'Bank account type' },
-    {
-      id: 'balance',
-      label: t('balance'),
-      format: (value) =>
-        formatMoney(
-          value,
-          company?.settings?.country_id,
-          company?.settings?.currency_id
-        ),
-    },
-  ];
+  const pages = useBankAccountPages();
+  const columns = useBankAccountColumns();
 
   return (
     <Settings

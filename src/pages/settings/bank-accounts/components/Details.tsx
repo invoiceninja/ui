@@ -20,7 +20,7 @@ const Details = ({ accountDetails }: { accountDetails: BankAccDetails }) => {
     bank_account_type: bankAccountType,
     provider_name: providerName,
     bank_account_status: bankAccountStatus,
-  } = accountDetails;
+  } = accountDetails || {};
 
   const [t] = useTranslation();
   const company = useCurrentCompany();
