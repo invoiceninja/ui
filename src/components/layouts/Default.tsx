@@ -35,6 +35,7 @@ import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
 import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
+import { AiOutlineBank } from 'react-icons/ai';
 import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 
@@ -233,7 +234,7 @@ export function Default(props: Props) {
     {
       name: t('transactions'),
       href: '/transactions',
-      icon: BiWallet,
+      icon: AiOutlineBank,
       current: location.pathname.startsWith('/transactions'),
       visible: true,
       rightButton: {

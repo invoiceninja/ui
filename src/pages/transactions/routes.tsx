@@ -11,7 +11,12 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
-import Transactions from './index/Transactions';
+import {
+  CreateTransaction,
+  EditTransaction,
+  Transaction,
+  Transactions,
+} from './index';
 
 export const transactionRoutes = (
   <Route path="transactions">
@@ -21,6 +26,33 @@ export const transactionRoutes = (
         <Guard
           guards={[() => permission('view_transaction')]}
           component={<Transactions />}
+        />
+      }
+    />
+    <Route
+      path="create"
+      element={
+        <Guard
+          guards={[() => permission('create_transaction')]}
+          component={<CreateTransaction />}
+        />
+      }
+    />
+    <Route
+      path=":id"
+      element={
+        <Guard
+          guards={[() => permission('view_transaction')]}
+          component={<Transaction />}
+        />
+      }
+    />
+    <Route
+      path=":id/edit"
+      element={
+        <Guard
+          guards={[() => permission('edit_transaction')]}
+          component={<EditTransaction />}
         />
       }
     />
