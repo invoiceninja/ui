@@ -12,17 +12,14 @@ import { useTitle } from 'common/hooks/useTitle';
 import { DataTable } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
-import { expenseColumns, useExpenseColumns } from 'pages/expenses/common/hooks';
-import { defaultColumns } from 'pages/products/common/hooks';
+import { useTransactionColumns } from '../common/hooks/useTransactionColumns';
+import { useTransactionPages } from '../common/hooks/useTransactionPages';
 
 const Transactions = () => {
   useTitle('transactions');
   const [t] = useTranslation();
-
-  const pages = [{ name: t('transactions'), href: '/transactions' }];
-
-  const columns = useExpenseColumns();
+  const pages = useTransactionPages();
+  const columns = useTransactionColumns();
 
   return (
     <Default
@@ -31,20 +28,12 @@ const Transactions = () => {
       docsLink="docs/transactions/"
     >
       <DataTable
-        resource="expense"
-        endpoint="/api/v1/expenses?include=client,vendor"
+        resource="transaction"
+        endpoint="/api/v1/bank_transactions"
         columns={columns}
-        bulkRoute="/api/v1/expenses/bulk"
-        linkToCreate="/expenses/create"
-        linkToEdit="/expenses/:id/edit"
+        linkToCreate="/transactions/create"
+        linkToEdit="/transactions/:id/edit"
         withResourcefulActions
-        leftSideChevrons={
-          <DataTableColumnsPicker
-            columns={expenseColumns as unknown as string[]}
-            defaultColumns={defaultColumns}
-            table="expense"
-          />
-        }
       />
     </Default>
   );
