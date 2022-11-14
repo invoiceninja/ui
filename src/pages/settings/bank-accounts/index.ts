@@ -8,7 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export { default as BankAccounts } from './index/BankAccounts';
-export { default as EditBankAccount } from './edit/Edit';
-export { default as CreateBankAccount } from './create/Create';
-export { default as BankAccountDetails } from './show/BankAccountDetails';
+export { BankAccounts } from './index/BankAccounts';
+
+export { Edit as EditBankAccount } from './edit/Edit';
+
+export { Create as CreateBankAccount } from './create/Create';
+
+export { BankAccount } from './show/BankAccount';

@@ -12,16 +12,22 @@ import { useTitle } from 'common/hooks/useTitle';
 import { DataTable } from 'components/DataTable';
 import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { ConnectAccounts } from '../components';
 import { isHosted } from 'common/helpers';
 import { useBankAccountColumns } from '../common/hooks/useBankAccountColumns';
-import { useBankAccountPages } from '../common/hooks/useBankAccountPages';
+import { Button } from '@invoiceninja/forms';
+import { MdLink } from 'react-icons/md';
 
-const BankAccounts = () => {
+export function BankAccounts() {
   useTitle('bank_accounts');
+
   const [t] = useTranslation();
-  const pages = useBankAccountPages();
+
   const columns = useBankAccountColumns();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('bank_accounts'), href: '/settings/bank_accounts' },
+  ];
 
   return (
     <Settings
@@ -36,10 +42,15 @@ const BankAccounts = () => {
         linkToCreate="/settings/bank_accounts/create"
         linkToEdit="/settings/bank_accounts/:id/edit"
         withResourcefulActions
-        rightSide={isHosted() && <ConnectAccounts />}
+        rightSide={
+          isHosted() && (
+            <Button>
+              <span className="mr-2">{<MdLink />}</span>
+              {t('connect_accounts')}
+            </Button>
+          )
+        }
       />
     </Settings>
   );
-};
-
-export default BankAccounts;
+}

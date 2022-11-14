@@ -120,7 +120,7 @@ export const settingsRoutes = (
         element={
           <Guard
             guards={[() => enterprisePlan()]}
-            component={<Settings.BankAccountDetails />}
+            component={<Settings.BankAccount />}
           />
         }
       />

@@ -18,13 +18,15 @@ import { useTranslation } from 'react-i18next';
 
 export const useBankAccountColumns = () => {
   const { t } = useTranslation();
+
   const company = useCurrentCompany();
+
   const formatMoney = useFormatMoney();
 
   const columns: DataTableColumns<BankAccount> = [
     {
       id: 'bank_account_name',
-      label: 'Bank account name',
+      label: t('bank_account_name'),
       format: (field, resource) => (
         <Link
           to={route('/settings/bank_accounts/:id/details', {
@@ -35,7 +37,7 @@ export const useBankAccountColumns = () => {
         </Link>
       ),
     },
-    { id: 'bank_account_type', label: 'Bank account type' },
+    { id: 'bank_account_type', label: t('bank_account_type') },
     {
       id: 'balance',
       label: t('balance'),

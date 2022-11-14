@@ -10,77 +10,81 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
-import { useFormik } from 'formik';
-import { useRef, useState } from 'react';
-import toast from 'react-hot-toast';
+import { BankAccountInput } from 'common/interfaces/bank-accounts';
+import { useState, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Settings } from '../../../../components/layouts/Settings';
-import { useBankAccountPages } from '../common/hooks/useBankAccountPages';
-import { BankAccountValidation } from '../common/validation/ValidationInterface';
 
-const Create = () => {
+interface BankAccountValidation {
+  bank_account_name?: string[];
+}
+
+export function Create() {
   useTitle('create_bank_account');
+
   const [t] = useTranslation();
+
   const navigate = useNavigate();
-  const pages = useBankAccountPages();
-  const bankAccountForm = useRef<any>();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('bank_accounts'), href: '/settings/bank_accounts' },
+  ];
+
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+
   const [errors, setErrors] = useState<BankAccountValidation | undefined>(
     undefined
   );
 
-  const form = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      bank_account_name: '',
-    },
-    onSubmit: async (values: any) => {
-      const toastId = toast.loading(t('processing'));
-      setErrors(undefined);
-      setIsFormBusy(true);
+  const [bankAccount, setBankAccount] = useState<BankAccountInput>();
 
-      if (values?.bank_account_name?.length < 4) {
-        setErrors({
-          bank_account_name: [
-            'Bank account name should be at least 4 characters long.',
-          ],
-        });
-        toast.dismiss();
-        setIsFormBusy(false);
-        return;
-      }
+  const handleChange = (
+    property: keyof BankAccountInput,
+    value: BankAccountInput[keyof BankAccountInput]
+  ) => {
+    setBankAccount((prevState) => ({ ...prevState, [property]: value }));
+  };
 
-      try {
-        request('POST', endpoint('/api/v1/bank_integrations'), values);
-        toast.success(t('created_bank_account'), { id: toastId });
-        navigate(route('/settings/bank_accounts'));
-      } catch (error: any) {
-        console.error(error);
-        toast.error(t('error_title'), { id: toastId });
-        if (error?.response?.status === 422) {
-          setErrors(error?.response?.data);
-        }
-      }
-      setIsFormBusy(false);
-      form.setSubmitting(false);
-    },
-  });
-
-  const handleCancel = (): void => {
+  const handleCancel = () => {
     if (!isFormBusy) {
       navigate(route('/settings/bank_accounts'));
     }
   };
 
-  const handleSave = (event: any): void => {
+  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     if (!isFormBusy) {
       event?.preventDefault();
-      form?.handleSubmit(event);
+
+      const toastId = toast.processing();
+      setErrors(undefined);
+      setIsFormBusy(true);
+
+      try {
+        await request(
+          'POST',
+          endpoint('/api/v1/bank_integrations'),
+          bankAccount
+        );
+        setIsFormBusy(false);
+        toast.success(t('created_bank_account'), { id: toastId });
+        navigate(route('/settings/bank_accounts'));
+      } catch (cachedError) {
+        const error = cachedError as AxiosError;
+        console.error(error);
+        toast.error();
+        if (error?.response?.status === 422) {
+          setErrors(error?.response?.data);
+        }
+        setIsFormBusy(false);
+      }
     }
   };
 
@@ -92,23 +96,20 @@ const Create = () => {
       onCancelClick={handleCancel}
       onSaveClick={handleSave}
     >
-      <Card title={t('create_bank_account')}>
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          ref={bankAccountForm}
-          className="my-6 space-y-4"
-        >
-          <Element leftSide={t('bank_account_name')}>
-            <InputField
-              id="bank_account_name"
-              value={form?.values?.bank_account_name}
-              onChange={form?.handleChange}
-              errorMessage={errors?.bank_account_name}
-            />
-          </Element>
-        </form>
+      <Card onFormSubmit={handleSave} title={t('create_bank_account')}>
+        <Element leftSide={t('bank_account_name')}>
+          <InputField
+            value={bankAccount?.bank_account_name}
+            onChange={(event: FormEvent<HTMLFormElement>) =>
+              handleChange(
+                'bank_account_name',
+                (event?.target as HTMLInputElement)?.value
+              )
+            }
+            errorMessage={errors?.bank_account_name}
+          />
+        </Element>
       </Card>
     </Settings>
   );
-};
-export default Create;
+}

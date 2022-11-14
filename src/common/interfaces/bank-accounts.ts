@@ -15,22 +15,26 @@ export interface BankAccount {
   balance: number;
 }
 
-export interface BankAccDetails {
-  id?: string;
-  archived_at?: number;
-  auto_sync?: boolean;
-  bank_account_name?: string;
-  bank_account_type?: string;
-  balance?: number;
-  bank_account_id?: number;
-  bank_account_status?: string;
-  created_at?: number;
-  currency?: string;
-  disabled_upstream?: boolean;
-  from_date?: string;
-  is_deleted?: boolean;
-  nickname?: string;
-  provider_id?: number;
-  provider_name?: string;
-  updated_at?: number;
+export interface BankAccountInput {
+  bank_account_name: string;
+}
+
+export interface BankAccountDetails {
+  id: string;
+  archived_at: number;
+  auto_sync: boolean;
+  bank_account_name: string;
+  bank_account_type: string;
+  balance: number;
+  bank_account_id: number;
+  bank_account_status: string;
+  created_at: number;
+  currency: string;
+  disabled_upstream: boolean;
+  from_date: string;
+  is_deleted: boolean;
+  nickname: string;
+  provider_id: number;
+  provider_name: string;
+  updated_at: number;
 }

@@ -10,94 +10,100 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
-import { defaultAccountDetails } from 'common/constants/bank-accounts';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
-import { BankAccDetails } from 'common/interfaces/bank-accounts';
-import { useBankAccountsQuery } from 'common/queries/bank-accounts';
-import { useFormik } from 'formik';
-import { useEffect, useRef, useState } from 'react';
-import toast from 'react-hot-toast';
+import {
+  BankAccountDetails,
+  BankAccountInput,
+} from 'common/interfaces/bank-accounts';
+import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Settings } from '../../../../components/layouts/Settings';
-import { useBankAccountPages } from '../common/hooks/useBankAccountPages';
-import { BankAccountValidation } from '../common/validation/ValidationInterface';
+import { useBankAccountsQuery } from '../common/queries';
 
-const Edit = () => {
+interface BankAccountValidation {
+  bank_account_name?: string[];
+}
+
+export function Edit() {
   useTitle('edit_bank_account');
+
   const [t] = useTranslation();
+
   const navigate = useNavigate();
+
   const { id } = useParams<string>();
-  const pages = useBankAccountPages();
-  const bankAccountForm = useRef<any>();
+
   const { data: response } = useBankAccountsQuery({ id });
+
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+
   const [errors, setErrors] = useState<BankAccountValidation | undefined>(
     undefined
   );
-  const [bankAccountDetails, setBankAccountDetails] = useState<BankAccDetails>(
-    defaultAccountDetails
-  );
 
-  const form = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      bank_account_name: bankAccountDetails?.bank_account_name,
-    },
-    onSubmit: async (values: any) => {
-      const toastId = toast.loading(t('processing'));
-      setErrors(undefined);
-      setIsFormBusy(true);
+  const [accountDetails, setAccountDetails] = useState<BankAccountInput>();
 
-      if (values?.bank_account_name?.length < 4) {
-        setErrors({
-          bank_account_name: [
-            'Bank account name should be at least 4 characters long.',
-          ],
-        });
-        setIsFormBusy(false);
-        toast.dismiss();
-        return;
-      }
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('bank_accounts'), href: '/settings/bank_accounts' },
+  ];
 
-      try {
-        request(
-          'PUT',
-          endpoint('/api/v1/bank_integrations/:id', { id }),
-          values
-        );
-        toast.success(t('updated_bank_account'), { id: toastId });
-        navigate(route('/settings/bank_accounts'));
-      } catch (error: any) {
-        console.error(error);
-        toast.error(t('error_title'), { id: toastId });
-        if (error?.response?.status === 422) {
-          setErrors(error?.response?.data);
-        }
-      }
-      setIsFormBusy(false);
-      form.setSubmitting(false);
-    },
-  });
+  const handleChange = (
+    property: keyof BankAccountInput,
+    value: BankAccountInput[keyof BankAccountInput]
+  ) => {
+    setAccountDetails((prevState) => ({ ...prevState, [property]: value }));
+  };
 
-  const handleCancel = (): void => {
+  const getBankAccount = (bankAccount: BankAccountDetails) => {
+    return {
+      bank_account_name: bankAccount?.bank_account_name,
+    };
+  };
+
+  const handleCancel = () => {
     if (!isFormBusy) {
       navigate(route('/settings/bank_accounts'));
     }
   };
 
-  const handleSave = (event: any): void => {
+  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     if (!isFormBusy) {
       event?.preventDefault();
-      form?.handleSubmit(event);
+
+      const toastId = toast.processing();
+      setErrors(undefined);
+      setIsFormBusy(true);
+
+      try {
+        await request(
+          'PUT',
+          endpoint('/api/v1/bank_integrations/:id', { id }),
+          accountDetails
+        );
+        setIsFormBusy(false);
+        toast.success(t('updated_bank_account'), { id: toastId });
+        navigate(route('/settings/bank_accounts'));
+      } catch (cachedError) {
+        const error = cachedError as AxiosError;
+        console.error(error);
+        toast.error();
+        if (error?.response?.status === 422) {
+          setErrors(error?.response?.data);
+        }
+        setIsFormBusy(false);
+      }
     }
   };
 
   useEffect(() => {
-    setBankAccountDetails(response?.data?.data);
+    setAccountDetails(getBankAccount(response?.data?.data));
   }, [response]);
 
   return (
@@ -108,23 +114,20 @@ const Edit = () => {
       onCancelClick={handleCancel}
       onSaveClick={handleSave}
     >
-      <Card title={t('edit_bank_account')}>
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          ref={bankAccountForm}
-          className="my-6 space-y-4"
-        >
-          <Element leftSide={t('bank_account_name')}>
-            <InputField
-              id="bank_account_name"
-              value={form?.values?.bank_account_name}
-              onChange={form?.handleChange}
-              errorMessage={errors?.bank_account_name}
-            />
-          </Element>
-        </form>
+      <Card onFormSubmit={handleSave} title={t('edit_bank_account')}>
+        <Element leftSide={t('bank_account_name')}>
+          <InputField
+            value={accountDetails?.bank_account_name}
+            onChange={(event: FormEvent<HTMLFormElement>) =>
+              handleChange(
+                'bank_account_name',
+                (event?.target as HTMLInputElement)?.value
+              )
+            }
+            errorMessage={errors?.bank_account_name}
+          />
+        </Element>
       </Card>
     </Settings>
   );
-};
-export default Edit;
+}
