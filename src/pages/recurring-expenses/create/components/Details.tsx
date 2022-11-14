@@ -22,11 +22,10 @@ import { VendorSelector } from 'components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import frequencies from 'common/constants/frequency';
 import { RecurringExpense } from 'common/interfaces/recurring-expenses';
-import { Expense } from 'common/interfaces/expense';
 import dayjs from 'dayjs';
 
 export interface ExpenseCardProps {
-  expense: Expense | undefined;
+  expense: RecurringExpense | undefined;
   handleChange: <T extends keyof RecurringExpense>(
     property: T,
     value: RecurringExpense[T]
