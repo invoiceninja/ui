@@ -26,6 +26,7 @@ import { projectRoutes } from 'pages/projects/routes';
 import { taskRoutes } from 'pages/tasks/routes';
 import { vendorRoutes } from 'pages/vendors/routes';
 import { expenseRoutes } from 'pages/expenses/routes';
+import { recurringExpenseRoutes } from 'pages/recurring-expenses/routes';
 import { purchaseOrdersRoutes } from 'pages/purchase-orders/routes';
 
 export const routes = (
@@ -46,6 +47,7 @@ export const routes = (
       {vendorRoutes}
       {purchaseOrdersRoutes}
       {expenseRoutes}
+      {recurringExpenseRoutes}
       {settingsRoutes}
       {systemlogRoutes}
     </Route>

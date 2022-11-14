@@ -231,6 +231,19 @@ export function Default(props: Props) {
       },
     },
     {
+      name: t('recurring_expenses'),
+      href: '/recurring_expenses',
+      icon: BiWallet,
+      current: location.pathname.startsWith('/recurring_expenses'),
+      visible: enabled(ModuleBitmask.Expenses) && hasPermission('view_expense'),
+      rightButton: {
+        icon: PlusCircle,
+        to: '/recurring_expenses/create',
+        label: t('new_recurring_expense'),
+        visible: hasPermission('create_expense'),
+      },
+    },
+    {
       name: t('settings'),
       href: '/settings/company_details',
       icon: Settings,

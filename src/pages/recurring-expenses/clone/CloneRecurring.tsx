@@ -9,8 +9,6 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { Expense } from 'common/interfaces/expense';
-import { useExpenseQuery } from 'common/queries/expenses';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -19,32 +17,30 @@ import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { Details } from '../create/components/Details';
-import { Notes } from '../create/components/Notes';
-import { AdditionalInfo } from '../create/components/AdditionalInfo';
-import { TaxSettings } from '../create/components/Taxes';
 import { route } from 'common/helpers/route';
-import { useRecurringExpenseQuery } from 'pages/recurring-expenses/common/queries';
+import { TaxSettings } from '../create/components/Taxes';
+import { AdditionalInfo } from '../create/components/AdditionalInfo';
+import { Notes } from '../create/components/Notes';
+import { Details } from '../create/components/Details';
+import { useRecurringExpenseQuery } from '../common/queries';
+import { RecurringExpense } from 'common/interfaces/recurring-expenses';
 
-export function Clone() {
+export function CloneRecurring() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
-  const { documentTitle } = useTitle('new_expense');
+  const { documentTitle } = useTitle('new_recurring_expense');
   const { id } = useParams();
-  
-  const { data: dataExpense } = useExpenseQuery({ id });
-  const { data: dataReccuringExpense } = useRecurringExpenseQuery({ id });
-  const data = dataExpense || dataReccuringExpense;
+  const { data } = useRecurringExpenseQuery({ id });
 
   const pages = [
-    { name: t('expenses'), href: '/expenses' },
-    { name: t('expense'), href: route('/expenses/:id/edit', { id }) },
-    { name: t('clone'), href: route('/expenses/:id/clone', { id }) },
+    { name: t('recurring_expenses'), href: '/recurring_expenses' },
+    { name: t('recurring_expense'), href: route('/recurring_expenses/:id/edit', { id }) },
+    { name: t('clone'), href: route('/recurring_expenses/:id/clone', { id }) },
   ];
 
-  const [expense, setExpense] = useState<Expense>();
+  const [expense, setExpense] = useState<RecurringExpense>();
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
   );
@@ -55,21 +51,21 @@ export function Clone() {
     }
   }, [data]);
 
-  const handleChange = <T extends keyof Expense>(
+  const handleChange = <T extends keyof RecurringExpense>(
     property: T,
-    value: Expense[typeof property]
+    value: RecurringExpense[typeof property]
   ) => {
     setExpense((expense) => expense && { ...expense, [property]: value });
   };
 
-  const onSave = (expense: Expense) => {
+  const onSave = (expense: RecurringExpense) => {
     toast.processing();
 
-    request('POST', endpoint('/api/v1/expenses'), expense)
-      .then((response: GenericSingleResourceResponse<Expense>) => {
-        toast.success('created_expense');
+    request('POST', endpoint('/api/v1/recurring_expenses'), expense)
+      .then((response: GenericSingleResourceResponse<RecurringExpense>) => {
+        toast.success('created_recurring_expense');
 
-        navigate(route('/expenses/:id/edit', { id: response.data.data.id }));
+        navigate(route('/recurring_expenses/:id/edit', { id: response.data.data.id }));
       })
       .catch((error) => {
         console.error(error);
@@ -82,7 +78,7 @@ export function Clone() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/expenses"
+      onBackClick="/recurring_expenses"
       onSaveClick={() => expense && onSave(expense)}
     >
       <div className="grid grid-cols-12 gap-4">
