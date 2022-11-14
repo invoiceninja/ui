@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint, isHosted } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
@@ -18,10 +18,6 @@ export function SwitchToFlutter() {
   const account = useCurrentAccount();
 
   const onClick = () => {
-    if (isHosted()) {
-      return (window.location.href = 'https://invoicing.co');
-    }
-
     toast.processing();
 
     request('PUT', endpoint('/api/v1/accounts/:id', { id: account.id }), {
