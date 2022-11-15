@@ -48,7 +48,7 @@ export function Transaction() {
   };
 
   useEffect(() => {
-    setTransaction(getTransactionDetailsObject(response?.data?.data));
+    setTransaction(getTransactionDetailsObject(response));
   }, [response]);
 
   return (

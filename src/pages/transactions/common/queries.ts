@@ -10,10 +10,20 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { TransactionResponse } from 'common/interfaces/transactions';
 import { useQuery } from 'react-query';
 
 export function useTransactionQuery(params: { id: string | undefined }) {
-  return useQuery(['/api/v1/bank_transactions/:id', { id: params.id }], () =>
-    request('GET', endpoint('/api/v1/bank_transactions/:id', { id: params.id }))
+  return useQuery<TransactionResponse>(
+    ['/api/v1/bank_transactions/:id', { id: params.id }],
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/bank_transactions/:id', { id: params.id })
+      ).then(
+        (response: GenericSingleResourceResponse<TransactionResponse>) =>
+          response.data.data
+      )
   );
 }

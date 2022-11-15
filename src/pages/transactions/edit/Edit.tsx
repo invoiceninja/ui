@@ -131,7 +131,7 @@ export function Edit() {
   };
 
   useEffect(() => {
-    setTransaction(getTransactionInputObject(response?.data?.data));
+    setTransaction(getTransactionInputObject(response));
   }, [response]);
 
   return (
