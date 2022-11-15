@@ -11,36 +11,35 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCountries } from 'common/hooks/useCountries';
-import { useCurrencies } from 'common/hooks/useCurrencies';
+import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { TransactionDetails } from 'common/interfaces/transactions';
 import { useTranslation } from 'react-i18next';
 
-const Details = ({
-  transactionDetails,
-}: {
-  transactionDetails: TransactionDetails | undefined;
-}) => {
-  const { amount = 0, date, currency_id = '' } = transactionDetails || {};
+interface Props {
+  transactionDetails?: TransactionDetails;
+}
+
+export function Details(props: Props) {
+  const { amount = 0, date, currency_id = '' } = props.transactionDetails || {};
 
   const [t] = useTranslation();
+
   const countries = useCountries();
-  const currencies = useCurrencies();
+
   const formatMoney = useFormatMoney();
 
-  const getCurrencyCodeById = (): string => {
-    return currencies?.find(({ id }) => currency_id === id)?.code || '';
-  };
+  const resolveCurrency = useResolveCurrency();
 
-  const getCountryIdByCurrencyCode = (
-    currencyCode: string | undefined
-  ): string => {
+  const getCountryIdByCurrencyCode = (currencyCode: string) => {
     return (
       countries?.find(({ currency_code: code }) => code === currencyCode)?.id ||
       ''
     );
   };
 
-  const countryId = getCountryIdByCurrencyCode(getCurrencyCodeById());
+  const countryId = getCountryIdByCurrencyCode(
+    resolveCurrency(currency_id)?.code || ''
+  );
 
   return (
     <Card title={t('details')}>
@@ -50,6 +49,4 @@ const Details = ({
       <Element leftSide={t('date')}>{date}</Element>
     </Card>
   );
-};
-
-export default Details;
+}

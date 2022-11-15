@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export { default as Transactions } from './index/Transactions';
-export { default as CreateTransaction } from './create/Create';
-export { default as EditTransaction } from './edit/Edit';
-export { default as Transaction } from './show/Transaction';
+export { Transactions } from './index/Transactions';
+export { Create as CreateTransaction } from './create/Create';
+export { Edit as EditTransaction } from './edit/Edit';
+export { Transaction } from './show/Transaction';

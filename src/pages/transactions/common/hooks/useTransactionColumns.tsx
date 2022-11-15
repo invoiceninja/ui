@@ -9,29 +9,25 @@
  */
 
 import { Link } from '@invoiceninja/forms';
-import { transactionStatuses } from 'common/constants/transactions';
 import { route } from 'common/helpers/route';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCountries } from 'common/hooks/useCountries';
-import { useCurrencies } from 'common/hooks/useCurrencies';
+import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { Transaction } from 'common/interfaces/transactions';
-import { Badge } from 'components/Badge';
 import { DataTableColumns } from 'components/DataTable';
+import { EntityStatus } from 'pages/transactions/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 
-export const useTransactionColumns = () => {
+export function useTransactionColumns() {
   const { t } = useTranslation();
+
   const countries = useCountries();
-  const currencies = useCurrencies();
+
   const formatMoney = useFormatMoney();
 
-  const getCurrencyCodeById = (currencyId: string): string => {
-    return currencies?.find(({ id }) => currencyId === id)?.code || '';
-  };
+  const resolveCurrency = useResolveCurrency();
 
-  const getCountryIdByCurrencyCode = (
-    currencyCode: string | undefined
-  ): string => {
+  const getCountryIdByCurrencyCode = (currencyCode: string) => {
     return (
       countries?.find(({ currency_code: code }) => code === currencyCode)?.id ||
       ''
@@ -43,27 +39,11 @@ export const useTransactionColumns = () => {
       id: 'status',
       label: t('status'),
       format: (value, transaction) => {
-        const transactionStatusKey =
-          transactionStatuses?.find(({ id }) => id === transaction?.status_id)
-            ?.key || '';
-        if (transactionStatusKey === 'unmatched') {
-          return (
-            <Link to={route('/transactions/:id/edit', { id: transaction.id })}>
-              <Badge variant="generic">{t(transactionStatusKey)}</Badge>
-            </Link>
-          );
-        }
-        if (transactionStatusKey === 'matched') {
-          return (
-            <Link to={route('/transactions/:id/edit', { id: transaction.id })}>
-              <Badge variant="dark-blue">{t(transactionStatusKey)}</Badge>
-            </Link>
-          );
-        }
         return (
-          <Link to={route('/transactions/:id/edit', { id: transaction.id })}>
-            <Badge variant="green">{t(transactionStatusKey)}</Badge>
-          </Link>
+          <EntityStatus
+            route={route('/transactions/:id/edit', { id: transaction.id })}
+            status={transaction.status_id}
+          />
         );
       },
     },
@@ -72,13 +52,13 @@ export const useTransactionColumns = () => {
       label: t('deposit'),
       format: (value, transaction) => {
         const countryId = getCountryIdByCurrencyCode(
-          getCurrencyCodeById(transaction?.currency_id)
+          resolveCurrency(transaction.currency_id)?.code || ''
         );
-        if (transaction?.base_type === 'CREDIT') {
+        if (transaction.base_type === 'CREDIT') {
           return formatMoney(
-            transaction?.amount,
+            transaction.amount,
             countryId,
-            transaction?.currency_id
+            transaction.currency_id
           );
         }
       },
@@ -88,21 +68,21 @@ export const useTransactionColumns = () => {
       label: t('withdrawal'),
       format: (value, transaction) => {
         const countryId = getCountryIdByCurrencyCode(
-          getCurrencyCodeById(transaction?.currency_id)
+          resolveCurrency(transaction.currency_id)?.code || ''
         );
-        if (transaction?.base_type === 'DEBIT') {
+        if (transaction.base_type === 'DEBIT') {
           return formatMoney(
-            transaction?.amount,
+            transaction.amount,
             countryId,
-            transaction?.currency_id
+            transaction.currency_id
           );
         }
       },
     },
-    { id: 'date', label: 'Date' },
+    { id: 'date', label: t('date') },
     {
       id: 'description',
-      label: 'Description',
+      label: t('description'),
       format: (value, transaction) => {
         return (
           <Link to={route('/transactions/:id', { id: transaction.id })}>
@@ -111,9 +91,9 @@ export const useTransactionColumns = () => {
         );
       },
     },
-    { id: 'invoices', label: 'Invoices' },
-    { id: 'expense', label: 'Expense' },
+    { id: 'invoices', label: t('invoices') },
+    { id: 'expense', label: t('expense') },
   ];
 
   return columns;
-};
+}

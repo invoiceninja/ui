@@ -13,9 +13,14 @@ import { TransactionInput } from 'common/interfaces/transactions';
 import { TransactionValidation } from '../validation/ValidationInterface';
 
 export const useTransactionValidation = () => {
-  const checkValidation = useCallback((transaction: TransactionInput) => {
-    const { base_type, date, currency_id, bank_integration_id, description } =
-      transaction;
+  const checkValidation = useCallback((transaction?: TransactionInput) => {
+    const {
+      base_type,
+      date,
+      currency_id,
+      bank_integration_id,
+      description = '',
+    } = transaction || {};
 
     if (!base_type) {
       return false;
@@ -37,12 +42,17 @@ export const useTransactionValidation = () => {
 
   const setValidation = useCallback(
     (
-      transaction: TransactionInput,
-      setErrors: any,
-      errors: TransactionValidation | undefined
+      transaction?: TransactionInput,
+      setErrors?: any,
+      errors?: TransactionValidation
     ) => {
-      const { base_type, date, currency_id, bank_integration_id, description } =
-        transaction;
+      const {
+        base_type,
+        date,
+        currency_id,
+        bank_integration_id,
+        description = '',
+      } = transaction || {};
 
       if (!base_type) {
         setErrors({

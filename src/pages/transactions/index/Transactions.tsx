@@ -13,13 +13,15 @@ import { DataTable } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useTransactionColumns } from '../common/hooks/useTransactionColumns';
-import { useTransactionPages } from '../common/hooks/useTransactionPages';
 
-const Transactions = () => {
+export function Transactions() {
   useTitle('transactions');
+
   const [t] = useTranslation();
-  const pages = useTransactionPages();
+
   const columns = useTransactionColumns();
+
+  const pages = [{ name: t('transactions'), href: '/transactions' }];
 
   return (
     <Default
@@ -37,6 +39,4 @@ const Transactions = () => {
       />
     </Default>
   );
-};
-
-export default Transactions;
+}

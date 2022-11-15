@@ -13,25 +13,32 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { useTransactionPages } from '../common/hooks/useTransactionPages';
-import { Details } from '../components/index';
-import { TransactionDetails } from 'common/interfaces/transactions';
-import { request } from 'common/helpers/request';
-import { endpoint } from 'common/helpers';
+import {
+  TransactionDetails,
+  TransactionResponse,
+} from 'common/interfaces/transactions';
+import { Details } from '../components/Details';
+import { useTransactionQuery } from '../common/queries';
 
-const BankAccountDetails = () => {
+export function Transaction() {
   useTitle('transaction_details');
-  const { id } = useParams();
-  const [t] = useTranslation();
-  const pages = useTransactionPages();
 
-  const [transaction, setTransaction] = useState<
-    TransactionDetails | undefined
-  >(undefined);
+  const { id } = useParams();
+
+  const [t] = useTranslation();
+
+  const { data: response } = useTransactionQuery({ id });
+
+  const [transaction, setTransaction] = useState<TransactionDetails>();
+
+  const pages = [
+    { name: t('transactions'), href: '/transactions' },
+    { name: t('transaction_details'), href: `/transactions/${id}` },
+  ];
 
   const getTransactionDetailsObject = (
-    responseDetails: any
-  ): TransactionDetails => {
+    responseDetails: TransactionResponse | undefined
+  ) => {
     const { date, amount, currency_id } = responseDetails || {};
     return {
       date,
@@ -40,17 +47,9 @@ const BankAccountDetails = () => {
     };
   };
 
-  const fetchTransactionDetails = async () => {
-    const response = await request(
-      'GET',
-      endpoint('/api/v1/bank_transactions/:id', { id })
-    );
-    setTransaction(getTransactionDetailsObject(response?.data?.data));
-  };
-
   useEffect(() => {
-    fetchTransactionDetails();
-  }, [id]);
+    setTransaction(getTransactionDetailsObject(response?.data?.data));
+  }, [response]);
 
   return (
     <Settings
@@ -61,6 +60,4 @@ const BankAccountDetails = () => {
       <Details transactionDetails={transaction} />
     </Settings>
   );
-};
-
-export default BankAccountDetails;
+}
