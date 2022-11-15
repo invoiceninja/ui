@@ -11,16 +11,19 @@
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from 'common/helpers/route';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { BankAccountDetails } from 'common/interfaces/bank-accounts';
 
 export function useBankAccountsQuery(params: { id: string | undefined }) {
-  return useQuery(
-    route('/api/v1/bank_integrations/:id', { id: params.id }),
+  return useQuery<BankAccountDetails>(
+    ['/api/v1/bank_integrations/:id', { id: params.id }],
     () =>
       request(
         'GET',
         endpoint('/api/v1/bank_integrations/:id', { id: params.id })
-      ),
-    { staleTime: Infinity }
+      ).then(
+        (response: GenericSingleResourceResponse<BankAccountDetails>) =>
+          response.data.data
+      )
   );
 }

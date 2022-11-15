@@ -52,6 +52,7 @@ export function Edit() {
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
+    { name: t('edit_bank_account'), href: `/bank_accounts/${id}/edit` },
   ];
 
   const handleChange = (
@@ -61,9 +62,9 @@ export function Edit() {
     setAccountDetails((prevState) => ({ ...prevState, [property]: value }));
   };
 
-  const getBankAccount = (bankAccount: BankAccountDetails) => {
+  const getBankAccount = (bankAccount: BankAccountDetails | undefined) => {
     return {
-      bank_account_name: bankAccount?.bank_account_name,
+      bank_account_name: bankAccount?.bank_account_name || '',
     };
   };
 
@@ -93,9 +94,11 @@ export function Edit() {
       } catch (cachedError) {
         const error = cachedError as AxiosError;
         console.error(error);
-        toast.error();
         if (error?.response?.status === 422) {
-          setErrors(error?.response?.data);
+          setErrors(error?.response?.data?.errors);
+          toast.dismiss();
+        } else {
+          toast.error();
         }
         setIsFormBusy(false);
       }
@@ -103,7 +106,7 @@ export function Edit() {
   };
 
   useEffect(() => {
-    setAccountDetails(getBankAccount(response?.data?.data));
+    setAccountDetails(getBankAccount(response));
   }, [response]);
 
   return (
@@ -118,12 +121,7 @@ export function Edit() {
         <Element leftSide={t('bank_account_name')}>
           <InputField
             value={accountDetails?.bank_account_name}
-            onChange={(event: FormEvent<HTMLFormElement>) =>
-              handleChange(
-                'bank_account_name',
-                (event?.target as HTMLInputElement)?.value
-              )
-            }
+            onValueChange={(value) => handleChange('bank_account_name', value)}
             errorMessage={errors?.bank_account_name}
           />
         </Element>

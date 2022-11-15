@@ -36,6 +36,7 @@ export function Create() {
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
+    { name: t('create_bank_account'), href: '/bank_accounts/create' },
   ];
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -79,9 +80,11 @@ export function Create() {
       } catch (cachedError) {
         const error = cachedError as AxiosError;
         console.error(error);
-        toast.error();
         if (error?.response?.status === 422) {
-          setErrors(error?.response?.data);
+          setErrors(error?.response?.data?.errors);
+          toast.dismiss();
+        } else {
+          toast.error();
         }
         setIsFormBusy(false);
       }
@@ -100,12 +103,7 @@ export function Create() {
         <Element leftSide={t('bank_account_name')}>
           <InputField
             value={bankAccount?.bank_account_name}
-            onChange={(event: FormEvent<HTMLFormElement>) =>
-              handleChange(
-                'bank_account_name',
-                (event?.target as HTMLInputElement)?.value
-              )
-            }
+            onValueChange={(value) => handleChange('bank_account_name', value)}
             errorMessage={errors?.bank_account_name}
           />
         </Element>

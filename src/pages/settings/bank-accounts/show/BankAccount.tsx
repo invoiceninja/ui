@@ -27,6 +27,7 @@ export function BankAccount() {
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
+    { name: t('bank_account_details'), href: `/bank_accounts/${id}` },
   ];
 
   const { data: response } = useBankAccountsQuery({ id });
@@ -34,7 +35,7 @@ export function BankAccount() {
   const [accountDetails, setAccountDetails] = useState<BankAccountDetails>();
 
   useEffect(() => {
-    setAccountDetails(response?.data?.data);
+    setAccountDetails(response);
   }, [response]);
 
   return (
