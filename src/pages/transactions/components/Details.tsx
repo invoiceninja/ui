@@ -10,8 +10,7 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCountries } from 'common/hooks/useCountries';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { TransactionDetails } from 'common/interfaces/transactions';
 import { useTranslation } from 'react-i18next';
 
@@ -24,27 +23,14 @@ export function Details(props: Props) {
 
   const [t] = useTranslation();
 
-  const countries = useCountries();
+  const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
-
-  const resolveCurrency = useResolveCurrency();
-
-  const getCountryIdByCurrencyCode = (currencyCode: string) => {
-    return (
-      countries?.find(({ currency_code: code }) => code === currencyCode)?.id ||
-      ''
-    );
-  };
-
-  const countryId = getCountryIdByCurrencyCode(
-    resolveCurrency(currency_id)?.code || ''
-  );
 
   return (
     <Card title={t('details')}>
       <Element leftSide={t('amount')}>
-        {formatMoney(amount, countryId, currency_id)}
+        {formatMoney(amount, company?.settings?.country_id, currency_id)}
       </Element>
       <Element leftSide={t('date')}>{date}</Element>
     </Card>

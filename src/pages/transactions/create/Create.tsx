@@ -28,6 +28,7 @@ import { useTransactionValidation } from '../common/hooks/useTransactionValidati
 import { toast } from 'common/helpers/toast/toast';
 import { AxiosError } from 'axios';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 
 export function Create() {
   const { t } = useTranslation();
@@ -37,6 +38,8 @@ export function Create() {
   const currencies = useCurrencies();
 
   const company = useCurrentCompany();
+
+  const formatMoney = useFormatMoney();
 
   const { documentTitle } = useTitle('new_transaction');
 
@@ -138,8 +141,11 @@ export function Create() {
           </Element>
           <Element required leftSide={t('amount')}>
             <InputField
-              type="number"
-              value={transaction?.amount}
+              value={formatMoney(
+                transaction?.amount || 0,
+                company?.settings?.country_id,
+                transaction?.currency_id || ''
+              )}
               onValueChange={(value) => handleChange('amount', value)}
               errorMessage={errors?.amount}
             />

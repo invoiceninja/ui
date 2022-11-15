@@ -32,6 +32,8 @@ import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { AxiosError } from 'axios';
 import { useTransactionQuery } from '../common/queries';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 
 export function Edit() {
   const { t } = useTranslation();
@@ -41,6 +43,10 @@ export function Edit() {
   const { id } = useParams<string>();
 
   const currencies = useCurrencies();
+
+  const company = useCurrentCompany();
+
+  const formatMoney = useFormatMoney();
 
   const { documentTitle } = useTitle('edit_transaction');
 
@@ -164,8 +170,11 @@ export function Edit() {
           </Element>
           <Element required leftSide={t('amount')}>
             <InputField
-              type="number"
-              value={transaction?.amount}
+              value={formatMoney(
+                transaction?.amount || 0,
+                company?.settings?.country_id,
+                transaction?.currency_id || ''
+              )}
               onValueChange={(value) => handleChange('amount', value)}
               errorMessage={errors?.amount}
             />

@@ -11,8 +11,7 @@
 import { Link } from '@invoiceninja/forms';
 import { route } from 'common/helpers/route';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCountries } from 'common/hooks/useCountries';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Transaction } from 'common/interfaces/transactions';
 import { DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'pages/transactions/components/EntityStatus';
@@ -21,18 +20,9 @@ import { useTranslation } from 'react-i18next';
 export function useTransactionColumns() {
   const { t } = useTranslation();
 
-  const countries = useCountries();
+  const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
-
-  const resolveCurrency = useResolveCurrency();
-
-  const getCountryIdByCurrencyCode = (currencyCode: string) => {
-    return (
-      countries?.find(({ currency_code: code }) => code === currencyCode)?.id ||
-      ''
-    );
-  };
 
   const columns: DataTableColumns<Transaction> = [
     {
@@ -51,13 +41,10 @@ export function useTransactionColumns() {
       id: 'deposit',
       label: t('deposit'),
       format: (value, transaction) => {
-        const countryId = getCountryIdByCurrencyCode(
-          resolveCurrency(transaction.currency_id)?.code || ''
-        );
         if (transaction.base_type === 'CREDIT') {
           return formatMoney(
             transaction.amount,
-            countryId,
+            company?.settings?.country_id,
             transaction.currency_id
           );
         }
@@ -67,13 +54,10 @@ export function useTransactionColumns() {
       id: 'withdrawal',
       label: t('withdrawal'),
       format: (value, transaction) => {
-        const countryId = getCountryIdByCurrencyCode(
-          resolveCurrency(transaction.currency_id)?.code || ''
-        );
         if (transaction.base_type === 'DEBIT') {
           return formatMoney(
             transaction.amount,
-            countryId,
+            company?.settings?.country_id,
             transaction.currency_id
           );
         }
