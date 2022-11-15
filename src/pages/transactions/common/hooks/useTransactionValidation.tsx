@@ -12,7 +12,7 @@ import { useCallback } from 'react';
 import { TransactionInput } from 'common/interfaces/transactions';
 import { TransactionValidation } from '../validation/ValidationInterface';
 
-export const useTransactionValidation = () => {
+export function useTransactionValidation() {
   const checkValidation = useCallback((transaction?: TransactionInput) => {
     const {
       base_type,
@@ -96,4 +96,4 @@ export const useTransactionValidation = () => {
   );
 
   return { checkValidation, setValidation };
-};
+}
