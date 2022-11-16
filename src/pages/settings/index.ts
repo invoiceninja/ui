@@ -27,6 +27,8 @@ export * from './generated-numbers';
 export * from './email-settings/EmailSettings';
 export * from './client-portal/ClientPortal';
 export * from './templates-and-reminders/TemplatesAndReminders';
+export * from './bank-accounts';
+
 export * from './group-settings/GroupSettings';
 export * from './subscriptions/Subscriptions';
 export * from './users';
