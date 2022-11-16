@@ -9,10 +9,10 @@
  */
 
 export interface TransactionValidation {
-  type: string;
+  base_type: string;
   date: string;
   amount: string;
-  currency: string;
-  bank_account: string;
+  currency_id: string;
+  bank_integration_id: string;
   description: string;
 }

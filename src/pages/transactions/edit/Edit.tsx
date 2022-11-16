@@ -24,7 +24,6 @@ import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { Default } from 'components/layouts/Default';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useTransactionValidation } from '../common/hooks/useTransactionValidation';
 import { TransactionValidation } from '../common/validation/ValidationInterface';
 import { request } from 'common/helpers/request';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -32,8 +31,9 @@ import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { AxiosError } from 'axios';
 import { useTransactionQuery } from '../common/queries';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
+import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
+import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 
 export function Edit() {
   const { t } = useTranslation();
@@ -44,9 +44,7 @@ export function Edit() {
 
   const currencies = useCurrencies();
 
-  const company = useCurrentCompany();
-
-  const formatMoney = useFormatMoney();
+  const resolveCurrency = useResolveCurrency();
 
   const { documentTitle } = useTitle('edit_transaction');
 
@@ -58,18 +56,30 @@ export function Edit() {
 
   const [transaction, setTransaction] = useState<TransactionInput>();
 
-  const { checkValidation, setValidation } = useTransactionValidation();
+  const [currencySeparators, setCurrencySeparators] = useState<
+    DecimalInputSeparators | undefined
+  >();
 
   const pages = [
     { name: t('transactions'), href: '/transactions' },
     { name: t('edit_transaction'), href: `/transactions/${id}/edit` },
   ];
 
+  const getCurrencySeparators = (currencyId: string) => {
+    const currency = resolveCurrency(currencyId) || currencies[0];
+    return {
+      decimalSeparator: currency?.decimal_separator,
+      precision: currency?.precision,
+      thousandSeparator: currency?.thousand_separator,
+    };
+  };
+
   const getTransactionInputObject = (
     responseDetails: TransactionResponse | undefined
   ) => {
     const { date, amount, currency_id, bank_integration_id, description } =
       responseDetails || {};
+    setCurrencySeparators(getCurrencySeparators(currency_id || ''));
     return {
       base_type:
         responseDetails?.base_type === 'CREDIT' ? 'deposit' : 'withdrawal',
@@ -85,6 +95,10 @@ export function Edit() {
     property: keyof TransactionInput,
     value: TransactionInput[keyof TransactionInput]
   ) => {
+    if (property === 'currency_id') {
+      setCurrencySeparators(getCurrencySeparators(value?.toString() || ''));
+    }
+
     setTransaction(
       (prevState) => prevState && { ...prevState, [property]: value }
     );
@@ -92,39 +106,32 @@ export function Edit() {
 
   const onSave = async (event: FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
+
     setErrors(undefined);
-    const isFormValid = checkValidation(transaction);
 
-    if (!isFormValid && !errors) {
-      setValidation(transaction, setErrors, errors);
-    }
+    setIsSaving(true);
 
-    if (isFormValid) {
-      setIsSaving(true);
-      const toastId = toast.processing();
+    const toastId = toast.processing();
 
-      try {
-        await request(
-          'PUT',
-          endpoint('/api/v1/bank_transactions/:id', { id }),
-          {
-            ...transaction,
-            amount: Number(transaction?.amount),
-            base_type:
-              transaction?.base_type === 'deposit' ? 'CREDIT' : 'DEBIT',
-          }
-        );
+    try {
+      await request('PUT', endpoint('/api/v1/bank_transactions/:id', { id }), {
+        ...transaction,
+        amount: Number(transaction?.amount),
+        base_type: transaction?.base_type === 'deposit' ? 'CREDIT' : 'DEBIT',
+      });
 
-        toast.success(t('updated_transaction'), { id: toastId });
-        setIsSaving(false);
-        navigate(route('/transactions'));
-      } catch (cachedError) {
-        const error = cachedError as AxiosError;
-        setIsSaving(false);
-        console.error(error);
-        if (error.response?.status == 422) {
-          setErrors(error.response.data);
-        }
+      toast.success(t('updated_transaction'), { id: toastId });
+      setIsSaving(false);
+      navigate(route('/transactions'));
+    } catch (cachedError) {
+      const error = cachedError as AxiosError;
+
+      console.error(error);
+
+      if (error?.response?.status === 422) {
+        setErrors(error?.response?.data?.errors);
+        toast.dismiss();
+      } else {
         toast.error(t('error_title'));
       }
     }
@@ -132,7 +139,7 @@ export function Edit() {
 
   useEffect(() => {
     setTransaction(getTransactionInputObject(response));
-  }, [response]);
+  }, [response, currencies]);
 
   return (
     <Default
@@ -151,7 +158,7 @@ export function Edit() {
             <SelectField
               value={transaction?.base_type}
               onValueChange={(value) => handleChange('base_type', value)}
-              errorMessage={errors?.type}
+              errorMessage={errors?.base_type}
             >
               {Object.values(transactionTypes).map((transactionType) => (
                 <option key={transactionType} value={transactionType}>
@@ -169,13 +176,14 @@ export function Edit() {
             />
           </Element>
           <Element required leftSide={t('amount')}>
-            <InputField
-              value={formatMoney(
-                transaction?.amount || 0,
-                company?.settings?.country_id,
-                transaction?.currency_id || ''
-              )}
-              onValueChange={(value) => handleChange('amount', value)}
+            <DecimalNumberInput
+              border
+              precision={currencySeparators?.precision}
+              currency={currencySeparators}
+              className="auto"
+              initialValue={transaction?.amount?.toString()}
+              value={transaction?.amount?.toString()}
+              onChange={(value: string) => handleChange('amount', value)}
               errorMessage={errors?.amount}
             />
           </Element>
@@ -184,7 +192,7 @@ export function Edit() {
               defaultValue={transaction?.currency_id}
               value={transaction?.currency_id}
               onValueChange={(value) => handleChange('currency_id', value)}
-              errorMessage={errors?.currency}
+              errorMessage={errors?.currency_id}
             >
               {currencies?.map(({ id, name }) => (
                 <option key={id} value={id}>
@@ -205,7 +213,7 @@ export function Edit() {
               clearButton
               onClearButtonClick={() => handleChange('bank_integration_id', '')}
               queryAdditional
-              errorMessage={errors?.bank_account}
+              errorMessage={errors?.bank_integration_id}
             />
           </Element>
           <Element required leftSide={t('description')}>

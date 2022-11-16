@@ -24,11 +24,12 @@ import { TransactionValidation } from '../common/validation/ValidationInterface'
 import { request } from 'common/helpers/request';
 import { useNavigate } from 'react-router-dom';
 import { route } from 'common/helpers/route';
-import { useTransactionValidation } from '../common/hooks/useTransactionValidation';
 import { toast } from 'common/helpers/toast/toast';
 import { AxiosError } from 'axios';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
+import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
+import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 
 export function Create() {
   const { t } = useTranslation();
@@ -39,58 +40,72 @@ export function Create() {
 
   const company = useCurrentCompany();
 
-  const formatMoney = useFormatMoney();
+  const resolveCurrency = useResolveCurrency();
 
   const { documentTitle } = useTitle('new_transaction');
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
+  const [currencySeparators, setCurrencySeparators] = useState<
+    DecimalInputSeparators | undefined
+  >();
+
   const [errors, setErrors] = useState<TransactionValidation>();
 
   const [transaction, setTransaction] = useState<TransactionInput>();
-
-  const { checkValidation, setValidation } = useTransactionValidation();
 
   const pages = [
     { name: t('transactions'), href: '/transactions' },
     { name: t('new_transaction'), href: '/transactions/create' },
   ];
 
+  const getCurrencySeparators = (currencyId: string) => {
+    const currency = resolveCurrency(currencyId) || currencies[0];
+    return {
+      decimalSeparator: currency?.decimal_separator,
+      precision: currency?.precision,
+      thousandSeparator: currency?.thousand_separator,
+    };
+  };
+
   const handleChange = (
     property: keyof TransactionInput,
     value: TransactionInput[keyof TransactionInput]
   ) => {
+    if (property === 'currency_id') {
+      setCurrencySeparators(getCurrencySeparators(value?.toString() || ''));
+    }
+
     setTransaction((prevState) => ({ ...prevState, [property]: value }));
   };
 
   const onSave = async (event: FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
+
     setErrors(undefined);
-    const isFormValid = checkValidation(transaction);
 
-    if (!isFormValid && !errors) {
-      setValidation(transaction, setErrors, errors);
-    }
+    setIsSaving(true);
 
-    if (isFormValid) {
-      setIsSaving(true);
-      const toastId = toast.processing();
-      try {
-        await request('POST', endpoint('/api/v1/bank_transactions'), {
-          ...transaction,
-          amount: Number(transaction?.amount),
-          base_type: transaction?.base_type === 'deposit' ? 'CREDIT' : 'DEBIT',
-        });
-        toast.success(t('created_transaction'), { id: toastId });
-        setIsSaving(false);
-        navigate(route('/transactions'));
-      } catch (cachedError) {
-        const error = cachedError as AxiosError;
-        setIsSaving(false);
-        console.error(error);
-        if (error.response?.status == 422) {
-          setErrors(error.response.data);
-        }
+    const toastId = toast.processing();
+
+    try {
+      await request('POST', endpoint('/api/v1/bank_transactions'), {
+        ...transaction,
+        amount: Number(transaction?.amount),
+        base_type: transaction?.base_type === 'deposit' ? 'CREDIT' : 'DEBIT',
+      });
+      toast.success(t('created_transaction'), { id: toastId });
+      setIsSaving(false);
+      navigate(route('/transactions'));
+    } catch (cachedError) {
+      setIsSaving(false);
+      const error = cachedError as AxiosError;
+      console.error(error);
+
+      if (error?.response?.status === 422) {
+        setErrors(error?.response?.data?.errors);
+        toast.dismiss();
+      } else {
         toast.error(t('error_title'));
       }
     }
@@ -102,8 +117,10 @@ export function Create() {
       base_type: 'deposit',
       currency_id: company?.settings?.currency_id,
       date: date(new Date().toString(), 'YYYY-MM-DD'),
+      amount: 0,
     }));
-  }, []);
+    setCurrencySeparators(getCurrencySeparators(currencies[0]?.id));
+  }, [currencies]);
 
   return (
     <Default
@@ -122,7 +139,7 @@ export function Create() {
             <SelectField
               value={transaction?.base_type}
               onValueChange={(value) => handleChange('base_type', value)}
-              errorMessage={errors?.type}
+              errorMessage={errors?.base_type}
             >
               {Object.values(transactionTypes).map((transactionType) => (
                 <option key={transactionType} value={transactionType}>
@@ -140,13 +157,14 @@ export function Create() {
             />
           </Element>
           <Element required leftSide={t('amount')}>
-            <InputField
-              value={formatMoney(
-                transaction?.amount || 0,
-                company?.settings?.country_id,
-                transaction?.currency_id || ''
-              )}
-              onValueChange={(value) => handleChange('amount', value)}
+            <DecimalNumberInput
+              border
+              precision={currencySeparators?.precision}
+              currency={currencySeparators}
+              className="auto"
+              initialValue={transaction?.amount?.toString()}
+              value={transaction?.amount?.toString()}
+              onChange={(value: string) => handleChange('amount', value)}
               errorMessage={errors?.amount}
             />
           </Element>
@@ -154,7 +172,7 @@ export function Create() {
             <SelectField
               value={transaction?.currency_id}
               onValueChange={(value) => handleChange('currency_id', value)}
-              errorMessage={errors?.currency}
+              errorMessage={errors?.currency_id}
             >
               {currencies?.map(({ id, name }) => (
                 <option key={id} value={id}>
@@ -173,7 +191,7 @@ export function Create() {
               }
               clearButton
               onClearButtonClick={() => handleChange('bank_integration_id', '')}
-              errorMessage={errors?.bank_account}
+              errorMessage={errors?.bank_integration_id}
             />
           </Element>
           <Element required leftSide={t('description')}>
