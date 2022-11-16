@@ -9,7 +9,6 @@
  */
 
 import { toast } from 'common/helpers/toast/toast';
-import { useState } from 'react';
 import { MdOutlineContentCopy } from 'react-icons/md';
 
 interface Props {
@@ -17,7 +16,7 @@ interface Props {
 }
 
 export function CopyToClipboard(props: Props) {
-  const [value] = useState(props.text);
+  const value = props.text || '';
 
   const handleClick = () => {
     navigator.clipboard.writeText(value);
