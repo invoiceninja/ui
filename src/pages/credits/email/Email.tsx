@@ -45,6 +45,7 @@ export function Email() {
           resourceType="credit"
           list={list}
           defaultEmail="email_template_credit"
+          redirectUrl="/credits"
         />
       )}
     </Default>
