@@ -12,10 +12,11 @@ import { useTitle } from 'common/hooks/useTitle';
 import { DataTable } from 'components/DataTable';
 import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { isHosted } from 'common/helpers';
 import { useBankAccountColumns } from '../common/hooks/useBankAccountColumns';
 import { Button } from '@invoiceninja/forms';
 import { MdLink } from 'react-icons/md';
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 
 export function BankAccounts() {
   useTitle('bank_accounts');
@@ -28,6 +29,21 @@ export function BankAccounts() {
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
   ];
+
+  const handleConnectAccounts = async () => {
+    const tokenResponse = await request(
+      'POST',
+      endpoint('/api/v1/one_time_token'),
+      { context: 'yodlee', platform: 'react' },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-API-SECRET': 'password',
+        },
+      }
+    );
+    window.open(`/yodlee/onboard/${tokenResponse?.data?.hash}`);
+  };
 
   return (
     <Settings
@@ -43,12 +59,10 @@ export function BankAccounts() {
         linkToEdit="/settings/bank_accounts/:id/edit"
         withResourcefulActions
         rightSide={
-          isHosted() && (
-            <Button>
-              <span className="mr-2">{<MdLink />}</span>
-              {t('connect_accounts')}
-            </Button>
-          )
+          <Button onClick={handleConnectAccounts}>
+            <span className="mr-2">{<MdLink />}</span>
+            {t('connect_accounts')}
+          </Button>
         }
       />
     </Settings>
