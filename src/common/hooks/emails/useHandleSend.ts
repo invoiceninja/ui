@@ -12,16 +12,19 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 
 export function useHandleSend() {
   const [t] = useTranslation();
+  const navigate = useNavigate();
 
   return (
     body: string,
     entity: string,
     entityId: string,
     subject: string,
-    template: string
+    template: string,
+    redirectUrl: string
   ) => {
     const toastId = toast.loading(t('processing'));
 
@@ -32,7 +35,11 @@ export function useHandleSend() {
       subject,
       template,
     })
-      .then(() => toast.success(t(`emailed_${entity}`), { id: toastId }))
+      .then(() => {
+        toast.success(t(`emailed_${entity}`), { id: toastId });
+
+        navigate(redirectUrl);
+      })
       .catch((error) => {
         console.error(error);
 
