@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useBankAccountColumns } from '../common/hooks/useBankAccountColumns';
 import { Button } from '@invoiceninja/forms';
 import { MdLink } from 'react-icons/md';
-import { endpoint } from 'common/helpers';
+import { endpoint, isHosted } from 'common/helpers';
 import { request } from 'common/helpers/request';
 
 export function BankAccounts() {
@@ -59,10 +59,12 @@ export function BankAccounts() {
         linkToEdit="/settings/bank_accounts/:id/edit"
         withResourcefulActions
         rightSide={
-          <Button onClick={handleConnectAccounts}>
-            <span className="mr-2">{<MdLink />}</span>
-            {t('connect_accounts')}
-          </Button>
+          isHosted() && (
+            <Button onClick={handleConnectAccounts}>
+              <span className="mr-2">{<MdLink />}</span>
+              {t('connect_accounts')}
+            </Button>
+          )
         }
       />
     </Settings>
