@@ -13,10 +13,11 @@ import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { BankAccountDetails } from 'common/interfaces/bank-accounts';
+import { route } from 'common/helpers/route';
 
 export function useBankAccountsQuery(params: { id: string | undefined }) {
   return useQuery<BankAccountDetails>(
-    ['/api/v1/bank_integrations/:id', { id: params.id }],
+    route('/api/v1/bank_integrations/:id', { id: params.id }),
     () =>
       request(
         'GET',
