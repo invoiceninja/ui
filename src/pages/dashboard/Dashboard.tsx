@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isSelfHosted } from 'common/helpers';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTitle } from 'common/hooks/useTitle';
 import { SwitchToFlutter } from 'components/SwitchToFlutter';
@@ -31,6 +32,7 @@ export function Dashboard() {
     <Default
       title={t('dashboard')}
       navigationTopRight={
+        isSelfHosted() &&
         (user?.company_user?.is_admin || user?.company_user?.is_owner) && (
           <SwitchToFlutter />
         )
