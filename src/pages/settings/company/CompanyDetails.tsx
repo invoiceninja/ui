@@ -16,14 +16,8 @@ import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
-import {
-  Address,
-  Defaults,
-  Details,
-  Documents,
-  Logo,
-  TabSection,
-} from './components';
+import { Address, Defaults, Details, Logo, TabSection } from './components';
+import { Documents } from './documents/Documents';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
@@ -55,8 +49,8 @@ export function CompanyDetails() {
     )[0];
     setTabsActivity((prevState) => ({
       ...prevState,
-      [property]: true,
       [currentActiveTabKey]: false,
+      [property]: true,
     }));
   };
 

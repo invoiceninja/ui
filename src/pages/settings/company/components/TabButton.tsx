@@ -22,9 +22,9 @@ export function TabButton(props: Props) {
   return (
     <div
       style={{
-        borderBottom: props?.active ? '3px solid rgb(47, 125, 195)' : 'none',
+        borderBottom: props?.active ? '3px solid white' : 'none',
       }}
-      className="p-3 inline-block cursor-pointer hover:bg-gray-200 text-gray-900"
+      className="p-3 pt-4 inline-block cursor-pointer hover:bg-gray-50 hover:bg-opacity-10 text-white"
       onClick={props.onClick}
     >
       {t(props.text)}

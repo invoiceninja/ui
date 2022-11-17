@@ -9,6 +9,7 @@
  */
 
 import { CompanySettingsTabs } from 'common/constants/company-settings';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { CompanyDetailsTabs } from 'common/interfaces/company-details';
 import { TabButton } from './TabButton';
 
@@ -18,8 +19,17 @@ interface Props {
 }
 
 export function TabSection(props: Props) {
+  const company = useCurrentCompany();
+  const companyPrimaryColor = company?.settings?.primary_color;
+
   return (
-    <div className="flex justify-center">
+    <div
+      style={{
+        backgroundColor: `${companyPrimaryColor}`,
+        boxShadow: '0 5px 6px -5px black',
+      }}
+      className="flex justify-center"
+    >
       {Object.values(CompanySettingsTabs).map((value) => (
         <TabButton
           key={value}
