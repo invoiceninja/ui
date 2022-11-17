@@ -19,6 +19,7 @@ import {
 } from 'common/interfaces/transactions';
 import { Details } from '../components/Details';
 import { useTransactionQuery } from '../common/queries';
+import { route } from 'common/helpers/route';
 
 export function Transaction() {
   useTitle('transaction_details');
@@ -33,7 +34,10 @@ export function Transaction() {
 
   const pages = [
     { name: t('transactions'), href: '/transactions' },
-    { name: t('transaction_details'), href: `/transactions/${id}` },
+    {
+      name: t('transaction_details'),
+      href: route('/transactions/:id', { id }),
+    },
   ];
 
   const getTransactionDetailsObject = (

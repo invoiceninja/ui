@@ -34,6 +34,7 @@ import { useTransactionQuery } from '../common/queries';
 import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
+import { ApiTransactionType, TransactionType } from 'common/enums/transactions';
 
 export function Edit() {
   const { t } = useTranslation();
@@ -62,7 +63,10 @@ export function Edit() {
 
   const pages = [
     { name: t('transactions'), href: '/transactions' },
-    { name: t('edit_transaction'), href: `/transactions/${id}/edit` },
+    {
+      name: t('edit_transaction'),
+      href: route('/transactions/:id/edit', { id }),
+    },
   ];
 
   const getCurrencySeparators = (currencyId: string) => {
@@ -82,7 +86,9 @@ export function Edit() {
     setCurrencySeparators(getCurrencySeparators(currency_id || ''));
     return {
       base_type:
-        responseDetails?.base_type === 'CREDIT' ? 'deposit' : 'withdrawal',
+        responseDetails?.base_type === ApiTransactionType.Credit
+          ? TransactionType.Deposit
+          : TransactionType.Withdrawal,
       date,
       amount,
       currency_id,
@@ -111,25 +117,28 @@ export function Edit() {
 
     setIsSaving(true);
 
-    const toastId = toast.processing();
+    toast.processing();
 
     try {
       await request('PUT', endpoint('/api/v1/bank_transactions/:id', { id }), {
         ...transaction,
         amount: Number(transaction?.amount),
-        base_type: transaction?.base_type === 'deposit' ? 'CREDIT' : 'DEBIT',
+        base_type:
+          transaction?.base_type === TransactionType.Deposit
+            ? ApiTransactionType.Credit
+            : ApiTransactionType.Debit,
       });
 
-      toast.success(t('updated_transaction'), { id: toastId });
+      toast.success(t('updated_transaction'));
       setIsSaving(false);
       navigate(route('/transactions'));
-    } catch (cachedError) {
-      const error = cachedError as AxiosError;
+    } catch (error) {
+      const axiosError = error as AxiosError;
 
-      console.error(error);
+      console.error(axiosError);
 
-      if (error?.response?.status === 422) {
-        setErrors(error?.response?.data?.errors);
+      if (axiosError?.response?.status === 422) {
+        setErrors(axiosError?.response?.data?.errors);
         toast.dismiss();
       } else {
         toast.error(t('error_title'));
@@ -162,7 +171,7 @@ export function Edit() {
             >
               {Object.values(transactionTypes).map((transactionType) => (
                 <option key={transactionType} value={transactionType}>
-                  {t(`${transactionType}`)}
+                  {t(transactionType)}
                 </option>
               ))}
             </SelectField>
@@ -196,7 +205,7 @@ export function Edit() {
             >
               {currencies?.map(({ id, name }) => (
                 <option key={id} value={id}>
-                  {t(`${name}`)}
+                  {t(name)}
                 </option>
               ))}
             </SelectField>

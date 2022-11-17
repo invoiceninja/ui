@@ -1,7 +1,7 @@
 /**
  * Invoice Ninja (https://invoiceninja.com).
  *
- * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ * @link https://github.com/invoiceninja/invoiceninja source repository
  *
  * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
  *
@@ -9,8 +9,13 @@
  */
 
 export const enum TransactionType {
-  Deposit = '1',
-  Withdrawal = '2',
+  Deposit = 'deposit',
+  Withdrawal = 'withdrawal',
+}
+
+export const enum ApiTransactionType {
+  Credit = 'CREDIT',
+  Debit = 'DEBIT',
 }
 
 export const enum TransactionStatus {

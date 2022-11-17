@@ -30,6 +30,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
+import { ApiTransactionType, TransactionType } from 'common/enums/transactions';
 
 export function Create() {
   const { t } = useTranslation();
@@ -86,24 +87,27 @@ export function Create() {
 
     setIsSaving(true);
 
-    const toastId = toast.processing();
+    toast.processing();
 
     try {
       await request('POST', endpoint('/api/v1/bank_transactions'), {
         ...transaction,
         amount: Number(transaction?.amount),
-        base_type: transaction?.base_type === 'deposit' ? 'CREDIT' : 'DEBIT',
+        base_type:
+          transaction?.base_type === TransactionType.Deposit
+            ? ApiTransactionType.Credit
+            : ApiTransactionType.Debit,
       });
-      toast.success(t('created_transaction'), { id: toastId });
+      toast.success(t('created_transaction'));
       setIsSaving(false);
       navigate(route('/transactions'));
-    } catch (cachedError) {
+    } catch (error) {
       setIsSaving(false);
-      const error = cachedError as AxiosError;
-      console.error(error);
+      const axiosError = error as AxiosError;
+      console.error(axiosError);
 
-      if (error?.response?.status === 422) {
-        setErrors(error?.response?.data?.errors);
+      if (axiosError?.response?.status === 422) {
+        setErrors(axiosError?.response?.data?.errors);
         toast.dismiss();
       } else {
         toast.error(t('error_title'));
@@ -114,7 +118,7 @@ export function Create() {
   useEffect(() => {
     setTransaction((prevState) => ({
       ...prevState,
-      base_type: 'deposit',
+      base_type: TransactionType.Deposit,
       currency_id: company?.settings?.currency_id,
       date: date(new Date().toString(), 'YYYY-MM-DD'),
       amount: 0,
@@ -143,7 +147,7 @@ export function Create() {
             >
               {Object.values(transactionTypes).map((transactionType) => (
                 <option key={transactionType} value={transactionType}>
-                  {t(`${transactionType}`)}
+                  {t(transactionType)}
                 </option>
               ))}
             </SelectField>
@@ -176,7 +180,7 @@ export function Create() {
             >
               {currencies?.map(({ id, name }) => (
                 <option key={id} value={id}>
-                  {t(`${name}`)}
+                  {t(name)}
                 </option>
               ))}
             </SelectField>

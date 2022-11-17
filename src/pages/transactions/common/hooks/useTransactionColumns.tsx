@@ -9,6 +9,7 @@
  */
 
 import { Link } from '@invoiceninja/forms';
+import { ApiTransactionType } from 'common/enums/transactions';
 import { route } from 'common/helpers/route';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
@@ -41,7 +42,7 @@ export function useTransactionColumns() {
       id: 'deposit',
       label: t('deposit'),
       format: (value, transaction) => {
-        if (transaction.base_type === 'CREDIT') {
+        if (transaction.base_type === ApiTransactionType.Credit) {
           return formatMoney(
             transaction.amount,
             company?.settings?.country_id,
@@ -54,7 +55,7 @@ export function useTransactionColumns() {
       id: 'withdrawal',
       label: t('withdrawal'),
       format: (value, transaction) => {
-        if (transaction.base_type === 'DEBIT') {
+        if (transaction.base_type === ApiTransactionType.Debit) {
           return formatMoney(
             transaction.amount,
             company?.settings?.country_id,
