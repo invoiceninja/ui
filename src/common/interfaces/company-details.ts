@@ -7,9 +7,12 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-export * from './Address';
-export * from './Defaults';
-export * from './Details';
-export * from './Documents';
-export * from './Logo';
-export * from './TabSection';
+
+export interface CompanyDetailsTabs {
+  details: boolean;
+  address: boolean;
+  logo: boolean;
+  defaults: boolean;
+  documents: boolean;
+  custom_fields: boolean;
+}

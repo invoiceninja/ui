@@ -10,16 +10,34 @@
 
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
+import { CompanyDetailsTabs } from 'common/interfaces/company-details';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
-import { Address, Defaults, Details, Documents, Logo } from './components';
+import {
+  Address,
+  Defaults,
+  Details,
+  Documents,
+  Logo,
+  TabSection,
+} from './components';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
 
   useTitle('company_details');
+
+  const [tabsActivity, setTabsActivity] = useState<CompanyDetailsTabs>({
+    details: true,
+    address: false,
+    logo: false,
+    defaults: false,
+    documents: false,
+    custom_fields: false,
+  });
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -31,6 +49,17 @@ export function CompanyDetails() {
 
   useInjectCompanyChanges();
 
+  const handleChangeTab = (property: string) => {
+    const currentActiveTabKey = Object.keys(tabsActivity).filter(
+      (key) => tabsActivity[key as keyof typeof tabsActivity] === true
+    )[0];
+    setTabsActivity((prevState) => ({
+      ...prevState,
+      [property]: true,
+      [currentActiveTabKey]: false,
+    }));
+  };
+
   return (
     <Settings
       onSaveClick={onSave}
@@ -39,11 +68,15 @@ export function CompanyDetails() {
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#company_details"
     >
-      <Details />
-      <Logo />
-      <Address />
-      <Defaults />
-      <Documents />
+      <TabSection
+        handleChangeTab={handleChangeTab}
+        tabsActivity={tabsActivity}
+      />
+      {tabsActivity.details && <Details />}
+      {tabsActivity.logo && <Logo />}
+      {tabsActivity.address && <Address />}
+      {tabsActivity.defaults && <Defaults />}
+      {tabsActivity.documents && <Documents />}
     </Settings>
   );
 }
