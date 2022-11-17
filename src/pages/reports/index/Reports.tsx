@@ -48,7 +48,7 @@ interface Group {
 }
 
 interface Date {
-  identifier: 'date' | 'due_date';
+  identifier: string;
   label: string;
 }
 
@@ -114,6 +114,51 @@ const reports: Report[] = [
       },
     ],
     dates: [],
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: '',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
+    identifier: 'credit',
+    label: 'credit',
+    endpoint: '/api/v1/reports/credits',
+    groups: [
+      { identifier: 'number', label: 'number', subgroups: [] },
+      {
+        identifier: 'date',
+        label: 'date',
+        subgroups: [
+          { identifier: 'day', label: 'day' },
+          { identifier: 'week', label: 'week' },
+          { identifier: 'month', label: 'month' },
+          { identifier: 'year', label: 'year' },
+        ],
+      },
+      {
+        identifier: 'valid_until',
+        label: 'valid_until',
+        subgroups: [
+          { identifier: 'day', label: 'day' },
+          { identifier: 'week', label: 'week' },
+          { identifier: 'month', label: 'month' },
+          { identifier: 'year', label: 'year' },
+        ],
+      },
+      {
+        identifier: 'client',
+        label: 'client',
+        subgroups: [],
+      },
+    ],
+    dates: [
+      { identifier: 'date', label: 'date' },
+      { identifier: 'valid_until', label: 'valid_until' },
+    ],
     payload: {
       start_date: '',
       end_date: '',
@@ -206,7 +251,9 @@ export function Reports() {
               onValueChange={(value) => handleReportChange(value as Identifier)}
             >
               {reports.map((report, i) => (
-                <option key={i}>{t(report.label)}</option>
+                <option value={report.identifier} key={i}>
+                  {t(report.label)}
+                </option>
               ))}
             </SelectField>
           </Element>
@@ -244,7 +291,7 @@ export function Reports() {
         <Card className="col-span-6 h-max">
           {report.dates.length > 0 && (
             <Element leftSide={t('date')}>
-              <SelectField>
+              <SelectField withBlank>
                 {report.dates.map((date, i) => (
                   <option value={date.identifier} key={i}>
                     {t(date.label)}
