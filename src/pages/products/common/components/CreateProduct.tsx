@@ -23,12 +23,15 @@ import { useTitle } from 'common/hooks/useTitle';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import Toggle from 'components/forms/Toggle';
 
 export interface CreateProductDto {
   product_key: string;
   notes: string;
   cost: number;
   quantity: number;
+  in_stock_quantity: number;
+  stock_notification_threshold: number;
   custom_value1: string;
   custom_value2: string;
   custom_value3: string;
@@ -48,13 +51,16 @@ interface Props {
 
 export function CreateProduct(props: Props) {
   const [t] = useTranslation();
-  const company = useCurrentCompany();
 
   useTitle(t('new_product'));
+
+  const company = useCurrentCompany();
 
   const navigate = useNavigate();
 
   const [errors, setErrors] = useState<any>();
+
+  const [stockNotification, setStockNotification] = useState(false);
 
   const formik = useFormik({
     initialValues: {
@@ -62,6 +68,9 @@ export function CreateProduct(props: Props) {
       notes: props.product?.notes || '',
       cost: props.product?.cost || 0,
       quantity: props.product?.quantity || 1,
+      in_stock_quantity: props.product?.in_stock_quantity || 0,
+      stock_notification_threshold:
+        props.product?.stock_notification_threshold || 0,
       custom_value1: props.product?.custom_value1 || '',
       custom_value2: props.product?.custom_value2 || '',
       custom_value3: props.product?.custom_value3 || '',
@@ -75,7 +84,10 @@ export function CreateProduct(props: Props) {
       price: props.product?.price || 0,
     },
     onSubmit: (values: CreateProductDto) => {
-      request('POST', endpoint('/api/v1/products'), values)
+      request('POST', endpoint('/api/v1/products'), {
+        ...values,
+        stock_notification: stockNotification,
+      })
         .then((response: AxiosResponse) => {
           toast.success(t('created_product'));
 
@@ -151,6 +163,33 @@ export function CreateProduct(props: Props) {
             errorMessage={errors?.quantity}
           />
         </Element>
+      )}
+
+      {company?.track_inventory && (
+        <>
+          <Element leftSide={t('stock_quantity')}>
+            <InputField
+              id="in_stock_quantity"
+              value={formik.initialValues.in_stock_quantity}
+              onChange={formik.handleChange}
+              errorMessage={errors?.in_stock_quantity}
+            />
+          </Element>
+          <Element leftSide={t('stock_notifications')}>
+            <Toggle
+              checked={stockNotification}
+              onChange={setStockNotification}
+            />
+          </Element>
+          <Element leftSide={t('notification_threshold')}>
+            <InputField
+              id="stock_notification_threshold"
+              value={formik.initialValues.stock_notification_threshold}
+              onChange={formik.handleChange}
+              errorMessage={errors?.stock_notification_threshold}
+            />
+          </Element>
+        </>
       )}
 
       {company && company.enabled_item_tax_rates > 0 && (
