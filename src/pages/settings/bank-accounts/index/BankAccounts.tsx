@@ -17,6 +17,7 @@ import { Button } from '@invoiceninja/forms';
 import { MdLink } from 'react-icons/md';
 import { endpoint, isHosted } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 
 export function BankAccounts() {
   useTitle('bank_accounts');
@@ -34,15 +35,13 @@ export function BankAccounts() {
     const tokenResponse = await request(
       'POST',
       endpoint('/api/v1/one_time_token'),
-      { context: 'yodlee', platform: 'react' },
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          'X-API-SECRET': 'password',
-        },
-      }
+      { context: 'yodlee', platform: 'react' }
     );
-    window.open(`/yodlee/onboard/${tokenResponse?.data?.hash}`);
+    window.open(
+      route('/yodlee/onboard/:hash', {
+        hash: tokenResponse?.data?.hash,
+      })
+    );
   };
 
   return (
