@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 interface Props {
   active: boolean;
   text: string;
-  onClick: (sectionKey: string) => void;
+  onClick: () => void;
 }
 
 export function TabButton(props: Props) {
@@ -25,7 +25,7 @@ export function TabButton(props: Props) {
         borderBottom: props?.active ? '3px solid rgb(47, 125, 195)' : 'none',
       }}
       className="p-3 inline-block cursor-pointer hover:bg-gray-200 text-gray-900"
-      onClick={() => props.onClick(props.text)}
+      onClick={props.onClick}
     >
       {t(props.text)}
     </div>

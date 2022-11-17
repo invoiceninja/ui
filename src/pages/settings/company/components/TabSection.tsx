@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { CompanySettingsTabs } from 'common/constants/company-settings';
 import { CompanyDetailsTabs } from 'common/interfaces/company-details';
 import { TabButton } from './TabButton';
 
@@ -19,36 +20,14 @@ interface Props {
 export function TabSection(props: Props) {
   return (
     <div className="flex justify-center">
-      <TabButton
-        text="details"
-        active={props.tabsActivity?.details}
-        onClick={props.handleChangeTab}
-      />
-      <TabButton
-        text="address"
-        active={props.tabsActivity.address}
-        onClick={props.handleChangeTab}
-      />
-      <TabButton
-        text="logo"
-        active={props.tabsActivity.logo}
-        onClick={props.handleChangeTab}
-      />
-      <TabButton
-        text="defaults"
-        active={props.tabsActivity.defaults}
-        onClick={props.handleChangeTab}
-      />
-      <TabButton
-        text="documents"
-        active={props.tabsActivity.documents}
-        onClick={props.handleChangeTab}
-      />
-      <TabButton
-        text="custom_fields"
-        active={props.tabsActivity.custom_fields}
-        onClick={props.handleChangeTab}
-      />
+      {Object.values(CompanySettingsTabs).map((value) => (
+        <TabButton
+          key={value}
+          text={value}
+          active={props.tabsActivity[value as keyof typeof props.tabsActivity]}
+          onClick={() => props.handleChangeTab(value)}
+        />
+      ))}
     </div>
   );
 }
