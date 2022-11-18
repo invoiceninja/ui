@@ -8,9 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Client } from './client';
-import { Vendor } from './vendor';
-
 export interface RecurringExpense {
   id: string;
   user_id: string;

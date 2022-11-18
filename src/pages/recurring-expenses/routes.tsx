@@ -1,14 +1,13 @@
-import { Guard } from "common/guards/Guard";
-import { enabled } from "common/guards/guards/enabled";
-import { permission } from "common/guards/guards/permission";
-import { RecurringExpenses } from "./index/RecurringExpenses";
-import { ModuleBitmask } from "pages/settings/account-management/component";
-import { Route } from "react-router-dom";
-import { Clone } from "pages/expenses/clone/Clone";
-import { Documents } from "pages/expenses/documents/Documents";
-import { Import } from "pages/expenses/import/Import";
-import { Edit } from "./edit/Edit";
-import { Create } from "./create/Create";
+import { Guard } from 'common/guards/Guard';
+import { enabled } from 'common/guards/guards/enabled';
+import { permission } from 'common/guards/guards/permission';
+import { RecurringExpenses } from './index/RecurringExpenses';
+import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { Route } from 'react-router-dom';
+import { Documents } from 'pages/expenses/documents/Documents';
+import { Import } from 'pages/expenses/import/Import';
+import { Edit } from './edit/Edit';
+import { Create } from './create/Create';
 
 export const recurringExpenseRoutes = (
   <Route path="recurring_expenses">
@@ -30,7 +29,9 @@ export const recurringExpenseRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.RecurringExpenses),
-            () => permission('create_recurring_expense') || permission('edit_recurring_expense'),
+            () =>
+              permission('create_recurring_expense') ||
+              permission('edit_recurring_expense'),
           ]}
           component={<Import />}
         />
@@ -73,10 +74,6 @@ export const recurringExpenseRoutes = (
           />
         }
       />
-      
     </Route>
-    
-
-  </Route >
-
-)
+  </Route>
+);
