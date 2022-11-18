@@ -21,11 +21,7 @@ import { UserSelector } from 'components/users/UserSelector';
 import { VendorSelector } from 'components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import frequencies from 'common/constants/frequency';
-<<<<<<< HEAD
 import { RecurringExpense } from 'common/interfaces/recurring-expense';
-=======
-import { RecurringExpense } from 'common/interfaces/recurring-expenses';
->>>>>>> 602e11a30ebfb368655d1d04e18289a0af3908c0
 import dayjs from 'dayjs';
 
 export interface ExpenseCardProps {
