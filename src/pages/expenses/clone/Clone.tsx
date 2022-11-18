@@ -24,7 +24,6 @@ import { Notes } from '../create/components/Notes';
 import { AdditionalInfo } from '../create/components/AdditionalInfo';
 import { TaxSettings } from '../create/components/Taxes';
 import { route } from 'common/helpers/route';
-import { useRecurringExpenseQuery } from 'pages/recurring-expenses/common/queries';
 
 export function Clone() {
   const [t] = useTranslation();
@@ -33,10 +32,8 @@ export function Clone() {
 
   const { documentTitle } = useTitle('new_expense');
   const { id } = useParams();
-  
-  const { data: dataExpense } = useExpenseQuery({ id });
-  const { data: dataReccuringExpense } = useRecurringExpenseQuery({ id });
-  const data = dataExpense || dataReccuringExpense;
+
+  const { data } = useExpenseQuery({ id });
 
   const pages = [
     { name: t('expenses'), href: '/expenses' },

@@ -8,42 +8,43 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
- import { endpoint } from 'common/helpers';
- import { request } from 'common/helpers/request';
- import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
- import { useQuery } from 'react-query';
- import { route } from 'common/helpers/route';
-import { RecurringExpense } from 'common/interfaces/recurring-expenses';
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { useQuery } from 'react-query';
+import { route } from 'common/helpers/route';
+import { RecurringExpense } from 'common/interfaces/recurring-expense';
+import { GenericQueryOptions } from 'common/queries/invoices';
 
+interface RecurringExpenseQueryParams {
+  id: string;
+}
 
- export interface GenericQueryOptions {
-    enabled: boolean;
-  }
- 
- export function useRecurringExpenseQuery(params: { id: string | undefined }) {
-   return useQuery<RecurringExpense>(
-     route('/api/v1/recurring_expenses/:id', { id: params.id }),
-     () =>
-       request(
-         'GET',
-         endpoint('/api/v1/recurring_expenses/:id', {
-           id: params.id,
-         })
-       ).then(
-        (response) => response.data.data
-       ),
-     { staleTime: Infinity }
-   );
- }
- 
- export function useBlankRecurringExpenseQuery(options?: GenericQueryOptions) {
-   return useQuery<RecurringExpense>(
-     '/api/v1/recurring_expenses/create',
-     () =>
-       request('GET', endpoint('/api/v1/recurring_expenses/create')).then(
-         (response: GenericSingleResourceResponse<RecurringExpense>) =>
-           response.data.data
-       ),
-     { ...options, staleTime: Infinity }
-   );
- }
+export function useRecurringExpenseQuery(params: RecurringExpenseQueryParams) {
+  return useQuery<RecurringExpense>(
+    route('/api/v1/recurring_expenses/:id', { id: params.id }),
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/recurring_expenses/:id', {
+          id: params.id,
+        })
+      ).then(
+        (response: GenericSingleResourceResponse<RecurringExpense>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}
+
+export function useBlankRecurringExpenseQuery(options?: GenericQueryOptions) {
+  return useQuery<RecurringExpense>(
+    '/api/v1/recurring_expenses/create',
+    () =>
+      request('GET', endpoint('/api/v1/recurring_expenses/create')).then(
+        (response: GenericSingleResourceResponse<RecurringExpense>) =>
+          response.data.data
+      ),
+    { ...options, staleTime: Infinity }
+  );
+}

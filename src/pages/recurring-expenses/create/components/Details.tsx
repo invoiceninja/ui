@@ -21,12 +21,11 @@ import { UserSelector } from 'components/users/UserSelector';
 import { VendorSelector } from 'components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import frequencies from 'common/constants/frequency';
-import { RecurringExpense } from 'common/interfaces/recurring-expenses';
-import { Expense } from 'common/interfaces/expense';
+import { RecurringExpense } from 'common/interfaces/recurring-expense';
 import dayjs from 'dayjs';
 
 export interface ExpenseCardProps {
-  expense: Expense | undefined;
+  expense: RecurringExpense | undefined;
   handleChange: <T extends keyof RecurringExpense>(
     property: T,
     value: RecurringExpense[T]
@@ -275,7 +274,6 @@ export function Details(props: Props) {
             value={expense?.frequency_id}
             onValueChange={(value) => handleChange('frequency_id', value)}
           >
-            {console.log(Object.keys(frequencies))}
             {Object.keys(frequencies).map((frequency, index) => (
               <option key={index} value={frequency}>
                 {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}

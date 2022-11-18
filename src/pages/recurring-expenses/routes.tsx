@@ -8,7 +8,6 @@ import { Clone } from "pages/expenses/clone/Clone";
 import { Documents } from "pages/expenses/documents/Documents";
 import { Import } from "pages/expenses/import/Import";
 import { Edit } from "./edit/Edit";
-import { CloneRecurring } from "./clone/CloneRecurring";
 import { Create } from "./create/Create";
 
 export const recurringExpenseRoutes = (
@@ -74,31 +73,9 @@ export const recurringExpenseRoutes = (
           />
         }
       />
-      <Route
-        path="recurring_clone"
-        element={
-          <Guard
-            guards={[
-              () => enabled(ModuleBitmask.RecurringExpenses),
-              () => permission('view_recurring_expense'),
-            ]}
-            component={<CloneRecurring />}
-          />
-        }
-      />
+      
     </Route>
-    <Route
-      path="clone"
-      element={
-        <Guard
-          guards={[
-            () => enabled(ModuleBitmask.RecurringExpenses),
-            () => permission('view_expense'),
-          ]}
-          component={<Clone />}
-        />
-      }
-    />
+    
 
   </Route >
 
