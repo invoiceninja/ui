@@ -125,6 +125,12 @@ export function Settings(props: Props) {
       visible: proPlan() || enterprisePlan(),
     },
     {
+      name: t('bank_accounts'),
+      href: '/settings/bank_accounts',
+      current: location.pathname === '/settings/bank_accounts',
+      visible: enterprisePlan(),
+    },
+    {
       name: t('user_management'),
       href: '/settings/users',
       current: location.pathname.startsWith('/settings/users'),
