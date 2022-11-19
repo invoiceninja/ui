@@ -10,7 +10,8 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
-import { endpoint } from 'common/helpers';
+import { freePlan } from 'common/guards/guards/free-plan';
+import { endpoint, isHosted, isSelfHosted } from 'common/helpers';
 import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
 import { request } from 'common/helpers/request';
 import { EmailTemplate } from 'common/hooks/emails/useResolveTemplate';
@@ -50,6 +51,7 @@ export function TemplatesAndReminders() {
   const [templateId, setTemplateId] = useState('invoice');
   const [templateBody, setTemplateBody] = useState<TemplateBody>();
   const [preview, setPreview] = useState<EmailTemplate>();
+  const canChangeEmailTemplate = (isHosted() && !freePlan()) || isSelfHosted();
 
   useEffect(() => {
     if (statics?.templates && company) {
@@ -194,16 +196,18 @@ export function TemplatesAndReminders() {
           />
         </Element>
 
-        <Element leftSide={t('body')}>
-          <MarkdownEditor
-            value={templateBody?.body}
-            onChange={(value) =>
-              setTemplateBody(
-                (current) => current && { ...current, body: value }
-              )
-            }
-          />
-        </Element>
+        {canChangeEmailTemplate && (
+          <Element leftSide={t('body')}>
+            <MarkdownEditor
+              value={templateBody?.body}
+              onChange={(value) =>
+                setTemplateBody(
+                  (current) => current && { ...current, body: value }
+                )
+              }
+            />
+          </Element>
+        )}
       </Card>
 
       {preview && (
