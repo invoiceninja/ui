@@ -12,3 +12,4 @@ export { Transactions } from './index/Transactions';
 export { Create as CreateTransaction } from './create/Create';
 export { Edit as EditTransaction } from './edit/Edit';
 export { Transaction } from './show/Transaction';
+export { Import } from './import/Import';

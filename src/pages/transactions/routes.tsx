@@ -16,6 +16,7 @@ import {
   EditTransaction,
   Transaction,
   Transactions,
+  Import,
 } from './index';
 
 export const transactionRoutes = (
@@ -35,6 +36,19 @@ export const transactionRoutes = (
         <Guard
           guards={[() => permission('create_transaction')]}
           component={<CreateTransaction />}
+        />
+      }
+    />
+    <Route
+      path="import"
+      element={
+        <Guard
+          guards={[
+            () =>
+              permission('create_transaction') ||
+              permission('edit_transaction'),
+          ]}
+          component={<Import />}
         />
       }
     />

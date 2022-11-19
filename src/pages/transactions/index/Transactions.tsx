@@ -13,6 +13,7 @@ import { DataTable } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useTransactionColumns } from '../common/hooks/useTransactionColumns';
+import { ImportButton } from 'components/import/ImportButton';
 
 export function Transactions() {
   useTitle('transactions');
@@ -35,6 +36,7 @@ export function Transactions() {
         columns={columns}
         linkToCreate="/transactions/create"
         linkToEdit="/transactions/:id/edit"
+        rightSide={<ImportButton route="/transactions/import" />}
         withResourcefulActions
       />
     </Default>
