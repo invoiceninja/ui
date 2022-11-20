@@ -31,7 +31,11 @@ export function Import() {
     >
       <div className="grid grid-cols-12">
         <div className="col-span-12 xl:col-span-10">
-          <UploadImport entity="transaction" onSuccess={false} type="csv" />
+          <UploadImport
+            entity="bank_transaction"
+            onSuccess={false}
+            type="csv"
+          />
         </div>
       </div>
     </Default>
