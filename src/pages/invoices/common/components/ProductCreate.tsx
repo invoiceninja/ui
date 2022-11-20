@@ -47,6 +47,9 @@ export function ProductCreate(props: Props) {
       notes: product?.data.datanotes || '',
       cost: product?.data.data.cost || 0,
       quantity: product?.data.data.quantity || 1,
+      in_stock_quantity: product?.data.data?.in_stock_quantity || 0,
+      stock_notification_threshold:
+        product?.data.data?.stock_notification_threshold || 0,
       tax_name1: product?.data.data.tax_name1 || '',
       tax_name2: product?.data.data.tax_name2 || '',
       tax_name3: product?.data.data.tax_name3 || '',
