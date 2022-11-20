@@ -9,3 +9,4 @@
  */
 export * from './CompanyDetails';
 export { Documents as CompanyDocuments } from './documents/Documents';
+export { Address, Defaults, Logo, Details } from './components';

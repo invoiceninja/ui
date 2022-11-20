@@ -17,9 +17,14 @@ import * as Settings from './index';
 export const settingsRoutes = (
   <Route path="/settings">
     <Route path="" element={<Settings.Settings />} />
-    <Route path="company_details">
-      <Route path="" element={<Settings.CompanyDetails />} />
+    <Route path="company_details" element={<Settings.CompanyDetails />}>
+      <Route path="" element={<Settings.Details />} />
+      <Route path="details" element={<Settings.Details />} />
+      <Route path="address" element={<Settings.Address />} />
+      <Route path="logo" element={<Settings.Logo />} />
+      <Route path="defaults" element={<Settings.Defaults />} />
       <Route path="documents" element={<Settings.CompanyDocuments />} />
+      <Route path="custom_fields" />
     </Route>
     <Route path="user_details" element={<Settings.UserDetails />} />
     <Route path="localization" element={<Settings.Localization />} />
