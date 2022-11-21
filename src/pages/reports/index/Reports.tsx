@@ -337,9 +337,15 @@ export function Reports() {
         console.error(error);
 
         if (error.response?.status === 422) {
-          const blob = error.response.data as Blob;
+          if (report.payload.send_email) {
+            setErrors(error.response.data);
+          }
 
-          blob.text().then((text) => setErrors(JSON.parse(text)));
+          if (!report.payload.send_email) {
+            const blob = error.response.data as Blob;
+
+            blob.text().then((text) => setErrors(JSON.parse(text)));
+          }
         }
 
         toast.error();
