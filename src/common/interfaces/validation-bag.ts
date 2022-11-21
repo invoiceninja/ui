@@ -10,5 +10,5 @@
 
 export interface ValidationBag {
   message: string;
-  errors?: Record<string, string[]>;
+  errors: Record<string, string[]>;
 }
