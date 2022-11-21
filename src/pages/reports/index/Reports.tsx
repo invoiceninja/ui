@@ -13,7 +13,7 @@ import { SelectField } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Identifier =
@@ -36,25 +36,7 @@ interface Report {
   identifier: Identifier;
   label: string;
   endpoint: string;
-  groups: Group[];
-  dates: Date[];
   payload: Payload;
-}
-
-interface Group {
-  identifier: string;
-  label: string;
-  subgroups: Subgroup[];
-}
-
-interface Date {
-  identifier: string;
-  label: string;
-}
-
-interface Subgroup {
-  identifier: string;
-  label: string;
 }
 
 interface Payload {
@@ -71,49 +53,6 @@ const reports: Report[] = [
     identifier: 'client',
     label: 'client',
     endpoint: '/api/v1/reports/clients',
-    groups: [
-      {
-        identifier: 'name',
-        label: 'name',
-        subgroups: [],
-      },
-      {
-        identifier: 'contact_email',
-        label: 'contact_email',
-        subgroups: [],
-      },
-      {
-        identifier: 'id_number',
-        label: 'id_number',
-        subgroups: [],
-      },
-      {
-        identifier: 'vat_number',
-        label: 'vat_number',
-        subgroups: [],
-      },
-      {
-        identifier: 'currency',
-        label: 'currency',
-        subgroups: [],
-      },
-      {
-        identifier: 'country',
-        label: 'country',
-        subgroups: [],
-      },
-      {
-        identifier: 'created_at',
-        label: 'created_at',
-        subgroups: [
-          { identifier: 'day', label: 'day' },
-          { identifier: 'week', label: 'week' },
-          { identifier: 'month', label: 'month' },
-          { identifier: 'year', label: 'year' },
-        ],
-      },
-    ],
-    dates: [],
     payload: {
       start_date: '',
       end_date: '',
@@ -127,38 +66,6 @@ const reports: Report[] = [
     identifier: 'credit',
     label: 'credit',
     endpoint: '/api/v1/reports/credits',
-    groups: [
-      { identifier: 'number', label: 'number', subgroups: [] },
-      {
-        identifier: 'date',
-        label: 'date',
-        subgroups: [
-          { identifier: 'day', label: 'day' },
-          { identifier: 'week', label: 'week' },
-          { identifier: 'month', label: 'month' },
-          { identifier: 'year', label: 'year' },
-        ],
-      },
-      {
-        identifier: 'valid_until',
-        label: 'valid_until',
-        subgroups: [
-          { identifier: 'day', label: 'day' },
-          { identifier: 'week', label: 'week' },
-          { identifier: 'month', label: 'month' },
-          { identifier: 'year', label: 'year' },
-        ],
-      },
-      {
-        identifier: 'client',
-        label: 'client',
-        subgroups: [],
-      },
-    ],
-    dates: [
-      { identifier: 'date', label: 'date' },
-      { identifier: 'valid_until', label: 'valid_until' },
-    ],
     payload: {
       start_date: '',
       end_date: '',
@@ -192,8 +99,6 @@ export function Reports() {
   const { t } = useTranslation();
 
   const [report, setReport] = useState<Report>(reports[0]);
-  const [group, setGroup] = useState<Group>();
-  const [subgroup, setSubgroup] = useState<Subgroup>();
   const [range, setRange] = useState<Range>();
 
   const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
@@ -206,26 +111,6 @@ export function Reports() {
     }
   };
 
-  const handleGroupChange = (identifier: string) => {
-    const group = report.groups.find(
-      (group) => group.identifier === identifier
-    );
-
-    if (group) {
-      setGroup(group);
-    }
-  };
-
-  const handleSubgroupChange = (identifier: string) => {
-    const subgroup = group?.subgroups.find(
-      (subgroup) => subgroup.identifier === identifier
-    );
-
-    if (subgroup) {
-      setSubgroup(subgroup);
-    }
-  };
-
   const handleRangeChange = (identifier: string) => {
     const range = ranges.find((range) => range.identifier === identifier);
 
@@ -233,14 +118,6 @@ export function Reports() {
       setRange(range);
     }
   };
-
-  useEffect(() => {
-    setGroup(undefined);
-  }, [report]);
-
-  useEffect(() => {
-    setSubgroup(undefined);
-  }, [group]);
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
@@ -257,50 +134,9 @@ export function Reports() {
               ))}
             </SelectField>
           </Element>
-
-          {report.groups.length > 0 && (
-            <Element leftSide={t('group')}>
-              <SelectField
-                onValueChange={(value) => handleGroupChange(value)}
-                withBlank
-              >
-                {report.groups.map((group, i) => (
-                  <option value={group.identifier} key={i}>
-                    {t(group.label)}
-                  </option>
-                ))}
-              </SelectField>
-            </Element>
-          )}
-
-          {group && group.subgroups.length > 0 && (
-            <Element leftSide={t('subgroup')}>
-              <SelectField
-                onValueChange={(value) => handleSubgroupChange(value)}
-              >
-                {group.subgroups.map((subgroup, i) => (
-                  <option value={subgroup.identifier} key={i}>
-                    {t(subgroup.label)}
-                  </option>
-                ))}
-              </SelectField>
-            </Element>
-          )}
         </Card>
 
         <Card className="col-span-6 h-max">
-          {report.dates.length > 0 && (
-            <Element leftSide={t('date')}>
-              <SelectField withBlank>
-                {report.dates.map((date, i) => (
-                  <option value={date.identifier} key={i}>
-                    {t(date.label)}
-                  </option>
-                ))}
-              </SelectField>
-            </Element>
-          )}
-
           <Element leftSide={t('range')}>
             <SelectField onValueChange={(value) => handleRangeChange(value)}>
               {ranges.map((range, i) => (
