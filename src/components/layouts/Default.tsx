@@ -35,6 +35,7 @@ import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
 import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
+import { AiOutlineBank } from 'react-icons/ai';
 import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 
@@ -241,6 +242,16 @@ export function Default(props: Props) {
         to: '/recurring_expenses/create',
         label: t('new_recurring_expense'),
         visible: hasPermission('create_expense'),
+      name: t('transactions'),
+      href: '/transactions',
+      icon: AiOutlineBank,
+      current: location.pathname.startsWith('/transactions'),
+      visible: true,
+      rightButton: {
+        icon: PlusCircle,
+        to: '/transactions/create',
+        label: t('new_transaction'),
+        visible: hasPermission('create_transaction'),
       },
     },
     {
