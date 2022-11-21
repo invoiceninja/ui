@@ -52,6 +52,9 @@ interface Payload {
   date_range: string;
   report_keys: string[];
   send_email: boolean;
+  is_income_billed?: boolean;
+  is_expense_billed?: boolean;
+  include_tax?: boolean;
 }
 
 const reports: Report[] = [
@@ -235,6 +238,9 @@ const reports: Report[] = [
       date_range: 'all',
       report_keys: [],
       send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
     },
   },
 ];
@@ -272,6 +278,16 @@ export function Reports() {
     if (report) {
       setReport(report);
     }
+  };
+
+  const handlePayloadChange = (
+    property: keyof Payload,
+    value: string | number | boolean
+  ) => {
+    setReport((current) => ({
+      ...current,
+      payload: { ...current.payload, [property]: value },
+    }));
   };
 
   const handleRangeChange = (identifier: string) => {
@@ -381,6 +397,37 @@ export function Reports() {
               onValueChange={handleSendEmailChange}
             />
           </Element>
+
+          {report.identifier === 'profitloss' && (
+            <>
+              <Element leftSide={t('is_expense_billed')}>
+                <Toggle
+                  checked={report.payload.is_expense_billed}
+                  onValueChange={(value) =>
+                    handlePayloadChange('is_expense_billed', value)
+                  }
+                />
+              </Element>
+
+              <Element leftSide={t('is_income_billed')}>
+                <Toggle
+                  checked={report.payload.is_income_billed}
+                  onValueChange={(value) =>
+                    handlePayloadChange('is_income_billed', value)
+                  }
+                />
+              </Element>
+
+              <Element leftSide={t('include_tax')}>
+                <Toggle
+                  checked={report.payload.include_tax}
+                  onValueChange={(value) =>
+                    handlePayloadChange('include_tax', value)
+                  }
+                />
+              </Element>
+            </>
+          )}
         </Card>
 
         <Card className="col-span-6 h-max">
