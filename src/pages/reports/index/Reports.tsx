@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { SelectField } from '@invoiceninja/forms';
+import { Datepicker, InputField, SelectField } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
@@ -119,6 +119,16 @@ export function Reports() {
     }
   };
 
+  const handleCustomDateChange = (
+    key: 'start_date' | 'end_date',
+    date: string
+  ) => {
+    setReport((current) => ({
+      ...current,
+      payload: { ...current.payload, [key]: date },
+    }));
+  };
+
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-4">
@@ -146,6 +156,28 @@ export function Reports() {
               ))}
             </SelectField>
           </Element>
+
+          {range?.identifier === 'custom' && (
+            <Element leftSide={t('start_date')}>
+              <InputField
+                type="date"
+                onValueChange={(value) =>
+                  handleCustomDateChange('start_date', value)
+                }
+              />
+            </Element>
+          )}
+
+          {range?.identifier === 'custom' && (
+            <Element leftSide={t('end_date')}>
+              <InputField
+                type="date"
+                onValueChange={(value) =>
+                  handleCustomDateChange('end_date', value)
+                }
+              />
+            </Element>
+          )}
         </Card>
       </div>
     </Default>
