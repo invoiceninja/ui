@@ -19,7 +19,6 @@ export const settingsRoutes = (
     <Route path="" element={<Settings.Settings />} />
     <Route path="company_details" element={<Settings.CompanyDetails />}>
       <Route path="" element={<Settings.Details />} />
-      <Route path="details" element={<Settings.Details />} />
       <Route path="address" element={<Settings.Address />} />
       <Route path="logo" element={<Settings.Logo />} />
       <Route path="defaults" element={<Settings.Defaults />} />

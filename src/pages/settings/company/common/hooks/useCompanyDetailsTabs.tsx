@@ -16,7 +16,7 @@ export function useCompanyDetailsTabs() {
   const { t } = useTranslation();
 
   const tabs: Tab[] = [
-    { name: t('details'), href: route('/settings/company_details/details') },
+    { name: t('details'), href: route('/settings/company_details') },
     { name: t('address'), href: route('/settings/company_details/address') },
     {
       name: t('logo'),
