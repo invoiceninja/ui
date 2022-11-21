@@ -36,7 +36,7 @@ type Identifier =
   | 'payment'
   | 'product'
   | 'task'
-  | 'profit_loss';
+  | 'profitloss';
 
 interface Report {
   identifier: Identifier;
@@ -48,7 +48,7 @@ interface Report {
 interface Payload {
   start_date: string;
   end_date: string;
-  date_key: string;
+  date_key?: string;
   date_range: string;
   report_keys: string[];
   send_email: boolean;
@@ -69,9 +69,165 @@ const reports: Report[] = [
     },
   },
   {
+    identifier: 'contact',
+    label: 'contact',
+    endpoint: '/api/v1/reports/contacts',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
     identifier: 'credit',
     label: 'credit',
     endpoint: '/api/v1/reports/credits',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
+    identifier: 'document',
+    label: 'document',
+    endpoint: '/api/v1/reports/documents',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
+    identifier: 'expense',
+    label: 'expense',
+    endpoint: '/api/v1/reports/expenses',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
+    identifier: 'invoice',
+    label: 'invoice',
+    endpoint: '/api/v1/reports/invoices',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
+    identifier: 'invoice_item',
+    label: 'invoice_item',
+    endpoint: '/api/v1/reports/invoice_items',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
+    identifier: 'quote',
+    label: 'quote',
+    endpoint: '/api/v1/reports/quotes',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
+    identifier: 'quote_item',
+    label: 'quote_item',
+    endpoint: '/api/v1/reports/quote_items',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
+    identifier: 'recurring_invoice',
+    label: 'recurring_invoice',
+    endpoint: '/api/v1/reports/recurring_invoices',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
+    identifier: 'payment',
+    label: 'payment',
+    endpoint: '/api/v1/reports/payments',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
+    identifier: 'product',
+    label: 'product',
+    endpoint: '/api/v1/reports/products',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
+    identifier: 'task',
+    label: 'task',
+    endpoint: '/api/v1/reports/tasks',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
+    identifier: 'profitloss',
+    label: 'profitloss',
+    endpoint: '/api/v1/reports/profitloss',
     payload: {
       start_date: '',
       end_date: '',
@@ -153,9 +309,13 @@ export function Reports() {
     setErrors(undefined);
 
     request('POST', endpoint(report.endpoint), report.payload, {
-      responseType: 'blob',
+      responseType: report.payload.send_email ? 'json' : 'blob',
     })
       .then((response) => {
+        if (report.payload.send_email) {
+          return toast.success();
+        }
+
         const blob = new Blob([response.data], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
 
