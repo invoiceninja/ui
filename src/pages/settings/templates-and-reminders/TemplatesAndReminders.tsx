@@ -9,12 +9,13 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
+import { Button, InputField, Link, SelectField } from '@invoiceninja/forms';
 import { freePlan } from 'common/guards/guards/free-plan';
 import { endpoint, isHosted, isSelfHosted } from 'common/helpers';
 import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
 import { request } from 'common/helpers/request';
 import { EmailTemplate } from 'common/hooks/emails/useResolveTemplate';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Settings as CompanySettings } from 'common/interfaces/company.interface';
@@ -46,6 +47,7 @@ export function TemplatesAndReminders() {
   const handleChange = useHandleCurrentCompanyChangeProperty();
   const handleSave = useHandleCompanySave();
   const handleCancel = useHandleCancel();
+  const user = useCurrentUser();
 
   const { data: statics } = useStaticsQuery();
   const [templateId, setTemplateId] = useState('invoice');
@@ -196,8 +198,8 @@ export function TemplatesAndReminders() {
           />
         </Element>
 
-        {canChangeEmailTemplate && (
-          <Element leftSide={t('body')}>
+        <Element leftSide={t('body')}>
+          {canChangeEmailTemplate ? (
             <MarkdownEditor
               value={templateBody?.body}
               onChange={(value) =>
@@ -206,8 +208,22 @@ export function TemplatesAndReminders() {
                 )
               }
             />
-          </Element>
-        )}
+          ) : (
+            <div className="flex flex-col items-start">
+              <span className=" text-gray-500" style={{ fontSize: 12 }}>
+                Email body template can be changed on{' '}
+                <strong>Enterprise/Pro</strong> plan.
+              </span>
+              <Link
+                className="mt-2"
+                external
+                to={user?.company_user?.ninja_portal_url || ''}
+              >
+                <Button>{t('plan_change')}</Button>
+              </Link>
+            </div>
+          )}
+        </Element>
       </Card>
 
       {preview && (
