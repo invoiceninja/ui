@@ -8,16 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { Button, InputField } from '@invoiceninja/forms';
+import { Button } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
-import { CompanyInput } from 'common/interfaces/company.interface';
-import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Modal } from 'components/Modal';
-import { FormEvent, useState, SetStateAction, Dispatch } from 'react';
+import { useState, SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -28,43 +26,26 @@ interface Props {
 export function CompanyCreate(props: Props) {
   const [t] = useTranslation();
 
-  const [errors, setErrors] = useState<ValidationBag>();
-
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const [company, setCompany] = useState<CompanyInput>();
-
-  const handleChange = (
-    property: keyof CompanyInput,
-    value: CompanyInput[keyof CompanyInput]
-  ) => {
-    setCompany((prevState) => ({ ...prevState, [property]: value }));
-  };
-
-  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = async () => {
     if (!isFormBusy) {
-      event?.preventDefault();
-
       toast.processing();
-
-      setErrors(undefined);
 
       setIsFormBusy(true);
 
       try {
-        await request('POST', endpoint('/api/v1/companies'), company);
-        setIsFormBusy(false);
+        await request('POST', endpoint('/api/v1/companies'));
+
         toast.success(t('created_company'));
+
         props.setIsModalOpen(false);
-      } catch (cachedError) {
-        const error = cachedError as AxiosError;
-        console.error(error);
-        if (error?.response?.status === 422) {
-          setErrors(error?.response?.data?.errors);
-          toast.dismiss();
-        } else {
-          toast.error();
-        }
+
+        window.location.href = route('/');
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        console.error(axiosError);
+        toast.error();
         setIsFormBusy(false);
       }
     }
@@ -72,27 +53,24 @@ export function CompanyCreate(props: Props) {
 
   return (
     <Modal
-      title={t('new_company')}
+      title={t('add_company')}
       visible={props.isModalOpen}
-      onClose={(value) => {
-        props.setIsModalOpen(value);
-        setErrors(undefined);
-      }}
-      size="regular"
-      backgroundColor="gray"
+      onClose={() => props.setIsModalOpen(false)}
+      size="small"
+      backgroundColor="white"
     >
-      <Card onFormSubmit={handleSave}>
-        <Element leftSide={t('company_name')}>
-          <InputField
-            value={company?.name}
-            onValueChange={(value) => handleChange('name', value)}
-            errorMessage={errors?.errors?.name}
-          />
-        </Element>
-      </Card>
-
-      <div className="flex justify-end space-x-4">
-        <Button onClick={handleSave}>{t('save')}</Button>
+      <span className="text-lg text-gray-900">Are you sure?</span>
+      <div className="flex justify-end space-x-4 mt-5">
+        <Button
+          className="text-gray-900"
+          onClick={() => props.setIsModalOpen(false)}
+          type="minimal"
+        >
+          <span className="text-base mx-3">{t('cancel')}</span>
+        </Button>
+        <Button onClick={handleSave}>
+          <span className="text-base mx-3">{t('yes')}</span>
+        </Button>
       </div>
     </Modal>
   );

@@ -13,7 +13,7 @@ import { AuthenticationTypes } from 'common/dtos/authentication';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { authenticate } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { Check, ChevronDown, PlusCircle } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -23,6 +23,8 @@ import { DropdownElement } from './dropdown/DropdownElement';
 import { useLogo } from 'common/hooks/useLogo';
 import { useCompanyName } from 'common/hooks/useLogo';
 import { CompanyCreate } from 'pages/settings/company/create/CompanyCreate';
+import { CompanyEdit } from 'pages/settings/company/edit/CompanyEdit';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -39,7 +41,12 @@ export function CompanySwitcher() {
 
   const companyName = useCompanyName();
 
+  const currentCompany = useCurrentCompany();
+
   const [isCompanyCreateModalOpened, setIsCompanyCreateModalOpened] =
+    useState<boolean>(false);
+
+  const [isCompanyEditModalOpened, setIsCompanyEditModalOpened] =
     useState<boolean>(false);
 
   const switchCompany = (index: number) => {
@@ -58,12 +65,24 @@ export function CompanySwitcher() {
     window.location.href = route('/');
   };
 
+  useEffect(() => {
+    if (currentCompany && !currentCompany?.settings?.name) {
+      setIsCompanyEditModalOpened(true);
+    }
+  }, [currentCompany]);
+
   return (
     <>
       <CompanyCreate
         isModalOpen={isCompanyCreateModalOpened}
         setIsModalOpen={setIsCompanyCreateModalOpened}
       />
+
+      <CompanyEdit
+        isModalOpen={isCompanyEditModalOpened}
+        setIsModalOpen={setIsCompanyEditModalOpened}
+      />
+
       <Menu as="div" className="relative inline-block text-left">
         <div>
           <Menu.Button className="flex items-center space-x-3 justify-center w-full rounded text-sm font-medium text-gray-700 border border-transparent">
