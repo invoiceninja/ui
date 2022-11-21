@@ -12,10 +12,12 @@ import { useTitle } from 'common/hooks/useTitle';
 import { DataTable } from 'components/DataTable';
 import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { isHosted } from 'common/helpers';
 import { useBankAccountColumns } from '../common/hooks/useBankAccountColumns';
 import { Button } from '@invoiceninja/forms';
 import { MdLink } from 'react-icons/md';
+import { endpoint, isHosted } from 'common/helpers';
+import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 
 export function BankAccounts() {
   useTitle('bank_accounts');
@@ -28,6 +30,19 @@ export function BankAccounts() {
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
   ];
+
+  const handleConnectAccounts = async () => {
+    const tokenResponse = await request(
+      'POST',
+      endpoint('/api/v1/one_time_token'),
+      { context: 'yodlee', platform: 'react' }
+    );
+    window.open(
+      route('/yodlee/onboard/:hash', {
+        hash: tokenResponse?.data?.hash,
+      })
+    );
+  };
 
   return (
     <Settings
@@ -44,7 +59,7 @@ export function BankAccounts() {
         withResourcefulActions
         rightSide={
           isHosted() && (
-            <Button>
+            <Button onClick={handleConnectAccounts}>
               <span className="mr-2">{<MdLink />}</span>
               {t('connect_accounts')}
             </Button>

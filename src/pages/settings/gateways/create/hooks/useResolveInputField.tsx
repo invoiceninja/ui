@@ -11,6 +11,7 @@
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import { CompanyGateway } from 'common/interfaces/company-gateway';
+import { ColorPicker } from 'components/forms/ColorPicker';
 import Toggle from 'components/forms/Toggle';
 import { ChangeEvent } from 'react';
 import { useHandleCredentialsChange } from './useHandleCredentialsChange';
@@ -37,12 +38,11 @@ export function useResolveInputField(
   return (property: string, value: Field) => {
     if (property.toLowerCase().endsWith('color')) {
       return (
-        <input
-          type="color"
-          onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            handleChange(property as keyof Field, event.target.value)
+        <ColorPicker
+          value={resolveConfigValue(property) || accentColor}
+          onValueChange={(color) =>
+            handleChange(property as keyof Field, color)
           }
-          defaultValue={resolveConfigValue(property) || accentColor}
         />
       );
     }

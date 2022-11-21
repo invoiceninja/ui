@@ -36,6 +36,7 @@ import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
 import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
+import { AiOutlineBank } from 'react-icons/ai';
 import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 
@@ -237,6 +238,19 @@ export function Default(props: Props) {
       icon: PieChart,
       current: location.pathname.startsWith('/reports'),
       visible: true,
+    },
+    {
+      name: t('transactions'),
+      href: '/transactions',
+      icon: AiOutlineBank,
+      current: location.pathname.startsWith('/transactions'),
+      visible: true,
+      rightButton: {
+        icon: PlusCircle,
+        to: '/transactions/create',
+        label: t('new_transaction'),
+        visible: hasPermission('create_transaction'),
+      },
     },
     {
       name: t('settings'),
