@@ -17,6 +17,7 @@ import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
+import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -138,6 +139,13 @@ export function Reports() {
     }));
   };
 
+  const handleSendEmailChange = (value: boolean) => {
+    setReport((current) => ({
+      ...current,
+      payload: { ...current.payload, send_email: value },
+    }));
+  };
+
   const handleExport = () => {
     toast.processing();
 
@@ -199,6 +207,13 @@ export function Reports() {
                 </option>
               ))}
             </SelectField>
+          </Element>
+
+          <Element leftSide={t('send_email')}>
+            <Toggle
+              checked={report.payload.send_email}
+              onValueChange={handleSendEmailChange}
+            />
           </Element>
         </Card>
 
