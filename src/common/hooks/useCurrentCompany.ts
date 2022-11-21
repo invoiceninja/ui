@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Company } from 'common/interfaces/company.interface';
+import { Company } from 'common/interfaces/company-interface';
 import { RootState } from 'common/stores/store';
 import { useSelector } from 'react-redux';
 

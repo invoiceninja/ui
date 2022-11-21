@@ -16,7 +16,7 @@ import { request } from 'common/helpers/request';
 import { EmailTemplate } from 'common/hooks/emails/useResolveTemplate';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
-import { Settings as CompanySettings } from 'common/interfaces/company.interface';
+import { Settings as CompanySettings } from 'common/interfaces/company-interface';
 import { TemplateBody, Templates } from 'common/interfaces/statics';
 import { useStaticsQuery } from 'common/queries/statics';
 import { MarkdownEditor } from 'components/forms/MarkdownEditor';

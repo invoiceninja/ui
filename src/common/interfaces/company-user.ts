@@ -9,7 +9,7 @@
  */
 
 import { Account } from './account';
-import { Company } from './company.interface';
+import { Company } from './company-interface';
 import { User } from './user';
 
 export interface CompanyUser {

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Company } from 'common/interfaces/company.interface';
+import { Company } from 'common/interfaces/company-interface';
 import { injectInChanges } from 'common/stores/slices/company-users';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
