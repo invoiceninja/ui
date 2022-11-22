@@ -54,8 +54,8 @@ export const settingsRoutes = (
       <Route path="expenses" element={<Settings.ExpensesCustomFields />} />
       <Route path="users" element={<Settings.UsersCustomFields />} />
     </Route>
-    <Route path="generated_numbers">
-      <Route path="" element={<Settings.GeneratedNumbers />} />
+    <Route path="generated_numbers" element={<Settings.GeneratedNumbers />}>
+      <Route path="" element={<Settings.GeneratedNumbersSettings />} />
       <Route path="clients" element={<Settings.ClientsGeneratedNumbers />} />
       <Route path="invoices" element={<Settings.InvoicesGeneratedNumbers />} />
       <Route

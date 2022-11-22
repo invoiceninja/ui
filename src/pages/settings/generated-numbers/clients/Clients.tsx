@@ -12,28 +12,19 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
-import { Settings } from '../../../../components/layouts/Settings';
 import { updateChanges } from 'common/stores/slices/company-users';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useDispatch } from 'react-redux';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { ChangeEvent } from 'react';
-import { useHandleCompanySave } from 'pages/settings/common/hooks/useHandleCompanySave';
-import { useDiscardChanges } from 'pages/settings/common/hooks/useDiscardChanges';
 
 export function Clients() {
   const [t] = useTranslation();
   const [pattern, setPattern] = useState<string>('');
-  const pages = [
-    { name: t('settings'), href: '/settings' },
-    { name: t('generated_numbers'), href: '/settings/generated_numbers' },
-    { name: t('clients'), href: '/settings/generated_numbers/clients' },
-  ];
 
   const companyChanges = useCompanyChanges();
+
   const dispatch = useDispatch();
-  const onSave = useHandleCompanySave();
-  const onCancel = useDiscardChanges();
 
   useInjectCompanyChanges();
 
@@ -60,29 +51,21 @@ export function Clients() {
   ];
 
   return (
-    <Settings
-      title={t('generated_numbers')}
-      breadcrumbs={pages}
-      onSaveClick={onSave}
-      onCancelClick={onCancel}
-      docsLink="docs/advanced-settings/#clients-invoices-recurring-invoices-payments-etc"
-    >
-      <Card title={`${t('generated_numbers')}: ${t('clients')}`}>
-        <Element leftSide={t('number_pattern')}>
-          <InputField
-            id="settings.client_number_pattern"
-            value={companyChanges?.settings?.client_number_pattern}
-            onChange={handleChange}
-          />
-        </Element>
-        <Element leftSide={t('number_counter')}>
-          <InputField
-            id="settings.client_number_counter"
-            value={companyChanges?.settings?.client_number_counter}
-            onChange={handleChange}
-          />
-        </Element>
-      </Card>
+    <Card title={t('clients')}>
+      <Element leftSide={t('number_pattern')}>
+        <InputField
+          id="settings.client_number_pattern"
+          value={companyChanges?.settings?.client_number_pattern}
+          onChange={handleChange}
+        />
+      </Element>
+      <Element leftSide={t('number_counter')}>
+        <InputField
+          id="settings.client_number_counter"
+          value={companyChanges?.settings?.client_number_counter}
+          onChange={handleChange}
+        />
+      </Element>
 
       <Card>
         {variables.map((item, index) => (
@@ -94,6 +77,6 @@ export function Clients() {
           </ClickableElement>
         ))}
       </Card>
-    </Settings>
+    </Card>
   );
 }
