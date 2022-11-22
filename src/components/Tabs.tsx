@@ -9,6 +9,7 @@
  */
 
 import { useAccentColor } from 'common/hooks/useAccentColor';
+import { MouseEvent, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface Props {
@@ -24,6 +25,22 @@ export function Tabs(props: Props) {
 
   const isActive = (link: string) => {
     return location.pathname === link;
+  };
+
+  const tabBar = useRef<HTMLDivElement>(null);
+
+  const handleScroll = (event: MouseEvent<HTMLAnchorElement>) => {
+    const clickedTab = event.currentTarget;
+
+    const tabBarElement = tabBar.current;
+
+    const scrollWidth = tabBarElement!.scrollWidth / 6;
+
+    const scrollBy = clickedTab.getBoundingClientRect().width / 2;
+
+    tabBarElement!.scrollTo({
+      left: clickedTab!.offsetLeft - scrollWidth - scrollBy,
+    });
   };
 
   return (
@@ -48,11 +65,16 @@ export function Tabs(props: Props) {
 
       <div className="hidden sm:block">
         <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+          <nav
+            ref={tabBar}
+            className="-mb-px flex space-x-8 relative scroll-smooth overflow-x-hidden"
+            aria-label="Tabs"
+          >
             {props.tabs.map((tab) => (
               <Link
                 key={tab.name}
                 to={tab.href}
+                onClick={(event) => handleScroll(event)}
                 style={{
                   borderColor: isActive(tab.href) ? accentColor : 'transparent',
                   color: isActive(tab.href) ? accentColor : '#6B7280',
