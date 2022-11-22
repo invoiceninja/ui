@@ -37,7 +37,7 @@ export function CompanyCreate(props: Props) {
       try {
         await request('POST', endpoint('/api/v1/companies'));
 
-        toast.success(t('created_company'));
+        toast.success('created_company');
 
         props.setIsModalOpen(false);
 

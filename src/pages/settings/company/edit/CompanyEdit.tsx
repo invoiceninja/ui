@@ -17,7 +17,7 @@ import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useLanguages } from 'common/hooks/useLanguages';
-import { CompanyInput } from 'common/interfaces/company-interface';
+import { CompanyInput } from 'common/interfaces/company.interface';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { CurrencySelector } from 'components/CurrencySelector';
 import { LightSwitch } from 'components/LightSwitch';
@@ -49,7 +49,7 @@ export function CompanyEdit(props: Props) {
 
   const [companyId, setCompanyId] = useState<string | undefined>();
 
-  const [company, setCompany] = useState<CompanyInput>();
+  const [company, setCompany] = useState<CompanyInput>({});
 
   const fetchCompanyDetails = async (company_id: string) => {
     const response = await request(
@@ -89,7 +89,7 @@ export function CompanyEdit(props: Props) {
 
       setIsFormBusy(true);
 
-      const { name, language_id, subdomain, currency_id } = company || {};
+      const { name, language_id, subdomain, currency_id } = company;
 
       try {
         const response = await request(
@@ -97,9 +97,9 @@ export function CompanyEdit(props: Props) {
           endpoint('/api/v1/companies/:id', { id: companyId })
         );
 
-        const respondedCompany = response?.data?.data;
+        const respondedCompany = response.data.data;
 
-        const companySettings = respondedCompany?.settings;
+        const companySettings = respondedCompany.settings;
 
         respondedCompany.settings = {
           ...respondedCompany.settings,
@@ -117,7 +117,7 @@ export function CompanyEdit(props: Props) {
 
         setIsFormBusy(false);
 
-        toast.success(t('updated_company'));
+        toast.success('updated_company');
 
         props.setIsModalOpen(false);
 
