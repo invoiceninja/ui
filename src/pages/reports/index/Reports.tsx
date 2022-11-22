@@ -382,6 +382,7 @@ export function Reports() {
           <Element leftSide={t('report')}>
             <SelectField
               onValueChange={(value) => handleReportChange(value as Identifier)}
+              value={report.identifier}
             >
               {reports.map((report, i) => (
                 <option value={report.identifier} key={i}>
@@ -432,7 +433,10 @@ export function Reports() {
 
         <Card className="col-span-6 h-max">
           <Element leftSide={t('range')}>
-            <SelectField onValueChange={(value) => handleRangeChange(value)}>
+            <SelectField
+              onValueChange={(value) => handleRangeChange(value)}
+              value={report.payload.date_range}
+            >
               {ranges.map((range, i) => (
                 <option value={range.identifier} key={i}>
                   {t(range.label)}
@@ -445,6 +449,7 @@ export function Reports() {
             <Element leftSide={t('start_date')}>
               <InputField
                 type="date"
+                value={report.payload.start_date}
                 onValueChange={(value) =>
                   handleCustomDateChange('start_date', value)
                 }
@@ -457,6 +462,7 @@ export function Reports() {
             <Element leftSide={t('end_date')}>
               <InputField
                 type="date"
+                value={report.payload.end_date}
                 onValueChange={(value) =>
                   handleCustomDateChange('end_date', value)
                 }
