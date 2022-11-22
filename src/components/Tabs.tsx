@@ -67,7 +67,7 @@ export function Tabs(props: Props) {
         <div className="border-b border-gray-200">
           <nav
             ref={tabBar}
-            className="-mb-px flex space-x-8 relative scroll-smooth overflow-x-hidden"
+            className="-mb-px flex space-x-8 relative scroll-smooth overflow-x-auto"
             aria-label="Tabs"
           >
             {props.tabs.map((tab) => (
