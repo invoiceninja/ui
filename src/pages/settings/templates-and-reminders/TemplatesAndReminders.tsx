@@ -210,9 +210,12 @@ export function TemplatesAndReminders() {
             />
           ) : (
             <div className="flex flex-col items-start">
-              <span className=" text-gray-500" style={{ fontSize: 12 }}>
-                Email body template can be changed on{' '}
-                <strong>Enterprise/Pro</strong> plan.
+              <span className="text-gray-500 text-sm">
+                {t('email_template_change')}{' '}
+                <strong>
+                  {t('enterprise')}/{t('pro')}
+                </strong>{' '}
+                {t('plan')}.
               </span>
               <Link
                 className="mt-2"
