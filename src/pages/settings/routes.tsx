@@ -23,7 +23,10 @@ export const settingsRoutes = (
       <Route path="logo" element={<Settings.Logo />} />
       <Route path="defaults" element={<Settings.Defaults />} />
       <Route path="documents" element={<Settings.CompanyDocuments />} />
-      <Route path="custom_fields" />
+      <Route
+        path="custom_fields"
+        element={<Settings.CompanyDetailsCustomFields />}
+      />
     </Route>
     <Route path="user_details" element={<Settings.UserDetails />} />
     <Route path="localization" element={<Settings.Localization />} />
