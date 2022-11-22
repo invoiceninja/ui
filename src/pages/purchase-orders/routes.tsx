@@ -15,7 +15,7 @@ import { Email } from './email/Email';
 import { PurchaseOrders } from './index/PurchaseOrders';
 import { Pdf } from './pdf/Pdf';
 
-export const purchaseOrdersRoutes = (
+export const purchaseOrderRoutes = (
   <Route path="/purchase_orders">
     <Route path="" element={<PurchaseOrders />} />
     <Route path=":id">
