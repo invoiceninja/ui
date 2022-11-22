@@ -172,7 +172,7 @@ export function UploadImport(props: Props) {
             {props.entity === 'bank_transaction' && (
               <Tr>
                 <Td className="space-x-2">
-                  <span>Bank account</span>
+                  <span>{t('bank_account')}</span>
                 </Td>
                 <Td colSpan={2}>
                   <DebouncedCombobox
