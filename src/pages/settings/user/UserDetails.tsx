@@ -21,18 +21,21 @@ import {
 } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
+import { Tabs } from 'components/Tabs';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
+import { Outlet } from 'react-router-dom';
 import { Settings } from '../../../components/layouts/Settings';
-import { AccentColor, Details, Notifications, Password } from './components';
-import { TwoFactorAuthentication } from './components/TwoFactorAuthentication';
+import { useUserDetailsTabs } from './common/hooks/useUserDetailsTabs';
 
 export function UserDetails() {
   useTitle('user_details');
 
   const [t] = useTranslation();
+
+  const tabs = useUserDetailsTabs();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -40,6 +43,7 @@ export function UserDetails() {
   ];
 
   const user = useCurrentUser();
+
   const dispatch = useDispatch();
 
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
@@ -94,13 +98,11 @@ export function UserDetails() {
         onClose={setPasswordConfirmModalOpen}
         onSave={onSave}
       />
+      <Tabs tabs={tabs} className="mt-6" />
 
-      <Details />
-      <Password />
-      {/* <Connect /> */}
-      <TwoFactorAuthentication />
-      <AccentColor />
-      <Notifications />
+      <div className="my-4">
+        <Outlet />
+      </div>
     </Settings>
   );
 }

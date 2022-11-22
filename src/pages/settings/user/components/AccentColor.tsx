@@ -23,7 +23,7 @@ export function AccentColor() {
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
   return (
-    <Card>
+    <Card title={t('accent_color')}>
       <Element leftSide={t('accent_color')}>
         <ColorPicker
           value={

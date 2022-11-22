@@ -7,9 +7,13 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-export * from './AccentColor';
-export * from './Connect';
-export * from './Details';
-export * from './Notifications';
-export * from './Password';
-export * from './TwoFactorAuthentication';
+
+export {
+  AccentColor,
+  Details as UserDetailsComponent,
+  Notifications,
+  Password,
+  TwoFactorAuthentication,
+  Connect,
+} from '././components/index';
+export { UserDetails } from './UserDetails';
