@@ -33,6 +33,10 @@ export function CompanySwitcher() {
 
   const state = useSelector((state: RootState) => state.companyUsers);
 
+  const isCompanyEditAlreadyOpened = sessionStorage.getItem(
+    'COMPANY-EDIT-OPENED'
+  );
+
   const dispatch = useDispatch();
 
   const queryClient = useQueryClient();
@@ -60,13 +64,20 @@ export function CompanySwitcher() {
 
     localStorage.setItem('X-CURRENT-INDEX', index.toString());
 
+    sessionStorage.setItem('COMPANY-EDIT-OPENED', 'false');
+
     queryClient.invalidateQueries();
 
     window.location.href = route('/');
   };
 
   useEffect(() => {
-    if (currentCompany && !currentCompany?.settings?.name) {
+    if (
+      currentCompany &&
+      !currentCompany?.settings?.name &&
+      isCompanyEditAlreadyOpened !== 'true'
+    ) {
+      sessionStorage.setItem('COMPANY-EDIT-OPENED', 'true');
       setIsCompanyEditModalOpened(true);
     }
   }, [currentCompany]);

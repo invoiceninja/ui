@@ -10,13 +10,18 @@
 
 import { Button } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
+import { AuthenticationTypes } from 'common/dtos/authentication';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
+import { updateCompanyUsers } from 'common/stores/slices/company-users';
+import { authenticate } from 'common/stores/slices/user';
 import { Modal } from 'components/Modal';
 import { useState, SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
+import { useDispatch } from 'react-redux';
 
 interface Props {
   isModalOpen: boolean;
@@ -26,7 +31,33 @@ interface Props {
 export function CompanyCreate(props: Props) {
   const [t] = useTranslation();
 
+  const dispatch = useDispatch();
+
+  const queryClient = useQueryClient();
+
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+
+  const switchCompany = (
+    index: number,
+    passedUser: Record<string, unknown>,
+    passedToken: string
+  ) => {
+    dispatch(
+      authenticate({
+        type: AuthenticationTypes.TOKEN,
+        user: passedUser,
+        token: passedToken,
+      })
+    );
+
+    localStorage.setItem('X-CURRENT-INDEX', index.toString());
+
+    sessionStorage.setItem('COMPANY-EDIT-OPENED', 'false');
+
+    queryClient.invalidateQueries();
+
+    window.location.href = route('/');
+  };
 
   const handleSave = async () => {
     if (!isFormBusy) {
@@ -37,11 +68,25 @@ export function CompanyCreate(props: Props) {
       try {
         await request('POST', endpoint('/api/v1/companies'));
 
+        const response = await request('POST', endpoint('/api/v1/refresh'));
+
+        const companyUsers = response.data.data;
+
+        const createdCompanyIndex = companyUsers.length - 1;
+
+        const companyUser = companyUsers[createdCompanyIndex];
+
+        dispatch(updateCompanyUsers(companyUsers));
+
         toast.success('created_company');
 
         props.setIsModalOpen(false);
 
-        window.location.href = route('/');
+        switchCompany(
+          createdCompanyIndex,
+          companyUser.user,
+          companyUser.token.token
+        );
       } catch (error) {
         const axiosError = error as AxiosError;
         console.error(axiosError);

@@ -34,10 +34,10 @@ export interface Company {
 }
 
 export interface CompanyInput {
-  name?: string;
-  subdomain?: string;
-  language_id?: string;
-  currency_id?: string;
+  name: string;
+  subdomain: string;
+  language_id: string;
+  currency_id: string;
 }
 
 export interface Settings {

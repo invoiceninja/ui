@@ -49,7 +49,12 @@ export function CompanyEdit(props: Props) {
 
   const [companyId, setCompanyId] = useState<string | undefined>();
 
-  const [company, setCompany] = useState<CompanyInput>({});
+  const [company, setCompany] = useState<CompanyInput>({
+    name: '',
+    language_id: '',
+    currency_id: '',
+    subdomain: '',
+  });
 
   const fetchCompanyDetails = async (company_id: string) => {
     const response = await request(
@@ -159,7 +164,9 @@ export function CompanyEdit(props: Props) {
     >
       <Card onFormSubmit={handleSave}>
         <div className="flex justify-between mb-6 px-6">
-          <h1 className="text-2xl text-gray-900">Welcome to Invoice Ninja</h1>
+          <h1 className="text-2xl text-gray-900">
+            {t('welcome_to_invoice_ninja')}
+          </h1>
           <LightSwitch />
         </div>
         <Element leftSide={t('company_name')}>
