@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
+import { Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
+import { endpoint, isHosted } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
@@ -20,7 +20,6 @@ import { useLanguages } from 'common/hooks/useLanguages';
 import { CompanyInput } from 'common/interfaces/company.interface';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { CurrencySelector } from 'components/CurrencySelector';
-import { LightSwitch } from 'components/LightSwitch';
 import { Modal } from 'components/Modal';
 import {
   FormEvent,
@@ -114,6 +113,12 @@ export function CompanyEdit(props: Props) {
           currency_id: currency_id ? currency_id : companySettings?.currency_id,
         };
 
+        if (subdomain && isHosted()) {
+          await request('POST', endpoint('/api/v1/check_subdomain'), {
+            subdomain: subdomain,
+          });
+        }
+
         await request(
           'PUT',
           endpoint('/api/v1/companies/:id', { id: companyId }),
@@ -135,6 +140,9 @@ export function CompanyEdit(props: Props) {
           toast.dismiss();
         } else {
           toast.error();
+        }
+        if (axiosError?.response?.status === 401) {
+          toast.error(t('subdomain_is_not_available'));
         }
         setIsFormBusy(false);
       }
@@ -160,14 +168,13 @@ export function CompanyEdit(props: Props) {
         setErrors(undefined);
       }}
       size="regular"
-      backgroundColor="gray"
+      backgroundColor="white"
     >
-      <Card onFormSubmit={handleSave}>
+      <div>
         <div className="flex justify-between mb-6 px-6">
           <h1 className="text-2xl text-gray-900">
             {t('welcome_to_invoice_ninja')}
           </h1>
-          <LightSwitch />
         </div>
         <Element leftSide={t('company_name')}>
           <InputField
@@ -176,13 +183,14 @@ export function CompanyEdit(props: Props) {
             errorMessage={errors?.errors?.name}
           />
         </Element>
-        <Element leftSide={t('subdomain')}>
-          <InputField
-            value={company?.subdomain}
-            onValueChange={(value) => handleChange('subdomain', value)}
-            errorMessage={errors?.errors?.subdomain}
-          />
-        </Element>
+        {isHosted() && (
+          <Element leftSide={t('subdomain')}>
+            <InputField
+              value={company?.subdomain}
+              onValueChange={(value) => handleChange('subdomain', value)}
+            />
+          </Element>
+        )}
         <Element leftSide={t('language')}>
           <SelectField
             defaultValue={languages[0]?.id}
@@ -203,8 +211,8 @@ export function CompanyEdit(props: Props) {
             onChange={(value) => handleChange('currency_id', value)}
           />
         </Element>
-      </Card>
-      <div className="flex justify-end space-x-4">
+      </div>
+      <div className="flex justify-end pr-6">
         <Button onClick={handleSave}>{t('save')}</Button>
       </div>
     </Modal>
