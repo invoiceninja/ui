@@ -28,7 +28,17 @@ export const settingsRoutes = (
         element={<Settings.CompanyDetailsCustomFields />}
       />
     </Route>
-    <Route path="user_details" element={<Settings.UserDetails />} />
+    <Route path="user_details" element={<Settings.UserDetails />}>
+      <Route path="" element={<Settings.UserDetailsComponent />} />
+      <Route path="password" element={<Settings.Password />} />
+      <Route path="connect" element={<Settings.Connect />} />
+      <Route path="accent_color" element={<Settings.AccentColor />} />
+      <Route path="notifications" element={<Settings.Notifications />} />
+      <Route
+        path="enable_two_factor"
+        element={<Settings.TwoFactorAuthentication />}
+      />
+    </Route>
     <Route path="localization" element={<Settings.Localization />} />
     <Route path="online_payments" element={<Settings.OnlinePayments />} />
     <Route path="tax_settings" element={<Settings.TaxSettings />} />
