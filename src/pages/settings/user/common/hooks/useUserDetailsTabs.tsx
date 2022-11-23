@@ -16,26 +16,26 @@ export function useUserDetailsTabs() {
   const { t } = useTranslation();
 
   const tabs: Tab[] = [
-    { name: t('details'), href: '/settings/user_details' },
+    { name: t('details'), href: route('/settings/user_details') },
     {
       name: t('password'),
-      href: '/settings/user_details/password',
+      href: route('/settings/user_details/password'),
     },
     {
       name: t('connect'),
-      href: '/settings/user_details/connect',
+      href: route('/settings/user_details/connect'),
     },
     {
       name: t('enable_two_factor'),
-      href: '/settings/user_details/enable_two_factor',
+      href: route('/settings/user_details/enable_two_factor'),
     },
     {
       name: t('accent_color'),
-      href: '/settings/user_details/accent_color',
+      href: route('/settings/user_details/accent_color'),
     },
     {
       name: t('notifications'),
-      href: '/settings/user_details/notifications',
+      href: route('/settings/user_details/notifications'),
     },
   ];
 
