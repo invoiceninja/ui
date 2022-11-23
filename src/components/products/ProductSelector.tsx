@@ -31,7 +31,7 @@ export function ProductSelector(props: Props) {
   return (
     <>
       <DebouncedCombobox
-        endpoint="/api/v1/products?limit=500"
+        endpoint="/api/v1/products?per_page=500"
         label="product_key"
         onChange={(record: Record<Product>) =>
           props.onChange && props.onChange(record)

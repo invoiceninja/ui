@@ -23,6 +23,7 @@ import {
   ShieldOff,
   Briefcase,
   Clock,
+  PieChart,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -230,6 +231,13 @@ export function Default(props: Props) {
         label: t('new_expense'),
         visible: hasPermission('create_expense'),
       },
+    },
+    {
+      name: t('reports'),
+      href: '/reports',
+      icon: PieChart,
+      current: location.pathname.startsWith('/reports'),
+      visible: true,
     },
     {
       name: t('transactions'),

@@ -8,8 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export { Transactions } from './index/Transactions';
-export { Create as CreateTransaction } from './create/Create';
-export { Edit as EditTransaction } from './edit/Edit';
-export { Transaction } from './show/Transaction';
-export { Import } from './import/Import';
+export {
+  AccentColor,
+  Details as UserDetailsComponent,
+  Notifications,
+  Password,
+  TwoFactorAuthentication,
+  Connect,
+} from '././components/index';
+export { UserDetails } from './UserDetails';

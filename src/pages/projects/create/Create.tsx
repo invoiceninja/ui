@@ -26,7 +26,7 @@ import { Default } from 'components/layouts/Default';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export function Create() {
   const { documentTitle } = useTitle('new_project');
@@ -40,6 +40,7 @@ export function Create() {
 
   const { data: blankProject } = useBlankProjectQuery();
 
+  const [searchParams] = useSearchParams();
   const [project, setProject] = useState<Project>();
   const [errors, setErrors] = useState<ValidationBag>();
 
@@ -56,6 +57,7 @@ export function Create() {
       setProject({
         ...blankProject,
         task_rate: company?.settings.default_task_rate || 0,
+        client_id: searchParams.get('client') || '',
       });
     }
   }, [blankProject]);

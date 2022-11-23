@@ -8,8 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export { Transactions } from './index/Transactions';
-export { Create as CreateTransaction } from './create/Create';
-export { Edit as EditTransaction } from './edit/Edit';
-export { Transaction } from './show/Transaction';
-export { Import } from './import/Import';
+import { Route } from 'react-router-dom';
+import { Reports } from './index/Reports';
+
+export const reportRoutes = (
+  <Route>
+    <Route path="/reports" element={<Reports />} />
+  </Route>
+);

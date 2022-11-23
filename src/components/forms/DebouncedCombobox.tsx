@@ -19,6 +19,7 @@ import { Spinner } from 'components/Spinner';
 import { useTranslation } from 'react-i18next';
 import { Alert } from 'components/Alert';
 import { request as httpRequest } from 'common/helpers/request';
+import { useDebounce } from 'react-use';
 
 export interface Record<T = any> {
   value: string | number;
@@ -228,10 +229,6 @@ export function DebouncedCombobox(props: Props) {
         withoutEvents: true,
       });
     }
-
-    if (props.initiallyVisible) {
-      openDropdownButton.current?.click();
-    }
   }, []);
 
   useEffect(() => {
@@ -246,6 +243,19 @@ export function DebouncedCombobox(props: Props) {
       request('', 0);
     });
   }, []);
+
+  useDebounce(
+    () => {
+      if (
+        typeof props.initiallyVisible !== 'undefined' &&
+        props.initiallyVisible
+      ) {
+        openDropdownButton.current?.click();
+      }
+    },
+    1000,
+    [props.initiallyVisible]
+  );
 
   return (
     <div className={`w-full ${props.className}`}>
