@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from 'react-i18next';
 import { Tab } from '../../common/components/Tabs';
 
 export function usePaymentGatewayTabs() {
-  const { t } = useTranslation();
-
   const tabs: Tab[] = [
-    { name: t('overview') },
+    { name: 'overview' },
     {
-      name: t('credentials'),
+      name: 'credentials',
     },
     {
-      name: t('settings'),
+      name: 'settings',
     },
     {
-      name: t('limits_and_fees'),
+      name: 'required_fields',
+    },
+    {
+      name: 'limits_and_fees',
     },
   ];
 

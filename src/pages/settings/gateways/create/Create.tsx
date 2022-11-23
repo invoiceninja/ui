@@ -21,6 +21,7 @@ import { Settings } from 'components/layouts/Settings';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { PaymentTabsActivity, Tabs } from '../common/components/Tabs';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from './components/Credentials';
 import { LimitsAndFees } from './components/LimitsAndFees';
@@ -28,30 +29,58 @@ import { RequiredFields } from './components/RequiredFields';
 import { Settings as GatewaySettings } from './components/Settings';
 import { useHandleCreate } from './hooks/useHandleCreate';
 import { blankFeesAndLimitsRecord } from './hooks/useHandleMethodToggle';
+import { usePaymentGatewayTabs } from './hooks/usePaymentGatewayTabs';
 
 export function Create() {
   const [t] = useTranslation();
+
   const navigate = useNavigate();
+
+  const { documentTitle } = useTitle('online_payments');
+
+  const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
+
+  const { data: companyGateways } = useCompanyGatewaysQuery();
+
+  const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
+
+  const [gateway, setGateway] = useState<Gateway>();
+
+  const [filteredGateways, setFilteredGateways] = useState<Gateway[]>([]);
+
+  const gateways = useGateways();
+
+  const onSave = useHandleCreate(companyGateway);
+
+  const tabs = usePaymentGatewayTabs();
+
+  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setGateway(gateways.find((gateway) => gateway.id === event.target.value));
+  };
+
+  const [activeTabKey, setActiveTabKey] = useState<string>('overview');
+
+  const [tabsActivity, setTabsActivity] = useState<PaymentTabsActivity>({
+    overview: true,
+    credentials: false,
+    settings: false,
+    required_fields: false,
+    limits_and_fees: false,
+  });
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('online_payments'), href: '/settings/online_payments' },
     { name: t('add_gateway'), href: '/settings/gateways/create' },
+    {
+      name: t(activeTabKey),
+      href: '/settings/gateways/create',
+    },
   ];
 
-  const { documentTitle } = useTitle('online_payments');
-  const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
-  const { data: companyGateways } = useCompanyGatewaysQuery();
-
-  const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
-  const [gateway, setGateway] = useState<Gateway>();
-  const [filteredGateways, setFilteredGateways] = useState<Gateway[]>([]);
-
-  const gateways = useGateways();
-  const onSave = useHandleCreate(companyGateway);
-
-  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setGateway(gateways.find((gateway) => gateway.id === event.target.value));
+  const getActiveTabKey = () => {
+    const tab = Object.entries(tabsActivity).filter((item) => item[1]);
+    return tab[0][0].toString();
   };
 
   useEffect(() => {
@@ -118,6 +147,10 @@ export function Create() {
     }
   }, [gateway]);
 
+  useEffect(() => {
+    setActiveTabKey(getActiveTabKey());
+  }, [tabsActivity]);
+
   return (
     <Settings
       title={documentTitle}
@@ -125,19 +158,28 @@ export function Create() {
       onSaveClick={onSave}
       onCancelClick={() => navigate('/settings/online_payments')}
     >
-      <Card title={t('add_gateway')}>
-        <Element leftSide={t('provider')}>
-          <SelectField onChange={handleChange} withBlank>
-            {filteredGateways.map((gateway, index) => (
-              <option value={gateway.id} key={index}>
-                {gateway.name}
-              </option>
-            ))}
-          </SelectField>
-        </Element>
-      </Card>
+      <Tabs
+        tabs={tabs}
+        tabsActivity={tabsActivity}
+        setTabsActivity={setTabsActivity}
+        activeTabKey={activeTabKey}
+      />
 
-      {gateway && companyGateway && (
+      {tabsActivity.overview && (
+        <Card title={t('add_gateway')}>
+          <Element leftSide={t('provider')}>
+            <SelectField onChange={handleChange} value={gateway?.id} withBlank>
+              {filteredGateways.map((gateway, index) => (
+                <option value={gateway.id} key={index}>
+                  {gateway.name}
+                </option>
+              ))}
+            </SelectField>
+          </Element>
+        </Card>
+      )}
+
+      {gateway && companyGateway && tabsActivity.credentials && (
         <Credentials
           gateway={gateway}
           companyGateway={companyGateway}
@@ -145,7 +187,7 @@ export function Create() {
         />
       )}
 
-      {gateway && companyGateway && (
+      {gateway && companyGateway && tabsActivity.settings && (
         <GatewaySettings
           gateway={gateway}
           companyGateway={companyGateway}
@@ -153,7 +195,7 @@ export function Create() {
         />
       )}
 
-      {gateway && companyGateway && (
+      {gateway && companyGateway && tabsActivity.required_fields && (
         <RequiredFields
           gateway={gateway}
           companyGateway={companyGateway}
@@ -161,7 +203,7 @@ export function Create() {
         />
       )}
 
-      {gateway && companyGateway && (
+      {gateway && companyGateway && tabsActivity.limits_and_fees && (
         <LimitsAndFees
           gateway={gateway}
           companyGateway={companyGateway}
