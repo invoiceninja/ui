@@ -19,6 +19,7 @@ import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { Button, SelectField } from '@invoiceninja/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
+import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 
 interface Props {
   entity: string;
@@ -30,6 +31,7 @@ interface ImportMap extends Record<string, any> {
   hash: string;
   import_type: string;
   skip_header: boolean;
+  bank_integration_id?: string;
 }
 
 export function UploadImport(props: Props) {
@@ -166,6 +168,32 @@ export function UploadImport(props: Props) {
                   </Td>
                 </Tr>
               )
+            )}
+            {props.entity === 'bank_transaction' && (
+              <Tr>
+                <Td className="space-x-2">
+                  <span>{t('bank_account')}</span>
+                </Td>
+                <Td colSpan={2}>
+                  <DebouncedCombobox
+                    endpoint="/api/v1/bank_integrations"
+                    label="bank_account_name"
+                    clearButton
+                    onChange={(transaction) =>
+                      setPayloadData((prevState) => ({
+                        ...prevState,
+                        bank_integration_id: transaction?.resource?.id,
+                      }))
+                    }
+                    onClearButtonClick={() =>
+                      setPayloadData((prevState) => ({
+                        ...prevState,
+                        bank_integration_id: '',
+                      }))
+                    }
+                  />
+                </Td>
+              </Tr>
             )}
             <Tr>
               <Td colSpan={2}>
