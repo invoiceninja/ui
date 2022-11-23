@@ -19,6 +19,7 @@ import { Quote } from './quote';
 import { RecurringInvoice } from './recurring-invoice';
 import { Task } from './task';
 import { Vendor } from './vendor';
+import { PurchaseOrder } from './purchase-order';
 
 interface WithHashId {
   hashed_id: string;
@@ -44,6 +45,8 @@ export interface ActivityRecord {
   vendor_id: string;
   task_id: string;
   token_id: string;
+  vendor_contact_id: string;
+  purchase_order_id: string;
   notes: string;
   ip: string;
   client: Client & WithHashId;
@@ -57,4 +60,6 @@ export interface ActivityRecord {
   credit?: Credit & WithHashId;
   quote?: Quote & WithHashId;
   vendor?: Vendor & WithHashId;
+  vendor_contact?: Contact & WithHashId;
+  purchase_order?: PurchaseOrder & WithHashId;
 }
