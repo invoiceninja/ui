@@ -31,6 +31,7 @@ import { CustomField } from 'components/CustomField';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
+import { ValidationAlert } from 'components/ValidationAlert';
 import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -189,6 +190,8 @@ export function Create() {
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
       <Container>
+        {errors && <ValidationAlert errors={errors} />}
+
         <Card
           title={t('enter_payment')}
           onFormSubmit={(event) => {
