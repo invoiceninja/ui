@@ -18,6 +18,7 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { dataTableStaleTime } from './Invoices';
 
 export function Credits() {
   const [t] = useTranslation();
@@ -61,6 +62,7 @@ export function Credits() {
       withResourcefulActions
       bulkRoute="/api/v1/credits/bulk"
       linkToCreate={route('/credits/create?client=:id', { id: id })}
+      staleTime={dataTableStaleTime}
     />
   );
 }
