@@ -18,20 +18,27 @@ import { Settings } from 'components/layouts/Settings';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Tabs } from '../common/components/Tabs';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from '../create/components/Credentials';
 import { LimitsAndFees } from '../create/components/LimitsAndFees';
 import { RequiredFields } from '../create/components/RequiredFields';
 import { Settings as GatewaySettings } from '../create/components/Settings';
+import { usePaymentGatewayTabs } from '../create/hooks/usePaymentGatewayTabs';
 import { useHandleUpdate } from './hooks/useHandleUpdate';
 
 export function Edit() {
   const [t] = useTranslation();
+
   const navigate = useNavigate();
 
-  const { documentTitle } = useTitle('online_payments');
   const { id } = useParams();
+
+  const tabs = usePaymentGatewayTabs();
+
   const { data } = useCompanyGatewayQuery({ id });
+
+  const { documentTitle } = useTitle('online_payments');
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -74,6 +81,8 @@ export function Edit() {
       onSaveClick={onSave}
       onCancelClick={() => navigate('/settings/online_payments')}
     >
+      <Tabs tabs={tabs} />
+
       {companyGateway && (
         <Card title={t('edit_gateway')}>
           <Element leftSide={t('provider')}>{companyGateway.label}</Element>
