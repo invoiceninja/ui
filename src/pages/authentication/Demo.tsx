@@ -8,6 +8,38 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { apiEndpoint, endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useLogin } from './common/hooks';
+
+const demoEndpoint = import.meta.env.VITE_DEMO_ENDPOINT;
+const email = import.meta.env.VITE_DEMO_EMAIL;
+const password = import.meta.env.VITE_DEMO_PASSWORD;
+
 export function Demo() {
-  return <div>Login to demo account</div>;
+  const navigate = useNavigate();
+  const login = useLogin();
+
+  console.log(apiEndpoint(), demoEndpoint);
+
+  useEffect(() => {
+    if (apiEndpoint() !== demoEndpoint) {
+      return navigate('/login');
+    }
+
+    request('POST', endpoint('/api/v1/login'), {
+      email,
+      password,
+    })
+      .then((response) => login(response))
+      .catch((error) => {
+        console.error(error);
+
+        navigate('/login');
+      });
+  }, []);
+
+  return <div></div>;
 }
