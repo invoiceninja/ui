@@ -71,13 +71,7 @@ export function useGenerateActivityElement() {
         </Link>
       ),
       user: activity?.user ? (
-        <Link
-          to={route('/settings/users/:id/edit', {
-            id: activity.user?.hashed_id,
-          })}
-        >
-          {activity?.user?.first_name} {activity?.user?.last_name}
-        </Link>
+          `${activity?.user?.first_name} ${activity?.user?.last_name}`
       ) : (
         'System'
       ),
