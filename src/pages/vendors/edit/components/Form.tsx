@@ -17,6 +17,7 @@ import { VendorContact } from 'common/interfaces/vendor-contact';
 import { Divider } from 'components/cards/Divider';
 import { CountrySelector } from 'components/CountrySelector';
 import { CustomField } from 'components/CustomField';
+import Toggle from 'components/forms/Toggle';
 import { UserSelector } from 'components/users/UserSelector';
 import { set } from 'lodash';
 import { Field } from 'pages/settings/custom-fields/components';
@@ -40,7 +41,7 @@ export function Form(props: Props) {
 
   const handleContactChange = (
     property: keyof VendorContact,
-    value: string,
+    value: string | boolean,
     index: number
   ) => {
     const contacts = [...vendor.contacts];
@@ -66,7 +67,7 @@ export function Form(props: Props) {
         first_name: '',
         last_name: '',
         email: '',
-        send_email: true,
+        send_email: false,
         created_at: 0,
         updated_at: 0,
         archived_at: 0,
@@ -258,6 +259,16 @@ export function Form(props: Props) {
                   }
                 />
               </Element>
+
+              <Element leftSide={t('send_email')}>
+                <Toggle
+                  checked={contact.send_email}
+                  onChange={(value) =>
+                    handleContactChange('send_email', value, index)
+                  }
+                />
+              </Element>
+
 
               <Element>
                 <div className="flex justify-between items-center">
