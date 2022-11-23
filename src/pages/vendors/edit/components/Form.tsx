@@ -12,7 +12,8 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
-import { Vendor, Contact } from 'common/interfaces/vendor';
+import { Vendor } from 'common/interfaces/vendor';
+import { VendorContact } from 'common/interfaces/vendor-contact';
 import { Divider } from 'components/cards/Divider';
 import { CountrySelector } from 'components/CountrySelector';
 import { CustomField } from 'components/CustomField';
@@ -38,7 +39,7 @@ export function Form(props: Props) {
   };
 
   const handleContactChange = (
-    property: keyof Contact,
+    property: keyof VendorContact,
     value: string,
     index: number
   ) => {
@@ -61,19 +62,21 @@ export function Form(props: Props) {
     const contacts = [...vendor.contacts];
 
     contacts.push({
-      id: '',
-      first_name: '',
-      last_name: '',
-      email: '',
-      created_at: 0,
-      updated_at: 0,
-      archived_at: 0,
-      is_primary: false,
-      phone: '',
-      custom_value1: '',
-      custom_value2: '',
-      custom_value3: '',
-      custom_value4: '',
+        id: '',
+        first_name: '',
+        last_name: '',
+        email: '',
+        send_email: true,
+        created_at: 0,
+        updated_at: 0,
+        archived_at: 0,
+        is_primary: false,
+        phone: '',
+        custom_value1: '',
+        custom_value2: '',
+        custom_value3: '',
+        custom_value4: '',
+        link: ''
     });
 
     handleChange('contacts', contacts);
