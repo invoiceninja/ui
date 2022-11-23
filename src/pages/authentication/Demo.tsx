@@ -22,8 +22,6 @@ export function Demo() {
   const navigate = useNavigate();
   const login = useLogin();
 
-  console.log(apiEndpoint(), demoEndpoint);
-
   useEffect(() => {
     if (apiEndpoint() !== demoEndpoint) {
       return navigate('/login');
