@@ -14,7 +14,9 @@ import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
-import { Address, Defaults, Details, Documents, Logo } from './components';
+import { Tabs } from 'components/Tabs';
+import { Outlet } from 'react-router-dom';
+import { useCompanyDetailsTabs } from './common/hooks/useCompanyDetailsTabs';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
@@ -27,7 +29,10 @@ export function CompanyDetails() {
   ];
 
   const onSave = useHandleCompanySave();
+
   const onCancel = useDiscardChanges();
+
+  const tabs = useCompanyDetailsTabs();
 
   useInjectCompanyChanges();
 
@@ -39,11 +44,10 @@ export function CompanyDetails() {
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#company_details"
     >
-      <Details />
-      <Logo />
-      <Address />
-      <Defaults />
-      <Documents />
+      <Tabs tabs={tabs} className="mt-6" />
+      <div className="my-4">
+        <Outlet />
+      </div>
     </Settings>
   );
 }
