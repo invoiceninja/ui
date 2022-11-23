@@ -16,6 +16,8 @@ import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
+export const dataTableStaleTime = 50;
+
 export function Invoices() {
   const [t] = useTranslation();
   const { id } = useParams();
@@ -44,11 +46,12 @@ export function Invoices() {
   return (
     <DataTable
       resource="invoice"
-      endpoint={`/api/v1/invoices?client_id=${id}`}
+      endpoint={route('/api/v1/invoices?client_id=:id', { id })}
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/invoices/bulk"
       linkToCreate={route('/invoices/create?client=:id', { id: id })}
+      staleTime={dataTableStaleTime}
     />
   );
 }
