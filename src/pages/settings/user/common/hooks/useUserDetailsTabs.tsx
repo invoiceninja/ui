@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from 'common/helpers/route';
 import { Tab } from 'components/Tabs';
 import { useTranslation } from 'react-i18next';
 
