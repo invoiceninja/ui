@@ -25,6 +25,8 @@ import { useCompanyName } from 'common/hooks/useLogo';
 import { CompanyCreate } from 'pages/settings/company/create/CompanyCreate';
 import { CompanyEdit } from 'pages/settings/company/edit/CompanyEdit';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { isHosted, isSelfHosted } from 'common/helpers';
+import { freePlan } from 'common/guards/guards/free-plan';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -32,6 +34,8 @@ export function CompanySwitcher() {
   const user = useCurrentUser();
 
   const state = useSelector((state: RootState) => state.companyUsers);
+
+  const canUserAddCompany = isSelfHosted() || (isHosted() && !freePlan());
 
   const isCompanyEditAlreadyOpened = sessionStorage.getItem(
     'COMPANY-EDIT-OPENED'
@@ -46,6 +50,9 @@ export function CompanySwitcher() {
   const companyName = useCompanyName();
 
   const currentCompany = useCurrentCompany();
+
+  const [shouldShowAddCompany, setShouldShowAddCompany] =
+    useState<boolean>(false);
 
   const [isCompanyCreateModalOpened, setIsCompanyCreateModalOpened] =
     useState<boolean>(false);
@@ -72,6 +79,10 @@ export function CompanySwitcher() {
   };
 
   useEffect(() => {
+    if (state.api.length < 10) {
+      setShouldShowAddCompany(true);
+    }
+
     if (
       currentCompany &&
       !currentCompany?.settings?.name &&
@@ -141,15 +152,17 @@ export function CompanySwitcher() {
                 ))}
             </div>
             <div className="py-1">
-              <Menu.Item>
-                <DropdownElement
-                  className="flex items-center"
-                  onClick={() => setIsCompanyCreateModalOpened(true)}
-                >
-                  {<PlusCircle />}
-                  <span className="ml-2">{t('add_company')}</span>
-                </DropdownElement>
-              </Menu.Item>
+              {shouldShowAddCompany && canUserAddCompany && (
+                <Menu.Item>
+                  <DropdownElement
+                    className="flex items-center"
+                    onClick={() => setIsCompanyCreateModalOpened(true)}
+                  >
+                    {<PlusCircle />}
+                    <span className="ml-2">{t('add_company')}</span>
+                  </DropdownElement>
+                </Menu.Item>
+              )}
 
               <Menu.Item>
                 <DropdownElement to={route('/settings/account_management')}>

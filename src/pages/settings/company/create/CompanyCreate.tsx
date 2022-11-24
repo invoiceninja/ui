@@ -78,7 +78,7 @@ export function CompanyCreate(props: Props) {
 
         dispatch(updateCompanyUsers(companyUsers));
 
-        toast.success('created_company');
+        toast.success('created_new_company');
 
         props.setIsModalOpen(false);
 
