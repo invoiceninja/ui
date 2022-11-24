@@ -349,12 +349,12 @@ export function Reports() {
 
         toast.success();
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag | Blob>) => {
         console.error(error);
 
         if (error.response?.status === 422) {
           if (report.payload.send_email) {
-            setErrors(error.response.data);
+            setErrors(error.response.data as ValidationBag);
           }
 
           if (!report.payload.send_email) {
