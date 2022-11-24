@@ -16,7 +16,6 @@ import { endpoint } from 'common/helpers';
 import { NonClickableElement } from 'components/cards/NonClickableElement';
 import { Spinner } from 'components/Spinner';
 import { SystemLogRecord } from 'common/interfaces/system-log';
-import ReactJson from 'react-json-view';
 import { date as formatDate } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { Card, Element } from '@invoiceninja/cards';
@@ -121,7 +120,7 @@ export function SystemLog() {
       const logs = JSON.parse(src);
 
       if (logs && typeof logs === 'object') {
-        return <ReactJson src={JSON.parse(src)} collapsed={true} />;
+        // return <ReactJson src={JSON.parse(src)} collapsed={true} />;
       }
     } catch (e) {
       return src;
