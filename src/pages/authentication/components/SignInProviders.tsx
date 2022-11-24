@@ -19,7 +19,7 @@ import {
 } from 'common/stores/slices/company-users';
 import { setMsal } from 'common/stores/slices/user';
 import { authenticate } from 'common/stores/slices/user';
-import GoogleLogin from 'react-google-login';
+// import GoogleLogin from 'react-google-login';
 import { useDispatch } from 'react-redux';
 import MicrosoftLogin from 'react-microsoft-login';
 import { ReactNode } from 'react';
@@ -88,13 +88,14 @@ export function SignInProviders() {
     ).then((response) => login(response));
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
   const microsoftClientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
 
   return (
     <div className="grid grid-cols-3 text-sm mt-4">
       <div className="col-span-3 flex flex-col space-y-3">
-        <GoogleLogin
+        {/* <GoogleLogin
           clientId={googleClientId}
           buttonText="Sign in with Google"
           onSuccess={handleGoogle}
@@ -136,7 +137,7 @@ export function SignInProviders() {
               <p>Log in with Google</p>
             </SignInProviderButton>
           )}
-        />
+        /> */}
 
         <MicrosoftLogin
           clientId={microsoftClientId}
