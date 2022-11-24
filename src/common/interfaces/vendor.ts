@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { VendorContact } from './vendor-contact';
+
 export interface Vendor {
   id: string;
   user_id: string;
@@ -36,22 +38,6 @@ export interface Vendor {
   archived_at: number;
   created_at: number;
   number: string;
-  contacts: Contact[];
+  contacts: VendorContact[];
   documents: any[];
-}
-
-export interface Contact {
-  id: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  created_at: number;
-  updated_at: number;
-  archived_at: number;
-  is_primary: boolean;
-  phone: string;
-  custom_value1: string;
-  custom_value2: string;
-  custom_value3: string;
-  custom_value4: string;
 }
