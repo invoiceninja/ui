@@ -17,6 +17,7 @@ import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { BankAccountInput } from 'common/interfaces/bank-accounts';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useState, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -78,8 +79,9 @@ export function Create() {
         toast.success(t('created_bank_account'), { id: toastId });
         navigate(route('/settings/bank_accounts'));
       } catch (cachedError) {
-        const error = cachedError as AxiosError;
+        const error = cachedError as AxiosError<ValidationBag>;
         console.error(error);
+        
         if (error?.response?.status === 422) {
           setErrors(error?.response?.data?.errors);
           toast.dismiss();

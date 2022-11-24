@@ -20,6 +20,7 @@ import {
   BankAccountDetails,
   BankAccountInput,
 } from 'common/interfaces/bank-accounts';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -92,14 +93,16 @@ export function Edit() {
         toast.success(t('updated_bank_account'), { id: toastId });
         navigate(route('/settings/bank_accounts'));
       } catch (cachedError) {
-        const error = cachedError as AxiosError;
+        const error = cachedError as AxiosError<ValidationBag>;
         console.error(error);
+
         if (error?.response?.status === 422) {
           setErrors(error?.response?.data?.errors);
           toast.dismiss();
         } else {
           toast.error();
         }
+        
         setIsFormBusy(false);
       }
     }
