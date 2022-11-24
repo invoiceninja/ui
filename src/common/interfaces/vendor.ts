@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { VendorContact } from "./vendor-contact";
+import { VendorContact } from './vendor-contact';
 
 export interface Vendor {
   id: string;

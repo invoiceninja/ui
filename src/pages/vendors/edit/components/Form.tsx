@@ -63,21 +63,21 @@ export function Form(props: Props) {
     const contacts = [...vendor.contacts];
 
     contacts.push({
-        id: '',
-        first_name: '',
-        last_name: '',
-        email: '',
-        send_email: false,
-        created_at: 0,
-        updated_at: 0,
-        archived_at: 0,
-        is_primary: false,
-        phone: '',
-        custom_value1: '',
-        custom_value2: '',
-        custom_value3: '',
-        custom_value4: '',
-        link: ''
+      id: '',
+      first_name: '',
+      last_name: '',
+      email: '',
+      send_email: false,
+      created_at: 0,
+      updated_at: 0,
+      archived_at: 0,
+      is_primary: false,
+      phone: '',
+      custom_value1: '',
+      custom_value2: '',
+      custom_value3: '',
+      custom_value4: '',
+      link: '',
     });
 
     handleChange('contacts', contacts);
@@ -268,7 +268,6 @@ export function Form(props: Props) {
                   }
                 />
               </Element>
-
 
               <Element>
                 <div className="flex justify-between items-center">
