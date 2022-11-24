@@ -20,3 +20,4 @@ export { Vendors as VendorsGeneratedNumbers } from './vendors/Vendors';
 export { PurchaseOrders as PurchaseOrdersGeneratedNumbers } from './purchase-orders/PurchaseOrders';
 export { Expenses as ExpensesGeneratedNumbers } from './expenses/Expenses';
 export { RecurringExpenses as RecurringExpensesGeneratedNumbers } from './recurring-expenses/RecurringExpenses';
+export { Settings as GeneratedNumbersSettings } from './components/Settings';

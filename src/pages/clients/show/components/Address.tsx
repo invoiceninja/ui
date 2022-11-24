@@ -40,7 +40,7 @@ export function Address() {
                   {client.data.data.state}
                 </p>
 
-                <p>{resolveCountry(client.data.data.country_id)?.full_name}</p>
+                <p>{resolveCountry(client.data.data.country_id)?.name}</p>
               </>
             }
             className="h-full"

@@ -44,6 +44,7 @@ interface Props {
   resourceType: MailerResourceType;
   list: Record<string, string>;
   defaultEmail: string;
+  redirectUrl: string;
 }
 
 export function Mailer(props: Props) {
@@ -110,7 +111,8 @@ export function Mailer(props: Props) {
               props.resourceType,
               props.resource?.id || '',
               subject,
-              templateId
+              templateId,
+              props.redirectUrl
             )
           }
         >

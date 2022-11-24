@@ -62,6 +62,7 @@ interface Props {
   rightSide?: ReactNode;
   withoutPadding?: boolean;
   leftSideChevrons?: ReactNode;
+  staleTime?: number;
 }
 
 export const datatablePerPageAtom = atomWithStorage('perPage', '10');
@@ -99,7 +100,7 @@ export function DataTable(props: Props) {
     [apiEndpoint.pathname, perPage, currentPage, filter, sort, status],
     () => request('GET', apiEndpoint.href),
     {
-      staleTime: 5000,
+      staleTime: props.staleTime || 5000,
     }
   );
 

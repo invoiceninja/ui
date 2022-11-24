@@ -340,7 +340,7 @@ export function useClientColumns() {
         <Link to={value.toString()} external>
           <Inline>
             <span>{value}</span>
-            <ExternalLink size={14} />
+            {value.toString().length > 0 && <ExternalLink size={14} />}
           </Inline>
         </Link>
       ),

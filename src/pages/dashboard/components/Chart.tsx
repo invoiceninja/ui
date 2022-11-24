@@ -40,126 +40,111 @@ type Props = {
 };
 
 export function Chart(props: Props) {
-  const [t] = useTranslation();
-  const [chartData, setchartData] = useState<unknown[]>([]);
-
+  const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const [chartData, setChartData] = useState<unknown[]>([]);
+
+  const generateDateRange = (start: Date, end: Date, range: 1 | 7 | 30) => {
+    const date = new Date(start.getTime());
+
+    const dates = [];
+
+    while (date <= end) {
+      dates.push(new Date(date));
+      date.setDate(date.getDate() + range);
+    }
+
+    return dates;
+  };
+
   useEffect(() => {
-    const completeChartData: {
-      name: string;
+    const data: {
+      date: string;
       invoices: number;
       expenses: number;
       payments: number;
     }[] = [];
 
-    switch (props.chartSensitivity) {
-      case 'day': {
-        for (
-          let date = new Date(props.dates.start_date);
-          date < new Date(props.dates.end_date);
-          date.setDate(date.getDate() + 1)
-        ) {
-          completeChartData.push({
-            name: formatDate(date.toString(), dateFormat),
-            invoices: 0,
-            expenses: 0,
-            payments: 0,
-          });
-        }
-        break;
-      }
-      case 'week': {
-        for (
-          let date = new Date(props.dates.start_date);
-          date < new Date(props.dates.end_date);
-          date.setDate(date.getDate() + 7)
-        ) {
-          completeChartData.push({
-            name: formatDate(date.toString(), dateFormat),
-            invoices: 0,
-            expenses: 0,
-            payments: 0,
-          });
-        }
-        break;
-      }
-      case 'month': {
-        for (
-          let date = new Date(props.dates.start_date);
-          date < new Date(props.dates.end_date);
-          date.setDate(date.getDate() + 30)
-        ) {
-          completeChartData.push({
-            name: formatDate(date.toString(), dateFormat),
-            invoices: 0,
-            expenses: 0,
-            payments: 0,
-          });
-        }
-        break;
-      }
+    if (props.chartSensitivity === 'day') {
+      const dates = generateDateRange(
+        new Date(props.dates.start_date),
+        new Date(props.dates.end_date),
+        1
+      );
+
+      dates.map((date) => {
+        data.push({
+          date: formatDate(date.toString(), dateFormat),
+          invoices: 0,
+          expenses: 0,
+          payments: 0,
+        });
+      });
     }
 
-    props.data?.expenses.forEach((item) => {
-      let itemAdded = false;
-      completeChartData.forEach((element) => {
-        if (element.name === item.date) {
-          element.expenses = parseFloat(item.total);
-          itemAdded = true;
-        }
-      });
-      if (!itemAdded) {
-        completeChartData.push({
-          name: item.date,
+    if (props.chartSensitivity === 'week') {
+      const dates = generateDateRange(
+        new Date(props.dates.start_date),
+        new Date(props.dates.end_date),
+        7
+      );
+
+      dates.map((date) => {
+        data.push({
+          date: formatDate(date.toString(), dateFormat),
           invoices: 0,
-          expenses: parseFloat(item.total),
-          payments: 0,
-        });
-      }
-    });
-    props.data?.payments.forEach((item) => {
-      let itemAdded = false;
-
-      completeChartData.forEach((element) => {
-        if (element.name === item.date) {
-          element.payments = parseFloat(item.total);
-          itemAdded = true;
-        }
-      });
-
-      if (!itemAdded) {
-        completeChartData.push({
-          name: item.date,
-          invoices: 0,
-          expenses: 0,
-          payments: parseFloat(item.total),
-        });
-      }
-    });
-    props.data?.invoices.forEach((item) => {
-      let itemAdded = false;
-
-      completeChartData.forEach((element) => {
-        if (element.name === item.date) {
-          element.invoices = parseFloat(item.total);
-          itemAdded = true;
-        }
-      });
-      if (!itemAdded) {
-        completeChartData.push({
-          name: item.date,
-          invoices: parseFloat(item.total),
           expenses: 0,
           payments: 0,
         });
+      });
+    }
+
+    if (props.chartSensitivity === 'month') {
+      const dates = generateDateRange(
+        new Date(props.dates.start_date),
+        new Date(props.dates.end_date),
+        30
+      );
+
+      dates.map((date) => {
+        data.push({
+          date: formatDate(date.toString(), dateFormat),
+          invoices: 0,
+          expenses: 0,
+          payments: 0,
+        });
+      });
+    }
+
+    props.data?.invoices.forEach((invoice) => {
+      const date = formatDate(invoice.date, dateFormat);
+      const record = data.findIndex((entry) => entry.date === date);
+
+      if (record >= 0) {
+        data[record].invoices += parseFloat(invoice.total);
       }
     });
 
-    completeChartData.sort((a, b) => {
-      return a.name < b.name ? -1 : a.name > b.name ? 1 : 0;
+    props.data?.expenses.forEach((expense) => {
+      const date = formatDate(expense.date, dateFormat);
+      const record = data.findIndex((entry) => entry.date === date);
+
+      if (record >= 0) {
+        data[record].expenses += parseFloat(expense.total);
+      }
     });
-    setchartData(completeChartData);
+
+    props.data?.payments.forEach((payment) => {
+      const date = formatDate(payment.date, dateFormat);
+      const record = data.findIndex((entry) => entry.date === date);
+
+      if (record >= 0) {
+        data[record].payments += parseFloat(payment.total);
+      }
+    });
+
+    setChartData(data);
   }, [props]);
 
   return (
@@ -183,7 +168,7 @@ export function Chart(props: Props) {
         <CartesianGrid strokeDasharray="3 3" />
         <Tooltip />
 
-        <XAxis height={50} dataKey="name" />
+        <XAxis height={50} dataKey="date" />
         <YAxis />
         <Area
           name={t('invoices')}
@@ -195,14 +180,14 @@ export function Chart(props: Props) {
         <Area
           name={t('payments')}
           dataKey="payments"
-          stroke={TotalColors.Red}
+          stroke={TotalColors.Green}
           fill="url(#payments)"
           fillOpacity={1}
         />
         <Area
           name={t('expenses')}
           dataKey="expenses"
-          stroke={TotalColors.Green}
+          stroke={TotalColors.Red}
           fill="url(#expenses)"
           fillOpacity={1}
         />

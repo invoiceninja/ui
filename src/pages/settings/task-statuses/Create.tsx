@@ -16,6 +16,7 @@ import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
+import { ColorPicker } from 'components/forms/ColorPicker';
 import { Settings } from 'components/layouts/Settings';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
@@ -98,7 +99,9 @@ export function Create() {
             />
 
             <InputLabel>{t('color')}</InputLabel>
-            <input type="color" id="color" onChange={formik.handleChange} />
+            <ColorPicker
+              onValueChange={(color) => formik.setFieldValue('color', color)}
+            />
           </CardContainer>
         </Card>
       </Container>

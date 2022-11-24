@@ -10,7 +10,7 @@
 
 export * from './Settings';
 export * from './company/CompanyDetails';
-export * from './user/UserDetails';
+export * from './user';
 export * from './localization/Localization';
 export * from './online-payments/OnlinePayments';
 export * from './tax-settings/TaxSettings';
@@ -27,6 +27,8 @@ export * from './generated-numbers';
 export * from './email-settings/EmailSettings';
 export * from './client-portal/ClientPortal';
 export * from './templates-and-reminders/TemplatesAndReminders';
+export * from './bank-accounts';
+
 export * from './group-settings/GroupSettings';
 export * from './subscriptions/Subscriptions';
 export * from './users';

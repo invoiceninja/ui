@@ -21,7 +21,7 @@ import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
 import { useFormik } from 'formik';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -29,15 +29,20 @@ import { useParams } from 'react-router-dom';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import Toggle from 'components/forms/Toggle';
 
 export function Edit() {
   const { id } = useParams();
+
   const { data: product } = useProductQuery({ id });
 
   const queryClient = useQueryClient();
 
   const [t] = useTranslation();
+
   const [errors, setErrors] = useState<ValidationBag>();
+
+  const [stockNotification, setStockNotification] = useState(false);
 
   const company = useCurrentCompany();
 
@@ -48,6 +53,9 @@ export function Edit() {
       notes: product?.data.data.notes || '',
       cost: product?.data.data.cost || 0,
       quantity: product?.data.data.quantity || 1,
+      in_stock_quantity: product?.data.data?.in_stock_quantity || 0,
+      stock_notification_threshold:
+        product?.data.data?.stock_notification_threshold || 0,
       tax_name1: product?.data.data.tax_name1 || '',
       tax_rate1: product?.data.data.tax_rate1 || 0,
       tax_name2: product?.data.data.tax_name2 || '',
@@ -60,7 +68,10 @@ export function Edit() {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
 
-      request('PUT', endpoint('/api/v1/products/:id', { id }), values)
+      request('PUT', endpoint('/api/v1/products/:id', { id }), {
+        ...values,
+        stock_notification: stockNotification,
+      })
         .then(() => toast.success(t('updated_product'), { id: toastId }))
         .catch((error: AxiosError) => {
           console.error(error);
@@ -96,6 +107,10 @@ export function Edit() {
         queryClient.invalidateQueries(route('/api/v1/products/:id', { id }))
       );
   };
+
+  useEffect(() => {
+    setStockNotification(product?.data?.data?.stock_notification);
+  }, [product]);
 
   return (
     <>
@@ -158,6 +173,33 @@ export function Edit() {
                 errorMessage={errors?.errors.quantity}
               />
             </Element>
+          )}
+
+          {company?.track_inventory && (
+            <>
+              <Element leftSide={t('stock_quantity')}>
+                <InputField
+                  id="in_stock_quantity"
+                  value={formik.initialValues.in_stock_quantity}
+                  onChange={formik.handleChange}
+                  errorMessage={errors?.errors?.in_stock_quantity}
+                />
+              </Element>
+              <Element leftSide={t('stock_notifications')}>
+                <Toggle
+                  checked={stockNotification}
+                  onChange={setStockNotification}
+                />
+              </Element>
+              <Element leftSide={t('notification_threshold')}>
+                <InputField
+                  id="stock_notification_threshold"
+                  value={formik.initialValues.stock_notification_threshold}
+                  onChange={formik.handleChange}
+                  errorMessage={errors?.errors?.stock_notification_threshold}
+                />
+              </Element>
+            </>
           )}
 
           {company && company.enabled_item_tax_rates > 0 && (

@@ -36,6 +36,7 @@ const numberInputs = [
   'quantity',
   'rate',
   'hours',
+  'tax_amount',
 ];
 
 const taxInputs = ['tax_rate1', 'tax_rate2', 'tax_rate3'];

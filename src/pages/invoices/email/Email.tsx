@@ -48,6 +48,7 @@ export function Email() {
           resourceType="invoice"
           list={list}
           defaultEmail="email_template_invoice"
+          redirectUrl="/invoices"
         />
       )}
     </Default>

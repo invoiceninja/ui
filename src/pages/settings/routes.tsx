@@ -17,11 +17,28 @@ import * as Settings from './index';
 export const settingsRoutes = (
   <Route path="/settings">
     <Route path="" element={<Settings.Settings />} />
-    <Route path="company_details">
-      <Route path="" element={<Settings.CompanyDetails />} />
+    <Route path="company_details" element={<Settings.CompanyDetails />}>
+      <Route path="" element={<Settings.Details />} />
+      <Route path="address" element={<Settings.Address />} />
+      <Route path="logo" element={<Settings.Logo />} />
+      <Route path="defaults" element={<Settings.Defaults />} />
       <Route path="documents" element={<Settings.CompanyDocuments />} />
+      <Route
+        path="custom_fields"
+        element={<Settings.CompanyDetailsCustomFields />}
+      />
     </Route>
-    <Route path="user_details" element={<Settings.UserDetails />} />
+    <Route path="user_details" element={<Settings.UserDetails />}>
+      <Route path="" element={<Settings.UserDetailsComponent />} />
+      <Route path="password" element={<Settings.Password />} />
+      <Route path="connect" element={<Settings.Connect />} />
+      <Route path="accent_color" element={<Settings.AccentColor />} />
+      <Route path="notifications" element={<Settings.Notifications />} />
+      <Route
+        path="enable_two_factor"
+        element={<Settings.TwoFactorAuthentication />}
+      />
+    </Route>
     <Route path="localization" element={<Settings.Localization />} />
     <Route path="online_payments" element={<Settings.OnlinePayments />} />
     <Route path="tax_settings" element={<Settings.TaxSettings />} />
@@ -54,8 +71,8 @@ export const settingsRoutes = (
       <Route path="expenses" element={<Settings.ExpensesCustomFields />} />
       <Route path="users" element={<Settings.UsersCustomFields />} />
     </Route>
-    <Route path="generated_numbers">
-      <Route path="" element={<Settings.GeneratedNumbers />} />
+    <Route path="generated_numbers" element={<Settings.GeneratedNumbers />}>
+      <Route path="" element={<Settings.GeneratedNumbersSettings />} />
       <Route path="clients" element={<Settings.ClientsGeneratedNumbers />} />
       <Route path="invoices" element={<Settings.InvoicesGeneratedNumbers />} />
       <Route
@@ -105,6 +122,44 @@ export const settingsRoutes = (
         />
       }
     />
+    <Route path="bank_accounts">
+      <Route
+        path=""
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.BankAccounts />}
+          />
+        }
+      />
+      <Route
+        path=":id/details"
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.BankAccount />}
+          />
+        }
+      />
+      <Route
+        path="create"
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.CreateBankAccount />}
+          />
+        }
+      />
+      <Route
+        path=":id/edit"
+        element={
+          <Guard
+            guards={[() => enterprisePlan()]}
+            component={<Settings.EditBankAccount />}
+          />
+        }
+      />
+    </Route>
     <Route path="group_settings" element={<Settings.GroupSettings />} />
     <Route path="subscriptions" element={<Settings.Subscriptions />} />
     <Route path="users">

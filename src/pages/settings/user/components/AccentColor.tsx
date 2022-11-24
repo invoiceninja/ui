@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { updateChanges } from 'common/stores/slices/user';
 import { RootState } from '../../../../common/stores/store';
 import colors from 'common/constants/colors';
-import { DebounceInput } from 'react-debounce-input';
+import { ColorPicker } from 'components/forms/ColorPicker';
 
 export function AccentColor() {
   const [t] = useTranslation();
@@ -23,18 +23,17 @@ export function AccentColor() {
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
   return (
-    <Card>
+    <Card title={t('accent_color')}>
       <Element leftSide={t('accent_color')}>
-        <DebounceInput
+        <ColorPicker
           value={
             userChanges?.company_user?.settings?.accent_color || colors.primary
           }
-          type="color"
-          onChange={(event) =>
+          onValueChange={(color) =>
             dispatch(
               updateChanges({
                 property: 'company_user.settings.accent_color',
-                value: event.target.value,
+                value: color,
               })
             )
           }

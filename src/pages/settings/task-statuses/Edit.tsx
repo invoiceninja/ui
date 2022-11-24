@@ -18,6 +18,7 @@ import { useTaskStatusQuery } from 'common/queries/task-statuses';
 import { Badge } from 'components/Badge';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
+import { ColorPicker } from 'components/forms/ColorPicker';
 import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
 import { useFormik } from 'formik';
@@ -131,11 +132,10 @@ export function Edit() {
               />
 
               <InputLabel>{t('color')}</InputLabel>
-              <input
-                type="color"
-                id="color"
-                onChange={formik.handleChange}
+
+              <ColorPicker
                 value={formik.values.color}
+                onValueChange={(color) => formik.setFieldValue('color', color)}
               />
             </CardContainer>
           </Card>

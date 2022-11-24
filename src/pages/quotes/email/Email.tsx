@@ -45,6 +45,7 @@ export function Email() {
           resourceType="quote"
           list={list}
           defaultEmail="email_template_quote"
+          redirectUrl="/quotes"
         />
       )}
     </Default>

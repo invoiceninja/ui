@@ -49,6 +49,7 @@ export function Email() {
           resourceType="purchase_order"
           list={list}
           defaultEmail="email_template_purchase_order"
+          redirectUrl="/purchase_orders"
         />
       )}
     </Default>

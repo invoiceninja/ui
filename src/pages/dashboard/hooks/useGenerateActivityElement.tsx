@@ -70,17 +70,9 @@ export function useGenerateActivityElement() {
           {activity.quote?.number}
         </Link>
       ),
-      user: activity?.user ? (
-        <Link
-          to={route('/settings/users/:id/edit', {
-            id: activity.user?.hashed_id,
-          })}
-        >
-          {activity?.user?.first_name} {activity?.user?.last_name}
-        </Link>
-      ) : (
-        'System'
-      ),
+      user: activity?.user
+        ? `${activity?.user?.first_name} ${activity?.user?.last_name}`
+        : 'System',
       expense: (
         <Link
           to={route('/expenses/:id/edit', { id: activity.expense?.hashed_id })}
@@ -152,12 +144,12 @@ export function useGenerateActivityElement() {
   };
 
   return (activity: ActivityRecord) => (
-    <NonClickableElement>
-      {generate(activity)}
+    <NonClickableElement padding="small" className="space-x-1">
+      <span className="text-gray-500 text-xs italic">
+        {date(activity.created_at, dateFormat)} &#183;
+      </span>
 
-      <p className="text-gray-500 text-xs">
-        {date(activity.created_at, dateFormat)} &#183; {activity.ip}
-      </p>
+      <span>{generate(activity)}</span>
     </NonClickableElement>
   );
 }

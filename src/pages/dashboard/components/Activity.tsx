@@ -30,7 +30,12 @@ export function Activity() {
   const activityElement = useGenerateActivityElement();
 
   return (
-    <Card title={t('activity')} className="h-96" withScrollableBody>
+    <Card
+      title={t('activity')}
+      className="h-96"
+      padding="small"
+      withScrollableBody
+    >
       {isLoading && (
         <NonClickableElement>
           <Spinner />
