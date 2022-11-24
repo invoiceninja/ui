@@ -26,8 +26,8 @@ import { route } from 'common/helpers/route';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import Board from '@asseinfo/react-kanban';
-import '@asseinfo/react-kanban/dist/styles.css';
+// import Board from '@asseinfo/react-kanban';
+// import '@asseinfo/react-kanban/dist/styles.css';
 
 interface Card {
   id: string;
@@ -59,6 +59,7 @@ export function Kanban() {
   const { data: taskStatuses } = useTaskStatusesQuery();
   const { data: tasks } = useTasksQuery({ limit: 1000 });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [board, setBoard] = useState<Board>();
 
   useEffect(() => {
@@ -126,13 +127,13 @@ export function Kanban() {
         </Link>
       }
     >
-      {board && (
+      {/* {board && (
         <Board
           initialBoard={board}
           onCardDragEnd={handleDragging}
           disableColumnDrag
         />
-      )}
+      )} */}
     </Default>
   );
 }
