@@ -116,7 +116,7 @@ export function Edit() {
 
         navigate(route('/clients/:id', { id }));
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         if (error.response?.status === 422) {
