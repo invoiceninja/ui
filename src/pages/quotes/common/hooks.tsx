@@ -184,7 +184,7 @@ export function useCreate(props: CreateProps) {
 
         navigate(route('/quotes/:id/edit', { id: response.data.data.id }));
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         error.response?.status === 422
@@ -225,7 +225,7 @@ export function useSave(props: CreateProps) {
           route('/api/v1/quotes/:id', { id: quote.id })
         );
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         error.response?.status === 422
