@@ -73,7 +73,7 @@ export function Edit() {
         stock_notification: stockNotification,
       })
         .then(() => toast.success(t('updated_product'), { id: toastId }))
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           console.error(error);
 
           toast.error(t('error_title'), { id: toastId });
