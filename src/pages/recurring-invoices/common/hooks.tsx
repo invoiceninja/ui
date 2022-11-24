@@ -197,7 +197,7 @@ export function useSave(props: RecurringInvoiceSaveProps) {
 
         toast.success('updated_recurring_invoice');
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         error.response?.status === 422
@@ -378,7 +378,7 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
           })
         );
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         error.response?.status === 422
