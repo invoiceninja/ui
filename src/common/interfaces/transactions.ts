@@ -58,4 +58,5 @@ export interface TransactionDetails {
   amount?: number;
   date?: string;
   currency_id?: string;
+  base_type?: string;
 }

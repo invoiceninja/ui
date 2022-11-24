@@ -12,6 +12,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { Invoice } from 'common/interfaces/invoice';
 import { TransactionResponse } from 'common/interfaces/transactions';
 import { useQuery } from 'react-query';
 
@@ -26,5 +27,14 @@ export function useTransactionQuery(params: { id: string | undefined }) {
         (response: GenericSingleResourceResponse<TransactionResponse>) =>
           response?.data?.data
       )
+  );
+}
+
+export function useInvoicesQuery() {
+  return useQuery<Invoice[]>(route('/api/v1/invoices'), () =>
+    request('GET', endpoint('/api/v1/invoices')).then(
+      (response: GenericSingleResourceResponse<Invoice[]>) =>
+        response?.data?.data
+    )
   );
 }
