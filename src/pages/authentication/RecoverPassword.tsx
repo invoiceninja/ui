@@ -78,9 +78,9 @@ export function RecoverPassword() {
               onChange={form.handleChange}
             />
 
-            {errors?.email && (
+            {errors?.errors?.email && (
               <Alert className="mt-2" type="danger">
-                {errors.email}
+                {errors.errors?.email}
               </Alert>
             )}
 
