@@ -21,5 +21,7 @@ export interface RegisterValidation {
 }
 
 export interface ForgotPasswordValidation {
-  email?: string[];
+  errors?: {
+    email: string[];
+  };
 }

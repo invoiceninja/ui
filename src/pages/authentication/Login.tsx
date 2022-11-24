@@ -35,6 +35,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { CompanyUser } from 'common/interfaces/company-user';
 import { request } from 'common/helpers/request';
 import { SignInProviders } from './components/SignInProviders';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 export function Login() {
   useTitle('login');
@@ -84,7 +85,7 @@ export function Login() {
           dispatch(updateCompanyUsers(response.data.data));
           dispatch(changeCurrentIndex(currentIndex));
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           return error.response?.status === 422
             ? setErrors(error.response.data.errors)
             : setMessage(
