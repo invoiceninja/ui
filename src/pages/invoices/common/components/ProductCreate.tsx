@@ -25,6 +25,7 @@ import { Product } from 'common/interfaces/product';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { request } from 'common/helpers/request';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 interface Props {
   isModalOpen: boolean;
@@ -78,7 +79,7 @@ export function ProductCreate(props: Props) {
 
           props.onProductCreated && props.onProductCreated(response.data.data);
         })
-        .catch((error: AxiosError) =>
+        .catch((error: AxiosError<ValidationBag>) =>
           error.response?.status === 422
             ? setErrors(error.response.data.errors)
             : toast.error(t('error_title'))

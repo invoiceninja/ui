@@ -33,7 +33,7 @@ export function useHandleCreate(
 
         navigate(route('/invoices/:id/edit', { id: response.data.data.id }));
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         error.response?.status === 422

@@ -101,7 +101,7 @@ export function ClientCreate(props: Props) {
           })
         );
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         if (error.response?.status === 422) {
