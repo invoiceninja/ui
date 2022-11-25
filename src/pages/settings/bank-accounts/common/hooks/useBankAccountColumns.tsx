@@ -26,7 +26,7 @@ export const useBankAccountColumns = () => {
   const columns: DataTableColumns<BankAccount> = [
     {
       id: 'bank_account_name',
-      label: t('bank_account_name'),
+      label: t('name'),
       format: (field, resource) => (
         <Link
           to={route('/settings/bank_accounts/:id/details', {
@@ -37,7 +37,7 @@ export const useBankAccountColumns = () => {
         </Link>
       ),
     },
-    { id: 'bank_account_type', label: t('bank_account_type') },
+    { id: 'bank_account_type', label: t('type') },
     {
       id: 'balance',
       label: t('balance'),
