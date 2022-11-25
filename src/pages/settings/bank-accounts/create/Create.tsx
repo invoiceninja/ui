@@ -19,6 +19,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { BankAccountInput } from 'common/interfaces/bank-accounts';
 import { useState, FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { Settings } from '../../../../components/layouts/Settings';
 
@@ -32,6 +33,8 @@ export function Create() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -54,9 +57,13 @@ export function Create() {
     setBankAccount((prevState) => ({ ...prevState, [property]: value }));
   };
 
+  const invalidateCache = () => {
+    queryClient.invalidateQueries(route('/api/v1/bank_integrations'));
+  };
+
   const handleCancel = () => {
     if (!isFormBusy) {
-      navigate(route('/settings/bank_accounts'));
+      navigate(route('/settings/bank_accounts/'));
     }
   };
 
@@ -64,7 +71,7 @@ export function Create() {
     if (!isFormBusy) {
       event?.preventDefault();
 
-      const toastId = toast.processing();
+      toast.processing();
       setErrors(undefined);
       setIsFormBusy(true);
 
@@ -74,8 +81,9 @@ export function Create() {
           endpoint('/api/v1/bank_integrations'),
           bankAccount
         );
+        invalidateCache();
         setIsFormBusy(false);
-        toast.success(t('created_bank_account'), { id: toastId });
+        toast.success(t('created_bank_account'));
         navigate(route('/settings/bank_accounts'));
       } catch (cachedError) {
         const error = cachedError as AxiosError;

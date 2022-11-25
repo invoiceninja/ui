@@ -196,6 +196,10 @@ export function Create() {
               clearButton
               onClearButtonClick={() => handleChange('bank_integration_id', '')}
               errorMessage={errors?.bank_integration_id}
+              actionLabel={t('new_bank_account')}
+              onActionClick={() =>
+                navigate(route('/settings/bank_accounts/create'))
+              }
             />
           </Element>
           <Element required leftSide={t('description')}>

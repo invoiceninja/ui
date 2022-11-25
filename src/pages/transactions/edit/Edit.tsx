@@ -223,6 +223,10 @@ export function Edit() {
               onClearButtonClick={() => handleChange('bank_integration_id', '')}
               queryAdditional
               errorMessage={errors?.bank_integration_id}
+              actionLabel={t('new_bank_account')}
+              onActionClick={() =>
+                navigate(route('/settings/bank_accounts/create'))
+              }
             />
           </Element>
           <Element required leftSide={t('description')}>
