@@ -41,7 +41,7 @@ export function Vendor() {
 
   const pages: Page[] = [
     { name: t('vendors'), href: '/vendors' },
-    { name: documentTitle, href: route('/vendors/:id', { id }) },
+    { name: documentTitle || '', href: route('/vendors/:id', { id }) },
   ];
 
   const tabs: Tab[] = [

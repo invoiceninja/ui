@@ -100,8 +100,10 @@ export function Create() {
             ? ApiTransactionType.Credit
             : ApiTransactionType.Debit,
       });
-      toast.success(t('created_transaction'));
+      toast.success('created_transaction');
+
       setIsSaving(false);
+
       navigate(route('/transactions'));
     } catch (error) {
       setIsSaving(false);
@@ -114,7 +116,7 @@ export function Create() {
         setErrors(axiosError?.response?.data);
         toast.dismiss();
       } else {
-        toast.error(t('error_title'));
+        toast.error();
       }
     }
   };

@@ -79,7 +79,6 @@ export function Edit() {
     if (!isFormBusy) {
       event?.preventDefault();
 
-      const toastId = toast.processing();
       setErrors(undefined);
       setIsFormBusy(true);
 
@@ -89,8 +88,11 @@ export function Edit() {
           endpoint('/api/v1/bank_integrations/:id', { id }),
           accountDetails
         );
+        
         setIsFormBusy(false);
-        toast.success(t('updated_bank_account'), { id: toastId });
+        
+        toast.success('updated_bank_account');
+
         navigate(route('/settings/bank_accounts'));
       } catch (cachedError) {
         const error = cachedError as AxiosError<ValidationBag>;

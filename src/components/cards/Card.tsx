@@ -18,12 +18,12 @@ import { Element } from 'components/cards/Element';
 
 interface Props {
   children: ReactNode;
-  title?: string;
+  title?: string | null;
   description?: string;
   withSaveButton?: boolean;
   onFormSubmit?: (event: React.FormEvent<HTMLFormElement>) => any;
   onSaveClick?: any;
-  saveButtonLabel?: string;
+  saveButtonLabel?: string | null;
   disableSubmitButton?: boolean;
   className?: string;
   withContainer?: boolean;

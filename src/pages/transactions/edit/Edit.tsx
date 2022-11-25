@@ -131,8 +131,10 @@ export function Edit() {
             : ApiTransactionType.Debit,
       });
 
-      toast.success(t('updated_transaction'));
+      toast.success('updated_transaction');
+
       setIsSaving(false);
+
       navigate(route('/transactions'));
     } catch (error) {
       const axiosError = error as AxiosError<
@@ -145,7 +147,7 @@ export function Edit() {
         setErrors(axiosError?.response?.data);
         toast.dismiss();
       } else {
-        toast.error(t('error_title'));
+        toast.error();
       }
     }
   };

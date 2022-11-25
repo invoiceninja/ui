@@ -16,7 +16,7 @@ import { DropdownElement } from './DropdownElement';
 import { useClickAway } from 'react-use';
 
 interface Props extends CommonProps {
-  label?: string;
+  label?: string | null;
 }
 
 export function Dropdown(props: Props) {

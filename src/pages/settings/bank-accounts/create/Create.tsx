@@ -65,7 +65,6 @@ export function Create() {
     if (!isFormBusy) {
       event?.preventDefault();
 
-      const toastId = toast.processing();
       setErrors(undefined);
       setIsFormBusy(true);
 
@@ -76,12 +75,14 @@ export function Create() {
           bankAccount
         );
         setIsFormBusy(false);
-        toast.success(t('created_bank_account'), { id: toastId });
+
+        toast.success('created_bank_account');
+
         navigate(route('/settings/bank_accounts'));
       } catch (cachedError) {
         const error = cachedError as AxiosError<ValidationBag>;
         console.error(error);
-        
+
         if (error?.response?.status === 422) {
           setErrors(error?.response?.data?.errors);
           toast.dismiss();

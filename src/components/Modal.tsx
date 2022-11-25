@@ -17,7 +17,7 @@ interface Props {
   visible: boolean;
   onClose: (status: boolean) => any;
   title: string;
-  text?: string;
+  text?: string | null;
   children?: ReactNode;
   centerContent?: boolean;
   size?: 'small' | 'regular' | 'large';

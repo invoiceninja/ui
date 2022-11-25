@@ -231,8 +231,8 @@ export function useToggleStartStop() {
 
         toast.success(
           action === 'start'
-            ? t('started_recurring_invoice')
-            : t('stopped_recurring_invoice')
+            ? 'started_recurring_invoice'
+            : 'stopped_recurring_invoice'
         );
       })
       .catch((error) => {

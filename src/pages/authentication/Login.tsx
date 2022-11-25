@@ -41,7 +41,7 @@ export function Login() {
   useTitle('login');
 
   const dispatch = useDispatch();
-  const [message, setMessage] = useState<string | undefined>(undefined);
+  const [message, setMessage] = useState<string | null>(null);
   const [errors, setErrors] = useState<LoginValidation | undefined>(undefined);
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [t] = useTranslation();
@@ -53,7 +53,7 @@ export function Login() {
       one_time_password: '',
     },
     onSubmit: (values: LoginForm) => {
-      setMessage(undefined);
+      setMessage(null);
       setErrors(undefined);
       setIsFormBusy(true);
 

@@ -134,7 +134,7 @@ export function ProductCreate(props: Props) {
 
       {company && company.enabled_item_tax_rates > 0 && (
         <TaxRateSelector
-          inputLabel={t('tax')}
+          inputLabel={t('tax') ?? ''}
           onChange={(value) => {
             formik.setFieldValue('tax_rate1', value.resource?.rate);
             formik.setFieldValue('tax_name1', value.resource?.name);
