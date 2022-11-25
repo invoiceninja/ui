@@ -80,6 +80,8 @@ export function Create() {
     setTransaction((prevState) => ({ ...prevState, [property]: value }));
   };
 
+  console.log('fix bug');
+
   const onSave = async (event: FormEvent<HTMLFormElement>) => {
     event?.preventDefault();
 
