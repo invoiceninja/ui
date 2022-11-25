@@ -37,7 +37,7 @@ import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { ApiTransactionType, TransactionType } from 'common/enums/transactions';
 
 export function Edit() {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
 
   const navigate = useNavigate();
 
@@ -47,7 +47,7 @@ export function Edit() {
 
   const resolveCurrency = useResolveCurrency();
 
-  const { documentTitle } = useTitle('edit_transaction');
+  const { documentTitle } = useTitle(t('edit_transaction'));
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
@@ -131,7 +131,7 @@ export function Edit() {
 
       toast.success(t('updated_transaction'));
       setIsSaving(false);
-      navigate(route('/transactions'));
+      navigate('/transactions');
     } catch (error) {
       const axiosError = error as AxiosError;
 
@@ -224,9 +224,7 @@ export function Edit() {
               queryAdditional
               errorMessage={errors?.bank_integration_id}
               actionLabel={t('new_bank_account')}
-              onActionClick={() =>
-                navigate(route('/settings/bank_accounts/create'))
-              }
+              onActionClick={() => navigate('/settings/bank_accounts/create')}
             />
           </Element>
           <Element required leftSide={t('description')}>

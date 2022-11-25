@@ -13,7 +13,6 @@ import { InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { BankAccountInput } from 'common/interfaces/bank-accounts';
@@ -28,11 +27,12 @@ interface BankAccountValidation {
 }
 
 export function Create() {
-  useTitle('create_bank_account');
-
   const [t] = useTranslation();
 
+  useTitle(t('create_bank_account'));
+
   const navigate = useNavigate();
+
   const queryClient = useQueryClient();
 
   const pages = [
@@ -58,7 +58,7 @@ export function Create() {
 
   const handleCancel = () => {
     if (!isFormBusy) {
-      navigate(route('/settings/bank_accounts/'));
+      navigate('/settings/bank_accounts/');
     }
   };
 
@@ -83,7 +83,7 @@ export function Create() {
 
         queryClient.invalidateQueries('/api/v1/bank_integrations');
 
-        navigate(route('/settings/bank_accounts'));
+        navigate('/settings/bank_accounts');
       } catch (cachedError) {
         const error = cachedError as AxiosError;
 

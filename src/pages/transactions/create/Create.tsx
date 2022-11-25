@@ -23,7 +23,6 @@ import { useTranslation } from 'react-i18next';
 import { TransactionValidation } from '../common/validation/ValidationInterface';
 import { request } from 'common/helpers/request';
 import { useNavigate } from 'react-router-dom';
-import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { AxiosError } from 'axios';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
@@ -100,7 +99,7 @@ export function Create() {
       });
       toast.success(t('created_transaction'));
       setIsSaving(false);
-      navigate(route('/transactions'));
+      navigate('/transactions');
     } catch (error) {
       setIsSaving(false);
       const axiosError = error as AxiosError;
@@ -152,7 +151,7 @@ export function Create() {
               ))}
             </SelectField>
           </Element>
-          
+
           <Element required leftSide={t('date')}>
             <InputField
               type="date"
@@ -201,9 +200,7 @@ export function Create() {
               onClearButtonClick={() => handleChange('bank_integration_id', '')}
               errorMessage={errors?.bank_integration_id}
               actionLabel={t('new_bank_account')}
-              onActionClick={() =>
-                navigate(route('/settings/bank_accounts/create'))
-              }
+              onActionClick={() => navigate('/settings/bank_accounts/create')}
             />
           </Element>
 
