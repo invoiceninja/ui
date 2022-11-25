@@ -60,7 +60,7 @@ export function Logo() {
     },
   });
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     formData.append('company_logo', acceptedFiles[0]);
     formData.append('_method', 'PUT');
 
@@ -73,7 +73,9 @@ export function Logo() {
     onDrop,
     multiple: false,
     maxFiles: 1,
-    accept: 'image/jpeg, image/png',
+    accept: {
+      'image/*': ['.jpeg', '.png'],
+    },
   });
 
   return (
