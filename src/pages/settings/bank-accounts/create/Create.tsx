@@ -29,7 +29,7 @@ interface BankAccountValidation {
 export function Create() {
   const [t] = useTranslation();
 
-  useTitle(t('create_bank_account'));
+  useTitle('create_bank_account');
 
   const navigate = useNavigate();
 

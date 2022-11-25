@@ -47,7 +47,7 @@ export function Edit() {
 
   const resolveCurrency = useResolveCurrency();
 
-  const { documentTitle } = useTitle(t('edit_transaction'));
+  const { documentTitle } = useTitle('edit_transaction');
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
