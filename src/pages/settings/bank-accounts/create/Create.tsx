@@ -33,7 +33,6 @@ export function Create() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-
   const queryClient = useQueryClient();
 
   const pages = [
@@ -57,10 +56,6 @@ export function Create() {
     setBankAccount((prevState) => ({ ...prevState, [property]: value }));
   };
 
-  const invalidateCache = () => {
-    queryClient.invalidateQueries(route('/api/v1/bank_integrations'));
-  };
-
   const handleCancel = () => {
     if (!isFormBusy) {
       navigate(route('/settings/bank_accounts/'));
@@ -81,19 +76,26 @@ export function Create() {
           endpoint('/api/v1/bank_integrations'),
           bankAccount
         );
-        invalidateCache();
+
         setIsFormBusy(false);
+
         toast.success(t('created_bank_account'));
+
+        queryClient.invalidateQueries('/api/v1/bank_integrations');
+
         navigate(route('/settings/bank_accounts'));
       } catch (cachedError) {
         const error = cachedError as AxiosError;
+
         console.error(error);
+
         if (error?.response?.status === 422) {
           setErrors(error?.response?.data?.errors);
           toast.dismiss();
         } else {
           toast.error();
         }
+
         setIsFormBusy(false);
       }
     }

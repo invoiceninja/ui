@@ -152,6 +152,7 @@ export function Create() {
               ))}
             </SelectField>
           </Element>
+          
           <Element required leftSide={t('date')}>
             <InputField
               type="date"
@@ -160,6 +161,7 @@ export function Create() {
               errorMessage={errors?.date}
             />
           </Element>
+
           <Element required leftSide={t('amount')}>
             <DecimalNumberInput
               border
@@ -172,6 +174,7 @@ export function Create() {
               errorMessage={errors?.amount}
             />
           </Element>
+
           <Element required leftSide={t('currency')}>
             <SelectField
               value={transaction?.currency_id}
@@ -185,6 +188,7 @@ export function Create() {
               ))}
             </SelectField>
           </Element>
+
           <Element required leftSide={t('bank_account')}>
             <DebouncedCombobox
               endpoint="/api/v1/bank_integrations"
@@ -202,6 +206,7 @@ export function Create() {
               }
             />
           </Element>
+
           <Element required leftSide={t('description')}>
             <InputField
               element="textarea"
