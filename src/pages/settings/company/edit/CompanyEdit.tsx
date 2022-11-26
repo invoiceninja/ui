@@ -193,7 +193,6 @@ export function CompanyEdit(props: Props) {
         )}
         <Element leftSide={t('language')}>
           <SelectField
-            defaultValue={languages[0]?.id}
             value={company?.language_id}
             onValueChange={(value) => handleChange('language_id', value)}
             errorMessage={errors?.errors?.language_id}

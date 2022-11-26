@@ -14,7 +14,7 @@ import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { authenticate } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { Fragment, useEffect, useState } from 'react';
-import { Check, ChevronDown, PlusCircle } from 'react-feather';
+import { Check, ChevronDown } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,7 +37,7 @@ export function CompanySwitcher() {
 
   const canUserAddCompany = isSelfHosted() || (isHosted() && !freePlan());
 
-  const isCompanyEditAlreadyOpened = sessionStorage.getItem(
+  const isCompanyEditAlreadyOpened = localStorage.getItem(
     'COMPANY-EDIT-OPENED'
   );
 
@@ -71,7 +71,7 @@ export function CompanySwitcher() {
 
     localStorage.setItem('X-CURRENT-INDEX', index.toString());
 
-    sessionStorage.setItem('COMPANY-EDIT-OPENED', 'false');
+    localStorage.setItem('COMPANY-EDIT-OPENED', 'false');
 
     queryClient.invalidateQueries();
 
@@ -88,7 +88,7 @@ export function CompanySwitcher() {
       !currentCompany?.settings?.name &&
       isCompanyEditAlreadyOpened !== 'true'
     ) {
-      sessionStorage.setItem('COMPANY-EDIT-OPENED', 'true');
+      localStorage.setItem('COMPANY-EDIT-OPENED', 'true');
       setIsCompanyEditModalOpened(true);
     }
   }, [currentCompany]);
@@ -158,22 +158,19 @@ export function CompanySwitcher() {
                     className="flex items-center"
                     onClick={() => setIsCompanyCreateModalOpened(true)}
                   >
-                    {<PlusCircle />}
-                    <span className="ml-2">{t('add_company')}</span>
+                    <span>{t('add_company')}</span>
                   </DropdownElement>
                 </Menu.Item>
               )}
 
               <Menu.Item>
-                <DropdownElement to={route('/settings/account_management')}>
+                <DropdownElement to="/settings/account_management">
                   {t('account_management')}
                 </DropdownElement>
               </Menu.Item>
 
               <Menu.Item>
-                <DropdownElement to={route('/logout')}>
-                  {t('logout')}
-                </DropdownElement>
+                <DropdownElement to="/logout">{t('logout')}</DropdownElement>
               </Menu.Item>
             </div>
           </Menu.Items>

@@ -52,7 +52,7 @@ export function CompanyCreate(props: Props) {
 
     localStorage.setItem('X-CURRENT-INDEX', index.toString());
 
-    sessionStorage.setItem('COMPANY-EDIT-OPENED', 'false');
+    localStorage.setItem('COMPANY-EDIT-OPENED', 'false');
 
     queryClient.invalidateQueries();
 
