@@ -211,7 +211,7 @@ export function Create() {
         />
       )}
 
-      {!gateway && !companyGateway && !tabsActivity.overview && (
+      {(!gateway || !companyGateway) && !tabsActivity.overview && (
         <Card className="flex justify-center">
           <span className="text-gray-900">{t('select_provider')}</span>
         </Card>
