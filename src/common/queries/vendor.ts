@@ -35,3 +35,14 @@ export function useBlankVendorQuery() {
     { staleTime: Infinity }
   );
 }
+
+export function useVendorsQuery() {
+  return useQuery<Vendor[]>(
+    '/api/v1/vendors',
+    () =>
+      request('GET', endpoint('/api/v1/vendors')).then(
+        (response) => response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}

@@ -43,12 +43,31 @@ export function Transaction() {
   const getTransactionDetailsObject = (
     responseDetails: TransactionResponse | undefined
   ) => {
-    const { date, amount, currency_id, base_type } = responseDetails || {};
-    return {
+    const {
       date,
       amount,
       currency_id,
       base_type,
+      id,
+      bank_integration_id,
+      invoice_ids,
+      status_id,
+      ninja_category_id,
+      vendor_id,
+      expense_id,
+    } = responseDetails || {};
+    return {
+      id,
+      date,
+      amount,
+      currency_id,
+      base_type,
+      bank_integration_id,
+      invoice_ids,
+      status_id,
+      ninja_category_id,
+      vendor_id,
+      expense_id,
     };
   };
 

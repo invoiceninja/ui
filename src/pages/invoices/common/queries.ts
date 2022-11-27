@@ -12,19 +12,17 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { TransactionResponse } from 'common/interfaces/transactions';
+import { Invoice } from 'common/interfaces/invoice';
 import { useQuery } from 'react-query';
 
-export function useTransactionQuery(params: { id: string | undefined }) {
-  return useQuery<TransactionResponse>(
-    route('/api/v1/bank_transactions/:id', { id: params.id }),
+export function useInvoicesQuery() {
+  return useQuery<Invoice[]>(
+    route('/api/v1/invoices'),
     () =>
-      request(
-        'GET',
-        endpoint('/api/v1/bank_transactions/:id', { id: params.id })
-      ).then(
-        (response: GenericSingleResourceResponse<TransactionResponse>) =>
+      request('GET', endpoint('/api/v1/invoices')).then(
+        (response: GenericSingleResourceResponse<Invoice[]>) =>
           response?.data?.data
-      )
+      ),
+    { staleTime: Infinity }
   );
 }
