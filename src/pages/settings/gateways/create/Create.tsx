@@ -210,6 +210,12 @@ export function Create() {
           setCompanyGateway={setCompanyGateway}
         />
       )}
+
+      {!gateway && !companyGateway && !tabsActivity.overview && (
+        <Card className="flex justify-center">
+          <span className="text-gray-900">{t('select_provider')}</span>
+        </Card>
+      )}
     </Settings>
   );
 }

@@ -81,7 +81,7 @@ export function Edit() {
       setGateway(
         gateways.find((gateway) => gateway.key == companyGateway.gateway_key)
       );
-  }, [companyGateway]);
+  }, [companyGateway, gateways]);
 
   useEffect(() => {
     if (data?.data.data) {
