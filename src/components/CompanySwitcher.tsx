@@ -27,6 +27,7 @@ import { CompanyEdit } from 'pages/settings/company/edit/CompanyEdit';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { isHosted, isSelfHosted } from 'common/helpers';
 import { freePlan } from 'common/guards/guards/free-plan';
+import { BiPlusCircle } from 'react-icons/bi';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -158,7 +159,8 @@ export function CompanySwitcher() {
                     className="flex items-center"
                     onClick={() => setIsCompanyCreateModalOpened(true)}
                   >
-                    <span>{t('add_company')}</span>
+                    {<BiPlusCircle fontSize={22} />}
+                    <span className="ml-2">{t('add_company')}</span>
                   </DropdownElement>
                 </Menu.Item>
               )}
