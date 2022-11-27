@@ -21,7 +21,7 @@ export function useInvoicesQuery() {
     () =>
       request('GET', endpoint('/api/v1/invoices')).then(
         (response: GenericSingleResourceResponse<Invoice[]>) =>
-          response?.data?.data
+          response.data.data
       ),
     { staleTime: Infinity }
   );

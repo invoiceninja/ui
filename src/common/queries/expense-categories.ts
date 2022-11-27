@@ -16,18 +16,21 @@ import { route } from 'common/helpers/route';
 import { Params } from './common/params.interface';
 
 export function useExpenseCategoriesQuery(params?: Params) {
-  return useQuery(['/api/v1/expense_categories', params], () =>
-    request(
-      'GET',
-      endpoint(
-        '/api/v1/expense_categories?per_page=:perPage&page=:currentPage&sort=:sort',
-        {
-          perPage: params?.perPage,
-          currentPage: params?.currentPage,
-          sort: params?.sort ?? 'id|asc',
-        }
-      )
-    ).then((response) => response?.data?.data)
+  return useQuery(
+    ['/api/v1/expense_categories', params],
+    () =>
+      request(
+        'GET',
+        endpoint(
+          '/api/v1/expense_categories?per_page=:perPage&page=:currentPage&sort=:sort',
+          {
+            perPage: params?.perPage,
+            currentPage: params?.currentPage,
+            sort: params?.sort ?? 'id|asc',
+          }
+        )
+      ).then((response) => response.data.data),
+    { staleTime: Infinity }
   );
 }
 
