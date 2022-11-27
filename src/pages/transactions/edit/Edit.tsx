@@ -35,6 +35,7 @@ import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { ApiTransactionType, TransactionType } from 'common/enums/transactions';
+import CreateBankAccountModal from '../components/CreateBankAccountModal';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -56,6 +57,9 @@ export function Edit() {
   const { data: response } = useTransactionQuery({ id });
 
   const [transaction, setTransaction] = useState<TransactionInput>();
+
+  const [isAddNewBankAccountModalOpened, setIsAddNewBankAccountModalOpened] =
+    useState<boolean>(false);
 
   const [currencySeparators, setCurrencySeparators] = useState<
     DecimalInputSeparators | undefined
@@ -101,6 +105,8 @@ export function Edit() {
     property: keyof TransactionInput,
     value: TransactionInput[keyof TransactionInput]
   ) => {
+    setErrors(undefined);
+
     if (property === 'currency_id') {
       setCurrencySeparators(getCurrencySeparators(value?.toString() || ''));
     }
@@ -115,34 +121,47 @@ export function Edit() {
 
     setErrors(undefined);
 
-    setIsSaving(true);
+    if (transaction?.bank_integration_id) {
+      setIsSaving(true);
 
-    toast.processing();
+      toast.processing();
 
-    try {
-      await request('PUT', endpoint('/api/v1/bank_transactions/:id', { id }), {
-        ...transaction,
-        amount: Number(transaction?.amount),
-        base_type:
-          transaction?.base_type === TransactionType.Deposit
-            ? ApiTransactionType.Credit
-            : ApiTransactionType.Debit,
-      });
+      try {
+        await request(
+          'PUT',
+          endpoint('/api/v1/bank_transactions/:id', { id }),
+          {
+            ...transaction,
+            amount: Number(transaction?.amount),
+            base_type:
+              transaction?.base_type === TransactionType.Deposit
+                ? ApiTransactionType.Credit
+                : ApiTransactionType.Debit,
+          }
+        );
 
-      toast.success(t('updated_transaction'));
-      setIsSaving(false);
-      navigate('/transactions');
-    } catch (error) {
-      const axiosError = error as AxiosError;
+        toast.success('updated_transaction');
+        setIsSaving(false);
+        navigate('/transactions');
+      } catch (error) {
+        const axiosError = error as AxiosError;
 
-      console.error(axiosError);
+        console.error(axiosError);
 
-      if (axiosError?.response?.status === 422) {
-        setErrors(axiosError?.response?.data?.errors);
-        toast.dismiss();
-      } else {
-        toast.error(t('error_title'));
+        if (axiosError?.response?.status === 422) {
+          setErrors(axiosError?.response?.data?.errors);
+          toast.dismiss();
+        } else {
+          toast.error(t('error_title'));
+        }
+
+        setIsSaving(false);
       }
+    } else {
+      setErrors((prevState) => ({
+        ...prevState,
+        bank_integration_id: t('required_field'),
+      }));
     }
   };
 
@@ -151,92 +170,101 @@ export function Edit() {
   }, [response, currencies]);
 
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      onBackClick="/transactions"
-    >
-      <Container>
-        <Card
-          title={documentTitle}
-          withSaveButton
-          onSaveClick={onSave}
-          disableSubmitButton={isSaving}
-        >
-          <Element required leftSide={t('type')}>
-            <SelectField
-              value={transaction?.base_type}
-              onValueChange={(value) => handleChange('base_type', value)}
-              errorMessage={errors?.base_type}
-            >
-              {Object.values(transactionTypes).map((transactionType) => (
-                <option key={transactionType} value={transactionType}>
-                  {t(transactionType)}
-                </option>
-              ))}
-            </SelectField>
-          </Element>
-          <Element required leftSide={t('date')}>
-            <InputField
-              type="date"
-              value={transaction?.date}
-              onValueChange={(value) => handleChange('date', value)}
-              errorMessage={errors?.date}
-            />
-          </Element>
-          <Element required leftSide={t('amount')}>
-            <DecimalNumberInput
-              border
-              precision={currencySeparators?.precision}
-              currency={currencySeparators}
-              className="auto"
-              initialValue={transaction?.amount?.toString()}
-              value={transaction?.amount?.toString()}
-              onChange={(value: string) => handleChange('amount', value)}
-              errorMessage={errors?.amount}
-            />
-          </Element>
-          <Element required leftSide={t('currency')}>
-            <SelectField
-              defaultValue={transaction?.currency_id}
-              value={transaction?.currency_id}
-              onValueChange={(value) => handleChange('currency_id', value)}
-              errorMessage={errors?.currency_id}
-            >
-              {currencies?.map(({ id, name }) => (
-                <option key={id} value={id}>
-                  {t(name)}
-                </option>
-              ))}
-            </SelectField>
-          </Element>
-          <Element required leftSide={t('bank_account')}>
-            <DebouncedCombobox
-              endpoint="/api/v1/bank_integrations"
-              label="bank_account_name"
-              onChange={(value) =>
-                handleChange('bank_integration_id', value?.resource?.id)
-              }
-              defaultValue={transaction?.bank_integration_id}
-              value={transaction?.bank_integration_id}
-              clearButton
-              onClearButtonClick={() => handleChange('bank_integration_id', '')}
-              queryAdditional
-              errorMessage={errors?.bank_integration_id}
-              actionLabel={t('new_bank_account')}
-              onActionClick={() => navigate('/settings/bank_accounts/create')}
-            />
-          </Element>
-          <Element required leftSide={t('description')}>
-            <InputField
-              element="textarea"
-              value={transaction?.description}
-              onValueChange={(value) => handleChange('description', value)}
-              errorMessage={errors?.description}
-            />
-          </Element>
-        </Card>
-      </Container>
-    </Default>
+    <>
+      <CreateBankAccountModal
+        isModalOpen={isAddNewBankAccountModalOpened}
+        setIsModalOpen={setIsAddNewBankAccountModalOpened}
+      />
+
+      <Default
+        title={documentTitle}
+        breadcrumbs={pages}
+        onBackClick="/transactions"
+      >
+        <Container>
+          <Card
+            title={documentTitle}
+            withSaveButton
+            onSaveClick={onSave}
+            disableSubmitButton={isSaving}
+          >
+            <Element required leftSide={t('type')}>
+              <SelectField
+                value={transaction?.base_type}
+                onValueChange={(value) => handleChange('base_type', value)}
+                errorMessage={errors?.base_type}
+              >
+                {Object.values(transactionTypes).map((transactionType) => (
+                  <option key={transactionType} value={transactionType}>
+                    {t(transactionType)}
+                  </option>
+                ))}
+              </SelectField>
+            </Element>
+            <Element required leftSide={t('date')}>
+              <InputField
+                type="date"
+                value={transaction?.date}
+                onValueChange={(value) => handleChange('date', value)}
+                errorMessage={errors?.date}
+              />
+            </Element>
+            <Element required leftSide={t('amount')}>
+              <DecimalNumberInput
+                border
+                precision={currencySeparators?.precision}
+                currency={currencySeparators}
+                className="auto"
+                initialValue={transaction?.amount?.toString()}
+                value={transaction?.amount?.toString()}
+                onChange={(value: string) => handleChange('amount', value)}
+                errorMessage={errors?.amount}
+              />
+            </Element>
+            <Element required leftSide={t('currency')}>
+              <SelectField
+                defaultValue={transaction?.currency_id}
+                value={transaction?.currency_id}
+                onValueChange={(value) => handleChange('currency_id', value)}
+                errorMessage={errors?.currency_id}
+              >
+                {currencies?.map(({ id, name }) => (
+                  <option key={id} value={id}>
+                    {t(name)}
+                  </option>
+                ))}
+              </SelectField>
+            </Element>
+            <Element required leftSide={t('bank_account')}>
+              <DebouncedCombobox
+                endpoint="/api/v1/bank_integrations"
+                label="bank_account_name"
+                onChange={(value) =>
+                  handleChange('bank_integration_id', value?.resource?.id)
+                }
+                defaultValue={transaction?.bank_integration_id}
+                value={transaction?.bank_integration_id}
+                clearButton
+                onClearButtonClick={() =>
+                  handleChange('bank_integration_id', '')
+                }
+                queryAdditional
+                errorMessage={errors?.bank_integration_id}
+                actionLabel={t('new_bank_account')}
+                onActionClick={() => setIsAddNewBankAccountModalOpened(true)}
+              />
+            </Element>
+            <Element required leftSide={t('description')}>
+              <InputField
+                element="textarea"
+                value={transaction?.description}
+                onValueChange={(value) => handleChange('description', value)}
+                errorMessage={errors?.description}
+              />
+            </Element>
+          </Card>
+        </Container>
+      </Default>
+    </>
   );
 }
