@@ -369,9 +369,7 @@ export default function ListBox(props: Props) {
                 />
                 <div className="flex flex-col items-center ml-2">
                   <span className="text-md">{name}</span>
-                  <span className="text-sm text-gray-500">
-                    {number || t('without_number')}
-                  </span>
+                  <span className="text-sm text-gray-500">{number}</span>
                 </div>
               </div>
             </div>

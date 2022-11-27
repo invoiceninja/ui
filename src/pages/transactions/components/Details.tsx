@@ -148,7 +148,7 @@ export function Details(props: Props) {
               )
             }
           >
-            {number}
+            {number || t('without_number')}
           </Element>
         ))}
 
