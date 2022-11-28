@@ -14,5 +14,5 @@ export interface Params {
   filter?: string;
   status?: string[];
   sort?: string;
-  companyDocuments?: string;
+  companyDocuments?: 'true' | 'false';
 }
