@@ -100,9 +100,13 @@ export function Edit() {
       onCancelClick={() => navigate('/settings/online_payments')}
     >
       <TabGroup tabs={tabs}>
-        <Card title={t('edit_gateway')}>
-          <Element leftSide={t('provider')}>{companyGateway?.label}</Element>
-        </Card>
+        <div>
+          {companyGateway && (
+            <Card title={t('edit_gateway')}>
+              <Element leftSide={t('provider')}>{companyGateway.label}</Element>
+            </Card>
+          )}
+        </div>
 
         <div>
           {gateway && companyGateway && (
