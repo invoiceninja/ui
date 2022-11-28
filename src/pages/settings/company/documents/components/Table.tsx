@@ -34,15 +34,21 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 
 export function Table() {
-  const [t] = useTranslation();
+  const { t } = useTranslation();
+  const { dateFormat } = useCurrentCompanyDateFormats();
+
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
-  const companyDocuments = 'true';
-  const { dateFormat } = useCurrentCompanyDateFormats();
   const [document, setDocument] = useState('');
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState(false);
-  const { data, isLoading } = useDocumentsQuery({ perPage, currentPage, companyDocuments });
+
+  const { data, isLoading } = useDocumentsQuery({
+    perPage,
+    currentPage,
+    companyDocuments: 'true',
+  });
+
   const queryClient = useQueryClient();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
