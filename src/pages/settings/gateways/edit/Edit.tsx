@@ -19,7 +19,6 @@ import { TabGroup } from 'components/TabGroup';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SelectProviderMessage } from '../common/components/SelectProviderMessage';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from '../create/components/Credentials';
 import { LimitsAndFees } from '../create/components/LimitsAndFees';
@@ -40,8 +39,9 @@ export function Edit() {
 
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
 
-  const tabs = [
-    t('provider'),
+  const defaultTabs = [t('provider')];
+
+  const additionalTabs = [
     t('credentials'),
     t('settings'),
     t('required_fields'),
@@ -58,6 +58,8 @@ export function Edit() {
   ];
 
   const [gateway, setGateway] = useState<Gateway>();
+
+  const [tabs, setTabs] = useState<string[]>(defaultTabs);
 
   const gateways = useGateways();
 
@@ -82,6 +84,14 @@ export function Edit() {
     };
   }, []);
 
+  useEffect(() => {
+    if (gateway) {
+      setTabs([...defaultTabs, ...additionalTabs]);
+    } else {
+      setTabs([...defaultTabs]);
+    }
+  }, [gateway]);
+
   return (
     <Settings
       title={documentTitle}
@@ -94,61 +104,45 @@ export function Edit() {
           <Element leftSide={t('provider')}>{companyGateway?.label}</Element>
         </Card>
 
-        {gateway && companyGateway ? (
-          <div>
+        <div>
+          {gateway && companyGateway && (
             <Credentials
               gateway={gateway}
               companyGateway={companyGateway}
               setCompanyGateway={setCompanyGateway}
             />
-          </div>
-        ) : (
-          <div>
-            <SelectProviderMessage />
-          </div>
-        )}
+          )}
+        </div>
 
-        {gateway && companyGateway ? (
-          <div>
+        <div>
+          {gateway && companyGateway && (
             <GatewaySettings
               gateway={gateway}
               companyGateway={companyGateway}
               setCompanyGateway={setCompanyGateway}
             />
-          </div>
-        ) : (
-          <div>
-            <SelectProviderMessage />
-          </div>
-        )}
+          )}
+        </div>
 
-        {gateway && companyGateway ? (
-          <div>
+        <div>
+          {gateway && companyGateway && (
             <RequiredFields
               gateway={gateway}
               companyGateway={companyGateway}
               setCompanyGateway={setCompanyGateway}
             />
-          </div>
-        ) : (
-          <div>
-            <SelectProviderMessage />
-          </div>
-        )}
+          )}
+        </div>
 
-        {gateway && companyGateway ? (
-          <div>
+        <div>
+          {gateway && companyGateway && (
             <LimitsAndFees
               gateway={gateway}
               companyGateway={companyGateway}
               setCompanyGateway={setCompanyGateway}
             />
-          </div>
-        ) : (
-          <div>
-            <SelectProviderMessage />
-          </div>
-        )}
+          )}
+        </div>
       </TabGroup>
     </Settings>
   );
