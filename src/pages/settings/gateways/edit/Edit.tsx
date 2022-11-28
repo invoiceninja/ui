@@ -15,16 +15,16 @@ import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { Gateway } from 'common/interfaces/statics';
 import { useCompanyGatewayQuery } from 'common/queries/company-gateways';
 import { Settings } from 'components/layouts/Settings';
+import { TabGroup } from 'components/TabGroup';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router-dom';
-import { PaymentTabsActivity, Tabs } from '../common/components/Tabs';
+import { SelectProviderMessage } from '../common/components/SelectProviderMessage';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from '../create/components/Credentials';
 import { LimitsAndFees } from '../create/components/LimitsAndFees';
 import { RequiredFields } from '../create/components/RequiredFields';
 import { Settings as GatewaySettings } from '../create/components/Settings';
-import { usePaymentGatewayTabs } from '../create/hooks/usePaymentGatewayTabs';
 import { useHandleUpdate } from './hooks/useHandleUpdate';
 
 export function Edit() {
@@ -34,38 +34,25 @@ export function Edit() {
 
   const { id } = useParams();
 
-  const tabs = usePaymentGatewayTabs();
-
   const { data } = useCompanyGatewayQuery({ id });
 
   const { documentTitle } = useTitle('online_payments');
 
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
 
-  const [activeTabKey, setActiveTabKey] = useState<string>('overview');
-
-  const [tabsActivity, setTabsActivity] = useState<PaymentTabsActivity>({
-    overview: true,
-    credentials: false,
-    settings: false,
-    required_fields: false,
-    limits_and_fees: false,
-  });
-
-  const getActiveTabKey = () => {
-    const tab = Object.entries(tabsActivity).filter((item) => item[1]);
-    return tab[0][0].toString();
-  };
+  const tabs = [
+    t('provider'),
+    t('credentials'),
+    t('settings'),
+    t('required_fields'),
+    t('limits_and_fees'),
+  ];
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('online_payments'), href: '/settings/online_payments' },
     {
       name: t('edit_gateway'),
-      href: route('/settings/gateways/:id/edit', { id }),
-    },
-    {
-      name: t(activeTabKey),
       href: route('/settings/gateways/:id/edit', { id }),
     },
   ];
@@ -95,10 +82,6 @@ export function Edit() {
     };
   }, []);
 
-  useEffect(() => {
-    setActiveTabKey(getActiveTabKey());
-  }, [tabsActivity]);
-
   return (
     <Settings
       title={documentTitle}
@@ -106,50 +89,67 @@ export function Edit() {
       onSaveClick={onSave}
       onCancelClick={() => navigate('/settings/online_payments')}
     >
-      <Tabs
-        tabs={tabs}
-        tabsActivity={tabsActivity}
-        setTabsActivity={setTabsActivity}
-        activeTabKey={activeTabKey}
-      />
-
-      {companyGateway && tabsActivity.overview && (
+      <TabGroup tabs={tabs}>
         <Card title={t('edit_gateway')}>
-          <Element leftSide={t('provider')}>{companyGateway.label}</Element>
+          <Element leftSide={t('provider')}>{companyGateway?.label}</Element>
         </Card>
-      )}
 
-      {gateway && companyGateway && tabsActivity.credentials && (
-        <Credentials
-          gateway={gateway}
-          companyGateway={companyGateway}
-          setCompanyGateway={setCompanyGateway}
-        />
-      )}
+        {gateway && companyGateway ? (
+          <div>
+            <Credentials
+              gateway={gateway}
+              companyGateway={companyGateway}
+              setCompanyGateway={setCompanyGateway}
+            />
+          </div>
+        ) : (
+          <div>
+            <SelectProviderMessage />
+          </div>
+        )}
 
-      {gateway && companyGateway && tabsActivity.settings && (
-        <GatewaySettings
-          gateway={gateway}
-          companyGateway={companyGateway}
-          setCompanyGateway={setCompanyGateway}
-        />
-      )}
+        {gateway && companyGateway ? (
+          <div>
+            <GatewaySettings
+              gateway={gateway}
+              companyGateway={companyGateway}
+              setCompanyGateway={setCompanyGateway}
+            />
+          </div>
+        ) : (
+          <div>
+            <SelectProviderMessage />
+          </div>
+        )}
 
-      {gateway && companyGateway && tabsActivity.required_fields && (
-        <RequiredFields
-          gateway={gateway}
-          companyGateway={companyGateway}
-          setCompanyGateway={setCompanyGateway}
-        />
-      )}
+        {gateway && companyGateway ? (
+          <div>
+            <RequiredFields
+              gateway={gateway}
+              companyGateway={companyGateway}
+              setCompanyGateway={setCompanyGateway}
+            />
+          </div>
+        ) : (
+          <div>
+            <SelectProviderMessage />
+          </div>
+        )}
 
-      {gateway && companyGateway && tabsActivity.limits_and_fees && (
-        <LimitsAndFees
-          gateway={gateway}
-          companyGateway={companyGateway}
-          setCompanyGateway={setCompanyGateway}
-        />
-      )}
+        {gateway && companyGateway ? (
+          <div>
+            <LimitsAndFees
+              gateway={gateway}
+              companyGateway={companyGateway}
+              setCompanyGateway={setCompanyGateway}
+            />
+          </div>
+        ) : (
+          <div>
+            <SelectProviderMessage />
+          </div>
+        )}
+      </TabGroup>
     </Settings>
   );
 }
