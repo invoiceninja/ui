@@ -58,7 +58,7 @@ export function Create() {
 
   const handleCancel = () => {
     if (!isFormBusy) {
-      navigate('/settings/bank_accounts/');
+      navigate('/settings/bank_accounts');
     }
   };
 

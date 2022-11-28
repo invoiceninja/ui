@@ -56,7 +56,14 @@ export function Edit() {
 
   const { data: response } = useTransactionQuery({ id });
 
-  const [transaction, setTransaction] = useState<TransactionInput>();
+  const [transaction, setTransaction] = useState<TransactionInput>({
+    bank_integration_id: '',
+    amount: 0,
+    base_type: '',
+    currency_id: '',
+    date: '',
+    description: '',
+  });
 
   const [isAddNewBankAccountModalOpened, setIsAddNewBankAccountModalOpened] =
     useState<boolean>(false);
@@ -93,11 +100,11 @@ export function Edit() {
         responseDetails?.base_type === ApiTransactionType.Credit
           ? TransactionType.Deposit
           : TransactionType.Withdrawal,
-      date,
-      amount,
-      currency_id,
-      bank_integration_id,
-      description,
+      date: date || '',
+      amount: amount || 0,
+      currency_id: currency_id || '',
+      bank_integration_id: bank_integration_id || '',
+      description: description || '',
     };
   };
 
@@ -111,52 +118,42 @@ export function Edit() {
       setCurrencySeparators(getCurrencySeparators(value?.toString() || ''));
     }
 
-    setTransaction(
-      (prevState) => prevState && { ...prevState, [property]: value }
-    );
+    setTransaction((prevState) => ({ ...prevState, [property]: value }));
   };
 
   const onSave = async (event: FormEvent<HTMLFormElement>) => {
-    event?.preventDefault();
+    event.preventDefault();
 
     setErrors(undefined);
 
-    if (transaction?.bank_integration_id) {
+    if (transaction.bank_integration_id) {
       setIsSaving(true);
 
       toast.processing();
 
-      try {
-        await request(
-          'PUT',
-          endpoint('/api/v1/bank_transactions/:id', { id }),
-          {
-            ...transaction,
-            amount: Number(transaction?.amount),
-            base_type:
-              transaction?.base_type === TransactionType.Deposit
-                ? ApiTransactionType.Credit
-                : ApiTransactionType.Debit,
+      request('PUT', endpoint('/api/v1/bank_transactions/:id', { id }), {
+        ...transaction,
+        amount: Number(transaction.amount),
+        base_type:
+          transaction.base_type === TransactionType.Deposit
+            ? ApiTransactionType.Credit
+            : ApiTransactionType.Debit,
+      })
+        .then(() => {
+          toast.success('updated_transaction');
+          navigate('/transactions');
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+
+          if (error?.response?.status === 422) {
+            setErrors(error?.response.data.errors);
+            toast.dismiss();
+          } else {
+            toast.error();
           }
-        );
-
-        toast.success('updated_transaction');
-        setIsSaving(false);
-        navigate('/transactions');
-      } catch (error) {
-        const axiosError = error as AxiosError;
-
-        console.error(axiosError);
-
-        if (axiosError?.response?.status === 422) {
-          setErrors(axiosError?.response?.data?.errors);
-          toast.dismiss();
-        } else {
-          toast.error(t('error_title'));
-        }
-
-        setIsSaving(false);
-      }
+        })
+        .finally(() => setIsSaving(false));
     } else {
       setErrors((prevState) => ({
         ...prevState,
@@ -242,7 +239,6 @@ export function Edit() {
                 onChange={(value) =>
                   handleChange('bank_integration_id', value?.resource?.id)
                 }
-                defaultValue={transaction?.bank_integration_id}
                 value={transaction?.bank_integration_id}
                 clearButton
                 onClearButtonClick={() =>

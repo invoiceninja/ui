@@ -56,7 +56,14 @@ export function Create() {
 
   const [errors, setErrors] = useState<TransactionValidation>();
 
-  const [transaction, setTransaction] = useState<TransactionInput>();
+  const [transaction, setTransaction] = useState<TransactionInput>({
+    bank_integration_id: '',
+    amount: 0,
+    base_type: '',
+    currency_id: '',
+    date: '',
+    description: '',
+  });
 
   const pages = [
     { name: t('transactions'), href: '/transactions' },
@@ -86,7 +93,7 @@ export function Create() {
   };
 
   const onSave = async (event: FormEvent<HTMLFormElement>) => {
-    event?.preventDefault();
+    event.preventDefault();
 
     setErrors(undefined);
 
@@ -95,33 +102,30 @@ export function Create() {
 
       toast.processing();
 
-      try {
-        await request('POST', endpoint('/api/v1/bank_transactions'), {
-          ...transaction,
-          amount: Number(transaction?.amount),
-          base_type:
-            transaction?.base_type === TransactionType.Deposit
-              ? ApiTransactionType.Credit
-              : ApiTransactionType.Debit,
-        });
-        toast.success(t('created_transaction'));
-        setIsSaving(false);
-        navigate('/transactions');
-      } catch (error) {
-        setIsSaving(false);
-        const axiosError = error as AxiosError;
-        console.log(axiosError);
-        console.error(axiosError);
+      request('POST', endpoint('/api/v1/bank_transactions'), {
+        ...transaction,
+        amount: Number(transaction.amount),
+        base_type:
+          transaction.base_type === TransactionType.Deposit
+            ? ApiTransactionType.Credit
+            : ApiTransactionType.Debit,
+      })
+        .then(() => {
+          toast.success('created_transaction');
+          setIsSaving(false);
+          navigate('/transactions');
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
 
-        if (axiosError?.response?.status === 422) {
-          setErrors(axiosError?.response?.data?.errors);
-          toast.dismiss();
-        } else {
-          toast.error(t('error_title'));
-        }
-
-        setIsSaving(false);
-      }
+          if (error?.response?.status === 422) {
+            setErrors(error?.response.data.errors);
+            toast.dismiss();
+          } else {
+            toast.error();
+          }
+        })
+        .finally(() => setIsSaving(true));
     } else {
       setErrors((prevState) => ({
         ...prevState,
@@ -136,8 +140,6 @@ export function Create() {
       base_type: TransactionType.Deposit,
       currency_id: company?.settings?.currency_id,
       date: date(new Date().toString(), 'YYYY-MM-DD'),
-      amount: 0,
-      bank_integration_id: '',
     }));
     setCurrencySeparators(getCurrencySeparators(currencies[0]?.id));
   }, [currencies, isAddNewBankAccountModalOpened]);

@@ -59,50 +59,41 @@ export default function CreateBankAccountModal(props: Props) {
     }
   };
 
-  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSave = (event: FormEvent<HTMLFormElement>) => {
     if (!isFormBusy) {
-      event?.preventDefault();
+      event.preventDefault();
 
       toast.processing();
       setErrors(undefined);
       setIsFormBusy(true);
 
-      try {
-        await request(
-          'POST',
-          endpoint('/api/v1/bank_integrations'),
-          bankAccount
-        );
+      request('POST', endpoint('/api/v1/bank_integrations'), bankAccount)
+        .then(() => {
+          toast.success('created_bank_account');
 
-        setIsFormBusy(false);
+          queryClient.invalidateQueries('/api/v1/bank_integrations');
 
-        toast.success('created_bank_account');
+          window.dispatchEvent(
+            new CustomEvent('invalidate.combobox.queries', {
+              detail: {
+                url: endpoint('/api/v1/bank_integrations'),
+              },
+            })
+          );
 
-        queryClient.invalidateQueries('/api/v1/bank_integrations');
+          props.setIsModalOpen(false);
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
 
-        window.dispatchEvent(
-          new CustomEvent('invalidate.combobox.queries', {
-            detail: {
-              url: endpoint('/api/v1/bank_integrations'),
-            },
-          })
-        );
-
-        props.setIsModalOpen(false);
-      } catch (cachedError) {
-        const error = cachedError as AxiosError;
-
-        console.error(error);
-
-        if (error?.response?.status === 422) {
-          setErrors(error?.response?.data?.errors);
-          toast.dismiss();
-        } else {
-          toast.error();
-        }
-
-        setIsFormBusy(false);
-      }
+          if (error?.response?.status === 422) {
+            setErrors(error?.response.data.errors);
+            toast.dismiss();
+          } else {
+            toast.error();
+          }
+        })
+        .finally(() => setIsFormBusy(false));
     }
   };
 
