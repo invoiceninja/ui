@@ -39,7 +39,7 @@ export function Edit() {
 
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
 
-  const defaultTabs = [t('provider')];
+  const defaultTab = [t('provider')];
 
   const additionalTabs = [
     t('credentials'),
@@ -59,7 +59,7 @@ export function Edit() {
 
   const [gateway, setGateway] = useState<Gateway>();
 
-  const [tabs, setTabs] = useState<string[]>(defaultTabs);
+  const [tabs, setTabs] = useState<string[]>(defaultTab);
 
   const gateways = useGateways();
 
@@ -86,9 +86,9 @@ export function Edit() {
 
   useEffect(() => {
     if (gateway) {
-      setTabs([...defaultTabs, ...additionalTabs]);
+      setTabs([...defaultTab, ...additionalTabs]);
     } else {
-      setTabs([...defaultTabs]);
+      setTabs([...defaultTab]);
     }
   }, [gateway]);
 
