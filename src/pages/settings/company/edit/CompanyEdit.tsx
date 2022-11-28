@@ -10,7 +10,7 @@
 
 import { Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint, isHosted } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
@@ -95,57 +95,60 @@ export function CompanyEdit(props: Props) {
 
       const { name, language_id, subdomain, currency_id } = company;
 
-      try {
-        const response = await request(
-          'GET',
-          endpoint('/api/v1/companies/:id', { id: companyId })
-        );
+      request('GET', endpoint('/api/v1/companies/:id', { id: companyId }))
+        .then((response: AxiosResponse) => {
+          const respondedCompany = response.data.data;
 
-        const respondedCompany = response.data.data;
+          const companySettings = respondedCompany.settings;
 
-        const companySettings = respondedCompany.settings;
+          respondedCompany.settings = {
+            ...respondedCompany.settings,
+            name: name ? name : companySettings?.name,
+            subdomain: subdomain ? subdomain : companySettings?.subdomain,
+            language_id: language_id
+              ? language_id
+              : companySettings?.language_id,
+            currency_id: currency_id
+              ? currency_id
+              : companySettings?.currency_id,
+          };
 
-        respondedCompany.settings = {
-          ...respondedCompany.settings,
-          name: name ? name : companySettings?.name,
-          subdomain: subdomain ? subdomain : companySettings?.subdomain,
-          language_id: language_id ? language_id : companySettings?.language_id,
-          currency_id: currency_id ? currency_id : companySettings?.currency_id,
-        };
+          if (subdomain && isHosted()) {
+            request('POST', endpoint('/api/v1/check_subdomain'), {
+              subdomain: subdomain,
+            }).catch((error: AxiosError) => {
+              if (error?.response?.status === 401) {
+                toast.error(t('subdomain_is_not_available'));
+              }
+              return;
+            });
+          }
 
-        if (subdomain && isHosted()) {
-          await request('POST', endpoint('/api/v1/check_subdomain'), {
-            subdomain: subdomain,
-          });
-        }
+          request(
+            'PUT',
+            endpoint('/api/v1/companies/:id', { id: companyId }),
+            respondedCompany
+          )
+            .then(() => {
+              toast.success('updated_company');
 
-        await request(
-          'PUT',
-          endpoint('/api/v1/companies/:id', { id: companyId }),
-          respondedCompany
-        );
+              props.setIsModalOpen(false);
 
-        setIsFormBusy(false);
-
-        toast.success('updated_company');
-
-        props.setIsModalOpen(false);
-
-        window.location.href = route('/');
-      } catch (error) {
-        const axiosError = error as AxiosError;
-        console.error(axiosError);
-        if (axiosError?.response?.status === 422) {
-          setErrors(axiosError?.response?.data?.errors);
-          toast.dismiss();
-        } else {
-          toast.error();
-        }
-        if (axiosError?.response?.status === 401) {
-          toast.error(t('subdomain_is_not_available'));
-        }
-        setIsFormBusy(false);
-      }
+              window.location.href = route('/');
+            })
+            .catch((error: AxiosError) => {
+              if (error?.response?.status === 422) {
+                setErrors(error?.response?.data?.errors);
+                toast.dismiss();
+              } else {
+                toast.error();
+              }
+            });
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+        })
+        .finally(() => setIsFormBusy(false));
     }
   };
 

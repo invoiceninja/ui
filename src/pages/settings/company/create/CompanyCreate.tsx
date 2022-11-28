@@ -9,7 +9,7 @@
  */
 
 import { Button } from '@invoiceninja/forms';
-import { AxiosError } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { AuthenticationTypes } from 'common/dtos/authentication';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
@@ -65,34 +65,38 @@ export function CompanyCreate(props: Props) {
 
       setIsFormBusy(true);
 
-      try {
-        await request('POST', endpoint('/api/v1/companies'));
+      request('POST', endpoint('/api/v1/companies'))
+        .then(() => {
+          request('POST', endpoint('/api/v1/refresh'))
+            .then((response: AxiosResponse) => {
+              const companyUsers = response.data.data;
 
-        const response = await request('POST', endpoint('/api/v1/refresh'));
+              const createdCompanyIndex = companyUsers.length - 1;
 
-        const companyUsers = response.data.data;
+              const companyUser = companyUsers[createdCompanyIndex];
 
-        const createdCompanyIndex = companyUsers.length - 1;
+              dispatch(updateCompanyUsers(companyUsers));
 
-        const companyUser = companyUsers[createdCompanyIndex];
+              toast.success('created_new_company');
 
-        dispatch(updateCompanyUsers(companyUsers));
+              props.setIsModalOpen(false);
 
-        toast.success('created_new_company');
-
-        props.setIsModalOpen(false);
-
-        switchCompany(
-          createdCompanyIndex,
-          companyUser.user,
-          companyUser.token.token
-        );
-      } catch (error) {
-        const axiosError = error as AxiosError;
-        console.error(axiosError);
-        toast.error();
-        setIsFormBusy(false);
-      }
+              switchCompany(
+                createdCompanyIndex,
+                companyUser.user,
+                companyUser.token.token
+              );
+            })
+            .catch((error: AxiosError) => {
+              console.error(error);
+              toast.error();
+            });
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+          toast.error();
+        })
+        .finally(() => setIsFormBusy(false));
     }
   };
 

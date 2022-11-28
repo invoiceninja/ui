@@ -86,7 +86,7 @@ export function CompanySwitcher() {
 
     if (
       currentCompany &&
-      !currentCompany?.settings?.name &&
+      currentCompany?.settings?.name.includes(t('untitled')) &&
       isCompanyEditAlreadyOpened !== 'true'
     ) {
       localStorage.setItem('COMPANY-EDIT-OPENED', 'true');
