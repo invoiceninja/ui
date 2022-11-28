@@ -239,7 +239,7 @@ export function Edit() {
                 onChange={(value) =>
                   handleChange('bank_integration_id', value?.resource?.id)
                 }
-                value={transaction?.bank_integration_id}
+                defaultValue={transaction?.bank_integration_id}
                 clearButton
                 onClearButtonClick={() =>
                   handleChange('bank_integration_id', '')
