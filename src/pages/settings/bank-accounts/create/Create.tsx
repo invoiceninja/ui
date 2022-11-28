@@ -70,34 +70,25 @@ export function Create() {
       setErrors(undefined);
       setIsFormBusy(true);
 
-      try {
-        await request(
-          'POST',
-          endpoint('/api/v1/bank_integrations'),
-          bankAccount
-        );
+      request('POST', endpoint('/api/v1/bank_integrations'), bankAccount)
+        .then(() => {
+          toast.success(t('created_bank_account'));
 
-        setIsFormBusy(false);
+          queryClient.invalidateQueries('/api/v1/bank_integrations');
 
-        toast.success(t('created_bank_account'));
+          navigate('/settings/bank_accounts');
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
 
-        queryClient.invalidateQueries('/api/v1/bank_integrations');
-
-        navigate('/settings/bank_accounts');
-      } catch (cachedError) {
-        const error = cachedError as AxiosError;
-
-        console.error(error);
-
-        if (error?.response?.status === 422) {
-          setErrors(error?.response?.data?.errors);
-          toast.dismiss();
-        } else {
-          toast.error();
-        }
-
-        setIsFormBusy(false);
-      }
+          if (error?.response?.status === 422) {
+            setErrors(error?.response?.data?.errors);
+            toast.dismiss();
+          } else {
+            toast.error();
+          }
+        })
+        .finally(() => setIsFormBusy(false));
     }
   };
 
