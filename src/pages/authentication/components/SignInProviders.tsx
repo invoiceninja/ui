@@ -19,10 +19,14 @@ import {
 } from 'common/stores/slices/company-users';
 import { setMsal } from 'common/stores/slices/user';
 import { authenticate } from 'common/stores/slices/user';
-// import GoogleLogin from 'react-google-login';
 import { useDispatch } from 'react-redux';
 import MicrosoftLogin from 'react-microsoft-login';
 import { ReactNode } from 'react';
+import {
+  GoogleLogin,
+  GoogleLoginResponse,
+  GoogleLoginResponseOffline,
+} from '@leecheuk/react-google-login';
 
 interface SignInProviderButtonProps {
   disabled?: boolean;
@@ -44,6 +48,7 @@ export function SignInProviderButton(props: SignInProviderButtonProps) {
 
 export function SignInProviders() {
   const dispatch = useDispatch();
+
   const login = (response: AxiosResponse) => {
     localStorage.removeItem('X-CURRENT-INDEX');
 
@@ -69,11 +74,13 @@ export function SignInProviders() {
     dispatch(changeCurrentIndex(currentIndex));
   };
 
-  const handleGoogle = (response: any) => {
+  const handleGoogle = (
+    response: GoogleLoginResponse | GoogleLoginResponseOffline
+  ) => {
     request(
       'POST',
       endpoint('/api/v1/oauth_login?provider=google&id_token=:token', {
-        token: response.tokenId,
+        token: response.code,
       })
     ).then((response) => login(response));
   };
@@ -95,16 +102,12 @@ export function SignInProviders() {
   return (
     <div className="grid grid-cols-3 text-sm mt-4">
       <div className="col-span-3 flex flex-col space-y-3">
-        {/* <GoogleLogin
-          clientId={googleClientId}
-          buttonText="Sign in with Google"
-          onSuccess={handleGoogle}
-          onFailure={handleGoogle}
-          cookiePolicy={'single_host_origin'}
-          render={(props) => (
+        <GoogleLogin
+          clientId="658977310896-knrl3gka66fldh83dao2rhgbblmd4un9.apps.googleusercontent.com"
+          render={(renderProps) => (
             <SignInProviderButton
-              disabled={props.disabled || false}
-              onClick={props.onClick}
+              disabled={renderProps.disabled || false}
+              onClick={renderProps.onClick}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -137,7 +140,11 @@ export function SignInProviders() {
               <p>Log in with Google</p>
             </SignInProviderButton>
           )}
-        /> */}
+          buttonText="Login"
+          onSuccess={handleGoogle}
+          onFailure={handleGoogle}
+          cookiePolicy={'single_host_origin'}
+        />
 
         <MicrosoftLogin
           clientId={microsoftClientId}
