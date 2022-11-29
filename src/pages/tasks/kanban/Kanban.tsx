@@ -88,6 +88,7 @@ export function Kanban() {
     }
   }, [taskStatuses, tasks]);
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDragging = (board: Board) => {
     const taskIds: Record<string, string[]> = {};
     const statusIds = collect(board.columns).pluck('id').toArray() as string[];
