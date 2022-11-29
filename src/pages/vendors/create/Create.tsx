@@ -58,6 +58,7 @@ export function Create() {
             first_name: '',
             last_name: '',
             email: '',
+            send_email: true,
             created_at: 0,
             updated_at: 0,
             archived_at: 0,
@@ -67,6 +68,7 @@ export function Create() {
             custom_value2: '',
             custom_value3: '',
             custom_value4: '',
+            link: '',
           },
         ],
       });

@@ -97,3 +97,9 @@ export function previewEndpoint(endpoint: string, params = {}): string {
 
   return apiEndpoint() + route(endpoint, params);
 }
+
+export function isDemo() {
+  const endpoint = import.meta.env.VITE_DEMO_ENDPOINT;
+
+  return endpoint === apiEndpoint();
+}

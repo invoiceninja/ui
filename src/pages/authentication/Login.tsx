@@ -10,14 +10,9 @@
 
 import { useState } from 'react';
 import { useFormik } from 'formik';
-import { useDispatch } from 'react-redux';
-import {
-  AuthenticationTypes,
-  LoginForm,
-} from '../../common/dtos/authentication';
+import { LoginForm } from '../../common/dtos/authentication';
 import { endpoint, isHosted } from '../../common/helpers';
-import { authenticate } from '../../common/stores/slices/user';
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { LoginValidation } from './common/ValidationInterface';
 import { useTranslation } from 'react-i18next';
 import { InputField } from '../../components/forms/InputField';
@@ -27,23 +22,20 @@ import { InputLabel } from '../../components/forms/InputLabel';
 import { Alert } from '../../components/Alert';
 import { HostedLinks } from './components/HostedLinks';
 import { Header } from './components/Header';
-import {
-  changeCurrentIndex,
-  updateCompanyUsers,
-} from 'common/stores/slices/company-users';
 import { useTitle } from 'common/hooks/useTitle';
-import { CompanyUser } from 'common/interfaces/company-user';
 import { request } from 'common/helpers/request';
 import { SignInProviders } from './components/SignInProviders';
+import { useLogin } from './common/hooks';
 
 export function Login() {
   useTitle('login');
 
-  const dispatch = useDispatch();
   const [message, setMessage] = useState<string | undefined>(undefined);
   const [errors, setErrors] = useState<LoginValidation | undefined>(undefined);
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [t] = useTranslation();
+
+  const login = useLogin();
 
   const form = useFormik({
     initialValues: {
@@ -57,33 +49,7 @@ export function Login() {
       setIsFormBusy(true);
 
       request('POST', endpoint('/api/v1/login'), values)
-        .then((response: AxiosResponse) => {
-          localStorage.removeItem('X-CURRENT-INDEX');
-
-          let currentIndex = 0;
-
-          const companyUsers: CompanyUser[] = response.data.data;
-          const defaultCompanyId = companyUsers[0].account.default_company_id;
-
-          currentIndex = companyUsers.findIndex(
-            (companyUser) => companyUser.company.id === defaultCompanyId
-          );
-
-          if (currentIndex === -1) {
-            currentIndex = 0;
-          }
-
-          dispatch(
-            authenticate({
-              type: AuthenticationTypes.TOKEN,
-              user: response.data.data[currentIndex].user,
-              token: response.data.data[currentIndex].token.token,
-            })
-          );
-
-          dispatch(updateCompanyUsers(response.data.data));
-          dispatch(changeCurrentIndex(currentIndex));
-        })
+        .then((response) => login(response))
         .catch((error: AxiosError) => {
           return error.response?.status === 422
             ? setErrors(error.response.data.errors)

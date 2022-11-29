@@ -12,6 +12,7 @@ import { HostedRoute } from 'components/HostedRoute';
 import { PrivateRoute } from 'components/PrivateRoute';
 import { PublicRoute } from 'components/PublicRoute';
 import { Route } from 'react-router-dom';
+import { Demo } from './Demo';
 import { Login } from './Login';
 import { Logout } from './Logout';
 import { RecoverPassword } from './RecoverPassword';
@@ -25,6 +26,7 @@ export const authenticationRoutes = (
       <Route element={<HostedRoute />}>
         <Route path="/register" element={<Register />} />
       </Route>
+      <Route path="/demo" element={<Demo />} />
     </Route>
 
     <Route element={<PrivateRoute />}>

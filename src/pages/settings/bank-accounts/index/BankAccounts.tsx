@@ -38,7 +38,7 @@ export function BankAccounts() {
       { context: 'yodlee', platform: 'react' }
     );
     window.open(
-      route('/yodlee/onboard/:hash', {
+      route('https://invoicing.co/yodlee/onboard/:hash', {
         hash: tokenResponse?.data?.hash,
       })
     );
