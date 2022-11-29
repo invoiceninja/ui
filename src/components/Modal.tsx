@@ -77,6 +77,7 @@ export function Modal(props: Props) {
                   'max-w-sm':
                     props.size === 'small' || typeof props.size === 'undefined',
                   'max-w-7xl': props.size === 'large',
+                  'max-w-2xl': props.size === 'regular',
                   'bg-white':
                     props.backgroundColor === 'white' ||
                     typeof props.backgroundColor === 'undefined',

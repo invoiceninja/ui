@@ -33,6 +33,13 @@ export interface Company {
   stop_on_unpaid_recurring: boolean;
 }
 
+export interface CompanyInput {
+  name: string;
+  subdomain: string;
+  language_id: string;
+  currency_id: string;
+}
+
 export interface Settings {
   auto_archive_invoice: boolean;
   lock_invoices: string;

@@ -401,7 +401,7 @@ export function Reports() {
 
           {report.identifier === 'profitloss' && (
             <>
-              <Element leftSide={t('is_expense_billed')}>
+              <Element leftSide={t('expense_paid_report')}>
                 <Toggle
                   checked={report.payload.is_expense_billed}
                   onValueChange={(value) =>
@@ -410,7 +410,7 @@ export function Reports() {
                 />
               </Element>
 
-              <Element leftSide={t('is_income_billed')}>
+              <Element leftSide={t('cash_vs_accrual')}>
                 <Toggle
                   checked={report.payload.is_income_billed}
                   onValueChange={(value) =>
