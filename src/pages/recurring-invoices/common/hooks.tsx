@@ -208,7 +208,6 @@ export function useSave(props: RecurringInvoiceSaveProps) {
 }
 
 export function useToggleStartStop() {
-  const [t] = useTranslation();
   const queryClient = useQueryClient();
 
   return (recurringInvoice: RecurringInvoice, action: 'start' | 'stop') => {
