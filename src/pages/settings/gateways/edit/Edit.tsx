@@ -13,6 +13,7 @@ import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { Gateway } from 'common/interfaces/statics';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useCompanyGatewayQuery } from 'common/queries/company-gateways';
 import { Settings } from 'components/layouts/Settings';
 import { TabGroup } from 'components/TabGroup';
@@ -36,6 +37,8 @@ export function Edit() {
   const { data } = useCompanyGatewayQuery({ id });
 
   const { documentTitle } = useTitle('online_payments');
+
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
 
@@ -63,7 +66,7 @@ export function Edit() {
 
   const gateways = useGateways();
 
-  const onSave = useHandleUpdate(companyGateway);
+  const onSave = useHandleUpdate(companyGateway, setErrors);
 
   useEffect(() => {
     companyGateway &&
@@ -114,6 +117,7 @@ export function Edit() {
               gateway={gateway}
               companyGateway={companyGateway}
               setCompanyGateway={setCompanyGateway}
+              errors={errors}
             />
           )}
         </div>
@@ -124,6 +128,7 @@ export function Edit() {
               gateway={gateway}
               companyGateway={companyGateway}
               setCompanyGateway={setCompanyGateway}
+              errors={errors}
             />
           )}
         </div>
@@ -144,6 +149,7 @@ export function Edit() {
               gateway={gateway}
               companyGateway={companyGateway}
               setCompanyGateway={setCompanyGateway}
+              errors={errors}
             />
           )}
         </div>

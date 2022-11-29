@@ -11,38 +11,55 @@
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { CompanyGateway } from 'common/interfaces/company-gateway';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
+import { Dispatch, SetStateAction } from 'react';
+import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useTranslation } from 'react-i18next';
 
-export function useHandleUpdate(companyGateway: CompanyGateway | undefined) {
+export function useHandleUpdate(
+  companyGateway: CompanyGateway | undefined,
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>
+) {
   const [t] = useTranslation();
   const queryClient = useQueryClient();
 
   return () => {
     if (!companyGateway) {
+      setErrors({
+        message: t('invalid_data'),
+        errors: {
+          gateway_key: [t('invalid_gateway_key')],
+        },
+      });
       return;
     }
 
-    const toastId = toast.loading(t('processing'));
+    setErrors(undefined);
+    toast.processing();
 
     request(
       'PUT',
       endpoint('/api/v1/company_gateways/:id', { id: companyGateway.id }),
       companyGateway
     )
-      .then(() => toast.success(t('updated_company_gateway'), { id: toastId }))
-      .catch((error) => {
-        console.error(error);
-        toast.error(t('error_title'), { id: toastId });
-      })
-      .finally(() =>
+      .then(() => {
+        toast.success('updated_company_gateway');
         queryClient.invalidateQueries(
           route('/api/v1/company_gateways/:id', {
             id: companyGateway.id,
           })
-        )
-      );
+        );
+      })
+      .catch((error) => {
+        if (error?.response?.status === 422) {
+          setErrors(error.response.data);
+        } else {
+          console.error(error);
+          toast.error();
+        }
+      })
+      .finally(() => toast.dismiss());
   };
 }

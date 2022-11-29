@@ -29,6 +29,7 @@ import { Settings as GatewaySettings } from './components/Settings';
 import { useHandleCreate } from './hooks/useHandleCreate';
 import { blankFeesAndLimitsRecord } from './hooks/useHandleMethodToggle';
 import { TabGroup } from 'components/TabGroup';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 export function Create() {
   const [t] = useTranslation();
@@ -43,13 +44,15 @@ export function Create() {
 
   const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
 
+  const [errors, setErrors] = useState<ValidationBag>();
+
   const [gateway, setGateway] = useState<Gateway>();
 
   const [filteredGateways, setFilteredGateways] = useState<Gateway[]>([]);
 
   const gateways = useGateways();
 
-  const onSave = useHandleCreate(companyGateway);
+  const onSave = useHandleCreate(companyGateway, setErrors);
 
   const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setGateway(gateways.find((gateway) => gateway.id === event.target.value));
@@ -154,7 +157,12 @@ export function Create() {
       <TabGroup tabs={tabs}>
         <Card title={t('add_gateway')}>
           <Element leftSide={t('provider')}>
-            <SelectField onChange={handleChange} value={gateway?.id} withBlank>
+            <SelectField
+              onChange={handleChange}
+              value={gateway?.id}
+              errorMessage={errors?.errors.gateway_key}
+              withBlank
+            >
               {filteredGateways.map((gateway, index) => (
                 <option value={gateway.id} key={index}>
                   {gateway.name}
@@ -170,6 +178,7 @@ export function Create() {
               gateway={gateway}
               companyGateway={companyGateway}
               setCompanyGateway={setCompanyGateway}
+              errors={errors}
             />
           )}
         </div>
@@ -180,6 +189,7 @@ export function Create() {
               gateway={gateway}
               companyGateway={companyGateway}
               setCompanyGateway={setCompanyGateway}
+              errors={errors}
             />
           )}
         </div>
@@ -200,6 +210,7 @@ export function Create() {
               gateway={gateway}
               companyGateway={companyGateway}
               setCompanyGateway={setCompanyGateway}
+              errors={errors}
             />
           )}
         </div>
