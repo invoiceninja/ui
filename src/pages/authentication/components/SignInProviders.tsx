@@ -103,7 +103,7 @@ export function SignInProviders() {
     <div className="grid grid-cols-3 text-sm mt-4">
       <div className="col-span-3 flex flex-col space-y-3">
         <GoogleLogin
-          clientId="658977310896-knrl3gka66fldh83dao2rhgbblmd4un9.apps.googleusercontent.com"
+          clientId={googleClientId}
           render={(renderProps) => (
             <SignInProviderButton
               disabled={renderProps.disabled || false}
