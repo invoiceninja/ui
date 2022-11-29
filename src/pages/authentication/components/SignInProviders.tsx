@@ -146,6 +146,11 @@ export function SignInProviders() {
           cookiePolicy={'single_host_origin'}
         />
 
+        {/* 
+          eslint-disable-next-line 
+          @typescript-eslint/ban-ts-comment 
+        */}
+        {/* @ts-ignore */}
         <MicrosoftLogin
           clientId={microsoftClientId}
           authCallback={authHandler}
