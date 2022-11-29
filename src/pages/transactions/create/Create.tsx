@@ -96,42 +96,36 @@ export function Create() {
     event.preventDefault();
 
     setErrors(undefined);
+    setIsSaving(true);
+    toast.processing();
 
-    if (transaction?.bank_integration_id) {
-      setIsSaving(true);
-
-      toast.processing();
-
-      request('POST', endpoint('/api/v1/bank_transactions'), {
-        ...transaction,
-        amount: Number(transaction.amount),
-        base_type:
-          transaction.base_type === TransactionType.Deposit
-            ? ApiTransactionType.Credit
-            : ApiTransactionType.Debit,
+    request('POST', endpoint('/api/v1/bank_transactions'), {
+      ...transaction,
+      amount: Number(transaction.amount),
+      base_type:
+        transaction.base_type === TransactionType.Deposit
+          ? ApiTransactionType.Credit
+          : ApiTransactionType.Debit,
+    })
+      .then(() => {
+        toast.success('created_transaction');
+        setIsSaving(false);
+        navigate('/transactions');
       })
-        .then(() => {
-          toast.success('created_transaction');
-          setIsSaving(false);
-          navigate('/transactions');
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
+      .catch((error: AxiosError) => {
+        console.error(error);
 
-          if (error?.response?.status === 422) {
-            setErrors(error?.response.data.errors);
-            toast.dismiss();
-          } else {
-            toast.error();
-          }
-        })
-        .finally(() => setIsSaving(true));
-    } else {
-      setErrors((prevState) => ({
-        ...prevState,
-        bank_integration_id: t('required_field'),
-      }));
-    }
+        if (error?.response?.status === 422) {
+          setErrors(error?.response.data.errors);
+          toast.dismiss();
+        } else {
+          toast.error();
+        }
+      })
+      .finally(() => {
+        toast.dismiss();
+        setIsSaving(false);
+      });
   };
 
   useEffect(() => {

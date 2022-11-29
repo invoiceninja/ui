@@ -125,41 +125,35 @@ export function Edit() {
     event.preventDefault();
 
     setErrors(undefined);
+    setIsSaving(true);
+    toast.processing();
 
-    if (transaction.bank_integration_id) {
-      setIsSaving(true);
-
-      toast.processing();
-
-      request('PUT', endpoint('/api/v1/bank_transactions/:id', { id }), {
-        ...transaction,
-        amount: Number(transaction.amount),
-        base_type:
-          transaction.base_type === TransactionType.Deposit
-            ? ApiTransactionType.Credit
-            : ApiTransactionType.Debit,
+    request('PUT', endpoint('/api/v1/bank_transactions/:id', { id }), {
+      ...transaction,
+      amount: Number(transaction.amount),
+      base_type:
+        transaction.base_type === TransactionType.Deposit
+          ? ApiTransactionType.Credit
+          : ApiTransactionType.Debit,
+    })
+      .then(() => {
+        toast.success('updated_transaction');
+        navigate('/transactions');
       })
-        .then(() => {
-          toast.success('updated_transaction');
-          navigate('/transactions');
-        })
-        .catch((error: AxiosError) => {
-          console.error(error);
+      .catch((error: AxiosError) => {
+        console.error(error);
 
-          if (error?.response?.status === 422) {
-            setErrors(error?.response.data.errors);
-            toast.dismiss();
-          } else {
-            toast.error();
-          }
-        })
-        .finally(() => setIsSaving(false));
-    } else {
-      setErrors((prevState) => ({
-        ...prevState,
-        bank_integration_id: t('required_field'),
-      }));
-    }
+        if (error?.response?.status === 422) {
+          setErrors(error?.response.data.errors);
+          toast.dismiss();
+        } else {
+          toast.error();
+        }
+      })
+      .finally(() => {
+        toast.dismiss();
+        setIsSaving(false);
+      });
   };
 
   useEffect(() => {
