@@ -43,9 +43,7 @@ export function Create() {
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const [errors, setErrors] = useState<BankAccountValidation | undefined>(
-    undefined
-  );
+  const [errors, setErrors] = useState<BankAccountValidation>();
 
   const [bankAccount, setBankAccount] = useState<BankAccountInput>();
 
@@ -72,7 +70,7 @@ export function Create() {
 
       request('POST', endpoint('/api/v1/bank_integrations'), bankAccount)
         .then(() => {
-          toast.success(t('created_bank_account'));
+          toast.success('created_bank_account');
 
           queryClient.invalidateQueries('/api/v1/bank_integrations');
 
@@ -83,12 +81,14 @@ export function Create() {
 
           if (error?.response?.status === 422) {
             setErrors(error?.response?.data?.errors);
-            toast.dismiss();
           } else {
             toast.error();
           }
         })
-        .finally(() => setIsFormBusy(false));
+        .finally(() => {
+          toast.dismiss();
+          setIsFormBusy(false);
+        });
     }
   };
 

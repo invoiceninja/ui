@@ -33,7 +33,7 @@ import { ApiTransactionType, TransactionType } from 'common/enums/transactions';
 import CreateBankAccountModal from '../components/CreateBankAccountModal';
 
 export function Create() {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
 
   const navigate = useNavigate();
 
@@ -50,9 +50,8 @@ export function Create() {
   const [isAddNewBankAccountModalOpened, setIsAddNewBankAccountModalOpened] =
     useState<boolean>(false);
 
-  const [currencySeparators, setCurrencySeparators] = useState<
-    DecimalInputSeparators | undefined
-  >();
+  const [currencySeparators, setCurrencySeparators] =
+    useState<DecimalInputSeparators>();
 
   const [errors, setErrors] = useState<TransactionValidation>();
 
@@ -109,7 +108,6 @@ export function Create() {
     })
       .then(() => {
         toast.success('created_transaction');
-        setIsSaving(false);
         navigate('/transactions');
       })
       .catch((error: AxiosError) => {
@@ -117,7 +115,6 @@ export function Create() {
 
         if (error?.response?.status === 422) {
           setErrors(error?.response.data.errors);
-          toast.dismiss();
         } else {
           toast.error();
         }

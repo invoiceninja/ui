@@ -68,9 +68,8 @@ export function Edit() {
   const [isAddNewBankAccountModalOpened, setIsAddNewBankAccountModalOpened] =
     useState<boolean>(false);
 
-  const [currencySeparators, setCurrencySeparators] = useState<
-    DecimalInputSeparators | undefined
-  >();
+  const [currencySeparators, setCurrencySeparators] =
+    useState<DecimalInputSeparators>();
 
   const pages = [
     { name: t('transactions'), href: '/transactions' },
@@ -145,7 +144,6 @@ export function Edit() {
 
         if (error?.response?.status === 422) {
           setErrors(error?.response.data.errors);
-          toast.dismiss();
         } else {
           toast.error();
         }

@@ -40,9 +40,7 @@ export default function CreateBankAccountModal(props: Props) {
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const [errors, setErrors] = useState<BankAccountValidation | undefined>(
-    undefined
-  );
+  const [errors, setErrors] = useState<BankAccountValidation>();
 
   const [bankAccount, setBankAccount] = useState<BankAccountInput>();
 
@@ -88,12 +86,14 @@ export default function CreateBankAccountModal(props: Props) {
 
           if (error?.response?.status === 422) {
             setErrors(error?.response.data.errors);
-            toast.dismiss();
           } else {
             toast.error();
           }
         })
-        .finally(() => setIsFormBusy(false));
+        .finally(() => {
+          toast.dismiss();
+          setIsFormBusy(false);
+        });
     }
   };
 
