@@ -13,6 +13,7 @@ import { SelectField } from './forms';
 
 export interface GenericSelectorProps<T = string> {
   value: T;
+  label?: string;
   onChange: (id: string) => unknown;
 }
 
@@ -20,7 +21,12 @@ export function CountrySelector(props: GenericSelectorProps) {
   const countries = useCountries();
 
   return (
-    <SelectField onValueChange={props.onChange} value={props.value} withBlank>
+    <SelectField
+      onValueChange={props.onChange}
+      value={props.value}
+      label={props.label}
+      withBlank
+    >
       {countries.map((country, index) => (
         <option key={index} value={country.id}>
           {country.name}
