@@ -39,7 +39,7 @@ export function SelectField(props: Props) {
         }}
         id={props.id}
         className={classNames(
-          `w-full py-2 px-3 rounded text-sm  border border-gray-300 ${props.className}`
+          `w-full py-2 px-3 rounded text-sm border border-gray-300 text-gray-900 ${props.className}`
         )}
         defaultValue={props.defaultValue}
         value={props.value}
