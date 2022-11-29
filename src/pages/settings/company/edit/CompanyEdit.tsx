@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint, isHosted } from 'common/helpers';
@@ -164,57 +163,49 @@ export function CompanyEdit(props: Props) {
 
   return (
     <Modal
-      title={t('company_details')}
+      title={t('welcome_to_invoice_ninja')}
       visible={props.isModalOpen}
       onClose={() => {
         props.setIsModalOpen(false);
         setErrors(undefined);
       }}
-      size="regular"
       backgroundColor="white"
     >
-      <div>
-        <div className="flex justify-between mb-6 px-6">
-          <h1 className="text-2xl text-gray-900">
-            {t('welcome_to_invoice_ninja')}
-          </h1>
-        </div>
-        <Element leftSide={t('company_name')}>
-          <InputField
-            value={company?.name}
-            onValueChange={(value) => handleChange('name', value)}
-            errorMessage={errors?.errors?.name}
-          />
-        </Element>
-        {isHosted() && (
-          <Element leftSide={t('subdomain')}>
-            <InputField
-              value={company?.subdomain}
-              onValueChange={(value) => handleChange('subdomain', value)}
-            />
-          </Element>
-        )}
-        <Element leftSide={t('language')}>
-          <SelectField
-            value={company?.language_id}
-            onValueChange={(value) => handleChange('language_id', value)}
-            errorMessage={errors?.errors?.language_id}
-          >
-            {languages?.map((language, index) => (
-              <option key={index} value={language?.id}>
-                {language?.name}
-              </option>
-            ))}
-          </SelectField>
-        </Element>
-        <Element leftSide={t('currency')}>
-          <CurrencySelector
-            value={company?.currency_id || ''}
-            onChange={(value) => handleChange('currency_id', value)}
-          />
-        </Element>
-      </div>
-      <div className="flex justify-end pr-6">
+      <InputField
+        label={t('company_name')}
+        value={company?.name}
+        onValueChange={(value) => handleChange('name', value)}
+        errorMessage={errors?.errors?.name}
+      />
+
+      {isHosted() && (
+        <InputField
+          label={t('subdomain')}
+          value={company?.subdomain}
+          onValueChange={(value) => handleChange('subdomain', value)}
+        />
+      )}
+
+      <SelectField
+        label={t('language')}
+        value={company?.language_id}
+        onValueChange={(value) => handleChange('language_id', value)}
+        errorMessage={errors?.errors?.language_id}
+      >
+        {languages?.map((language, index) => (
+          <option key={index} value={language?.id}>
+            {language?.name}
+          </option>
+        ))}
+      </SelectField>
+
+      <CurrencySelector
+        label={t('currency')}
+        value={company?.currency_id || ''}
+        onChange={(value) => handleChange('currency_id', value)}
+      />
+
+      <div className="flex justify-end">
         <Button onClick={handleSave}>{t('save')}</Button>
       </div>
     </Modal>
