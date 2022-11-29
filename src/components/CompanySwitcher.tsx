@@ -25,7 +25,7 @@ import { useCompanyName } from 'common/hooks/useLogo';
 import { CompanyCreate } from 'pages/settings/company/create/CompanyCreate';
 import { CompanyEdit } from 'pages/settings/company/edit/CompanyEdit';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { isHosted, isSelfHosted } from 'common/helpers';
+import { isDemo, isHosted, isSelfHosted } from 'common/helpers';
 import { freePlan } from 'common/guards/guards/free-plan';
 import { BiPlusCircle } from 'react-icons/bi';
 
@@ -82,6 +82,10 @@ export function CompanySwitcher() {
   useEffect(() => {
     if (state.api.length < 10) {
       setShouldShowAddCompany(true);
+    }
+
+    if (isDemo()) {
+      setShouldShowAddCompany(false);
     }
 
     if (
