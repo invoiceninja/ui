@@ -12,10 +12,12 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
-import { Vendor, Contact } from 'common/interfaces/vendor';
+import { Vendor } from 'common/interfaces/vendor';
+import { VendorContact } from 'common/interfaces/vendor-contact';
 import { Divider } from 'components/cards/Divider';
 import { CountrySelector } from 'components/CountrySelector';
 import { CustomField } from 'components/CustomField';
+import Toggle from 'components/forms/Toggle';
 import { UserSelector } from 'components/users/UserSelector';
 import { set } from 'lodash';
 import { Field } from 'pages/settings/custom-fields/components';
@@ -38,8 +40,8 @@ export function Form(props: Props) {
   };
 
   const handleContactChange = (
-    property: keyof Contact,
-    value: string,
+    property: keyof VendorContact,
+    value: string | boolean,
     index: number
   ) => {
     const contacts = [...vendor.contacts];
@@ -65,6 +67,7 @@ export function Form(props: Props) {
       first_name: '',
       last_name: '',
       email: '',
+      send_email: false,
       created_at: 0,
       updated_at: 0,
       archived_at: 0,
@@ -74,6 +77,7 @@ export function Form(props: Props) {
       custom_value2: '',
       custom_value3: '',
       custom_value4: '',
+      link: '',
     });
 
     handleChange('contacts', contacts);
@@ -252,6 +256,15 @@ export function Form(props: Props) {
                   value={contact.phone}
                   onValueChange={(value) =>
                     handleContactChange('phone', value, index)
+                  }
+                />
+              </Element>
+
+              <Element leftSide={t('send_email')}>
+                <Toggle
+                  checked={contact.send_email}
+                  onChange={(value) =>
+                    handleContactChange('send_email', value, index)
                   }
                 />
               </Element>
