@@ -16,7 +16,12 @@ export function CurrencySelector(props: GenericSelectorProps) {
   const currencies = useCurrencies();
 
   return (
-    <SelectField value={props.value} onValueChange={props.onChange} withBlank>
+    <SelectField
+      value={props.value}
+      onValueChange={props.onChange}
+      label={props.label}
+      withBlank
+    >
       {currencies.map((currency, index) => (
         <option key={index} value={currency.id}>
           {currency.name}
