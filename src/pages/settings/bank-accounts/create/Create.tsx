@@ -77,18 +77,15 @@ export function Create() {
           navigate('/settings/bank_accounts');
         })
         .catch((error: AxiosError) => {
-          console.error(error);
-
           if (error?.response?.status === 422) {
-            setErrors(error?.response?.data?.errors);
+            setErrors(error.response.data.errors);
+            toast.dismiss();
           } else {
+            console.error(error);
             toast.error();
           }
         })
-        .finally(() => {
-          toast.dismiss();
-          setIsFormBusy(false);
-        });
+        .finally(() => setIsFormBusy(false));
     }
   };
 

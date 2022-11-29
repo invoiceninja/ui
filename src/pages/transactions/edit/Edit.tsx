@@ -140,18 +140,15 @@ export function Edit() {
         navigate('/transactions');
       })
       .catch((error: AxiosError) => {
-        console.error(error);
-
         if (error?.response?.status === 422) {
           setErrors(error?.response.data.errors);
+          toast.dismiss();
         } else {
+          console.error(error);
           toast.error();
         }
       })
-      .finally(() => {
-        toast.dismiss();
-        setIsSaving(false);
-      });
+      .finally(() => setIsSaving(false));
   };
 
   useEffect(() => {
