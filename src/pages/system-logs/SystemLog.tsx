@@ -20,11 +20,34 @@ import { date as formatDate } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { Card, Element } from '@invoiceninja/cards';
 import { Divider } from 'components/cards/Divider';
+import { JSONTree } from 'react-json-tree';
+import { Badge } from 'components/Badge';
 
 interface Category {
   id: number;
   name: string;
 }
+
+const jsonTreeTheme = {
+  scheme: 'monokai',
+  author: 'wimer hazenberg (http://www.monokai.nl)',
+  base00: '#272822',
+  base01: '#383830',
+  base02: '#49483e',
+  base03: '#75715e',
+  base04: '#a59f85',
+  base05: '#f8f8f2',
+  base06: '#f5f4f1',
+  base07: '#f9f8f5',
+  base08: '#f92672',
+  base09: '#fd971f',
+  base0A: '#f4bf75',
+  base0B: '#a6e22e',
+  base0C: '#a1efe4',
+  base0D: '#66d9ef',
+  base0E: '#ae81ff',
+  base0F: '#cc6633',
+};
 
 export function SystemLog() {
   const [t] = useTranslation();
@@ -116,16 +139,7 @@ export function SystemLog() {
   };
 
   const getLog = (src: string) => {
-    try {
-      const logs = JSON.parse(src);
-
-      if (logs && typeof logs === 'object') {
-        // return <ReactJson src={JSON.parse(src)} collapsed={true} />;
-      }
-    } catch (e) {
-      return src;
-    }
-    return src;
+    return <JSONTree data={JSON.parse(src)} theme={jsonTreeTheme} /> || src;
   };
 
   return (
@@ -152,12 +166,12 @@ export function SystemLog() {
                   dateFormat
                 )}`}
               >
-                <div>
-                  <p className="text-sm text-gray-900">
-                    {getEvent(systemLog.event_id)}
-                  </p>
+                <div className="flex flex-col space-y-2">
+                  <div>
+                    <Badge>{getEvent(systemLog.event_id)}</Badge>
+                  </div>
 
-                  {getLog(systemLog.log)}
+                  <div>{getLog(systemLog.log)}</div>
                 </div>
               </Element>
 
