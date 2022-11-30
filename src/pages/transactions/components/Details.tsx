@@ -21,7 +21,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Expense } from 'common/interfaces/expense';
 import { ExpenseCategory } from 'common/interfaces/expense-category';
 import { Invoice } from 'common/interfaces/invoice';
-import { TransactionDetails } from 'common/interfaces/transactions';
+import { TransactionResponse } from 'common/interfaces/transactions';
 import { Vendor } from 'common/interfaces/vendor';
 import { useExpenseCategoryQuery } from 'common/queries/expense-categories';
 import { useExpenseQuery } from 'common/queries/expenses';
@@ -34,19 +34,19 @@ import { useNavigate } from 'react-router-dom';
 import { TransactionMatchDetails } from './TransactionMatchDetails';
 
 interface Props {
-  transactionDetails?: TransactionDetails;
+  transactionDetails: TransactionResponse | undefined;
 }
 
 export function Details(props: Props) {
   const {
     id = '',
     amount = 0,
-    date,
+    date = '',
     currency_id = '',
     base_type = '',
     status_id = '',
     bank_integration_id = '',
-    invoice_ids,
+    invoice_ids = '',
     ninja_category_id = '',
     vendor_id = '',
     expense_id = '',

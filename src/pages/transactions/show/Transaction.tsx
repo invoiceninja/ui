@@ -12,10 +12,7 @@ import { useState, useEffect } from 'react';
 import { useTitle } from 'common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import {
-  TransactionDetails,
-  TransactionResponse,
-} from 'common/interfaces/transactions';
+import { TransactionResponse } from 'common/interfaces/transactions';
 import { Details } from '../components/Details';
 import { useTransactionQuery } from '../common/queries';
 import { route } from 'common/helpers/route';
@@ -30,7 +27,7 @@ export function Transaction() {
 
   const { data: response } = useTransactionQuery({ id });
 
-  const [transaction, setTransaction] = useState<TransactionDetails>();
+  const [transaction, setTransaction] = useState<TransactionResponse>();
 
   const pages = [
     { name: t('transactions'), href: '/transactions' },
@@ -40,39 +37,8 @@ export function Transaction() {
     },
   ];
 
-  const getTransactionDetailsObject = (
-    responseDetails: TransactionResponse | undefined
-  ) => {
-    const {
-      date = '',
-      amount = 0,
-      currency_id = '',
-      base_type = '',
-      id = '',
-      bank_integration_id = '',
-      invoice_ids = '',
-      status_id = '',
-      ninja_category_id = '',
-      vendor_id = '',
-      expense_id = '',
-    } = responseDetails || {};
-    return {
-      id,
-      date,
-      amount,
-      currency_id,
-      base_type,
-      bank_integration_id,
-      invoice_ids,
-      status_id,
-      ninja_category_id,
-      vendor_id,
-      expense_id,
-    };
-  };
-
   useEffect(() => {
-    setTransaction(getTransactionDetailsObject(response));
+    setTransaction(response);
   }, [response]);
 
   return (

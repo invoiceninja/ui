@@ -239,13 +239,13 @@ export default function ListBox(props: Props) {
           {props.isCreditTransactionType ? (
             <MdFilterAlt
               className="ml-3 cursor-pointer"
-              style={{ fontSize: 30 }}
+              fontSize={30}
               onClick={() => setIsFilterModalOpened((prevState) => !prevState)}
             />
           ) : (
             <BiPlusCircle
               className="ml-3 cursor-pointer"
-              style={{ fontSize: 28 }}
+              fontSize={28}
               onClick={() =>
                 props.dataKey === 'vendors'
                   ? navigate('/vendors/create')
@@ -364,9 +364,8 @@ export default function ListBox(props: Props) {
           filteredVendors?.map(({ id, name, number }) => (
             <div
               key={id}
-              className="flex justify-between relative hover:bg-gray-100 w-full cursor-pointer p-3 border-b border-gray-400"
+              className="flex justify-between relative hover:bg-gray-100 w-full cursor-pointer p-4 border-b border-gray-400"
               onClick={() => selectItem(id)}
-              style={{ height: 60 }}
             >
               <div className="flex items-center">
                 <Checkbox
@@ -385,9 +384,8 @@ export default function ListBox(props: Props) {
           filteredExpenseCategories?.map(({ id, name }) => (
             <div
               key={id}
-              className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-3 border-b border-gray-400"
+              className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-4 border-b border-gray-400"
               onClick={() => selectItem(id)}
-              style={{ height: 60 }}
             >
               <div className="flex items-center">
                 <Checkbox

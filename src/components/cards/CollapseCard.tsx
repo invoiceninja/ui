@@ -12,7 +12,7 @@ import { Dispatch, Fragment, ReactNode, SetStateAction } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import CommonProps from 'common/interfaces/common-props.interface';
 import { MdClose } from 'react-icons/md';
-import { classNames } from 'common/helpers';
+import classNames from 'classnames';
 
 interface Props extends CommonProps {
   visible: boolean;
@@ -23,22 +23,6 @@ interface Props extends CommonProps {
 }
 
 export function CollapseCard(props: Props) {
-  const getSizeClass = () => {
-    if (props.size === 'large') {
-      return 'max-w-2xl';
-    }
-    if (props.size === 'regular') {
-      return 'max-w-md';
-    }
-    if (props.size === 'small') {
-      return 'max-w-sm';
-    }
-    if (props.size === 'extraSmall') {
-      return 'max-w-xs';
-    }
-    return 'max-w-4xl';
-  };
-
   return (
     <Transition.Root show={props.visible} as={Fragment}>
       <Dialog
@@ -61,10 +45,13 @@ export function CollapseCard(props: Props) {
                 leaveTo="translate-x-full"
               >
                 <Dialog.Panel
-                  className={classNames(
-                    `pointer-events-auto w-screen`,
-                    getSizeClass()
-                  )}
+                  className={classNames('pointer-events-auto', 'w-screen', {
+                    'max-w-2xl': props.size === 'large',
+                    'max-w-sm': props.size === 'small',
+                    'max-w-md': props.size === 'regular',
+                    'max-w-xs': props.size === 'extraSmall',
+                    'max-w-4xl': props.size === 'extraLarge',
+                  })}
                 >
                   <form className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
                     <div className="h-0 flex-1 overflow-y-auto">
