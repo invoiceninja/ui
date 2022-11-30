@@ -23,11 +23,11 @@ import { Invoice } from 'common/interfaces/invoice';
 import CommonProps from 'common/interfaces/common-props.interface';
 import { BiPlusCircle } from 'react-icons/bi';
 import { useNavigate } from 'react-router-dom';
-import { useVendorsQuery } from 'common/queries/vendor';
 import { useExpenseCategoriesQuery } from 'common/queries/expense-categories';
 import { Vendor } from 'common/interfaces/vendor';
 import { ExpenseCategory } from 'common/interfaces/expense-category';
 import { useInvoicesQuery } from 'pages/invoices/common/queries';
+import { useVendorsQuery } from 'common/queries/vendor';
 
 interface SearchInput {
   searchTerm: string;
@@ -220,17 +220,14 @@ export default function ListBox(props: Props) {
   }, [searchParams]);
 
   return (
-    <div
-      className={`flex flex-col ${
-        props.isCreditTransactionType ? 'w-3/4' : 'w-full'
-      }`}
-    >
+    <div className="flex flex-col w-full">
       <div
-        className={`flex justify-center items-start px-5 py-3 relative border-b border-t border-gray-400 ${
-          props.dataKey === 'vendors' && 'border-r'
-        } ${props.className}`}
+        className={`flex justify-center items-start px-5 py-3 relative border-b border-t border-gray-400 ${props.className}`}
       >
-        <div className="flex items-center">
+        <form
+          className="flex items-center"
+          onSubmit={(event) => event.preventDefault()}
+        >
           <InputField
             className="bg-gray-200"
             placeholder={t(`search_${props.dataKey}`)}
@@ -256,9 +253,12 @@ export default function ListBox(props: Props) {
               }
             />
           )}
-        </div>
+        </form>
         {isFilterModalOpened && props.isCreditTransactionType && (
-          <div className="absolute w-full top-full m-1 bg-gray-100 text-center pb-2 border-b border-gray-400 z-10">
+          <form
+            onSubmit={(event) => event.preventDefault()}
+            className="absolute w-full top-full m-1 bg-gray-100 text-center pb-2 border-b border-gray-400 z-10"
+          >
             <div className="w-3/5 p-3 inline-block">
               <div className="flex justify-center">
                 <div className="flex flex-col items-start">
@@ -273,7 +273,7 @@ export default function ListBox(props: Props) {
                     }
                   />
                 </div>
-                <div className="flex flex-col items-start pr-3 ml-2">
+                <div className="flex flex-col items-start pr-3">
                   <p className="text-sm ml-4">{`${t('max')} ${t('amount')}`}</p>
                   <InputField
                     value={searchParams.maxAmount}
@@ -317,13 +317,13 @@ export default function ListBox(props: Props) {
                 </div>
               </div>
             </div>
-          </div>
+          </form>
         )}
       </div>
       <div
         className="flex flex-col justify-start items-center overflow-y-auto border-b border-gray-400"
         style={{
-          height: 330,
+          height: props.isCreditTransactionType ? 550 : 320,
         }}
       >
         {props.isCreditTransactionType &&
@@ -339,16 +339,16 @@ export default function ListBox(props: Props) {
                   checked={isItemChecked(invoice.id)}
                   onClick={() => selectItem(invoice.id)}
                 />
-                <span className="text-md">{invoice.number}</span>
+                <span className="text-sm">{invoice.number}</span>
               </div>
               <div className="flex flex-col">
-                <span className="text-md">
+                <span className="text-sm">
                   {getClientName(invoice.client_id)}
                 </span>
                 <span className="text-sm text-gray-600">{invoice.date}</span>
               </div>
               <div className="flex items-center">
-                <span className="mr-6">
+                <span className="mr-6 text-sm">
                   {formatMoney(
                     invoice.amount,
                     company.settings.country_id,
@@ -364,7 +364,7 @@ export default function ListBox(props: Props) {
           filteredVendors?.map(({ id, name, number }) => (
             <div
               key={id}
-              className="flex justify-between relative hover:bg-gray-100 w-full cursor-pointer p-3 border-b border-r border-gray-400"
+              className="flex justify-between relative hover:bg-gray-100 w-full cursor-pointer p-3 border-b border-gray-400"
               onClick={() => selectItem(id)}
               style={{ height: 60 }}
             >

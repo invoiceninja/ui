@@ -9,6 +9,7 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
+import { Button } from '@invoiceninja/forms';
 import {
   ApiTransactionType,
   TransactionStatus,
@@ -76,6 +77,9 @@ export function Details(props: Props) {
   const [isCreditTransactionType, setIsCreditTransactionType] =
     useState<boolean>(false);
 
+  const [isMatchTransactionDialogOpened, setIsMatchTransactionDialogOpened] =
+    useState<boolean>(false);
+
   const [matchedInvoices, setMatchedInvoices] = useState<Invoice[]>();
 
   const [matchedVendor, setMatchedVendor] = useState<Vendor>();
@@ -97,7 +101,7 @@ export function Details(props: Props) {
     setMatchedInvoices(filteredMatchedInvoices);
 
     setShouldShowTransactionMatchDetails(
-      TransactionStatus.Unmatched === status_id
+      TransactionStatus.Converted !== status_id
     );
 
     setIsCreditTransactionType(base_type === ApiTransactionType.Credit);
@@ -123,7 +127,7 @@ export function Details(props: Props) {
           : t(TransactionType.Withdrawal)}
       </Element>
       <Element leftSide={t('amount')}>
-        {formatMoney(amount, company.settings.country_id, currency_id)}
+        {formatMoney(amount, company?.settings.country_id, currency_id)}
       </Element>
       <Element leftSide={t('date')}>{date}</Element>
       <Element
@@ -202,9 +206,18 @@ export function Details(props: Props) {
         </>
       )}
       {shouldShowTransactionMatchDetails && (
-        <TransactionMatchDetails
-          transactionDetails={{ base_type, transaction_id: id, status_id }}
-        />
+        <>
+          <Element leftSide={t('match_transaction')}>
+            <Button onClick={() => setIsMatchTransactionDialogOpened(true)}>
+              {t('open')}
+            </Button>
+          </Element>
+          <TransactionMatchDetails
+            transactionDetails={{ base_type, transaction_id: id, status_id }}
+            visible={isMatchTransactionDialogOpened}
+            setVisible={setIsMatchTransactionDialogOpened}
+          />
+        </>
       )}
     </Card>
   );

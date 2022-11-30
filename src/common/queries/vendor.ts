@@ -38,7 +38,7 @@ export function useBlankVendorQuery() {
 }
 
 export function useVendorsQuery() {
-  return useQuery<Vendor[]>(
+  return useQuery(
     '/api/v1/vendors',
     () =>
       request('GET', endpoint('/api/v1/vendors')).then(

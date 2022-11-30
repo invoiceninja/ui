@@ -8,7 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { FormEvent, useEffect, useState } from 'react';
+import {
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'common/helpers/toast/toast';
 import { request } from 'common/helpers/request';
@@ -16,10 +22,11 @@ import { endpoint } from 'common/helpers';
 import { AxiosError } from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from 'react-query';
-import ListBox from './ListBox';
 import { MdContentCopy } from 'react-icons/md';
 import { ApiTransactionType } from 'common/enums/transactions';
 import { Button } from '@invoiceninja/forms';
+import ListBox from './ListBox';
+import { ToggleCard } from 'components/cards/ToggleCard';
 
 export interface TransactionDetails {
   base_type: string;
@@ -29,6 +36,8 @@ export interface TransactionDetails {
 
 interface Props {
   transactionDetails: TransactionDetails;
+  visible: boolean;
+  setVisible: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function TransactionMatchDetails(props: Props) {
@@ -54,7 +63,7 @@ export default function TransactionMatchDetails(props: Props) {
     event.preventDefault();
 
     if (!selectedInvoiceIds?.length) {
-      toast.error('select_invoices');
+      return;
     } else {
       setIsFormBusy(true);
 
@@ -88,10 +97,8 @@ export default function TransactionMatchDetails(props: Props) {
   const convertToExpense = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!selectedVendorIds?.length) {
-      toast.error('select_vendors');
-    } else if (!selectedExpenseCategoryIds?.length) {
-      toast.error('select_expense_category');
+    if (!selectedVendorIds?.length || !selectedExpenseCategoryIds?.length) {
+      return;
     } else {
       setIsFormBusy(true);
 
@@ -117,7 +124,7 @@ export default function TransactionMatchDetails(props: Props) {
         })
         .catch((error: AxiosError) => {
           console.error(error);
-          toast.error(t('error_title'));
+          toast.error();
         })
         .finally(() => {
           setIsFormBusy(false);
@@ -131,48 +138,61 @@ export default function TransactionMatchDetails(props: Props) {
     );
   }, [props.transactionDetails.base_type]);
 
+  const actionButton = (
+    <Button
+      className="w-full"
+      onClick={isCreditTransactionType ? convertToPayment : convertToExpense}
+      disabled={isFormBusy}
+    >
+      {<MdContentCopy style={{ fontSize: 22 }} />}
+      <span>
+        {isCreditTransactionType
+          ? t('convert_to_payment')
+          : t('convert_to_expense')}
+      </span>
+    </Button>
+  );
+
   return (
-    <div className="flex flex-col items-center justify-center mt-10 px-7 border-gray-400">
-      {isCreditTransactionType ? (
-        <ListBox
-          transactionDetails={props.transactionDetails}
-          isCreditTransactionType={isCreditTransactionType}
-          dataKey="invoices"
-          setSelectedIds={setSelectedInvoiceIds}
-          selectedIds={selectedInvoiceIds}
-        />
-      ) : (
-        <div className="flex w-full">
-          <ListBox
-            transactionDetails={props.transactionDetails}
-            isCreditTransactionType={isCreditTransactionType}
-            dataKey="vendors"
-            setSelectedIds={setSelectedVendorIds}
-            selectedIds={selectedVendorIds}
-          />
-          <ListBox
-            transactionDetails={props.transactionDetails}
-            isCreditTransactionType={isCreditTransactionType}
-            dataKey="categories"
-            setSelectedIds={setSelectedExpenseCategoryIds}
-            selectedIds={selectedExpenseCategoryIds}
-          />
-        </div>
-      )}
-      <Button
-        className={`mt-4 ${
-          isCreditTransactionType ? 'w-3/4' : 'w-2/4'
-        } self-center`}
-        onClick={isCreditTransactionType ? convertToPayment : convertToExpense}
-        disabled={isFormBusy}
+    <ToggleCard
+      title={t('match_transaction')}
+      visible={props.visible}
+      setVisible={props.setVisible}
+      size={isCreditTransactionType ? 'large' : 'small'}
+      actionElement={actionButton}
+    >
+      <div
+        className="flex flex-col items-center justify-center border-gray-400"
+        style={{ width: isCreditTransactionType ? '600px' : 'auto' }}
       >
-        {<MdContentCopy style={{ fontSize: 22 }} />}
-        <span>
-          {isCreditTransactionType
-            ? t('convert_to_payment')
-            : t('convert_to_expense')}
-        </span>
-      </Button>
-    </div>
+        {isCreditTransactionType ? (
+          <ListBox
+            transactionDetails={props.transactionDetails}
+            isCreditTransactionType={isCreditTransactionType}
+            dataKey="invoices"
+            setSelectedIds={setSelectedInvoiceIds}
+            selectedIds={selectedInvoiceIds}
+          />
+        ) : (
+          <>
+            <ListBox
+              transactionDetails={props.transactionDetails}
+              isCreditTransactionType={isCreditTransactionType}
+              dataKey="vendors"
+              setSelectedIds={setSelectedVendorIds}
+              selectedIds={selectedVendorIds}
+            />
+            <ListBox
+              className="border-t-0"
+              transactionDetails={props.transactionDetails}
+              isCreditTransactionType={isCreditTransactionType}
+              dataKey="categories"
+              setSelectedIds={setSelectedExpenseCategoryIds}
+              selectedIds={selectedExpenseCategoryIds}
+            />
+          </>
+        )}
+      </div>
+    </ToggleCard>
   );
 }

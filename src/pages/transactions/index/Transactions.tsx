@@ -36,6 +36,7 @@ export function Transactions() {
         columns={columns}
         linkToCreate="/transactions/create"
         linkToEdit="/transactions/:id/edit"
+        rowClickLink="/transactions/:id"
         rightSide={<ImportButton route="/transactions/import" />}
         withResourcefulActions
       />

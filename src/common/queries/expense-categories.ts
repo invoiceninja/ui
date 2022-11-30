@@ -18,7 +18,7 @@ import { ExpenseCategory } from 'common/interfaces/expense-category';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
 export function useExpenseCategoriesQuery(params?: Params) {
-  return useQuery<ExpenseCategory[]>(
+  return useQuery(
     ['/api/v1/expense_categories', params],
     () =>
       request(
