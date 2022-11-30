@@ -153,6 +153,7 @@ export function Create() {
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={() => navigate('/settings/online_payments')}
+      disableSaveButton={!gateway}
     >
       <TabGroup tabs={tabs}>
         <Card title={t('add_gateway')}>
