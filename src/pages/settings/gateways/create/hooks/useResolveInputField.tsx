@@ -11,6 +11,7 @@
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import { CompanyGateway } from 'common/interfaces/company-gateway';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { ColorPicker } from 'components/forms/ColorPicker';
 import Toggle from 'components/forms/Toggle';
 import { ChangeEvent } from 'react';
@@ -35,7 +36,11 @@ export function useResolveInputField(
   // Boolean (toggle) where value is false/true (default)
   // Dropdow where value is array of possible items
 
-  return (property: string, value: Field) => {
+  return (
+    property: string,
+    value: Field,
+    errors: ValidationBag | undefined
+  ) => {
     if (property.toLowerCase().endsWith('color')) {
       return (
         <ColorPicker
@@ -55,6 +60,7 @@ export function useResolveInputField(
             handleChange(property as keyof Field, event.target.value)
           }
           value={resolveConfigValue(property)}
+          errorMessage={errors?.errors.appleDomainVerification}
         />
       );
     }
@@ -66,6 +72,7 @@ export function useResolveInputField(
             handleChange(property as keyof Field, event.target.value)
           }
           value={resolveConfigValue(property)}
+          errorMessage={errors?.errors[property]}
         />
       );
     }
@@ -86,6 +93,7 @@ export function useResolveInputField(
             handleChange(property as keyof Field, event.target.value)
           }
           value={resolveConfigValue(property)}
+          errorMessage={errors?.errors[property]}
         >
           {value.map((option, index) => (
             <option key={index} value={option}>

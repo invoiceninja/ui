@@ -15,6 +15,7 @@ import {
   FeesAndLimitsEntry,
 } from 'common/interfaces/company-gateway';
 import { Gateway } from 'common/interfaces/statics';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Divider } from 'components/cards/Divider';
 import Toggle from 'components/forms/Toggle';
 import { ChangeEvent, useEffect, useState } from 'react';
@@ -28,6 +29,7 @@ interface Props {
   setCompanyGateway: React.Dispatch<
     React.SetStateAction<CompanyGateway | undefined>
   >;
+  errors: ValidationBag | undefined;
 }
 
 export function LimitsAndFees(props: Props) {
@@ -67,7 +69,10 @@ export function LimitsAndFees(props: Props) {
   return (
     <Card title={t('limits_and_fees')}>
       <Element leftSide={t('payment_type')}>
-        <SelectField onChange={handlePaymentTypeChange}>
+        <SelectField
+          onChange={handlePaymentTypeChange}
+          errorMessage={props.errors?.errors.gatewayTypeId}
+        >
           {Object.entries(props.companyGateway.fees_and_limits)
             .filter(([, entry]) => entry.is_enabled)
             .map(([gatewayTypeId], index) => (
@@ -96,6 +101,7 @@ export function LimitsAndFees(props: Props) {
                 onValueChange={(value) =>
                   handleEntryChange('min_limit', parseFloat(value) || -1)
                 }
+                errorMessage={props.errors?.errors.min_limit}
               />
 
               <Toggle
@@ -125,6 +131,7 @@ export function LimitsAndFees(props: Props) {
                 onValueChange={(value) =>
                   handleEntryChange('max_limit', parseFloat(value) || -1)
                 }
+                errorMessage={props.errors?.errors.max_limit}
               />
 
               <Toggle
@@ -151,6 +158,7 @@ export function LimitsAndFees(props: Props) {
               onValueChange={(value) =>
                 handleEntryChange('fee_percent', parseFloat(value))
               }
+              errorMessage={props.errors?.errors.fee_percent}
             />
           </Element>
 
@@ -163,6 +171,7 @@ export function LimitsAndFees(props: Props) {
               onValueChange={(value) =>
                 handleEntryChange('fee_amount', parseFloat(value))
               }
+              errorMessage={props.errors?.errors.fee_amount}
             />
           </Element>
 
@@ -175,6 +184,7 @@ export function LimitsAndFees(props: Props) {
               onValueChange={(value) =>
                 handleEntryChange('fee_cap', parseFloat(value))
               }
+              errorMessage={props.errors?.errors.fee_cap}
             />
           </Element>
 
