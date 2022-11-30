@@ -10,14 +10,13 @@
 
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Invoice } from 'common/interfaces/invoice';
 import { useQuery } from 'react-query';
 
 export function useInvoicesQuery() {
   return useQuery<Invoice[]>(
-    route('/api/v1/invoices'),
+    '/api/v1/invoices',
     () =>
       request('GET', endpoint('/api/v1/invoices')).then(
         (response: GenericSingleResourceResponse<Invoice[]>) =>

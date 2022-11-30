@@ -104,10 +104,16 @@ export function Details(props: Props) {
 
     setMatchedVendor(vendorResponse);
 
-    setMatchedExpenseCategory(expenseCategoryResponse?.data?.data);
+    setMatchedExpenseCategory(expenseCategoryResponse?.data.data);
 
     setMatchedExpense(expenseResponse);
-  }, [invoicesResponse, invoice_ids, vendorResponse, expenseCategoryResponse]);
+  }, [
+    invoicesResponse,
+    invoice_ids,
+    vendorResponse,
+    expenseCategoryResponse,
+    id,
+  ]);
 
   return (
     <Card title={t('details')}>
@@ -117,7 +123,7 @@ export function Details(props: Props) {
           : t(TransactionType.Withdrawal)}
       </Element>
       <Element leftSide={t('amount')}>
-        {formatMoney(amount, company?.settings?.country_id, currency_id)}
+        {formatMoney(amount, company.settings.country_id, currency_id)}
       </Element>
       <Element leftSide={t('date')}>{date}</Element>
       <Element
@@ -148,7 +154,7 @@ export function Details(props: Props) {
               )
             }
           >
-            {number || t('without_number')}
+            {number}
           </Element>
         ))}
 

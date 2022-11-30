@@ -13,6 +13,7 @@ import { Vendor } from 'common/interfaces/vendor';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { endpoint } from '../helpers';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
 export function useVendorQuery(params: { id: string | undefined }) {
   return useQuery<Vendor>(
@@ -41,7 +42,8 @@ export function useVendorsQuery() {
     '/api/v1/vendors',
     () =>
       request('GET', endpoint('/api/v1/vendors')).then(
-        (response) => response.data.data
+        (response: GenericSingleResourceResponse<Vendor[]>) =>
+          response.data.data
       ),
     { staleTime: Infinity }
   );

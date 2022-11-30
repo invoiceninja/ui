@@ -55,15 +55,15 @@ export interface TransactionResponse {
 }
 
 export interface TransactionDetails {
-  id?: string;
-  amount?: number;
-  date?: string;
-  currency_id?: string;
-  base_type?: string;
-  status_id?: string;
-  bank_integration_id?: string;
-  invoice_ids?: string;
-  vendor_id?: string;
-  ninja_category_id?: string;
-  expense_id?: string;
+  id: string;
+  amount: number;
+  date: string;
+  currency_id: string;
+  base_type: string;
+  status_id: string;
+  bank_integration_id: string;
+  invoice_ids: string;
+  vendor_id: string;
+  ninja_category_id: string;
+  expense_id: string;
 }

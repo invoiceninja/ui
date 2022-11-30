@@ -93,18 +93,16 @@ export default function ListBox(props: Props) {
     return Boolean(filteredItemIds?.length);
   };
 
-  const selectItem = (invoiceId: string) => {
-    const filteredInvoiceIdsList = props.selectedIds?.find(
-      (id) => invoiceId === id
-    );
+  const selectItem = (itemId: string) => {
+    const filteredItemIdsList = props.selectedIds?.find((id) => itemId === id);
 
     let updatedItemIds;
 
-    if (filteredInvoiceIdsList?.length) {
-      updatedItemIds = props.selectedIds?.filter((id) => id !== invoiceId);
+    if (filteredItemIdsList?.length) {
+      updatedItemIds = props.selectedIds?.filter((id) => id !== itemId);
       props.setSelectedIds(updatedItemIds);
     } else {
-      updatedItemIds = [...(props.selectedIds || []), invoiceId];
+      updatedItemIds = [...(props.selectedIds || []), itemId];
       props.setSelectedIds(updatedItemIds);
     }
 
@@ -112,7 +110,7 @@ export default function ListBox(props: Props) {
       const vendorIdsList = updatedItemIds?.join(',');
 
       const filteredVendorItems = vendors?.filter(({ id }) =>
-        vendorIdsList ? vendorIdsList?.includes(id) : true
+        vendorIdsList ? vendorIdsList.includes(id) : true
       );
 
       setFilteredVendors(filteredVendorItems);
@@ -122,7 +120,7 @@ export default function ListBox(props: Props) {
       const expenseCategoryIdsList = updatedItemIds?.join(',');
 
       const filteredExpenseCategoryItems = expenseCategories?.filter(({ id }) =>
-        expenseCategoryIdsList ? expenseCategoryIdsList?.includes(id) : true
+        expenseCategoryIdsList ? expenseCategoryIdsList.includes(id) : true
       );
 
       setFilteredExpenseCategories(filteredExpenseCategoryItems);
@@ -176,7 +174,7 @@ export default function ListBox(props: Props) {
 
     const updatedDataWithSearchTerm = vendors?.filter(({ number, name }) =>
       searchTerm
-        ? number.includes(searchTerm) || name?.includes(searchTerm)
+        ? number.includes(searchTerm) || name.includes(searchTerm)
         : true
     );
 
@@ -187,7 +185,7 @@ export default function ListBox(props: Props) {
     const { searchTerm } = searchParams;
 
     const updatedDataWithSearchTerm = expenseCategories?.filter(({ name }) =>
-      searchTerm ? name?.includes(searchTerm) : true
+      searchTerm ? name.includes(searchTerm) : true
     );
 
     setFilteredExpenseCategories(updatedDataWithSearchTerm);
@@ -195,7 +193,7 @@ export default function ListBox(props: Props) {
 
   useEffect(() => {
     if (props.isCreditTransactionType) {
-      setClients(clientsResponse?.data?.data);
+      setClients(clientsResponse?.data.data);
       setInvoices(invoicesResponse);
       setFilteredInvoices(invoicesResponse);
     } else {
@@ -222,9 +220,15 @@ export default function ListBox(props: Props) {
   }, [searchParams]);
 
   return (
-    <>
+    <div
+      className={`flex flex-col ${
+        props.isCreditTransactionType ? 'w-3/4' : 'w-full'
+      }`}
+    >
       <div
-        className={`flex justify-center px-5 py-3 w-full relative border-b border-t border-gray-400 ${props.className}`}
+        className={`flex justify-center items-start px-5 py-3 relative border-b border-t border-gray-400 ${
+          props.dataKey === 'vendors' && 'border-r'
+        } ${props.className}`}
       >
         <div className="flex items-center">
           <InputField
@@ -317,7 +321,7 @@ export default function ListBox(props: Props) {
         )}
       </div>
       <div
-        className="flex flex-col justify-start items-center overflow-y-auto w-full border-b border-gray-400"
+        className="flex flex-col justify-start items-center overflow-y-auto border-b border-gray-400"
         style={{
           height: 330,
         }}
@@ -325,14 +329,15 @@ export default function ListBox(props: Props) {
         {props.isCreditTransactionType &&
           filteredInvoices?.map((invoice) => (
             <div
-              key={invoice?.id}
+              key={invoice.id}
               className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-3 border-b border-gray-400"
-              onClick={() => selectItem(invoice?.id)}
+              onClick={() => selectItem(invoice.id)}
+              style={{ height: 68 }}
             >
               <div className="flex items-center">
                 <Checkbox
                   checked={isItemChecked(invoice.id)}
-                  onClick={() => selectItem(invoice?.id)}
+                  onClick={() => selectItem(invoice.id)}
                 />
                 <span className="text-md">{invoice.number}</span>
               </div>
@@ -359,8 +364,9 @@ export default function ListBox(props: Props) {
           filteredVendors?.map(({ id, name, number }) => (
             <div
               key={id}
-              className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-3 border-b border-gray-400"
+              className="flex justify-between relative hover:bg-gray-100 w-full cursor-pointer p-3 border-b border-r border-gray-400"
               onClick={() => selectItem(id)}
+              style={{ height: 60 }}
             >
               <div className="flex items-center">
                 <Checkbox
@@ -381,6 +387,7 @@ export default function ListBox(props: Props) {
               key={id}
               className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-3 border-b border-gray-400"
               onClick={() => selectItem(id)}
+              style={{ height: 60 }}
             >
               <div className="flex items-center">
                 <Checkbox
@@ -392,6 +399,6 @@ export default function ListBox(props: Props) {
             </div>
           ))}
       </div>
-    </>
+    </div>
   );
 }

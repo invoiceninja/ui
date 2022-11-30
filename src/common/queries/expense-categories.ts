@@ -14,9 +14,11 @@ import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { Params } from './common/params.interface';
+import { ExpenseCategory } from 'common/interfaces/expense-category';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
 export function useExpenseCategoriesQuery(params?: Params) {
-  return useQuery(
+  return useQuery<ExpenseCategory[]>(
     ['/api/v1/expense_categories', params],
     () =>
       request(
@@ -29,7 +31,10 @@ export function useExpenseCategoriesQuery(params?: Params) {
             sort: params?.sort ?? 'id|asc',
           }
         )
-      ).then((response) => response.data.data),
+      ).then(
+        (response: GenericSingleResourceResponse<ExpenseCategory[]>) =>
+          response.data.data
+      ),
     { staleTime: Infinity }
   );
 }

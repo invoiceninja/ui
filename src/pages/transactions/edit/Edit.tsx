@@ -143,8 +143,6 @@ export function Edit() {
       } else {
         toast.error(t('error_title'));
       }
-
-      setIsSaving(false);
     }
   };
 

@@ -43,17 +43,12 @@ export default function TransactionMatchDetails(props: Props) {
   const [isCreditTransactionType, setIsCreditTransactionType] =
     useState<boolean>(false);
 
-  const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<
-    string[] | undefined
-  >();
+  const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>();
 
-  const [selectedVendorIds, setSelectedVendorIds] = useState<
-    string[] | undefined
-  >();
+  const [selectedVendorIds, setSelectedVendorIds] = useState<string[]>();
 
-  const [selectedExpenseCategoryIds, setSelectedExpenseCategoryIds] = useState<
-    string[] | undefined
-  >();
+  const [selectedExpenseCategoryIds, setSelectedExpenseCategoryIds] =
+    useState<string[]>();
 
   const convertToPayment = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -82,7 +77,7 @@ export default function TransactionMatchDetails(props: Props) {
         })
         .catch((error: AxiosError) => {
           console.error(error);
-          toast.error(t('error_title'));
+          toast.error();
         })
         .finally(() => {
           setIsFormBusy(false);
@@ -102,9 +97,9 @@ export default function TransactionMatchDetails(props: Props) {
 
       toast.processing();
 
-      const vendor_id = selectedVendorIds?.join(',');
+      const vendor_id = selectedVendorIds.join(',');
 
-      const ninja_category_id = selectedExpenseCategoryIds?.join(',');
+      const ninja_category_id = selectedExpenseCategoryIds.join(',');
 
       request('POST', endpoint('/api/v1/bank_transactions/match'), {
         transactions: [
@@ -117,7 +112,7 @@ export default function TransactionMatchDetails(props: Props) {
       })
         .then(() => {
           queryClient.invalidateQueries('/api/v1/bank_transactions');
-          toast.success(t('converted_transaction'));
+          toast.success('converted_transaction');
           navigate('/transactions');
         })
         .catch((error: AxiosError) => {
@@ -147,7 +142,7 @@ export default function TransactionMatchDetails(props: Props) {
           selectedIds={selectedInvoiceIds}
         />
       ) : (
-        <>
+        <div className="flex w-full">
           <ListBox
             transactionDetails={props.transactionDetails}
             isCreditTransactionType={isCreditTransactionType}
@@ -156,17 +151,18 @@ export default function TransactionMatchDetails(props: Props) {
             selectedIds={selectedVendorIds}
           />
           <ListBox
-            className="border-t-0"
             transactionDetails={props.transactionDetails}
             isCreditTransactionType={isCreditTransactionType}
             dataKey="categories"
             setSelectedIds={setSelectedExpenseCategoryIds}
             selectedIds={selectedExpenseCategoryIds}
           />
-        </>
+        </div>
       )}
       <Button
-        className="mt-4 w-full"
+        className={`mt-4 ${
+          isCreditTransactionType ? 'w-3/4' : 'w-2/4'
+        } self-center`}
         onClick={isCreditTransactionType ? convertToPayment : convertToExpense}
         disabled={isFormBusy}
       >
