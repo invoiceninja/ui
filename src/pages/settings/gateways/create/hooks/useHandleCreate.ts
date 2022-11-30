@@ -24,11 +24,8 @@ export function useHandleCreate(
   const navigate = useNavigate();
 
   return () => {
-    if (!companyGateway) {
-      return;
-    }
-
     toast.processing();
+
     setErrors(undefined);
 
     request('POST', endpoint('/api/v1/company_gateways'), companyGateway)
