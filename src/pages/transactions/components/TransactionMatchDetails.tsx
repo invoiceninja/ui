@@ -129,7 +129,7 @@ export default function TransactionMatchDetails(props: Props) {
     setIsCreditTransactionType(
       props.transactionDetails.base_type === ApiTransactionType.Credit
     );
-  }, []);
+  }, [props.transactionDetails.base_type]);
 
   return (
     <div className="flex flex-col items-center justify-center mt-10 px-7 border-gray-400">
