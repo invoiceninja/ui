@@ -267,7 +267,7 @@ export function DataTable(props: Props) {
                   props.rowClickLink
                     ? navigate(
                         route(props.rowClickLink, {
-                          id: resource?.id,
+                          id: resource.id,
                         })
                       )
                     : document.getElementById(resource.id)?.click()

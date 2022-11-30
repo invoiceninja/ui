@@ -324,15 +324,15 @@ export default function ListBox(props: Props) {
         className="flex flex-col justify-start items-center overflow-y-auto border-b border-gray-400"
         style={{
           height: props.isCreditTransactionType ? 550 : 320,
+          width: props.isCreditTransactionType ? 600 : 'auto',
         }}
       >
         {props.isCreditTransactionType &&
           filteredInvoices?.map((invoice) => (
             <div
               key={invoice.id}
-              className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-3 border-b border-gray-400"
+              className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-4 border-b border-gray-400"
               onClick={() => selectItem(invoice.id)}
-              style={{ height: 68 }}
             >
               <div className="flex items-center">
                 <Checkbox

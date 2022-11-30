@@ -161,10 +161,7 @@ export function TransactionMatchDetails(props: Props) {
       size={isCreditTransactionType ? 'large' : 'small'}
       actionElement={actionButton}
     >
-      <div
-        className="flex flex-col items-center justify-center border-gray-400"
-        style={{ width: isCreditTransactionType ? '600px' : 'auto' }}
-      >
+      <div className="flex flex-col items-center justify-center border-gray-400">
         {isCreditTransactionType ? (
           <ListBox
             transactionDetails={props.transactionDetails}
