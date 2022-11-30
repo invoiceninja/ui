@@ -16,23 +16,15 @@ import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { Dispatch, SetStateAction } from 'react';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useTranslation } from 'react-i18next';
 
 export function useHandleUpdate(
   companyGateway: CompanyGateway | undefined,
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>
 ) {
-  const [t] = useTranslation();
   const queryClient = useQueryClient();
 
   return () => {
     if (!companyGateway) {
-      setErrors({
-        message: t('invalid_data'),
-        errors: {
-          gateway_key: [t('invalid_gateway_key')],
-        },
-      });
       return;
     }
 
@@ -41,25 +33,25 @@ export function useHandleUpdate(
 
     request(
       'PUT',
-      endpoint('/api/v1/company_gateways/:id', { id: companyGateway.id }),
+      endpoint('/api/v1/company_gateways/:id', { id: companyGateway?.id }),
       companyGateway
     )
       .then(() => {
         toast.success('updated_company_gateway');
         queryClient.invalidateQueries(
           route('/api/v1/company_gateways/:id', {
-            id: companyGateway.id,
+            id: companyGateway?.id,
           })
         );
       })
       .catch((error) => {
         if (error?.response?.status === 422) {
+          toast.dismiss();
           setErrors(error.response.data);
         } else {
           console.error(error);
           toast.error();
         }
-      })
-      .finally(() => toast.dismiss());
+      });
   };
 }
