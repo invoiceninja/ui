@@ -31,7 +31,7 @@ import { useBankAccountsQuery } from 'pages/settings/bank-accounts/common/querie
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
-import TransactionMatchDetails from './TransactionMatchDetails';
+import { TransactionMatchDetails } from './TransactionMatchDetails';
 
 interface Props {
   transactionDetails?: TransactionDetails;
@@ -164,52 +164,58 @@ export function Details(props: Props) {
 
       {!isCreditTransactionType && !shouldShowTransactionMatchDetails && (
         <>
-          <Element
-            leftSide={t('vendor')}
-            className="hover:bg-gray-100 cursor-pointer"
-            onClick={() =>
-              navigate(
-                route('/vendors/:id', {
-                  id: matchedVendor?.id,
-                })
-              )
-            }
-          >
-            {matchedVendor?.name}
-          </Element>
-          <Element
-            leftSide={t('category')}
-            className="hover:bg-gray-100 cursor-pointer"
-            onClick={() =>
-              navigate(
-                route('/settings/expense_categories/:id/edit', {
-                  id: matchedExpenseCategory?.id,
-                })
-              )
-            }
-          >
-            {matchedExpenseCategory?.name}
-          </Element>
-          <Element
-            leftSide={t('expense')}
-            className="hover:bg-gray-100 cursor-pointer"
-            onClick={() =>
-              navigate(
-                route('/expenses/:id/edit', {
-                  id: matchedExpense?.id,
-                })
-              )
-            }
-          >
-            {matchedExpense?.number}
-          </Element>
+          {vendor_id && (
+            <Element
+              leftSide={t('vendor')}
+              className="hover:bg-gray-100 cursor-pointer"
+              onClick={() =>
+                navigate(
+                  route('/vendors/:id', {
+                    id: matchedVendor?.id,
+                  })
+                )
+              }
+            >
+              {matchedVendor?.name}
+            </Element>
+          )}
+          {ninja_category_id && (
+            <Element
+              leftSide={t('category')}
+              className="hover:bg-gray-100 cursor-pointer"
+              onClick={() =>
+                navigate(
+                  route('/settings/expense_categories/:id/edit', {
+                    id: matchedExpenseCategory?.id,
+                  })
+                )
+              }
+            >
+              {matchedExpenseCategory?.name}
+            </Element>
+          )}
+          {expense_id && (
+            <Element
+              leftSide={t('expense')}
+              className="hover:bg-gray-100 cursor-pointer"
+              onClick={() =>
+                navigate(
+                  route('/expenses/:id/edit', {
+                    id: matchedExpense?.id,
+                  })
+                )
+              }
+            >
+              {matchedExpense?.number}
+            </Element>
+          )}
         </>
       )}
       {shouldShowTransactionMatchDetails && (
         <>
           <Element leftSide={t('match_transaction')}>
             <Button onClick={() => setIsMatchTransactionDialogOpened(true)}>
-              {t('open')}
+              {t('match')}
             </Button>
           </Element>
           <TransactionMatchDetails

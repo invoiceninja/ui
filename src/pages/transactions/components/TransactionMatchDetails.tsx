@@ -26,7 +26,7 @@ import { MdContentCopy } from 'react-icons/md';
 import { ApiTransactionType } from 'common/enums/transactions';
 import { Button } from '@invoiceninja/forms';
 import ListBox from './ListBox';
-import { ToggleCard } from 'components/cards/ToggleCard';
+import { CollapseCard } from 'components/cards/CollapseCard';
 
 export interface TransactionDetails {
   base_type: string;
@@ -40,7 +40,7 @@ interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function TransactionMatchDetails(props: Props) {
+export function TransactionMatchDetails(props: Props) {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
@@ -97,16 +97,16 @@ export default function TransactionMatchDetails(props: Props) {
   const convertToExpense = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!selectedVendorIds?.length || !selectedExpenseCategoryIds?.length) {
+    if (!selectedVendorIds?.length && !selectedExpenseCategoryIds?.length) {
       return;
     } else {
       setIsFormBusy(true);
 
       toast.processing();
 
-      const vendor_id = selectedVendorIds.join(',');
+      const vendor_id = selectedVendorIds?.join(',');
 
-      const ninja_category_id = selectedExpenseCategoryIds.join(',');
+      const ninja_category_id = selectedExpenseCategoryIds?.join(',');
 
       request('POST', endpoint('/api/v1/bank_transactions/match'), {
         transactions: [
@@ -144,7 +144,7 @@ export default function TransactionMatchDetails(props: Props) {
       onClick={isCreditTransactionType ? convertToPayment : convertToExpense}
       disabled={isFormBusy}
     >
-      {<MdContentCopy style={{ fontSize: 22 }} />}
+      {<MdContentCopy fontSize={22} />}
       <span>
         {isCreditTransactionType
           ? t('convert_to_payment')
@@ -154,7 +154,7 @@ export default function TransactionMatchDetails(props: Props) {
   );
 
   return (
-    <ToggleCard
+    <CollapseCard
       title={t('match_transaction')}
       visible={props.visible}
       setVisible={props.setVisible}
@@ -193,6 +193,6 @@ export default function TransactionMatchDetails(props: Props) {
           </>
         )}
       </div>
-    </ToggleCard>
+    </CollapseCard>
   );
 }

@@ -22,7 +22,7 @@ interface Props extends CommonProps {
   size: 'extraSmall' | 'small' | 'regular' | 'large' | 'extraLarge';
 }
 
-export function ToggleCard(props: Props) {
+export function CollapseCard(props: Props) {
   const getSizeClass = () => {
     if (props.size === 'large') {
       return 'max-w-2xl';
