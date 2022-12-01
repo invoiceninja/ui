@@ -16,7 +16,6 @@ import { useTitle } from 'common/hooks/useTitle';
 import { date, endpoint } from 'common/helpers';
 import { TransactionInput } from 'common/interfaces/transactions';
 import { Container } from 'components/Container';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { Default } from 'components/layouts/Default';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -30,7 +29,7 @@ import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 import { ApiTransactionType, TransactionType } from 'common/enums/transactions';
-import CreateBankAccountModal from '../components/CreateBankAccountModal';
+import { BankAccountSelector } from '../components/BankAccountSelector';
 
 export function Create() {
   const [t] = useTranslation();
@@ -46,9 +45,6 @@ export function Create() {
   const { documentTitle } = useTitle('new_transaction');
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
-
-  const [isAddNewBankAccountModalOpened, setIsAddNewBankAccountModalOpened] =
-    useState<boolean>(false);
 
   const [currencySeparators, setCurrencySeparators] =
     useState<DecimalInputSeparators>();
@@ -129,106 +125,92 @@ export function Create() {
       currency_id: company?.settings?.currency_id,
       date: date(new Date().toString(), 'YYYY-MM-DD'),
     }));
+
     setCurrencySeparators(getCurrencySeparators(currencies[0]?.id));
-  }, [currencies, isAddNewBankAccountModalOpened]);
+  }, [currencies]);
 
   return (
-    <>
-      <CreateBankAccountModal
-        isModalOpen={isAddNewBankAccountModalOpened}
-        setIsModalOpen={setIsAddNewBankAccountModalOpened}
-      />
-      <Default
-        title={documentTitle}
-        breadcrumbs={pages}
-        onBackClick="/transactions"
-      >
-        <Container>
-          <Card
-            title={documentTitle}
-            withSaveButton
-            onSaveClick={onSave}
-            disableSubmitButton={isSaving}
-          >
-            <Element required leftSide={t('type')}>
-              <SelectField
-                value={transaction?.base_type}
-                onValueChange={(value) => handleChange('base_type', value)}
-                errorMessage={errors?.base_type}
-              >
-                {Object.values(transactionTypes).map((transactionType) => (
-                  <option key={transactionType} value={transactionType}>
-                    {t(transactionType)}
-                  </option>
-                ))}
-              </SelectField>
-            </Element>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onBackClick="/transactions"
+    >
+      <Container>
+        <Card
+          title={documentTitle}
+          withSaveButton
+          onSaveClick={onSave}
+          disableSubmitButton={isSaving}
+        >
+          <Element required leftSide={t('type')}>
+            <SelectField
+              value={transaction?.base_type}
+              onValueChange={(value) => handleChange('base_type', value)}
+              errorMessage={errors?.base_type}
+            >
+              {Object.values(transactionTypes).map((transactionType) => (
+                <option key={transactionType} value={transactionType}>
+                  {t(transactionType)}
+                </option>
+              ))}
+            </SelectField>
+          </Element>
 
-            <Element required leftSide={t('date')}>
-              <InputField
-                type="date"
-                value={transaction?.date}
-                onValueChange={(value) => handleChange('date', value)}
-                errorMessage={errors?.date}
-              />
-            </Element>
+          <Element required leftSide={t('date')}>
+            <InputField
+              type="date"
+              value={transaction?.date}
+              onValueChange={(value) => handleChange('date', value)}
+              errorMessage={errors?.date}
+            />
+          </Element>
 
-            <Element required leftSide={t('amount')}>
-              <DecimalNumberInput
-                border
-                precision={currencySeparators?.precision}
-                currency={currencySeparators}
-                className="auto"
-                initialValue={transaction?.amount?.toString()}
-                value={transaction?.amount?.toString()}
-                onChange={(value: string) => handleChange('amount', value)}
-                errorMessage={errors?.amount}
-              />
-            </Element>
+          <Element required leftSide={t('amount')}>
+            <DecimalNumberInput
+              border
+              precision={currencySeparators?.precision}
+              currency={currencySeparators}
+              className="auto"
+              initialValue={transaction?.amount?.toString()}
+              value={transaction?.amount?.toString()}
+              onChange={(value: string) => handleChange('amount', value)}
+              errorMessage={errors?.amount}
+            />
+          </Element>
 
-            <Element required leftSide={t('currency')}>
-              <SelectField
-                value={transaction?.currency_id}
-                onValueChange={(value) => handleChange('currency_id', value)}
-                errorMessage={errors?.currency_id}
-              >
-                {currencies?.map(({ id, name }) => (
-                  <option key={id} value={id}>
-                    {t(name)}
-                  </option>
-                ))}
-              </SelectField>
-            </Element>
+          <Element required leftSide={t('currency')}>
+            <SelectField
+              value={transaction?.currency_id}
+              onValueChange={(value) => handleChange('currency_id', value)}
+              errorMessage={errors?.currency_id}
+            >
+              {currencies?.map(({ id, name }) => (
+                <option key={id} value={id}>
+                  {t(name)}
+                </option>
+              ))}
+            </SelectField>
+          </Element>
 
-            <Element required leftSide={t('bank_account')}>
-              <DebouncedCombobox
-                endpoint="/api/v1/bank_integrations"
-                label="bank_account_name"
-                defaultValue={transaction?.bank_integration_id}
-                onChange={(value) =>
-                  handleChange('bank_integration_id', value?.value)
-                }
-                clearButton
-                onClearButtonClick={() =>
-                  handleChange('bank_integration_id', '')
-                }
-                errorMessage={errors?.bank_integration_id}
-                actionLabel={t('new_bank_account')}
-                onActionClick={() => setIsAddNewBankAccountModalOpened(true)}
-              />
-            </Element>
+          <Element required leftSide={t('bank_account')}>
+            <BankAccountSelector
+              onChange={(account) =>
+                handleChange('bank_integration_id', account?.id)
+              }
+              errorMessage={errors?.bank_integration_id}
+            />
+          </Element>
 
-            <Element required leftSide={t('description')}>
-              <InputField
-                element="textarea"
-                value={transaction?.description}
-                onValueChange={(value) => handleChange('description', value)}
-                errorMessage={errors?.description}
-              />
-            </Element>
-          </Card>
-        </Container>
-      </Default>
-    </>
+          <Element required leftSide={t('description')}>
+            <InputField
+              element="textarea"
+              value={transaction?.description}
+              onValueChange={(value) => handleChange('description', value)}
+              errorMessage={errors?.description}
+            />
+          </Element>
+        </Card>
+      </Container>
+    </Default>
   );
 }
