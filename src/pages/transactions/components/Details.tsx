@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
+import { Element } from '@invoiceninja/cards';
 import {
   ApiTransactionType,
   TransactionStatus,
@@ -124,7 +124,7 @@ export function Details(props: Props) {
   }, []);
 
   return (
-    <Card>
+    <div>
       <Element leftSide={t('type')}>
         {isCreditTransactionType
           ? t(TransactionType.Deposit)
@@ -232,6 +232,6 @@ export function Details(props: Props) {
           setActionButton={props.setActionButton}
         />
       )}
-    </Card>
+    </div>
   );
 }

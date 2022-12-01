@@ -16,18 +16,17 @@ import {
   useEffect,
   useState,
 } from 'react';
-import { useTranslation } from 'react-i18next';
 import { toast } from 'common/helpers/toast/toast';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { AxiosError } from 'axios';
 import { useQueryClient } from 'react-query';
-import ListBox from './ListBox';
 import { TransactionStatus } from 'common/enums/transactions';
 import { ConvertButton } from './ConvertButton';
 import { route } from 'common/helpers/route';
 import { TransactionResponse } from 'common/interfaces/transactions';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { ListBox } from './ListBox';
 
 export interface TransactionDetails {
   base_type: string;
@@ -42,8 +41,6 @@ interface Props {
 }
 
 export function TransactionMatchDetails(props: Props) {
-  const [t] = useTranslation();
-
   const queryClient = useQueryClient();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -148,11 +145,7 @@ export function TransactionMatchDetails(props: Props) {
       props.setActionButton(
         <ConvertButton
           isFormBusy={isFormBusy}
-          text={
-            props.isCreditTransactionType
-              ? t('convert_to_payment')
-              : t('convert_to_expense')
-          }
+          isCreditTransactionType={props.isCreditTransactionType}
           onClick={
             props.isCreditTransactionType ? convertToPayment : convertToExpense
           }
@@ -173,7 +166,6 @@ export function TransactionMatchDetails(props: Props) {
     <>
       {props.isCreditTransactionType ? (
         <ListBox
-          className="border-t-0"
           transactionDetails={props.transactionDetails}
           dataKey="invoices"
           setSelectedIds={setInvoiceIds}
@@ -188,6 +180,7 @@ export function TransactionMatchDetails(props: Props) {
             selectedIds={vendorIds}
           />
           <ListBox
+            className="mt-5"
             transactionDetails={props.transactionDetails}
             dataKey="categories"
             setSelectedIds={setExpenseCategoryIds}

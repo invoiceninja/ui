@@ -10,15 +10,18 @@
 
 import { Button } from '@invoiceninja/forms';
 import React, { FormEvent } from 'react';
+import { useTranslation } from 'react-i18next';
 import { MdContentCopy } from 'react-icons/md';
 
 interface Props {
   isFormBusy: boolean;
-  text: string;
+  isCreditTransactionType: boolean;
   onClick: (event: FormEvent<HTMLFormElement>) => void;
 }
 
 export function ConvertButton(props: Props) {
+  const [t] = useTranslation();
+
   return (
     <Button
       className="w-full"
@@ -26,7 +29,11 @@ export function ConvertButton(props: Props) {
       disabled={props.isFormBusy}
     >
       {<MdContentCopy fontSize={22} />}
-      <span>{props.text}</span>
+      <span>
+        {props.isCreditTransactionType
+          ? t('convert_to_payment')
+          : t('convert_to_expense')}
+      </span>
     </Button>
   );
 }

@@ -8,28 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Checkbox, InputField } from '@invoiceninja/forms';
-import { MdFilterAlt } from 'react-icons/md';
-import invoiceStatus from 'common/constants/invoice-status';
-import { StatusBadge } from 'components/StatusBadge';
 import { TransactionDetails } from './TransactionMatchDetails';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useClientsQuery } from 'common/queries/clients';
 import { Client } from 'common/interfaces/client';
-import { Invoice } from 'common/interfaces/invoice';
 import CommonProps from 'common/interfaces/common-props.interface';
-import { BiPlusCircle } from 'react-icons/bi';
-import { useNavigate } from 'react-router-dom';
-import { useExpenseCategoriesQuery } from 'common/queries/expense-categories';
-import { Vendor } from 'common/interfaces/vendor';
-import { ExpenseCategory } from 'common/interfaces/expense-category';
-import { useInvoicesQuery } from 'pages/invoices/common/queries';
-import { useVendorsQuery } from 'common/queries/vendor';
+import { SearchArea } from './SearchArea';
+import { useResourceDataQuery } from '../common/queries';
+import { ListBoxItem } from './ListBoxItem';
 
-interface SearchInput {
+export interface ResourceItem {
+  id: string;
+  name?: string;
+  number?: number;
+  clientName?: string;
+  status_id?: string;
+  amount?: number;
+  date?: string;
+}
+
+export interface SearchInput {
   searchTerm: string;
   minAmount: number;
   maxAmount: number;
@@ -44,26 +42,12 @@ interface Props extends CommonProps {
   selectedIds: string[] | undefined;
 }
 
-export default function ListBox(props: Props) {
-  const [t] = useTranslation();
-
-  const navigate = useNavigate();
-
-  const company = useCurrentCompany();
-
-  const formatMoney = useFormatMoney();
-
+export function ListBox(props: Props) {
   const { data: clientsResponse } = useClientsQuery();
 
-  const { data: vendorsResponse } = useVendorsQuery();
-
-  const { data: invoicesResponse } = useInvoicesQuery();
-
-  const { data: expenseCategoriesResponse } = useExpenseCategoriesQuery();
-
-  const [isFilterModalOpened, setIsFilterModalOpened] = useState<boolean>();
-
-  const [isInvoicesDataKey, setIsInvoicesDataKey] = useState<boolean>(false);
+  const { data: resourceResponse } = useResourceDataQuery({
+    dataKey: props.dataKey,
+  });
 
   const [searchParams, setSearchParams] = useState<SearchInput>({
     searchTerm: '',
@@ -73,21 +57,14 @@ export default function ListBox(props: Props) {
     endDate: '',
   });
 
-  const [vendors, setVendors] = useState<Vendor[]>();
-
-  const [filteredVendors, setFilteredVendors] = useState<Vendor[]>();
-
-  const [invoices, setInvoices] = useState<Invoice[]>();
-
-  const [expenseCategories, setExpenseCategories] =
-    useState<ExpenseCategory[]>();
-
-  const [filteredExpenseCategories, setFilteredExpenseCategories] =
-    useState<ExpenseCategory[]>();
-
-  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>();
+  const [resourceItems, setResourceItems] = useState<ResourceItem[]>();
 
   const [clients, setClients] = useState<Client[]>();
+
+  const [isFilterModalOpened, setIsFilterModalOpened] =
+    useState<boolean>(false);
+
+  const [isInvoicesDataKey, setIsInvoicesDataKey] = useState<boolean>(false);
 
   const isItemChecked = (itemId: string) => {
     const filteredItemIds = props.selectedIds?.find((id) => id === itemId);
@@ -112,279 +89,64 @@ export default function ListBox(props: Props) {
     return clients?.find(({ id }) => id === clientId)?.name;
   };
 
-  const handleChangeSearchParams = (
-    property: keyof SearchInput,
-    value: SearchInput[keyof SearchInput]
-  ) => {
-    setSearchParams((prevState) => ({ ...prevState, [property]: value }));
-  };
-
-  const filterInvoicesBySearchParams = () => {
-    const { searchTerm, minAmount, maxAmount, startDate, endDate } =
-      searchParams;
-
-    const updatedDataWithSearchTerm = invoices?.filter(
-      ({ number, client_id }) =>
-        searchTerm
-          ? number.includes(searchTerm) ||
-            getClientName(client_id)?.includes(searchTerm)
-          : true
-    );
-
-    const updatedDataWithMinAmount = updatedDataWithSearchTerm?.filter(
-      ({ amount }) => (minAmount ? amount >= minAmount : true)
-    );
-
-    const updatedDataWithMaxAmount = updatedDataWithMinAmount?.filter(
-      ({ amount }) => (maxAmount ? amount <= maxAmount : true)
-    );
-
-    const updatedDataWithStartDate = updatedDataWithMaxAmount?.filter(
-      ({ date }) => (startDate ? new Date(date) >= new Date(startDate) : true)
-    );
-
-    const updatedDataWithEndDate = updatedDataWithStartDate?.filter(
-      ({ date }) => (endDate ? new Date(date) <= new Date(endDate) : true)
-    );
-
-    setFilteredInvoices(updatedDataWithEndDate);
-  };
-
-  const filterVendorsBySearchParams = () => {
-    const { searchTerm } = searchParams;
-
-    const updatedDataWithSearchTerm = vendors?.filter(({ number, name }) =>
-      searchTerm
-        ? number.includes(searchTerm) || name.includes(searchTerm)
-        : true
-    );
-
-    setFilteredVendors(updatedDataWithSearchTerm);
-  };
-
-  const filterExpenseCategoriesBySearchParams = () => {
-    const { searchTerm } = searchParams;
-
-    const updatedDataWithSearchTerm = expenseCategories?.filter(({ name }) =>
-      searchTerm ? name.includes(searchTerm) : true
-    );
-
-    setFilteredExpenseCategories(updatedDataWithSearchTerm);
+  const getResourceObject = (resourceList: any) => {
+    return resourceList?.map((resourceItem: any) => ({
+      id: resourceItem.id,
+      number: resourceItem?.number,
+      name: resourceItem?.name,
+      clientName: getClientName(resourceItem?.client_id),
+      status_id: resourceItem?.status_id,
+      amount: resourceItem?.amount,
+      date: resourceItem?.date,
+    }));
   };
 
   useEffect(() => {
+    setClients(clientsResponse?.data.data);
+    setResourceItems(getResourceObject(resourceResponse));
     if (props.dataKey === 'invoices') {
       setIsInvoicesDataKey(true);
-      setClients(clientsResponse?.data.data);
-      setInvoices(invoicesResponse);
-      setFilteredInvoices(invoicesResponse);
-    } else {
-      setVendors(vendorsResponse);
-      setFilteredVendors(vendorsResponse);
-      setExpenseCategories(expenseCategoriesResponse);
-      setFilteredExpenseCategories(expenseCategoriesResponse);
     }
-  }, [
-    invoicesResponse,
-    clientsResponse,
-    vendorsResponse,
-    expenseCategoriesResponse,
-    props.dataKey,
-  ]);
+  }, [props.dataKey, resourceResponse, clientsResponse]);
 
   useEffect(() => {
-    if (props.dataKey === 'invoices') {
-      filterInvoicesBySearchParams();
-    } else if (props.dataKey === 'vendors') {
-      filterVendorsBySearchParams();
-    } else {
-      filterExpenseCategoriesBySearchParams();
-    }
+    console.log('ok');
   }, [searchParams]);
 
   return (
     <div className="flex flex-col w-full">
       <div
-        className={`flex justify-center items-start px-5 py-3 relative border-b border-t border-gray-200 ${props.className}`}
+        className={`flex justify-center px-5 py-3 relative border-b border-t border-gray-200 ${props.className}`}
       >
-        <form
-          className="flex items-center"
-          onSubmit={(event) => event.preventDefault()}
-        >
-          <InputField
-            className="bg-gray-200"
-            placeholder={t(`search_${props.dataKey}`)}
-            value={searchParams.searchTerm}
-            onValueChange={(value) =>
-              handleChangeSearchParams('searchTerm', value)
-            }
-          />
-          {isInvoicesDataKey ? (
-            <MdFilterAlt
-              className="ml-3 cursor-pointer"
-              fontSize={30}
-              onClick={() => setIsFilterModalOpened((prevState) => !prevState)}
-            />
-          ) : (
-            <BiPlusCircle
-              className="ml-3 cursor-pointer"
-              fontSize={28}
-              onClick={() =>
-                isInvoicesDataKey
-                  ? navigate('/vendors/create')
-                  : navigate('/settings/expense_categories/create')
-              }
-            />
-          )}
-        </form>
-        {isFilterModalOpened && (
-          <form
-            onSubmit={(event) => event.preventDefault()}
-            className="absolute w-full top-full m-1 bg-gray-100 text-center pb-2 border-b border-gray-200 z-10"
-          >
-            <div className="w-3/5 p-3 inline-block">
-              <div className="flex justify-center">
-                <div className="flex flex-col items-start">
-                  <p className="text-sm ml-2">{`${t('min')} ${t('amount')}`}</p>
-                  <InputField
-                    value={searchParams.minAmount}
-                    onValueChange={(value) =>
-                      handleChangeSearchParams(
-                        'minAmount',
-                        value ? Number(value) : 0
-                      )
-                    }
-                  />
-                </div>
-                <div className="flex flex-col items-start pr-3">
-                  <p className="text-sm ml-4">{`${t('max')} ${t('amount')}`}</p>
-                  <InputField
-                    value={searchParams.maxAmount}
-                    onValueChange={(value) =>
-                      handleChangeSearchParams(
-                        'maxAmount',
-                        value ? Number(value) : 0
-                      )
-                    }
-                  />
-                </div>
-              </div>
-              <div className="flex justify-center mt-3 w-full">
-                <div className="flex flex-col items-start w-1/2 pr-3">
-                  <p className="text-sm ml-2">{`${t('start')} ${t('date')}`}</p>
-                  <input
-                    className="w-full border-none"
-                    type="date"
-                    value={searchParams.startDate}
-                    onChange={(event) =>
-                      handleChangeSearchParams(
-                        'startDate',
-                        event.target.value ? event.target.value : ''
-                      )
-                    }
-                  />
-                </div>
-                <div className="flex flex-col items-start w-1/2">
-                  <p className="text-sm ml-2">{`${t('end')} ${t('date')}`}</p>
-                  <input
-                    className="w-full border-none"
-                    type="date"
-                    value={searchParams.endDate}
-                    onChange={(event) =>
-                      handleChangeSearchParams(
-                        'endDate',
-                        event.target.value ? event.target.value : ''
-                      )
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-          </form>
-        )}
+        <SearchArea
+          dataKey={props.dataKey}
+          isInvoicesDataKey={isInvoicesDataKey}
+          searchParams={searchParams}
+          setIsFilterModalOpened={setIsFilterModalOpened}
+          isFilterModalOpened={isFilterModalOpened}
+          setSearchParams={setSearchParams}
+        />
       </div>
-      <div
-        className="flex flex-col justify-start items-center overflow-y-auto w-auto"
+      <ul
+        className="flex flex-col justify-start overflow-y-auto"
         style={{
           height: isInvoicesDataKey ? 400 : 200,
         }}
       >
-        {isInvoicesDataKey &&
-          filteredInvoices?.map((invoice) => (
-            <div
-              key={invoice.id}
-              className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-4 border-b border-gray-200"
-              onClick={() => selectItem(invoice.id)}
-            >
-              <div className="flex items-center">
-                <Checkbox
-                  checked={isItemChecked(invoice.id)}
-                  onClick={() => selectItem(invoice.id)}
-                />
-                <span className="text-sm">{invoice.number}</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm">
-                  {getClientName(invoice.client_id)}
-                </span>
-                <span className="text-sm text-gray-600">{invoice.date}</span>
-              </div>
-              <div className="flex items-center">
-                <span className="mr-6 text-sm">
-                  {formatMoney(
-                    invoice.amount,
-                    company.settings.country_id,
-                    company.settings.currency_id
-                  )}
-                </span>
-                <StatusBadge for={invoiceStatus} code={invoice.status_id} />
-              </div>
-            </div>
-          ))}
-
-        {props.dataKey === 'vendors' &&
-          filteredVendors?.map(
-            ({ id, name, number }) =>
-              (isItemChecked(id) || !props.selectedIds?.length) && (
-                <div
-                  key={id}
-                  className="flex justify-between relative hover:bg-gray-100 w-full cursor-pointer p-4 border-b border-gray-200"
-                  onClick={() => selectItem(id)}
-                >
-                  <div className="flex items-center">
-                    <Checkbox
-                      checked={isItemChecked(id)}
-                      onClick={() => selectItem(id)}
-                    />
-                    <div className="flex flex-col items-center ml-2">
-                      <span className="text-md">{name}</span>
-                      <span className="text-sm text-gray-500">{number}</span>
-                    </div>
-                  </div>
-                </div>
-              )
-          )}
-
-        {props.dataKey === 'categories' &&
-          filteredExpenseCategories?.map(
-            ({ id, name }) =>
-              (isItemChecked(id) || !props.selectedIds?.length) && (
-                <div
-                  key={id}
-                  className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-4 border-b border-gray-200"
-                  onClick={() => selectItem(id)}
-                >
-                  <div className="flex items-center">
-                    <Checkbox
-                      checked={isItemChecked(id)}
-                      onClick={() => selectItem(id)}
-                    />
-                    <span className="text-md">{name}</span>
-                  </div>
-                </div>
-              )
-          )}
-      </div>
+        {resourceItems?.map(
+          (resourceItem: ResourceItem) =>
+            (isItemChecked(resourceItem.id) ||
+              !props.selectedIds?.length ||
+              isInvoicesDataKey) && (
+              <ListBoxItem
+                key={resourceItem.id}
+                isItemChecked={isItemChecked(resourceItem.id)}
+                resourceItem={resourceItem}
+                selectItem={selectItem}
+              />
+            )
+        )}
+      </ul>
     </div>
   );
 }

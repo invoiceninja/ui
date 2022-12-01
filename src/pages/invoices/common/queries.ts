@@ -15,7 +15,7 @@ import { Invoice } from 'common/interfaces/invoice';
 import { useQuery } from 'react-query';
 
 export function useInvoicesQuery() {
-  return useQuery(
+  return useQuery<Invoice[]>(
     '/api/v1/invoices',
     () =>
       request('GET', endpoint('/api/v1/invoices')).then(
