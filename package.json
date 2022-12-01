@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/styled": "^11.10.5",
     "@headlessui/react": "^1.7.4",
+    "@hello-pangea/dnd": "^16.2.0",
     "@leecheuk/react-google-login": "^5.4.1",
     "@monaco-editor/react": "^4.4.6",
     "@reduxjs/toolkit": "^1.9.0",
