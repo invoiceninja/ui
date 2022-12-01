@@ -23,6 +23,13 @@ import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from '@hello-pangea/dnd';
+import { cloneDeep } from 'lodash';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -89,7 +96,7 @@ export function Kanban() {
   }, [taskStatuses, tasks]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleDragging = (board: Board) => {
+  const updateTasks = (board: Board) => {
     const taskIds: Record<string, string[]> = {};
     const statusIds = collect(board.columns).pluck('id').toArray() as string[];
 
@@ -118,6 +125,35 @@ export function Kanban() {
       .finally(() => queryClient.invalidateQueries(route('/api/v1/tasks')));
   };
 
+  const onDragEnd = (result: DropResult) => {
+    const local = cloneDeep(board) as Board;
+
+    const source = local.columns.find(
+      (c) => c.id === result.source.droppableId
+    );
+
+    const target = local.columns.find(
+      (c) => c.id === result.destination?.droppableId
+    );
+
+    if (source && target && result.destination) {
+      const task = source.cards.find((c) => c.id === result.draggableId);
+
+      const taskIndex = source.cards.findIndex(
+        (c) => c.id === result.draggableId
+      );
+
+      if (task && taskIndex > -1) {
+        target.cards.splice(result.destination.index, 0, task);
+
+        source.cards.splice(taskIndex, 1);
+      }
+    }
+
+    // setBoard(cloneDeep(local));
+    updateTasks(local);
+  };
+
   return (
     <Default
       title={documentTitle}
@@ -128,13 +164,55 @@ export function Kanban() {
         </Link>
       }
     >
-      {/* {board && (
-        <Board
-          initialBoard={board}
-          onCardDragEnd={handleDragging}
-          disableColumnDrag
-        />
-      )} */}
+      {board && (
+        <div className="flex pb-6 px-1 space-x-4 overflow-x-auto">
+          <DragDropContext onDragEnd={onDragEnd}>
+            {board.columns.map((board) => (
+              <Droppable key={board.id} droppableId={board.id}>
+                {(provided) => (
+                  <div
+                    className="bg-white rounded shadow select-none h-max"
+                    style={{ minWidth: 360 }}
+                  >
+                    <div className="border-b border-gray-200 px-4 py-5">
+                      <h3 className="leading-6 font-medium text-gray-900">
+                        {board.title}
+                      </h3>
+                    </div>
+
+                    <div
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className="p-4 space-y-4"
+                    >
+                      {board.cards.map((card, i) => (
+                        <Draggable
+                          draggableId={card.id}
+                          key={card.id}
+                          index={i}
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className="w-full text-leftblock bg-gray-50 hover:bg-gray-100 rounded text-gray-700 hover:text-gray-900 text-sm px-4 sm:px-6 py-4 cursor-move"
+                            >
+                              {card.title}
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                    </div>
+
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            ))}
+          </DragDropContext>
+        </div>
+      )}
     </Default>
   );
 }
