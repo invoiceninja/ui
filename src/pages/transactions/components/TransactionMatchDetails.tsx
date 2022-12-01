@@ -11,6 +11,7 @@
 import {
   Dispatch,
   FormEvent,
+  ReactNode,
   SetStateAction,
   useEffect,
   useState,
@@ -20,13 +21,13 @@ import { toast } from 'common/helpers/toast/toast';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { AxiosError } from 'axios';
-import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from 'react-query';
-import { MdContentCopy } from 'react-icons/md';
-import { ApiTransactionType } from 'common/enums/transactions';
-import { Button } from '@invoiceninja/forms';
 import ListBox from './ListBox';
-import { CollapseCard } from 'components/cards/CollapseCard';
+import { TransactionStatus } from 'common/enums/transactions';
+import { ConvertButton } from './ConvertButton';
+import { route } from 'common/helpers/route';
+import { TransactionResponse } from 'common/interfaces/transactions';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
 export interface TransactionDetails {
   base_type: string;
@@ -36,40 +37,34 @@ export interface TransactionDetails {
 
 interface Props {
   transactionDetails: TransactionDetails;
-  visible: boolean;
-  setVisible: Dispatch<SetStateAction<boolean>>;
+  isCreditTransactionType: boolean;
+  setActionButton: Dispatch<SetStateAction<ReactNode>>;
 }
 
 export function TransactionMatchDetails(props: Props) {
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
-
   const queryClient = useQueryClient();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const [isCreditTransactionType, setIsCreditTransactionType] =
-    useState<boolean>(false);
+  const [vendorIds, setVendorIds] = useState<string[]>();
 
-  const [selectedInvoiceIds, setSelectedInvoiceIds] = useState<string[]>();
+  const [invoiceIds, setInvoiceIds] = useState<string[]>();
 
-  const [selectedVendorIds, setSelectedVendorIds] = useState<string[]>();
-
-  const [selectedExpenseCategoryIds, setSelectedExpenseCategoryIds] =
-    useState<string[]>();
+  const [expenseCategoryIds, setExpenseCategoryIds] = useState<string[]>();
 
   const convertToPayment = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!selectedInvoiceIds?.length) {
+    if (!invoiceIds?.length || isFormBusy) {
       return;
     } else {
       setIsFormBusy(true);
 
       toast.processing();
 
-      const invoicesIds = selectedInvoiceIds.join(',');
+      const invoicesIds = invoiceIds.join(',');
 
       request('POST', endpoint('/api/v1/bank_transactions/match'), {
         transactions: [
@@ -81,8 +76,13 @@ export function TransactionMatchDetails(props: Props) {
       })
         .then(() => {
           queryClient.invalidateQueries('/api/v1/bank_transactions');
+          queryClient.invalidateQueries('/api/v1/invoices');
+          queryClient.invalidateQueries(
+            route('/api/v1/bank_transactions/:id', {
+              id: props.transactionDetails.transaction_id,
+            })
+          );
           toast.success('converted_transaction');
-          navigate('/transactions');
         })
         .catch((error: AxiosError) => {
           console.error(error);
@@ -97,16 +97,16 @@ export function TransactionMatchDetails(props: Props) {
   const convertToExpense = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!selectedVendorIds?.length && !selectedExpenseCategoryIds?.length) {
+    if ((!vendorIds?.length && !expenseCategoryIds?.length) || isFormBusy) {
       return;
     } else {
       setIsFormBusy(true);
 
       toast.processing();
 
-      const vendor_id = selectedVendorIds?.join(',');
+      const vendor_id = vendorIds?.join(',');
 
-      const ninja_category_id = selectedExpenseCategoryIds?.join(',');
+      const ninja_category_id = expenseCategoryIds?.join(',');
 
       request('POST', endpoint('/api/v1/bank_transactions/match'), {
         transactions: [
@@ -117,11 +117,22 @@ export function TransactionMatchDetails(props: Props) {
           },
         ],
       })
-        .then(() => {
-          queryClient.invalidateQueries('/api/v1/bank_transactions');
-          toast.success('converted_transaction');
-          navigate('/transactions');
-        })
+        .then(
+          (response: GenericSingleResourceResponse<TransactionResponse[]>) => {
+            queryClient.invalidateQueries('/api/v1/bank_transactions');
+            queryClient.invalidateQueries(
+              route('/api/v1/bank_transactions/:id', {
+                id: props.transactionDetails.transaction_id,
+              })
+            );
+            queryClient.invalidateQueries(
+              route('/api/v1/expenses/:id', {
+                id: response.data.data[0].expense_id,
+              })
+            );
+            toast.success('converted_transaction');
+          }
+        )
         .catch((error: AxiosError) => {
           console.error(error);
           toast.error();
@@ -133,63 +144,57 @@ export function TransactionMatchDetails(props: Props) {
   };
 
   useEffect(() => {
-    setIsCreditTransactionType(
-      props.transactionDetails.base_type === ApiTransactionType.Credit
-    );
-  }, [props.transactionDetails.base_type]);
-
-  const actionButton = (
-    <Button
-      className="w-full"
-      onClick={isCreditTransactionType ? convertToPayment : convertToExpense}
-      disabled={isFormBusy}
-    >
-      {<MdContentCopy fontSize={22} />}
-      <span>
-        {isCreditTransactionType
-          ? t('convert_to_payment')
-          : t('convert_to_expense')}
-      </span>
-    </Button>
-  );
+    if (props.transactionDetails.status_id !== TransactionStatus.Converted) {
+      props.setActionButton(
+        <ConvertButton
+          isFormBusy={isFormBusy}
+          text={
+            props.isCreditTransactionType
+              ? t('convert_to_payment')
+              : t('convert_to_expense')
+          }
+          onClick={
+            props.isCreditTransactionType ? convertToPayment : convertToExpense
+          }
+        />
+      );
+    } else {
+      props.setActionButton(undefined);
+    }
+  }, [
+    props.transactionDetails.status_id,
+    props.isCreditTransactionType,
+    vendorIds,
+    invoiceIds,
+    expenseCategoryIds,
+  ]);
 
   return (
-    <CollapseCard
-      title={t('match_transaction')}
-      visible={props.visible}
-      setVisible={props.setVisible}
-      size={isCreditTransactionType ? 'large' : 'small'}
-      actionElement={actionButton}
-    >
-      <div className="flex flex-col items-center justify-center border-gray-400">
-        {isCreditTransactionType ? (
+    <>
+      {props.isCreditTransactionType ? (
+        <ListBox
+          className="border-t-0"
+          transactionDetails={props.transactionDetails}
+          dataKey="invoices"
+          setSelectedIds={setInvoiceIds}
+          selectedIds={invoiceIds}
+        />
+      ) : (
+        <>
           <ListBox
             transactionDetails={props.transactionDetails}
-            isCreditTransactionType={isCreditTransactionType}
-            dataKey="invoices"
-            setSelectedIds={setSelectedInvoiceIds}
-            selectedIds={selectedInvoiceIds}
+            dataKey="vendors"
+            setSelectedIds={setVendorIds}
+            selectedIds={vendorIds}
           />
-        ) : (
-          <>
-            <ListBox
-              transactionDetails={props.transactionDetails}
-              isCreditTransactionType={isCreditTransactionType}
-              dataKey="vendors"
-              setSelectedIds={setSelectedVendorIds}
-              selectedIds={selectedVendorIds}
-            />
-            <ListBox
-              className="border-t-0"
-              transactionDetails={props.transactionDetails}
-              isCreditTransactionType={isCreditTransactionType}
-              dataKey="categories"
-              setSelectedIds={setSelectedExpenseCategoryIds}
-              selectedIds={selectedExpenseCategoryIds}
-            />
-          </>
-        )}
-      </div>
-    </CollapseCard>
+          <ListBox
+            transactionDetails={props.transactionDetails}
+            dataKey="categories"
+            setSelectedIds={setExpenseCategoryIds}
+            selectedIds={expenseCategoryIds}
+          />
+        </>
+      )}
+    </>
   );
 }

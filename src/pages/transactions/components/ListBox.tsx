@@ -39,7 +39,6 @@ interface SearchInput {
 
 interface Props extends CommonProps {
   transactionDetails: TransactionDetails;
-  isCreditTransactionType: boolean;
   dataKey: 'invoices' | 'categories' | 'vendors';
   setSelectedIds: Dispatch<SetStateAction<string[] | undefined>>;
   selectedIds: string[] | undefined;
@@ -63,6 +62,8 @@ export default function ListBox(props: Props) {
   const { data: expenseCategoriesResponse } = useExpenseCategoriesQuery();
 
   const [isFilterModalOpened, setIsFilterModalOpened] = useState<boolean>();
+
+  const [isInvoicesDataKey, setIsInvoicesDataKey] = useState<boolean>(false);
 
   const [searchParams, setSearchParams] = useState<SearchInput>({
     searchTerm: '',
@@ -104,26 +105,6 @@ export default function ListBox(props: Props) {
     } else {
       updatedItemIds = [...(props.selectedIds || []), itemId];
       props.setSelectedIds(updatedItemIds);
-    }
-
-    if (props.dataKey === 'vendors') {
-      const vendorIdsList = updatedItemIds?.join(',');
-
-      const filteredVendorItems = vendors?.filter(({ id }) =>
-        vendorIdsList ? vendorIdsList.includes(id) : true
-      );
-
-      setFilteredVendors(filteredVendorItems);
-    }
-
-    if (props.dataKey === 'categories') {
-      const expenseCategoryIdsList = updatedItemIds?.join(',');
-
-      const filteredExpenseCategoryItems = expenseCategories?.filter(({ id }) =>
-        expenseCategoryIdsList ? expenseCategoryIdsList.includes(id) : true
-      );
-
-      setFilteredExpenseCategories(filteredExpenseCategoryItems);
     }
   };
 
@@ -192,7 +173,8 @@ export default function ListBox(props: Props) {
   };
 
   useEffect(() => {
-    if (props.isCreditTransactionType) {
+    if (props.dataKey === 'invoices') {
+      setIsInvoicesDataKey(true);
       setClients(clientsResponse?.data.data);
       setInvoices(invoicesResponse);
       setFilteredInvoices(invoicesResponse);
@@ -207,6 +189,7 @@ export default function ListBox(props: Props) {
     clientsResponse,
     vendorsResponse,
     expenseCategoriesResponse,
+    props.dataKey,
   ]);
 
   useEffect(() => {
@@ -222,7 +205,7 @@ export default function ListBox(props: Props) {
   return (
     <div className="flex flex-col w-full">
       <div
-        className={`flex justify-center items-start px-5 py-3 relative border-b border-t border-gray-400 ${props.className}`}
+        className={`flex justify-center items-start px-5 py-3 relative border-b border-t border-gray-200 ${props.className}`}
       >
         <form
           className="flex items-center"
@@ -236,7 +219,7 @@ export default function ListBox(props: Props) {
               handleChangeSearchParams('searchTerm', value)
             }
           />
-          {props.isCreditTransactionType ? (
+          {isInvoicesDataKey ? (
             <MdFilterAlt
               className="ml-3 cursor-pointer"
               fontSize={30}
@@ -247,17 +230,17 @@ export default function ListBox(props: Props) {
               className="ml-3 cursor-pointer"
               fontSize={28}
               onClick={() =>
-                props.dataKey === 'vendors'
+                isInvoicesDataKey
                   ? navigate('/vendors/create')
                   : navigate('/settings/expense_categories/create')
               }
             />
           )}
         </form>
-        {isFilterModalOpened && props.isCreditTransactionType && (
+        {isFilterModalOpened && (
           <form
             onSubmit={(event) => event.preventDefault()}
-            className="absolute w-full top-full m-1 bg-gray-100 text-center pb-2 border-b border-gray-400 z-10"
+            className="absolute w-full top-full m-1 bg-gray-100 text-center pb-2 border-b border-gray-200 z-10"
           >
             <div className="w-3/5 p-3 inline-block">
               <div className="flex justify-center">
@@ -321,17 +304,16 @@ export default function ListBox(props: Props) {
         )}
       </div>
       <div
-        className="flex flex-col justify-start items-center overflow-y-auto border-b border-gray-400"
+        className="flex flex-col justify-start items-center overflow-y-auto w-auto"
         style={{
-          height: props.isCreditTransactionType ? 550 : 320,
-          width: props.isCreditTransactionType ? 600 : 'auto',
+          height: isInvoicesDataKey ? 400 : 200,
         }}
       >
-        {props.isCreditTransactionType &&
+        {isInvoicesDataKey &&
           filteredInvoices?.map((invoice) => (
             <div
               key={invoice.id}
-              className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-4 border-b border-gray-400"
+              className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-4 border-b border-gray-200"
               onClick={() => selectItem(invoice.id)}
             >
               <div className="flex items-center">
@@ -361,41 +343,47 @@ export default function ListBox(props: Props) {
           ))}
 
         {props.dataKey === 'vendors' &&
-          filteredVendors?.map(({ id, name, number }) => (
-            <div
-              key={id}
-              className="flex justify-between relative hover:bg-gray-100 w-full cursor-pointer p-4 border-b border-gray-400"
-              onClick={() => selectItem(id)}
-            >
-              <div className="flex items-center">
-                <Checkbox
-                  checked={isItemChecked(id)}
+          filteredVendors?.map(
+            ({ id, name, number }) =>
+              (isItemChecked(id) || !props.selectedIds?.length) && (
+                <div
+                  key={id}
+                  className="flex justify-between relative hover:bg-gray-100 w-full cursor-pointer p-4 border-b border-gray-200"
                   onClick={() => selectItem(id)}
-                />
-                <div className="flex flex-col items-center ml-2">
-                  <span className="text-md">{name}</span>
-                  <span className="text-sm text-gray-500">{number}</span>
+                >
+                  <div className="flex items-center">
+                    <Checkbox
+                      checked={isItemChecked(id)}
+                      onClick={() => selectItem(id)}
+                    />
+                    <div className="flex flex-col items-center ml-2">
+                      <span className="text-md">{name}</span>
+                      <span className="text-sm text-gray-500">{number}</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              )
+          )}
 
         {props.dataKey === 'categories' &&
-          filteredExpenseCategories?.map(({ id, name }) => (
-            <div
-              key={id}
-              className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-4 border-b border-gray-400"
-              onClick={() => selectItem(id)}
-            >
-              <div className="flex items-center">
-                <Checkbox
-                  checked={isItemChecked(id)}
+          filteredExpenseCategories?.map(
+            ({ id, name }) =>
+              (isItemChecked(id) || !props.selectedIds?.length) && (
+                <div
+                  key={id}
+                  className="flex justify-between hover:bg-gray-100 w-full cursor-pointer p-4 border-b border-gray-200"
                   onClick={() => selectItem(id)}
-                />
-                <span className="text-md">{name}</span>
-              </div>
-            </div>
-          ))}
+                >
+                  <div className="flex items-center">
+                    <Checkbox
+                      checked={isItemChecked(id)}
+                      onClick={() => selectItem(id)}
+                    />
+                    <span className="text-md">{name}</span>
+                  </div>
+                </div>
+              )
+          )}
       </div>
     </div>
   );

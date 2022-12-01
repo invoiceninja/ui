@@ -46,14 +46,17 @@ export function CollapseCard(props: Props) {
               >
                 <Dialog.Panel
                   className={classNames('pointer-events-auto', 'w-screen', {
-                    'max-w-2xl': props.size === 'large',
+                    'max-w-xl': props.size === 'large',
                     'max-w-sm': props.size === 'small',
                     'max-w-md': props.size === 'regular',
                     'max-w-xs': props.size === 'extraSmall',
                     'max-w-4xl': props.size === 'extraLarge',
                   })}
                 >
-                  <form className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl">
+                  <form
+                    onSubmit={(event) => event.preventDefault()}
+                    className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
+                  >
                     <div className="h-0 flex-1 overflow-y-auto">
                       <div className="py-6 px-4 sm:px-6">
                         <div className="flex items-center justify-between">
@@ -68,14 +71,16 @@ export function CollapseCard(props: Props) {
                         </div>
                       </div>
                       <div className="flex flex-1 flex-col justify-between items-center">
-                        <div className="divide-y divide-gray-200 px-4 sm:px-6">
+                        <div className="divide-y divide-gray-200 w-full">
                           {props.children}
                         </div>
                       </div>
                     </div>
-                    <div className="flex justify-center px-4 py-4">
-                      {props.actionElement}
-                    </div>
+                    {props.actionElement && (
+                      <div className="flex justify-center px-4 py-4">
+                        {props.actionElement}
+                      </div>
+                    )}
                   </form>
                 </Dialog.Panel>
               </Transition.Child>

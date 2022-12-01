@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
 import { ApiTransactionType } from 'common/enums/transactions';
 import { route } from 'common/helpers/route';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
@@ -68,13 +67,6 @@ export function useTransactionColumns() {
     {
       id: 'description',
       label: t('description'),
-      format: (value, transaction) => {
-        return (
-          <Link to={route('/transactions/:id', { id: transaction.id })}>
-            {value}
-          </Link>
-        );
-      },
     },
     { id: 'invoices', label: t('invoices') },
     { id: 'expense', label: t('expense') },

@@ -13,7 +13,9 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import React, {
   ChangeEvent,
+  Dispatch,
   ReactNode,
+  SetStateAction,
   useEffect,
   useRef,
   useState,
@@ -41,7 +43,6 @@ import {
 } from './tables';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
-import { useNavigate } from 'react-router-dom';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -64,15 +65,13 @@ interface Props {
   withoutPadding?: boolean;
   leftSideChevrons?: ReactNode;
   staleTime?: number;
-  rowClickLink?: string;
+  setResourceId?: Dispatch<SetStateAction<string>>;
 }
 
 export const datatablePerPageAtom = atomWithStorage('perPage', '10');
 
 export function DataTable(props: Props) {
   const [t] = useTranslation();
-
-  const navigate = useNavigate();
 
   const [apiEndpoint, setApiEndpoint] = useState(
     new URL(endpoint(props.endpoint))
@@ -264,12 +263,8 @@ export function DataTable(props: Props) {
               <Tr
                 key={index}
                 onClick={() =>
-                  props.rowClickLink
-                    ? navigate(
-                        route(props.rowClickLink, {
-                          id: resource.id,
-                        })
-                      )
+                  props.setResourceId
+                    ? props.setResourceId(resource.id)
                     : document.getElementById(resource.id)?.click()
                 }
               >

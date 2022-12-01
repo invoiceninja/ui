@@ -14,6 +14,9 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useTransactionColumns } from '../common/hooks/useTransactionColumns';
 import { ImportButton } from 'components/import/ImportButton';
+import { ReactNode, useEffect, useState } from 'react';
+import { Details } from '../components/Details';
+import { CollapseCard } from 'components/cards/CollapseCard';
 
 export function Transactions() {
   useTitle('transactions');
@@ -24,22 +27,50 @@ export function Transactions() {
 
   const pages = [{ name: t('transactions'), href: '/transactions' }];
 
+  const [transactionId, setTransactionId] = useState<string>('');
+
+  const [actionButton, setActionButton] = useState<ReactNode>();
+
+  const [isTransactionSliderVisible, setIsTransactionSliderVisible] =
+    useState<boolean>(false);
+
+  useEffect(() => {
+    if (transactionId) {
+      setIsTransactionSliderVisible(true);
+    }
+  }, [transactionId]);
+
   return (
-    <Default
-      title={t('transactions')}
-      breadcrumbs={pages}
-      docsLink="docs/transactions/"
-    >
-      <DataTable
-        resource="transaction"
-        endpoint="/api/v1/bank_transactions"
-        columns={columns}
-        linkToCreate="/transactions/create"
-        linkToEdit="/transactions/:id/edit"
-        rowClickLink="/transactions/:id"
-        rightSide={<ImportButton route="/transactions/import" />}
-        withResourcefulActions
-      />
-    </Default>
+    <>
+      <CollapseCard
+        title={t('transaction_details')}
+        visible={isTransactionSliderVisible}
+        setVisible={setIsTransactionSliderVisible}
+        size="large"
+        actionElement={actionButton}
+      >
+        <Details
+          transactionId={transactionId}
+          setTransactionId={setTransactionId}
+          setActionButton={setActionButton}
+        />
+      </CollapseCard>
+      <Default
+        title={t('transactions')}
+        breadcrumbs={pages}
+        docsLink="docs/transactions/"
+      >
+        <DataTable
+          resource="transaction"
+          endpoint="/api/v1/bank_transactions"
+          columns={columns}
+          linkToCreate="/transactions/create"
+          linkToEdit="/transactions/:id/edit"
+          setResourceId={setTransactionId}
+          rightSide={<ImportButton route="/transactions/import" />}
+          withResourcefulActions
+        />
+      </Default>
+    </>
   );
 }
