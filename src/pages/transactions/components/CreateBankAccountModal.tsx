@@ -26,8 +26,6 @@ interface Props {
 export function CreateBankAccountModal(props: Props) {
   const [t] = useTranslation();
 
-  useTitle('create_bank_account');
-
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const [errors, setErrors] = useState<ValidationBag>();
