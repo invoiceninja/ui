@@ -10,21 +10,14 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
-import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { BankAccountInput } from 'common/interfaces/bank-accounts';
-import { useState, FormEvent } from 'react';
+import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { Settings } from '../../../../components/layouts/Settings';
-
-interface BankAccountValidation {
-  bank_account_name?: string[];
-}
+import { useHandleCreate } from './hooks/useHandleCreate';
 
 export function Create() {
   const [t] = useTranslation();
@@ -32,8 +25,6 @@ export function Create() {
   useTitle('create_bank_account');
 
   const navigate = useNavigate();
-
-  const queryClient = useQueryClient();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -43,9 +34,16 @@ export function Create() {
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const [errors, setErrors] = useState<BankAccountValidation>();
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const [bankAccount, setBankAccount] = useState<BankAccountInput>();
+
+  const handleSave = useHandleCreate(
+    bankAccount,
+    setErrors,
+    setIsFormBusy,
+    isFormBusy
+  );
 
   const handleChange = (
     property: keyof BankAccountInput,
@@ -60,35 +58,6 @@ export function Create() {
     }
   };
 
-  const handleSave = async (event: FormEvent<HTMLFormElement>) => {
-    if (!isFormBusy) {
-      event?.preventDefault();
-
-      toast.processing();
-      setErrors(undefined);
-      setIsFormBusy(true);
-
-      request('POST', endpoint('/api/v1/bank_integrations'), bankAccount)
-        .then(() => {
-          toast.success('created_bank_account');
-
-          queryClient.invalidateQueries('/api/v1/bank_integrations');
-
-          navigate('/settings/bank_accounts');
-        })
-        .catch((error: AxiosError) => {
-          if (error?.response?.status === 422) {
-            setErrors(error.response.data.errors);
-            toast.dismiss();
-          } else {
-            console.error(error);
-            toast.error();
-          }
-        })
-        .finally(() => setIsFormBusy(false));
-    }
-  };
-
   return (
     <Settings
       title={t('create_bank_account')}
@@ -98,11 +67,11 @@ export function Create() {
       onSaveClick={handleSave}
     >
       <Card onFormSubmit={handleSave} title={t('create_bank_account')}>
-        <Element leftSide={t('bank_account_name')}>
+        <Element leftSide={t('name')}>
           <InputField
             value={bankAccount?.bank_account_name}
             onValueChange={(value) => handleChange('bank_account_name', value)}
-            errorMessage={errors?.bank_account_name}
+            errorMessage={errors?.errors.bank_account_name}
           />
         </Element>
       </Card>

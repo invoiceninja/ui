@@ -111,8 +111,8 @@ export function Create() {
         navigate('/transactions');
       })
       .catch((error: AxiosError) => {
-        if (error?.response?.status === 422) {
-          setErrors(error?.response.data.errors);
+        if (error.response?.status === 422) {
+          setErrors(error.response.data.errors);
           toast.dismiss();
         } else {
           console.error(error);
