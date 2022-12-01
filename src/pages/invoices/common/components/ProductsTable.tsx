@@ -13,7 +13,7 @@ import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useResolveInputField } from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
 import { resolveColumnWidth } from '../helpers/resolve-column-width';
 import { Invoice } from 'common/interfaces/invoice';
