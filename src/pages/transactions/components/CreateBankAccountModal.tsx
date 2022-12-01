@@ -11,7 +11,6 @@
 import { Modal } from 'components/Modal';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { BankAccountInput } from 'common/interfaces/bank-accounts';
@@ -24,7 +23,7 @@ interface Props {
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-export default function CreateBankAccountModal(props: Props) {
+export function CreateBankAccountModal(props: Props) {
   const [t] = useTranslation();
 
   useTitle('create_bank_account');
@@ -61,20 +60,15 @@ export default function CreateBankAccountModal(props: Props) {
       title={t('new_bank_account')}
       visible={props.isModalOpen}
       onClose={handleCancel}
-      size="regular"
-      backgroundColor="gray"
     >
-      <Card onFormSubmit={handleSave}>
-        <Element leftSide={t('name')}>
-          <InputField
-            value={bankAccount?.bank_account_name}
-            onValueChange={(value) => handleChange('bank_account_name', value)}
-            errorMessage={errors?.errors.bank_account_name}
-          />
-        </Element>
-      </Card>
+      <InputField
+        label={t('name')}
+        value={bankAccount?.bank_account_name}
+        onValueChange={(value) => handleChange('bank_account_name', value)}
+        errorMessage={errors?.errors.bank_account_name}
+      />
 
-      <div className="flex justify-end space-x-4">
+      <div className="flex justify-end">
         <Button onClick={handleSave}>{t('save')}</Button>
       </div>
     </Modal>
