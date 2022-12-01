@@ -12,7 +12,6 @@ import { Modal } from 'components/Modal';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button, InputField } from '@invoiceninja/forms';
-import { useTitle } from 'common/hooks/useTitle';
 import { BankAccountInput } from 'common/interfaces/bank-accounts';
 import { useState } from 'react';
 import { ValidationBag } from 'common/interfaces/validation-bag';
