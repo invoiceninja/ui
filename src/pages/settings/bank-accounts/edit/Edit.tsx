@@ -97,7 +97,7 @@ export function Edit() {
           navigate('/settings/bank_accounts');
         })
         .catch((error: AxiosError) => {
-          if (error?.response?.status === 422) {
+          if (error.response?.status === 422) {
             setErrors(error.response.data.errors);
             toast.dismiss();
           } else {
