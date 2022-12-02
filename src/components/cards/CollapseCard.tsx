@@ -18,7 +18,7 @@ interface Props extends CommonProps {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
   title?: string;
-  actionElement?: ReactNode;
+  actionChildren?: ReactNode;
   size: 'extraSmall' | 'small' | 'regular' | 'large' | 'extraLarge';
 }
 
@@ -60,9 +60,9 @@ export function CollapseCard(props: Props) {
                     <div className="h-0 flex-1 overflow-y-auto">
                       <div className="py-6 px-4 sm:px-6">
                         <div className="flex items-center justify-between">
-                          <Dialog.Title className="text-lg font-medium text-gray-900">
+                          <span className="text-lg font-medium text-gray-900">
                             {props.title}
-                          </Dialog.Title>
+                          </span>
                           <MdClose
                             fontSize={24}
                             className="cursor-pointer"
@@ -76,9 +76,9 @@ export function CollapseCard(props: Props) {
                         </div>
                       </div>
                     </div>
-                    {props.actionElement && (
+                    {props.actionChildren && (
                       <div className="flex justify-center px-4 py-4">
-                        {props.actionElement}
+                        {props.actionChildren}
                       </div>
                     )}
                   </form>

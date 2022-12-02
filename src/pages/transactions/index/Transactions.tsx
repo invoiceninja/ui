@@ -47,7 +47,7 @@ export function Transactions() {
         visible={isTransactionSliderVisible}
         setVisible={setIsTransactionSliderVisible}
         size="large"
-        actionElement={actionButton}
+        actionChildren={actionButton}
       >
         <Details
           transactionId={transactionId}

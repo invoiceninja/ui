@@ -16,7 +16,6 @@ import CommonProps from 'common/interfaces/common-props.interface';
 import { SearchArea } from './SearchArea';
 import { useTransactionMatchResourceQuery } from '../common/queries';
 import { ListBoxItem } from './ListBoxItem';
-import { useQueryClient } from 'react-query';
 
 export interface ResourceItem {
   id: string;
@@ -45,8 +44,6 @@ interface Props extends CommonProps {
 }
 
 export function ListBox(props: Props) {
-  const queryClient = useQueryClient();
-
   const [searchParams, setSearchParams] = useState<SearchInput>({
     searchTerm: '',
     minAmount: 0,
@@ -113,18 +110,17 @@ export function ListBox(props: Props) {
 
   useEffect(() => {
     setClients(clientsResponse?.data.data);
+
     setResourceItems(getResourceObject(resourceResponse));
+
     if (props.dataKey === 'invoices') {
       setIsInvoicesDataKey(true);
     }
   }, [props.dataKey, resourceResponse, clientsResponse]);
 
   useEffect(() => {
-    if (isInvoicesDataKey) {
-      if (!props.selectedIds?.length) {
-        queryClient.invalidateQueries('/api/v1/invoices');
-        setClientId('');
-      }
+    if (isInvoicesDataKey && !props.selectedIds?.length) {
+      setClientId('');
     }
   }, [props.selectedIds]);
 

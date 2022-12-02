@@ -17,10 +17,8 @@ import {
 import { route } from 'common/helpers/route';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Expense } from 'common/interfaces/expense';
 import { ExpenseCategory } from 'common/interfaces/expense-category';
 import { Invoice } from 'common/interfaces/invoice';
-import { Vendor } from 'common/interfaces/vendor';
 import { useExpenseCategoryQuery } from 'common/queries/expense-categories';
 import { useExpenseQuery } from 'common/queries/expenses';
 import { useVendorQuery } from 'common/queries/vendor';
@@ -80,10 +78,6 @@ export function Details(props: Props) {
 
   const [matchedInvoices, setMatchedInvoices] = useState<Invoice[]>();
 
-  const [matchedVendor, setMatchedVendor] = useState<Vendor>();
-
-  const [matchedExpense, setMatchedExpense] = useState<Expense>();
-
   const [matchedExpenseCategory, setMatchedExpenseCategory] =
     useState<ExpenseCategory>();
 
@@ -104,18 +98,8 @@ export function Details(props: Props) {
       transaction?.base_type === ApiTransactionType.Credit
     );
 
-    setMatchedVendor(vendorResponse);
-
     setMatchedExpenseCategory(expenseCategoryResponse?.data.data);
-
-    setMatchedExpense(expenseResponse);
-  }, [
-    transaction,
-    expenseResponse,
-    vendorResponse,
-    expenseCategoryResponse,
-    props.transactionId,
-  ]);
+  }, [transaction, expenseCategoryResponse, props.transactionId]);
 
   useEffect(() => {
     return () => {
@@ -130,14 +114,17 @@ export function Details(props: Props) {
           ? t(TransactionType.Deposit)
           : t(TransactionType.Withdrawal)}
       </Element>
+
       <Element leftSide={t('amount')}>
         {formatMoney(
-          Number(transaction?.amount),
+          transaction?.amount || 0,
           company?.settings.country_id,
           transaction?.currency_id || ''
         )}
       </Element>
+
       <Element leftSide={t('date')}>{transaction?.date}</Element>
+
       <Element
         leftSide={t('bank_account')}
         className="hover:bg-gray-100 cursor-pointer"
@@ -151,74 +138,72 @@ export function Details(props: Props) {
       >
         {bankAccountResponse?.bank_account_name}
       </Element>
+
       {!showTransactionMatchDetails ? (
         <>
-          {isCreditTransactionType &&
-            matchedInvoices?.map(({ id, number }) => (
-              <Element
-                key={id}
-                leftSide={t('invoice')}
-                className="hover:bg-gray-100 cursor-pointer"
-                onClick={() =>
-                  navigate(
-                    route('/invoices/:id/edit', {
-                      id,
-                    })
-                  )
-                }
-              >
-                {number}
-              </Element>
-            ))}
+          {matchedInvoices?.map(({ id, number }) => (
+            <Element
+              key={id}
+              leftSide={t('invoice')}
+              className="hover:bg-gray-100 cursor-pointer"
+              onClick={() =>
+                navigate(
+                  route('/invoices/:id/edit', {
+                    id,
+                  })
+                )
+              }
+            >
+              {number}
+            </Element>
+          ))}
 
-          {!isCreditTransactionType && (
-            <>
-              {transaction?.vendor_id && (
-                <Element
-                  leftSide={t('vendor')}
-                  className="hover:bg-gray-100 cursor-pointer"
-                  onClick={() =>
-                    navigate(
-                      route('/vendors/:id', {
-                        id: matchedVendor?.id,
-                      })
-                    )
-                  }
-                >
-                  {matchedVendor?.name}
-                </Element>
-              )}
-              {transaction?.ninja_category_id && (
-                <Element
-                  leftSide={t('category')}
-                  className="hover:bg-gray-100 cursor-pointer"
-                  onClick={() =>
-                    navigate(
-                      route('/settings/expense_categories/:id/edit', {
-                        id: matchedExpenseCategory?.id,
-                      })
-                    )
-                  }
-                >
-                  {matchedExpenseCategory?.name}
-                </Element>
-              )}
-              {transaction?.expense_id && (
-                <Element
-                  leftSide={t('expense')}
-                  className="hover:bg-gray-100 cursor-pointer"
-                  onClick={() =>
-                    navigate(
-                      route('/expenses/:id/edit', {
-                        id: matchedExpense?.id,
-                      })
-                    )
-                  }
-                >
-                  {matchedExpense?.number}
-                </Element>
-              )}
-            </>
+          {transaction?.vendor_id && (
+            <Element
+              leftSide={t('vendor')}
+              className="hover:bg-gray-100 cursor-pointer"
+              onClick={() =>
+                navigate(
+                  route('/vendors/:id', {
+                    id: vendorResponse?.id,
+                  })
+                )
+              }
+            >
+              {vendorResponse?.name}
+            </Element>
+          )}
+
+          {transaction?.ninja_category_id && (
+            <Element
+              leftSide={t('category')}
+              className="hover:bg-gray-100 cursor-pointer"
+              onClick={() =>
+                navigate(
+                  route('/settings/expense_categories/:id/edit', {
+                    id: matchedExpenseCategory?.id,
+                  })
+                )
+              }
+            >
+              {matchedExpenseCategory?.name}
+            </Element>
+          )}
+
+          {transaction?.expense_id && (
+            <Element
+              leftSide={t('expense')}
+              className="hover:bg-gray-100 cursor-pointer"
+              onClick={() =>
+                navigate(
+                  route('/expenses/:id/edit', {
+                    id: expenseResponse?.id,
+                  })
+                )
+              }
+            >
+              {expenseResponse?.number}
+            </Element>
           )}
         </>
       ) : (

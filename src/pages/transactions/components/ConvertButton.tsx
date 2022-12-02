@@ -9,7 +9,7 @@
  */
 
 import { Button } from '@invoiceninja/forms';
-import React, { FormEvent } from 'react';
+import { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdContentCopy } from 'react-icons/md';
 
@@ -25,7 +25,7 @@ export function ConvertButton(props: Props) {
   return (
     <Button
       className="w-full"
-      onClick={(event: FormEvent<HTMLFormElement>) => props.onClick(event)}
+      onClick={props.onClick}
       disabled={props.isFormBusy}
     >
       {<MdContentCopy fontSize={22} />}

@@ -41,45 +41,38 @@ export function SearchArea(props: Props) {
     }));
   };
   return (
-    <>
-      <form
-        className="flex items-center"
-        onSubmit={(event) => event.preventDefault()}
-      >
-        <InputField
-          className="bg-gray-200"
-          placeholder={t(`search_${props.dataKey}`)}
-          value={props.searchParams.searchTerm}
-          onValueChange={(value) =>
-            handleChangeSearchParams('searchTerm', value)
+    <div className="flex items-center">
+      <InputField
+        className="bg-gray-200"
+        placeholder={t(`search_${props.dataKey}`)}
+        value={props.searchParams.searchTerm}
+        onValueChange={(value) => handleChangeSearchParams('searchTerm', value)}
+      />
+      {props.isInvoicesDataKey ? (
+        <MdFilterAlt
+          className="ml-3 cursor-pointer"
+          fontSize={28}
+          onClick={() =>
+            props.setIsFilterModalOpened((prevState) => !prevState)
           }
         />
-        {props.isInvoicesDataKey ? (
-          <MdFilterAlt
-            className="ml-3 cursor-pointer"
-            fontSize={30}
-            onClick={() =>
-              props.setIsFilterModalOpened((prevState) => !prevState)
-            }
-          />
-        ) : (
-          <BiPlusCircle
-            className="ml-3 cursor-pointer"
-            fontSize={28}
-            onClick={() =>
-              props.isInvoicesDataKey
-                ? navigate('/vendors/create')
-                : navigate('/settings/expense_categories/create')
-            }
-          />
-        )}
-      </form>
+      ) : (
+        <BiPlusCircle
+          className="ml-3 cursor-pointer"
+          fontSize={28}
+          onClick={() =>
+            props.isInvoicesDataKey
+              ? navigate('/vendors/create')
+              : navigate('/settings/expense_categories/create')
+          }
+        />
+      )}
       {props.isFilterModalOpened && (
         <FilterModal
           searchParams={props.searchParams}
           setSearchParams={props.setSearchParams}
         />
       )}
-    </>
+    </div>
   );
 }

@@ -61,13 +61,11 @@ export function TransactionMatchDetails(props: Props) {
 
       toast.processing();
 
-      const invoicesIds = invoiceIds.join(',');
-
       request('POST', endpoint('/api/v1/bank_transactions/match'), {
         transactions: [
           {
             id: props.transactionDetails.transaction_id,
-            invoice_ids: invoicesIds,
+            invoice_ids: invoiceIds.join(','),
           },
         ],
       })
@@ -79,15 +77,14 @@ export function TransactionMatchDetails(props: Props) {
               id: props.transactionDetails.transaction_id,
             })
           );
+
           toast.success('converted_transaction');
         })
         .catch((error: AxiosError) => {
           console.error(error);
           toast.error();
         })
-        .finally(() => {
-          setIsFormBusy(false);
-        });
+        .finally(() => setIsFormBusy(false));
     }
   };
 
@@ -101,16 +98,12 @@ export function TransactionMatchDetails(props: Props) {
 
       toast.processing();
 
-      const vendor_id = vendorIds?.join(',');
-
-      const ninja_category_id = expenseCategoryIds?.join(',');
-
       request('POST', endpoint('/api/v1/bank_transactions/match'), {
         transactions: [
           {
             id: props.transactionDetails.transaction_id,
-            vendor_id,
-            ninja_category_id,
+            vendor_id: vendorIds?.join(','),
+            ninja_category_id: expenseCategoryIds?.join(','),
           },
         ],
       })
@@ -127,6 +120,7 @@ export function TransactionMatchDetails(props: Props) {
                 id: response.data.data[0].expense_id,
               })
             );
+
             toast.success('converted_transaction');
           }
         )
@@ -134,9 +128,7 @@ export function TransactionMatchDetails(props: Props) {
           console.error(error);
           toast.error();
         })
-        .finally(() => {
-          setIsFormBusy(false);
-        });
+        .finally(() => setIsFormBusy(false));
     }
   };
 
@@ -161,6 +153,12 @@ export function TransactionMatchDetails(props: Props) {
     invoiceIds,
     expenseCategoryIds,
   ]);
+
+  useEffect(() => {
+    return () => {
+      props.setActionButton(undefined);
+    };
+  }, []);
 
   return (
     <>

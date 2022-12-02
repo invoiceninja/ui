@@ -29,10 +29,7 @@ export function FilterModal(props: Props) {
   };
 
   return (
-    <form
-      onSubmit={(event) => event.preventDefault()}
-      className="absolute w-full top-full m-1 bg-gray-100 text-center pb-2 border-b border-gray-200 z-10"
-    >
+    <div className="absolute w-full top-full left-0 mt-1 bg-gray-100 text-center pb-2 border-b border-gray-200 z-10">
       <div className="flex flex-col items-center p-3">
         <div className="flex justify-evenly w-full">
           <div className="flex flex-col items-start w-2/5">
@@ -86,6 +83,6 @@ export function FilterModal(props: Props) {
           </div>
         </div>
       </div>
-    </form>
+    </div>
   );
 }
