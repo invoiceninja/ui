@@ -108,7 +108,7 @@ export function Details(props: Props) {
   }, []);
 
   return (
-    <div>
+    <div className="border-b border-gray-200">
       <Element leftSide={t('type')}>
         {isCreditTransactionType
           ? t(TransactionType.Deposit)

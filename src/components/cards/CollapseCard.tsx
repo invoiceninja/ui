@@ -58,7 +58,7 @@ export function CollapseCard(props: Props) {
                     className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
                   >
                     <div className="h-0 flex-1 overflow-y-auto">
-                      <div className="py-6 px-4 sm:px-6">
+                      <div className="py-6 px-4 sm:px-6 bg-gray-100">
                         <div className="flex items-center justify-between">
                           <span className="text-lg font-medium text-gray-900">
                             {props.title}
