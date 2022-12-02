@@ -14,6 +14,7 @@ import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { endpoint } from '../helpers';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { Params } from './common/params.interface';
 
 export function useVendorQuery(params: { id: string | undefined }) {
   return useQuery<Vendor>(
@@ -37,11 +38,16 @@ export function useBlankVendorQuery() {
   );
 }
 
-export function useVendorsQuery() {
+export function useVendorsQuery(params?: Params) {
   return useQuery<Vendor[]>(
-    '/api/v1/vendors',
+    ['/api/v1/vendors', params],
     () =>
-      request('GET', endpoint('/api/v1/vendors')).then(
+      request(
+        'GET',
+        endpoint('/api/v1/vendors?filter=:filter', {
+          filter: params?.filter,
+        })
+      ).then(
         (response: GenericSingleResourceResponse<Vendor[]>) =>
           response.data.data
       ),

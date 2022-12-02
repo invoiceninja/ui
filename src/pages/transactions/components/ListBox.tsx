@@ -14,17 +14,19 @@ import { useClientsQuery } from 'common/queries/clients';
 import { Client } from 'common/interfaces/client';
 import CommonProps from 'common/interfaces/common-props.interface';
 import { SearchArea } from './SearchArea';
-import { useResourceDataQuery } from '../common/queries';
+import { useTransactionMatchResourceQuery } from '../common/queries';
 import { ListBoxItem } from './ListBoxItem';
+import { useQueryClient } from 'react-query';
 
 export interface ResourceItem {
   id: string;
-  name?: string;
-  number?: number;
-  clientName?: string;
-  status_id?: string;
-  amount?: number;
-  date?: string;
+  name: string;
+  number: number;
+  clientName: string;
+  client_id: string;
+  status_id: string;
+  amount: number;
+  date: string;
 }
 
 export interface SearchInput {
@@ -43,11 +45,7 @@ interface Props extends CommonProps {
 }
 
 export function ListBox(props: Props) {
-  const { data: clientsResponse } = useClientsQuery();
-
-  const { data: resourceResponse } = useResourceDataQuery({
-    dataKey: props.dataKey,
-  });
+  const queryClient = useQueryClient();
 
   const [searchParams, setSearchParams] = useState<SearchInput>({
     searchTerm: '',
@@ -56,6 +54,16 @@ export function ListBox(props: Props) {
     startDate: '',
     endDate: '',
   });
+
+  const [clientId, setClientId] = useState<string>('');
+
+  const { data: clientsResponse } = useClientsQuery();
+
+  const { data: resourceResponse } = useTransactionMatchResourceQuery(
+    props.dataKey,
+    searchParams.searchTerm,
+    clientId
+  );
 
   const [resourceItems, setResourceItems] = useState<ResourceItem[]>();
 
@@ -67,11 +75,12 @@ export function ListBox(props: Props) {
   const [isInvoicesDataKey, setIsInvoicesDataKey] = useState<boolean>(false);
 
   const isItemChecked = (itemId: string) => {
-    const filteredItemIds = props.selectedIds?.find((id) => id === itemId);
-    return Boolean(filteredItemIds?.length);
+    return Boolean(props.selectedIds?.find((id) => id === itemId)?.length);
   };
 
-  const selectItem = (itemId: string) => {
+  const selectItem = (itemId: string, clientId?: string) => {
+    setClientId(clientId || '');
+
     const filteredItemIdsList = props.selectedIds?.find((id) => itemId === id);
 
     let updatedItemIds;
@@ -92,12 +101,13 @@ export function ListBox(props: Props) {
   const getResourceObject = (resourceList: any) => {
     return resourceList?.map((resourceItem: any) => ({
       id: resourceItem.id,
-      number: resourceItem?.number,
-      name: resourceItem?.name,
-      clientName: getClientName(resourceItem?.client_id),
-      status_id: resourceItem?.status_id,
-      amount: resourceItem?.amount,
-      date: resourceItem?.date,
+      number: resourceItem.number,
+      name: resourceItem.name,
+      clientName: getClientName(resourceItem.client_id),
+      status_id: resourceItem.status_id,
+      amount: resourceItem.amount,
+      date: resourceItem.date,
+      client_id: resourceItem.client_id,
     }));
   };
 
@@ -110,8 +120,13 @@ export function ListBox(props: Props) {
   }, [props.dataKey, resourceResponse, clientsResponse]);
 
   useEffect(() => {
-    console.log('ok');
-  }, [searchParams]);
+    if (isInvoicesDataKey) {
+      if (!props.selectedIds?.length) {
+        queryClient.invalidateQueries('/api/v1/invoices');
+        setClientId('');
+      }
+    }
+  }, [props.selectedIds]);
 
   return (
     <div className="flex flex-col w-full">

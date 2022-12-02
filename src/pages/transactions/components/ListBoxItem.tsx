@@ -18,7 +18,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 interface Props {
   resourceItem: ResourceItem;
   isItemChecked: boolean;
-  selectItem: (id: string) => void;
+  selectItem: (id: string, clientId?: string) => void;
 }
 
 export function ListBoxItem(props: Props) {
@@ -30,7 +30,9 @@ export function ListBoxItem(props: Props) {
     <li
       key={props.resourceItem.id}
       className="flex justify-between hover:bg-gray-50 w-full cursor-pointer p-4 border-b border-gray-200"
-      onClick={() => props.selectItem(props.resourceItem.id)}
+      onClick={() =>
+        props.selectItem(props.resourceItem.id, props.resourceItem?.client_id)
+      }
     >
       <div className="flex items-center">
         <Checkbox
@@ -42,15 +44,15 @@ export function ListBoxItem(props: Props) {
           <span className="text-sm">{props.resourceItem?.number}</span>
         </div>
       </div>
-      <div className="flex flex-col flex-grow pl-8 pr-3">
-        <span className="text-sm">{props.resourceItem?.clientName}</span>
-        <span className="text-sm text-gray-600">
-          {props.resourceItem?.date}
-        </span>
-      </div>
-      <div className="flex items-center">
+      <div className="flex items-center flex-grow pr-3">
+        <div className="flex flex-col flex-grow pl-8 pr-3">
+          <span className="text-sm">{props.resourceItem?.clientName}</span>
+          <span className="text-sm text-gray-600">
+            {props.resourceItem?.date}
+          </span>
+        </div>
         {props.resourceItem?.amount && (
-          <span className="mr-6 text-sm">
+          <span className="text-sm">
             {formatMoney(
               props.resourceItem.amount,
               company.settings.country_id,
@@ -58,6 +60,8 @@ export function ListBoxItem(props: Props) {
             )}
           </span>
         )}
+      </div>
+      <div className="flex items-center">
         {props.resourceItem?.status_id && (
           <StatusBadge
             for={invoiceStatus}

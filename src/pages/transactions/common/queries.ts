@@ -32,16 +32,22 @@ export function useTransactionQuery(params: { id: string | undefined }) {
   );
 }
 
-export function useResourceDataQuery(params: {
-  dataKey: 'invoices' | 'vendors' | 'categories';
-}) {
-  if (params.dataKey === 'invoices') {
-    return useInvoicesQuery();
+export function useTransactionMatchResourceQuery(
+  dataKey: 'invoices' | 'vendors' | 'categories',
+  filter?: string,
+  clientId?: string
+) {
+  if (dataKey === 'invoices') {
+    return useInvoicesQuery({
+      client_status: 'unpaid',
+      filter,
+      client_id: clientId,
+    });
   }
 
-  if (params.dataKey === 'vendors') {
-    return useVendorsQuery();
+  if (dataKey === 'vendors') {
+    return useVendorsQuery({ filter });
   }
 
-  return useExpenseCategoriesQuery();
+  return useExpenseCategoriesQuery({ filter });
 }

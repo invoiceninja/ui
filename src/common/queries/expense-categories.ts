@@ -24,11 +24,12 @@ export function useExpenseCategoriesQuery(params?: Params) {
       request(
         'GET',
         endpoint(
-          '/api/v1/expense_categories?per_page=:perPage&page=:currentPage&sort=:sort',
+          '/api/v1/expense_categories?per_page=:perPage&page=:currentPage&sort=:sort&filter=:filter',
           {
             perPage: params?.perPage,
             currentPage: params?.currentPage,
             sort: params?.sort ?? 'id|asc',
+            filter: params?.filter,
           }
         )
       ).then(
