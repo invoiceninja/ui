@@ -9,7 +9,7 @@
  */
 
 import { InputField } from '@invoiceninja/forms';
-import React, { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
 import { MdFilterAlt } from 'react-icons/md';
@@ -40,6 +40,7 @@ export function SearchArea(props: Props) {
       [property]: value,
     }));
   };
+
   return (
     <div className="flex items-center">
       <InputField

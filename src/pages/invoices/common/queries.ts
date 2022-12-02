@@ -15,22 +15,24 @@ import { Invoice } from 'common/interfaces/invoice';
 import { Params } from 'common/queries/common/params.interface';
 import { useQuery } from 'react-query';
 
-interface InoviceParams extends Params {
+interface InvoiceParams extends Params {
   client_status?: string;
   client_id?: string;
 }
 
-export function useInvoicesQuery(params?: InoviceParams) {
-  const { client_status = 'all', client_id = '', filter = '' } = params || {};
-
+export function useInvoicesQuery(params?: InvoiceParams) {
   return useQuery<Invoice[]>(
-    ['/api/v1/invoices', { client_status, client_id, filter }],
+    ['/api/v1/invoices', params],
     () =>
       request(
         'GET',
         endpoint(
           '/api/v1/invoices?client_status=:client_status&filter=:filter&client_id=:client_id',
-          { client_status, client_id, filter }
+          {
+            client_status: params?.client_status ?? 'all',
+            client_id: params?.client_id ?? '',
+            filter: params?.filter ?? '',
+          }
         )
       ).then(
         (response: GenericSingleResourceResponse<Invoice[]>) =>

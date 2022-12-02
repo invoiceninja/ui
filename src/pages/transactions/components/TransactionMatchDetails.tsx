@@ -45,9 +45,9 @@ export function TransactionMatchDetails(props: Props) {
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const [vendorIds, setVendorIds] = useState<string[]>();
-
   const [invoiceIds, setInvoiceIds] = useState<string[]>();
+
+  const [vendorIds, setVendorIds] = useState<string[]>();
 
   const [expenseCategoryIds, setExpenseCategoryIds] = useState<string[]>();
 

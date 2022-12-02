@@ -35,17 +35,15 @@ export function useTransactionQuery(params: { id: string | undefined }) {
 export function useTransactionMatchResourceQuery(
   dataKey: 'invoices' | 'vendors' | 'categories',
   filter?: string,
-  clientId?: string
+  client_id?: string
 ) {
   if (dataKey === 'invoices') {
     return useInvoicesQuery({
       client_status: 'unpaid',
       filter,
-      client_id: clientId,
+      client_id,
     });
-  }
-
-  if (dataKey === 'vendors') {
+  } else if (dataKey === 'vendors') {
     return useVendorsQuery({ filter });
   }
 

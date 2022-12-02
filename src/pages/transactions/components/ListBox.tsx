@@ -95,7 +95,7 @@ export function ListBox(props: Props) {
     return clients?.find(({ id }) => id === clientId)?.name;
   };
 
-  const getResourceObject = (resourceList: any) => {
+  const getFormattedResourceList = (resourceList: any) => {
     return resourceList?.map((resourceItem: any) => ({
       id: resourceItem.id,
       number: resourceItem.number,
@@ -111,7 +111,7 @@ export function ListBox(props: Props) {
   useEffect(() => {
     setClients(clientsResponse?.data.data);
 
-    setResourceItems(getResourceObject(resourceResponse));
+    setResourceItems(getFormattedResourceList(resourceResponse));
 
     if (props.dataKey === 'invoices') {
       setIsInvoicesDataKey(true);
