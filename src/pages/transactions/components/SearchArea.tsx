@@ -9,17 +9,19 @@
  */
 
 import { InputField } from '@invoiceninja/forms';
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
 import { MdFilterAlt } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
+import { CreateExpenseCategoryModal } from './CreateExpenseCategoryModal';
+import { CreateVendorModal } from './CreateVendorModal';
 import { FilterModal } from './FilterModal';
 import { SearchInput } from './ListBox';
 
 interface Props {
   searchParams: SearchInput;
   setSearchParams: Dispatch<SetStateAction<SearchInput>>;
+  setSelectedIds: Dispatch<SetStateAction<string[] | undefined>>;
   setIsFilterModalOpened: Dispatch<SetStateAction<boolean>>;
   isInvoicesDataKey: boolean;
   isFilterModalOpened: boolean;
@@ -29,7 +31,13 @@ interface Props {
 export function SearchArea(props: Props) {
   const [t] = useTranslation();
 
-  const navigate = useNavigate();
+  const [
+    isCreateExpenseCategoryModalOpen,
+    setIsCreateExpenseCategoryModalOpen,
+  ] = useState<boolean>(false);
+
+  const [isCreateVendorModalOpen, setIsCreateVendorModalOpen] =
+    useState<boolean>(false);
 
   const handleChangeSearchParams = (
     property: keyof SearchInput,
@@ -42,38 +50,56 @@ export function SearchArea(props: Props) {
   };
 
   return (
-    <div className="flex items-center">
-      <InputField
-        className="bg-gray-200"
-        placeholder={t(`search_${props.dataKey}`)}
-        value={props.searchParams.searchTerm}
-        onValueChange={(value) => handleChangeSearchParams('searchTerm', value)}
+    <>
+      <CreateExpenseCategoryModal
+        visible={isCreateExpenseCategoryModalOpen}
+        setVisible={setIsCreateExpenseCategoryModalOpen}
+        setSelectedIds={props.setSelectedIds}
       />
-      {props.isInvoicesDataKey ? (
-        <MdFilterAlt
-          className="ml-3 cursor-pointer"
-          fontSize={28}
-          onClick={() =>
-            props.setIsFilterModalOpened((prevState) => !prevState)
+
+      <CreateVendorModal
+        visible={isCreateVendorModalOpen}
+        setVisible={setIsCreateVendorModalOpen}
+        setSelectedIds={props.setSelectedIds}
+      />
+
+      <div className="flex items-center">
+        <InputField
+          className="bg-gray-200"
+          placeholder={t(`search_${props.dataKey}`)}
+          value={props.searchParams.searchTerm}
+          onValueChange={(value) =>
+            handleChangeSearchParams('searchTerm', value)
           }
         />
-      ) : (
-        <BiPlusCircle
-          className="ml-3 cursor-pointer"
-          fontSize={28}
-          onClick={() =>
-            props.isInvoicesDataKey
-              ? navigate('/vendors/create')
-              : navigate('/settings/expense_categories/create')
-          }
-        />
-      )}
-      {props.isFilterModalOpened && (
-        <FilterModal
-          searchParams={props.searchParams}
-          setSearchParams={props.setSearchParams}
-        />
-      )}
-    </div>
+
+        {props.isInvoicesDataKey ? (
+          <MdFilterAlt
+            className="ml-3 cursor-pointer"
+            fontSize={28}
+            onClick={() =>
+              props.setIsFilterModalOpened((prevState) => !prevState)
+            }
+          />
+        ) : (
+          <BiPlusCircle
+            className="ml-3 cursor-pointer"
+            fontSize={28}
+            onClick={() =>
+              props.dataKey === 'vendors'
+                ? setIsCreateVendorModalOpen(true)
+                : setIsCreateExpenseCategoryModalOpen(true)
+            }
+          />
+        )}
+
+        {props.isFilterModalOpened && (
+          <FilterModal
+            searchParams={props.searchParams}
+            setSearchParams={props.setSearchParams}
+          />
+        )}
+      </div>
+    </>
   );
 }

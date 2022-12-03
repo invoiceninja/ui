@@ -23,11 +23,15 @@ import { useFormik } from 'formik';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
 export function Create() {
   const [t] = useTranslation();
+
   const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
 
   const [errors, setErrors] = useState<Record<string, any>>({});
 
@@ -55,6 +59,8 @@ export function Create() {
         .then((response) => {
           toast.dismiss();
           toast.success(t('created_expense_category'));
+
+          queryClient.invalidateQueries('/api/v1/expense_categories');
 
           navigate(
             route('/settings/expense_categories/:id/edit', {

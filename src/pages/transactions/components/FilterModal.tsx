@@ -53,7 +53,7 @@ export function FilterModal(props: Props) {
           </div>
         </div>
         <div className="flex justify-evenly mt-3 w-full">
-          <div className="flex flex-col items-start w-2/5">
+          <div className="flex flex-col items-start w-1/3 mr-9">
             <p className="text-sm ml-2">{`${t('start')} ${t('date')}`}</p>
             <input
               className="w-full border-gray-300"
@@ -67,7 +67,7 @@ export function FilterModal(props: Props) {
               }
             />
           </div>
-          <div className="flex flex-col items-start w-2/5">
+          <div className="flex flex-col items-start w-1/3 mr-9">
             <p className="text-sm ml-2">{`${t('end')} ${t('date')}`}</p>
             <input
               className="w-full border-gray-300"

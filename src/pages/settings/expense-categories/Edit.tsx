@@ -72,16 +72,17 @@ export function Edit() {
         .catch((error: AxiosError) => {
           toast.dismiss();
 
+          queryClient.invalidateQueries('/api/v1/expense_categories');
+
+          queryClient.invalidateQueries(
+            route('/api/v1/expense_categories/:id', { id })
+          );
+
           error.response?.status === 422
             ? setErrors(error.response?.data)
             : toast.error(t('error_title'));
         })
-        .finally(() => {
-          formik.setSubmitting(false);
-          queryClient.invalidateQueries(
-            route('/api/v1/expense_categories/:id', { id })
-          );
-        });
+        .finally(() => formik.setSubmitting(false));
     },
   });
 

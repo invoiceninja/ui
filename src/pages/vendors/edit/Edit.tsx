@@ -67,6 +67,10 @@ export function Edit() {
       .then((response) => {
         toast.success('updated_vendor');
 
+        queryClient.invalidateQueries('/api/v1/vendors');
+
+        queryClient.invalidateQueries(route('/api/v1/vendors/:id', { id }));
+
         dispatch(
           updateRecord({ object: 'company', data: response[1].data.data })
         );
@@ -75,10 +79,7 @@ export function Edit() {
         console.error(error);
 
         toast.error();
-      })
-      .finally(() =>
-        queryClient.invalidateQueries(route('/api/v1/vendors/:id', { id }))
-      );
+      });
   };
 
   return (

@@ -136,6 +136,7 @@ export function ListBox(props: Props) {
           setIsFilterModalOpened={setIsFilterModalOpened}
           isFilterModalOpened={isFilterModalOpened}
           setSearchParams={setSearchParams}
+          setSelectedIds={props.setSelectedIds}
         />
       </div>
       <ul

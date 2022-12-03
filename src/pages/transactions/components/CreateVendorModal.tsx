@@ -8,47 +8,40 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
-import { endpoint } from 'common/helpers';
+import { Button } from '@invoiceninja/forms';
+import axios, { AxiosError } from 'axios';
 import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
+import { endpoint } from 'common/helpers';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useTitle } from 'common/hooks/useTitle';
 import { Vendor } from 'common/interfaces/vendor';
 import { useBlankVendorQuery } from 'common/queries/vendor';
 import { updateRecord } from 'common/stores/slices/company-users';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { useEffect, useState } from 'react';
+import { Modal } from 'components/Modal';
+import { Form } from 'pages/vendors/edit/components/Form';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { Form } from '../edit/components/Form';
 
-export function Create() {
-  const { documentTitle } = useTitle('create_vendor');
+interface Props {
+  visible: boolean;
+  setVisible: Dispatch<SetStateAction<boolean>>;
+  setSelectedIds: Dispatch<SetStateAction<string[] | undefined>>;
+}
 
+export function CreateVendorModal(props: Props) {
   const [t] = useTranslation();
 
   const { data } = useBlankVendorQuery();
 
+  const dispatch = useDispatch();
+
   const queryClient = useQueryClient();
 
-  const [vendor, setVendor] = useState<Vendor>();
-
   const company = useInjectCompanyChanges();
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
 
-  const pages: Page[] = [
-    { name: t('vendors'), href: '/vendors' },
-    {
-      name: t('create_vendor'),
-      href: '/vendors/:id/create',
-    },
-  ];
+  const [vendor, setVendor] = useState<Vendor>();
 
   useEffect(() => {
     if (data) {
@@ -78,7 +71,7 @@ export function Create() {
     }
   }, [data]);
 
-  const onSave = () => {
+  const handleSave = () => {
     toast.processing();
 
     axios
@@ -99,23 +92,28 @@ export function Create() {
 
         queryClient.invalidateQueries('/api/v1/vendors');
 
-        navigate(route('/vendors/:id', { id: response[0].data.data.id }));
-      })
-      .catch((error) => {
-        console.error(error);
+        props.setSelectedIds([response[0].data.data.id]);
 
+        props.setVisible(false);
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
         toast.error();
       });
   };
 
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      onBackClick="/vendors"
-      onSaveClick={onSave}
+    <Modal
+      title={t('create_vendor')}
+      visible={props.visible}
+      onClose={() => props.setVisible(false)}
+      size="large"
     >
       {vendor && <Form vendor={vendor} setVendor={setVendor} />}
-    </Default>
+
+      <div className="flex justify-end space-x-4 mt-5">
+        <Button onClick={handleSave}>{t('save')}</Button>
+      </div>
+    </Modal>
   );
 }
