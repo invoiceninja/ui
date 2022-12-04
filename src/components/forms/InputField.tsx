@@ -10,7 +10,9 @@
 
 import classNames from 'classnames';
 import { Alert } from 'components/Alert';
+import { useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
+import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
@@ -35,6 +37,10 @@ interface Props extends CommonProps {
 }
 
 export function InputField(props: Props) {
+  const isInitialTypePassword = props.type === 'password';
+
+  const [isEyeOpen, setIsEyeOpen] = useState<boolean>(true);
+
   return (
     <section>
       {props.label && (
@@ -44,31 +50,57 @@ export function InputField(props: Props) {
         </InputLabel>
       )}
 
-      <DebounceInput
-        min={props.min}
-        disabled={props.disabled}
-        element={props.element || 'input'}
-        inputRef={props.innerRef}
-        debounceTimeout={props.debounceTimeout ?? 300}
-        required={props.required}
-        id={props.id}
-        type={props.type}
-        className={classNames(
-          `w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
-          {
-            'border border-gray-300': props.border !== false,
+      <div className="relative">
+        <DebounceInput
+          min={props.min}
+          disabled={props.disabled}
+          element={props.element || 'input'}
+          inputRef={props.innerRef}
+          debounceTimeout={props.debounceTimeout ?? 300}
+          required={props.required}
+          id={props.id}
+          type={
+            isInitialTypePassword && isEyeOpen
+              ? 'password'
+              : isInitialTypePassword && !isEyeOpen
+              ? 'text'
+              : props.type
           }
+          className={classNames(
+            `w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
+            {
+              'border border-gray-300': props.border !== false,
+            }
+          )}
+          placeholder={props.placeholder}
+          onChange={(event) => {
+            props.onValueChange && props.onValueChange(event.target.value);
+            props.onChange && props.onChange(event);
+          }}
+          value={props.value}
+          list={props.list}
+          rows={props.textareaRows || 5}
+          step={props.step}
+        />
+
+        {isInitialTypePassword && (
+          <span className="absolute top-1/4 right-5 cursor-pointer">
+            {isEyeOpen ? (
+              <AiFillEye
+                className="text-gray-400"
+                fontSize={19}
+                onClick={() => setIsEyeOpen(false)}
+              />
+            ) : (
+              <AiFillEyeInvisible
+                className="text-gray-400"
+                fontSize={19}
+                onClick={() => setIsEyeOpen(true)}
+              />
+            )}
+          </span>
         )}
-        placeholder={props.placeholder}
-        onChange={(event) => {
-          props.onValueChange && props.onValueChange(event.target.value);
-          props.onChange && props.onChange(event);
-        }}
-        value={props.value}
-        list={props.list}
-        rows={props.textareaRows || 5}
-        step={props.step}
-      />
+      </div>
 
       {props.errorMessage && (
         <Alert className="mt-2" type="danger">
