@@ -29,7 +29,7 @@ export function useInvoicesQuery(params?: InvoiceParams) {
         endpoint(
           '/api/v1/invoices?client_status=:client_status&filter=:filter&client_id=:client_id',
           {
-            client_status: params?.client_status ?? 'all',
+            client_status: params?.client_status ?? '',
             client_id: params?.client_id ?? '',
             filter: params?.filter ?? '',
           }
