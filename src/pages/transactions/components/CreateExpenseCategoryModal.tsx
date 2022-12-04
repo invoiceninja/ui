@@ -93,7 +93,7 @@ export function CreateExpenseCategoryModal(props: Props) {
       title={t('create_expense_category')}
       visible={props.visible}
       onClose={() => props.setVisible(false)}
-      size="regular"
+      size="small"
     >
       <form onSubmit={handleSave}>
         <CardContainer>

@@ -32,29 +32,26 @@ export function FilterModal(props: Props) {
     <div className="absolute w-full top-full left-0 mt-1 bg-gray-100 text-center pb-2 border-b border-gray-200 z-10">
       <div className="flex flex-col items-center p-3">
         <div className="flex justify-evenly w-full">
-          <div className="flex flex-col items-start w-2/5">
-            <p className="text-sm ml-2">{`${t('min')} ${t('amount')}`}</p>
-            <InputField
-              className="w-full"
-              value={props.searchParams.minAmount}
-              onValueChange={(value) =>
-                handleChangeSearchParams('minAmount', value ? Number(value) : 0)
-              }
-            />
-          </div>
-          <div className="flex flex-col items-start w-2/5">
-            <p className="text-sm ml-2">{`${t('max')} ${t('amount')}`}</p>
-            <InputField
-              value={props.searchParams.maxAmount}
-              onValueChange={(value) =>
-                handleChangeSearchParams('maxAmount', value ? Number(value) : 0)
-              }
-            />
-          </div>
+          <InputField
+            label={`${t('min')} ${t('amount')}`}
+            value={props.searchParams.minAmount}
+            onValueChange={(value) =>
+              handleChangeSearchParams('minAmount', value ? Number(value) : 0)
+            }
+          />
+          <InputField
+            label={`${t('max')} ${t('amount')}`}
+            value={props.searchParams.maxAmount}
+            onValueChange={(value) =>
+              handleChangeSearchParams('maxAmount', value ? Number(value) : 0)
+            }
+          />
         </div>
         <div className="flex justify-evenly mt-3 w-full">
-          <div className="flex flex-col items-start w-1/3 mr-9">
-            <p className="text-sm ml-2">{`${t('start')} ${t('date')}`}</p>
+          <div className="flex flex-col items-center w-1/3">
+            <p className="text-sm font-medium text-gray-500 mb-2">{`${t(
+              'start'
+            )} ${t('date')}`}</p>
             <input
               className="w-full border-gray-300"
               type="date"
@@ -67,8 +64,10 @@ export function FilterModal(props: Props) {
               }
             />
           </div>
-          <div className="flex flex-col items-start w-1/3 mr-9">
-            <p className="text-sm ml-2">{`${t('end')} ${t('date')}`}</p>
+          <div className="flex flex-col items-center w-1/3">
+            <p className="text-sm font-medium text-gray-500 mb-2">{`${t(
+              'end'
+            )} ${t('date')}`}</p>
             <input
               className="w-full border-gray-300"
               type="date"
