@@ -36,6 +36,10 @@ export function useUserDetailsTabs() {
       name: t('notifications'),
       href: '/settings/user_details/notifications',
     },
+    {
+      name: t('custom_fields'),
+      href: '/settings/user_details/custom_fields',
+    },
   ];
 
   return tabs;
