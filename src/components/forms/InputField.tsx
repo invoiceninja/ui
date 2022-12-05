@@ -84,7 +84,7 @@ export function InputField(props: Props) {
         />
 
         {isInitialTypePassword && (
-          <span className="absolute top-1/4 right-5 cursor-pointer">
+          <span className="absolute top-1/4 right-3 cursor-pointer">
             {isEyeOpen ? (
               <AiFillEye
                 className="text-gray-400"
