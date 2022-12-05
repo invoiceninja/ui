@@ -66,8 +66,15 @@ export function useResolveInputField(
     }
 
     if (typeof value === 'string') {
+      const isSecureField =
+        property.toLowerCase().includes('key') ||
+        property.toLowerCase().includes('password') ||
+        property.toLowerCase().includes('secret') ||
+        property.toLowerCase().includes('id');
+
       return (
         <InputField
+          type={isSecureField ? 'password' : 'text'}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             handleChange(property as keyof Field, event.target.value)
           }
