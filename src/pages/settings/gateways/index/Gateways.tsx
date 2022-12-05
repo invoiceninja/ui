@@ -41,6 +41,7 @@ export function Gateways() {
       resource="company_gateway"
       endpoint="/api/v1/company_gateways"
       linkToCreate="/settings/gateways/create"
+      linkToEdit="/settings/gateways/:id/edit"
       withResourcefulActions
     />
   );
