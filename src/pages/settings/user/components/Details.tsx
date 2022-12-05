@@ -23,9 +23,9 @@ export function Details() {
 
   const user = useCurrentUser();
 
-  const company = useCurrentCompany();
-
   const dispatch = useDispatch();
+
+  const company = useCurrentCompany();
 
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
@@ -80,7 +80,7 @@ export function Details() {
               defaultValue={userChanges.custom_value1}
               value={company.custom_fields.user1}
               onValueChange={(value) =>
-                handleChange('custom_value1', value.toString())
+                handleChange('custom_value1', value as string)
               }
             />
           )}
@@ -91,7 +91,7 @@ export function Details() {
               defaultValue={userChanges.custom_value2}
               value={company.custom_fields.user2}
               onValueChange={(value) =>
-                handleChange('custom_value2', value.toString())
+                handleChange('custom_value2', value as string)
               }
             />
           )}
@@ -102,7 +102,7 @@ export function Details() {
               defaultValue={userChanges.custom_value3}
               value={company.custom_fields.user3}
               onValueChange={(value) =>
-                handleChange('custom_value3', value.toString())
+                handleChange('custom_value3', value as string)
               }
             />
           )}
@@ -113,7 +113,7 @@ export function Details() {
               defaultValue={userChanges.custom_value4}
               value={company.custom_fields.user4}
               onValueChange={(value) =>
-                handleChange('custom_value4', value.toString())
+                handleChange('custom_value4', value as string)
               }
             />
           )}
