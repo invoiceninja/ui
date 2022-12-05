@@ -10,11 +10,10 @@
 
 import classNames from 'classnames';
 import { Alert } from 'components/Alert';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
-
-import CommonProps from '../../common/interfaces/common-props.interface';
+  import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
 
 interface Props extends CommonProps {
@@ -39,7 +38,19 @@ interface Props extends CommonProps {
 export function InputField(props: Props) {
   const isInitialTypePassword = props.type === 'password';
 
-  const [isEyeOpen, setIsEyeOpen] = useState<boolean>(true);
+  const [isInputMasked, setIsInputMasked] = useState(true);
+
+  const inputType = useMemo(() => {
+    if (props.type === 'password' && isInputMasked) {
+      return 'password';
+    }
+
+    if (props.type === 'password' && !isInputMasked) {
+      return 'text';
+    }
+
+    return props.type;
+  }, [props.type, isInputMasked]);
 
   return (
     <section>
@@ -59,13 +70,7 @@ export function InputField(props: Props) {
           debounceTimeout={props.debounceTimeout ?? 300}
           required={props.required}
           id={props.id}
-          type={
-            isInitialTypePassword && isEyeOpen
-              ? 'password'
-              : isInitialTypePassword && !isEyeOpen
-              ? 'text'
-              : props.type
-          }
+          type={inputType}
           className={classNames(
             `w-full py-2 px-3 rounded text-sm text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`,
             {
@@ -85,17 +90,17 @@ export function InputField(props: Props) {
 
         {isInitialTypePassword && (
           <span className="absolute top-1/4 right-3 cursor-pointer">
-            {isEyeOpen ? (
+            {isInputMasked ? (
               <AiFillEye
                 className="text-gray-400"
                 fontSize={19}
-                onClick={() => setIsEyeOpen(false)}
+                onClick={() => setIsInputMasked(false)}
               />
             ) : (
               <AiFillEyeInvisible
                 className="text-gray-400"
                 fontSize={19}
-                onClick={() => setIsEyeOpen(true)}
+                onClick={() => setIsInputMasked(true)}
               />
             )}
           </span>
