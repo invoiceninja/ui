@@ -30,6 +30,7 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { cloneDeep } from 'lodash';
+import { arrayMoveImmutable } from 'array-move';
 
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
@@ -40,6 +41,7 @@ interface Card {
   id: string;
   title: string;
   description: string;
+  sortOrder: number;
 }
 
 interface Column {
@@ -87,9 +89,14 @@ export function Kanban() {
             id: task.id,
             title: task.description,
             description: calculateTime(task.time_log),
+            sortOrder: task.status_order,
           });
         }
       });
+
+      columns.map(
+        (c) => (c.cards = c.cards.sort((a, b) => a.sortOrder - b.sortOrder))
+      );
 
       setBoard((current) => ({ ...current, columns }));
     }
@@ -103,9 +110,7 @@ export function Kanban() {
     statusIds.forEach((id) => (taskIds[id] = []));
 
     board.columns.forEach((column) => {
-      taskIds[column.id] = collect(column.cards)
-        .pluck('id')
-        .toArray() as string[];
+      column.cards.map((card) => taskIds[column.id].push(card.id));
     });
 
     const payload = {
@@ -132,25 +137,44 @@ export function Kanban() {
       (c) => c.id === result.source.droppableId
     );
 
+    const sourceIndex = local.columns.findIndex(
+      (c) => c.id === result.source.droppableId
+    ) as number;
+
     const target = local.columns.find(
       (c) => c.id === result.destination?.droppableId
     );
 
-    if (source && target && result.destination) {
-      const task = source.cards.find((c) => c.id === result.draggableId);
+    const targetIndex = local.columns.findIndex(
+      (c) => c.id === result.destination?.droppableId
+    );
 
-      const taskIndex = source.cards.findIndex(
-        (c) => c.id === result.draggableId
-      );
+    if (source && sourceIndex > -1 && target && targetIndex > -1) {
+      const task = source.cards.find((task) => task.id === result.draggableId);
 
-      if (task && taskIndex > -1) {
-        target.cards.splice(result.destination.index, 0, task);
+      if (task) {
+        local.columns[sourceIndex].cards = source.cards.filter(
+          (card) => card.id !== result.draggableId
+        );
 
-        source.cards.splice(taskIndex, 1);
+        local.columns[targetIndex].cards.push(task);
+
+        const taskIndex = local.columns[targetIndex].cards.findIndex(
+          (task) => task.id === result.draggableId
+        );
+
+        if (result.destination!.index > -1) {
+          local.columns[targetIndex].cards = arrayMoveImmutable(
+            local.columns[targetIndex].cards,
+            taskIndex,
+            result.destination?.index || 0
+          );
+        }
       }
     }
 
-    // setBoard(cloneDeep(local));
+    setBoard(local);
+
     updateTasks(local);
   };
 
