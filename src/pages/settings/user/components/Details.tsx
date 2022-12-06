@@ -29,7 +29,7 @@ export function Details() {
 
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
-  const handleChange = (property: string, value: string) =>
+  const handleChange = (property: string, value: string | number | boolean) =>
     dispatch(
       updateChanges({
         property: property,
@@ -44,18 +44,14 @@ export function Details() {
           <Element leftSide={t('first_name')}>
             <InputField
               value={userChanges?.first_name || user?.first_name || ''}
-              onValueChange={(value) =>
-                handleChange('first_name', value as string)
-              }
+              onValueChange={(value) => handleChange('first_name', value)}
             />
           </Element>
 
           <Element leftSide={t('last_name')}>
             <InputField
               value={userChanges?.last_name || user?.last_name || ''}
-              onValueChange={(value) =>
-                handleChange('last_name', value as string)
-              }
+              onValueChange={(value) => handleChange('last_name', value)}
             />
           </Element>
 
@@ -63,14 +59,14 @@ export function Details() {
             <InputField
               value={userChanges?.email || user?.email || ''}
               type="email"
-              onValueChange={(value) => handleChange('email', value as string)}
+              onValueChange={(value) => handleChange('email', value)}
             />
           </Element>
 
           <Element leftSide={t('phone')}>
             <InputField
               value={userChanges?.phone || user?.phone || ''}
-              onValueChange={(value) => handleChange('phone', value as string)}
+              onValueChange={(value) => handleChange('phone', value)}
             />
           </Element>
 
@@ -79,9 +75,7 @@ export function Details() {
               field="user1"
               defaultValue={userChanges.custom_value1}
               value={company.custom_fields.user1}
-              onValueChange={(value) =>
-                handleChange('custom_value1', value as string)
-              }
+              onValueChange={(value) => handleChange('custom_value1', value)}
             />
           )}
 
@@ -90,9 +84,7 @@ export function Details() {
               field="user2"
               defaultValue={userChanges.custom_value2}
               value={company.custom_fields.user2}
-              onValueChange={(value) =>
-                handleChange('custom_value2', value as string)
-              }
+              onValueChange={(value) => handleChange('custom_value2', value)}
             />
           )}
 
@@ -101,9 +93,7 @@ export function Details() {
               field="user3"
               defaultValue={userChanges.custom_value3}
               value={company.custom_fields.user3}
-              onValueChange={(value) =>
-                handleChange('custom_value3', value as string)
-              }
+              onValueChange={(value) => handleChange('custom_value3', value)}
             />
           )}
 
@@ -112,9 +102,7 @@ export function Details() {
               field="user4"
               defaultValue={userChanges.custom_value4}
               value={company.custom_fields.user4}
-              onValueChange={(value) =>
-                handleChange('custom_value4', value as string)
-              }
+              onValueChange={(value) => handleChange('custom_value4', value)}
             />
           )}
         </Card>
