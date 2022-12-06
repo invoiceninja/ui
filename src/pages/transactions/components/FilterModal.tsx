@@ -28,8 +28,6 @@ export function FilterModal(props: Props) {
     props.setSearchParams((prevState) => ({ ...prevState, [property]: value }));
   };
 
-  console.log(props.searchParams);
-
   return (
     <div className="absolute w-full top-full left-0 mt-1 bg-gray-100 text-center pb-2 border-b border-gray-200 z-10">
       <div className="flex flex-col items-center p-3">
