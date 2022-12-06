@@ -94,6 +94,14 @@ export function CreateVendorForm(props: Props) {
 
         queryClient.invalidateQueries('/api/v1/vendors');
 
+        window.dispatchEvent(
+          new CustomEvent('invalidate.combobox.queries', {
+            detail: {
+              url: endpoint('/api/v1/vendors'),
+            },
+          })
+        );
+
         if (props.setSelectedIds) {
           props.setSelectedIds([response[0].data.data.id]);
         }

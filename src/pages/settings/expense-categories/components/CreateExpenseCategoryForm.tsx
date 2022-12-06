@@ -74,6 +74,14 @@ export function CreateExpenseCategoryForm(props: Props) {
 
           queryClient.invalidateQueries('/api/v1/expense_categories');
 
+          window.dispatchEvent(
+            new CustomEvent('invalidate.combobox.queries', {
+              detail: {
+                url: endpoint('/api/v1/expense_categories'),
+              },
+            })
+          );
+
           if (props.setSelectedIds) {
             props.setSelectedIds([response.data.data.id]);
           }
