@@ -185,7 +185,14 @@ export function TransactionMatchDetails(props: Props) {
                 ? convertToPayment
                 : convertToExpense
             }
-            disabled={isFormBusy}
+            disableWithoutIcon={true}
+            disabled={
+              isFormBusy ||
+              (props.isCreditTransactionType && !invoiceIds.length) ||
+              (!props.isCreditTransactionType &&
+                !vendorIds.length &&
+                !expenseCategoryIds.length)
+            }
           >
             {<MdContentCopy fontSize={22} />}
             <span>
