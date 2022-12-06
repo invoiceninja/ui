@@ -43,7 +43,11 @@ export function useBlankVendorQuery() {
   );
 }
 
-export function useVendorsQuery(params: Params) {
+interface VendorParams extends Params {
+  enabled?: boolean;
+}
+
+export function useVendorsQuery(params: VendorParams) {
   return useQuery<Vendor[]>(
     ['/api/v1/vendors', params],
     () =>
@@ -56,6 +60,6 @@ export function useVendorsQuery(params: Params) {
         (response: GenericSingleResourceResponse<Vendor[]>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }

@@ -17,7 +17,11 @@ import { Params } from './common/params.interface';
 import { ExpenseCategory } from 'common/interfaces/expense-category';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
-export function useExpenseCategoriesQuery(params: Params) {
+interface ExpenseCategoriesParams extends Params {
+  enabled?: boolean;
+}
+
+export function useExpenseCategoriesQuery(params: ExpenseCategoriesParams) {
   return useQuery<ExpenseCategory[]>(
     ['/api/v1/expense_categories', params],
     () =>
@@ -36,7 +40,7 @@ export function useExpenseCategoriesQuery(params: Params) {
         (response: GenericSingleResourceResponse<ExpenseCategory[]>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }
 

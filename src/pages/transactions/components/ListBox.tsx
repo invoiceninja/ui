@@ -54,22 +54,33 @@ export function ListBox(props: Props) {
     endDate: '',
   });
 
+  const isInvoicesDataKey = props.dataKey === 'invoices';
+
+  const isVendorsDataKey = props.dataKey === 'vendors';
+
+  const isExpenseCategoriesDataKey = props.dataKey === 'categories';
+
   const [clientId, setClientId] = useState<string>();
 
-  const { data: clientsResponse } = useClientsQuery();
+  const { data: clientsResponse } = useClientsQuery({
+    enabled: isInvoicesDataKey,
+  });
 
   const { data: invoicesResponse } = useInvoicesQuery({
     clientStatus: 'unpaid',
     filter: searchParams.searchTerm,
     clientId,
+    enabled: isInvoicesDataKey,
   });
 
   const { data: vendorsResponse } = useVendorsQuery({
     filter: searchParams.searchTerm,
+    enabled: isVendorsDataKey,
   });
 
   const { data: expenseCategoriesResponse } = useExpenseCategoriesQuery({
     filter: searchParams.searchTerm,
+    enabled: isExpenseCategoriesDataKey,
   });
 
   const [resourceItems, setResourceItems] = useState<ResourceItem[]>();
@@ -78,8 +89,6 @@ export function ListBox(props: Props) {
 
   const [isFilterModalOpened, setIsFilterModalOpened] =
     useState<boolean>(false);
-
-  const [isInvoicesDataKey, setIsInvoicesDataKey] = useState<boolean>(false);
 
   const isItemChecked = (itemId: string) => {
     return Boolean(props.selectedIds?.find((id) => id === itemId)?.length);
@@ -119,17 +128,15 @@ export function ListBox(props: Props) {
   };
 
   useEffect(() => {
-    setClients(clientsResponse?.data.data);
+    setClients(clientsResponse);
 
-    if (props.dataKey === 'invoices') {
+    if (isInvoicesDataKey) {
       setResourceItems(getFormattedResourceList(invoicesResponse));
-    } else if (props.dataKey === 'vendors') {
+    } else if (isVendorsDataKey) {
       setResourceItems(getFormattedResourceList(vendorsResponse));
     } else {
       setResourceItems(getFormattedResourceList(expenseCategoriesResponse));
     }
-
-    setIsInvoicesDataKey(props.dataKey === 'invoices');
   }, [
     props.dataKey,
     invoicesResponse,
