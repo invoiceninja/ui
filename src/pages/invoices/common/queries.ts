@@ -29,8 +29,10 @@ export function useInvoicesQuery(params: InvoiceParams) {
       request(
         'GET',
         endpoint(
-          '/api/v1/invoices?client_status=:client_status&filter=:filter&client_id=:client_id&without_deleted_clients=:without_deleted_clients',
+          '/api/v1/invoices?client_status=:client_status&filter=:filter&client_id=:client_id&without_deleted_clients=:without_deleted_clients&per_page=:per_page&page=:page',
           {
+            per_page: params.perPage ?? '100',
+            page: params.currentPage ?? '1',
             client_status: params.clientStatus ?? 'all',
             client_id: params.clientId ?? '',
             filter: params.filter ?? '',

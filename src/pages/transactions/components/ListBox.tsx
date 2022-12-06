@@ -120,10 +120,10 @@ export function ListBox(props: Props) {
       number: resourceItem.number,
       name: resourceItem.name,
       clientName: getClientName(resourceItem.client_id),
-      status_id: resourceItem.status_id,
+      statusId: resourceItem.status_id,
       amount: resourceItem.amount,
       date: resourceItem.date,
-      client_id: resourceItem.client_id,
+      clientId: resourceItem.client_id,
     }));
   };
 

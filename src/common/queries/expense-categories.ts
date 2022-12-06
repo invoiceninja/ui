@@ -30,7 +30,7 @@ export function useExpenseCategoriesQuery(params: ExpenseCategoriesParams) {
         endpoint(
           '/api/v1/expense_categories?per_page=:perPage&page=:currentPage&sort=:sort&filter=:filter',
           {
-            perPage: params.perPage ?? '50',
+            perPage: params.perPage ?? '100',
             currentPage: params.currentPage ?? '1',
             sort: params.sort ?? 'id|asc',
             filter: params.filter ?? '',

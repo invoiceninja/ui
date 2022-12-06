@@ -43,12 +43,6 @@ export function Transactions() {
     }
   }, [transactionId]);
 
-  useEffect(() => {
-    if (!isTransactionSliderVisible) {
-      setTransactionId('');
-    }
-  }, [isTransactionSliderVisible]);
-
   return (
     <>
       <Slider
@@ -60,6 +54,7 @@ export function Transactions() {
         <Details
           transactionId={transactionId}
           setTransactionId={setTransactionId}
+          setSliderVisible={setIsTransactionSliderVisible}
         />
       </Slider>
       <Default

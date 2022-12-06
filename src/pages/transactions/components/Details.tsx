@@ -33,6 +33,7 @@ import { TransactionMatchDetails } from './TransactionMatchDetails';
 interface Props {
   transactionId: string;
   setTransactionId: Dispatch<SetStateAction<string>>;
+  setSliderVisible?: Dispatch<SetStateAction<boolean>>;
 }
 
 export function Details(props: Props) {
@@ -90,6 +91,15 @@ export function Details(props: Props) {
 
     setMatchedExpenseCategory(expenseCategoryResponse?.data.data);
   }, [transaction, expenseCategoryResponse, props.transactionId]);
+
+  useEffect(() => {
+    return () => {
+      props.setTransactionId('');
+      if (props.setSliderVisible) {
+        props.setSliderVisible(false);
+      }
+    };
+  }, []);
 
   return (
     <div className="border-b border-gray-200">
