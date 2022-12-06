@@ -16,12 +16,13 @@ import { Params } from 'common/queries/common/params.interface';
 import { useQuery } from 'react-query';
 
 interface InvoiceParams extends Params {
-  client_status?: string;
-  client_id?: string;
-  without_deleted_clients?: boolean;
+  clientStatus?: string;
+  clientId?: string;
+  withoutDeletedClients?: boolean;
+  enabled?: boolean;
 }
 
-export function useInvoicesQuery(params?: InvoiceParams) {
+export function useInvoicesQuery(params: InvoiceParams) {
   return useQuery<Invoice[]>(
     ['/api/v1/invoices', params],
     () =>
@@ -30,16 +31,16 @@ export function useInvoicesQuery(params?: InvoiceParams) {
         endpoint(
           '/api/v1/invoices?client_status=:client_status&filter=:filter&client_id=:client_id&without_deleted_clients=:without_deleted_clients',
           {
-            client_status: params?.client_status ?? 'all',
-            client_id: params?.client_id ?? '',
-            filter: params?.filter ?? '',
-            without_deleted_clients: params?.without_deleted_clients || true,
+            client_status: params.clientStatus ?? 'all',
+            client_id: params.clientId ?? '',
+            filter: params.filter ?? '',
+            without_deleted_clients: params.withoutDeletedClients || true,
           }
         )
       ).then(
         (response: GenericSingleResourceResponse<Invoice[]>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }

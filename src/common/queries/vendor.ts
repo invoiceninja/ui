@@ -16,14 +16,19 @@ import { endpoint } from '../helpers';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Params } from './common/params.interface';
 
-export function useVendorQuery(params: { id: string | undefined }) {
+interface Props {
+  id: string | undefined;
+  enabled?: boolean;
+}
+
+export function useVendorQuery(props: Props) {
   return useQuery<Vendor>(
-    route('/api/v1/vendors/:id', { id: params.id }),
+    route('/api/v1/vendors/:id', { id: props.id }),
     () =>
-      request('GET', endpoint('/api/v1/vendors/:id', { id: params.id })).then(
+      request('GET', endpoint('/api/v1/vendors/:id', { id: props.id })).then(
         (response) => response.data.data
       ),
-    { staleTime: Infinity }
+    { enabled: props.enabled ?? true, staleTime: Infinity }
   );
 }
 
@@ -38,14 +43,14 @@ export function useBlankVendorQuery() {
   );
 }
 
-export function useVendorsQuery(params?: Params) {
+export function useVendorsQuery(params: Params) {
   return useQuery<Vendor[]>(
     ['/api/v1/vendors', params],
     () =>
       request(
         'GET',
         endpoint('/api/v1/vendors?filter=:filter', {
-          filter: params?.filter,
+          filter: params.filter,
         })
       ).then(
         (response: GenericSingleResourceResponse<Vendor[]>) =>

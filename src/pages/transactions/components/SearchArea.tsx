@@ -9,19 +9,19 @@
  */
 
 import { InputField } from '@invoiceninja/forms';
+import { ExpenseCategorySelector } from 'components/expense-categories/ExpenseCategorySelector';
+import { VendorSelector } from 'components/vendors/VendorSelector';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
 import { MdFilterAlt } from 'react-icons/md';
-import { CreateExpenseCategoryModal } from './CreateExpenseCategoryModal';
-import { CreateVendorModal } from './CreateVendorModal';
 import { FilterModal } from './FilterModal';
 import { SearchInput } from './ListBox';
 
 interface Props {
   searchParams: SearchInput;
   setSearchParams: Dispatch<SetStateAction<SearchInput>>;
-  setSelectedIds: Dispatch<SetStateAction<string[] | undefined>>;
+  setSelectedIds: Dispatch<SetStateAction<string[]>>;
   setIsFilterModalOpened: Dispatch<SetStateAction<boolean>>;
   isInvoicesDataKey: boolean;
   isFilterModalOpened: boolean;
@@ -51,16 +51,18 @@ export function SearchArea(props: Props) {
 
   return (
     <>
-      <CreateExpenseCategoryModal
-        visible={isCreateExpenseCategoryModalOpen}
+      <ExpenseCategorySelector
+        initiallyVisible={isCreateExpenseCategoryModalOpen}
         setVisible={setIsCreateExpenseCategoryModalOpen}
         setSelectedIds={props.setSelectedIds}
+        onChange={() => {}}
       />
 
-      <CreateVendorModal
-        visible={isCreateVendorModalOpen}
+      <VendorSelector
+        initiallyVisible={isCreateVendorModalOpen}
         setVisible={setIsCreateVendorModalOpen}
         setSelectedIds={props.setSelectedIds}
+        onChange={() => {}}
       />
 
       <div className="flex items-center">

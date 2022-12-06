@@ -25,13 +25,18 @@ export function useBlankExpenseQuery() {
   );
 }
 
-export function useExpenseQuery(params: { id: string | undefined }) {
+interface Props {
+  id: string | undefined;
+  enabled?: boolean;
+}
+
+export function useExpenseQuery(props: Props) {
   return useQuery<Expense>(
-    route('/api/v1/expenses/:id', { id: params.id }),
+    route('/api/v1/expenses/:id', { id: props.id }),
     () =>
-      request('GET', endpoint('/api/v1/expenses/:id', { id: params.id })).then(
+      request('GET', endpoint('/api/v1/expenses/:id', { id: props.id })).then(
         (response) => response.data.data
       ),
-    { staleTime: Infinity }
+    { enabled: props.enabled ?? true, staleTime: Infinity }
   );
 }

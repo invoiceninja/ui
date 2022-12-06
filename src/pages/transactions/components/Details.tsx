@@ -24,13 +24,7 @@ import { useExpenseQuery } from 'common/queries/expenses';
 import { useVendorQuery } from 'common/queries/vendor';
 import { useInvoicesQuery } from 'pages/invoices/common/queries';
 import { useBankAccountsQuery } from 'pages/settings/bank-accounts/common/queries';
-import {
-  Dispatch,
-  ReactNode,
-  SetStateAction,
-  useEffect,
-  useState,
-} from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useTransactionQuery } from '../common/queries';
@@ -39,7 +33,6 @@ import { TransactionMatchDetails } from './TransactionMatchDetails';
 interface Props {
   transactionId: string;
   setTransactionId: Dispatch<SetStateAction<string>>;
-  setActionButton: Dispatch<SetStateAction<ReactNode>>;
 }
 
 export function Details(props: Props) {
@@ -51,8 +44,6 @@ export function Details(props: Props) {
 
   const formatMoney = useFormatMoney();
 
-  const { data: invoicesResponse } = useInvoicesQuery();
-
   const { data: transaction } = useTransactionQuery({
     id: props.transactionId,
   });
@@ -61,28 +52,35 @@ export function Details(props: Props) {
     id: transaction?.bank_integration_id || '',
   });
 
+  const isCreditTransactionType =
+    transaction?.base_type === ApiTransactionType.Credit;
+
+  const { data: invoicesResponse } = useInvoicesQuery({
+    enabled: isCreditTransactionType,
+  });
+
   const { data: vendorResponse } = useVendorQuery({
     id: transaction?.vendor_id || '',
+    enabled: !isCreditTransactionType,
   });
 
   const { data: expenseResponse } = useExpenseQuery({
     id: transaction?.expense_id || '',
+    enabled: !isCreditTransactionType,
   });
 
   const { data: expenseCategoryResponse } = useExpenseCategoryQuery({
     id: transaction?.ninja_category_id || '',
+    enabled: !isCreditTransactionType,
   });
-
-  const [isCreditTransactionType, setIsCreditTransactionType] =
-    useState<boolean>(false);
 
   const [matchedInvoices, setMatchedInvoices] = useState<Invoice[]>();
 
   const [matchedExpenseCategory, setMatchedExpenseCategory] =
     useState<ExpenseCategory>();
 
-  const [showTransactionMatchDetails, setShowTransactionMatchDetails] =
-    useState<boolean>(false);
+  const showTransactionMatchDetails =
+    TransactionStatus.Converted !== transaction?.status_id;
 
   useEffect(() => {
     const filteredMatchedInvoices = invoicesResponse?.filter(({ id }) =>
@@ -90,22 +88,8 @@ export function Details(props: Props) {
     );
     setMatchedInvoices(filteredMatchedInvoices);
 
-    setShowTransactionMatchDetails(
-      TransactionStatus.Converted !== transaction?.status_id
-    );
-
-    setIsCreditTransactionType(
-      transaction?.base_type === ApiTransactionType.Credit
-    );
-
     setMatchedExpenseCategory(expenseCategoryResponse?.data.data);
   }, [transaction, expenseCategoryResponse, props.transactionId]);
-
-  useEffect(() => {
-    return () => {
-      props.setTransactionId('');
-    };
-  }, []);
 
   return (
     <div className="border-b border-gray-200">
@@ -214,7 +198,6 @@ export function Details(props: Props) {
             status_id: transaction?.status_id || '',
           }}
           isCreditTransactionType={isCreditTransactionType}
-          setActionButton={props.setActionButton}
         />
       )}
     </div>

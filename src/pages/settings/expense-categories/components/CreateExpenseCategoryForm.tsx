@@ -13,15 +13,16 @@ import { Button, InputField, InputLabel } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { ExpenseCategory } from 'common/interfaces/expense-category';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { ColorPicker } from 'components/forms/ColorPicker';
-import { Modal } from 'components/Modal';
 import { Dispatch, FormEvent, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 
 interface ExpenseCategoryInput {
   name: string;
@@ -29,13 +30,14 @@ interface ExpenseCategoryInput {
 }
 
 interface Props {
-  visible: boolean;
-  setVisible: Dispatch<SetStateAction<boolean>>;
-  setSelectedIds: Dispatch<SetStateAction<string[] | undefined>>;
+  setVisible?: Dispatch<SetStateAction<boolean>>;
+  setSelectedIds?: Dispatch<SetStateAction<string[]>>;
 }
 
-export function CreateExpenseCategoryModal(props: Props) {
+export function CreateExpenseCategoryForm(props: Props) {
   const [t] = useTranslation();
+
+  const navigate = useNavigate();
 
   const queryClient = useQueryClient();
 
@@ -72,9 +74,19 @@ export function CreateExpenseCategoryModal(props: Props) {
 
           queryClient.invalidateQueries('/api/v1/expense_categories');
 
-          props.setSelectedIds([response.data.data.id]);
+          if (props.setSelectedIds) {
+            props.setSelectedIds([response.data.data.id]);
+          }
 
-          props.setVisible(false);
+          if (props.setVisible) {
+            props.setVisible(false);
+          } else {
+            navigate(
+              route('/settings/expense_categories/:id/edit', {
+                id: response.data.data.id,
+              })
+            );
+          }
         })
         .catch((error: AxiosError) => {
           if (error.response?.status === 422) {
@@ -89,32 +101,21 @@ export function CreateExpenseCategoryModal(props: Props) {
   };
 
   return (
-    <Modal
-      title={t('create_expense_category')}
-      visible={props.visible}
-      onClose={() => props.setVisible(false)}
-      size="small"
-    >
-      <form onSubmit={handleSave}>
-        <CardContainer>
-          <InputField
-            label={t('name')}
-            onValueChange={(value) => handleChange('name', value)}
-            errorMessage={errors?.errors.name}
-            required
-          />
+    <CardContainer>
+      <InputField
+        label={t('name')}
+        onValueChange={(value) => handleChange('name', value)}
+        errorMessage={errors?.errors.name}
+        required
+      />
 
-          <InputLabel>{t('color')}</InputLabel>
+      <InputLabel>{t('color')}</InputLabel>
 
-          <ColorPicker
-            onValueChange={(value) => handleChange('color', value)}
-          />
+      <ColorPicker onValueChange={(value) => handleChange('color', value)} />
 
-          <div className="flex justify-end space-x-4 mt-5">
-            <Button onClick={handleSave}>{t('save')}</Button>
-          </div>
-        </CardContainer>
-      </form>
-    </Modal>
+      <div className="flex justify-end space-x-4 mt-5">
+        <Button onClick={handleSave}>{t('save')}</Button>
+      </div>
+    </CardContainer>
   );
 }

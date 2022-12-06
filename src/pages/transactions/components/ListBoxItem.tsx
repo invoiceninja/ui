@@ -31,7 +31,7 @@ export function ListBoxItem(props: Props) {
       key={props.resourceItem.id}
       className="flex justify-between hover:bg-gray-50 w-full cursor-pointer p-4 border-b border-gray-200"
       onClick={() =>
-        props.selectItem(props.resourceItem.id, props.resourceItem.client_id)
+        props.selectItem(props.resourceItem.id, props.resourceItem.clientId)
       }
     >
       <div className="flex items-center">
@@ -62,11 +62,8 @@ export function ListBoxItem(props: Props) {
         )}
       </div>
       <div className="flex items-center">
-        {props.resourceItem.status_id && (
-          <StatusBadge
-            for={invoiceStatus}
-            code={props.resourceItem.status_id}
-          />
+        {props.resourceItem.statusId && (
+          <StatusBadge for={invoiceStatus} code={props.resourceItem.statusId} />
         )}
       </div>
     </li>

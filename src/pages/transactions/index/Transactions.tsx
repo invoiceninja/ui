@@ -14,9 +14,10 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useTransactionColumns } from '../common/hooks/useTransactionColumns';
 import { ImportButton } from 'components/import/ImportButton';
-import { ReactNode, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Details } from '../components/Details';
-import { CollapseCard } from 'components/cards/CollapseCard';
+import { Slider } from 'components/cards/Slider';
+import { Transaction } from 'common/interfaces/transactions';
 
 export function Transactions() {
   useTitle('transactions');
@@ -29,10 +30,12 @@ export function Transactions() {
 
   const [transactionId, setTransactionId] = useState<string>('');
 
-  const [actionButton, setActionButton] = useState<ReactNode>();
-
   const [isTransactionSliderVisible, setIsTransactionSliderVisible] =
     useState<boolean>(false);
+
+  const getSelectedTransaction = (transaction: Transaction) => {
+    setTransactionId(transaction.id);
+  };
 
   useEffect(() => {
     if (transactionId) {
@@ -40,21 +43,25 @@ export function Transactions() {
     }
   }, [transactionId]);
 
+  useEffect(() => {
+    if (!isTransactionSliderVisible) {
+      setTransactionId('');
+    }
+  }, [isTransactionSliderVisible]);
+
   return (
     <>
-      <CollapseCard
+      <Slider
         title={t('transaction_details')}
         visible={isTransactionSliderVisible}
         setVisible={setIsTransactionSliderVisible}
         size="large"
-        actionChildren={actionButton}
       >
         <Details
           transactionId={transactionId}
           setTransactionId={setTransactionId}
-          setActionButton={setActionButton}
         />
-      </CollapseCard>
+      </Slider>
       <Default
         title={t('transactions')}
         breadcrumbs={pages}
@@ -66,7 +73,7 @@ export function Transactions() {
           columns={columns}
           linkToCreate="/transactions/create"
           linkToEdit="/transactions/:id/edit"
-          setResourceId={setTransactionId}
+          onTableRowClick={getSelectedTransaction}
           rightSide={<ImportButton route="/transactions/import" />}
           withResourcefulActions
         />

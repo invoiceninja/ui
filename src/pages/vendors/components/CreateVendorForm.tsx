@@ -17,21 +17,23 @@ import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { Vendor } from 'common/interfaces/vendor';
 import { useBlankVendorQuery } from 'common/queries/vendor';
 import { updateRecord } from 'common/stores/slices/company-users';
-import { Modal } from 'components/Modal';
 import { Form } from 'pages/vendors/edit/components/Form';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { route } from 'common/helpers/route';
 
 interface Props {
-  visible: boolean;
-  setVisible: Dispatch<SetStateAction<boolean>>;
-  setSelectedIds: Dispatch<SetStateAction<string[] | undefined>>;
+  setVisible?: Dispatch<SetStateAction<boolean>>;
+  setSelectedIds?: Dispatch<SetStateAction<string[]>>;
 }
 
-export function CreateVendorModal(props: Props) {
+export function CreateVendorForm(props: Props) {
   const [t] = useTranslation();
+
+  const navigate = useNavigate();
 
   const { data } = useBlankVendorQuery();
 
@@ -92,9 +94,15 @@ export function CreateVendorModal(props: Props) {
 
         queryClient.invalidateQueries('/api/v1/vendors');
 
-        props.setSelectedIds([response[0].data.data.id]);
+        if (props.setSelectedIds) {
+          props.setSelectedIds([response[0].data.data.id]);
+        }
 
-        props.setVisible(false);
+        if (props.setVisible) {
+          props.setVisible(false);
+        } else {
+          navigate(route('/vendors/:id', { id: response[0].data.data.id }));
+        }
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -103,17 +111,12 @@ export function CreateVendorModal(props: Props) {
   };
 
   return (
-    <Modal
-      title={t('create_vendor')}
-      visible={props.visible}
-      onClose={() => props.setVisible(false)}
-      size="large"
-    >
+    <>
       {vendor && <Form vendor={vendor} setVendor={setVendor} />}
 
       <div className="flex justify-end space-x-4 mt-5">
         <Button onClick={handleSave}>{t('save')}</Button>
       </div>
-    </Modal>
+    </>
   );
 }

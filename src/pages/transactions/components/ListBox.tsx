@@ -14,16 +14,18 @@ import { useClientsQuery } from 'common/queries/clients';
 import { Client } from 'common/interfaces/client';
 import CommonProps from 'common/interfaces/common-props.interface';
 import { SearchArea } from './SearchArea';
-import { useTransactionMatchResourceQuery } from '../common/queries';
 import { ListBoxItem } from './ListBoxItem';
+import { useInvoicesQuery } from 'pages/invoices/common/queries';
+import { useVendorsQuery } from 'common/queries/vendor';
+import { useExpenseCategoriesQuery } from 'common/queries/expense-categories';
 
 export interface ResourceItem {
   id: string;
   name: string;
   number: number;
   clientName: string;
-  client_id: string;
-  status_id: string;
+  clientId: string;
+  statusId: string;
   amount: number;
   date: string;
 }
@@ -39,8 +41,8 @@ export interface SearchInput {
 interface Props extends CommonProps {
   transactionDetails: TransactionDetails;
   dataKey: 'invoices' | 'categories' | 'vendors';
-  setSelectedIds: Dispatch<SetStateAction<string[] | undefined>>;
-  selectedIds: string[] | undefined;
+  setSelectedIds: Dispatch<SetStateAction<string[]>>;
+  selectedIds: string[];
 }
 
 export function ListBox(props: Props) {
@@ -52,15 +54,23 @@ export function ListBox(props: Props) {
     endDate: '',
   });
 
-  const [clientId, setClientId] = useState<string>('');
+  const [clientId, setClientId] = useState<string>();
 
   const { data: clientsResponse } = useClientsQuery();
 
-  const { data: resourceResponse } = useTransactionMatchResourceQuery(
-    props.dataKey,
-    searchParams.searchTerm,
-    clientId
-  );
+  const { data: invoicesResponse } = useInvoicesQuery({
+    clientStatus: 'unpaid',
+    filter: searchParams.searchTerm,
+    clientId,
+  });
+
+  const { data: vendorsResponse } = useVendorsQuery({
+    filter: searchParams.searchTerm,
+  });
+
+  const { data: expenseCategoriesResponse } = useExpenseCategoriesQuery({
+    filter: searchParams.searchTerm,
+  });
 
   const [resourceItems, setResourceItems] = useState<ResourceItem[]>();
 
@@ -76,7 +86,7 @@ export function ListBox(props: Props) {
   };
 
   const selectItem = (itemId: string, clientId?: string) => {
-    setClientId(clientId || '');
+    setClientId(clientId);
 
     const filteredItemIdsList = props.selectedIds?.find((id) => itemId === id);
 
@@ -111,12 +121,22 @@ export function ListBox(props: Props) {
   useEffect(() => {
     setClients(clientsResponse?.data.data);
 
-    setResourceItems(getFormattedResourceList(resourceResponse));
-
     if (props.dataKey === 'invoices') {
-      setIsInvoicesDataKey(true);
+      setResourceItems(getFormattedResourceList(invoicesResponse));
+    } else if (props.dataKey === 'vendors') {
+      setResourceItems(getFormattedResourceList(vendorsResponse));
+    } else {
+      setResourceItems(getFormattedResourceList(expenseCategoriesResponse));
     }
-  }, [props.dataKey, resourceResponse, clientsResponse]);
+
+    setIsInvoicesDataKey(props.dataKey === 'invoices');
+  }, [
+    props.dataKey,
+    invoicesResponse,
+    vendorsResponse,
+    expenseCategoriesResponse,
+    clientsResponse,
+  ]);
 
   useEffect(() => {
     if (isInvoicesDataKey && !props.selectedIds?.length) {

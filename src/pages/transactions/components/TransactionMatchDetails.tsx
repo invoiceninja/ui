@@ -8,25 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import {
-  Dispatch,
-  FormEvent,
-  ReactNode,
-  SetStateAction,
-  useEffect,
-  useState,
-} from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { toast } from 'common/helpers/toast/toast';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { AxiosError } from 'axios';
 import { useQueryClient } from 'react-query';
 import { TransactionStatus } from 'common/enums/transactions';
-import { ConvertButton } from './ConvertButton';
 import { route } from 'common/helpers/route';
 import { TransactionResponse } from 'common/interfaces/transactions';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { ListBox } from './ListBox';
+import { Button } from '@invoiceninja/forms';
+import { MdContentCopy } from 'react-icons/md';
+import { useTranslation } from 'react-i18next';
 
 export interface TransactionDetails {
   base_type: string;
@@ -37,19 +32,23 @@ export interface TransactionDetails {
 interface Props {
   transactionDetails: TransactionDetails;
   isCreditTransactionType: boolean;
-  setActionButton: Dispatch<SetStateAction<ReactNode>>;
 }
 
 export function TransactionMatchDetails(props: Props) {
+  const [t] = useTranslation();
+
   const queryClient = useQueryClient();
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const [invoiceIds, setInvoiceIds] = useState<string[]>();
+  const [isTransactionConverted, setIsTransactionConverted] =
+    useState<boolean>(true);
 
-  const [vendorIds, setVendorIds] = useState<string[]>();
+  const [invoiceIds, setInvoiceIds] = useState<string[]>([]);
 
-  const [expenseCategoryIds, setExpenseCategoryIds] = useState<string[]>();
+  const [vendorIds, setVendorIds] = useState<string[]>([]);
+
+  const [expenseCategoryIds, setExpenseCategoryIds] = useState<string[]>([]);
 
   const convertToPayment = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -133,19 +132,9 @@ export function TransactionMatchDetails(props: Props) {
   };
 
   useEffect(() => {
-    if (props.transactionDetails.status_id !== TransactionStatus.Converted) {
-      props.setActionButton(
-        <ConvertButton
-          isFormBusy={isFormBusy}
-          isCreditTransactionType={props.isCreditTransactionType}
-          onClick={
-            props.isCreditTransactionType ? convertToPayment : convertToExpense
-          }
-        />
-      );
-    } else {
-      props.setActionButton(undefined);
-    }
+    setIsTransactionConverted(
+      props.transactionDetails.status_id === TransactionStatus.Converted
+    );
   }, [
     props.transactionDetails.status_id,
     props.isCreditTransactionType,
@@ -156,7 +145,7 @@ export function TransactionMatchDetails(props: Props) {
 
   useEffect(() => {
     return () => {
-      props.setActionButton(undefined);
+      setIsTransactionConverted(true);
     };
   }, []);
 
@@ -185,6 +174,27 @@ export function TransactionMatchDetails(props: Props) {
             selectedIds={expenseCategoryIds}
           />
         </>
+      )}
+
+      {!isTransactionConverted && (
+        <div className="absolute bottom-0 px-3 py-3 w-full border-t border-gray-200">
+          <Button
+            className="w-full"
+            onClick={
+              props.isCreditTransactionType
+                ? convertToPayment
+                : convertToExpense
+            }
+            disabled={isFormBusy}
+          >
+            {<MdContentCopy fontSize={22} />}
+            <span>
+              {props.isCreditTransactionType
+                ? t('convert_to_payment')
+                : t('convert_to_expense')}
+            </span>
+          </Button>
+        </div>
       )}
     </>
   );

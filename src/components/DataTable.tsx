@@ -13,9 +13,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import React, {
   ChangeEvent,
-  Dispatch,
   ReactNode,
-  SetStateAction,
   useEffect,
   useRef,
   useState,
@@ -50,7 +48,7 @@ export type DataTableColumns<T = any> = {
   format?: (field: string | number, resource: T) => unknown;
 }[];
 
-interface Props {
+interface Props<T> {
   resource: string;
   columns: DataTableColumns;
   endpoint: string;
@@ -65,12 +63,12 @@ interface Props {
   withoutPadding?: boolean;
   leftSideChevrons?: ReactNode;
   staleTime?: number;
-  setResourceId?: Dispatch<SetStateAction<string>>;
+  onTableRowClick?: (resource: T) => unknown;
 }
 
 export const datatablePerPageAtom = atomWithStorage('perPage', '10');
 
-export function DataTable(props: Props) {
+export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
 
   const [apiEndpoint, setApiEndpoint] = useState(
@@ -263,8 +261,8 @@ export function DataTable(props: Props) {
               <Tr
                 key={index}
                 onClick={() =>
-                  props.setResourceId
-                    ? props.setResourceId(resource.id)
+                  props.onTableRowClick
+                    ? props.onTableRowClick(resource)
                     : document.getElementById(resource.id)?.click()
                 }
               >

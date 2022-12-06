@@ -13,9 +13,6 @@ import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { TransactionResponse } from 'common/interfaces/transactions';
-import { useExpenseCategoriesQuery } from 'common/queries/expense-categories';
-import { useVendorsQuery } from 'common/queries/vendor';
-import { useInvoicesQuery } from 'pages/invoices/common/queries';
 import { useQuery } from 'react-query';
 
 export function useTransactionQuery(params: { id: string | undefined }) {
@@ -30,22 +27,4 @@ export function useTransactionQuery(params: { id: string | undefined }) {
           response?.data?.data
       )
   );
-}
-
-export function useTransactionMatchResourceQuery(
-  dataKey: 'invoices' | 'vendors' | 'categories',
-  filter?: string,
-  client_id?: string
-) {
-  if (dataKey === 'invoices') {
-    return useInvoicesQuery({
-      client_status: 'unpaid',
-      filter,
-      client_id,
-    });
-  } else if (dataKey === 'vendors') {
-    return useVendorsQuery({ filter });
-  }
-
-  return useExpenseCategoriesQuery({ filter });
 }
