@@ -53,7 +53,7 @@ export function TransactionMatchDetails(props: Props) {
   const convertToPayment = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!invoiceIds?.length || isFormBusy) {
+    if (!invoiceIds.length || isFormBusy) {
       return;
     } else {
       setIsFormBusy(true);
@@ -90,7 +90,7 @@ export function TransactionMatchDetails(props: Props) {
   const convertToExpense = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if ((!vendorIds?.length && !expenseCategoryIds?.length) || isFormBusy) {
+    if ((!vendorIds.length && !expenseCategoryIds.length) || isFormBusy) {
       return;
     } else {
       setIsFormBusy(true);
@@ -101,8 +101,8 @@ export function TransactionMatchDetails(props: Props) {
         transactions: [
           {
             id: props.transactionDetails.transaction_id,
-            vendor_id: vendorIds?.join(','),
-            ninja_category_id: expenseCategoryIds?.join(','),
+            vendor_id: vendorIds.join(','),
+            ninja_category_id: expenseCategoryIds.join(','),
           },
         ],
       })
