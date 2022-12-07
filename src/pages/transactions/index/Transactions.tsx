@@ -30,11 +30,22 @@ export function Transactions() {
 
   const [transactionId, setTransactionId] = useState<string>('');
 
+  const [sliderTitle, setSliderTitle] = useState<string>();
+
   const [isTransactionSliderVisible, setIsTransactionSliderVisible] =
     useState<boolean>(false);
 
   const getSelectedTransaction = (transaction: Transaction) => {
     setTransactionId(transaction.id);
+    if (transaction.description) {
+      let cutDescription = transaction.description;
+      if (transaction.description.length > 35) {
+        cutDescription = cutDescription.slice(0, 35).concat('...');
+      }
+      setSliderTitle(cutDescription);
+    } else {
+      setSliderTitle(transaction.date);
+    }
   };
 
   useEffect(() => {
@@ -46,7 +57,7 @@ export function Transactions() {
   return (
     <>
       <Slider
-        title={t('transaction_details')}
+        title={sliderTitle}
         visible={isTransactionSliderVisible}
         setVisible={setIsTransactionSliderVisible}
         size="large"
