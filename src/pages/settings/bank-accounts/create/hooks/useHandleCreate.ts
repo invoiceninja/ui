@@ -54,7 +54,7 @@ export function useHandleCreate(
             setIsModalOpened(false);
           }
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
             toast.dismiss();
             setErrors(error.response.data);
