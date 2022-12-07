@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
@@ -23,12 +22,15 @@ import { RootState } from 'common/stores/store';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { Tabs } from 'components/Tabs';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { Settings } from '../../../components/layouts/Settings';
 import { useUserDetailsTabs } from './common/hooks/useUserDetailsTabs';
+import axios from 'axios';
+import { updateRecord } from 'common/stores/slices/company-users';
+import { toast } from 'common/helpers/toast/toast';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 
 export function UserDetails() {
   useTitle('user_details');
@@ -46,6 +48,8 @@ export function UserDetails() {
 
   const dispatch = useDispatch();
 
+  const company = useInjectCompanyChanges();
+
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState(false);
 
@@ -53,30 +57,40 @@ export function UserDetails() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {
-    toast.loading(t('processing'));
+    toast.processing();
 
-    request(
-      'PUT',
-      endpoint('/api/v1/users/:id?include=company_user', { id: user!.id }),
-      userState.changes,
-      { headers: { 'X-Api-Password': password } }
-    )
+    axios
+      .all([
+        request(
+          'PUT',
+          endpoint('/api/v1/users/:id?include=company_user', { id: user!.id }),
+          userState.changes,
+          { headers: { 'X-Api-Password': password } }
+        ),
+        request(
+          'PUT',
+          endpoint('/api/v1/companies/:id', { id: company?.id }),
+          company
+        ),
+      ])
       .then((response) => {
-        toast.dismiss();
-        toast.success(t('updated_settings'));
+        toast.success('updated_settings');
 
-        dispatch(updateUser(response.data.data));
+        dispatch(updateUser(response[0].data.data));
 
         window.dispatchEvent(new CustomEvent('user.updated'));
+
+        dispatch(
+          updateRecord({ object: 'company', data: response[1].data.data })
+        );
       })
-      .catch((error: AxiosError) => {
-        console.error(error);
-
-        toast.dismiss();
-
-        error.response?.status === 412
-          ? toast.error(t('password_error_incorrect'))
-          : toast.error(t('error_title'));
+      .catch((error) => {
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+        } else {
+          console.error(error);
+          toast.error();
+        }
       })
       .finally(() => dispatch(deletePassword()));
   };

@@ -9,23 +9,20 @@
  */
 
 import { Card } from '@invoiceninja/cards';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useHandleCompanySave } from 'pages/settings/common/hooks/useHandleCompanySave';
 import { Field } from 'pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 
 export function CustomFields() {
   const [t] = useTranslation();
 
-  const company = useInjectCompanyChanges();
+  const company = useCurrentCompany();
 
   const handleCustomFieldChange = useHandleCustomFieldChange();
 
-  const onSave = useHandleCompanySave();
-
   return (
-    <Card title={t('custom_fields')} withSaveButton onFormSubmit={onSave}>
+    <Card title={t('custom_fields')}>
       {company &&
         ['user1', 'user2', 'user3', 'user4'].map((field) => (
           <Field
