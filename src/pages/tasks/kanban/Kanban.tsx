@@ -32,11 +32,6 @@ import {
 import { cloneDeep } from 'lodash';
 import { arrayMoveImmutable } from 'array-move';
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-// import Board from '@asseinfo/react-kanban';
-// import '@asseinfo/react-kanban/dist/styles.css';
-
 interface Card {
   id: string;
   title: string;
@@ -68,7 +63,6 @@ export function Kanban() {
   const { data: taskStatuses } = useTaskStatusesQuery();
   const { data: tasks } = useTasksQuery({ limit: 1000 });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [board, setBoard] = useState<Board>();
 
   useEffect(() => {
@@ -102,7 +96,6 @@ export function Kanban() {
     }
   }, [taskStatuses, tasks]);
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const updateTasks = (board: Board) => {
     const taskIds: Record<string, string[]> = {};
     const statusIds = collect(board.columns).pluck('id').toArray() as string[];
@@ -121,7 +114,7 @@ export function Kanban() {
     toast.processing();
 
     request('POST', endpoint('/api/v1/tasks/sort'), payload)
-      .then(() => toast.success('updated_task'))
+      .then(() => toast.success())
       .catch((error) => {
         console.error(error);
 
@@ -174,7 +167,6 @@ export function Kanban() {
     }
 
     setBoard(local);
-
     updateTasks(local);
   };
 
