@@ -148,7 +148,7 @@ export function useRecurringInvoiceUtilities(
     );
   };
 
-  const calculateInvoiceSum = () => {
+  const calculateInvoiceSum = (recurringInvoice: RecurringInvoice) => {
     const currency = currencyResolver(
       props.client?.settings.currency_id || company?.settings.currency_id
     );
