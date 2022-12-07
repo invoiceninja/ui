@@ -142,7 +142,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     setQuote((quote) => quote && { ...quote, line_items: lineItems });
   };
 
-  const calculateInvoiceSum = () => {
+  const calculateInvoiceSum = (quote: Quote) => {
     const currency = currencyResolver(
       props.client?.settings.currency_id || company?.settings.currency_id
     );
