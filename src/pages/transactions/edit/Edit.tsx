@@ -20,7 +20,6 @@ import {
   TransactionResponse,
 } from 'common/interfaces/transactions';
 import { Container } from 'components/Container';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { Default } from 'components/layouts/Default';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,10 +34,11 @@ import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { ApiTransactionType, TransactionType } from 'common/enums/transactions';
+import { BankAccountSelector } from '../components/BankAccountSelector';
 import { GenericValidationBag } from 'common/interfaces/validation-bag';
 
 export function Edit() {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
 
   const navigate = useNavigate();
 
@@ -57,11 +57,17 @@ export function Edit() {
 
   const { data: response } = useTransactionQuery({ id });
 
-  const [transaction, setTransaction] = useState<TransactionInput>();
+  const [transaction, setTransaction] = useState<TransactionInput>({
+    bank_integration_id: '',
+    amount: 0,
+    base_type: '',
+    currency_id: '',
+    date: '',
+    description: '',
+  });
 
-  const [currencySeparators, setCurrencySeparators] = useState<
-    DecimalInputSeparators | undefined
-  >();
+  const [currencySeparators, setCurrencySeparators] =
+    useState<DecimalInputSeparators>();
 
   const pages = [
     { name: t('transactions'), href: '/transactions' },
@@ -91,11 +97,11 @@ export function Edit() {
         responseDetails?.base_type === ApiTransactionType.Credit
           ? TransactionType.Deposit
           : TransactionType.Withdrawal,
-      date,
-      amount,
-      currency_id,
-      bank_integration_id,
-      description,
+      date: date || '',
+      amount: amount || 0,
+      currency_id: currency_id || '',
+      bank_integration_id: bank_integration_id || '',
+      description: description || '',
     };
   };
 
@@ -103,53 +109,44 @@ export function Edit() {
     property: keyof TransactionInput,
     value: TransactionInput[keyof TransactionInput]
   ) => {
+    setErrors(undefined);
+
     if (property === 'currency_id') {
       setCurrencySeparators(getCurrencySeparators(value?.toString() || ''));
     }
 
-    setTransaction(
-      (prevState) => prevState && { ...prevState, [property]: value }
-    );
+    setTransaction((prevState) => ({ ...prevState, [property]: value }));
   };
 
   const onSave = async (event: FormEvent<HTMLFormElement>) => {
-    event?.preventDefault();
+    event.preventDefault();
 
     setErrors(undefined);
-
     setIsSaving(true);
-
     toast.processing();
 
-    try {
-      await request('PUT', endpoint('/api/v1/bank_transactions/:id', { id }), {
-        ...transaction,
-        amount: Number(transaction?.amount),
-        base_type:
-          transaction?.base_type === TransactionType.Deposit
-            ? ApiTransactionType.Credit
-            : ApiTransactionType.Debit,
-      });
-
-      toast.success('updated_transaction');
-
-      setIsSaving(false);
-
-      navigate(route('/transactions'));
-    } catch (error) {
-      const axiosError = error as AxiosError<
-        GenericValidationBag<TransactionValidation>
-      >;
-
-      console.error(axiosError);
-
-      if (axiosError?.response?.status === 422) {
-        setErrors(axiosError?.response?.data);
-        toast.dismiss();
-      } else {
-        toast.error();
-      }
-    }
+    request('PUT', endpoint('/api/v1/bank_transactions/:id', { id }), {
+      ...transaction,
+      amount: Number(transaction.amount),
+      base_type:
+        transaction.base_type === TransactionType.Deposit
+          ? ApiTransactionType.Credit
+          : ApiTransactionType.Debit,
+    })
+      .then(() => {
+        toast.success('updated_transaction');
+        navigate('/transactions');
+      })
+      .catch((error: AxiosError<GenericValidationBag<TransactionValidation>>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        } else {
+          console.error(error);
+          toast.error();
+        }
+      })
+      .finally(() => setIsSaving(false));
   };
 
   useEffect(() => {
@@ -182,6 +179,7 @@ export function Edit() {
               ))}
             </SelectField>
           </Element>
+
           <Element required leftSide={t('date')}>
             <InputField
               type="date"
@@ -190,6 +188,7 @@ export function Edit() {
               errorMessage={errors?.errors?.date}
             />
           </Element>
+
           <Element required leftSide={t('amount')}>
             <DecimalNumberInput
               border
@@ -202,6 +201,7 @@ export function Edit() {
               errorMessage={errors?.errors?.amount}
             />
           </Element>
+
           <Element required leftSide={t('currency')}>
             <SelectField
               defaultValue={transaction?.currency_id}
@@ -216,21 +216,16 @@ export function Edit() {
               ))}
             </SelectField>
           </Element>
+
           <Element required leftSide={t('bank_account')}>
-            <DebouncedCombobox
-              endpoint="/api/v1/bank_integrations"
-              label="bank_account_name"
+            <BankAccountSelector
+              value={transaction.bank_integration_id}
               onChange={(value) =>
-                handleChange('bank_integration_id', value?.resource?.id)
+                handleChange('bank_integration_id', value?.id)
               }
-              defaultValue={transaction?.bank_integration_id}
-              value={transaction?.bank_integration_id}
-              clearButton
-              onClearButtonClick={() => handleChange('bank_integration_id', '')}
-              queryAdditional
-              errorMessage={errors?.errors?.bank_integration_id}
             />
           </Element>
+          
           <Element required leftSide={t('description')}>
             <InputField
               element="textarea"

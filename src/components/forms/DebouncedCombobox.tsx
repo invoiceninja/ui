@@ -106,7 +106,7 @@ export function DebouncedCombobox(props: Props) {
     const array: Record[] = [];
 
     const response = await queryClient.fetchQuery(
-      url.href,
+      [url.pathname, url.searchParams.toString()],
       () => httpRequest('GET', url.href),
       { staleTime }
     );

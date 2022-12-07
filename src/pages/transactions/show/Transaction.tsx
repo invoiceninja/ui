@@ -10,7 +10,6 @@
 
 import { useState, useEffect } from 'react';
 import { useTitle } from 'common/hooks/useTitle';
-import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import {
@@ -20,6 +19,7 @@ import {
 import { Details } from '../components/Details';
 import { useTransactionQuery } from '../common/queries';
 import { route } from 'common/helpers/route';
+import { Default } from 'components/layouts/Default';
 
 export function Transaction() {
   useTitle('transaction_details');
@@ -56,12 +56,12 @@ export function Transaction() {
   }, [response]);
 
   return (
-    <Settings
+    <Default
       title={t('transaction_details')}
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#transaction_details"
     >
       <Details transactionDetails={transaction} />
-    </Settings>
+    </Default>
   );
 }
