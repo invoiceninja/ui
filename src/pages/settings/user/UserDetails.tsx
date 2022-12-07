@@ -27,7 +27,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Outlet } from 'react-router-dom';
 import { Settings } from '../../../components/layouts/Settings';
 import { useUserDetailsTabs } from './common/hooks/useUserDetailsTabs';
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { toast } from 'common/helpers/toast/toast';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
@@ -84,7 +84,7 @@ export function UserDetails() {
           updateRecord({ object: 'company', data: response[1].data.data })
         );
       })
-      .catch((error) => {
+      .catch((error: AxiosError) => {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
         } else {
