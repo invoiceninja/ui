@@ -162,12 +162,12 @@ export function useActions() {
     ),
     (invoice: Invoice) => (
       <DropdownElement onClick={() => cloneToRecurringInvoice(invoice)}>
-        {t('clone_to_recurring_invoices')}
+        {t('clone_to_recurring')}
       </DropdownElement>
     ),
     (invoice: Invoice) => (
       <DropdownElement onClick={() => cloneToPurchaseOrder(invoice)}>
-        {t('clone_to_purchase_orders')}
+        {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
     () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
