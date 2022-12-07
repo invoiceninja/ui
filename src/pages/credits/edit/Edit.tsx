@@ -90,7 +90,7 @@ export function Edit() {
     // which is the reason we don't have to set a freshly built invoice,
     // rather just modified version.
 
-    credit && calculateInvoiceSum();
+    credit && calculateInvoiceSum(credit);
   }, [credit]);
 
   const actions = useActions();

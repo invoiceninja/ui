@@ -144,7 +144,7 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     setCredit((current) => current && { ...current, line_items: lineItems });
   };
 
-  const calculateInvoiceSum = () => {
+  const calculateInvoiceSum = (credit: Credit) => {
     const currency = currencyResolver(
       props.client?.settings.currency_id || company?.settings.currency_id
     );
