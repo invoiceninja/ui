@@ -23,12 +23,6 @@ export function Details() {
   const userChanges = useSelector((state: RootState) => state.user.changes);
   const user = useCurrentUser();
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event.target.id === 'phone') {
-      dispatch(
-        updateChanges({ property: 'verified_phone_number', value: false })
-      );
-    }
-
     dispatch(
       updateChanges({ property: event.target.id, value: event.target.value })
     );
