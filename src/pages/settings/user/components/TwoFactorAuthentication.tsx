@@ -22,18 +22,18 @@ import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
 import { useDispatch } from 'react-redux';
+import { SmsVerificationModal } from './SmsVerificationModal';
 
 export function TwoFactorAuthentication() {
   const [t] = useTranslation();
 
   const user = useCurrentUser();
 
-  console.log(user);
-
   const dispatch = useDispatch();
 
-  const [isEnableModalOpen, setIsEnableModalOpen] = useState(false);
-  const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);
+  const [isEnableModalOpen, setIsEnableModalOpen] = useState<boolean>(false);
+  const [isDisableModalOpen, setIsDisableModalOpen] = useState<boolean>(false);
+  const [isSmsModalOpen, setIsSmsModalOpen] = useState<boolean>(false);
 
   const [qrCode, setQrCode] = useState('');
   const [qrCodeSecret, setQrCodeSecret] = useState('');
@@ -102,18 +102,79 @@ export function TwoFactorAuthentication() {
       .catch((error) => console.error(error));
   };
 
+  const resetSmsCode = () => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/sms_reset'), { email: user!.email })
+      .then(() => {
+        toast.success('check_phone_code');
+      })
+      .catch((error: AxiosError) => {
+        if (error.response?.status === 400) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.dismiss();
+          console.error(error);
+        }
+      });
+  };
+
+  const verifyPhoneNumber = (code: string) => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/sms_reset/confirm?validate_only=true'), {
+      code,
+      email: user!.email,
+    })
+      .then(() => {
+        toast.success('verified_phone_number');
+
+        dispatch(updateUser(merge({}, user, { verified_phone_number: true })));
+
+        setIsSmsModalOpen(false);
+
+        requestQrCode();
+
+        setIsEnableModalOpen(true);
+      })
+      .catch((error: AxiosError) => {
+        if (error.response?.status === 400) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.dismiss();
+          console.error(error);
+        }
+      });
+  };
+
+  const ishost = true;
+
   const checkPhoneNumberVerification = () => {
-    if (!user?.phone) {
-      toast.error('enter_phone_number');
-    } else if (!user?.verified_phone_number) {
-      toast.error('verify_phone_number_2fa');
+    if (ishost) {
+      if (!user?.phone) {
+        toast.error('enter_phone_number');
+      } else if (!user?.verified_phone_number) {
+        setIsSmsModalOpen(true);
+        resetSmsCode();
+      } else {
+        requestQrCode();
+        setIsEnableModalOpen(true);
+      }
     } else {
       requestQrCode();
+      setIsEnableModalOpen(true);
     }
   };
 
   return (
     <>
+      <SmsVerificationModal
+        visible={isSmsModalOpen}
+        setVisible={setIsSmsModalOpen}
+        resendSmsCode={resetSmsCode}
+        verifyPhoneNumber={verifyPhoneNumber}
+      />
+
       <Modal
         title={t('enable_two_factor')}
         visible={isEnableModalOpen}
