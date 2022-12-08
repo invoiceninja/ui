@@ -90,11 +90,7 @@ export function Edit() {
   }, [data]);
 
   useEffect(() => {
-    // The InvoiceSum takes exact same reference to the `invoice` object
-    // which is the reason we don't have to set a freshly built invoice,
-    // rather just modified version.
-
-    recurringInvoice && calculateInvoiceSum();
+    recurringInvoice && calculateInvoiceSum(recurringInvoice);
   }, [recurringInvoice]);
 
   const actions = useActions();

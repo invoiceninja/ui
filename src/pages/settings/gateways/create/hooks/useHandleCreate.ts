@@ -33,7 +33,7 @@ export function useHandleCreate(
         toast.success('created_company_gateway');
         navigate('/settings/online_payments');
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error?.response?.status === 422) {
           toast.dismiss();
           setErrors(error.response.data);

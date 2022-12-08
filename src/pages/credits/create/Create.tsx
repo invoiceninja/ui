@@ -114,11 +114,7 @@ export function Create() {
   }, [credit?.client_id]);
 
   useEffect(() => {
-    // The InvoiceSum takes exact same reference to the `invoice` object
-    // which is the reason we don't have to set a freshly built invoice,
-    // rather just modified version.
-
-    credit && calculateInvoiceSum();
+    credit && calculateInvoiceSum(credit);
   }, [credit]);
 
   const save = useCreate({ setErrors });

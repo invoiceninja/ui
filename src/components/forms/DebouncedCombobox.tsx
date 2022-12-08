@@ -37,12 +37,12 @@ interface Props {
   onChange: (value: Record) => any;
   formatLabel?: (resource: any) => any;
   onActionClick?: () => any;
-  actionLabel?: string;
+  actionLabel?: string | null;
   defaultValue?: string | number | boolean;
   disabled?: boolean;
   clearButton?: any;
   onClearButtonClick?: any;
-  inputLabel?: string;
+  inputLabel?: string | null;
   onInputFocus?: () => unknown;
   exclude?: (string | number)[];
   clearInputAfterSelection?: boolean;

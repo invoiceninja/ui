@@ -15,7 +15,7 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   defaultValue?: any;
-  label?: string;
+  label?: string | null;
   required?: boolean;
   withBlank?: boolean;
   onValueChange?: (value: string) => unknown;

@@ -148,7 +148,7 @@ export function useRecurringInvoiceUtilities(
     );
   };
 
-  const calculateInvoiceSum = () => {
+  const calculateInvoiceSum = (recurringInvoice: RecurringInvoice) => {
     const currency = currencyResolver(
       props.client?.settings.currency_id || company?.settings.currency_id
     );
@@ -197,7 +197,7 @@ export function useSave(props: RecurringInvoiceSaveProps) {
 
         toast.success('updated_recurring_invoice');
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         error.response?.status === 422
@@ -208,7 +208,6 @@ export function useSave(props: RecurringInvoiceSaveProps) {
 }
 
 export function useToggleStartStop() {
-  const [t] = useTranslation();
   const queryClient = useQueryClient();
 
   return (recurringInvoice: RecurringInvoice, action: 'start' | 'stop') => {
@@ -231,8 +230,8 @@ export function useToggleStartStop() {
 
         toast.success(
           action === 'start'
-            ? t('started_recurring_invoice')
-            : t('stopped_recurring_invoice')
+            ? 'started_recurring_invoice'
+            : 'stopped_recurring_invoice'
         );
       })
       .catch((error) => {
@@ -378,7 +377,7 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
           })
         );
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         error.response?.status === 422

@@ -14,6 +14,7 @@ import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { updateUser } from 'common/stores/slices/user';
 import { Modal } from 'components/Modal';
 import { merge } from 'lodash';
@@ -49,7 +50,7 @@ export function TwoFactorAuthentication() {
 
         setIsEnableModalOpen(true);
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         toast.dismiss();
         console.error(error);
 
@@ -74,7 +75,7 @@ export function TwoFactorAuthentication() {
 
         setIsEnableModalOpen(false);
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         toast.dismiss();
 
         error.response?.status === 400

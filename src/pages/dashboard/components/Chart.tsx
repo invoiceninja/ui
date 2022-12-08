@@ -171,21 +171,21 @@ export function Chart(props: Props) {
         <XAxis height={50} dataKey="date" />
         <YAxis />
         <Area
-          name={t('invoices')}
+          name={t('invoices') ?? ''}
           dataKey="invoices"
           stroke={TotalColors.Blue}
           fill="url(#invoices)"
           fillOpacity={1}
         />
         <Area
-          name={t('payments')}
+          name={t('payments') ?? ''}
           dataKey="payments"
           stroke={TotalColors.Green}
           fill="url(#payments)"
           fillOpacity={1}
         />
         <Area
-          name={t('expenses')}
+          name={t('expenses') ?? ''}
           dataKey="expenses"
           stroke={TotalColors.Red}
           fill="url(#expenses)"

@@ -14,6 +14,7 @@ import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { ColorPicker } from 'components/forms/ColorPicker';
@@ -65,7 +66,7 @@ export function Create() {
             })
           );
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           toast.dismiss();
           console.error(error);
 

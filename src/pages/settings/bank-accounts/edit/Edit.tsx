@@ -20,6 +20,7 @@ import {
   BankAccountDetails,
   BankAccountInput,
 } from 'common/interfaces/bank-accounts';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -96,7 +97,7 @@ export function Edit() {
           queryClient.invalidateQueries('/api/v1/bank_integrations');
           navigate('/settings/bank_accounts');
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
             setErrors(error.response.data.errors);
             toast.dismiss();
