@@ -152,7 +152,7 @@ export function ListBox(props: Props) {
   }, [props.selectedIds]);
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col flex-1 w-full">
       <div
         className={`flex justify-center px-5 py-3 relative border-b border-t border-gray-200 ${props.className}`}
       >
@@ -167,7 +167,7 @@ export function ListBox(props: Props) {
         />
       </div>
       <ul
-        className="flex flex-col justify-start overflow-y-auto"
+        className="flex flex-col grow justify-start overflow-y-auto"
         style={{
           height: isInvoicesDataKey ? 400 : 200,
         }}

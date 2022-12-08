@@ -150,34 +150,36 @@ export function TransactionMatchDetails(props: Props) {
   }, []);
 
   return (
-    <>
-      {props.isCreditTransactionType ? (
-        <ListBox
-          transactionDetails={props.transactionDetails}
-          dataKey="invoices"
-          setSelectedIds={setInvoiceIds}
-          selectedIds={invoiceIds}
-        />
-      ) : (
-        <>
+    <div className="flex flex-col flex-1">
+      <div className="flex flex-col flex-1">
+        {props.isCreditTransactionType ? (
           <ListBox
             transactionDetails={props.transactionDetails}
-            dataKey="vendors"
-            setSelectedIds={setVendorIds}
-            selectedIds={vendorIds}
+            dataKey="invoices"
+            setSelectedIds={setInvoiceIds}
+            selectedIds={invoiceIds}
           />
-          <ListBox
-            className="mt-5"
-            transactionDetails={props.transactionDetails}
-            dataKey="categories"
-            setSelectedIds={setExpenseCategoryIds}
-            selectedIds={expenseCategoryIds}
-          />
-        </>
-      )}
+        ) : (
+          <>
+            <ListBox
+              transactionDetails={props.transactionDetails}
+              dataKey="vendors"
+              setSelectedIds={setVendorIds}
+              selectedIds={vendorIds}
+            />
+            <ListBox
+              className="mt-5"
+              transactionDetails={props.transactionDetails}
+              dataKey="categories"
+              setSelectedIds={setExpenseCategoryIds}
+              selectedIds={expenseCategoryIds}
+            />
+          </>
+        )}
+      </div>
 
       {!isTransactionConverted && (
-        <div className="absolute bottom-0 px-3 py-3 w-full border-t border-gray-200 bg-white">
+        <div className="px-3 py-3 w-full border-t border-gray-200">
           <Button
             className="w-full"
             onClick={
@@ -203,6 +205,6 @@ export function TransactionMatchDetails(props: Props) {
           </Button>
         </div>
       )}
-    </>
+    </div>
   );
 }

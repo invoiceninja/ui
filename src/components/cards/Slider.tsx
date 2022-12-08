@@ -49,7 +49,7 @@ export function Slider(props: Props) {
                 onSubmit={(event) => event.preventDefault()}
                 className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
               >
-                <div className="relative h-0 flex-1 overflow-y-auto">
+                <div className="flex flex-col flex-1 h-0 overflow-y-auto">
                   <div className="py-6 px-4 sm:px-6 border-b border-gray-200">
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-medium text-gray-900">
@@ -63,7 +63,7 @@ export function Slider(props: Props) {
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col justify-between items-center">
-                    <div className="divide-y divide-gray-200 w-full">
+                    <div className="flex flex-col flex-1 divide-y divide-gray-200 w-full">
                       {props.children}
                     </div>
                   </div>

@@ -73,6 +73,7 @@ export function Transactions() {
           setSliderVisible={setIsTransactionSliderVisible}
         />
       </Slider>
+
       <Default
         title={t('transactions')}
         breadcrumbs={pages}

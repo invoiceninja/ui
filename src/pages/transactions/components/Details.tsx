@@ -91,35 +91,37 @@ export function Details(props: Props) {
   }, [transaction, expenseCategoryResponse, props.transactionId]);
 
   return (
-    <div className="border-b border-gray-200">
-      <Element leftSide={t('type')}>
-        {isCreditTransactionType
-          ? t(TransactionType.Deposit)
-          : t(TransactionType.Withdrawal)}
-      </Element>
+    <div className="flex flex-col flex-1 border-b border-gray-200">
+      <div>
+        <Element leftSide={t('type')}>
+          {isCreditTransactionType
+            ? t(TransactionType.Deposit)
+            : t(TransactionType.Withdrawal)}
+        </Element>
 
-      <Element leftSide={t('amount')}>
-        {formatMoney(
-          transaction?.amount || 0,
-          company?.settings.country_id,
-          transaction?.currency_id || ''
-        )}
-      </Element>
+        <Element leftSide={t('amount')}>
+          {formatMoney(
+            transaction?.amount || 0,
+            company?.settings.country_id,
+            transaction?.currency_id || ''
+          )}
+        </Element>
 
-      <Element leftSide={t('date')}>{transaction?.date}</Element>
+        <Element leftSide={t('date')}>{transaction?.date}</Element>
 
-      <Element
-        leftSide={t('bank_account')}
-        className="hover:bg-gray-100 cursor-pointer"
-      >
-        <Link
-          to={route('/settings/bank_accounts/:id/details', {
-            id: bankAccountResponse?.id,
-          })}
+        <Element
+          leftSide={t('bank_account')}
+          className="hover:bg-gray-100 cursor-pointer"
         >
-          {bankAccountResponse?.bank_account_name}
-        </Link>
-      </Element>
+          <Link
+            to={route('/settings/bank_accounts/:id/details', {
+              id: bankAccountResponse?.id,
+            })}
+          >
+            {bankAccountResponse?.bank_account_name}
+          </Link>
+        </Element>
+      </div>
 
       {!showTransactionMatchDetails ? (
         <>
