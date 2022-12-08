@@ -42,7 +42,7 @@ export function Edit() {
 
   useEffect(() => {
     if (data?.data.data) {
-      const payment: Payment = { ...data.data.data };
+      const payment: Payment = { ...data.data.data, invoices: [], credits: [] };
       delete payment.documents;
 
       setPayment(payment);
