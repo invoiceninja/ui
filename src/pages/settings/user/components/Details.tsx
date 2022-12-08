@@ -8,10 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { updateChanges } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
-import { ChangeEvent } from 'react';
+import { CustomField } from 'components/CustomField';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
@@ -19,12 +20,21 @@ import { InputField } from '../../../../components/forms';
 
 export function Details() {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
-  const userChanges = useSelector((state: RootState) => state.user.changes);
+
   const user = useCurrentUser();
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
+
+  const dispatch = useDispatch();
+
+  const company = useCurrentCompany();
+
+  const userChanges = useSelector((state: RootState) => state.user.changes);
+
+  const handleChange = (property: string, value: string | number | boolean) =>
     dispatch(
-      updateChanges({ property: event.target.id, value: event.target.value })
+      updateChanges({
+        property: property,
+        value: value,
+      })
     );
 
   return (
@@ -33,36 +43,68 @@ export function Details() {
         <Card title={t('details')}>
           <Element leftSide={t('first_name')}>
             <InputField
-              id="first_name"
               value={userChanges?.first_name || user?.first_name || ''}
-              onChange={handleChange}
+              onValueChange={(value) => handleChange('first_name', value)}
             />
           </Element>
 
           <Element leftSide={t('last_name')}>
             <InputField
-              id="last_name"
               value={userChanges?.last_name || user?.last_name || ''}
-              onChange={handleChange}
+              onValueChange={(value) => handleChange('last_name', value)}
             />
           </Element>
 
           <Element leftSide={t('email')}>
             <InputField
-              id="email"
               value={userChanges?.email || user?.email || ''}
               type="email"
-              onChange={handleChange}
+              onValueChange={(value) => handleChange('email', value)}
             />
           </Element>
 
           <Element leftSide={t('phone')}>
             <InputField
-              id="phone"
               value={userChanges?.phone || user?.phone || ''}
-              onChange={handleChange}
+              onValueChange={(value) => handleChange('phone', value)}
             />
           </Element>
+
+          {company?.custom_fields?.user1 && (
+            <CustomField
+              field="user1"
+              defaultValue={userChanges.custom_value1}
+              value={company.custom_fields.user1}
+              onValueChange={(value) => handleChange('custom_value1', value)}
+            />
+          )}
+
+          {company?.custom_fields?.user2 && (
+            <CustomField
+              field="user2"
+              defaultValue={userChanges.custom_value2}
+              value={company.custom_fields.user2}
+              onValueChange={(value) => handleChange('custom_value2', value)}
+            />
+          )}
+
+          {company?.custom_fields?.user3 && (
+            <CustomField
+              field="user3"
+              defaultValue={userChanges.custom_value3}
+              value={company.custom_fields.user3}
+              onValueChange={(value) => handleChange('custom_value3', value)}
+            />
+          )}
+
+          {company?.custom_fields?.user4 && (
+            <CustomField
+              field="user4"
+              defaultValue={userChanges.custom_value4}
+              value={company.custom_fields.user4}
+              onValueChange={(value) => handleChange('custom_value4', value)}
+            />
+          )}
         </Card>
       )}
     </>
