@@ -27,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { useNavigate } from 'react-router-dom';
 
 export function Apply() {
   const queryClient = useQueryClient();
@@ -34,6 +35,7 @@ export function Apply() {
   const [t] = useTranslation();
   const { data: payment } = usePaymentQuery({ id });
   const [errors, setErrors] = useState<ValidationBag>();
+  const navigate = useNavigate();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -45,8 +47,9 @@ export function Apply() {
       setErrors(undefined);
 
       request('PUT', endpoint('/api/v1/payments/:id', { id }), values)
-        .then(() => {
+        .then((data) => {
           toast.success(t('updated_payment'), { id: toastId });
+          navigate(route('/payments/:id/edit', { id: data.data.data.id }));
         })
         .catch((error: AxiosError) => {
           console.error(error);
