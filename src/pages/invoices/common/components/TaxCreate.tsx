@@ -53,7 +53,7 @@ export function TaxCreate(props: Props) {
 
           props.onTaxCreated && props.onTaxCreated(response.data.data);
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           console.error(error);
 
           error.response?.status === 422

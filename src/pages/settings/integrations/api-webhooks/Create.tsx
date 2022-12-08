@@ -15,6 +15,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Divider } from 'components/cards/Divider';
 import { Settings } from 'components/layouts/Settings';
 import { useFormik } from 'formik';
@@ -126,7 +127,7 @@ export function Create() {
             })
           );
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           toast.dismiss();
 
           error.response?.status === 422

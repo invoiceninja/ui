@@ -22,6 +22,7 @@ import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useTitle } from 'common/hooks/useTitle';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 export function Create() {
   const [t] = useTranslation();
@@ -64,7 +65,7 @@ export function Create() {
             })
           );
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           formik.setSubmitting(false);
 
           if (error.response?.status === 422) {

@@ -53,10 +53,10 @@ export function RecoverPassword() {
 
       request('POST', endpoint('/api/v1/reset_password'), values)
         .then((response: AxiosResponse) => setMessage(response.data))
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ForgotPasswordValidation>) => {
           return error.response?.status === 422
-            ? setErrors(error.response?.data.errors)
-            : setMessage(error.response?.data);
+            ? setErrors(error.response?.data.errors as ForgotPasswordValidation)
+            : setMessage(error.response?.data as Response);
         })
         .finally(() => setIsFormBusy(false));
     },
@@ -78,9 +78,9 @@ export function RecoverPassword() {
               onChange={form.handleChange}
             />
 
-            {errors?.email && (
+            {errors?.errors?.email && (
               <Alert className="mt-2" type="danger">
-                {errors.email}
+                {errors.errors?.email}
               </Alert>
             )}
 

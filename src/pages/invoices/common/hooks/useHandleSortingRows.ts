@@ -10,7 +10,7 @@
 
 import { arrayMoveImmutable } from 'array-move';
 import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { DropResult } from 'react-beautiful-dnd';
+import { DropResult } from '@hello-pangea/dnd';
 import { ProductTableResource } from '../components/ProductsTable';
 
 interface Props {

@@ -63,7 +63,7 @@ export function Edit() {
 
         queryClient.invalidateQueries(route('/api/v1/projects/:id', { id }));
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         if (error.response?.status == 422) {

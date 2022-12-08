@@ -12,7 +12,7 @@ import { useAccentColor } from 'common/hooks/useAccentColor';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
-  label?: string;
+  label?: string | null;
   checked?: boolean;
   onValueChange?: (value: string, checked?: boolean) => unknown;
 }

@@ -23,16 +23,20 @@ import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import Board from '@asseinfo/react-kanban';
-import '@asseinfo/react-kanban/dist/styles.css';
+import {
+  DragDropContext,
+  Draggable,
+  Droppable,
+  DropResult,
+} from '@hello-pangea/dnd';
+import { cloneDeep } from 'lodash';
+import { arrayMoveImmutable } from 'array-move';
 
 interface Card {
   id: string;
   title: string;
   description: string;
+  sortOrder: number;
 }
 
 interface Column {
@@ -79,24 +83,27 @@ export function Kanban() {
             id: task.id,
             title: task.description,
             description: calculateTime(task.time_log),
+            sortOrder: task.status_order,
           });
         }
       });
+
+      columns.map(
+        (c) => (c.cards = c.cards.sort((a, b) => a.sortOrder - b.sortOrder))
+      );
 
       setBoard((current) => ({ ...current, columns }));
     }
   }, [taskStatuses, tasks]);
 
-  const handleDragging = (board: Board) => {
+  const updateTasks = (board: Board) => {
     const taskIds: Record<string, string[]> = {};
     const statusIds = collect(board.columns).pluck('id').toArray() as string[];
 
     statusIds.forEach((id) => (taskIds[id] = []));
 
     board.columns.forEach((column) => {
-      taskIds[column.id] = collect(column.cards)
-        .pluck('id')
-        .toArray() as string[];
+      column.cards.map((card) => taskIds[column.id].push(card.id));
     });
 
     const payload = {
@@ -107,13 +114,60 @@ export function Kanban() {
     toast.processing();
 
     request('POST', endpoint('/api/v1/tasks/sort'), payload)
-      .then(() => toast.success('updated_task'))
+      .then(() => toast.success())
       .catch((error) => {
         console.error(error);
 
         toast.error();
       })
       .finally(() => queryClient.invalidateQueries(route('/api/v1/tasks')));
+  };
+
+  const onDragEnd = (result: DropResult) => {
+    const local = cloneDeep(board) as Board;
+
+    const source = local.columns.find(
+      (c) => c.id === result.source.droppableId
+    );
+
+    const sourceIndex = local.columns.findIndex(
+      (c) => c.id === result.source.droppableId
+    ) as number;
+
+    const target = local.columns.find(
+      (c) => c.id === result.destination?.droppableId
+    );
+
+    const targetIndex = local.columns.findIndex(
+      (c) => c.id === result.destination?.droppableId
+    );
+
+    if (source && sourceIndex > -1 && target && targetIndex > -1) {
+      const task = source.cards.find((task) => task.id === result.draggableId);
+
+      if (task) {
+        local.columns[sourceIndex].cards = source.cards.filter(
+          (card) => card.id !== result.draggableId
+        );
+
+        local.columns[targetIndex].cards.push(task);
+
+        const taskIndex = local.columns[targetIndex].cards.findIndex(
+          (task) => task.id === result.draggableId
+        );
+
+        if (result.destination!.index > -1) {
+          local.columns[targetIndex].cards = arrayMoveImmutable(
+            local.columns[targetIndex].cards,
+            taskIndex,
+            result.destination?.index || 0
+          );
+        }
+      }
+    }
+
+    setBoard(local);
+    updateTasks(local);
   };
 
   return (
@@ -127,11 +181,53 @@ export function Kanban() {
       }
     >
       {board && (
-        <Board
-          initialBoard={board}
-          onCardDragEnd={handleDragging}
-          disableColumnDrag
-        />
+        <div className="flex pb-6 px-1 space-x-4 overflow-x-auto">
+          <DragDropContext onDragEnd={onDragEnd}>
+            {board.columns.map((board) => (
+              <Droppable key={board.id} droppableId={board.id}>
+                {(provided) => (
+                  <div
+                    className="bg-white rounded shadow select-none h-max"
+                    style={{ minWidth: 360 }}
+                  >
+                    <div className="border-b border-gray-200 px-4 py-5">
+                      <h3 className="leading-6 font-medium text-gray-900">
+                        {board.title}
+                      </h3>
+                    </div>
+
+                    <div
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className="p-4 space-y-4"
+                    >
+                      {board.cards.map((card, i) => (
+                        <Draggable
+                          draggableId={card.id}
+                          key={card.id}
+                          index={i}
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              className="w-full text-leftblock bg-gray-50 hover:bg-gray-100 rounded text-gray-700 hover:text-gray-900 text-sm px-4 sm:px-6 py-4 cursor-move"
+                            >
+                              {card.title}
+                            </div>
+                          )}
+                        </Draggable>
+                      ))}
+                    </div>
+
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            ))}
+          </DragDropContext>
+        </div>
       )}
     </Default>
   );

@@ -25,6 +25,9 @@ import { HostedLinks } from './components/HostedLinks';
 import { Link } from '../../components/forms/Link';
 import { request } from 'common/helpers/request';
 import { SignInProviders } from './components/SignInProviders';
+import {
+  GenericValidationBag,
+} from 'common/interfaces/validation-bag';
 
 export function Register() {
   const [t] = useTranslation();
@@ -73,14 +76,16 @@ export function Register() {
             })
           );
         })
-        .catch((error: AxiosError) => {
-          if (error.response?.status === 422) {
-            setErrors(error.response.data.errors);
-          }
+        .catch(
+          (error: AxiosError<GenericValidationBag<RegisterValidation>>) => {
+            if (error.response?.status === 422) {
+              setErrors(error.response.data.errors);
+            }
 
-          setMessage(error.response?.data.message);
-          setIsFormBusy(false);
-        });
+            setMessage(error.response?.data.message as string);
+            setIsFormBusy(false);
+          }
+        );
     },
   });
 
