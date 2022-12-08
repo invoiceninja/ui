@@ -139,7 +139,7 @@ export function Apply() {
                 value={record.number}
               />
               <InputField
-                label={t('payment_amount')}
+                label={t('amount_received')}
                 id={`invoices[${index}].amount`}
                 onChange={formik.handleChange}
                 value={record.amount}
