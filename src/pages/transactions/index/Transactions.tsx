@@ -54,12 +54,17 @@ export function Transactions() {
     }
   }, [transactionId]);
 
+  const handleSliderClose = () => {
+    setTransactionId('');
+    setIsTransactionSliderVisible(false);
+  };
+
   return (
     <>
       <Slider
         title={sliderTitle}
         visible={isTransactionSliderVisible}
-        setVisible={setIsTransactionSliderVisible}
+        onClose={handleSliderClose}
         size="large"
       >
         <Details

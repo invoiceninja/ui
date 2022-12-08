@@ -9,6 +9,7 @@
  */
 
 import { Element } from '@invoiceninja/cards';
+import { Link } from '@invoiceninja/forms';
 import {
   ApiTransactionType,
   TransactionStatus,
@@ -26,7 +27,6 @@ import { useInvoicesQuery } from 'pages/invoices/common/queries';
 import { useBankAccountsQuery } from 'pages/settings/bank-accounts/common/queries';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useTransactionQuery } from '../common/queries';
 import { TransactionMatchDetails } from './TransactionMatchDetails';
 
@@ -38,8 +38,6 @@ interface Props {
 
 export function Details(props: Props) {
   const [t] = useTranslation();
-
-  const navigate = useNavigate();
 
   const company = useCurrentCompany();
 
@@ -92,15 +90,6 @@ export function Details(props: Props) {
     setMatchedExpenseCategory(expenseCategoryResponse?.data.data);
   }, [transaction, expenseCategoryResponse, props.transactionId]);
 
-  useEffect(() => {
-    return () => {
-      props.setTransactionId('');
-      if (props.setSliderVisible) {
-        props.setSliderVisible(false);
-      }
-    };
-  }, []);
-
   return (
     <div className="border-b border-gray-200">
       <Element leftSide={t('type')}>
@@ -122,15 +111,14 @@ export function Details(props: Props) {
       <Element
         leftSide={t('bank_account')}
         className="hover:bg-gray-100 cursor-pointer"
-        onClick={() =>
-          navigate(
-            route('/settings/bank_accounts/:id/details', {
-              id: bankAccountResponse?.id,
-            })
-          )
-        }
       >
-        {bankAccountResponse?.bank_account_name}
+        <Link
+          to={route('/settings/bank_accounts/:id/details', {
+            id: bankAccountResponse?.id,
+          })}
+        >
+          {bankAccountResponse?.bank_account_name}
+        </Link>
       </Element>
 
       {!showTransactionMatchDetails ? (
@@ -140,15 +128,14 @@ export function Details(props: Props) {
               key={id}
               leftSide={t('invoice')}
               className="hover:bg-gray-100 cursor-pointer"
-              onClick={() =>
-                navigate(
-                  route('/invoices/:id/edit', {
-                    id,
-                  })
-                )
-              }
             >
-              {number}
+              <Link
+                to={route('/invoices/:id/edit', {
+                  id,
+                })}
+              >
+                {number}
+              </Link>
             </Element>
           ))}
 
@@ -156,15 +143,14 @@ export function Details(props: Props) {
             <Element
               leftSide={t('vendor')}
               className="hover:bg-gray-100 cursor-pointer"
-              onClick={() =>
-                navigate(
-                  route('/vendors/:id', {
-                    id: vendorResponse?.id,
-                  })
-                )
-              }
             >
-              {vendorResponse?.name}
+              <Link
+                to={route('/vendors/:id', {
+                  id: vendorResponse?.id,
+                })}
+              >
+                {vendorResponse?.name}
+              </Link>
             </Element>
           )}
 
@@ -172,15 +158,14 @@ export function Details(props: Props) {
             <Element
               leftSide={t('category')}
               className="hover:bg-gray-100 cursor-pointer"
-              onClick={() =>
-                navigate(
-                  route('/settings/expense_categories/:id/edit', {
-                    id: matchedExpenseCategory?.id,
-                  })
-                )
-              }
             >
-              {matchedExpenseCategory?.name}
+              <Link
+                to={route('/settings/expense_categories/:id/edit', {
+                  id: matchedExpenseCategory?.id,
+                })}
+              >
+                {matchedExpenseCategory?.name}
+              </Link>
             </Element>
           )}
 
@@ -188,15 +173,14 @@ export function Details(props: Props) {
             <Element
               leftSide={t('expense')}
               className="hover:bg-gray-100 cursor-pointer"
-              onClick={() =>
-                navigate(
-                  route('/expenses/:id/edit', {
-                    id: expenseResponse?.id,
-                  })
-                )
-              }
             >
-              {expenseResponse?.number}
+              <Link
+                to={route('/expenses/:id/edit', {
+                  id: expenseResponse?.id,
+                })}
+              >
+                {expenseResponse?.number}
+              </Link>
             </Element>
           )}
         </>

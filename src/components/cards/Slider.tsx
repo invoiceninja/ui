@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Dispatch, Fragment, ReactNode, SetStateAction } from 'react';
+import { Fragment, ReactNode } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import CommonProps from 'common/interfaces/common-props.interface';
 import { MdClose } from 'react-icons/md';
@@ -16,7 +16,7 @@ import classNames from 'classnames';
 
 interface Props extends CommonProps {
   visible: boolean;
-  setVisible: Dispatch<SetStateAction<boolean>>;
+  onClose: () => void;
   title?: string;
   actionChildren?: ReactNode;
   size: 'extraSmall' | 'small' | 'regular' | 'large' | 'extraLarge';
@@ -25,20 +25,16 @@ interface Props extends CommonProps {
 export function Slider(props: Props) {
   return (
     <Transition.Root show={props.visible} as={Fragment}>
-      <Dialog
-        as="div"
-        className="relative z-10"
-        onClose={() => props.setVisible(false)}
-      >
+      <Dialog as="div" className="relative z-10" onClose={props.onClose}>
         <div className="pointer-events-none fixed inset-y-0 right-0 flex max-w-full pl-10 sm:pl-16">
           <Transition.Child
             as={Fragment}
-            enter="transform transition ease-in-out duration-500 sm:duration-700"
-            enterFrom="translate-x-full"
-            enterTo="translate-x-0"
-            leave="transform transition ease-in-out duration-500 sm:duration-700"
-            leaveFrom="translate-x-0"
-            leaveTo="translate-x-full"
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
           >
             <Dialog.Panel
               className={classNames('pointer-events-auto', 'w-screen', {
@@ -53,8 +49,8 @@ export function Slider(props: Props) {
                 onSubmit={(event) => event.preventDefault()}
                 className="flex h-full flex-col divide-y divide-gray-200 bg-white shadow-xl"
               >
-                <div className="h-0 flex-1 overflow-y-auto">
-                  <div className="py-6 px-4 sm:px-6 bg-gray-100">
+                <div className="relative h-0 flex-1 overflow-y-auto">
+                  <div className="py-6 px-4 sm:px-6 border-b border-gray-200">
                     <div className="flex items-center justify-between">
                       <span className="text-lg font-medium text-gray-900">
                         {props.title}
@@ -62,7 +58,7 @@ export function Slider(props: Props) {
                       <MdClose
                         fontSize={24}
                         className="cursor-pointer"
-                        onClick={() => props.setVisible(false)}
+                        onClick={() => props.onClose()}
                       />
                     </div>
                   </div>

@@ -177,7 +177,7 @@ export function TransactionMatchDetails(props: Props) {
       )}
 
       {!isTransactionConverted && (
-        <div className="absolute bottom-0 px-3 py-3 w-full border-t border-gray-200">
+        <div className="absolute bottom-0 px-3 py-3 w-full border-t border-gray-200 bg-white">
           <Button
             className="w-full"
             onClick={

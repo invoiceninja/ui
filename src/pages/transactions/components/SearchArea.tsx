@@ -65,7 +65,6 @@ export function SearchArea(props: Props) {
 
       <div className="flex items-center">
         <InputField
-          className="bg-gray-200"
           placeholder={trans(`search_${props.dataKey}`, {
             count: '',
           })}
