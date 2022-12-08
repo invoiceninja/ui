@@ -22,14 +22,14 @@ import { useHandleCreate } from './hooks/useHandleCreate';
 export function Create() {
   const [t] = useTranslation();
 
-  useTitle('create_bank_account');
+  useTitle('new_bank_account');
 
   const navigate = useNavigate();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
-    { name: t('create_bank_account'), href: '/bank_accounts/create' },
+    { name: t('new_bank_account'), href: '/settings/bank_accounts/create' },
   ];
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -66,7 +66,7 @@ export function Create() {
       onCancelClick={handleCancel}
       onSaveClick={handleSave}
     >
-      <Card onFormSubmit={handleSave} title={t('create_bank_account')}>
+      <Card onFormSubmit={handleSave} title={t('new_bank_account')}>
         <Element leftSide={t('name')}>
           <InputField
             value={bankAccount?.bank_account_name}
