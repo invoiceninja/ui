@@ -96,7 +96,7 @@ export function CreateExpenseCategoryForm(props: Props) {
             );
           }
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
             setErrors(error.response.data);
             toast.dismiss();
