@@ -9,10 +9,10 @@
  */
 
 import { InputField } from '@invoiceninja/forms';
+import { trans } from 'common/helpers';
 import { ExpenseCategorySelector } from 'components/expense-categories/ExpenseCategorySelector';
 import { VendorSelector } from 'components/vendors/VendorSelector';
 import { Dispatch, SetStateAction, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
 import { MdFilterAlt } from 'react-icons/md';
 import { FilterModal } from './FilterModal';
@@ -29,8 +29,6 @@ interface Props {
 }
 
 export function SearchArea(props: Props) {
-  const [t] = useTranslation();
-
   const [
     isCreateExpenseCategoryModalOpen,
     setIsCreateExpenseCategoryModalOpen,
@@ -68,7 +66,9 @@ export function SearchArea(props: Props) {
       <div className="flex items-center">
         <InputField
           className="bg-gray-200"
-          placeholder={t(`search_${props.dataKey}`)}
+          placeholder={trans(`search_${props.dataKey}`, {
+            count: '',
+          })}
           value={props.searchParams.searchTerm}
           onValueChange={(value) =>
             handleChangeSearchParams('searchTerm', value)
