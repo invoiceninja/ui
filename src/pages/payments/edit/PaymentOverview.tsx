@@ -66,7 +66,7 @@ export function PaymentOverview(props: Props) {
       <div>
         {props.payment.paymentables.map((value) => (
           <PaymentOverviewInvoice
-            key={props.payment.id}
+            key={value.id}
             payment={props.payment}
             paymentable={value}
           />

@@ -72,7 +72,7 @@ export function Edit() {
       }}
     >
       {payment?.client && <ClientCard client={payment.client} />}
-      {payment && <PaymentOverview payment={payment} />}
+      {payment && <PaymentOverview payment={data?.data.data} />}
 
       <Divider />
 
