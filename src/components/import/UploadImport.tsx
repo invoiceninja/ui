@@ -103,7 +103,9 @@ export function UploadImport(props: Props) {
   });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: ['.csv'],
+    accept: {
+      'text/*': ['.csv'],
+    },
     onDrop: (acceptedFiles) => {
       acceptedFiles.forEach((file) =>
         formData.append(`files[${props.entity}]`, file)

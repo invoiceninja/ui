@@ -15,6 +15,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useApiWebhookQuery } from 'common/queries/api-webhooks';
 import { Divider } from 'components/cards/Divider';
 import { Settings } from 'components/layouts/Settings';
@@ -134,7 +135,7 @@ export function Edit() {
 
       request('PUT', endpoint('/api/v1/webhooks/:id', { id }), values)
         .then(() => toast.success(t('updated_webhook'), { id: toastId }))
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           toast.dismiss();
 
           error.response?.status === 422

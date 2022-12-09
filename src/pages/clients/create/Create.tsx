@@ -90,7 +90,7 @@ export function Create() {
 
         navigate(route('/clients/:id', { id: response.data.data.id }));
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         if (error.response?.status === 422) {

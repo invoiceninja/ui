@@ -42,7 +42,7 @@ export function useSave(
         toast.success(t('created_payment'), { id: toastId });
         navigate(route('/payments/:id/edit', { id: data.data.data.id }));
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
         toast.error(t('error_title'), { id: toastId });
 

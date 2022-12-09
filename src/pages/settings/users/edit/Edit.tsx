@@ -74,14 +74,14 @@ export function Edit() {
       user
     )
       .then(() => {
-        toast.success(t('updated_user'));
+        toast.success('updated_user');
 
         queryClient.invalidateQueries(route('/api/v1/users/:id', { id }));
       })
       .catch((error) => {
         console.error(error);
 
-        toast.error(t('error_title'));
+        toast.error();
       });
   };
 

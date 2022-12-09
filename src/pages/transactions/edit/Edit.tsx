@@ -35,6 +35,7 @@ import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-s
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { ApiTransactionType, TransactionType } from 'common/enums/transactions';
 import { BankAccountSelector } from '../components/BankAccountSelector';
+import { GenericValidationBag } from 'common/interfaces/validation-bag';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -51,7 +52,8 @@ export function Edit() {
 
   const [isSaving, setIsSaving] = useState<boolean>(false);
 
-  const [errors, setErrors] = useState<TransactionValidation>();
+  const [errors, setErrors] =
+    useState<GenericValidationBag<TransactionValidation>>();
 
   const { data: response } = useTransactionQuery({ id });
 
@@ -135,9 +137,9 @@ export function Edit() {
         toast.success('updated_transaction');
         navigate('/transactions');
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<GenericValidationBag<TransactionValidation>>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data.errors);
+          setErrors(error.response.data);
           toast.dismiss();
         } else {
           console.error(error);
@@ -168,7 +170,7 @@ export function Edit() {
             <SelectField
               value={transaction?.base_type}
               onValueChange={(value) => handleChange('base_type', value)}
-              errorMessage={errors?.base_type}
+              errorMessage={errors?.errors?.base_type}
             >
               {Object.values(transactionTypes).map((transactionType) => (
                 <option key={transactionType} value={transactionType}>
@@ -183,7 +185,7 @@ export function Edit() {
               type="date"
               value={transaction?.date}
               onValueChange={(value) => handleChange('date', value)}
-              errorMessage={errors?.date}
+              errorMessage={errors?.errors?.date}
             />
           </Element>
 
@@ -196,7 +198,7 @@ export function Edit() {
               initialValue={transaction?.amount?.toString()}
               value={transaction?.amount?.toString()}
               onChange={(value: string) => handleChange('amount', value)}
-              errorMessage={errors?.amount}
+              errorMessage={errors?.errors?.amount}
             />
           </Element>
 
@@ -205,7 +207,7 @@ export function Edit() {
               defaultValue={transaction?.currency_id}
               value={transaction?.currency_id}
               onValueChange={(value) => handleChange('currency_id', value)}
-              errorMessage={errors?.currency_id}
+              errorMessage={errors?.errors?.currency_id}
             >
               {currencies?.map(({ id, name }) => (
                 <option key={id} value={id}>
@@ -229,7 +231,7 @@ export function Edit() {
               element="textarea"
               value={transaction?.description}
               onValueChange={(value) => handleChange('description', value)}
-              errorMessage={errors?.description}
+              errorMessage={errors?.errors?.description}
             />
           </Element>
         </Card>

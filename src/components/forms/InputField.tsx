@@ -17,10 +17,10 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
 
 interface Props extends CommonProps {
-  label?: string;
+  label?: string | null;
   id?: string;
   type?: string;
-  placeholder?: string;
+  placeholder?: string | null;
   required?: boolean;
   border?: boolean;
   name?: string;
@@ -79,7 +79,7 @@ export function InputField(props: Props) {
               'border border-gray-300': props.border !== false,
             }
           )}
-          placeholder={props.placeholder}
+          placeholder={props.placeholder || ''}
           onChange={(event) => {
             props.onValueChange && props.onValueChange(event.target.value);
             props.onChange && props.onChange(event);

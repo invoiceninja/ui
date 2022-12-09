@@ -18,8 +18,9 @@ import { PurchaseOrder } from 'common/interfaces/purchase-order';
 
 export class InvoiceSum {
   protected taxMap = collect();
-  public invoiceItems = new InvoiceItemSum(this.invoice, this.currency);
   protected totalTaxMap: Record<string, unknown>[] = [];
+
+  public declare invoiceItems: InvoiceItemSum;
 
   public totalDiscount = 0;
   public total = 0;
@@ -30,7 +31,9 @@ export class InvoiceSum {
   constructor(
     public invoice: Invoice | RecurringInvoice | PurchaseOrder,
     protected currency: Currency
-  ) {}
+  ) {
+    this.invoiceItems = new InvoiceItemSum(this.invoice, this.currency);
+  }
 
   public build() {
     this.calculateLineItems()

@@ -30,6 +30,7 @@ import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
 import { ApiTransactionType, TransactionType } from 'common/enums/transactions';
 import { BankAccountSelector } from '../components/BankAccountSelector';
+import { GenericValidationBag } from 'common/interfaces/validation-bag';
 
 export function Create() {
   const [t] = useTranslation();
@@ -49,7 +50,8 @@ export function Create() {
   const [currencySeparators, setCurrencySeparators] =
     useState<DecimalInputSeparators>();
 
-  const [errors, setErrors] = useState<TransactionValidation>();
+  const [errors, setErrors] =
+    useState<GenericValidationBag<TransactionValidation>>();
 
   const [transaction, setTransaction] = useState<TransactionInput>({
     bank_integration_id: '',
@@ -106,9 +108,9 @@ export function Create() {
         toast.success('created_transaction');
         navigate('/transactions');
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<GenericValidationBag<TransactionValidation>>) => {
         if (error.response?.status === 422) {
-          setErrors(error.response.data.errors);
+          setErrors(error.response.data);
           toast.dismiss();
         } else {
           console.error(error);
@@ -146,7 +148,7 @@ export function Create() {
             <SelectField
               value={transaction?.base_type}
               onValueChange={(value) => handleChange('base_type', value)}
-              errorMessage={errors?.base_type}
+              errorMessage={errors?.errors?.base_type}
             >
               {Object.values(transactionTypes).map((transactionType) => (
                 <option key={transactionType} value={transactionType}>
@@ -161,7 +163,7 @@ export function Create() {
               type="date"
               value={transaction?.date}
               onValueChange={(value) => handleChange('date', value)}
-              errorMessage={errors?.date}
+              errorMessage={errors?.errors?.date}
             />
           </Element>
 
@@ -174,7 +176,7 @@ export function Create() {
               initialValue={transaction?.amount?.toString()}
               value={transaction?.amount?.toString()}
               onChange={(value: string) => handleChange('amount', value)}
-              errorMessage={errors?.amount}
+              errorMessage={errors?.errors?.amount}
             />
           </Element>
 
@@ -182,7 +184,7 @@ export function Create() {
             <SelectField
               value={transaction?.currency_id}
               onValueChange={(value) => handleChange('currency_id', value)}
-              errorMessage={errors?.currency_id}
+              errorMessage={errors?.errors?.currency_id}
             >
               {currencies?.map(({ id, name }) => (
                 <option key={id} value={id}>
@@ -197,7 +199,9 @@ export function Create() {
               onChange={(account) =>
                 handleChange('bank_integration_id', account?.id)
               }
-              errorMessage={errors?.bank_integration_id}
+              clearButton
+              onClearButtonClick={() => handleChange('bank_integration_id', '')}
+              errorMessage={errors?.errors?.bank_integration_id}
             />
           </Element>
 
@@ -206,7 +210,7 @@ export function Create() {
               element="textarea"
               value={transaction?.description}
               onValueChange={(value) => handleChange('description', value)}
-              errorMessage={errors?.description}
+              errorMessage={errors?.errors?.description}
             />
           </Element>
         </Card>

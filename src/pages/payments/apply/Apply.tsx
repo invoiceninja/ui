@@ -48,7 +48,7 @@ export function Apply() {
         .then(() => {
           toast.success(t('updated_payment'), { id: toastId });
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           console.error(error);
           toast.error(t('error_title'), { id: toastId });
           if (error.response?.status === 422) {

@@ -13,7 +13,7 @@ import { SelectField } from './forms';
 
 export interface GenericSelectorProps<T = string> {
   value: T;
-  label?: string;
+  label?: string | null;
   onChange: (id: string) => unknown;
 }
 

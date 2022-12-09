@@ -60,7 +60,7 @@ export function Logo() {
     },
   });
 
-  const onDrop = useCallback((acceptedFiles) => {
+  const onDrop = useCallback((acceptedFiles: File[]) => {
     formData.append('company_logo', acceptedFiles[0]);
     formData.append('_method', 'PUT');
 
@@ -73,7 +73,9 @@ export function Logo() {
     onDrop,
     multiple: false,
     maxFiles: 1,
-    accept: 'image/jpeg, image/png',
+    accept: {
+      'image/*': ['.jpeg', '.png'],
+    },
   });
 
   return (
@@ -81,11 +83,11 @@ export function Logo() {
       <Element leftSide={t('logo')}>
         <div className="grid grid-cols-12 lg:gap-4 space-y-4 lg:space-y-0">
           <div className="bg-gray-200 col-span-12 lg:col-span-5 rounded-lg p-6">
-            <img src={logo} alt={t('company_logo')} />
+            <img src={logo} alt={t('company_logo') ?? 'Company logo'} />
           </div>
 
           <div className="col-span-12 lg:col-span-5 bg-gray-900 rounded-lg p-6">
-            <img src={logo} alt={t('company_logo')} />
+            <img src={logo} alt={t('company_logo') ?? 'Company logo'} />
           </div>
         </div>
       </Element>

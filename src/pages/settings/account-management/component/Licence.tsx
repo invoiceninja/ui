@@ -12,6 +12,7 @@ import { Button, InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Divider } from 'components/cards/Divider';
 import { Modal } from 'components/Modal';
 import { useFormik } from 'formik';
@@ -45,7 +46,7 @@ export function License() {
 
           setIsModalVisible(false);
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           toast.dismiss();
 
           error.response?.status === 400

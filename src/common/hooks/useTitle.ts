@@ -15,7 +15,7 @@ export function useTitle(title: string, translate = true) {
   const [t] = useTranslation();
 
   const [documentTitle, setDocumentTitle] = useState(
-    translate ? t(title) : title
+    translate ? t(title) || '' : title
   );
 
   useEffect(() => {

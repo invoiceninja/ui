@@ -26,6 +26,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { request } from 'common/helpers/request';
 import { SignInProviders } from './components/SignInProviders';
 import { useLogin } from './common/hooks';
+import { GenericValidationBag } from 'common/interfaces/validation-bag';
 
 export function Login() {
   useTitle('login');
@@ -50,11 +51,12 @@ export function Login() {
 
       request('POST', endpoint('/api/v1/login'), values)
         .then((response) => login(response))
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
           return error.response?.status === 422
             ? setErrors(error.response.data.errors)
             : setMessage(
-                error.response?.data.message ?? t('invalid_credentials')
+                error.response?.data.message ??
+                  (t('invalid_credentials') as string)
               );
         })
         .finally(() => setIsFormBusy(false));

@@ -26,6 +26,7 @@ import toast from 'react-hot-toast';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -69,7 +70,7 @@ export function Edit() {
           toast.dismiss();
           toast.success(t('updated_tax_rate'));
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           console.error(error);
           toast.dismiss();
 

@@ -61,7 +61,7 @@ export function Refund() {
           toast.success(t('refunded_payment'), { id: toastId });
           navigate('/payments');
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           console.error(error);
           toast.error(t('error_title'), { id: toastId });
           if (error.response?.status === 422) {

@@ -13,6 +13,7 @@ import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useExpenseCategoryQuery } from 'common/queries/expense-categories';
 import { Badge } from 'components/Badge';
 import { Breadcrumbs } from 'components/Breadcrumbs';
@@ -69,7 +70,7 @@ export function Edit() {
           toast.dismiss();
           toast.success(t('updated_expense_category'));
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           toast.dismiss();
 
           error.response?.status === 422

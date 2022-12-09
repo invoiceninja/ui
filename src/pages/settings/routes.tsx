@@ -38,6 +38,7 @@ export const settingsRoutes = (
         path="enable_two_factor"
         element={<Settings.TwoFactorAuthentication />}
       />
+      <Route path="custom_fields" element={<Settings.UserCustomFields />} />
     </Route>
     <Route path="localization" element={<Settings.Localization />} />
     <Route path="online_payments" element={<Settings.OnlinePayments />} />

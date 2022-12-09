@@ -117,7 +117,7 @@ export function CompanyEdit(props: Props) {
               subdomain: subdomain,
             }).catch((error: AxiosError) => {
               if (error?.response?.status === 401) {
-                toast.error(t('subdomain_is_not_available'));
+                toast.error('subdomain_is_not_available');
               }
               return;
             });
@@ -135,9 +135,9 @@ export function CompanyEdit(props: Props) {
 
               window.location.href = route('/');
             })
-            .catch((error: AxiosError) => {
-              if (error?.response?.status === 422) {
-                setErrors(error?.response?.data?.errors);
+            .catch((error: AxiosError<ValidationBag>) => {
+              if (error.response?.status === 422) {
+                setErrors(error.response.data);
                 toast.dismiss();
               } else {
                 toast.error();

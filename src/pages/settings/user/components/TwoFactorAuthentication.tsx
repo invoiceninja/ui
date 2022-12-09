@@ -15,6 +15,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { updateUser } from 'common/stores/slices/user';
 import { Modal } from 'components/Modal';
 import { merge } from 'lodash';
@@ -53,7 +54,7 @@ export function TwoFactorAuthentication() {
 
         setIsEnableModalOpen(true);
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.data?.message) {
           toast.error(error.response.data.message);
           toast.dismiss();
@@ -77,7 +78,7 @@ export function TwoFactorAuthentication() {
 
         setIsEnableModalOpen(false);
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 400) {
           toast.error(error.response.data.message);
           toast.dismiss();
@@ -109,7 +110,7 @@ export function TwoFactorAuthentication() {
       .then(() => {
         toast.success('check_phone_code');
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 400) {
           toast.error(error.response.data.message);
         } else {
@@ -137,7 +138,7 @@ export function TwoFactorAuthentication() {
 
         setIsEnableModalOpen(true);
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 400) {
           toast.error(error.response.data.message);
         } else {

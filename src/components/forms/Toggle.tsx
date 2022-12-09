@@ -16,7 +16,7 @@ import { useAccentColor } from 'common/hooks/useAccentColor';
 import { useEffect } from 'react';
 
 interface Props extends CommonProps {
-  label?: string;
+  label?: string | null;
   checked?: boolean;
   disabled?: boolean;
   onChange?: (value: boolean) => unknown;
