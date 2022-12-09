@@ -30,6 +30,6 @@ export interface User extends Timestamps {
   oauth_user_token: string;
   phone: string;
   signature: string;
+  verified_phone_number: boolean;
   company_user?: CompanyUser;
-  verified_phone_number?: boolean;
 }
