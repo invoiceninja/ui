@@ -50,6 +50,7 @@ export function TwoFactorAuthentication() {
         toast.dismiss();
 
         setQrCode(response.data.data.qrCode);
+
         setQrCodeSecret(response.data.data.secret);
 
         setIsEnableModalOpen(true);
@@ -57,8 +58,8 @@ export function TwoFactorAuthentication() {
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.data?.message) {
           toast.error(error.response.data.message);
-          toast.dismiss();
         } else {
+          toast.dismiss();
           console.error(error);
         }
       });
@@ -81,8 +82,8 @@ export function TwoFactorAuthentication() {
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 400) {
           toast.error(error.response.data.message);
-          toast.dismiss();
         } else {
+          toast.dismiss();
           toast.error();
         }
       })
@@ -100,7 +101,10 @@ export function TwoFactorAuthentication() {
 
         setIsDisableModalOpen(false);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        toast.error();
+        console.error(error);
+      });
   };
 
   const resetSmsCode = () => {
