@@ -29,7 +29,7 @@ export function Details() {
 
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
-  const handleChange = (property: string, value: string | number | boolean) =>
+  const handleChange = (property: string, value: string | number | boolean) => {
     dispatch(
       updateChanges({
         property: property,
