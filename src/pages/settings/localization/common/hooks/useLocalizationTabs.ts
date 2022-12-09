@@ -12,7 +12,7 @@ import { Tab } from 'components/Tabs';
 import { useTranslation } from 'react-i18next';
 
 export function useLocalizationTabs() {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
 
   const tabs: Tab[] = [
     { name: t('settings'), href: '/settings/localization' },
