@@ -41,15 +41,15 @@ export function SmsVerificationModal(props: Props) {
   const [isCodeEntered, setIsCodeEntered] = useState<boolean>(false);
 
   const handleChangeValue = (value: string, fieldIndex: number) => {
-    const updatedArray = code.map((currentValue, index) =>
+    const updatedCode = code.map((currentValue, index) =>
       index === fieldIndex ? value : currentValue
     );
 
-    const isCodeFullyEntered = updatedArray.every((value) => value);
+    const isCodeFullyEntered = updatedCode.every((value) => value);
 
     setIsCodeEntered(isCodeFullyEntered);
 
-    setCode(updatedArray);
+    setCode(updatedCode);
 
     if (value) {
       if (fieldIndex === digitFields.length - 1) {
