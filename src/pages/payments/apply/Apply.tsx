@@ -27,6 +27,8 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { useNavigate } from 'react-router-dom';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 
 export function Apply() {
   const queryClient = useQueryClient();
@@ -34,6 +36,8 @@ export function Apply() {
   const [t] = useTranslation();
   const { data: payment } = usePaymentQuery({ id });
   const [errors, setErrors] = useState<ValidationBag>();
+  const navigate = useNavigate();
+  const formatMoney = useFormatMoney();
 
   const formik = useFormik({
     enableReinitialize: true,
@@ -45,8 +49,9 @@ export function Apply() {
       setErrors(undefined);
 
       request('PUT', endpoint('/api/v1/payments/:id', { id }), values)
-        .then(() => {
+        .then((data) => {
           toast.success(t('updated_payment'), { id: toastId });
+          navigate(route('/payments/:id/edit', { id: data.data.data.id }));
         })
         .catch((error: AxiosError<ValidationBag>) => {
           console.error(error);
@@ -61,10 +66,10 @@ export function Apply() {
         });
     },
   });
-  const handleInvoiceChange = (id: string, amount: number) => {
+  const handleInvoiceChange = (id: string, amount: number, number: string) => {
     formik.setFieldValue('invoices', [
       ...formik.values.invoices,
-      { _id: v4(), amount, credit_id: '', invoice_id: id },
+      { _id: v4(), amount, credit_id: '', invoice_id: id, number: number },
     ]);
   };
 
@@ -97,11 +102,14 @@ export function Apply() {
       <Element leftSide={t('amount')}>
         <InputField
           disabled
-          value={payment?.data.data.amount - payment?.data.data.refunded}
+          value={formatMoney((payment?.data.data.amount - payment?.data.data.refunded), payment?.data.data.client.country_id, payment?.data.data.client.settings.currency_id)}
         />
       </Element>
       <Element leftSide={t('applied')}>
-        <InputField disabled value={payment?.data.data.applied} />
+        <InputField disabled value={formatMoney(payment?.data.data.applied, payment?.data.data.client.country_id, payment?.data.data.client.settings.currency_id)} />
+      </Element>
+      <Element leftSide={t('unapplied')}>
+        <InputField disabled value={formatMoney(((payment?.data.data.amount - payment?.data.data.refunded) - payment?.data.data.applied), payment?.data.data.client.country_id, payment?.data.data.client.settings.currency_id)} />
       </Element>
       <Element leftSide={t('invoices')}>
         <DebouncedCombobox
@@ -110,7 +118,8 @@ export function Apply() {
           onChange={(value: Record<Invoice>) =>
             handleInvoiceChange(
               value.resource?.id as string,
-              value.resource?.amount as number
+              value.resource?.amount as number,
+              value.resource?.number as string
             )
           }
         />
@@ -121,10 +130,16 @@ export function Apply() {
         )}
       </Element>
       {formik.values.invoices.map(
-        (record: { _id: string; amount: number }, index) => (
+        (record: { _id: string; amount: number; number: string; }, index) => (
           <Element key={index} leftSide={t('applied')}>
             <div className="flex items-center space-x-2">
               <InputField
+                disabled
+                label={t('invoice_number')}
+                value={record.number}
+              />
+              <InputField
+                label={t('amount_received')}
                 id={`invoices[${index}].amount`}
                 onChange={formik.handleChange}
                 value={record.amount}

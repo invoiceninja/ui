@@ -46,4 +46,6 @@ export const enum PaymentType {
   ACSS = '44',
   INSTANT_BANK_PAY = '45',
   FPX = '46',
+  KLARNA = '47',
+  INTERAC = '48',
 }
