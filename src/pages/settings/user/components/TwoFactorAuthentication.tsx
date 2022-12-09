@@ -11,7 +11,7 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, Link } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
+import { endpoint, isHosted } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
@@ -148,10 +148,8 @@ export function TwoFactorAuthentication() {
       });
   };
 
-  const ishost = true;
-
   const checkPhoneNumberVerification = () => {
-    if (ishost) {
+    if (isHosted()) {
       if (!user?.phone) {
         toast.error('enter_phone_number');
       } else if (!user?.verified_phone_number) {

@@ -106,6 +106,7 @@ export function SmsVerificationModal(props: Props) {
           <Button type="minimal" onClick={() => props.resendSmsCode()}>
             {t('resend_code')}
           </Button>
+
           <Button
             onClick={() => props.verifyPhoneNumber(code.join(''))}
             disableWithoutIcon

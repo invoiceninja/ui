@@ -8,16 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { deletePassword, updateChanges } from 'common/stores/slices/user';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
+import { useOutletContext } from 'react-router-dom';
 import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 
 export function Password() {
   const [t] = useTranslation();
+
   const dispatch = useDispatch();
+
+  const errors: ValidationBag = useOutletContext();
 
   const [password, setPassword] = useState('');
   const [passwordConfirmation, setPasswordConfirmation] = useState('');
@@ -49,6 +54,7 @@ export function Password() {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             setPassword(event.target.value)
           }
+          errorMessage={(errors?.errors?.password ?? [])[0]}
         />
       </Element>
       <Element leftSide={t('confirm_password')}>
@@ -59,6 +65,7 @@ export function Password() {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             setPasswordConfirmation(event.target.value)
           }
+          errorMessage={(errors?.errors?.password_confirmation ?? [])[0]}
         />
       </Element>
     </Card>

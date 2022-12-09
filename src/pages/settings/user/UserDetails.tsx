@@ -31,6 +31,7 @@ import axios, { AxiosError } from 'axios';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { toast } from 'common/helpers/toast/toast';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 export function UserDetails() {
   useTitle('user_details');
@@ -38,6 +39,8 @@ export function UserDetails() {
   const [t] = useTranslation();
 
   const tabs = useUserDetailsTabs();
+
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -58,6 +61,7 @@ export function UserDetails() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {
     toast.processing();
+    setErrors(undefined);
 
     axios
       .all([
@@ -84,9 +88,12 @@ export function UserDetails() {
           updateRecord({ object: 'company', data: response[1].data.data })
         );
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
+        } else if (error.response?.status == 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
         } else {
           console.error(error);
           toast.error();
@@ -112,10 +119,11 @@ export function UserDetails() {
         onClose={setPasswordConfirmModalOpen}
         onSave={onSave}
       />
+
       <Tabs tabs={tabs} className="mt-6" />
 
       <div className="my-4">
-        <Outlet />
+        <Outlet context={errors} />
       </div>
     </Settings>
   );
