@@ -33,6 +33,10 @@ export function useCompanyDetailsTabs() {
       name: t('custom_fields'),
       href: '/settings/company_details/custom_fields',
     },
+    {
+      name: t('import_company'),
+      href: '/settings/company_details/import',
+    },
   ];
 
   return tabs;

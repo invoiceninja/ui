@@ -27,7 +27,7 @@ import { CompanyEdit } from 'pages/settings/company/edit/CompanyEdit';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { isDemo, isHosted, isSelfHosted } from 'common/helpers';
 import { freePlan } from 'common/guards/guards/free-plan';
-import { BiPlusCircle } from 'react-icons/bi';
+import { BiDownload, BiPlusCircle } from 'react-icons/bi';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -158,15 +158,27 @@ export function CompanySwitcher() {
             </div>
             <div className="py-1">
               {shouldShowAddCompany && canUserAddCompany && (
-                <Menu.Item>
-                  <DropdownElement
-                    className="flex items-center"
-                    onClick={() => setIsCompanyCreateModalOpened(true)}
-                  >
-                    {<BiPlusCircle fontSize={22} />}
-                    <span className="ml-2">{t('add_company')}</span>
-                  </DropdownElement>
-                </Menu.Item>
+                <>
+                  <Menu.Item>
+                    <DropdownElement
+                      className="flex items-center"
+                      onClick={() => setIsCompanyCreateModalOpened(true)}
+                    >
+                      {<BiPlusCircle fontSize={22} />}
+                      <span className="ml-2">{t('add_company')}</span>
+                    </DropdownElement>
+                  </Menu.Item>
+
+                  <Menu.Item>
+                    <DropdownElement
+                      className="flex items-center"
+                      to="/settings/company_details/import"
+                    >
+                      {<BiDownload fontSize={22} />}
+                      <span className="ml-2">{t('import_company')}</span>
+                    </DropdownElement>
+                  </Menu.Item>
+                </>
               )}
 
               <Menu.Item>
