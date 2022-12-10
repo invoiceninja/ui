@@ -29,16 +29,19 @@ interface Props extends CommonProps {
   rightSide?: ReactNode;
   onFilterChange?: any;
   onStatusChange?: any;
+  onCustomFilterChange?: any;
+  customFilters?: SelectOption[];
+  customFilterPlaceholder?: string;
 }
 
 export function Actions(props: Props) {
   const [t] = useTranslation();
 
-  function onStatusChange(
+  const onStatusChange = (
     options:
       | MultiValue<{ value: string; label: string }>
       | SingleValue<{ value: string; label: string }>
-  ) {
+  ) => {
     const values: string[] = [];
 
     (options as any).map((option: { value: string; label: string }) =>
@@ -46,7 +49,22 @@ export function Actions(props: Props) {
     );
 
     return props.onStatusChange(values);
-  }
+  };
+
+  const onCustomFilterChange = (
+    options:
+      | MultiValue<{ value: string; label: string }>
+      | SingleValue<{ value: string; label: string }>
+  ) => {
+    const values: string[] = [];
+
+    (options as any).map((option: { value: string; label: string }) =>
+      values.push(option.value)
+    );
+
+    return props.onCustomFilterChange(values);
+  };
+
   const customStyles: StylesConfig<SelectOption, true> = {
     multiValue: (styles, { data }) => {
       return {
@@ -81,6 +99,17 @@ export function Actions(props: Props) {
             onChange={(options) => onStatusChange(options)}
             placeholder={t('status')}
             options={props.options}
+            isMulti={props.optionsMultiSelect}
+          />
+        )}
+
+        {props.customFilters && props.customFilterPlaceholder && (
+          <Select
+            styles={customStyles}
+            defaultValue={props.customFilters[0]}
+            onChange={(options) => onCustomFilterChange(options)}
+            placeholder={t(props.customFilterPlaceholder)}
+            options={props.customFilters}
             isMulti={props.optionsMultiSelect}
           />
         )}
