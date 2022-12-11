@@ -92,6 +92,11 @@ export function Settings(props: Props) {
       href: '/settings/account_management',
       current: location.pathname === '/settings/account_management',
     },
+    {
+      name: `${t('backup')}/${t('restore')}`,
+      href: '/settings/backup_restore',
+      current: location.pathname === '/settings/backup_restore',
+    },
   ];
 
   const advanced: AdvanceSetting[] = [
