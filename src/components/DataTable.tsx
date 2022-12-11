@@ -58,7 +58,6 @@ interface Props {
   bulkRoute?: string;
   customActions?: any;
   customFilters?: SelectOption[];
-  customFilterPlaceholder?: string;
   customFilterQueryKey?: string;
   withoutActions?: boolean;
   withoutPagination?: boolean;
@@ -179,7 +178,7 @@ export function DataTable(props: Props) {
           defaultOption={options[0]}
           onStatusChange={setStatus}
           customFilters={props.customFilters}
-          customFilterPlaceholder={props.customFilterPlaceholder}
+          customFilterQueryKey={props.customFilterQueryKey}
           onCustomFilterChange={setCustomFilter}
           rightSide={
             <Inline>

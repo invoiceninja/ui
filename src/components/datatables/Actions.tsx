@@ -14,6 +14,10 @@ import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
 import { ReactNode, ChangeEvent } from 'react';
 
+interface Placeholders {
+  client_status: string;
+}
+
 export interface SelectOption {
   value: string;
   label: string;
@@ -31,7 +35,7 @@ interface Props extends CommonProps {
   onStatusChange?: any;
   onCustomFilterChange?: any;
   customFilters?: SelectOption[];
-  customFilterPlaceholder?: string;
+  customFilterQueryKey?: string;
 }
 
 export function Actions(props: Props) {
@@ -88,6 +92,10 @@ export function Actions(props: Props) {
     }),
   };
 
+  const customFiltersPlaceholders: Placeholders = {
+    client_status: t('invoice_status'),
+  };
+
   return (
     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
       <div className="flex flex-col space-y-2 mt-2 lg:mt-0 lg:flex-row lg:items-center lg:space-x-4 lg:space-y-0">
@@ -103,12 +111,16 @@ export function Actions(props: Props) {
           />
         )}
 
-        {props.customFilters && props.customFilterPlaceholder && (
+        {props.customFilters && (
           <Select
             styles={customStyles}
             defaultValue={props.customFilters[0]}
             onChange={(options) => onCustomFilterChange(options)}
-            placeholder={t(props.customFilterPlaceholder)}
+            placeholder={
+              customFiltersPlaceholders[
+                props.customFilterQueryKey as keyof Placeholders
+              ]
+            }
             options={props.customFilters}
             isMulti={props.optionsMultiSelect}
           />

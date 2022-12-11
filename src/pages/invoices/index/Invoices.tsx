@@ -47,7 +47,6 @@ export function Invoices() {
         withResourcefulActions
         customActions={actions}
         customFilters={filters}
-        customFilterPlaceholder="invoice_status"
         customFilterQueryKey="client_status"
         rightSide={<ImportButton route="/invoices/import" />}
         leftSideChevrons={
