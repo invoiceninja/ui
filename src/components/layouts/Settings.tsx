@@ -93,9 +93,9 @@ export function Settings(props: Props) {
       current: location.pathname === '/settings/account_management',
     },
     {
-      name: `${t('backup')}/${t('restore')}`,
-      href: '/settings/backup_restore',
-      current: location.pathname === '/settings/backup_restore',
+      name: `${t('export')}/${t('import')}`,
+      href: '/settings/export_import',
+      current: location.pathname === '/settings/export_import',
     },
   ];
 

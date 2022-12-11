@@ -104,23 +104,30 @@ export function UploadImport(props: Props) {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: {
-      'text/*': ['.csv'],
+      'text/*': [`${'.' + props.type}`],
     },
     onDrop: (acceptedFiles) => {
-      acceptedFiles.forEach((file) =>
-        formData.append(`files[${props.entity}]`, file)
+      const isFilesTypeCorrect = acceptedFiles.every(({ type }) =>
+        type.includes(props.type)
       );
-      formData.append('import_type', props.entity);
-      setFormData(formData);
 
-      formik.submitForm();
+      if (isFilesTypeCorrect) {
+        acceptedFiles.forEach((file) => {
+          formData.append(`files[${props.entity}]`, file);
+        });
+        formData.append('import_type', props.entity);
+        setFormData(formData);
+        formik.submitForm();
+      } else {
+        toast.error('wrong_file_extension');
+      }
     },
   });
 
   return (
     <>
       <Card title={t(props.entity)}>
-        <Element leftSide={t('csv_file')}>
+        <Element leftSide={t(props.type + '_file')}>
           <div
             {...getRootProps()}
             className="flex flex-col md:flex-row md:items-center"
