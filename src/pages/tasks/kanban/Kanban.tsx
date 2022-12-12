@@ -31,9 +31,10 @@ import {
 } from '@hello-pangea/dnd';
 import { cloneDeep } from 'lodash';
 import { arrayMoveImmutable } from 'array-move';
-import { Slider } from 'components/cards/Slider';
 import { Task } from 'common/interfaces/task';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { atom, useAtom } from 'jotai';
+import { TaskSlider } from './components/TaskSlider';
 
 interface Card {
   id: string;
@@ -52,6 +53,9 @@ interface Board {
   columns: Column[];
 }
 
+export const currentTaskAtom = atom<Task | undefined>(undefined);
+export const isKanbanSliderVisibleAtom = atom(false);
+
 export function Kanban() {
   const { documentTitle } = useTitle('kanban');
   const [t] = useTranslation();
@@ -67,8 +71,10 @@ export function Kanban() {
   const { data: tasks } = useTasksQuery({ limit: 1000 });
 
   const [board, setBoard] = useState<Board>();
-  const [isSliderVisible, setIsSliderVisible] = useState(false);
-  const [currentTask, setCurrentTask] = useState<Task>();
+  const [isKanbanSliderVisible, setIsKanbanSliderVisible] = useAtom(
+    isKanbanSliderVisibleAtom
+  );
+  const [currentTask, setCurrentTask] = useAtom(currentTaskAtom);
 
   useEffect(() => {
     if (taskStatuses && tasks) {
@@ -177,7 +183,7 @@ export function Kanban() {
 
   const handleCurrentTask = (id: string) => {
     if (currentTask?.id === id) {
-      return setIsSliderVisible(true);
+      return setIsKanbanSliderVisible(true);
     }
 
     toast.processing();
@@ -189,7 +195,7 @@ export function Kanban() {
       )
       .then((response) => {
         setCurrentTask(response.data.data);
-        setIsSliderVisible(true);
+        setIsKanbanSliderVisible(true);
 
         toast.dismiss();
       })
@@ -206,20 +212,12 @@ export function Kanban() {
         </Link>
       }
     >
-      <Slider
-        visible={isSliderVisible}
-        onClose={() => setIsSliderVisible(false)}
-        size="regular"
-        title={currentTask?.description}
-        withContainer
-      >
-        My awesome content
-      </Slider>
+      <TaskSlider />
 
       {board && (
         <div
           className="flex pb-6 px-1 space-x-4 overflow-x-auto"
-          style={{ paddingRight: isSliderVisible ? 512 : 0 }}
+          style={{ paddingRight: isKanbanSliderVisible ? 512 : 0 }}
         >
           <DragDropContext onDragEnd={onDragEnd}>
             {board.columns.map((board) => (
