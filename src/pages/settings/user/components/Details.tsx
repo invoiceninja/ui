@@ -10,16 +10,20 @@
 
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { updateChanges } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { CustomField } from 'components/CustomField';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
+import { useOutletContext } from 'react-router-dom';
 import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 
 export function Details() {
   const [t] = useTranslation();
+
+  const errors: ValidationBag = useOutletContext();
 
   const user = useCurrentUser();
 
@@ -29,13 +33,14 @@ export function Details() {
 
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
-  const handleChange = (property: string, value: string | number | boolean) =>
+  const handleChange = (property: string, value: string | number | boolean) => {
     dispatch(
       updateChanges({
         property: property,
         value: value,
       })
     );
+  };
 
   return (
     <>
@@ -45,6 +50,7 @@ export function Details() {
             <InputField
               value={userChanges?.first_name || user?.first_name || ''}
               onValueChange={(value) => handleChange('first_name', value)}
+              errorMessage={(errors?.errors?.first_name ?? [])[0]}
             />
           </Element>
 
@@ -52,6 +58,7 @@ export function Details() {
             <InputField
               value={userChanges?.last_name || user?.last_name || ''}
               onValueChange={(value) => handleChange('last_name', value)}
+              errorMessage={(errors?.errors?.last_name ?? [])[0]}
             />
           </Element>
 
@@ -60,6 +67,7 @@ export function Details() {
               value={userChanges?.email || user?.email || ''}
               type="email"
               onValueChange={(value) => handleChange('email', value)}
+              errorMessage={(errors?.errors?.email ?? [])[0]}
             />
           </Element>
 
@@ -67,6 +75,7 @@ export function Details() {
             <InputField
               value={userChanges?.phone || user?.phone || ''}
               onValueChange={(value) => handleChange('phone', value)}
+              errorMessage={(errors?.errors?.phone ?? [])[0]}
             />
           </Element>
 
