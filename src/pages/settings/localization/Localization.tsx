@@ -9,23 +9,28 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
+import { Tabs } from 'components/Tabs';
 import { useTranslation } from 'react-i18next';
+import { Outlet } from 'react-router-dom';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
-import { CustomLabels, Settings as SettingsComponent } from './components';
+import { useLocalizationTabs } from './common/hooks/useLocalizationTabs';
 
 export function Localization() {
   const [t] = useTranslation();
+
+  useTitle('localization');
+
+  const tabs = useLocalizationTabs();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('localization'), href: '/settings/localization' },
   ];
 
-  useTitle('localization');
-
   const onSave = useHandleCompanySave();
+
   const onCancel = useDiscardChanges();
 
   return (
@@ -36,8 +41,10 @@ export function Localization() {
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#localization"
     >
-      <SettingsComponent />
-      <CustomLabels />
+      <Tabs tabs={tabs} className="mt-6" />
+      <div className="my-4">
+        <Outlet />
+      </div>
     </Settings>
   );
 }
