@@ -190,8 +190,10 @@ export function Kanban() {
       .then((response) => {
         setCurrentTask(response.data.data);
         setIsSliderVisible(true);
+
+        toast.dismiss();
       })
-      .finally(() => toast.dismiss());
+      .catch(() => toast.error());
   };
 
   return (
