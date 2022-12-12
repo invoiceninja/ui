@@ -18,13 +18,13 @@ export function ImportExport() {
   const pages = [
     { name: t('settings'), href: '/settings' },
     {
-      name: `${t('import')}/${t('export')}`,
-      href: '/settings/import_export',
+      name: t('import_export'),
+      href: '/settings/company_import_export',
     },
   ];
 
   return (
-    <Settings title={`${t('import')}/${t('export')}`} breadcrumbs={pages}>
+    <Settings title={t('import_export')} breadcrumbs={pages}>
       <div className="grid grid-cols-12">
         <div className="col-span-12">
           <UploadImport entity="company" onSuccess={false} type="zip" />
