@@ -31,6 +31,9 @@ import {
 } from '@hello-pangea/dnd';
 import { cloneDeep } from 'lodash';
 import { arrayMoveImmutable } from 'array-move';
+import { Slider } from 'components/cards/Slider';
+import { Task } from 'common/interfaces/task';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
 interface Card {
   id: string;
@@ -64,6 +67,8 @@ export function Kanban() {
   const { data: tasks } = useTasksQuery({ limit: 1000 });
 
   const [board, setBoard] = useState<Board>();
+  const [isSliderVisible, setIsSliderVisible] = useState(false);
+  const [currentTask, setCurrentTask] = useState<Task>();
 
   useEffect(() => {
     if (taskStatuses && tasks) {
@@ -170,6 +175,25 @@ export function Kanban() {
     updateTasks(local);
   };
 
+  const handleCurrentTask = (id: string) => {
+    if (currentTask?.id === id) {
+      return setIsSliderVisible(true);
+    }
+
+    toast.processing();
+
+    queryClient
+      .fetchQuery<GenericSingleResourceResponse<Task>>(
+        ['/api/v1/tasks', id],
+        () => request('GET', endpoint('/api/v1/tasks/:id', { id }))
+      )
+      .then((response) => {
+        setCurrentTask(response.data.data);
+        setIsSliderVisible(true);
+      })
+      .finally(() => toast.dismiss());
+  };
+
   return (
     <Default
       title={documentTitle}
@@ -180,8 +204,21 @@ export function Kanban() {
         </Link>
       }
     >
+      <Slider
+        visible={isSliderVisible}
+        onClose={() => setIsSliderVisible(false)}
+        size="regular"
+        title={currentTask?.description}
+        withContainer
+      >
+        My awesome content
+      </Slider>
+
       {board && (
-        <div className="flex pb-6 px-1 space-x-4 overflow-x-auto">
+        <div
+          className="flex pb-6 px-1 space-x-4 overflow-x-auto"
+          style={{ paddingRight: isSliderVisible ? 512 : 0 }}
+        >
           <DragDropContext onDragEnd={onDragEnd}>
             {board.columns.map((board) => (
               <Droppable key={board.id} droppableId={board.id}>
@@ -225,7 +262,10 @@ export function Kanban() {
                           </Draggable>
 
                           <div className="hidden group-hover:flex border-t border-gray-100 justify-center items-center">
-                            <button className="w-full hover:bg-gray-200 py-2 rounded-bl">
+                            <button
+                              className="w-full hover:bg-gray-200 py-2 rounded-bl"
+                              onClick={() => handleCurrentTask(card.id)}
+                            >
                               {t('view')}
                             </button>
 
