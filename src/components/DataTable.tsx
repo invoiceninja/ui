@@ -48,7 +48,7 @@ export type DataTableColumns<T = any> = {
   format?: (field: string | number, resource: T) => unknown;
 }[];
 
-interface Props {
+interface Props<T> {
   resource: string;
   columns: DataTableColumns;
   endpoint: string;
@@ -63,11 +63,12 @@ interface Props {
   withoutPadding?: boolean;
   leftSideChevrons?: ReactNode;
   staleTime?: number;
+  onTableRowClick?: (resource: T) => unknown;
 }
 
 export const datatablePerPageAtom = atomWithStorage('perPage', '10');
 
-export function DataTable(props: Props) {
+export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
 
   const [apiEndpoint, setApiEndpoint] = useState(
@@ -259,7 +260,11 @@ export function DataTable(props: Props) {
             data?.data?.data?.map((resource: any, index: number) => (
               <Tr
                 key={index}
-                onClick={() => document.getElementById(resource.id)?.click()}
+                onClick={() =>
+                  props.onTableRowClick
+                    ? props.onTableRowClick(resource)
+                    : document.getElementById(resource.id)?.click()
+                }
               >
                 {!props.withoutActions && (
                   <Td>

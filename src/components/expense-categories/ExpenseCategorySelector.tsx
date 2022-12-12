@@ -11,27 +11,44 @@
 import { ExpenseCategory } from 'common/interfaces/expense-category';
 import { GenericSelectorProps } from 'common/interfaces/generic-selector-props';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
+import { CreateExpenseCategoryModal } from 'pages/settings/expense-categories/components/CreateExpenseCategoryModal';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 
-export function ExpenseCategorySelector(
-  props: GenericSelectorProps<ExpenseCategory>
-) {
+export interface ExpenseCategorySelectorProps
+  extends GenericSelectorProps<ExpenseCategory> {
+  initiallyVisible?: boolean;
+  setVisible?: Dispatch<SetStateAction<boolean>>;
+  setSelectedIds?: Dispatch<SetStateAction<string[]>>;
+}
+
+export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
   const [t] = useTranslation();
-  const navigate = useNavigate();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <DebouncedCombobox
-      {...props}
-      value="id"
-      endpoint="/api/v1/expense_categories"
-      label="name"
-      defaultValue={props.value}
-      onChange={(category: Record<ExpenseCategory>) =>
-        category.resource && props.onChange(category.resource)
-      }
-      actionLabel={t('new_expense_category')}
-      onActionClick={() => navigate('/settings/expense_categories/create')}
-    />
+    <>
+      <CreateExpenseCategoryModal
+        visible={props.initiallyVisible || isModalOpen}
+        setVisible={props.setVisible || setIsModalOpen}
+        setSelectedIds={props.setSelectedIds}
+      />
+
+      {!props.setSelectedIds && (
+        <DebouncedCombobox
+          {...props}
+          value="id"
+          endpoint="/api/v1/expense_categories"
+          label="name"
+          defaultValue={props.value}
+          onChange={(category: Record<ExpenseCategory>) =>
+            category.resource && props.onChange(category.resource)
+          }
+          actionLabel={t('new_expense_category')}
+          onActionClick={() => setIsModalOpen(true)}
+        />
+      )}
+    </>
   );
 }
