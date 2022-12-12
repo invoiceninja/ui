@@ -11,7 +11,7 @@
 import { toast } from 'common/helpers/toast/toast';
 import { Card, Element } from '@invoiceninja/cards';
 import { useFormik } from 'formik';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +21,8 @@ import { Button, SelectField } from '@invoiceninja/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
+import { BiDownload } from 'react-icons/bi';
+import { MdClose } from 'react-icons/md';
 
 interface Props {
   entity: string;
@@ -40,12 +42,13 @@ export function UploadImport(props: Props) {
   const isImportFileTypeZip = props.type === 'zip';
   const acceptableFileTypes = {
     ...(!isImportFileTypeZip && { 'text/*': ['.csv'] }),
-    ...(isImportFileTypeZip && { 'application/json': ['.zip'] }),
+    ...(isImportFileTypeZip && { 'application/zip': ['.zip'] }),
   };
 
   const [importSettings, setImportSettings] = useState<boolean>(false);
   const [importData, setImportData] = useState<boolean>(false);
   const [formData, setFormData] = useState(new FormData());
+  const [files, setFiles] = useState<File[]>([]);
   const [mapData, setMapData] = useState<ImportMap>();
   const [payload, setPayloadData] = useState<ImportMap>({
     hash: '',
@@ -74,6 +77,11 @@ export function UploadImport(props: Props) {
   };
 
   const processImport = () => {
+    if (!files.length && isImportFileTypeZip) {
+      toast.error('select_file');
+      return;
+    }
+
     toast.processing();
 
     let endPointUrl = '/api/v1/import';
@@ -105,8 +113,6 @@ export function UploadImport(props: Props) {
 
     const requestData = isImportFileTypeZip ? formData : payload;
 
-    console.log(requestData.get('files[company]'));
-
     request('POST', endpoint(endPointUrl, params), requestData)
       .then((response) => {
         toast.success(response?.data?.message ?? 'error_title');
@@ -137,6 +143,28 @@ export function UploadImport(props: Props) {
     },
   });
 
+  const updateFormDataFiles = () => {
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+
+    setFormData(formData);
+  };
+
+  const removeFileFromFormData = (fileIndex: number) => {
+    const filteredFileList = files.filter((file, index) => fileIndex !== index);
+
+    const updatedFormData = new FormData();
+
+    filteredFileList.forEach((file) => {
+      updatedFormData.append('files', file);
+    });
+
+    setFiles(filteredFileList);
+
+    setFormData(updatedFormData);
+  };
+
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: acceptableFileTypes,
     onDrop: (acceptedFiles) => {
@@ -146,10 +174,11 @@ export function UploadImport(props: Props) {
 
       if (isFilesTypeCorrect) {
         acceptedFiles.forEach((file) => {
-          formData.append(
-            `files[${props.entity}]`,
-            new Blob([file], { type: 'application/octet-stream' })
-          );
+          if (isImportFileTypeZip) {
+            setFiles((prevState) => [...prevState, file]);
+          } else {
+            formData.append(`files[${props.entity}]`, file);
+          }
         });
         setFormData(formData);
         if (!isImportFileTypeZip) {
@@ -162,24 +191,48 @@ export function UploadImport(props: Props) {
     },
   });
 
+  useEffect(() => {
+    updateFormDataFiles();
+  }, [files]);
+
   return (
     <>
       <Card title={t(props.entity)}>
         <Element leftSide={t(props.type + '_file')}>
-          <div
-            {...getRootProps()}
-            className="flex flex-col md:flex-row md:items-center"
-          >
-            <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              <input {...getInputProps()} />
-              <Image className="mx-auto h-12 w-12 text-gray-400" />
-              <span className="mt-2 block text-sm font-medium text-gray-900">
-                {isDragActive
-                  ? 'drop_your_files_here'
-                  : t('dropzone_default_message')}
-              </span>
+          {!files.length ? (
+            <div
+              {...getRootProps()}
+              className="flex flex-col md:flex-row md:items-center"
+            >
+              <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <input {...getInputProps()} />
+                <Image className="mx-auto h-12 w-12 text-gray-400" />
+                <span className="mt-2 block text-sm font-medium text-gray-900">
+                  {isDragActive
+                    ? 'drop_your_files_here'
+                    : t('dropzone_default_message')}
+                </span>
+              </div>
             </div>
-          </div>
+          ) : (
+            <ul className="grid xs:grid-rows-6 lg:grid-cols-2">
+              {files.map((file, index) => (
+                <li
+                  key={index}
+                  className="flex items-center hover:bg-gray-50 cursor-pointer p-2"
+                >
+                  {file.name} - {(file.size / 1024).toPrecision(2)} KB{' '}
+                  {
+                    <MdClose
+                      fontSize={15}
+                      className="cursor-pointer ml-3"
+                      onClick={() => removeFileFromFormData(index)}
+                    />
+                  }
+                </li>
+              ))}
+            </ul>
+          )}
         </Element>
 
         {isImportFileTypeZip && (
@@ -197,13 +250,19 @@ export function UploadImport(props: Props) {
                 onValueChange={(value) => setImportData(value)}
               />
             </Element>
+
             <div className="flex justify-end pr-5">
               <Button
-                className="flex float-right"
+                className="w-28"
                 behavior="button"
                 onClick={processImport}
+                disableWithoutIcon
+                disabled={(!importSettings && !importData) || !files.length}
               >
-                {t('import')}
+                <div className="flex items-center">
+                  <BiDownload className="mr-2" fontSize={22} />
+                  {t('import')}
+                </div>
               </Button>
             </div>
           </>
