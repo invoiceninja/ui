@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import toast from 'react-hot-toast';
+import { toast } from 'common/helpers/toast/toast';
 import { Card, Element } from '@invoiceninja/cards';
 import { useFormik } from 'formik';
 import { ChangeEvent, useState } from 'react';
@@ -20,6 +20,7 @@ import { endpoint } from 'common/helpers';
 import { Button, SelectField } from '@invoiceninja/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
+import Toggle from 'components/forms/Toggle';
 
 interface Props {
   entity: string;
@@ -36,6 +37,14 @@ interface ImportMap extends Record<string, any> {
 
 export function UploadImport(props: Props) {
   const [t] = useTranslation();
+  const isImportFileTypeZip = props.type === 'zip';
+  const acceptableFileTypes = {
+    ...(!isImportFileTypeZip && { 'text/*': ['.csv'] }),
+    ...(isImportFileTypeZip && { 'application/json': ['.zip'] }),
+  };
+
+  const [importSettings, setImportSettings] = useState<boolean>(false);
+  const [importData, setImportData] = useState<boolean>(false);
   const [formData, setFormData] = useState(new FormData());
   const [mapData, setMapData] = useState<ImportMap>();
   const [payload, setPayloadData] = useState<ImportMap>({
@@ -65,19 +74,47 @@ export function UploadImport(props: Props) {
   };
 
   const processImport = () => {
-    const toastId = toast.loading(t('processing'));
-    payload.hash = mapData!.hash;
+    toast.processing();
 
-    request('POST', endpoint('/api/v1/import'), payload)
+    let endPointUrl = '/api/v1/import';
+    let params = {};
+
+    if (isImportFileTypeZip) {
+      endPointUrl = '/api/v1/import_json?';
+      if (!importSettings && !importData) {
+        toast.error('data_or_settings');
+        return;
+      } else {
+        if (importSettings) {
+          endPointUrl += '&import_settings=:import_settings';
+          params = {
+            import_settings: true,
+          };
+        }
+        if (importData) {
+          endPointUrl += '&import_data=:import_data';
+          params = {
+            ...params,
+            import_data: true,
+          };
+        }
+      }
+    } else {
+      payload.hash = mapData!.hash;
+    }
+
+    const requestData = isImportFileTypeZip ? formData : payload;
+
+    console.log(requestData.get('files[company]'));
+
+    request('POST', endpoint(endPointUrl, params), requestData)
       .then((response) => {
-        toast.success(response?.data?.message ?? t('error_title'), {
-          id: toastId,
-        });
+        toast.success(response?.data?.message ?? 'error_title');
         props.onSuccess;
       })
       .catch((error) => {
         console.error(error);
-        toast.error(t('error_title'), { id: toastId });
+        toast.error();
       });
   };
 
@@ -85,11 +122,9 @@ export function UploadImport(props: Props) {
     enableReinitialize: true,
     initialValues: {},
     onSubmit: () => {
-      const toastId = toast.loading(t('processing'));
+      toast.processing();
 
-      request('POST', endpoint('/api/v1/preimport'), formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
+      request('POST', endpoint('/api/v1/preimport'), formData)
         .then((response) => {
           setMapData(response.data);
           props.onSuccess;
@@ -97,15 +132,13 @@ export function UploadImport(props: Props) {
         })
         .catch((error) => {
           console.error(error);
-          toast.error(t('error_title'), { id: toastId });
+          toast.error();
         });
     },
   });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: {
-      'text/*': [`${'.' + props.type}`],
-    },
+    accept: acceptableFileTypes,
     onDrop: (acceptedFiles) => {
       const isFilesTypeCorrect = acceptedFiles.every(({ type }) =>
         type.includes(props.type)
@@ -113,11 +146,16 @@ export function UploadImport(props: Props) {
 
       if (isFilesTypeCorrect) {
         acceptedFiles.forEach((file) => {
-          formData.append(`files[${props.entity}]`, file);
+          formData.append(
+            `files[${props.entity}]`,
+            new Blob([file], { type: 'application/octet-stream' })
+          );
         });
-        formData.append('import_type', props.entity);
         setFormData(formData);
-        formik.submitForm();
+        if (!isImportFileTypeZip) {
+          formik.submitForm();
+          formData.append('import_type', props.entity);
+        }
       } else {
         toast.error('wrong_file_extension');
       }
@@ -143,9 +181,36 @@ export function UploadImport(props: Props) {
             </div>
           </div>
         </Element>
+
+        {isImportFileTypeZip && (
+          <>
+            <Element leftSide={t('import_settings')}>
+              <Toggle
+                checked={importSettings}
+                onValueChange={(value) => setImportSettings(value)}
+              />
+            </Element>
+
+            <Element leftSide={t('import_data')}>
+              <Toggle
+                checked={importData}
+                onValueChange={(value) => setImportData(value)}
+              />
+            </Element>
+            <div className="flex justify-end pr-5">
+              <Button
+                className="flex float-right"
+                behavior="button"
+                onClick={processImport}
+              >
+                {t('import')}
+              </Button>
+            </div>
+          </>
+        )}
       </Card>
 
-      {mapData && (
+      {mapData && !isImportFileTypeZip && (
         <Table>
           <Thead>
             <Th>{t('headers')}</Th>
