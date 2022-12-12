@@ -49,7 +49,7 @@ export const settingsRoutes = (
     <Route path="workflow_settings" element={<Settings.WorkflowSettings />} />
     <Route path="import_export" element={<Settings.ImportExport />} />
     <Route path="account_management" element={<Settings.AccountManagement />} />
-    <Route path="export_import" element={<Settings.Backup />} />
+    <Route path="import_export" element={<Settings.ImportExport />} />
     <Route
       path="invoice_design"
       element={

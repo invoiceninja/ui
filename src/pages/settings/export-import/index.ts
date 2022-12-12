@@ -8,4 +8,4 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export * from './index/ExportImport';
+export * from './index/ImportExport';

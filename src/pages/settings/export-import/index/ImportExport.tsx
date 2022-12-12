@@ -12,19 +12,19 @@ import { UploadImport } from 'components/import/UploadImport';
 import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 
-export function Backup() {
+export function ImportExport() {
   const [t] = useTranslation();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     {
-      name: `${t('export')}/${t('import')}`,
-      href: '/settings/export_import',
+      name: `${t('import')}/${t('export')}`,
+      href: '/settings/import_export',
     },
   ];
 
   return (
-    <Settings title={`${t('export')}/${t('import')}`} breadcrumbs={pages}>
+    <Settings title={`${t('import')}/${t('export')}`} breadcrumbs={pages}>
       <div className="grid grid-cols-12">
         <div className="col-span-12">
           <UploadImport entity="company" onSuccess={false} type="zip" />
