@@ -12,10 +12,11 @@ import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputField } from '../forms/InputField';
 import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
-import { ReactNode, ChangeEvent } from 'react';
+import { ReactNode, ChangeEvent, Dispatch, SetStateAction } from 'react';
 
 interface Placeholders {
-  client_status: string;
+  key: string;
+  value: string;
 }
 
 export interface SelectOption {
@@ -31,9 +32,9 @@ interface Props extends CommonProps {
   optionsPlaceholder?: string;
   optionsMultiSelect?: true | undefined;
   rightSide?: ReactNode;
-  onFilterChange?: any;
-  onStatusChange?: any;
-  onCustomFilterChange?: any;
+  onFilterChange?: Dispatch<SetStateAction<string>>;
+  onStatusChange?: Dispatch<SetStateAction<string[]>>;
+  onCustomFilterChange?: Dispatch<SetStateAction<string[]>>;
   customFilters?: SelectOption[];
   customFilterQueryKey?: string;
 }
@@ -46,13 +47,15 @@ export function Actions(props: Props) {
       | MultiValue<{ value: string; label: string }>
       | SingleValue<{ value: string; label: string }>
   ) => {
-    const values: string[] = [];
+    if (props.onStatusChange) {
+      const values: string[] = [];
 
-    (options as any).map((option: { value: string; label: string }) =>
-      values.push(option.value)
-    );
+      (options as SelectOption[]).map(
+        (option: { value: string; label: string }) => values.push(option.value)
+      );
 
-    return props.onStatusChange(values);
+      return props.onStatusChange(values);
+    }
   };
 
   const onCustomFilterChange = (
@@ -60,13 +63,15 @@ export function Actions(props: Props) {
       | MultiValue<{ value: string; label: string }>
       | SingleValue<{ value: string; label: string }>
   ) => {
-    const values: string[] = [];
+    if (props.onCustomFilterChange) {
+      const values: string[] = [];
 
-    (options as any).map((option: { value: string; label: string }) =>
-      values.push(option.value)
-    );
+      (options as SelectOption[]).map(
+        (option: { value: string; label: string }) => values.push(option.value)
+      );
 
-    return props.onCustomFilterChange(values);
+      return props.onCustomFilterChange(values);
+    }
   };
 
   const customStyles: StylesConfig<SelectOption, true> = {
@@ -92,8 +97,18 @@ export function Actions(props: Props) {
     }),
   };
 
-  const customFiltersPlaceholders: Placeholders = {
-    client_status: t('invoice_status'),
+  const customFiltersPlaceholders: Placeholders[] = [
+    {
+      key: 'client_status',
+      value: t('invoice_status'),
+    },
+  ];
+
+  const getPlaceHolderString = (passedKey: string) => {
+    const filteredPlaceholder = customFiltersPlaceholders.filter(
+      ({ key }) => key === passedKey
+    );
+    return filteredPlaceholder[0].value;
   };
 
   return (
@@ -116,11 +131,7 @@ export function Actions(props: Props) {
             styles={customStyles}
             defaultValue={props.customFilters[0]}
             onChange={(options) => onCustomFilterChange(options)}
-            placeholder={
-              customFiltersPlaceholders[
-                props.customFilterQueryKey as keyof Placeholders
-              ]
-            }
+            placeholder={getPlaceHolderString(props.customFilterQueryKey || '')}
             options={props.customFilters}
             isMulti={props.optionsMultiSelect}
           />
@@ -131,7 +142,7 @@ export function Actions(props: Props) {
           id="filter"
           placeholder={t('filter')}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
-            props.onFilterChange(event.target.value)
+            props.onFilterChange && props.onFilterChange(event.target.value)
           }
           debounceTimeout={800}
         />

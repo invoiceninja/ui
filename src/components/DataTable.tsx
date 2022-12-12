@@ -78,13 +78,13 @@ export function DataTable(props: Props) {
 
   const queryClient = useQueryClient();
 
-  const [filter, setFilter] = useState('');
-  const [customFilter, setCustomFilter] = useState<string[]>(['']);
+  const [filter, setFilter] = useState<string>('');
+  const [customFilter, setCustomFilter] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useAtom(datatablePerPageAtom);
   const [sort, setSort] = useState('id|asc');
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
-  const [status, setStatus] = useState(['active']);
+  const [status, setStatus] = useState<string[]>(['active']);
   const [selected, setSelected] = useState<string[]>([]);
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
