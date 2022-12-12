@@ -202,22 +202,42 @@ export function Kanban() {
                       className="p-4 space-y-4"
                     >
                       {board.cards.map((card, i) => (
-                        <Draggable
-                          draggableId={card.id}
-                          key={card.id}
-                          index={i}
+                        <div
+                          key={i}
+                          className="w-full text-leftblock rounded bg-gray-50 text-gray-700 hover:text-gray-900 text-sm cursor-pointer group"
                         >
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className="w-full text-leftblock bg-gray-50 hover:bg-gray-100 rounded text-gray-700 hover:text-gray-900 text-sm px-4 sm:px-6 py-4 cursor-move"
-                            >
-                              {card.title}
-                            </div>
-                          )}
-                        </Draggable>
+                          <Draggable
+                            draggableId={card.id}
+                            key={card.id}
+                            index={i}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className="px-4 sm:px-6 py-4 bg-gray-50 hover:bg-gray-100"
+                              >
+                                <p>{card.title}</p>
+                                <small>{card.description}</small>
+                              </div>
+                            )}
+                          </Draggable>
+
+                          <div className="hidden group-hover:flex border-t border-gray-100 justify-center items-center">
+                            <button className="w-full hover:bg-gray-200 py-2 rounded-bl">
+                              {t('view')}
+                            </button>
+
+                            <button className="w-full hover:bg-gray-200 py-2">
+                              {t('edit')}
+                            </button>
+
+                            <button className="w-full hover:bg-gray-200 py-2 rounded-br">
+                              {t('resume')}
+                            </button>
+                          </div>
+                        </div>
                       ))}
                     </div>
 
