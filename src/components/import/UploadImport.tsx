@@ -144,7 +144,7 @@ export function UploadImport(props: Props) {
     },
   });
 
-  const updateFormDataFiles = () => {
+  const addFilesToFormData = () => {
     files.forEach((file) => {
       formData.append('files', file);
     });
@@ -194,7 +194,7 @@ export function UploadImport(props: Props) {
   });
 
   useEffect(() => {
-    updateFormDataFiles();
+    addFilesToFormData();
   }, [files]);
 
   return (
