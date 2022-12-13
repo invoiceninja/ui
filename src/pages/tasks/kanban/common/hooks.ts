@@ -46,8 +46,6 @@ export function useFormatTimeLog() {
     const logs: string[][] = [];
 
     parseTimeLog(log).map(([start, end]) => {
-      console.log(start, end);
-
       logs.push([
         date(start, dateFormat),
         new Date(start * 1000).toLocaleTimeString(),
