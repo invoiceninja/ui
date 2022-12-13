@@ -8,13 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
+import { date, endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
+import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Task } from 'common/interfaces/task';
 import { useSetAtom } from 'jotai';
+import { parseTimeLog } from 'pages/tasks/common/helpers/calculate-time';
+import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { currentTaskAtom, isKanbanSliderVisibleAtom } from './atoms';
 
@@ -33,4 +36,25 @@ export function useHandleCurrentTask(id: string | undefined) {
         .catch(() => toast.error()),
     { enabled: Boolean(id) }
   );
+}
+
+export function useFormatTimeLog() {
+  const { dateFormat } = useCurrentCompanyDateFormats();
+  const { t } = useTranslation();
+
+  return (log: string) => {
+    const logs: string[][] = [];
+
+    parseTimeLog(log).map(([start, end]) => {
+      console.log(start, end);
+
+      logs.push([
+        date(start, dateFormat),
+        new Date(start * 1000).toLocaleTimeString(),
+        end === 0 ? t('now') : new Date(end * 1000).toLocaleTimeString(),
+      ]);
+    });
+
+    return logs;
+  };
 }
