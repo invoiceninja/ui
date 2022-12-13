@@ -32,15 +32,21 @@ import {
 import { cloneDeep } from 'lodash';
 import { arrayMoveImmutable } from 'array-move';
 import { Task } from 'common/interfaces/task';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { atom, useAtom } from 'jotai';
-import { TaskSlider } from './components/TaskSlider';
+import { useAtom } from 'jotai';
+import { ViewSlider } from './components/ViewSlider';
+import { Link as ReactRouterLink } from 'react-router-dom';
+import { isTaskRunning } from '../common/helpers/calculate-entity-state';
+import { currentTaskIdAtom, isKanbanSliderVisibleAtom } from './common/atoms';
+import { useHandleCurrentTask } from './common/hooks';
+import { useStart } from '../common/hooks/useStart';
+import { useStop } from '../common/hooks/useStop';
 
 interface Card {
   id: string;
   title: string;
   description: string;
   sortOrder: number;
+  task: Task;
 }
 
 interface Column {
@@ -52,9 +58,6 @@ interface Column {
 interface Board {
   columns: Column[];
 }
-
-export const currentTaskAtom = atom<Task | undefined>(undefined);
-export const isKanbanSliderVisibleAtom = atom(false);
 
 export function Kanban() {
   const { documentTitle } = useTitle('kanban');
@@ -71,10 +74,16 @@ export function Kanban() {
   const { data: tasks } = useTasksQuery({ limit: 1000 });
 
   const [board, setBoard] = useState<Board>();
+  const [currentTaskId, setCurrentTaskId] = useAtom(currentTaskIdAtom);
+
   const [isKanbanSliderVisible, setIsKanbanSliderVisible] = useAtom(
     isKanbanSliderVisibleAtom
   );
-  const [currentTask, setCurrentTask] = useAtom(currentTaskAtom);
+
+  const startTask = useStart();
+  const stopTask = useStop();
+
+  useHandleCurrentTask(currentTaskId);
 
   useEffect(() => {
     if (taskStatuses && tasks) {
@@ -95,6 +104,7 @@ export function Kanban() {
             title: task.description,
             description: calculateTime(task.time_log),
             sortOrder: task.status_order,
+            task,
           });
         }
       });
@@ -182,24 +192,11 @@ export function Kanban() {
   };
 
   const handleCurrentTask = (id: string) => {
-    if (currentTask?.id === id) {
+    if (currentTaskId === id) {
       return setIsKanbanSliderVisible(true);
     }
 
-    toast.processing();
-
-    queryClient
-      .fetchQuery<GenericSingleResourceResponse<Task>>(
-        ['/api/v1/tasks', id],
-        () => request('GET', endpoint('/api/v1/tasks/:id', { id }))
-      )
-      .then((response) => {
-        setCurrentTask(response.data.data);
-        setIsKanbanSliderVisible(true);
-
-        toast.dismiss();
-      })
-      .catch(() => toast.error());
+    setCurrentTaskId(id);
   };
 
   return (
@@ -212,7 +209,7 @@ export function Kanban() {
         </Link>
       }
     >
-      <TaskSlider />
+      <ViewSlider />
 
       {board && (
         <div
@@ -269,13 +266,30 @@ export function Kanban() {
                               {t('view')}
                             </button>
 
-                            <button className="w-full hover:bg-gray-200 py-2">
+                            <ReactRouterLink
+                              to={route('/tasks/:id/edit', { id: card.id })}
+                              className="w-full text-center hover:bg-gray-200 py-2"
+                            >
                               {t('edit')}
-                            </button>
+                            </ReactRouterLink>
 
-                            <button className="w-full hover:bg-gray-200 py-2 rounded-br">
-                              {t('resume')}
-                            </button>
+                            {isTaskRunning(card.task) && (
+                              <button
+                                className="w-full hover:bg-gray-200 py-2 rounded-br"
+                                onClick={() => stopTask(card.task)}
+                              >
+                                {t('stop')}
+                              </button>
+                            )}
+
+                            {!isTaskRunning(card.task) && (
+                              <button
+                                className="w-full hover:bg-gray-200 py-2 rounded-br"
+                                onClick={() => startTask(card.task)}
+                              >
+                                {t('start')}
+                              </button>
+                            )}
                           </div>
                         </div>
                       ))}
