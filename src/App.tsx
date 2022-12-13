@@ -35,6 +35,8 @@ export function App() {
 
     const resolvedLanguage = resolveLanguage(company?.settings.language_id);
     i18n.changeLanguage(resolvedLanguage?.locale);
+
+    console.log('test');
   }, [darkMode, company]);
 
   return (
