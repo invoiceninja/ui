@@ -14,6 +14,7 @@ import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Settings } from 'components/layouts/Settings';
@@ -63,7 +64,7 @@ export function Create() {
             })
           );
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           console.error(error);
 
           error.response?.status === 422

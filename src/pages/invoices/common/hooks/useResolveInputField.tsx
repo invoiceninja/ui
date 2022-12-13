@@ -95,12 +95,13 @@ export function useResolveInputField(props: Props) {
       return (
         <ProductSelector
           onChange={(value) =>
+            value.resource &&
             handleProductChange(index, value.label, value.resource)
           }
           className="w-auto"
           defaultValue={resource?.line_items[index][property]}
           onProductCreated={(product) =>
-            handleProductChange(index, product.product_key, product)
+            product && handleProductChange(index, product.product_key, product)
           }
         />
       );

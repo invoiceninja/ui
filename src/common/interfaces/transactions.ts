@@ -24,12 +24,12 @@ export interface Transaction {
 }
 
 export interface TransactionInput {
-  base_type?: string;
-  date?: string;
-  amount?: number;
-  currency_id?: string;
-  bank_integration_id?: string;
-  description?: string;
+  base_type: string;
+  date: string;
+  amount: number;
+  currency_id: string;
+  bank_integration_id: string;
+  description: string;
 }
 
 export interface TransactionResponse {
@@ -52,10 +52,4 @@ export interface TransactionResponse {
   transaction_id: number;
   update_at: number;
   vendor_id: string;
-}
-
-export interface TransactionDetails {
-  amount?: number;
-  date?: string;
-  currency_id?: string;
 }

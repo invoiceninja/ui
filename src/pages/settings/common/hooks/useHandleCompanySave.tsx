@@ -16,6 +16,7 @@ import { updateRecord } from 'common/stores/slices/company-users';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { request } from 'common/helpers/request';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 export function useHandleCompanySave() {
   const [t] = useTranslation();
@@ -35,7 +36,7 @@ export function useHandleCompanySave() {
 
         toast.success(t('updated_settings'), { id: toastId });
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         toast.error(t('error_title'), { id: toastId });

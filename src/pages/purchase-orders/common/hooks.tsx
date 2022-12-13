@@ -53,7 +53,7 @@ export function useCreate(props: CreateProps) {
           })
         );
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         error.response?.status === 422

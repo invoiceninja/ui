@@ -11,96 +11,173 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, Link } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
+import { endpoint, isHosted } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { updateUser } from 'common/stores/slices/user';
 import { Modal } from 'components/Modal';
 import { merge } from 'lodash';
 import { ChangeEvent, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'react-qr-code';
 import { useDispatch } from 'react-redux';
+import { SmsVerificationModal } from './SmsVerificationModal';
 
 export function TwoFactorAuthentication() {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
+
   const user = useCurrentUser();
 
-  const [isEnableModalOpen, setIsEnableModalOpen] = useState(false);
-  const [isDisableModalOpen, setIsDisableModalOpen] = useState(false);
+  const dispatch = useDispatch();
+
+  const [isEnableModalOpen, setIsEnableModalOpen] = useState<boolean>(false);
+  const [isDisableModalOpen, setIsDisableModalOpen] = useState<boolean>(false);
+  const [isSmsModalOpen, setIsSmsModalOpen] = useState<boolean>(false);
 
   const [qrCode, setQrCode] = useState('');
   const [qrCodeSecret, setQrCodeSecret] = useState('');
 
   const [oneTimePassword, setOneTimePassword] = useState('');
-  const [isSumbitDisabled, setIsSubmitDisabled] = useState(false);
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(false);
 
   const requestQrCode = () => {
-    toast.loading(t('processing'));
+    toast.processing();
 
     request('GET', endpoint('/api/v1/settings/enable_two_factor'))
       .then((response) => {
         toast.dismiss();
 
         setQrCode(response.data.data.qrCode);
+
         setQrCodeSecret(response.data.data.secret);
 
         setIsEnableModalOpen(true);
       })
-      .catch((error: AxiosError) => {
-        toast.dismiss();
-        console.error(error);
-
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.data?.message) {
           toast.error(error.response.data.message);
+        } else {
+          toast.dismiss();
+          console.error(error);
         }
       });
   };
 
   const enableTwoFactor = () => {
-    toast.loading(t('processing'));
+    toast.processing();
 
     request('POST', endpoint('/api/v1/settings/enable_two_factor'), {
       secret: qrCodeSecret,
       one_time_password: oneTimePassword,
     })
       .then((response) => {
-        toast.dismiss();
         toast.success(response.data.message);
 
         dispatch(updateUser(merge({}, user, { google_2fa_secret: true })));
 
         setIsEnableModalOpen(false);
       })
-      .catch((error: AxiosError) => {
-        toast.dismiss();
-
-        error.response?.status === 400
-          ? toast.error(error.response.data.message)
-          : toast.error(t('error_title'));
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 400) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.dismiss();
+          toast.error();
+        }
       })
       .finally(() => setIsSubmitDisabled(false));
   };
 
   const disableTwoFactor = () => {
-    toast.loading(t('processing'));
+    toast.processing();
 
     request('POST', endpoint('/api/v1/settings/disable_two_factor'))
       .then(() => {
-        toast.dismiss();
-        toast.success(t('disabled_two_factor'));
+        toast.success('disabled_two_factor');
 
         dispatch(updateUser(merge({}, user, { google_2fa_secret: false })));
 
         setIsDisableModalOpen(false);
       })
-      .catch((error) => console.error(error));
+      .catch((error) => {
+        toast.error();
+        console.error(error);
+      });
+  };
+
+  const resetSmsCode = () => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/sms_reset'), { email: user!.email })
+      .then(() => {
+        toast.success('check_phone_code');
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 400) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.dismiss();
+          console.error(error);
+        }
+      });
+  };
+
+  const verifyPhoneNumber = (code: string) => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/sms_reset/confirm?validate_only=true'), {
+      code,
+      email: user!.email,
+    })
+      .then(() => {
+        toast.success('verified_phone_number');
+
+        dispatch(updateUser(merge({}, user, { verified_phone_number: true })));
+
+        setIsSmsModalOpen(false);
+
+        requestQrCode();
+
+        setIsEnableModalOpen(true);
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 400) {
+          toast.error(error.response.data.message);
+        } else {
+          toast.dismiss();
+          console.error(error);
+        }
+      });
+  };
+
+  const checkPhoneNumberVerification = () => {
+    if (isHosted()) {
+      if (!user?.phone) {
+        toast.error('enter_phone_number');
+      } else if (!user?.verified_phone_number) {
+        setIsSmsModalOpen(true);
+        resetSmsCode();
+      } else {
+        requestQrCode();
+        setIsEnableModalOpen(true);
+      }
+    } else {
+      requestQrCode();
+      setIsEnableModalOpen(true);
+    }
   };
 
   return (
     <>
+      <SmsVerificationModal
+        visible={isSmsModalOpen}
+        setVisible={setIsSmsModalOpen}
+        resendSmsCode={resetSmsCode}
+        verifyPhoneNumber={verifyPhoneNumber}
+      />
+
       <Modal
         title={t('enable_two_factor')}
         visible={isEnableModalOpen}
@@ -120,7 +197,7 @@ export function TwoFactorAuthentication() {
           }
         />
 
-        <Button disabled={isSumbitDisabled} onClick={() => enableTwoFactor()}>
+        <Button disabled={isSubmitDisabled} onClick={() => enableTwoFactor()}>
           {t('continue')}
         </Button>
 
@@ -137,7 +214,7 @@ export function TwoFactorAuthentication() {
         visible={isDisableModalOpen}
         onClose={setIsDisableModalOpen}
       >
-        <Button disabled={isSumbitDisabled} onClick={() => disableTwoFactor()}>
+        <Button disabled={isSubmitDisabled} onClick={() => disableTwoFactor()}>
           {t('confirm')}
         </Button>
       </Modal>
@@ -148,7 +225,7 @@ export function TwoFactorAuthentication() {
             <Button
               behavior="button"
               type="minimal"
-              onClick={() => requestQrCode()}
+              onClick={() => checkPhoneNumberVerification()}
             >
               {t('enable')}
             </Button>

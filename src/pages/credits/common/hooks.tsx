@@ -144,7 +144,7 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     setCredit((current) => current && { ...current, line_items: lineItems });
   };
 
-  const calculateInvoiceSum = () => {
+  const calculateInvoiceSum = (credit: Credit) => {
     const currency = currencyResolver(
       props.client?.settings.currency_id || company?.settings.currency_id
     );
@@ -186,7 +186,7 @@ export function useCreate(props: CreateProps) {
 
         navigate(route('/credits/:id/edit', { id: response.data.data.id }));
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         error.response?.status === 422
@@ -231,7 +231,7 @@ export function useSave(props: CreateProps) {
           route('/api/v1/credits/:id', { id: credit.id })
         );
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         error.response?.status === 422

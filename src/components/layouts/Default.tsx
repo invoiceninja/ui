@@ -41,7 +41,7 @@ import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 
 interface Props extends CommonProps {
-  title?: string;
+  title?: string | null;
   onSaveClick?: any;
   onCancelClick?: any;
   onBackClick?: string;
@@ -49,7 +49,7 @@ interface Props extends CommonProps {
   topRight?: ReactNode;
   docsLink?: string;
   navigationTopRight?: ReactNode;
-  saveButtonLabel?: string;
+  saveButtonLabel?: string | null;
   backButtonLabel?: string;
   disableSaveButton?: boolean;
 }

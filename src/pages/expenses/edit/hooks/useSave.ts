@@ -35,7 +35,7 @@ export function useSave(props: Props) {
       expense
     )
       .then(() => toast.success('updated_expense'))
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
         toast.error();
 

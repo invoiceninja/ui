@@ -9,7 +9,6 @@
  */
 
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { App } from './App';
 import { BrowserRouter, HashRouter } from 'react-router-dom';
 import { Provider } from 'react-redux';
@@ -20,6 +19,7 @@ import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
 import { ScrollToTop } from 'components/ScrollToTop';
 import { QueryClient, QueryClientProvider } from 'react-query';
+import { createRoot } from 'react-dom/client';
 
 import './resources/css/app.css';
 import en from './resources/lang/en/en.json';
@@ -48,7 +48,9 @@ Sentry.init({
   tracesSampleRate: 1.0,
 });
 
-ReactDOM.render(
+const container = document.getElementById('root') as HTMLElement;
+
+createRoot(container).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
@@ -59,6 +61,5 @@ ReactDOM.render(
         </Router>
       </Provider>
     </QueryClientProvider>
-  </React.StrictMode>,
-  document.getElementById('root')
+  </React.StrictMode>
 );

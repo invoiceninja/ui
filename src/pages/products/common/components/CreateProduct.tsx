@@ -24,6 +24,7 @@ import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import Toggle from 'components/forms/Toggle';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 export interface CreateProductDto {
   product_key: string;
@@ -98,7 +99,7 @@ export function CreateProduct(props: Props) {
             { state: { message: t('created_product') } }
           );
         })
-        .catch((error: AxiosError) =>
+        .catch((error: AxiosError<ValidationBag>) =>
           error.response?.status === 422
             ? setErrors(error.response.data.errors)
             : toast.error(t('error_title'))

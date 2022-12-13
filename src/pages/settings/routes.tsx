@@ -38,8 +38,12 @@ export const settingsRoutes = (
         path="enable_two_factor"
         element={<Settings.TwoFactorAuthentication />}
       />
+      <Route path="custom_fields" element={<Settings.UserCustomFields />} />
     </Route>
-    <Route path="localization" element={<Settings.Localization />} />
+    <Route path="localization" element={<Settings.Localization />}>
+      <Route path="" element={<Settings.LocalizationSettings />} />
+      <Route path="custom_labels" element={<Settings.CustomLabels />} />
+    </Route>
     <Route path="online_payments" element={<Settings.OnlinePayments />} />
     <Route path="tax_settings" element={<Settings.TaxSettings />} />
     <Route path="product_settings" element={<Settings.ProductSettings />} />

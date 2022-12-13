@@ -29,7 +29,7 @@ export function useSave(setErrors: (errors: ValidationBag) => unknown) {
       purchaseOrder
     )
       .then(() => toast.success('updated_purchase_order'))
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         error.response?.status === 422
           ? toast.dismiss() && setErrors(error.response.data)
           : toast.error();

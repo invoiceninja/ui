@@ -29,6 +29,7 @@ import { Delete } from './components/Delete';
 import { useTitle } from 'common/hooks/useTitle';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -66,7 +67,7 @@ export function Edit() {
         .then(() => {
           toast.success(t('updated_token'), { id: toastId });
         })
-        .catch((error: AxiosError) => {
+        .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
             toast.dismiss();
 

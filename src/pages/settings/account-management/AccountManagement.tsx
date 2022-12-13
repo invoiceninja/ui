@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isDemo } from 'common/helpers';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 
@@ -51,7 +52,7 @@ export function AccountManagement() {
       <EnabledModules />
       <Integrations />
       <SecuritySettings />
-      <DangerZone />
+      {!isDemo() && <DangerZone />}
     </Settings>
   );
 }

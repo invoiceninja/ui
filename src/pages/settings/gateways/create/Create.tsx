@@ -28,10 +28,44 @@ import { RequiredFields } from './components/RequiredFields';
 import { Settings as GatewaySettings } from './components/Settings';
 import { useHandleCreate } from './hooks/useHandleCreate';
 import { blankFeesAndLimitsRecord } from './hooks/useHandleMethodToggle';
+import { TabGroup } from 'components/TabGroup';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 export function Create() {
   const [t] = useTranslation();
+
   const navigate = useNavigate();
+
+  const { documentTitle } = useTitle('online_payments');
+
+  const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
+
+  const { data: companyGateways } = useCompanyGatewaysQuery();
+
+  const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
+
+  const [errors, setErrors] = useState<ValidationBag>();
+
+  const [gateway, setGateway] = useState<Gateway>();
+
+  const [filteredGateways, setFilteredGateways] = useState<Gateway[]>([]);
+
+  const gateways = useGateways();
+
+  const onSave = useHandleCreate(companyGateway, setErrors);
+
+  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    setGateway(gateways.find((gateway) => gateway.id === event.target.value));
+  };
+
+  const defaultTab = [t('provider')];
+
+  const additionalTabs = [
+    t('credentials'),
+    t('settings'),
+    t('required_fields'),
+    t('limits_and_fees'),
+  ];
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -39,20 +73,7 @@ export function Create() {
     { name: t('add_gateway'), href: '/settings/gateways/create' },
   ];
 
-  const { documentTitle } = useTitle('online_payments');
-  const { data: blankCompanyGateway } = useBlankCompanyGatewayQuery();
-  const { data: companyGateways } = useCompanyGatewaysQuery();
-
-  const [companyGateway, setCompanyGateway] = useState<CompanyGateway>();
-  const [gateway, setGateway] = useState<Gateway>();
-  const [filteredGateways, setFilteredGateways] = useState<Gateway[]>([]);
-
-  const gateways = useGateways();
-  const onSave = useHandleCreate(companyGateway);
-
-  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setGateway(gateways.find((gateway) => gateway.id === event.target.value));
-  };
+  const [tabs, setTabs] = useState<string[]>(defaultTab);
 
   useEffect(() => {
     let existingCompanyGatewaysKeys: string[] = [];
@@ -118,56 +139,83 @@ export function Create() {
     }
   }, [gateway]);
 
+  useEffect(() => {
+    if (gateway) {
+      setTabs([...defaultTab, ...additionalTabs]);
+    } else {
+      setTabs([...defaultTab]);
+    }
+  }, [gateway]);
+
   return (
     <Settings
       title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={() => navigate('/settings/online_payments')}
+      disableSaveButton={!gateway}
     >
-      <Card title={t('add_gateway')}>
-        <Element leftSide={t('provider')}>
-          <SelectField onChange={handleChange} withBlank>
-            {filteredGateways.map((gateway, index) => (
-              <option value={gateway.id} key={index}>
-                {gateway.name}
-              </option>
-            ))}
-          </SelectField>
-        </Element>
-      </Card>
+      <TabGroup tabs={tabs}>
+        <Card title={t('add_gateway')}>
+          <Element leftSide={t('provider')}>
+            <SelectField
+              onChange={handleChange}
+              value={gateway?.id}
+              errorMessage={errors?.errors.gateway_key}
+              withBlank
+            >
+              {filteredGateways.map((gateway, index) => (
+                <option value={gateway.id} key={index}>
+                  {gateway.name}
+                </option>
+              ))}
+            </SelectField>
+          </Element>
+        </Card>
 
-      {gateway && companyGateway && (
-        <Credentials
-          gateway={gateway}
-          companyGateway={companyGateway}
-          setCompanyGateway={setCompanyGateway}
-        />
-      )}
+        <div>
+          {gateway && companyGateway && (
+            <Credentials
+              gateway={gateway}
+              companyGateway={companyGateway}
+              setCompanyGateway={setCompanyGateway}
+              errors={errors}
+            />
+          )}
+        </div>
 
-      {gateway && companyGateway && (
-        <GatewaySettings
-          gateway={gateway}
-          companyGateway={companyGateway}
-          setCompanyGateway={setCompanyGateway}
-        />
-      )}
+        <div>
+          {gateway && companyGateway && (
+            <GatewaySettings
+              gateway={gateway}
+              companyGateway={companyGateway}
+              setCompanyGateway={setCompanyGateway}
+              errors={errors}
+            />
+          )}
+        </div>
 
-      {gateway && companyGateway && (
-        <RequiredFields
-          gateway={gateway}
-          companyGateway={companyGateway}
-          setCompanyGateway={setCompanyGateway}
-        />
-      )}
+        <div>
+          {gateway && companyGateway && (
+            <RequiredFields
+              gateway={gateway}
+              companyGateway={companyGateway}
+              setCompanyGateway={setCompanyGateway}
+            />
+          )}
+        </div>
 
-      {gateway && companyGateway && (
-        <LimitsAndFees
-          gateway={gateway}
-          companyGateway={companyGateway}
-          setCompanyGateway={setCompanyGateway}
-        />
-      )}
+        <div>
+          {gateway && companyGateway && (
+            <LimitsAndFees
+              gateway={gateway}
+              companyGateway={companyGateway}
+              setCompanyGateway={setCompanyGateway}
+              errors={errors}
+            />
+          )}
+        </div>
+      </TabGroup>
     </Settings>
   );
 }

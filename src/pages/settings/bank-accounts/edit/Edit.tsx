@@ -20,8 +20,10 @@ import {
   BankAccountDetails,
   BankAccountInput,
 } from 'common/interfaces/bank-accounts';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Settings } from '../../../../components/layouts/Settings';
 import { useBankAccountsQuery } from '../common/queries';
@@ -41,18 +43,21 @@ export function Edit() {
 
   const { data: response } = useBankAccountsQuery({ id });
 
+  const queryClient = useQueryClient();
+
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const [errors, setErrors] = useState<BankAccountValidation | undefined>(
-    undefined
-  );
+  const [errors, setErrors] = useState<BankAccountValidation>();
 
   const [accountDetails, setAccountDetails] = useState<BankAccountInput>();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
-    { name: t('edit_bank_account'), href: `/bank_accounts/${id}/edit` },
+    {
+      name: t('edit_bank_account'),
+      href: route('/bank_accounts/:id/edit', { id }),
+    },
   ];
 
   const handleChange = (
@@ -70,38 +75,38 @@ export function Edit() {
 
   const handleCancel = () => {
     if (!isFormBusy) {
-      navigate(route('/settings/bank_accounts'));
+      navigate('/settings/bank_accounts');
     }
   };
 
   const handleSave = async (event: FormEvent<HTMLFormElement>) => {
     if (!isFormBusy) {
-      event?.preventDefault();
+      event.preventDefault();
 
-      const toastId = toast.processing();
+      toast.processing();
       setErrors(undefined);
       setIsFormBusy(true);
 
-      try {
-        await request(
-          'PUT',
-          endpoint('/api/v1/bank_integrations/:id', { id }),
-          accountDetails
-        );
-        setIsFormBusy(false);
-        toast.success(t('updated_bank_account'), { id: toastId });
-        navigate(route('/settings/bank_accounts'));
-      } catch (cachedError) {
-        const error = cachedError as AxiosError;
-        console.error(error);
-        if (error?.response?.status === 422) {
-          setErrors(error?.response?.data?.errors);
-          toast.dismiss();
-        } else {
-          toast.error();
-        }
-        setIsFormBusy(false);
-      }
+      request(
+        'PUT',
+        endpoint('/api/v1/bank_integrations/:id', { id }),
+        accountDetails
+      )
+        .then(() => {
+          toast.success('updated_bank_account');
+          queryClient.invalidateQueries('/api/v1/bank_integrations');
+          navigate('/settings/bank_accounts');
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            setErrors(error.response.data.errors);
+            toast.dismiss();
+          } else {
+            console.error(error);
+            toast.error();
+          }
+        })
+        .finally(() => setIsFormBusy(false));
     }
   };
 

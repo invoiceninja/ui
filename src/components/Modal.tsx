@@ -17,7 +17,7 @@ interface Props {
   visible: boolean;
   onClose: (status: boolean) => any;
   title: string;
-  text?: string;
+  text?: string | null;
   children?: ReactNode;
   centerContent?: boolean;
   size?: 'small' | 'regular' | 'large';
@@ -77,6 +77,7 @@ export function Modal(props: Props) {
                   'max-w-sm':
                     props.size === 'small' || typeof props.size === 'undefined',
                   'max-w-7xl': props.size === 'large',
+                  'max-w-2xl': props.size === 'regular',
                   'bg-white':
                     props.backgroundColor === 'white' ||
                     typeof props.backgroundColor === 'undefined',

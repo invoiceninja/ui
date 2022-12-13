@@ -18,6 +18,7 @@ import { blankLineItem } from 'common/constants/blank-line-item';
 import { useAtom } from 'jotai';
 import { invoiceAtom, invoiceSumAtom } from 'pages/invoices/common/atoms';
 import { ChangeHandler } from '../Create';
+import { Invoice } from 'common/interfaces/invoice';
 
 interface Props {
   client?: Client;
@@ -57,7 +58,7 @@ export function useInvoiceUtilities(props: Props) {
     handleChange('invitations', invitations);
   };
 
-  const calculateInvoiceSum = () => {
+  const calculateInvoiceSum = (invoice: Invoice) => {
     const currency = currencyResolver(
       props.client?.settings.currency_id || company?.settings.currency_id
     );

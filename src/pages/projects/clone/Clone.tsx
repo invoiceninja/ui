@@ -83,7 +83,7 @@ export function Clone() {
 
         navigate(route('/projects/:id/edit', { id: response.data.data.id }));
       })
-      .catch((error: AxiosError) => {
+      .catch((error: AxiosError<ValidationBag>) => {
         console.error(error);
 
         if (error.response?.status == 422) {

@@ -29,7 +29,7 @@ export default {
   [PaymentType.FPX]: 'fpx',
   [PaymentType.GIROPAY]: 'giropay',
   [PaymentType.GOCARDLESS]: 'payment_type_GoCardless',
-  [PaymentType.HOSTED_PAGE]: 'hosted_page',
+  [PaymentType.HOSTED_PAGE]: 'payment_type_Hosted Page',
   [PaymentType.IDEAL]: 'ideal',
   [PaymentType.INSTANT_BANK_PAY]: 'instant_bank_pay',
   [PaymentType.JCB]: 'payment_type_JCB',
@@ -47,4 +47,6 @@ export default {
   [PaymentType.SWITCH]: 'payment_type_Switch',
   [PaymentType.UNIONPAY]: 'payment_type_UnionPay',
   [PaymentType.VISA]: 'payment_type_Visa Card',
+  [PaymentType.KLARNA]: 'payment_type_Klarna',
+  [PaymentType.INTERAC]: 'payment_type_Interac E-Transfer',
 };
