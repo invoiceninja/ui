@@ -53,9 +53,3 @@ export interface TransactionResponse {
   update_at: number;
   vendor_id: string;
 }
-
-export interface TransactionDetails {
-  amount?: number;
-  date?: string;
-  currency_id?: string;
-}

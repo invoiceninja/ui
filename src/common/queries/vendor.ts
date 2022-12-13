@@ -13,15 +13,22 @@ import { Vendor } from 'common/interfaces/vendor';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { endpoint } from '../helpers';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { Params } from './common/params.interface';
 
-export function useVendorQuery(params: { id: string | undefined }) {
+interface VendorParams {
+  id: string | undefined;
+  enabled?: boolean;
+}
+
+export function useVendorQuery(params: VendorParams) {
   return useQuery<Vendor>(
     route('/api/v1/vendors/:id', { id: params.id }),
     () =>
       request('GET', endpoint('/api/v1/vendors/:id', { id: params.id })).then(
         (response) => response.data.data
       ),
-    { staleTime: Infinity }
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }
 
@@ -33,5 +40,33 @@ export function useBlankVendorQuery() {
         (response) => response.data.data
       ),
     { staleTime: Infinity }
+  );
+}
+
+interface VendorsParams extends Params {
+  enabled?: boolean;
+  withoutDeletedClients?: boolean;
+}
+
+export function useVendorsQuery(params: VendorsParams) {
+  return useQuery<Vendor[]>(
+    ['/api/v1/vendors', params],
+    () =>
+      request(
+        'GET',
+        endpoint(
+          '/api/v1/vendors?filter=:filter&per_page=:per_page&status=:status&page=:page',
+          {
+            per_page: params.perPage ?? '100',
+            page: params.currentPage ?? '1',
+            status: params.status ?? 'active',
+            filter: params.filter ?? '',
+          }
+        )
+      ).then(
+        (response: GenericSingleResourceResponse<Vendor[]>) =>
+          response.data.data
+      ),
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }

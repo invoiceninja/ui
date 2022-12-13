@@ -14,7 +14,6 @@ import { Route } from 'react-router-dom';
 import {
   CreateTransaction,
   EditTransaction,
-  Transaction,
   Transactions,
   Import,
 } from './index';
@@ -49,15 +48,6 @@ export const transactionRoutes = (
               permission('edit_transaction'),
           ]}
           component={<Import />}
-        />
-      }
-    />
-    <Route
-      path=":id"
-      element={
-        <Guard
-          guards={[() => permission('view_transaction')]}
-          component={<Transaction />}
         />
       }
     />
