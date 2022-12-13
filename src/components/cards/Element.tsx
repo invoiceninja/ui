@@ -20,14 +20,18 @@ interface Props {
   className?: any;
   onClick?: () => unknown;
   noExternalPadding?: boolean;
+  withoutItemsCenter?: boolean;
 }
 
 export function Element(props: Props) {
   return (
     <div
       className={classNames(
-        `py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row lg:items-center ${props.className}`,
-        { 'px-5 sm:px-6': !props.noExternalPadding }
+        `py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row ${props.className}`,
+        {
+          'px-5 sm:px-6': !props.noExternalPadding,
+          'lg:items-center': !props.withoutItemsCenter,
+        }
       )}
       onClick={props.onClick}
     >
