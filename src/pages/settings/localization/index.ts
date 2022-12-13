@@ -8,7 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export { Transactions } from './index/Transactions';
-export { Create as CreateTransaction } from './create/Create';
-export { Edit as EditTransaction } from './edit/Edit';
-export { Import } from './import/Import';
+export {
+  Settings as LocalizationSettings,
+  CustomLabels,
+} from './components/index';
+export * from './Localization';

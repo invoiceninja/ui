@@ -33,6 +33,7 @@ interface Props extends CommonProps {
   onValueChange?: (value: string) => unknown;
   textareaRows?: number;
   step?: string;
+  maxLength?: number;
 }
 
 export function InputField(props: Props) {
@@ -64,6 +65,7 @@ export function InputField(props: Props) {
       <div className="relative">
         <DebounceInput
           min={props.min}
+          maxLength={props.maxLength}
           disabled={props.disabled}
           element={props.element || 'input'}
           inputRef={props.innerRef}
