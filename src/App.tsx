@@ -34,9 +34,19 @@ export function App() {
       : document.querySelector('html')?.classList.remove('dark');
 
     const resolvedLanguage = resolveLanguage(company?.settings.language_id);
-    i18n.changeLanguage(resolvedLanguage?.locale);
 
-    console.log('test');
+    if (resolvedLanguage?.locale) {
+      if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
+        import(
+          `./resources/lang/${resolvedLanguage.locale}/${resolvedLanguage.locale}.json`
+        ).then((response) => {
+          i18n.addResources(resolvedLanguage.locale, 'translation', response);
+          i18n.changeLanguage(resolvedLanguage.locale);
+        });
+      } else {
+        i18n.changeLanguage(resolvedLanguage.locale);
+      }
+    }
   }, [darkMode, company]);
 
   return (
