@@ -8,31 +8,194 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
+import { Element } from '@invoiceninja/cards';
+import { Link } from '@invoiceninja/forms';
+import {
+  ApiTransactionType,
+  TransactionStatus,
+  TransactionType,
+} from 'common/enums/transactions';
+import { route } from 'common/helpers/route';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { TransactionDetails } from 'common/interfaces/transactions';
+import { ExpenseCategory } from 'common/interfaces/expense-category';
+import { Invoice } from 'common/interfaces/invoice';
+import { useExpenseCategoryQuery } from 'common/queries/expense-categories';
+import { useExpenseQuery } from 'common/queries/expenses';
+import { useVendorQuery } from 'common/queries/vendor';
+import { useInvoicesQuery } from 'pages/invoices/common/queries';
+import { useBankAccountsQuery } from 'pages/settings/bank-accounts/common/queries';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useTransactionQuery } from '../common/queries';
+import { TransactionMatchDetails } from './TransactionMatchDetails';
 
 interface Props {
-  transactionDetails?: TransactionDetails;
+  transactionId: string;
+  setTransactionId: Dispatch<SetStateAction<string>>;
+  setSliderVisible?: Dispatch<SetStateAction<boolean>>;
 }
 
 export function Details(props: Props) {
-  const { amount = 0, date, currency_id = '' } = props.transactionDetails || {};
-
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
 
+  const { data: transaction } = useTransactionQuery({
+    id: props.transactionId,
+  });
+
+  const { data: bankAccountResponse } = useBankAccountsQuery({
+    id: transaction?.bank_integration_id || '',
+  });
+
+  const isCreditTransactionType =
+    transaction?.base_type === ApiTransactionType.Credit;
+
+  const { data: invoicesResponse } = useInvoicesQuery({
+    enabled: isCreditTransactionType,
+  });
+
+  const { data: vendorResponse } = useVendorQuery({
+    id: transaction?.vendor_id || '',
+    enabled: !isCreditTransactionType,
+  });
+
+  const { data: expenseResponse } = useExpenseQuery({
+    id: transaction?.expense_id || '',
+    enabled: !isCreditTransactionType,
+  });
+
+  const { data: expenseCategoryResponse } = useExpenseCategoryQuery({
+    id: transaction?.ninja_category_id || '',
+    enabled: !isCreditTransactionType,
+  });
+
+  const [matchedInvoices, setMatchedInvoices] = useState<Invoice[]>();
+
+  const [matchedExpenseCategory, setMatchedExpenseCategory] =
+    useState<ExpenseCategory>();
+
+  const showTransactionMatchDetails =
+    TransactionStatus.Converted !== transaction?.status_id;
+
+  useEffect(() => {
+    const filteredMatchedInvoices = invoicesResponse?.filter(({ id }) =>
+      transaction?.invoice_ids?.includes(id)
+    );
+    setMatchedInvoices(filteredMatchedInvoices);
+
+    setMatchedExpenseCategory(expenseCategoryResponse?.data.data);
+  }, [transaction, expenseCategoryResponse, props.transactionId]);
+
   return (
-    <Card title={t('details')}>
-      <Element leftSide={t('amount')}>
-        {formatMoney(amount, company?.settings?.country_id, currency_id)}
-      </Element>
-      <Element leftSide={t('date')}>{date}</Element>
-    </Card>
+    <div className="flex flex-col flex-1 border-b border-gray-200">
+      <div>
+        <Element leftSide={t('type')}>
+          {isCreditTransactionType
+            ? t(TransactionType.Deposit)
+            : t(TransactionType.Withdrawal)}
+        </Element>
+
+        <Element leftSide={t('amount')}>
+          {formatMoney(
+            transaction?.amount || 0,
+            company?.settings.country_id,
+            transaction?.currency_id || ''
+          )}
+        </Element>
+
+        <Element leftSide={t('date')}>{transaction?.date}</Element>
+
+        <Element
+          leftSide={t('bank_account')}
+          className="hover:bg-gray-100 cursor-pointer"
+        >
+          <Link
+            to={route('/settings/bank_accounts/:id/details', {
+              id: bankAccountResponse?.id,
+            })}
+          >
+            {bankAccountResponse?.bank_account_name}
+          </Link>
+        </Element>
+      </div>
+
+      {!showTransactionMatchDetails ? (
+        <>
+          {matchedInvoices?.map(({ id, number }) => (
+            <Element
+              key={id}
+              leftSide={t('invoice')}
+              className="hover:bg-gray-100 cursor-pointer"
+            >
+              <Link
+                to={route('/invoices/:id/edit', {
+                  id,
+                })}
+              >
+                {number}
+              </Link>
+            </Element>
+          ))}
+
+          {transaction?.vendor_id && (
+            <Element
+              leftSide={t('vendor')}
+              className="hover:bg-gray-100 cursor-pointer"
+            >
+              <Link
+                to={route('/vendors/:id', {
+                  id: vendorResponse?.id,
+                })}
+              >
+                {vendorResponse?.name}
+              </Link>
+            </Element>
+          )}
+
+          {transaction?.ninja_category_id && (
+            <Element
+              leftSide={t('category')}
+              className="hover:bg-gray-100 cursor-pointer"
+            >
+              <Link
+                to={route('/settings/expense_categories/:id/edit', {
+                  id: matchedExpenseCategory?.id,
+                })}
+              >
+                {matchedExpenseCategory?.name}
+              </Link>
+            </Element>
+          )}
+
+          {transaction?.expense_id && (
+            <Element
+              leftSide={t('expense')}
+              className="hover:bg-gray-100 cursor-pointer"
+            >
+              <Link
+                to={route('/expenses/:id/edit', {
+                  id: expenseResponse?.id,
+                })}
+              >
+                {expenseResponse?.number}
+              </Link>
+            </Element>
+          )}
+        </>
+      ) : (
+        <TransactionMatchDetails
+          transactionDetails={{
+            base_type: transaction?.base_type || '',
+            transaction_id: transaction?.id || '',
+            status_id: transaction?.status_id || '',
+          }}
+          isCreditTransactionType={isCreditTransactionType}
+        />
+      )}
+    </div>
   );
 }

@@ -8,31 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer } from '@invoiceninja/cards';
-import { InputField, InputLabel } from '@invoiceninja/forms';
-import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
+import { Card } from '@invoiceninja/cards';
 import { useTitle } from 'common/hooks/useTitle';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Breadcrumbs } from 'components/Breadcrumbs';
-import { Container } from 'components/Container';
-import { ColorPicker } from 'components/forms/ColorPicker';
 import { Settings } from 'components/layouts/Settings';
-import { useFormik } from 'formik';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { CreateExpenseCategoryForm } from './components/CreateExpenseCategoryForm';
 
 export function Create() {
-  const [t] = useTranslation();
-  const navigate = useNavigate();
-
-  const [errors, setErrors] = useState<Record<string, any>>({});
-
   useTitle('new_expense_category');
+
+  const [t] = useTranslation();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -43,65 +28,11 @@ export function Create() {
     },
   ];
 
-  const formik = useFormik({
-    initialValues: {
-      name: '',
-      color: '',
-    },
-    onSubmit: (values) => {
-      setErrors({});
-      toast.loading(t('processing'));
-
-      request('POST', endpoint('/api/v1/expense_categories'), values)
-        .then((response) => {
-          toast.dismiss();
-          toast.success(t('created_expense_category'));
-
-          navigate(
-            route('/settings/expense_categories/:id/edit', {
-              id: response.data.data.id,
-            })
-          );
-        })
-        .catch((error: AxiosError<ValidationBag>) => {
-          toast.dismiss();
-
-          error.response?.status === 422
-            ? setErrors(error.response?.data)
-            : toast.error(t('error_title'));
-        })
-        .finally(() => formik.setSubmitting(false));
-    },
-  });
-
   return (
-    <Settings title={t('expense_categories')}>
-      <Container>
-        <Breadcrumbs pages={pages} />
-
-        <Card
-          withSaveButton
-          disableSubmitButton={formik.isSubmitting}
-          onFormSubmit={formik.handleSubmit}
-          title={t('create_expense_category')}
-        >
-          <CardContainer>
-            <InputField
-              id="name"
-              label={t('name')}
-              onChange={formik.handleChange}
-              errorMessage={errors?.errors?.name}
-              required
-            />
-
-            <InputLabel>{t('color')}</InputLabel>
-
-            <ColorPicker
-              onValueChange={(color) => formik.setFieldValue('color', color)}
-            />
-          </CardContainer>
-        </Card>
-      </Container>
+    <Settings title={t('expense_categories')} breadcrumbs={pages}>
+      <Card title={t('create_expense_category')}>
+        <CreateExpenseCategoryForm />
+      </Card>
     </Settings>
   );
 }

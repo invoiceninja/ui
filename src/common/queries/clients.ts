@@ -14,9 +14,18 @@ import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 
-export function useClientsQuery() {
-  return useQuery(['/api/v1/clients?filter_deleted_clients=true'], () =>
-    request('GET', endpoint('/api/v1/clients'))
+interface Props {
+  enabled?: boolean;
+}
+
+export function useClientsQuery(props: Props) {
+  return useQuery(
+    ['/api/v1/clients?filter_deleted_clients=true'],
+    () =>
+      request('GET', endpoint('/api/v1/clients')).then(
+        (response) => response.data.data
+      ),
+    { enabled: props.enabled ?? true, staleTime: Infinity }
   );
 }
 
