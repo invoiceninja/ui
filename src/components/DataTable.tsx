@@ -59,6 +59,7 @@ interface Props<T> {
   customActions?: any;
   customFilters?: SelectOption[];
   customFilterQueryKey?: string;
+  customFilterPlaceholder?: string;
   withoutActions?: boolean;
   withoutPagination?: boolean;
   rightSide?: ReactNode;
@@ -180,6 +181,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           onStatusChange={setStatus}
           customFilters={props.customFilters}
           customFilterQueryKey={props.customFilterQueryKey}
+          customFilterPlaceholder={props.customFilterPlaceholder}
           onCustomFilterChange={setCustomFilter}
           rightSide={
             <Inline>

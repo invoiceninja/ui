@@ -48,6 +48,7 @@ export function Invoices() {
         customActions={actions}
         customFilters={filters}
         customFilterQueryKey="client_status"
+        customFilterPlaceholder="invoice_status"
         rightSide={<ImportButton route="/invoices/import" />}
         leftSideChevrons={
           <DataTableColumnsPicker
