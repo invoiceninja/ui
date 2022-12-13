@@ -21,7 +21,6 @@ import { Button, SelectField } from '@invoiceninja/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
-import { BiDownload } from 'react-icons/bi';
 import { MdClose } from 'react-icons/md';
 
 interface Props {
@@ -40,7 +39,7 @@ interface ImportMap extends Record<string, any> {
 export function UploadImport(props: Props) {
   const [t] = useTranslation();
   const isImportFileTypeZip = props.type === 'zip';
-  const acceptableFileTypes = {
+  const acceptableFileExtensions = {
     ...(!isImportFileTypeZip && { 'text/*': ['.csv'] }),
     ...(isImportFileTypeZip && { 'application/zip': ['.zip'] }),
   };
@@ -88,17 +87,19 @@ export function UploadImport(props: Props) {
     let params = {};
 
     if (isImportFileTypeZip) {
-      endPointUrl = '/api/v1/import_json?';
       if (!importSettings && !importData) {
-        toast.error('data_or_settings');
+        toast.error('settings_or_data');
         return;
       } else {
+        endPointUrl = '/api/v1/import_json?';
+
         if (importSettings) {
           endPointUrl += '&import_settings=:import_settings';
           params = {
             import_settings: true,
           };
         }
+
         if (importData) {
           endPointUrl += '&import_data=:import_data';
           params = {
@@ -166,7 +167,7 @@ export function UploadImport(props: Props) {
   };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: acceptableFileTypes,
+    accept: acceptableFileExtensions,
     onDrop: (acceptedFiles) => {
       const isFilesTypeCorrect = acceptedFiles.every(({ type }) =>
         type.includes(props.type)
@@ -180,10 +181,11 @@ export function UploadImport(props: Props) {
             formData.append(`files[${props.entity}]`, file);
           }
         });
-        setFormData(formData);
+
         if (!isImportFileTypeZip) {
-          formik.submitForm();
           formData.append('import_type', props.entity);
+          formik.submitForm();
+          setFormData(formData);
         }
       } else {
         toast.error('wrong_file_extension');
@@ -253,16 +255,12 @@ export function UploadImport(props: Props) {
 
             <div className="flex justify-end pr-5">
               <Button
-                className="w-28"
                 behavior="button"
                 onClick={processImport}
                 disableWithoutIcon
                 disabled={(!importSettings && !importData) || !files.length}
               >
-                <div className="flex items-center">
-                  <BiDownload className="mr-2" fontSize={22} />
-                  {t('import')}
-                </div>
+                {t('import')}
               </Button>
             </div>
           </>
