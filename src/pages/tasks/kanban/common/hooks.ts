@@ -19,11 +19,11 @@ import { useSetAtom } from 'jotai';
 import { parseTimeLog } from 'pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
-import { currentTaskAtom, isKanbanSliderVisibleAtom } from './atoms';
+import { currentTaskAtom, isKanbanViewSliderVisibleAtom } from './atoms';
 
 export function useHandleCurrentTask(id: string | undefined) {
   const setCurrentTask = useSetAtom(currentTaskAtom);
-  const setIsKanbanSliderVisible = useSetAtom(isKanbanSliderVisibleAtom);
+  const setIsKanbanSliderVisible = useSetAtom(isKanbanViewSliderVisibleAtom);
 
   useQuery(
     route('/api/v1/tasks/:id', { id }),

@@ -36,7 +36,10 @@ import { useAtom } from 'jotai';
 import { ViewSlider } from './components/ViewSlider';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
-import { currentTaskIdAtom, isKanbanSliderVisibleAtom } from './common/atoms';
+import {
+  currentTaskIdAtom,
+  isKanbanViewSliderVisibleAtom,
+} from './common/atoms';
 import { useHandleCurrentTask } from './common/hooks';
 import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
@@ -76,8 +79,8 @@ export function Kanban() {
   const [board, setBoard] = useState<Board>();
   const [currentTaskId, setCurrentTaskId] = useAtom(currentTaskIdAtom);
 
-  const [isKanbanSliderVisible, setIsKanbanSliderVisible] = useAtom(
-    isKanbanSliderVisibleAtom
+  const [isKanbanViewSliderVisible, setIsKanbanViewSliderVisible] = useAtom(
+    isKanbanViewSliderVisibleAtom
   );
 
   const startTask = useStart();
@@ -193,7 +196,7 @@ export function Kanban() {
 
   const handleCurrentTask = (id: string) => {
     if (currentTaskId === id) {
-      return setIsKanbanSliderVisible(true);
+      return setIsKanbanViewSliderVisible(true);
     }
 
     setCurrentTaskId(id);
@@ -214,7 +217,7 @@ export function Kanban() {
       {board && (
         <div
           className="flex pb-6 px-1 space-x-4 overflow-x-auto"
-          style={{ paddingRight: isKanbanSliderVisible ? 512 : 0 }}
+          style={{ paddingRight: isKanbanViewSliderVisible ? 512 : 0 }}
         >
           <DragDropContext onDragEnd={onDragEnd}>
             {board.columns.map((board) => (

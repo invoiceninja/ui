@@ -13,4 +13,6 @@ import { atom } from 'jotai';
 
 export const currentTaskAtom = atom<Task | undefined>(undefined);
 export const currentTaskIdAtom = atom<string | undefined>(undefined);
-export const isKanbanSliderVisibleAtom = atom(false);
+
+export const isKanbanViewSliderVisibleAtom = atom(false);
+export const isKanbanEditSliderVisibleAtom = atom(false);

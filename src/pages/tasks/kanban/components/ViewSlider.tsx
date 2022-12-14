@@ -25,14 +25,14 @@ import { useTranslation } from 'react-i18next';
 import {
   currentTaskAtom,
   currentTaskIdAtom,
-  isKanbanSliderVisibleAtom,
+  isKanbanViewSliderVisibleAtom,
 } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
 
 export function ViewSlider() {
   const [t] = useTranslation();
   const [isKanbanSliderVisible, setIsKanbanSliderVisible] = useAtom(
-    isKanbanSliderVisibleAtom
+    isKanbanViewSliderVisibleAtom
   );
   const setCurrentTaskId = useSetAtom(currentTaskIdAtom);
   const setCurrentTask = useSetAtom(currentTaskAtom);
