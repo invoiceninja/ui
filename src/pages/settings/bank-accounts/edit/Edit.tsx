@@ -123,7 +123,7 @@ export function Edit() {
       onSaveClick={handleSave}
     >
       <Card onFormSubmit={handleSave} title={t('edit_bank_account')}>
-        <Element leftSide={t('bank_account_name')}>
+        <Element leftSide={t('account_name')}>
           <InputField
             value={accountDetails?.bank_account_name}
             onValueChange={(value) => handleChange('bank_account_name', value)}
