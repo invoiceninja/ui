@@ -37,12 +37,14 @@ import { ViewSlider } from './components/ViewSlider';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import {
+  currentTaskAtom,
   currentTaskIdAtom,
   isKanbanViewSliderVisibleAtom,
 } from './common/atoms';
 import { useHandleCurrentTask } from './common/hooks';
 import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
+import { Slider } from 'components/cards/Slider';
 
 interface Card {
   id: string;
@@ -77,6 +79,7 @@ export function Kanban() {
   const { data: tasks } = useTasksQuery({ limit: 1000 });
 
   const [board, setBoard] = useState<Board>();
+  const [currentTask] = useAtom(currentTaskAtom);
   const [currentTaskId, setCurrentTaskId] = useAtom(currentTaskIdAtom);
 
   const [isKanbanViewSliderVisible, setIsKanbanViewSliderVisible] = useAtom(
@@ -202,6 +205,11 @@ export function Kanban() {
     setCurrentTaskId(id);
   };
 
+  const handleKanbanClose = () => {
+    setIsKanbanViewSliderVisible(false);
+    setCurrentTaskId(undefined);
+  };
+
   return (
     <Default
       title={documentTitle}
@@ -212,7 +220,18 @@ export function Kanban() {
         </Link>
       }
     >
-      <ViewSlider />
+      <Slider
+        title={
+          currentTask
+            ? `${t('task')} ${currentTask.number}`
+            : (t('task') as string)
+        }
+        visible={isKanbanViewSliderVisible}
+        onClose={handleKanbanClose}
+        size="regular"
+      >
+        <ViewSlider />
+      </Slider>
 
       {board && (
         <div
