@@ -24,4 +24,10 @@ export class Statics {
       .then((response) => (this.cache = response.data))
       .then(() => this.cache);
   }
+
+  public static reloadQuery(): Promise<IStatics> {
+    return request('GET', endpoint('/api/v1/statics'))
+      .then((response) => (this.cache = response.data))
+      .then(() => this.cache);
+  }
 }
