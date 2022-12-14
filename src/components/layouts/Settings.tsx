@@ -39,58 +39,59 @@ interface AdvanceSetting {
 
 export function Settings(props: Props) {
   const [t] = useTranslation();
+
   const location = useLocation();
 
   const basic = [
     {
       name: t('company_details'),
       href: '/settings/company_details',
-      current: location.pathname === '/settings/company_details',
+      current: location.pathname.startsWith('/settings/company_details'),
     },
     {
       name: t('user_details'),
       href: '/settings/user_details',
-      current: location.pathname === '/settings/user_details',
+      current: location.pathname.startsWith('/settings/user_details'),
     },
     {
       name: t('localization'),
       href: '/settings/localization',
-      current: location.pathname === '/settings/localization',
+      current: location.pathname.startsWith('/settings/localization'),
     },
     {
       name: t('payment_settings'),
       href: '/settings/online_payments',
-      current: location.pathname === '/settings/online_payments',
+      current: location.pathname.startsWith('/settings/online_payments'),
     },
     {
       name: t('tax_settings'),
       href: '/settings/tax_settings',
-      current: location.pathname === '/settings/tax_settings',
+      current: location.pathname.startsWith('/settings/tax_settings'),
     },
     {
       name: t('product_settings'),
       href: '/settings/product_settings',
-      current: location.pathname === '/settings/product_settings',
+      current: location.pathname.startsWith('/settings/product_settings'),
     },
     {
       name: t('task_settings'),
       href: '/settings/task_settings',
-      current: location.pathname === '/settings/task_settings',
+      current: location.pathname.startsWith('/settings/task_settings'),
     },
     {
       name: t('expense_settings'),
       href: '/settings/expense_settings',
-      current: location.pathname === '/settings/expense_settings',
+      current: location.pathname.startsWith('/settings/expense_settings'),
     },
     {
       name: t('workflow_settings'),
       href: '/settings/workflow_settings',
-      current: location.pathname === '/settings/workflow_settings',
+      current: location.pathname.startsWith('/settings/workflow_settings'),
     },
     {
       name: t('account_management'),
       href: '/settings/account_management',
-      current: location.pathname === '/settings/account_management',
+      current: location.pathname.startsWith('/settings/account_management'),
     },
     {
       name: t('import_export'),
@@ -103,37 +104,39 @@ export function Settings(props: Props) {
     {
       name: t('invoice_design'),
       href: '/settings/invoice_design',
-      current: location.pathname === '/settings/invoice_design',
+      current: location.pathname.startsWith('/settings/invoice_design'),
       visible: proPlan() || enterprisePlan(),
     },
     {
       name: t('generated_numbers'),
       href: '/settings/generated_numbers',
-      current: location.pathname === '/settings/generated_numbers',
+      current: location.pathname.startsWith('/settings/generated_numbers'),
       visible: proPlan() || enterprisePlan(),
     },
     {
       name: t('client_portal'),
       href: '/settings/client_portal',
-      current: location.pathname === '/settings/client_portal',
+      current: location.pathname.startsWith('/settings/client_portal'),
       visible: proPlan() || enterprisePlan(),
     },
     {
       name: t('email_settings'),
       href: '/settings/email_settings',
-      current: location.pathname === '/settings/email_settings',
+      current: location.pathname.startsWith('/settings/email_settings'),
       visible: proPlan() || enterprisePlan(),
     },
     {
       name: t('templates_and_reminders'),
       href: '/settings/templates_and_reminders',
-      current: location.pathname === '/settings/templates_and_reminders',
+      current: location.pathname.startsWith(
+        '/settings/templates_and_reminders'
+      ),
       visible: proPlan() || enterprisePlan(),
     },
     {
       name: t('bank_accounts'),
       href: '/settings/bank_accounts',
-      current: location.pathname === '/settings/bank_accounts',
+      current: location.pathname.startsWith('/settings/bank_accounts'),
       visible: enterprisePlan(),
     },
     {
