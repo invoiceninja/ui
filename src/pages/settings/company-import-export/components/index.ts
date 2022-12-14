@@ -8,5 +8,5 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+export { Restore as CompanyRestore } from './Restore';
 export { Backup as CompanyBackup } from './Backup';
-export { Export as CompanyExport } from './Export';

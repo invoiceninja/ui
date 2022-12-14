@@ -11,12 +11,12 @@
 import { Tab } from 'components/Tabs';
 import { useTranslation } from 'react-i18next';
 
-export function useCompanyImportExportTabs() {
+export function useCompanyBackupRestoreTabs() {
   const { t } = useTranslation();
 
   const tabs: Tab[] = [
-    { name: t('backup'), href: '/settings/company_import_export' },
-    { name: t('export'), href: '/settings/company_import_export/export' },
+    { name: t('backup'), href: '/settings/backup_restore' },
+    { name: t('restore'), href: '/settings/backup_restore/restore' },
   ];
 
   return tabs;

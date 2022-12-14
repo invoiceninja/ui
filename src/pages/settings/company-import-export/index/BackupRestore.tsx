@@ -12,23 +12,23 @@ import { Settings } from 'components/layouts/Settings';
 import { Tabs } from 'components/Tabs';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
-import { useCompanyImportExportTabs } from '../common/hooks/useCompanyImportExportTabs';
+import { useCompanyBackupRestoreTabs } from '../common/hooks/useCompanyImportExportTabs';
 
-export function ImportExport() {
+export function BackupRestore() {
   const [t] = useTranslation();
 
-  const tabs = useCompanyImportExportTabs();
+  const tabs = useCompanyBackupRestoreTabs();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
     {
-      name: t('import_export'),
-      href: '/settings/company_import_export',
+      name: t('backup_restore'),
+      href: '/settings/backup_restore',
     },
   ];
 
   return (
-    <Settings title={t('import_export')} breadcrumbs={pages}>
+    <Settings title={t('backup_restore')} breadcrumbs={pages}>
       <Tabs tabs={tabs} className="mt-6" />
 
       <div className="my-4">
