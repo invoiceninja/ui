@@ -8,12 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { UploadImport } from 'components/import/UploadImport';
 import { Settings } from 'components/layouts/Settings';
+import { Tabs } from 'components/Tabs';
 import { useTranslation } from 'react-i18next';
+import { Outlet } from 'react-router-dom';
+import { useCompanyImportExportTabs } from '../common/hooks/useCompanyImportExportTabs';
 
 export function ImportExport() {
   const [t] = useTranslation();
+
+  const tabs = useCompanyImportExportTabs();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -25,10 +29,10 @@ export function ImportExport() {
 
   return (
     <Settings title={t('import_export')} breadcrumbs={pages}>
-      <div className="grid grid-cols-12">
-        <div className="col-span-12">
-          <UploadImport entity="company" onSuccess={false} type="zip" />
-        </div>
+      <Tabs tabs={tabs} className="mt-6" />
+
+      <div className="my-4">
+        <Outlet />
       </div>
     </Settings>
   );

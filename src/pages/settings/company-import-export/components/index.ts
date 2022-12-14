@@ -8,5 +8,5 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export { ImportExport as CompanyImportExport } from './index/ImportExport';
-export * from './components/index';
+export { Backup as CompanyBackup } from './Backup';
+export { Export as CompanyExport } from './Export';

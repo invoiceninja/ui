@@ -200,7 +200,10 @@ export function UploadImport(props: Props) {
   return (
     <>
       <Card title={t(props.entity)}>
-        <Element leftSide={t(props.type + '_file')}>
+        <Element
+          leftSide={t(isImportFileTypeZip ? 'company_backup_file' : 'csv_file')}
+          leftSideHelp={isImportFileTypeZip && t('company_backup_file_help')}
+        >
           {!files.length ? (
             <div
               {...getRootProps()}

@@ -55,7 +55,10 @@ export const settingsRoutes = (
     <Route
       path="company_import_export"
       element={<Settings.CompanyImportExport />}
-    />
+    >
+      <Route path="" element={<Settings.CompanyBackup />} />
+      <Route path="export" element={<Settings.CompanyExport />} />
+    </Route>
     <Route
       path="invoice_design"
       element={
