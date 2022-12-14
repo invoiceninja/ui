@@ -34,7 +34,6 @@ import { arrayMoveImmutable } from 'array-move';
 import { Task } from 'common/interfaces/task';
 import { useAtom } from 'jotai';
 import { ViewSlider } from './components/ViewSlider';
-import { Link as ReactRouterLink } from 'react-router-dom';
 import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import {
   currentTaskAtom,
