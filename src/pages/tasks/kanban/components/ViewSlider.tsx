@@ -9,12 +9,15 @@
  */
 
 import { ClickableElement, Element } from '@invoiceninja/cards';
+import { endpoint } from 'common/helpers';
 import { route } from 'common/helpers/route';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { NonClickableElement } from 'components/cards/NonClickableElement';
+import { DocumentsTable } from 'components/DocumentsTable';
 import { TabGroup } from 'components/TabGroup';
 import { useAtom } from 'jotai';
+import { Upload } from 'pages/settings/company/documents/components';
 import { TaskStatus } from 'pages/tasks/common/components/TaskStatus';
 import { isTaskRunning } from 'pages/tasks/common/helpers/calculate-entity-state';
 import { calculateTime } from 'pages/tasks/common/helpers/calculate-time';
@@ -22,9 +25,8 @@ import { useStart } from 'pages/tasks/common/hooks/useStart';
 import { useStop } from 'pages/tasks/common/hooks/useStop';
 import { Edit, Pause, Play, Plus } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import {
-  currentTaskAtom,
-} from '../common/atoms';
+import { useQueryClient } from 'react-query';
+import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
 
 export function ViewSlider() {
@@ -37,6 +39,14 @@ export function ViewSlider() {
 
   const startTask = useStart();
   const stopTask = useStop();
+
+  const queryClient = useQueryClient();
+
+  const onSuccess = () => {
+    queryClient.invalidateQueries(
+      route('/api/v1/tasks/:id', { id: currentTask?.id })
+    );
+  };
 
   return (
     <TabGroup tabs={[t('overview'), t('documents')]} width="full">
@@ -113,7 +123,20 @@ export function ViewSlider() {
         )}
       </div>
 
-      <div>Documents</div>
+      <div className="px-4">
+        <Upload
+          endpoint={endpoint('/api/v1/tasks/:id/upload', {
+            id: currentTask?.id,
+          })}
+          onSuccess={onSuccess}
+          widgetOnly
+        />
+
+        <DocumentsTable
+          documents={currentTask?.documents || []}
+          onDocumentDelete={onSuccess}
+        />
+      </div>
     </TabGroup>
   );
 }
