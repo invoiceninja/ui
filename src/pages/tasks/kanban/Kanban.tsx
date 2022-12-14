@@ -45,6 +45,7 @@ import { useHandleCurrentTask } from './common/hooks';
 import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
 import { Slider } from 'components/cards/Slider';
+import { EditSlider } from './components/EditSlider';
 
 interface Card {
   id: string;
@@ -64,6 +65,8 @@ interface Board {
   columns: Column[];
 }
 
+type SliderType = 'view' | 'edit';
+
 export function Kanban() {
   const { documentTitle } = useTitle('kanban');
   const [t] = useTranslation();
@@ -79,6 +82,8 @@ export function Kanban() {
   const { data: tasks } = useTasksQuery({ limit: 1000 });
 
   const [board, setBoard] = useState<Board>();
+  const [sliderType, setSliderType] = useState<SliderType>('view');
+
   const [currentTask] = useAtom(currentTaskAtom);
   const [currentTaskId, setCurrentTaskId] = useAtom(currentTaskIdAtom);
 
@@ -197,7 +202,15 @@ export function Kanban() {
     updateTasks(local);
   };
 
-  const handleCurrentTask = (id: string) => {
+  const handleCurrentTask = (id: string, slider: SliderType) => {
+    if (slider === 'edit') {
+      setSliderType('edit');
+    }
+
+    if (slider === 'view') {
+      setSliderType('view');
+    }
+
     if (currentTaskId === id) {
       return setIsKanbanViewSliderVisible(true);
     }
@@ -230,7 +243,8 @@ export function Kanban() {
         onClose={handleKanbanClose}
         size="regular"
       >
-        <ViewSlider />
+        {sliderType === 'view' && <ViewSlider />}
+        {sliderType === 'edit' && <EditSlider />}
       </Slider>
 
       {board && (
@@ -283,17 +297,17 @@ export function Kanban() {
                           <div className="hidden group-hover:flex border-t border-gray-100 justify-center items-center">
                             <button
                               className="w-full hover:bg-gray-200 py-2 rounded-bl"
-                              onClick={() => handleCurrentTask(card.id)}
+                              onClick={() => handleCurrentTask(card.id, 'view')}
                             >
                               {t('view')}
                             </button>
 
-                            <ReactRouterLink
-                              to={route('/tasks/:id/edit', { id: card.id })}
+                            <button
                               className="w-full text-center hover:bg-gray-200 py-2"
+                              onClick={() => handleCurrentTask(card.id, 'edit')}
                             >
                               {t('edit')}
-                            </ReactRouterLink>
+                            </button>
 
                             {isTaskRunning(card.task) && (
                               <button
