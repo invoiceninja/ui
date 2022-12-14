@@ -214,7 +214,7 @@ export function UploadImport(props: Props) {
                 <Image className="mx-auto h-12 w-12 text-gray-400" />
                 <span className="mt-2 block text-sm font-medium text-gray-900">
                   {isDragActive
-                    ? 'drop_your_files_here'
+                    ? t('drop_your_files_here')
                     : t('dropzone_default_message')}
                 </span>
               </div>
