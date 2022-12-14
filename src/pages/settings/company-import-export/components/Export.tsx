@@ -24,7 +24,10 @@ export function Export() {
 
     toast.processing();
 
-    request('POST', endpoint('/api/v1/export'))
+    request('POST', endpoint('/api/v1/export'), {
+      send_email: true,
+      report_keys: [],
+    })
       .then((response) => {
         toast.success(response.data.message);
       })
