@@ -28,7 +28,7 @@ export * from './email-settings/EmailSettings';
 export * from './client-portal/ClientPortal';
 export * from './templates-and-reminders/TemplatesAndReminders';
 export * from './bank-accounts';
-export * from './company-import-export';
+export * from './backup-restore';
 
 export * from './group-settings/GroupSettings';
 export * from './subscriptions/Subscriptions';

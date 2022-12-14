@@ -12,7 +12,7 @@ import { Settings } from 'components/layouts/Settings';
 import { Tabs } from 'components/Tabs';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
-import { useCompanyBackupRestoreTabs } from '../common/hooks/useCompanyImportExportTabs';
+import { useCompanyBackupRestoreTabs } from '../common/hooks/useCompanyBackupRestoreTabs';
 
 export function BackupRestore() {
   const [t] = useTranslation();
