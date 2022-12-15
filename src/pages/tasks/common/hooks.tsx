@@ -258,6 +258,8 @@ export function useSave() {
         );
       })
       .catch((error) => {
+        console.error(error);
+
         toast.error();
       });
   };
