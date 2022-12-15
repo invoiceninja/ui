@@ -18,7 +18,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import toast from 'react-hot-toast';
+import { toast } from 'common/helpers/toast/toast';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
@@ -57,6 +57,9 @@ interface Props<T> {
   withResourcefulActions?: ReactNode[] | boolean;
   bulkRoute?: string;
   customActions?: any;
+  customFilters?: SelectOption[];
+  customFilterQueryKey?: string;
+  customFilterPlaceholder?: string;
   withoutActions?: boolean;
   withoutPagination?: boolean;
   rightSide?: ReactNode;
@@ -77,12 +80,13 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const queryClient = useQueryClient();
 
-  const [filter, setFilter] = useState('');
+  const [filter, setFilter] = useState<string>('');
+  const [customFilter, setCustomFilter] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useAtom(datatablePerPageAtom);
   const [sort, setSort] = useState('id|asc');
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
-  const [status, setStatus] = useState(['active']);
+  const [status, setStatus] = useState<string[]>(['active']);
   const [selected, setSelected] = useState<string[]>([]);
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
@@ -91,14 +95,28 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('per_page', perPage);
     apiEndpoint.searchParams.set('page', currentPage.toString());
     apiEndpoint.searchParams.set('filter', filter);
+    if (props.customFilterQueryKey) {
+      apiEndpoint.searchParams.set(
+        props.customFilterQueryKey,
+        customFilter.join(',')
+      );
+    }
     apiEndpoint.searchParams.set('sort', sort);
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
     setApiEndpoint(apiEndpoint);
-  }, [perPage, currentPage, filter, sort, status]);
+  }, [perPage, currentPage, filter, sort, status, customFilter]);
 
   const { data, isLoading, isError } = useQuery(
-    [apiEndpoint.pathname, perPage, currentPage, filter, sort, status],
+    [
+      apiEndpoint.pathname,
+      perPage,
+      currentPage,
+      filter,
+      sort,
+      status,
+      customFilter,
+    ],
     () => request('GET', apiEndpoint.href),
     {
       staleTime: props.staleTime || 5000,
@@ -127,16 +145,14 @@ export function DataTable<T extends object>(props: Props<T>) {
   ];
 
   const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request('POST', endpoint(props.bulkRoute ?? `${props.endpoint}/bulk`), {
       action,
       ids: id ? [id] : Array.from(selected),
     })
       .then(() => {
-        toast.success(t(`${action}d_${props.resource}`), {
-          id: toastId,
-        });
+        toast.success(`${action}d_${props.resource}`);
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         /** @ts-ignore: Unreachable, if element is null/undefined. */
@@ -146,9 +162,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         console.error(error);
         console.error(error.response?.data);
 
-        toast.error(t('error_title'), {
-          id: toastId,
-        });
+        toast.error();
       })
       .finally(() => {
         queryClient.invalidateQueries(apiEndpoint.pathname);
@@ -165,6 +179,10 @@ export function DataTable<T extends object>(props: Props<T>) {
           options={options}
           defaultOption={options[0]}
           onStatusChange={setStatus}
+          customFilters={props.customFilters}
+          customFilterQueryKey={props.customFilterQueryKey}
+          customFilterPlaceholder={props.customFilterPlaceholder}
+          onCustomFilterChange={setCustomFilter}
           rightSide={
             <Inline>
               {props.rightSide}
