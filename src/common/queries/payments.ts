@@ -17,7 +17,12 @@ import { Payment } from 'common/interfaces/payment';
 import { Params } from './common/params.interface';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
-export function usePaymentQuery(params: { id: string | undefined }) {
+interface PaymentParams {
+  id: string | undefined;
+  enabled?: boolean;
+}
+
+export function usePaymentQuery(params: PaymentParams) {
   return useQuery(
     route('/api/v1/payments/:id', { id: params.id }),
     () =>
@@ -27,7 +32,7 @@ export function usePaymentQuery(params: { id: string | undefined }) {
           id: params.id,
         })
       ),
-    { staleTime: Infinity }
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }
 

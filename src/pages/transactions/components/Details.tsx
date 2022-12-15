@@ -20,8 +20,10 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { ExpenseCategory } from 'common/interfaces/expense-category';
 import { Invoice } from 'common/interfaces/invoice';
+import { Payment } from 'common/interfaces/payment';
 import { useExpenseCategoryQuery } from 'common/queries/expense-categories';
 import { useExpenseQuery } from 'common/queries/expenses';
+import { usePaymentQuery } from 'common/queries/payments';
 import { useVendorQuery } from 'common/queries/vendor';
 import { useInvoicesQuery } from 'pages/invoices/common/queries';
 import { useBankAccountsQuery } from 'pages/settings/bank-accounts/common/queries';
@@ -58,6 +60,11 @@ export function Details(props: Props) {
     enabled: isCreditTransactionType,
   });
 
+  const { data: paymentResponse } = usePaymentQuery({
+    id: transaction?.payment_id || '',
+    enabled: isCreditTransactionType,
+  });
+
   const { data: vendorResponse } = useVendorQuery({
     id: transaction?.vendor_id || '',
     enabled: !isCreditTransactionType,
@@ -75,6 +82,8 @@ export function Details(props: Props) {
 
   const [matchedInvoices, setMatchedInvoices] = useState<Invoice[]>();
 
+  const [matchedPayment, setMatchedPayment] = useState<Payment>();
+
   const [matchedExpenseCategory, setMatchedExpenseCategory] =
     useState<ExpenseCategory>();
 
@@ -88,7 +97,14 @@ export function Details(props: Props) {
     setMatchedInvoices(filteredMatchedInvoices);
 
     setMatchedExpenseCategory(expenseCategoryResponse?.data.data);
-  }, [transaction, expenseCategoryResponse, props.transactionId]);
+
+    setMatchedPayment(paymentResponse?.data.data);
+  }, [
+    transaction,
+    expenseCategoryResponse,
+    paymentResponse,
+    props.transactionId,
+  ]);
 
   return (
     <div className="flex flex-col flex-1 border-b border-gray-200">
@@ -140,6 +156,21 @@ export function Details(props: Props) {
               </Link>
             </Element>
           ))}
+
+          {transaction?.payment_id && (
+            <Element
+              leftSide={t('payment')}
+              className="hover:bg-gray-100 cursor-pointer"
+            >
+              <Link
+                to={route('/payments/:id/edit', {
+                  id: matchedPayment?.id,
+                })}
+              >
+                {matchedPayment?.number}
+              </Link>
+            </Element>
+          )}
 
           {transaction?.vendor_id && (
             <Element
