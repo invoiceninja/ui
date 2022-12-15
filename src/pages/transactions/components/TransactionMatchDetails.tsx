@@ -262,7 +262,7 @@ export function TransactionMatchDetails(props: Props) {
           <div className="flex p-4 border-t border-gray-200">
             <button
               className={`flex-1 cursor-pointer text-center py-3 border border-gray-200 hover:bg-gray-100 text-gray-900 ${
-                isCreate && 'bg-gray-100 border-blue-300'
+                isCreate && 'border-blue-300'
               }`}
               onClick={() => setIsCreate(true)}
             >
@@ -272,7 +272,7 @@ export function TransactionMatchDetails(props: Props) {
             </button>
             <button
               className={`flex-1 cursor-pointer text-center py-3 border border-gray-200 hover:bg-gray-100 text-gray-900 ${
-                !isCreate && 'bg-gray-100 border-blue-300'
+                !isCreate && 'border-blue-300'
               }`}
               onClick={() => setIsCreate(false)}
             >
