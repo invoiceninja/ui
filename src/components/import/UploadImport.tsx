@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import toast from 'react-hot-toast';
+import { toast } from 'common/helpers/toast/toast';
 import { Card, Element } from '@invoiceninja/cards';
 import { useFormik } from 'formik';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +20,8 @@ import { endpoint } from 'common/helpers';
 import { Button, SelectField } from '@invoiceninja/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
+import Toggle from 'components/forms/Toggle';
+import { MdClose } from 'react-icons/md';
 
 interface Props {
   entity: string;
@@ -36,7 +38,16 @@ interface ImportMap extends Record<string, any> {
 
 export function UploadImport(props: Props) {
   const [t] = useTranslation();
+  const isImportFileTypeZip = props.type === 'zip';
+  const acceptableFileExtensions = {
+    ...(!isImportFileTypeZip && { 'text/*': ['.csv'] }),
+    ...(isImportFileTypeZip && { 'application/zip': ['.zip'] }),
+  };
+
+  const [importSettings, setImportSettings] = useState<boolean>(false);
+  const [importData, setImportData] = useState<boolean>(false);
   const [formData, setFormData] = useState(new FormData());
+  const [files, setFiles] = useState<File[]>([]);
   const [mapData, setMapData] = useState<ImportMap>();
   const [payload, setPayloadData] = useState<ImportMap>({
     hash: '',
@@ -65,19 +76,52 @@ export function UploadImport(props: Props) {
   };
 
   const processImport = () => {
-    const toastId = toast.loading(t('processing'));
-    payload.hash = mapData!.hash;
+    if (!files.length && isImportFileTypeZip) {
+      toast.error('select_file');
+      return;
+    }
 
-    request('POST', endpoint('/api/v1/import'), payload)
+    toast.processing();
+
+    let endPointUrl = '/api/v1/import';
+    let params = {};
+
+    if (isImportFileTypeZip) {
+      if (!importSettings && !importData) {
+        toast.error('settings_or_data');
+        return;
+      } else {
+        endPointUrl = '/api/v1/import_json?';
+
+        if (importSettings) {
+          endPointUrl += '&import_settings=:import_settings';
+          params = {
+            import_settings: true,
+          };
+        }
+
+        if (importData) {
+          endPointUrl += '&import_data=:import_data';
+          params = {
+            ...params,
+            import_data: true,
+          };
+        }
+      }
+    } else {
+      payload.hash = mapData!.hash;
+    }
+
+    const requestData = isImportFileTypeZip ? formData : payload;
+
+    request('POST', endpoint(endPointUrl, params), requestData)
       .then((response) => {
-        toast.success(response?.data?.message ?? t('error_title'), {
-          id: toastId,
-        });
+        toast.success(response?.data?.message ?? 'error_title');
         props.onSuccess;
       })
       .catch((error) => {
         console.error(error);
-        toast.error(t('error_title'), { id: toastId });
+        toast.error();
       });
   };
 
@@ -85,11 +129,9 @@ export function UploadImport(props: Props) {
     enableReinitialize: true,
     initialValues: {},
     onSubmit: () => {
-      const toastId = toast.loading(t('processing'));
+      toast.processing();
 
-      request('POST', endpoint('/api/v1/preimport'), formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-      })
+      request('POST', endpoint('/api/v1/preimport'), formData)
         .then((response) => {
           setMapData(response.data);
           props.onSuccess;
@@ -97,48 +139,138 @@ export function UploadImport(props: Props) {
         })
         .catch((error) => {
           console.error(error);
-          toast.error(t('error_title'), { id: toastId });
+          toast.error();
         });
     },
   });
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: {
-      'text/*': ['.csv'],
-    },
-    onDrop: (acceptedFiles) => {
-      acceptedFiles.forEach((file) =>
-        formData.append(`files[${props.entity}]`, file)
-      );
-      formData.append('import_type', props.entity);
-      setFormData(formData);
+  const addFilesToFormData = () => {
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
 
-      formik.submitForm();
+    setFormData(formData);
+  };
+
+  const removeFileFromFormData = (fileIndex: number) => {
+    const filteredFileList = files.filter((file, index) => fileIndex !== index);
+
+    const updatedFormData = new FormData();
+
+    filteredFileList.forEach((file) => {
+      updatedFormData.append('files', file);
+    });
+
+    setFiles(filteredFileList);
+
+    setFormData(updatedFormData);
+  };
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: acceptableFileExtensions,
+    onDrop: (acceptedFiles) => {
+      const isFilesTypeCorrect = acceptedFiles.every(({ type }) =>
+        type.includes(props.type)
+      );
+
+      if (isFilesTypeCorrect) {
+        acceptedFiles.forEach((file) => {
+          if (isImportFileTypeZip) {
+            setFiles((prevState) => [...prevState, file]);
+          } else {
+            formData.append(`files[${props.entity}]`, file);
+          }
+        });
+
+        if (!isImportFileTypeZip) {
+          formData.append('import_type', props.entity);
+          formik.submitForm();
+          setFormData(formData);
+        }
+      } else {
+        toast.error('wrong_file_extension');
+      }
     },
   });
+
+  useEffect(() => {
+    addFilesToFormData();
+  }, [files]);
 
   return (
     <>
       <Card title={t(props.entity)}>
-        <Element leftSide={t('csv_file')}>
-          <div
-            {...getRootProps()}
-            className="flex flex-col md:flex-row md:items-center"
-          >
-            <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-              <input {...getInputProps()} />
-              <Image className="mx-auto h-12 w-12 text-gray-400" />
-              <span className="mt-2 block text-sm font-medium text-gray-900">
-                {isDragActive
-                  ? 'drop_your_files_here'
-                  : t('dropzone_default_message')}
-              </span>
+        <Element
+          leftSide={t(isImportFileTypeZip ? 'company_backup_file' : 'csv_file')}
+          leftSideHelp={isImportFileTypeZip && t('company_backup_file_help')}
+        >
+          {!files.length ? (
+            <div
+              {...getRootProps()}
+              className="flex flex-col md:flex-row md:items-center"
+            >
+              <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                <input {...getInputProps()} />
+                <Image className="mx-auto h-12 w-12 text-gray-400" />
+                <span className="mt-2 block text-sm font-medium text-gray-900">
+                  {isDragActive
+                    ? t('drop_your_files_here')
+                    : t('dropzone_default_message')}
+                </span>
+              </div>
             </div>
-          </div>
+          ) : (
+            <ul className="grid xs:grid-rows-6 lg:grid-cols-2">
+              {files.map((file, index) => (
+                <li
+                  key={index}
+                  className="flex items-center hover:bg-gray-50 cursor-pointer p-2"
+                >
+                  {file.name} - {(file.size / 1024).toPrecision(2)} KB{' '}
+                  {
+                    <MdClose
+                      fontSize={15}
+                      className="cursor-pointer ml-3"
+                      onClick={() => removeFileFromFormData(index)}
+                    />
+                  }
+                </li>
+              ))}
+            </ul>
+          )}
         </Element>
+
+        {isImportFileTypeZip && (
+          <>
+            <Element leftSide={t('import_settings')}>
+              <Toggle
+                checked={importSettings}
+                onValueChange={(value) => setImportSettings(value)}
+              />
+            </Element>
+
+            <Element leftSide={t('import_data')}>
+              <Toggle
+                checked={importData}
+                onValueChange={(value) => setImportData(value)}
+              />
+            </Element>
+
+            <div className="flex justify-end pr-5">
+              <Button
+                behavior="button"
+                onClick={processImport}
+                disableWithoutIcon
+                disabled={(!importSettings && !importData) || !files.length}
+              >
+                {t('import')}
+              </Button>
+            </div>
+          </>
+        )}
       </Card>
 
-      {mapData && (
+      {mapData && !isImportFileTypeZip && (
         <Table>
           <Thead>
             <Th>{t('headers')}</Th>
