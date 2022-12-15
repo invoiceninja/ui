@@ -8,26 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
-import {
-  Pagination,
-  Table,
-  Tbody,
-  Td,
-  Th,
-  Thead,
-  Tr,
-} from '@invoiceninja/tables';
+import { DataTable } from 'components/DataTable';
 import { Settings } from 'components/layouts/Settings';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSubscriptionColumns } from './common/hooks/useSubscriptionColumns';
 
 export function Subscriptions() {
   const [t] = useTranslation();
+
+  const columns = useSubscriptionColumns();
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('subscriptions'), href: '/settings/subscriptions' },
   ];
+
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('subscriptions')}`;
   });
@@ -38,28 +34,13 @@ export function Subscriptions() {
       breadcrumbs={pages}
       docsLink="docs/advanced-settings/#subscriptions"
     >
-      <div className="flex justify-end mt-4 lg:mt-0">
-        <Button to="/subscriptions/create">Create subscription</Button>
-      </div>
-
-      <Table>
-        <Thead>
-          <Th>{t('category')}</Th>
-          <Th>{t('total')}</Th>
-          <Th>{t('action')}</Th>
-        </Thead>
-        <Tbody>
-          <Tr>
-            <Td colSpan={3}>{t('empty_table')}</Td>
-          </Tr>
-        </Tbody>
-      </Table>
-
-      <Pagination
-        currentPage={1}
-        onPageChange={() => {}}
-        onRowsChange={() => {}}
-        totalPages={1}
+      <DataTable
+        resource="subscription"
+        columns={columns}
+        endpoint="/api/v1/subscriptions"
+        linkToCreate="/settings/subscriptions/create"
+        linkToEdit="/settings/subscriptions/:id/edit"
+        withResourcefulActions
       />
     </Settings>
   );
