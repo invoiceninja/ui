@@ -9,17 +9,20 @@
  */
 
 import { AxiosError } from 'axios';
+import toast from 'react-hot-toast';
 import { endpoint } from 'common/helpers';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { updateRecord } from 'common/stores/slices/company-users';
+import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { request } from 'common/helpers/request';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Statics } from 'common/helpers/statics';
 import { useQueryClient } from 'react-query';
-import { toast } from 'common/helpers/toast/toast';
 
 export function useHandleCompanySave() {
+  const [t] = useTranslation();
+
   const dispatch = useDispatch();
 
   const queryClient = useQueryClient();
@@ -27,7 +30,7 @@ export function useHandleCompanySave() {
   const companyChanges = useCompanyChanges();
 
   return () => {
-    toast.processing();
+    const toastId = toast.loading(t('processing'));
 
     request(
       'PUT',
@@ -41,17 +44,29 @@ export function useHandleCompanySave() {
 
         Statics.reloadQuery();
 
-        toast.success('updated_settings');
+        toast.success(t('updated_settings'), { id: toastId });
       })
       .catch((error: AxiosError<ValidationBag>) => {
+        console.error(error);
+
+        toast.error(t('error_title'), { id: toastId });
+
+        console.error(error.response?.data);
+
         if (error.response?.status === 422) {
-          toast.error(error.response.data.message);
-        } else {
-          console.error(error);
+          const message = (
+            <div>
+              {error.response.data.message}
 
-          console.error(error.response?.data);
+              {Object.keys(error.response?.data.errors).map((key, index) => (
+                <p className="text-sm" key={index}>
+                  {error.response?.data.errors[key]}
+                </p>
+              ))}
+            </div>
+          );
 
-          toast.error();
+          toast.error(message, { id: toastId });
         }
       });
   };
