@@ -20,7 +20,7 @@ import { TransactionResponse } from 'common/interfaces/transactions';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { ListBox } from './ListBox';
 import { Button } from '@invoiceninja/forms';
-import { MdContentCopy } from 'react-icons/md';
+import { MdContentCopy, MdLink } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 
 export interface TransactionDetails {
@@ -44,11 +44,17 @@ export function TransactionMatchDetails(props: Props) {
   const [isTransactionConverted, setIsTransactionConverted] =
     useState<boolean>(true);
 
+  const [isCreate, setIsCreate] = useState<boolean>(true);
+
   const [invoiceIds, setInvoiceIds] = useState<string[]>([]);
 
   const [vendorIds, setVendorIds] = useState<string[]>([]);
 
   const [expenseCategoryIds, setExpenseCategoryIds] = useState<string[]>([]);
+
+  const [paymentIds, setPaymentIds] = useState<string[]>([]);
+
+  const [expenseIds, setExpenseIds] = useState<string[]>([]);
 
   const convertToPayment = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -78,6 +84,44 @@ export function TransactionMatchDetails(props: Props) {
           );
 
           toast.success('converted_transaction');
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+          toast.error();
+        })
+        .finally(() => setIsFormBusy(false));
+    }
+  };
+
+  const linkToPayment = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!paymentIds.length || isFormBusy) {
+      return;
+    } else {
+      setIsFormBusy(true);
+
+      toast.processing();
+
+      request('POST', endpoint('/api/v1/bank_transactions/match'), {
+        transactions: [
+          {
+            id: props.transactionDetails.transaction_id,
+            payment_id: paymentIds.join(','),
+          },
+        ],
+      })
+        .then(() => {
+          queryClient.invalidateQueries('/api/v1/bank_transactions');
+          queryClient.invalidateQueries('/api/v1/invoices');
+          queryClient.invalidateQueries('/api/v1/payments');
+          queryClient.invalidateQueries(
+            route('/api/v1/bank_transactions/:id', {
+              id: props.transactionDetails.transaction_id,
+            })
+          );
+
+          toast.success('linked_transaction');
         })
         .catch((error: AxiosError) => {
           console.error(error);
@@ -131,6 +175,66 @@ export function TransactionMatchDetails(props: Props) {
     }
   };
 
+  const linkToExpense = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!expenseIds.length || isFormBusy) {
+      return;
+    } else {
+      setIsFormBusy(true);
+
+      toast.processing();
+
+      request('POST', endpoint('/api/v1/bank_transactions/match'), {
+        transactions: [
+          {
+            id: props.transactionDetails.transaction_id,
+            expense_id: expenseIds.join(','),
+          },
+        ],
+      })
+        .then(
+          (response: GenericSingleResourceResponse<TransactionResponse[]>) => {
+            queryClient.invalidateQueries('/api/v1/bank_transactions');
+            queryClient.invalidateQueries('/api/v1/expenses');
+            queryClient.invalidateQueries(
+              route('/api/v1/bank_transactions/:id', {
+                id: props.transactionDetails.transaction_id,
+              })
+            );
+            queryClient.invalidateQueries(
+              route('/api/v1/expenses/:id', {
+                id: response.data.data[0].expense_id,
+              })
+            );
+
+            toast.success('linked_transaction');
+          }
+        )
+        .catch((error: AxiosError) => {
+          console.error(error);
+          toast.error();
+        })
+        .finally(() => setIsFormBusy(false));
+    }
+  };
+
+  const getMatchingFunction = () => {
+    if (isCreate) {
+      if (props.isCreditTransactionType) {
+        return convertToPayment;
+      } else {
+        return convertToExpense;
+      }
+    } else {
+      if (props.isCreditTransactionType) {
+        return linkToPayment;
+      } else {
+        return linkToExpense;
+      }
+    }
+  };
+
   useEffect(() => {
     setIsTransactionConverted(
       props.transactionDetails.status_id === TransactionStatus.Converted
@@ -141,6 +245,8 @@ export function TransactionMatchDetails(props: Props) {
     vendorIds,
     invoiceIds,
     expenseCategoryIds,
+    paymentIds,
+    expenseIds,
   ]);
 
   useEffect(() => {
@@ -152,28 +258,79 @@ export function TransactionMatchDetails(props: Props) {
   return (
     <div className="flex flex-col flex-1">
       <div className="flex flex-col flex-1">
-        {props.isCreditTransactionType ? (
-          <ListBox
-            transactionDetails={props.transactionDetails}
-            dataKey="invoices"
-            setSelectedIds={setInvoiceIds}
-            selectedIds={invoiceIds}
-          />
+        {!isTransactionConverted && (
+          <div className="flex p-4 border-t border-gray-200">
+            <button
+              className={`flex-1 cursor-pointer text-center py-3 border border-gray-200 hover:bg-gray-100 text-gray-900 ${
+                isCreate && 'bg-gray-100 border-blue-300'
+              }`}
+              onClick={() => setIsCreate(true)}
+            >
+              {props.isCreditTransactionType
+                ? t('create_payment')
+                : t('create_expense')}
+            </button>
+            <button
+              className={`flex-1 cursor-pointer text-center py-3 border border-gray-200 hover:bg-gray-100 text-gray-900 ${
+                !isCreate && 'bg-gray-100 border-blue-300'
+              }`}
+              onClick={() => setIsCreate(false)}
+            >
+              {props.isCreditTransactionType
+                ? t('match_payment')
+                : t('match_expense')}
+            </button>
+          </div>
+        )}
+        {isCreate ? (
+          <>
+            {props.isCreditTransactionType ? (
+              <ListBox
+                transactionDetails={props.transactionDetails}
+                dataKey="invoices"
+                setSelectedIds={setInvoiceIds}
+                selectedIds={invoiceIds}
+                isCreate={isCreate}
+              />
+            ) : (
+              <>
+                <ListBox
+                  transactionDetails={props.transactionDetails}
+                  dataKey="vendors"
+                  setSelectedIds={setVendorIds}
+                  selectedIds={vendorIds}
+                  isCreate={isCreate}
+                />
+                <ListBox
+                  className="mt-5"
+                  transactionDetails={props.transactionDetails}
+                  dataKey="categories"
+                  setSelectedIds={setExpenseCategoryIds}
+                  selectedIds={expenseCategoryIds}
+                  isCreate={isCreate}
+                />
+              </>
+            )}
+          </>
         ) : (
           <>
-            <ListBox
-              transactionDetails={props.transactionDetails}
-              dataKey="vendors"
-              setSelectedIds={setVendorIds}
-              selectedIds={vendorIds}
-            />
-            <ListBox
-              className="mt-5"
-              transactionDetails={props.transactionDetails}
-              dataKey="categories"
-              setSelectedIds={setExpenseCategoryIds}
-              selectedIds={expenseCategoryIds}
-            />
+            {props.isCreditTransactionType ? (
+              <ListBox
+                transactionDetails={props.transactionDetails}
+                dataKey="payments"
+                setSelectedIds={setPaymentIds}
+                selectedIds={paymentIds}
+                isCreate={isCreate}
+              />
+            ) : (
+              <ListBox
+                transactionDetails={props.transactionDetails}
+                dataKey="expenses"
+                setSelectedIds={setExpenseIds}
+                selectedIds={expenseIds}
+                isCreate={isCreate}
+              />
+            )}
           </>
         )}
       </div>
@@ -182,26 +339,38 @@ export function TransactionMatchDetails(props: Props) {
         <div className="px-3 py-3 w-full border-t border-gray-200">
           <Button
             className="w-full"
-            onClick={
-              props.isCreditTransactionType
-                ? convertToPayment
-                : convertToExpense
-            }
+            onClick={getMatchingFunction()}
             disableWithoutIcon={true}
             disabled={
               isFormBusy ||
-              (props.isCreditTransactionType && !invoiceIds.length) ||
+              (props.isCreditTransactionType &&
+                !invoiceIds.length &&
+                !paymentIds.length) ||
               (!props.isCreditTransactionType &&
                 !vendorIds.length &&
-                !expenseCategoryIds.length)
+                !expenseCategoryIds.length &&
+                !expenseIds.length)
             }
           >
-            {<MdContentCopy fontSize={22} />}
-            <span>
-              {props.isCreditTransactionType
-                ? t('convert_to_payment')
-                : t('convert_to_expense')}
-            </span>
+            {isCreate ? (
+              <MdContentCopy fontSize={22} />
+            ) : (
+              <MdLink fontSize={22} />
+            )}
+
+            {isCreate ? (
+              <span>
+                {props.isCreditTransactionType
+                  ? t('convert_to_payment')
+                  : t('convert_to_expense')}
+              </span>
+            ) : (
+              <span>
+                {props.isCreditTransactionType
+                  ? t('link_to_payment')
+                  : t('link_to_expense')}
+              </span>
+            )}
           </Button>
         </div>
       )}

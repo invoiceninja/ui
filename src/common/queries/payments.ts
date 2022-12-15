@@ -13,6 +13,9 @@ import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { endpoint } from '../helpers';
+import { Payment } from 'common/interfaces/payment';
+import { Params } from './common/params.interface';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
 export function usePaymentQuery(params: { id: string | undefined }) {
   return useQuery(
@@ -25,6 +28,35 @@ export function usePaymentQuery(params: { id: string | undefined }) {
         })
       ),
     { staleTime: Infinity }
+  );
+}
+
+interface PaymentsParams extends Params {
+  enabled?: boolean;
+  matchTransactions?: boolean;
+}
+
+export function usePaymentsQuery(params: PaymentsParams) {
+  return useQuery<Payment[]>(
+    ['/api/v1/payments', params],
+    () =>
+      request(
+        'GET',
+        endpoint(
+          '/api/v1/payments?filter=:filter&per_page=:per_page&status=:status&page=:page&match_transactions=:match_transactions',
+          {
+            per_page: params.perPage ?? '100',
+            page: params.currentPage ?? '1',
+            status: params.status ?? 'active',
+            filter: params.filter ?? '',
+            match_transactions: params.matchTransactions ?? false,
+          }
+        )
+      ).then(
+        (response: GenericSingleResourceResponse<Payment[]>) =>
+          response.data.data
+      ),
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }
 

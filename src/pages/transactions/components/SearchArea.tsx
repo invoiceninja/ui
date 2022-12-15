@@ -26,6 +26,7 @@ interface Props {
   isInvoicesDataKey: boolean;
   isFilterModalOpened: boolean;
   dataKey: string;
+  isCreate: boolean;
 }
 
 export function SearchArea(props: Props) {
@@ -74,7 +75,7 @@ export function SearchArea(props: Props) {
           }
         />
 
-        {props.isInvoicesDataKey ? (
+        {props.isInvoicesDataKey || !props.isCreate ? (
           <MdFilterAlt
             className="ml-3 cursor-pointer"
             fontSize={28}

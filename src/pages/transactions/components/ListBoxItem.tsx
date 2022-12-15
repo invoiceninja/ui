@@ -14,11 +14,14 @@ import invoiceStatus from 'common/constants/invoice-status';
 import { ResourceItem } from './ListBox';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import paymentStatus from 'common/constants/payment-status';
+import { ExpenseStatus } from 'pages/expenses/common/components/ExpenseStatus';
 
 interface Props {
   resourceItem: ResourceItem;
   isItemChecked: boolean;
   selectItem: (id: string, clientId?: string) => void;
+  dataKey: string;
 }
 
 export function ListBoxItem(props: Props) {
@@ -39,7 +42,7 @@ export function ListBoxItem(props: Props) {
           checked={props.isItemChecked}
           onClick={() => props.selectItem(props.resourceItem.id)}
         />
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-start">
           <span className="text-sm">{props.resourceItem.name}</span>
           <span className="text-sm">{props.resourceItem.number}</span>
         </div>
@@ -62,8 +65,27 @@ export function ListBoxItem(props: Props) {
         )}
       </div>
       <div className="flex items-center">
-        {props.resourceItem.statusId && (
-          <StatusBadge for={invoiceStatus} code={props.resourceItem.statusId} />
+        {props.resourceItem.statusId ? (
+          <>
+            {props.dataKey === 'invoices' && (
+              <StatusBadge
+                for={invoiceStatus}
+                code={props.resourceItem.statusId}
+              />
+            )}
+            {props.dataKey === 'payments' && (
+              <StatusBadge
+                for={paymentStatus}
+                code={props.resourceItem.statusId}
+              />
+            )}
+          </>
+        ) : (
+          <>
+            {props.dataKey === 'expenses' && (
+              <ExpenseStatus entity={props.resourceItem} />
+            )}
+          </>
         )}
       </div>
     </li>
