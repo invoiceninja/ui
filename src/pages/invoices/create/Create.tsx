@@ -48,8 +48,6 @@ export function Create() {
   const { t } = useTranslation();
   const { documentTitle } = useTitle('new_invoice');
 
-  console.log('ok');
-
   const [invoice, setInvoice] = useAtom(invoiceAtom);
 
   const { data } = useBlankInvoiceQuery({
