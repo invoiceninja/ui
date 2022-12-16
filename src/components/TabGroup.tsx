@@ -11,25 +11,45 @@
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import React, { ReactElement, useState } from 'react';
 
+export interface Tab {
+  tab: string;
+  index: number;
+}
+
 interface Props {
   children: ReactElement[];
   tabs: string[];
   className?: string;
   defaultTabIndex?: number;
+  onTabClick?: (tab: Tab) => unknown;
+  isTransactionMatchingTabGroup?: boolean;
 }
 
 export function TabGroup(props: Props) {
   const accentColor = useAccentColor();
+
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
+
+  const handleTabClick = (tab: Tab) => {
+    setCurrentIndex(tab.index);
+
+    if (props.onTabClick) {
+      props.onTabClick(tab);
+    }
+  };
 
   return (
     <div className={props.className}>
-      <div className="-mb-px flex space-x-8 overflow-x-auto border-b border-gray-200">
+      <div
+        className={`-mb-px flex space-x-8 overflow-x-auto border-b border-gray-200 ${
+          props.isTransactionMatchingTabGroup && 'justify-center'
+        }`}
+      >
         {props.tabs.map((tab, index) => (
           <div key={index}>
             <button
               type="button"
-              onClick={() => setCurrentIndex(index)}
+              onClick={() => handleTabClick({ tab, index })}
               style={{
                 borderColor:
                   currentIndex === index ? accentColor : 'transparent',
@@ -43,7 +63,11 @@ export function TabGroup(props: Props) {
         ))}
       </div>
 
-      <div className="my-4">
+      <div
+        className={`${
+          props.isTransactionMatchingTabGroup && 'flex flex-1'
+        } my-4`}
+      >
         {[...props.children].map(
           (element, index) =>
             React.isValidElement(element) &&
@@ -51,7 +75,20 @@ export function TabGroup(props: Props) {
               key: index,
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              style: { display: currentIndex === index ? 'block' : 'none' },
+              style: {
+                display:
+                  currentIndex === index
+                    ? `${
+                        props.isTransactionMatchingTabGroup ? 'flex' : 'block'
+                      }`
+                    : 'none',
+                ...(props.isTransactionMatchingTabGroup && {
+                  flexDirection: 'column',
+                }),
+                ...(props.isTransactionMatchingTabGroup && {
+                  flexGrow: 1,
+                }),
+              },
             })
         )}
       </div>
