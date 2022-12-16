@@ -15,7 +15,12 @@ import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-res
 import { TransactionResponse } from 'common/interfaces/transactions';
 import { useQuery } from 'react-query';
 
-export function useTransactionQuery(params: { id: string | undefined }) {
+interface TransactionParams {
+  id: string | undefined;
+  enabled?: boolean;
+}
+
+export function useTransactionQuery(params: TransactionParams) {
   return useQuery<TransactionResponse>(
     route('/api/v1/bank_transactions/:id', { id: params.id }),
     () =>
@@ -25,6 +30,7 @@ export function useTransactionQuery(params: { id: string | undefined }) {
       ).then(
         (response: GenericSingleResourceResponse<TransactionResponse>) =>
           response?.data?.data
-      )
+      ),
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }

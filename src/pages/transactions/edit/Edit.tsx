@@ -36,6 +36,7 @@ import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { ApiTransactionType, TransactionType } from 'common/enums/transactions';
 import { BankAccountSelector } from '../components/BankAccountSelector';
 import { GenericValidationBag } from 'common/interfaces/validation-bag';
+import { useQueryClient } from 'react-query';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -47,6 +48,8 @@ export function Edit() {
   const currencies = useCurrencies();
 
   const resolveCurrency = useResolveCurrency();
+
+  const queryClient = useQueryClient();
 
   const { documentTitle } = useTitle('edit_transaction');
 
@@ -135,17 +138,26 @@ export function Edit() {
     })
       .then(() => {
         toast.success('updated_transaction');
+
+        queryClient.invalidateQueries('/api/v1/bank_transactions');
+
+        queryClient.invalidateQueries(
+          route('/api/v1/bank_transactions/:id', { id })
+        );
+
         navigate('/transactions');
       })
-      .catch((error: AxiosError<GenericValidationBag<TransactionValidation>>) => {
-        if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
+      .catch(
+        (error: AxiosError<GenericValidationBag<TransactionValidation>>) => {
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+            toast.dismiss();
+          } else {
+            console.error(error);
+            toast.error();
+          }
         }
-      })
+      )
       .finally(() => setIsSaving(false));
   };
 
@@ -225,7 +237,7 @@ export function Edit() {
               }
             />
           </Element>
-          
+
           <Element required leftSide={t('description')}>
             <InputField
               element="textarea"
