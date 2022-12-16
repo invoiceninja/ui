@@ -22,6 +22,7 @@ import { ListBox } from './ListBox';
 import { Button } from '@invoiceninja/forms';
 import { MdContentCopy, MdLink } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
+import { Tab, TabGroup } from 'components/TabGroup';
 
 export interface TransactionDetails {
   base_type: string;
@@ -55,6 +56,11 @@ export function TransactionMatchDetails(props: Props) {
   const [paymentIds, setPaymentIds] = useState<string[]>([]);
 
   const [expenseIds, setExpenseIds] = useState<string[]>([]);
+
+  const tabs = [
+    props.isCreditTransactionType ? t('create_payment') : t('create_expense'),
+    props.isCreditTransactionType ? t('match_payment') : t('match_expense'),
+  ];
 
   const convertToPayment = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -223,15 +229,23 @@ export function TransactionMatchDetails(props: Props) {
     if (isCreate) {
       if (props.isCreditTransactionType) {
         return convertToPayment;
-      } else {
-        return convertToExpense;
       }
+
+      return convertToExpense;
+    }
+
+    if (props.isCreditTransactionType) {
+      return linkToPayment;
+    }
+
+    return linkToExpense;
+  };
+
+  const handleOnTabClick = (tab: Tab) => {
+    if (!tab.index) {
+      setIsCreate(true);
     } else {
-      if (props.isCreditTransactionType) {
-        return linkToPayment;
-      } else {
-        return linkToExpense;
-      }
+      setIsCreate(false);
     }
   };
 
@@ -259,79 +273,62 @@ export function TransactionMatchDetails(props: Props) {
     <div className="flex flex-col flex-1">
       <div className="flex flex-col flex-1">
         {!isTransactionConverted && (
-          <div className="flex p-4 border-t border-gray-200">
-            <button
-              className={`flex-1 cursor-pointer text-center py-3 border border-gray-200 hover:bg-gray-100 text-gray-900 ${
-                isCreate && 'border-blue-300'
-              }`}
-              onClick={() => setIsCreate(true)}
-            >
-              {props.isCreditTransactionType
-                ? t('create_payment')
-                : t('create_expense')}
-            </button>
-            <button
-              className={`flex-1 cursor-pointer text-center py-3 border border-gray-200 hover:bg-gray-100 text-gray-900 ${
-                !isCreate && 'border-blue-300'
-              }`}
-              onClick={() => setIsCreate(false)}
-            >
-              {props.isCreditTransactionType
-                ? t('match_payment')
-                : t('match_expense')}
-            </button>
-          </div>
-        )}
-        {isCreate ? (
-          <>
-            {props.isCreditTransactionType ? (
-              <ListBox
-                transactionDetails={props.transactionDetails}
-                dataKey="invoices"
-                setSelectedIds={setInvoiceIds}
-                selectedIds={invoiceIds}
-                isCreate={isCreate}
-              />
-            ) : (
-              <>
+          <TabGroup
+            className="flex flex-col align-center px-5 flex-1"
+            tabs={tabs}
+            isTransactionMatchingTabGroup={true}
+            onTabClick={handleOnTabClick}
+          >
+            <div>
+              {props.isCreditTransactionType ? (
                 <ListBox
                   transactionDetails={props.transactionDetails}
-                  dataKey="vendors"
-                  setSelectedIds={setVendorIds}
-                  selectedIds={vendorIds}
+                  dataKey="invoices"
+                  setSelectedIds={setInvoiceIds}
+                  selectedIds={invoiceIds}
                   isCreate={isCreate}
                 />
+              ) : (
+                <>
+                  <ListBox
+                    transactionDetails={props.transactionDetails}
+                    dataKey="vendors"
+                    setSelectedIds={setVendorIds}
+                    selectedIds={vendorIds}
+                    isCreate={isCreate}
+                  />
+                  <ListBox
+                    className="mt-5"
+                    transactionDetails={props.transactionDetails}
+                    dataKey="categories"
+                    setSelectedIds={setExpenseCategoryIds}
+                    selectedIds={expenseCategoryIds}
+                    isCreate={isCreate}
+                  />
+                </>
+              )}
+            </div>
+
+            <div>
+              {props.isCreditTransactionType ? (
                 <ListBox
-                  className="mt-5"
                   transactionDetails={props.transactionDetails}
-                  dataKey="categories"
-                  setSelectedIds={setExpenseCategoryIds}
-                  selectedIds={expenseCategoryIds}
+                  dataKey="payments"
+                  setSelectedIds={setPaymentIds}
+                  selectedIds={paymentIds}
                   isCreate={isCreate}
                 />
-              </>
-            )}
-          </>
-        ) : (
-          <>
-            {props.isCreditTransactionType ? (
-              <ListBox
-                transactionDetails={props.transactionDetails}
-                dataKey="payments"
-                setSelectedIds={setPaymentIds}
-                selectedIds={paymentIds}
-                isCreate={isCreate}
-              />
-            ) : (
-              <ListBox
-                transactionDetails={props.transactionDetails}
-                dataKey="expenses"
-                setSelectedIds={setExpenseIds}
-                selectedIds={expenseIds}
-                isCreate={isCreate}
-              />
-            )}
-          </>
+              ) : (
+                <ListBox
+                  transactionDetails={props.transactionDetails}
+                  dataKey="expenses"
+                  setSelectedIds={setExpenseIds}
+                  selectedIds={expenseIds}
+                  isCreate={isCreate}
+                />
+              )}
+            </div>
+          </TabGroup>
         )}
       </div>
 
