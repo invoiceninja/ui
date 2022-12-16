@@ -10,6 +10,7 @@
 
 import { ClickableElement } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Task } from 'common/interfaces/task';
 import { TaskStatus } from 'common/interfaces/task-status';
 import { ClientSelector } from 'components/clients/ClientSelector';
@@ -19,9 +20,14 @@ import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { TabGroup } from 'components/TabGroup';
 import { UserSelector } from 'components/users/UserSelector';
 import { useAtom } from 'jotai';
+import { LogPosition } from 'pages/tasks/common/components/TaskTable';
+import {
+  handleTaskDateChange,
+  parseTimeToDate,
+} from 'pages/tasks/common/helpers';
 import { parseTimeLog } from 'pages/tasks/common/helpers/calculate-time';
 import { useSave } from 'pages/tasks/common/hooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
@@ -31,14 +37,35 @@ export function EditSlider() {
   const [task, setTask] = useAtom(currentTaskAtom);
 
   const [isTimeModalVisible, setIsTimeModalVisible] = useState(false);
-  const [timeLog, setTimeLog] = useState<number[]>([]);
+
+  const [timeLogIndex, setTimeLogIndex] = useState<number>();
+  const [timeLog, setTimeLog] = useState<number[][]>([]);
 
   const handleChange = (property: keyof Task, value: Task[typeof property]) => {
     setTask((current) => current && { ...current, [property]: value });
   };
 
+  const company = useCurrentCompany();
   const save = useSave();
   const formatTimeLog = useFormatTimeLog();
+
+  useEffect(() => {
+    if (task?.time_log) {
+      setTimeLog(parseTimeLog(task.time_log));
+    }
+  }, [timeLogIndex]);
+
+  const handleDateChange = (
+    unix: number,
+    value: string,
+    index: number,
+    position: number
+  ) => {
+    handleChange(
+      'time_log',
+      handleTaskDateChange(task!.time_log, unix, value, index, position)
+    );
+  };
 
   return (
     <>
@@ -47,19 +74,48 @@ export function EditSlider() {
         visible={isTimeModalVisible && timeLog.length > 0}
         onClose={() => {
           setIsTimeModalVisible(false);
-          setTimeLog([]);
+          setTimeLogIndex(undefined);
         }}
       >
-        <InputField
-          label={t('date')}
-          type="date"
-          // value={parseTimeToDate(timeLog[0])}
-          onValueChange={(value) => console.log(value)}
-        />
+        {timeLog[Number(timeLogIndex)] && (
+          <>
+            <InputField
+              label={t('start_date')}
+              type="date"
+              value={parseTimeToDate(timeLog[timeLogIndex!][LogPosition.Start])}
+              onValueChange={(value) =>
+                handleDateChange(
+                  timeLog[timeLogIndex!][LogPosition.Start],
+                  value,
+                  timeLogIndex!,
+                  LogPosition.Start
+                )
+              }
+            />
 
-        <InputField label={t('start_time')} />
-        <InputField label={t('end_time')} />
-        <InputField label={t('duration')} />
+            {company?.show_task_end_date && (
+              <InputField
+                label={t('end_date')}
+                type="date"
+                value={parseTimeToDate(timeLog[timeLogIndex!][LogPosition.End])}
+                onValueChange={(value) =>
+                  handleDateChange(
+                    timeLog[timeLogIndex!][LogPosition.End],
+                    value,
+                    timeLogIndex!,
+                    LogPosition.End
+                  )
+                }
+              />
+            )}
+          </>
+        )}
+
+        <div className="flex justify-end">
+          <Button onClick={() => setIsTimeModalVisible(false)}>
+            {t('done')}
+          </Button>
+        </div>
       </Modal>
 
       <TabGroup tabs={[t('details'), t('times')]} width="full">
@@ -110,10 +166,6 @@ export function EditSlider() {
             value={task?.description}
             onValueChange={(value) => handleChange('description', value)}
           />
-
-          <div className="flex justify-end">
-            <Button onClick={() => task && save(task)}>{t('save')}</Button>
-          </div>
         </div>
 
         <div>
@@ -123,7 +175,7 @@ export function EditSlider() {
                 key={i}
                 onClick={() => {
                   setIsTimeModalVisible(true);
-                  setTimeLog(parseTimeLog(task.time_log)[i]);
+                  setTimeLogIndex(i);
                 }}
               >
                 <div>
@@ -137,6 +189,11 @@ export function EditSlider() {
             ))}
         </div>
       </TabGroup>
+
+      
+      <div className="flex justify-end p-4">
+        <Button onClick={() => task && save(task)}>{t('save')}</Button>
+      </div>
     </>
   );
 }
