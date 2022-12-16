@@ -73,7 +73,7 @@ export function UpcomingInvoices() {
       <DataTable
         resource="invoice"
         columns={columns}
-        endpoint="/api/v1/invoices?include=client&upcoming=true&per_page=50&page=1"
+        endpoint="/api/v1/invoices?include=client&upcoming=true&without_deleted_clients=true&per_page=50&page=1"
         withoutActions
         withoutPagination
         withoutPadding
