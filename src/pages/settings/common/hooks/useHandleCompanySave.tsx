@@ -17,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { request } from 'common/helpers/request';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Statics } from 'common/helpers/statics';
 import { useQueryClient } from 'react-query';
 
 export function useHandleCompanySave() {
@@ -41,8 +40,6 @@ export function useHandleCompanySave() {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
 
         queryClient.invalidateQueries('/api/v1/statics');
-
-        Statics.reloadQuery();
 
         toast.success(t('updated_settings'), { id: toastId });
       })
