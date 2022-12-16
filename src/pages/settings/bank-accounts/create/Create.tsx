@@ -67,7 +67,7 @@ export function Create() {
       onSaveClick={handleSave}
     >
       <Card onFormSubmit={handleSave} title={t('new_bank_account')}>
-        <Element leftSide={t('name')}>
+        <Element leftSide={t('account_name')}>
           <InputField
             value={bankAccount?.bank_account_name}
             onValueChange={(value) => handleChange('bank_account_name', value)}
