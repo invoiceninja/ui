@@ -35,8 +35,6 @@ export function App() {
 
     const resolvedLanguage = resolveLanguage(company?.settings.language_id);
 
-    console.log('ok');
-
     if (resolvedLanguage?.locale) {
       if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
         import(
