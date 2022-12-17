@@ -14,7 +14,6 @@ import React, { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
 import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 
@@ -23,17 +22,28 @@ export function App() {
 
   const company = useCurrentCompany();
 
-  const location = useLocation();
-
   const resolveLanguage = useResolveLanguage();
 
-  const shouldEnableResolving = !location.pathname.startsWith('/login');
-
-  const resolvedLanguage = shouldEnableResolving
-    ? resolveLanguage(company?.settings.language_id)
-    : undefined;
+  const resolvedLanguage = resolveLanguage(company?.settings.language_id);
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
+
+  const changeTranslationJsonResource = () => {
+    if (resolvedLanguage?.locale) {
+      const fileKey = resolvedLanguage.locale;
+
+      if (!i18n.hasResourceBundle(fileKey, 'translation')) {
+        import(`./resources/lang/${fileKey}/${fileKey}.json`).then(
+          (response) => {
+            i18n.addResources(fileKey, 'translation', response);
+            i18n.changeLanguage(fileKey);
+          }
+        );
+      } else {
+        i18n.changeLanguage(fileKey);
+      }
+    }
+  };
 
   useEffect(() => {
     document.body.classList.add('bg-gray-50', 'dark:bg-gray-900');
@@ -42,15 +52,7 @@ export function App() {
       ? document.querySelector('html')?.classList.add('dark')
       : document.querySelector('html')?.classList.remove('dark');
 
-    if (resolvedLanguage?.locale) {
-      const fileKey = resolvedLanguage.locale;
-
-      if (!i18n.hasResourceBundle(fileKey, 'translation')) {
-        console.log('ok');
-      } else {
-        i18n.changeLanguage(fileKey);
-      }
-    }
+    changeTranslationJsonResource();
   }, [darkMode, company]);
 
   return (
