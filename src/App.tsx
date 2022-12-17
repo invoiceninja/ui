@@ -37,12 +37,14 @@ export function App() {
 
     if (resolvedLanguage?.locale) {
       if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
-        import(
-          `./resources/lang/${resolvedLanguage.locale}/${resolvedLanguage.locale}.json`
-        ).then((response: JSON) => {
-          i18n.addResources(resolvedLanguage.locale, 'translation', response);
-          i18n.changeLanguage(resolvedLanguage.locale);
-        });
+        fetch(
+          `/src/resources/lang/${resolvedLanguage.locale}/${resolvedLanguage.locale}.json`
+        )
+          .then((response) => response.json())
+          .then((response: JSON) => {
+            i18n.addResources(resolvedLanguage.locale, 'translation', response);
+            i18n.changeLanguage(resolvedLanguage.locale);
+          });
       } else {
         i18n.changeLanguage(resolvedLanguage.locale);
       }
