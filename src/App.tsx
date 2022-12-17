@@ -24,6 +24,12 @@ export function App() {
 
   const resolveLanguage = useResolveLanguage();
 
+  const shouldEnableResolving = !location.pathname.startsWith('/login');
+
+  const resolvedLanguage = shouldEnableResolving
+    ? resolveLanguage(company?.settings.language_id)
+    : undefined;
+
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
   useEffect(() => {
@@ -32,8 +38,6 @@ export function App() {
     darkMode
       ? document.querySelector('html')?.classList.add('dark')
       : document.querySelector('html')?.classList.remove('dark');
-
-    const resolvedLanguage = resolveLanguage(company?.settings.language_id);
 
     if (resolvedLanguage?.locale) {
       if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
