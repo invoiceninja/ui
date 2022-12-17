@@ -27,8 +27,6 @@ export function App() {
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
   useEffect(() => {
-    let unmounted = false;
-
     document.body.classList.add('bg-gray-50', 'dark:bg-gray-900');
 
     darkMode
@@ -39,22 +37,16 @@ export function App() {
 
     if (resolvedLanguage?.locale) {
       if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
-        if (!unmounted) {
-          import(
-            `./resources/lang/${resolvedLanguage.locale}/${resolvedLanguage.locale}.json`
-          ).then((response) => {
-            i18n.addResources(resolvedLanguage.locale, 'translation', response);
-            i18n.changeLanguage(resolvedLanguage.locale);
-          });
-        }
+        import(
+          `./resources/lang/${resolvedLanguage.locale}/${resolvedLanguage.locale}.json`
+        ).then((response: JSON) => {
+          i18n.addResources(resolvedLanguage.locale, 'translation', response);
+          i18n.changeLanguage(resolvedLanguage.locale);
+        });
       } else {
         i18n.changeLanguage(resolvedLanguage.locale);
       }
     }
-
-    return () => {
-      unmounted = true;
-    };
   }, [darkMode, company]);
 
   return (
