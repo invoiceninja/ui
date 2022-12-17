@@ -10,7 +10,7 @@
 
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -33,8 +33,6 @@ export function App() {
     ? resolveLanguage(company?.settings.language_id)
     : undefined;
 
-  console.log(resolvedLanguage);
-
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
   useEffect(() => {
@@ -48,12 +46,7 @@ export function App() {
       const fileKey = resolvedLanguage.locale;
 
       if (!i18n.hasResourceBundle(fileKey, 'translation')) {
-        import(`./resources/lang/${fileKey}/${fileKey}.json`).then(
-          (response) => {
-            i18n.addResources(fileKey, 'translation', response);
-            i18n.changeLanguage(fileKey);
-          }
-        );
+        console.log('ok');
       } else {
         i18n.changeLanguage(fileKey);
       }
