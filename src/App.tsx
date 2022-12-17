@@ -10,7 +10,7 @@
 
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -24,54 +24,38 @@ export function App() {
 
   const resolveLanguage = useResolveLanguage();
 
-  const [currentLanguage, setCurrentLanguage] = useState<string>();
-
-  const resolvedLanguage = currentLanguage
-    ? resolveLanguage(currentLanguage)
-    : undefined;
-
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
-  const getTranslationLanguageKey = () => {
-    if (resolvedLanguage?.locale) {
-      const fileKey = resolvedLanguage.locale;
-
-      if (!i18n.hasResourceBundle(fileKey, 'translation')) {
-        import(`./resources/lang/${fileKey}/${fileKey}.json`).then(
-          (response) => {
-            i18n.addResources(fileKey, 'translation', response);
-
-            i18n.changeLanguage(fileKey);
-
-            return '';
-          }
-        );
-      }
-
-      return fileKey;
-    }
-  };
-
-  const languageKey = useMemo(
-    () => getTranslationLanguageKey(),
-    [currentLanguage, resolvedLanguage]
-  );
-
   useEffect(() => {
+    let unmounted = false;
+
     document.body.classList.add('bg-gray-50', 'dark:bg-gray-900');
 
     darkMode
       ? document.querySelector('html')?.classList.add('dark')
       : document.querySelector('html')?.classList.remove('dark');
-  }, [darkMode]);
 
-  useEffect(() => {
-    if (languageKey) {
-      i18n.changeLanguage(languageKey);
+    const resolvedLanguage = resolveLanguage(company?.settings.language_id);
+
+    if (resolvedLanguage?.locale) {
+      if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
+        if (!unmounted) {
+          import(
+            `./resources/lang/${resolvedLanguage.locale}/${resolvedLanguage.locale}.json`
+          ).then((response) => {
+            i18n.addResources(resolvedLanguage.locale, 'translation', response);
+            i18n.changeLanguage(resolvedLanguage.locale);
+          });
+        }
+      } else {
+        i18n.changeLanguage(resolvedLanguage.locale);
+      }
     }
 
-    setCurrentLanguage(company?.settings.language_id);
-  }, [languageKey, company]);
+    return () => {
+      unmounted = true;
+    };
+  }, [darkMode, company]);
 
   return (
     <div className="App">
