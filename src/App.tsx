@@ -26,14 +26,16 @@ export function App() {
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
+  const resolvedLanguage = company
+    ? resolveLanguage(company.settings.language_id)
+    : undefined;
+
   useEffect(() => {
     document.body.classList.add('bg-gray-50', 'dark:bg-gray-900');
 
     darkMode
       ? document.querySelector('html')?.classList.add('dark')
       : document.querySelector('html')?.classList.remove('dark');
-
-    const resolvedLanguage = resolveLanguage(company?.settings.language_id);
 
     if (resolvedLanguage?.locale) {
       if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
@@ -49,7 +51,7 @@ export function App() {
         i18n.changeLanguage(resolvedLanguage.locale);
       }
     }
-  }, [darkMode, company]);
+  }, [darkMode, resolvedLanguage]);
 
   return (
     <div className="App">
