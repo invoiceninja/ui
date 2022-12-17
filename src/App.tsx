@@ -12,15 +12,15 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
 import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 
 export function App() {
-  const { i18n } = useTranslation();
-
   const company = useCurrentCompany();
+
+  const location = useLocation();
 
   const resolveLanguage = useResolveLanguage();
 
@@ -30,6 +30,8 @@ export function App() {
     ? resolveLanguage(company?.settings.language_id)
     : undefined;
 
+  console.log(resolvedLanguage);
+
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
   useEffect(() => {
@@ -38,19 +40,6 @@ export function App() {
     darkMode
       ? document.querySelector('html')?.classList.add('dark')
       : document.querySelector('html')?.classList.remove('dark');
-
-    if (resolvedLanguage?.locale) {
-      if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
-        import(
-          `./resources/lang/${resolvedLanguage.locale}/${resolvedLanguage.locale}.json`
-        ).then((response) => {
-          i18n.addResources(resolvedLanguage.locale, 'translation', response);
-          i18n.changeLanguage(resolvedLanguage.locale);
-        });
-      } else {
-        i18n.changeLanguage(resolvedLanguage.locale);
-      }
-    }
   }, [darkMode, company]);
 
   return (
