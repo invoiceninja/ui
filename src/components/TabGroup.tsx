@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import React, { ReactElement, useState } from 'react';
 
@@ -23,6 +24,7 @@ interface Props {
   defaultTabIndex?: number;
   onTabClick?: (tab: Tab) => unknown;
   height?: 'full';
+  width?: 'full';
 }
 
 export function TabGroup(props: Props) {
@@ -42,7 +44,10 @@ export function TabGroup(props: Props) {
     <div className={props.className}>
       <div className="-mb-px flex space-x-8 overflow-x-auto border-b border-gray-200">
         {props.tabs.map((tab, index) => (
-          <div key={index}>
+          <div
+            key={index}
+            className={classNames({ 'w-full': props.width === 'full' })}
+          >
             <button
               type="button"
               onClick={() => handleTabClick({ tab, index })}
@@ -51,7 +56,10 @@ export function TabGroup(props: Props) {
                   currentIndex === index ? accentColor : 'transparent',
                 color: currentIndex === index ? accentColor : '#6B7280',
               }}
-              className="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
+              className={classNames(
+                'whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm',
+                { 'w-full': props.width === 'full' }
+              )}
             >
               {tab}
             </button>

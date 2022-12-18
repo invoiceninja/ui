@@ -17,11 +17,16 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { request } from 'common/helpers/request';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useQueryClient } from 'react-query';
 
 export function useHandleCompanySave() {
   const [t] = useTranslation();
-  const companyChanges = useCompanyChanges();
+
   const dispatch = useDispatch();
+
+  const queryClient = useQueryClient();
+
+  const companyChanges = useCompanyChanges();
 
   return () => {
     const toastId = toast.loading(t('processing'));
@@ -33,6 +38,8 @@ export function useHandleCompanySave() {
     )
       .then((response) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
+
+        queryClient.invalidateQueries('/api/v1/statics');
 
         toast.success(t('updated_settings'), { id: toastId });
       })
