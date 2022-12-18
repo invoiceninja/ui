@@ -32,7 +32,7 @@ export function ListBoxItem(props: Props) {
   return (
     <li
       key={props.resourceItem.id}
-      className="flex justify-between hover:bg-gray-50 w-full cursor-pointer p-4 border-b border-gray-200"
+      className="flex justify-between hover:bg-gray-50 w-full cursor-pointer p-4 border-b border-gray-200 last:border-b-0"
       onClick={() =>
         props.selectItem(props.resourceItem.id, props.resourceItem.clientId)
       }

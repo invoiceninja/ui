@@ -22,7 +22,6 @@ interface Props {
   tabs: string[];
   className?: string;
   defaultTabIndex?: number;
-  onTabClick?: (tab: Tab) => unknown;
   height?: 'full';
   width?: 'full';
 }
@@ -31,14 +30,6 @@ export function TabGroup(props: Props) {
   const accentColor = useAccentColor();
 
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
-
-  const handleTabClick = (tab: Tab) => {
-    setCurrentIndex(tab.index);
-
-    if (props.onTabClick) {
-      props.onTabClick(tab);
-    }
-  };
 
   return (
     <div className={props.className}>
@@ -50,7 +41,7 @@ export function TabGroup(props: Props) {
           >
             <button
               type="button"
-              onClick={() => handleTabClick({ tab, index })}
+              onClick={() => setCurrentIndex(index)}
               style={{
                 borderColor:
                   currentIndex === index ? accentColor : 'transparent',
@@ -67,7 +58,13 @@ export function TabGroup(props: Props) {
         ))}
       </div>
 
-      <div className={`${props.height === 'full' && 'flex flex-1'} my-4`}>
+      <div
+        className={classNames({
+          flex: props.height === 'full',
+          'flex-1': props.height === 'full',
+          'my-4': props.height !== 'full',
+        })}
+      >
         {[...props.children].map(
           (element, index) =>
             React.isValidElement(element) &&

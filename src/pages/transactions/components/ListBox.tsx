@@ -47,7 +47,6 @@ interface Props extends CommonProps {
   dataKey: 'invoices' | 'categories' | 'vendors' | 'payments' | 'expenses';
   setSelectedIds: Dispatch<SetStateAction<string[]>>;
   selectedIds: string[];
-  isCreate: boolean;
 }
 
 export function ListBox(props: Props) {
@@ -187,13 +186,11 @@ export function ListBox(props: Props) {
       >
         <SearchArea
           dataKey={props.dataKey}
-          isInvoicesDataKey={isInvoicesDataKey}
           searchParams={searchParams}
           setIsFilterModalOpened={setIsFilterModalOpened}
           isFilterModalOpened={isFilterModalOpened}
           setSearchParams={setSearchParams}
           setSelectedIds={props.setSelectedIds}
-          isCreate={props.isCreate}
         />
       </div>
       <ul
