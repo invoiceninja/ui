@@ -45,6 +45,8 @@ import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
 import { Slider } from 'components/cards/Slider';
 import { EditSlider } from './components/EditSlider';
+import { Edit, Pause, Play } from 'react-feather';
+import { Link as ReactRouterLink } from 'react-router-dom';
 
 interface Card {
   id: string;
@@ -240,7 +242,46 @@ export function Kanban() {
         }
         visible={isKanbanViewSliderVisible}
         onClose={handleKanbanClose}
+        actionChildren={
+          <div className="flex w-full divide-x-2">
+            {sliderType === 'view' && (
+              <ReactRouterLink
+                to={route('/tasks/:id/edit', { id: currentTask?.id })}
+                className="flex justify-center items-center text-sm p-4 space-x-2 w-full hover:bg-gray-50"
+              >
+                <Edit size={18} />
+                <span>{t('edit_task')}</span>
+              </ReactRouterLink>
+            )}
+
+            {/* <button className="flex justify-center items-center text-sm p-4 space-x-2 w-full hover:bg-gray-50">
+              <Plus size={18} />
+              <span>{t('invoice_task')}</span>
+            </button> */}
+
+            {currentTask && !isTaskRunning(currentTask) && (
+              <button
+                className="flex justify-center items-center text-sm p-4 space-x-2 w-full hover:bg-gray-50"
+                onClick={() => startTask(currentTask)}
+              >
+                <Play size={18} />
+                <span>{t('start')}</span>
+              </button>
+            )}
+
+            {currentTask && isTaskRunning(currentTask) && (
+              <button
+                className="flex justify-center items-center text-sm p-4 space-x-2 w-full hover:bg-gray-50"
+                onClick={() => stopTask(currentTask)}
+              >
+                <Pause size={18} />
+                <span>{t('stop')}</span>
+              </button>
+            )}
+          </div>
+        }
         size="regular"
+        withoutActionContainer
       >
         {sliderType === 'view' && <ViewSlider />}
         {sliderType === 'edit' && <EditSlider />}
