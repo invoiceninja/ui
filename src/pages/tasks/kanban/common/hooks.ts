@@ -8,34 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date, endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
+import { date } from 'common/helpers';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { Task } from 'common/interfaces/task';
+import { useTaskQuery } from 'common/queries/tasks';
 import { useSetAtom } from 'jotai';
 import { parseTimeLog } from 'pages/tasks/common/helpers/calculate-time';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useQuery } from 'react-query';
 import { currentTaskAtom, isKanbanViewSliderVisibleAtom } from './atoms';
 
 export function useHandleCurrentTask(id: string | undefined) {
   const setCurrentTask = useSetAtom(currentTaskAtom);
   const setIsKanbanSliderVisible = useSetAtom(isKanbanViewSliderVisibleAtom);
 
-  useQuery(
-    route('/api/v1/tasks/:id', { id }),
-    () =>
-      request('GET', endpoint('/api/v1/tasks/:id', { id }))
-        .then((response: GenericSingleResourceResponse<Task>) => {
-          setCurrentTask(response.data.data);
-          setIsKanbanSliderVisible(true);
-        })
-        .catch(() => toast.error()),
-    { enabled: Boolean(id) }
-  );
+  const { data } = useTaskQuery({ id, enabled: Boolean(id) });
+
+  useEffect(() => {
+    if (data) {
+      setCurrentTask(data);
+      setIsKanbanSliderVisible(true);
+    }
+  }, [data]);
 }
 
 export function useFormatTimeLog() {
