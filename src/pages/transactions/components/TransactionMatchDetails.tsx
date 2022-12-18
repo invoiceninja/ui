@@ -274,9 +274,9 @@ export function TransactionMatchDetails(props: Props) {
       <div className="flex flex-col flex-1">
         {!isTransactionConverted && (
           <TabGroup
-            className="flex flex-col align-center px-5 flex-1"
+            className="flex flex-col flex-1 align-center px-5 border-t border-gray-200"
             tabs={tabs}
-            isTransactionMatchingTabGroup={true}
+            height="full"
             onTabClick={handleOnTabClick}
           >
             <div>

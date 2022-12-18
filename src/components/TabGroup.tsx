@@ -22,7 +22,7 @@ interface Props {
   className?: string;
   defaultTabIndex?: number;
   onTabClick?: (tab: Tab) => unknown;
-  isTransactionMatchingTabGroup?: boolean;
+  height?: 'full';
 }
 
 export function TabGroup(props: Props) {
@@ -40,11 +40,7 @@ export function TabGroup(props: Props) {
 
   return (
     <div className={props.className}>
-      <div
-        className={`-mb-px flex space-x-8 overflow-x-auto border-b border-gray-200 ${
-          props.isTransactionMatchingTabGroup && 'justify-center'
-        }`}
-      >
+      <div className="-mb-px flex space-x-8 overflow-x-auto border-b border-gray-200">
         {props.tabs.map((tab, index) => (
           <div key={index}>
             <button
@@ -63,11 +59,7 @@ export function TabGroup(props: Props) {
         ))}
       </div>
 
-      <div
-        className={`${
-          props.isTransactionMatchingTabGroup && 'flex flex-1'
-        } my-4`}
-      >
+      <div className={`${props.height === 'full' && 'flex flex-1'} my-4`}>
         {[...props.children].map(
           (element, index) =>
             React.isValidElement(element) &&
@@ -78,14 +70,12 @@ export function TabGroup(props: Props) {
               style: {
                 display:
                   currentIndex === index
-                    ? `${
-                        props.isTransactionMatchingTabGroup ? 'flex' : 'block'
-                      }`
+                    ? `${props.height === 'full' ? 'flex' : 'block'}`
                     : 'none',
-                ...(props.isTransactionMatchingTabGroup && {
+                ...(props.height === 'full' && {
                   flexDirection: 'column',
                 }),
-                ...(props.isTransactionMatchingTabGroup && {
+                ...(props.height === 'full' && {
                   flexGrow: 1,
                 }),
               },
