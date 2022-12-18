@@ -12,11 +12,6 @@ import classNames from 'classnames';
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import React, { ReactElement, useState } from 'react';
 
-export interface Tab {
-  tab: string;
-  index: number;
-}
-
 interface Props {
   children: ReactElement[];
   tabs: string[];
