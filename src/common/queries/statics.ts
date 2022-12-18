@@ -17,14 +17,12 @@ import { useLocation } from 'react-router-dom';
 export function useStaticsQuery() {
   const location = useLocation();
 
-  const shouldEnableQuery = !location.pathname.startsWith('/login');
-
   return useQuery<Statics>(
     '/api/v1/statics',
     () =>
       request('GET', endpoint('/api/v1/statics')).then(
         (response) => response.data
       ),
-    { enabled: shouldEnableQuery, staleTime: Infinity }
+    { enabled: !location.pathname.startsWith('/login'), staleTime: Infinity }
   );
 }
