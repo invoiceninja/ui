@@ -10,11 +10,11 @@
 
 import { date, endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { Document } from 'common/interfaces/document.interface';
 import prettyBytes from 'pretty-bytes';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
@@ -29,6 +29,7 @@ interface Props {
 
 export function DocumentsTable(props: Props) {
   const [t] = useTranslation();
+
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState(false);
 
@@ -37,7 +38,7 @@ export function DocumentsTable(props: Props) {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const destroy = (password: string) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request(
       'delete',
@@ -45,11 +46,10 @@ export function DocumentsTable(props: Props) {
       {},
       { headers: { 'X-Api-Password': password } }
     )
-      .then(() => toast.success(t('deleted_document'), { id: toastId }))
+      .then(() => toast.success('deleted_document'))
       .catch((error) => {
         console.error(error);
-
-        toast.error(t('error_title'), { id: toastId });
+        toast.error();
       })
       .finally(() => props.onDocumentDelete?.());
   };
