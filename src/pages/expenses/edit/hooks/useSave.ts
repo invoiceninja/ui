@@ -23,10 +23,12 @@ interface Props {
 
 export function useSave(props: Props) {
   const queryClient = useQueryClient();
+
   const { setErrors } = props;
 
   return (expense: Expense) => {
     toast.processing();
+
     setErrors(undefined);
 
     request(
@@ -34,19 +36,21 @@ export function useSave(props: Props) {
       endpoint('/api/v1/expenses/:id', { id: expense.id }),
       expense
     )
-      .then(() => toast.success('updated_expense'))
-      .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-        toast.error();
+      .then(() => {
+        toast.success('updated_expense');
 
-        if (error.response?.status === 422) {
-          setErrors(error.response.data);
-        }
-      })
-      .finally(() =>
         queryClient.invalidateQueries(
           route('/api/v1/expenses/:id', { id: expense.id })
-        )
-      );
+        );
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        } else {
+          console.error(error);
+          toast.error();
+        }
+      });
   };
 }

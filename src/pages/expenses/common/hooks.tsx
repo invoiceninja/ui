@@ -17,11 +17,18 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Expense } from 'common/interfaces/expense';
+import { RecurringExpense } from 'common/interfaces/recurring-expense';
 import { customField } from 'components/CustomField';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
+import { Action } from 'components/ResourceActions';
 import { StatusBadge } from 'components/StatusBadge';
+import { useAtom } from 'jotai';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { recurringExpenseAtom } from 'pages/recurring-expenses/common/atoms';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { expenseAtom } from './atoms';
 import { ExpenseStatus } from './components/ExpenseStatus';
 
 export const expenseColumns = [
@@ -64,6 +71,47 @@ export const expenseColumns = [
 ] as const;
 
 type ExpenseColumns = typeof expenseColumns[number];
+
+export function useActions() {
+  const { t } = useTranslation();
+
+  const navigate = useNavigate();
+
+  const [, setExpense] = useAtom(expenseAtom);
+
+  const [, setRecurringExpense] = useAtom(recurringExpenseAtom);
+
+  const cloneToExpense = (recurringExpense: Expense) => {
+    setExpense({ ...recurringExpense, documents: [], number: '' });
+
+    navigate('/expenses/create');
+  };
+
+  const cloneToRecurringExpense = (recurringExpense: Expense) => {
+    setRecurringExpense({
+      ...(recurringExpense as RecurringExpense),
+      documents: [],
+      number: '',
+    });
+
+    navigate('/recurring_expenses/create');
+  };
+
+  const actions: Action<Expense>[] = [
+    (expense) => (
+      <DropdownElement onClick={() => cloneToExpense(expense)}>
+        {t('clone_to_expense')}
+      </DropdownElement>
+    ),
+    (expense) => (
+      <DropdownElement onClick={() => cloneToRecurringExpense(expense)}>
+        {t('clone_to_recurring')}
+      </DropdownElement>
+    ),
+  ];
+
+  return actions;
+}
 
 export const defaultColumns: ExpenseColumns[] = [
   'status',

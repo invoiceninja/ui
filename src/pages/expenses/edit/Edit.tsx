@@ -14,26 +14,29 @@ import { Expense } from 'common/interfaces/expense';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useExpenseQuery } from 'common/queries/expenses';
 import { Page } from 'components/Breadcrumbs';
-import { Dropdown } from 'components/dropdown/Dropdown';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
+import { ResourceActions } from 'components/ResourceActions';
 import { Tab, Tabs } from 'components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
+import { useActions } from '../common/hooks';
 import { AdditionalInfo } from '../create/components/AdditionalInfo';
 import { Details } from '../create/components/Details';
 import { Notes } from '../create/components/Notes';
 import { TaxSettings } from '../create/components/Taxes';
-import { useBulk } from './hooks/useBulk';
 import { useSave } from './hooks/useSave';
 
 export function Edit() {
+  const [t] = useTranslation();
+
   const { documentTitle } = useTitle('expense');
+
   const { id } = useParams();
+
   const { data } = useExpenseQuery({ id });
 
-  const [t] = useTranslation();
+  const actions = useActions();
 
   const pages: Page[] = [
     { name: t('expenses'), href: '/expenses' },
@@ -52,13 +55,13 @@ export function Edit() {
   ];
 
   const [expense, setExpense] = useState<Expense>();
+
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
   );
 
   const [errors, setErrors] = useState<ValidationBag>();
 
-  const bulk = useBulk();
   const save = useSave({ setErrors });
 
   const handleChange = <T extends keyof Expense>(
@@ -78,42 +81,17 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      topRight={
+      onBackClick="/expenses"
+      onSaveClick={() => expense && save(expense)}
+      navigationTopRight={
         expense && (
-          <Dropdown label={t('more_actions')} className="divide-y">
-            <div>
-              {expense.archived_at === 0 && (
-                <DropdownElement onClick={() => bulk([expense.id], 'archive')}>
-                  {t('archive')}
-                </DropdownElement>
-              )}
-
-              {expense.archived_at > 0 && (
-                <DropdownElement onClick={() => bulk([expense.id], 'restore')}>
-                  {t('restore')}
-                </DropdownElement>
-              )}
-
-              {!expense.is_deleted && (
-                <DropdownElement onClick={() => bulk([expense.id], 'delete')}>
-                  {t('delete')}
-                </DropdownElement>
-              )}
-            </div>
-
-            <div>
-              <DropdownElement
-                to={route('/expenses/:id/clone', { id: expense.id })}
-              >
-                {t('clone_to_expense')}
-              </DropdownElement>
-              {/* <DropdownElement>{t('clone_to_recurring')}</DropdownElement> */}
-            </div>
-          </Dropdown>
+          <ResourceActions
+            resource={expense}
+            label={t('more_actions')}
+            actions={actions}
+          />
         )
       }
-      onBackClick={route('/expenses')}
-      onSaveClick={() => expense && save(expense)}
     >
       <div className="space-y-4">
         <Tabs tabs={tabs} />
