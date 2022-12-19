@@ -190,7 +190,7 @@ export function useActions() {
 
   const cloneToExpense = (recurringExpense: RecurringExpense) => {
     setExpense({
-      ...(recurringExpense as unknown as Expense),
+      ...(recurringExpense as Expense),
       documents: [],
       number: '',
     });
