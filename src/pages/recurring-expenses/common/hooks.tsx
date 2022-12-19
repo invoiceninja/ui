@@ -117,7 +117,7 @@ export function useRecurringExpenseColumns() {
       format: (value, recurringExpense) => {
         return formatMoney(
           recurringExpense.amount,
-          company?.settings?.country_id,
+          company?.settings.country_id,
           recurringExpense.currency_id
         );
       },

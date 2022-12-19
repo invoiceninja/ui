@@ -38,8 +38,6 @@ export function Create() {
 
   const { data } = useBlankRecurringExpenseQuery();
 
-  console.log(data);
-
   const pages = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
     { name: t('new_recurring_expense'), href: '/recurring_expenses/create' },
@@ -49,15 +47,25 @@ export function Create() {
     'by_rate'
   );
 
+  let mounted = false;
+
   const [recurringExpense, setRecurringExpense] = useAtom(recurringExpenseAtom);
 
   const [errors, setErrors] = useState<ValidationBag>();
 
   useEffect(() => {
-    if (data) {
+    if (data && !recurringExpense) {
       setRecurringExpense(data);
     }
   }, [data]);
+
+  useEffect(() => {
+    if (mounted) {
+      return () => setRecurringExpense(undefined);
+    } else {
+      mounted = true;
+    }
+  }, []);
 
   const handleChange = <T extends keyof RecurringExpense>(
     property: T,
@@ -82,12 +90,12 @@ export function Create() {
         );
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        toast.error();
-
         if (error.response?.status === 422) {
           setErrors(error.response.data);
+          toast.dismiss();
+        } else {
+          console.error(error);
+          toast.error();
         }
       });
   };
@@ -98,6 +106,7 @@ export function Create() {
       breadcrumbs={pages}
       onBackClick="/recurring_expenses"
       onSaveClick={() => recurringExpense && onSave(recurringExpense)}
+      disableSaveButton={recurringExpense?.client_id.length === 0}
     >
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 xl:col-span-4">

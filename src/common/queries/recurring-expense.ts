@@ -26,3 +26,23 @@ export function useBlankRecurringExpenseQuery() {
     { staleTime: Infinity }
   );
 }
+
+interface Params {
+  id: string | undefined;
+  enabled?: boolean;
+}
+
+export function useRecurringExpenseQuery(params: Params) {
+  return useQuery<RecurringExpense>(
+    route('/api/v1/recurring_expenses/:id', { id: params.id }),
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/recurring_expenses/:id', { id: params.id })
+      ).then(
+        (response: GenericSingleResourceResponse<RecurringExpense>) =>
+          response.data.data
+      ),
+    { enabled: params.enabled ?? true, staleTime: Infinity }
+  );
+}
