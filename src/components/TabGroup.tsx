@@ -55,8 +55,7 @@ export function TabGroup(props: Props) {
 
       <div
         className={classNames({
-          flex: props.height === 'full',
-          'flex-1': props.height === 'full',
+          'flex flex-1': props.height === 'full',
           'my-4': props.height !== 'full',
         })}
       >
@@ -67,18 +66,11 @@ export function TabGroup(props: Props) {
               key: index,
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              style: {
-                display:
-                  currentIndex === index
-                    ? `${props.height === 'full' ? 'flex' : 'block'}`
-                    : 'none',
-                ...(props.height === 'full' && {
-                  flexDirection: 'column',
-                }),
-                ...(props.height === 'full' && {
-                  flexGrow: 1,
-                }),
-              },
+              className: classNames({
+                'flex flex-col flex-1': props.height === 'full',
+                'block my-4': props.height !== 'full',
+                hidden: currentIndex !== index,
+              }),
             })
         )}
       </div>
