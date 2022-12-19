@@ -40,7 +40,10 @@ export function App() {
     if (resolvedLanguage?.locale) {
       if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
         fetch(
-          `/src/resources/lang/${resolvedLanguage.locale}/${resolvedLanguage.locale}.json`
+          new URL(
+            `/src/resources/lang/${resolvedLanguage.locale}/${resolvedLanguage.locale}.json`,
+            import.meta.url
+          ).href
         )
           .then((response) => response.json())
           .then((response: JSON) => {
