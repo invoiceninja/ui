@@ -17,11 +17,13 @@ interface Props {
   tabs: string[];
   className?: string;
   defaultTabIndex?: number;
+  height?: 'full';
   width?: 'full';
 }
 
 export function TabGroup(props: Props) {
   const accentColor = useAccentColor();
+
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
 
   return (
@@ -51,7 +53,12 @@ export function TabGroup(props: Props) {
         ))}
       </div>
 
-      <div className="my-4">
+      <div
+        className={classNames({
+          'flex flex-1': props.height === 'full',
+          'my-4': props.height !== 'full',
+        })}
+      >
         {[...props.children].map(
           (element, index) =>
             React.isValidElement(element) &&
@@ -59,7 +66,11 @@ export function TabGroup(props: Props) {
               key: index,
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              style: { display: currentIndex === index ? 'block' : 'none' },
+              className: classNames({
+                'flex flex-col flex-1': props.height === 'full',
+                'block my-4': props.height !== 'full',
+                hidden: currentIndex !== index,
+              }),
             })
         )}
       </div>
