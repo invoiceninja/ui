@@ -49,7 +49,7 @@ export function Details(props: Props) {
   return (
     <Card title={t('details')} isLoading={!recurringExpense}>
       {recurringExpense && pageType === 'edit' && (
-        <Element leftSide={t('recurring_expense_number')}>
+        <Element leftSide={t('expense_number')}>
           <InputField
             value={recurringExpense.number}
             onValueChange={(value) => handleChange('number', value)}
