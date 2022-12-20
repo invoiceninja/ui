@@ -24,6 +24,7 @@ import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
+import { SelectOption } from 'components/datatables/Actions';
 import { EntityStatus } from 'components/EntityStatus';
 import { StatusBadge } from 'components/StatusBadge';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
@@ -289,4 +290,43 @@ export function usePurchaseOrderColumns() {
   return columns
     .filter((column) => list.includes(column.column))
     .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+}
+
+export function usePurchaseOrderFilters() {
+  const [t] = useTranslation();
+
+  const filters: SelectOption[] = [
+    {
+      label: t('all'),
+      value: 'all',
+      color: 'black',
+      backgroundColor: '#e4e4e4',
+    },
+    {
+      label: t('draft'),
+      value: 'draft',
+      color: 'white',
+      backgroundColor: '#6B7280',
+    },
+    {
+      label: t('sent'),
+      value: 'sent',
+      color: 'white',
+      backgroundColor: '#93C5FD',
+    },
+    {
+      label: t('accepted'),
+      value: 'accepted',
+      color: 'white',
+      backgroundColor: '#1D4ED8',
+    },
+    {
+      label: t('cancelled'),
+      value: 'cancelled',
+      color: 'white',
+      backgroundColor: '#e6b05c',
+    },
+  ];
+
+  return filters;
 }
