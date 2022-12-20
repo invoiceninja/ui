@@ -16,7 +16,7 @@ import { useActions, useRecurringExpenseColumns } from '../common/hooks';
 export function RecurringExpenses() {
   useTitle('recurring_expenses');
 
-  const { t } = useTranslation();
+  const [t] = useTranslation();
 
   const pages = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
@@ -34,8 +34,9 @@ export function RecurringExpenses() {
     >
       <DataTable
         resource="recurring_expense"
-        endpoint="/api/v1/recurring_expenses"
+        endpoint="/api/v1/recurring_expenses?include=client,vendor"
         columns={columns}
+        bulkRoute="/api/v1/recurring_expenses/bulk"
         linkToCreate="/recurring_expenses/create"
         linkToEdit="/recurring_expenses/:id/edit"
         customActions={actions}

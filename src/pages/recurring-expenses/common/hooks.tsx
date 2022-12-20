@@ -35,7 +35,7 @@ import { useQueryClient } from 'react-query';
 import { expenseAtom } from 'pages/expenses/common/atoms';
 
 export function useRecurringExpenseColumns() {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
@@ -172,7 +172,7 @@ export function useToggleStartStop() {
 }
 
 export function useActions() {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
 
   const navigate = useNavigate();
 

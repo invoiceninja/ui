@@ -23,10 +23,10 @@ interface Props extends RecurringExpenseCardProps {
 export function TaxSettings(props: Props) {
   const [t] = useTranslation();
 
+  const company = useCurrentCompany();
+
   const { recurringExpense, handleChange, taxInputType, setTaxInputType } =
     props;
-
-  const company = useCurrentCompany();
 
   return (
     <Card title={t('taxes')} isLoading={!recurringExpense}>
@@ -63,8 +63,8 @@ export function TaxSettings(props: Props) {
           }
         >
           <Toggle
-            onChange={(value) => handleChange('uses_inclusive_taxes', value)}
             checked={recurringExpense.uses_inclusive_taxes}
+            onChange={(value) => handleChange('uses_inclusive_taxes', value)}
           />
         </Element>
       )}

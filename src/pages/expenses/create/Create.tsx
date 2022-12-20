@@ -52,7 +52,6 @@ export function Create() {
   );
 
   const [errors, setErrors] = useState<ValidationBag>();
-
   useEffect(() => {
     if (data && !expense) {
       setExpense(data);

@@ -22,18 +22,18 @@ export function Notes(props: RecurringExpenseCardProps) {
     <Card title={t('notes')} isLoading={!recurringExpense} withContainer>
       {recurringExpense && (
         <InputField
-          value={recurringExpense.public_notes}
-          label={t('public_notes')}
           element="textarea"
+          label={t('public_notes')}
+          value={recurringExpense.public_notes}
           onValueChange={(value) => handleChange('public_notes', value)}
         />
       )}
 
       {recurringExpense && (
         <InputField
-          value={recurringExpense.private_notes}
-          label={t('private_notes')}
           element="textarea"
+          label={t('private_notes')}
+          value={recurringExpense.private_notes}
           onValueChange={(value) => handleChange('private_notes', value)}
         />
       )}
