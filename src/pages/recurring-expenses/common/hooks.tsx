@@ -157,11 +157,7 @@ export function useToggleStartStop() {
           })
         );
 
-        toast.success(
-          action === 'start'
-            ? 'started_recurring_expense'
-            : 'stopped_recurring_expense'
-        );
+        toast.success(action === 'start' ? 'started' : 'stopped');
       })
       .catch((error) => {
         console.error(error);
