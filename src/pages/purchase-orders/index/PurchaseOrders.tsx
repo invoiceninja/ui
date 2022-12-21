@@ -45,7 +45,7 @@ export function PurchaseOrders() {
         columns={columns}
         customFilters={filters}
         customFilterQueryKey="client_status"
-        customFilterPlaceholder="purchase_order_status"
+        customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={
           <DataTableColumnsPicker
