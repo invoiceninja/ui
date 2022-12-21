@@ -46,6 +46,7 @@ export function CustomResourcefulActions(props: Props) {
           to={route('/clients/:id/statement', {
             id: props.clientId,
           })}
+          iconType="view"
         >
           {t('view_statement')}
         </DropdownElement>
@@ -54,6 +55,7 @@ export function CustomResourcefulActions(props: Props) {
           to={route('/invoices/create?client=:id', {
             id: props.clientId,
           })}
+          iconType="new"
         >
           {t('new_invoice')}
         </DropdownElement>
@@ -62,6 +64,7 @@ export function CustomResourcefulActions(props: Props) {
           to={route('/payments/create?client=:id', {
             id: props.clientId,
           })}
+          iconType="new"
         >
           {t('new_payment')}
         </DropdownElement>
@@ -70,6 +73,7 @@ export function CustomResourcefulActions(props: Props) {
           to={route('/quotes/create?client=:id', {
             id: props.clientId,
           })}
+          iconType="new"
         >
           {t('new_quote')}
         </DropdownElement>
@@ -77,6 +81,7 @@ export function CustomResourcefulActions(props: Props) {
           to={route('/credits/create?client=:id', {
             id: props.clientId,
           })}
+          iconType="new"
         >
           {t('new_credit')}
         </DropdownElement>
@@ -88,6 +93,7 @@ export function CustomResourcefulActions(props: Props) {
           onClick={() => {
             handleResourcefulAction('archive');
           }}
+          iconType="archive"
         >
           {t('archive')}
         </DropdownElement>
@@ -96,6 +102,7 @@ export function CustomResourcefulActions(props: Props) {
           onClick={() => {
             handleResourcefulAction('delete');
           }}
+          iconType="delete"
         >
           {t('delete')}
         </DropdownElement>
@@ -104,6 +111,7 @@ export function CustomResourcefulActions(props: Props) {
           onClick={() => {
             props.openPurgeModal(true);
           }}
+          iconType="purge"
         >
           {t('purge')}
         </DropdownElement>

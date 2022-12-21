@@ -8,12 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import classNames from 'classnames';
+import { Icon } from 'components/icons/Icon';
+import { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   to?: string;
   setVisible?: (value: boolean) => any;
+  iconType?: 'view' | 'new' | 'archive' | 'delete' | 'purge';
+  icon?: ReactNode;
 }
 
 export function DropdownElement(props: Props) {
@@ -21,9 +26,22 @@ export function DropdownElement(props: Props) {
     return (
       <Link
         to={props.to}
-        className={`w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700 ${props.className}`}
+        className={classNames(
+          {
+            'flex items-center': props.iconType,
+          },
+          `w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700 ${props.className}`
+        )}
       >
-        {props.children}
+        {props.iconType && !props.icon && <Icon type={props.iconType} />}
+        {props.icon}
+        <div
+          className={classNames({
+            'ml-2': props.iconType,
+          })}
+        >
+          {props.children}
+        </div>
       </Link>
     );
   }
@@ -36,9 +54,22 @@ export function DropdownElement(props: Props) {
         props.setVisible?.(false);
       }}
       ref={props.innerRef}
-      className={`w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 ${props.className} `}
+      className={classNames(
+        {
+          'flex items-center': props.iconType,
+        },
+        `w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 ${props.className} `
+      )}
     >
-      {props.children}
+      {props.iconType && !props.icon && <Icon type={props.iconType} />}
+      {props.icon}
+      <div
+        className={classNames({
+          'ml-2': props.iconType,
+        })}
+      >
+        {props.children}
+      </div>
     </button>
   );
 }
