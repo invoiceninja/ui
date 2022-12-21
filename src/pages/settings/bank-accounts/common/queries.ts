@@ -15,7 +15,12 @@ import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-res
 import { BankAccountDetails } from 'common/interfaces/bank-accounts';
 import { route } from 'common/helpers/route';
 
-export function useBankAccountsQuery(params: { id: string | undefined }) {
+interface BankAccountParams {
+  id: string | undefined;
+  enabled?: boolean;
+}
+
+export function useBankAccountQuery(params: BankAccountParams) {
   return useQuery<BankAccountDetails>(
     route('/api/v1/bank_integrations/:id', { id: params.id }),
     () =>
@@ -25,6 +30,7 @@ export function useBankAccountsQuery(params: { id: string | undefined }) {
       ).then(
         (response: GenericSingleResourceResponse<BankAccountDetails>) =>
           response.data.data
-      )
+      ),
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }

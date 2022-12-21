@@ -49,6 +49,7 @@ import { StatusBadge } from 'components/StatusBadge';
 import recurringInvoicesFrequency from 'common/constants/recurring-invoices-frequency';
 import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
+import { SelectOption } from 'components/datatables/Actions';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -638,4 +639,37 @@ export function useRecurringInvoiceColumns() {
   return columns
     .filter((column) => list.includes(column.column))
     .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+}
+
+export function useRecurringInvoiceFilters() {
+  const [t] = useTranslation();
+
+  const filters: SelectOption[] = [
+    {
+      label: t('all'),
+      value: 'all',
+      color: 'black',
+      backgroundColor: '#e4e4e4',
+    },
+    {
+      label: t('active'),
+      value: 'paid',
+      color: 'white',
+      backgroundColor: '#22C55E',
+    },
+    {
+      label: t('paused'),
+      value: 'unpaid',
+      color: 'white',
+      backgroundColor: '#F97316',
+    },
+    {
+      label: t('completed'),
+      value: 'overdue',
+      color: 'white',
+      backgroundColor: '#93C5FD',
+    },
+  ];
+
+  return filters;
 }

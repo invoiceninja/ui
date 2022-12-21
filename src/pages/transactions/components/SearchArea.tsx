@@ -23,12 +23,17 @@ interface Props {
   setSearchParams: Dispatch<SetStateAction<SearchInput>>;
   setSelectedIds: Dispatch<SetStateAction<string[]>>;
   setIsFilterModalOpened: Dispatch<SetStateAction<boolean>>;
-  isInvoicesDataKey: boolean;
   isFilterModalOpened: boolean;
   dataKey: string;
 }
 
 export function SearchArea(props: Props) {
+  const isInvoicesDataKey = props.dataKey === 'invoices';
+
+  const isPaymentsDataKey = props.dataKey === 'payments';
+
+  const isExpensesDataKey = props.dataKey === 'expenses';
+
   const [
     isCreateExpenseCategoryModalOpen,
     setIsCreateExpenseCategoryModalOpen,
@@ -74,7 +79,7 @@ export function SearchArea(props: Props) {
           }
         />
 
-        {props.isInvoicesDataKey ? (
+        {isInvoicesDataKey || isPaymentsDataKey || isExpensesDataKey ? (
           <MdFilterAlt
             className="ml-3 cursor-pointer"
             fontSize={28}

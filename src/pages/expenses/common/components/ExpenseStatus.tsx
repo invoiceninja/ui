@@ -11,9 +11,10 @@
 import { Badge } from 'components/Badge';
 import { useTranslation } from 'react-i18next';
 import { Expense } from 'common/interfaces/expense';
+import { ResourceItem } from 'pages/transactions/components/ListBox';
 
 interface Props {
-  entity: Expense;
+  entity: Expense | ResourceItem;
 }
 
 export function ExpenseStatus(props: Props) {
@@ -26,6 +27,4 @@ export function ExpenseStatus(props: Props) {
     return <Badge variant="light-blue">{t('paid')}</Badge>;
 
   return <Badge variant="generic">{t('logged')}</Badge>;
-
-  return <></>;
 }

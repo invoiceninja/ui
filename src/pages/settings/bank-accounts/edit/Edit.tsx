@@ -26,7 +26,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Settings } from '../../../../components/layouts/Settings';
-import { useBankAccountsQuery } from '../common/queries';
+import { useBankAccountQuery } from '../common/queries';
 
 interface BankAccountValidation {
   bank_account_name?: string[];
@@ -41,7 +41,7 @@ export function Edit() {
 
   const { id } = useParams<string>();
 
-  const { data: response } = useBankAccountsQuery({ id });
+  const { data: response } = useBankAccountQuery({ id });
 
   const queryClient = useQueryClient();
 
@@ -94,7 +94,13 @@ export function Edit() {
       )
         .then(() => {
           toast.success('updated_bank_account');
+
           queryClient.invalidateQueries('/api/v1/bank_integrations');
+
+          queryClient.invalidateQueries(
+            route('/api/v1/bank_integrations/:id', { id })
+          );
+
           navigate('/settings/bank_accounts');
         })
         .catch((error: AxiosError<ValidationBag>) => {
@@ -123,7 +129,7 @@ export function Edit() {
       onSaveClick={handleSave}
     >
       <Card onFormSubmit={handleSave} title={t('edit_bank_account')}>
-        <Element leftSide={t('bank_account_name')}>
+        <Element leftSide={t('account_name')}>
           <InputField
             value={accountDetails?.bank_account_name}
             onValueChange={(value) => handleChange('bank_account_name', value)}

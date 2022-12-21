@@ -52,4 +52,5 @@ export interface TransactionResponse {
   transaction_id: number;
   update_at: number;
   vendor_id: string;
+  payment_id: string;
 }
