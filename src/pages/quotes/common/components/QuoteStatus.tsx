@@ -28,9 +28,13 @@ export function QuoteStatus(props: Props) {
   if (props.entity.invoice_id)
     return <Badge variant="green">{t('converted')}</Badge>;
 
+  if (
+    props.entity.status_id === '2' &&
+    new Date(props.entity.date) < new Date()
+  )
+    return <Badge variant="red">{t('expired')}</Badge>;
+
   switch (props.entity.status_id) {
-    case '-1':
-      return <Badge variant="red">{t('expired')}</Badge>;
     case '1':
       return <Badge variant="generic">{t('draft')}</Badge>;
     case '2':
@@ -39,8 +43,5 @@ export function QuoteStatus(props: Props) {
       return <Badge variant="dark-blue">{t('approved')}</Badge>;
     default:
       return <Badge variant="light-blue">{t('error')}</Badge>;
-      break;
   }
-
-  return <></>;
 }
