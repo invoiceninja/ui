@@ -49,7 +49,7 @@ export function Quotes() {
         customActions={actions}
         customFilters={filters}
         customFilterQueryKey="client_status"
-        customFilterPlaceholder="quote_status"
+        customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={<ImportButton route="/quotes/import" />}
         leftSideChevrons={
