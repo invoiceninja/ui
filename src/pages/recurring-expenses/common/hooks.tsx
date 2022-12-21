@@ -157,7 +157,7 @@ export function useToggleStartStop() {
           })
         );
 
-        toast.success(action === 'start' ? 'started' : 'stopped');
+        toast.success(action === 'start' ? 'start' : 'stop');
       })
       .catch((error) => {
         console.error(error);
