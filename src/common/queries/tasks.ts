@@ -15,14 +15,19 @@ import { Task } from 'common/interfaces/task';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 
-export function useTaskQuery(params: { id: string | undefined }) {
+interface TaskParams {
+  id?: string;
+  enabled?: boolean;
+}
+
+export function useTaskQuery(params: TaskParams) {
   return useQuery<Task>(
     route('/api/v1/tasks/:id', { id: params.id }),
     () =>
       request('GET', endpoint('/api/v1/tasks/:id', { id: params.id })).then(
         (response) => response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: params.enabled ?? true }
   );
 }
 

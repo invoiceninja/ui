@@ -9,8 +9,10 @@
  */
 
 import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
+import { date, endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
@@ -20,6 +22,7 @@ import { customField } from 'components/CustomField';
 import dayjs from 'dayjs';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { TaskStatus } from './components/TaskStatus';
 import {
   calculateEntityState,
@@ -240,4 +243,24 @@ export function useTaskColumns() {
   return columns
     .filter((column) => list.includes(column.column))
     .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+}
+
+export function useSave() {
+  const queryClient = useQueryClient();
+
+  return (task: Task) => {
+    request('PUT', endpoint('/api/v1/tasks/:id', { id: task.id }), task)
+      .then(() => {
+        toast.success('updated_task');
+
+        queryClient.invalidateQueries(
+          route('/api/v1/tasks/:id', { id: task.id })
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.error();
+      });
+  };
 }

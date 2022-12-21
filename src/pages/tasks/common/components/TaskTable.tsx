@@ -15,11 +15,24 @@ import { Task } from 'common/interfaces/task';
 import dayjs from 'dayjs';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import {
+  duration,
+  handleTaskDateChange,
+  handleTaskDurationChange,
+  handleTaskTimeChange,
+  parseTime,
+  parseTimeToDate,
+} from '../helpers';
 import { parseTimeLog } from '../helpers/calculate-time';
 
 interface Props {
   task: Task;
   handleChange: (property: keyof Task, value: unknown) => unknown;
+}
+
+export enum LogPosition {
+  Start = 0,
+  End = 1,
 }
 
 export function TaskTable(props: Props) {
@@ -52,50 +65,16 @@ export function TaskTable(props: Props) {
     handleChange('time_log', JSON.stringify(logs));
   };
 
-  const parseTimeToDate = (timestamp: number) => {
-    if (timestamp === 0) {
-      return;
-    }
-
-    return dayjs.unix(timestamp).format('YYYY-MM-DD');
-  };
-
-  const parseTime = (timestamp: number) => {
-    if (timestamp === 0) {
-      return;
-    }
-
-    return dayjs.unix(timestamp).format('hh:mm:ss');
-  };
-
-  const duration = (start: number, stop: number) => {
-    const diff = dayjs.unix(stop).diff(dayjs.unix(start), 'seconds');
-
-    if (diff < 0) {
-      return;
-    }
-
-    return new Date(diff * 1000).toISOString().slice(11, 19);
-  };
-
   const handleTimeChange = (
     unix: number,
     time: string,
     position: number,
     index: number
   ) => {
-    const date = parseTimeToDate(unix);
-
-    const unixTimestamp = dayjs(
-      `${date} ${time}`,
-      'YYYY-MM-DD hh:mm:ss'
-    ).unix();
-
-    const logs = parseTimeLog(task.time_log);
-
-    logs[index][position] = unixTimestamp;
-
-    handleChange('time_log', JSON.stringify(logs));
+    handleChange(
+      'time_log',
+      handleTaskTimeChange(task.time_log, unix, time, position, index)
+    );
   };
 
   const handleDateChange = (
@@ -104,19 +83,10 @@ export function TaskTable(props: Props) {
     index: number,
     position: number
   ) => {
-    const date = parseTimeToDate(unix);
-    const time = parseTime(unix);
-
-    const unixTimestamp = dayjs(
-      `${date} ${time}`,
-      'YYYY-MM-DD hh:mm:ss'
-    ).unix();
-
-    const logs = parseTimeLog(task.time_log);
-
-    logs[index][position] = unixTimestamp;
-
-    handleChange('time_log', JSON.stringify(logs));
+    handleChange(
+      'time_log',
+      handleTaskDateChange(task.time_log, unix, value, index, position)
+    );
   };
 
   const handleDurationChange = (
@@ -124,26 +94,10 @@ export function TaskTable(props: Props) {
     start: number,
     index: number
   ) => {
-    let date = dayjs.unix(start);
-    const parts = value.split(':');
-
-    if (parts[0]) {
-      date = date.add(parseFloat(parts[0]), 'hour');
-    }
-
-    if (parts[1]) {
-      date = date.add(parseFloat(parts[1]), 'minute');
-    }
-
-    if (parts[2]) {
-      date = date.add(parseFloat(parts[2]), 'second');
-    }
-
-    const logs = parseTimeLog(task.time_log);
-
-    logs[index][1] = date.unix();
-
-    handleChange('time_log', JSON.stringify(logs));
+    handleChange(
+      'time_log',
+      handleTaskDurationChange(task.time_log, value, start, index)
+    );
   };
 
   return (
@@ -165,7 +119,7 @@ export function TaskTable(props: Props) {
                     type="date"
                     value={parseTimeToDate(start)}
                     onValueChange={(value) =>
-                      handleDateChange(start, value, index, 0)
+                      handleDateChange(start, value, index, LogPosition.Start)
                     }
                   />
                 </Td>
@@ -174,7 +128,7 @@ export function TaskTable(props: Props) {
                     type="time"
                     value={parseTime(start)}
                     onValueChange={(value) =>
-                      handleTimeChange(start, value, 0, index)
+                      handleTimeChange(start, value, LogPosition.Start, index)
                     }
                     step="1"
                   />
@@ -185,7 +139,7 @@ export function TaskTable(props: Props) {
                       type="date"
                       value={parseTimeToDate(stop)}
                       onValueChange={(value) =>
-                        handleDateChange(start, value, index, 0)
+                        handleDateChange(start, value, index, LogPosition.End)
                       }
                     />
                   </Td>
@@ -195,7 +149,7 @@ export function TaskTable(props: Props) {
                     type="time"
                     value={parseTime(stop || 0)}
                     onValueChange={(value) =>
-                      handleTimeChange(start, value, 1, index)
+                      handleTimeChange(start, value, LogPosition.End, index)
                     }
                     step="1"
                   />
