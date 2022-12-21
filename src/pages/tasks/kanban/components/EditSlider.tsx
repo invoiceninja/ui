@@ -23,6 +23,8 @@ import { useAtom } from 'jotai';
 import { LogPosition } from 'pages/tasks/common/components/TaskTable';
 import {
   handleTaskDateChange,
+  handleTaskTimeChange,
+  parseTime,
   parseTimeToDate,
 } from 'pages/tasks/common/helpers';
 import { parseTimeLog } from 'pages/tasks/common/helpers/calculate-time';
@@ -67,6 +69,18 @@ export function EditSlider() {
     );
   };
 
+  const handleTimeChange = (
+    unix: number,
+    time: string,
+    index: number,
+    position: number
+  ) => {
+    handleChange(
+      'time_log',
+      handleTaskTimeChange(task!.time_log, unix, time, position, index)
+    );
+  };
+
   return (
     <>
       <Modal
@@ -93,6 +107,21 @@ export function EditSlider() {
               }
             />
 
+            <InputField
+              label={t('start_time')}
+              type="time"
+              value={parseTime(timeLog[timeLogIndex!][LogPosition.Start])}
+              onValueChange={(value) =>
+                handleTimeChange(
+                  timeLog[timeLogIndex!][LogPosition.Start],
+                  value,
+                  LogPosition.Start,
+                  timeLogIndex!
+                )
+              }
+              step="1"
+            />
+
             {company?.show_task_end_date && (
               <InputField
                 label={t('end_date')}
@@ -108,6 +137,21 @@ export function EditSlider() {
                 }
               />
             )}
+
+            <InputField
+              label={t('end_time')}
+              type="time"
+              value={parseTime(timeLog[timeLogIndex!][LogPosition.End])}
+              onValueChange={(value) =>
+                handleTimeChange(
+                  timeLog[timeLogIndex!][LogPosition.End],
+                  value,
+                  timeLogIndex!,
+                  LogPosition.End
+                )
+              }
+              step="1"
+            />
           </>
         )}
 
@@ -190,7 +234,6 @@ export function EditSlider() {
         </div>
       </TabGroup>
 
-      
       <div className="flex justify-end p-4">
         <Button onClick={() => task && save(task)}>{t('save')}</Button>
       </div>
