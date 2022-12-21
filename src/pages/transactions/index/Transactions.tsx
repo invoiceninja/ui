@@ -91,7 +91,7 @@ export function Transactions() {
           onTableRowClick={getSelectedTransaction}
           customFilters={filters}
           customFilterQueryKey="client_status"
-          customFilterPlaceholder="transaction_status"
+          customFilterPlaceholder="status"
           rightSide={<ImportButton route="/transactions/import" />}
           withResourcefulActions
         />
