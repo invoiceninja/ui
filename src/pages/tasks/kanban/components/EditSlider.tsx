@@ -22,7 +22,9 @@ import { UserSelector } from 'components/users/UserSelector';
 import { useAtom } from 'jotai';
 import { LogPosition } from 'pages/tasks/common/components/TaskTable';
 import {
+  duration,
   handleTaskDateChange,
+  handleTaskDurationChange,
   handleTaskTimeChange,
   parseTime,
   parseTimeToDate,
@@ -78,6 +80,17 @@ export function EditSlider() {
     handleChange(
       'time_log',
       handleTaskTimeChange(task!.time_log, unix, time, position, index)
+    );
+  };
+
+  const handleDurationChange = (
+    value: string,
+    start: number,
+    index: number
+  ) => {
+    handleChange(
+      'time_log',
+      handleTaskDurationChange(task!.time_log, value, start, index)
     );
   };
 
@@ -151,6 +164,22 @@ export function EditSlider() {
                 )
               }
               step="1"
+            />
+
+            <InputField
+              label={t('duration')}
+              debounceTimeout={1000}
+              value={duration(
+                timeLog[timeLogIndex!][LogPosition.Start],
+                timeLog[timeLogIndex!][LogPosition.End]
+              )}
+              onValueChange={(value) =>
+                handleDurationChange(
+                  value,
+                  timeLog[timeLogIndex!][LogPosition.Start],
+                  timeLogIndex!
+                )
+              }
             />
           </>
         )}
