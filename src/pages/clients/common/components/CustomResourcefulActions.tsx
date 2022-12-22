@@ -15,6 +15,14 @@ import { DropdownElement } from 'components/dropdown/DropdownElement';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { route } from 'common/helpers/route';
+import {
+  MdArchive,
+  MdDelete,
+  MdDeleteForever,
+  MdPictureAsPdf,
+} from 'react-icons/md';
+import { BiPlusCircle } from 'react-icons/bi';
+import { Icon } from 'components/icons/Icon';
 
 interface Props {
   clientId: string | undefined;
@@ -46,7 +54,7 @@ export function CustomResourcefulActions(props: Props) {
           to={route('/clients/:id/statement', {
             id: props.clientId,
           })}
-          iconType="view"
+          icon={<Icon element={MdPictureAsPdf} />}
         >
           {t('view_statement')}
         </DropdownElement>
@@ -55,7 +63,7 @@ export function CustomResourcefulActions(props: Props) {
           to={route('/invoices/create?client=:id', {
             id: props.clientId,
           })}
-          iconType="new"
+          icon={<Icon element={BiPlusCircle} />}
         >
           {t('new_invoice')}
         </DropdownElement>
@@ -64,7 +72,7 @@ export function CustomResourcefulActions(props: Props) {
           to={route('/payments/create?client=:id', {
             id: props.clientId,
           })}
-          iconType="new"
+          icon={<Icon element={BiPlusCircle} />}
         >
           {t('new_payment')}
         </DropdownElement>
@@ -73,7 +81,7 @@ export function CustomResourcefulActions(props: Props) {
           to={route('/quotes/create?client=:id', {
             id: props.clientId,
           })}
-          iconType="new"
+          icon={<Icon element={BiPlusCircle} />}
         >
           {t('new_quote')}
         </DropdownElement>
@@ -81,7 +89,7 @@ export function CustomResourcefulActions(props: Props) {
           to={route('/credits/create?client=:id', {
             id: props.clientId,
           })}
-          iconType="new"
+          icon={<Icon element={BiPlusCircle} />}
         >
           {t('new_credit')}
         </DropdownElement>
@@ -93,7 +101,7 @@ export function CustomResourcefulActions(props: Props) {
           onClick={() => {
             handleResourcefulAction('archive');
           }}
-          iconType="archive"
+          icon={<Icon element={MdArchive} />}
         >
           {t('archive')}
         </DropdownElement>
@@ -102,7 +110,7 @@ export function CustomResourcefulActions(props: Props) {
           onClick={() => {
             handleResourcefulAction('delete');
           }}
-          iconType="delete"
+          icon={<Icon element={MdDelete} />}
         >
           {t('delete')}
         </DropdownElement>
@@ -111,7 +119,7 @@ export function CustomResourcefulActions(props: Props) {
           onClick={() => {
             props.openPurgeModal(true);
           }}
-          iconType="purge"
+          icon={<Icon element={MdDeleteForever} />}
         >
           {t('purge')}
         </DropdownElement>

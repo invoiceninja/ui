@@ -8,62 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { BiPlusCircle } from 'react-icons/bi';
-import {
-  MdPictureAsPdf,
-  MdArchive,
-  MdDelete,
-  MdDeleteForever,
-} from 'react-icons/md';
+import { useAccentColor } from 'common/hooks/useAccentColor';
+import { isValidElement, cloneElement, createElement } from 'react';
+import { IconType } from 'react-icons';
 
 interface Props {
-  type: 'view' | 'new' | 'archive' | 'delete' | 'purge';
-  fontSize?: number;
+  element: IconType;
+  size?: number;
   color?: string;
 }
 
 export function Icon(props: Props) {
-  const fontSize = props.fontSize ? props.fontSize : 18;
+  const accentColor = useAccentColor();
 
-  switch (props.type) {
-    case 'view':
-      return (
-        <MdPictureAsPdf
-          fontSize={fontSize}
-          color={props.color ? props.color : '#278ADF'}
-        />
-      );
+  const iconElement = createElement(props.element);
 
-    case 'archive':
-      return (
-        <MdArchive
-          fontSize={fontSize}
-          color={props.color ? props.color : '#DFA129'}
-        />
-      );
-
-    case 'delete':
-      return (
-        <MdDelete
-          fontSize={fontSize}
-          color={props.color ? props.color : '#EF4444'}
-        />
-      );
-
-    case 'purge':
-      return (
-        <MdDeleteForever
-          fontSize={fontSize}
-          color={props.color ? props.color : '#EF4444'}
-        />
-      );
-
-    default:
-      return (
-        <BiPlusCircle
-          fontSize={fontSize}
-          color={props.color ? props.color : '#278ADF'}
-        />
-      );
+  if (isValidElement(iconElement)) {
+    return cloneElement(iconElement, {
+      fontSize: props.size || 18,
+      color: props.color || accentColor,
+    });
   }
+
+  return <></>;
 }

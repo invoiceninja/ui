@@ -9,16 +9,14 @@
  */
 
 import classNames from 'classnames';
-import { Icon } from 'components/icons/Icon';
-import { ReactNode } from 'react';
+import { ReactElement } from 'react';
 import { Link } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   to?: string;
   setVisible?: (value: boolean) => any;
-  iconType?: 'view' | 'new' | 'archive' | 'delete' | 'purge';
-  icon?: ReactNode;
+  icon?: ReactElement;
 }
 
 export function DropdownElement(props: Props) {
@@ -28,16 +26,15 @@ export function DropdownElement(props: Props) {
         to={props.to}
         className={classNames(
           {
-            'flex items-center': props.iconType,
+            'flex items-center': props.icon,
           },
           `w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-700 ${props.className}`
         )}
       >
-        {props.iconType && !props.icon && <Icon type={props.iconType} />}
         {props.icon}
         <div
           className={classNames({
-            'ml-2': props.iconType,
+            'ml-2': props.icon,
           })}
         >
           {props.children}
@@ -56,16 +53,15 @@ export function DropdownElement(props: Props) {
       ref={props.innerRef}
       className={classNames(
         {
-          'flex items-center': props.iconType,
+          'flex items-center': props.icon,
         },
         `w-full text-left hover:bg-gray-100 z-50 block px-4 py-2 text-sm text-gray-600 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 ${props.className} `
       )}
     >
-      {props.iconType && !props.icon && <Icon type={props.iconType} />}
       {props.icon}
       <div
         className={classNames({
-          'ml-2': props.iconType,
+          'ml-2': props.icon,
         })}
       >
         {props.children}
