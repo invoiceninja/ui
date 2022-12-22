@@ -39,13 +39,26 @@ export function useBlankTaskQuery() {
   );
 }
 
-export function useTasksQuery(options = { limit: 10 }) {
-  return useQuery<GenericManyResponse<Task>>(route('/api/v1/tasks'), () =>
-    request(
-      'GET',
-      endpoint('/api/v1/tasks?limit=:limit', {
-        limit: options.limit.toString(),
-      })
-    ).then((response) => response.data)
+interface TasksParams {
+  options?: {
+    limit: number;
+  };
+  endpoint?: string;
+}
+
+export function useTasksQuery(params: TasksParams) {
+  return useQuery<GenericManyResponse<Task>>(
+    route(':endpoint?limit=:limit', {
+      endpoint: params.endpoint || '/api/v1/tasks',
+      limit: params.options?.limit.toString() || 10,
+    }),
+    () =>
+      request(
+        'GET',
+        endpoint(':endpoint?limit=:limit', {
+          endpoint: params.endpoint || '/api/v1/tasks',
+          limit: params.options?.limit.toString() || 10,
+        })
+      ).then((response) => response.data)
   );
 }

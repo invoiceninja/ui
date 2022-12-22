@@ -192,53 +192,55 @@ export function EditSlider() {
       </Modal>
 
       <TabGroup tabs={[t('details'), t('times')]} width="full">
-        <div className="p-4 space-y-4">
-          <ClientSelector
-            inputLabel={t('client')}
-            value={task?.client_id}
-            onChange={(client) => handleChange('client_id', client.id)}
-          />
+        <div>
+          <div className="px-4 space-y-4">
+            <ClientSelector
+              inputLabel={t('client')}
+              value={task?.client_id}
+              onChange={(client) => handleChange('client_id', client.id)}
+            />
 
-          <ProjectSelector
-            inputLabel={t('project')}
-            value={task?.project_id}
-            onChange={(project) => handleChange('project_id', project.id)}
-          />
+            <ProjectSelector
+              inputLabel={t('project')}
+              value={task?.project_id}
+              onChange={(project) => handleChange('project_id', project.id)}
+            />
 
-          <UserSelector
-            inputLabel={t('user')}
-            value={task?.assigned_user_id}
-            onChange={(user) => handleChange('assigned_user_id', user.id)}
-          />
+            <UserSelector
+              inputLabel={t('user')}
+              value={task?.assigned_user_id}
+              onChange={(user) => handleChange('assigned_user_id', user.id)}
+            />
 
-          <InputField
-            label={t('task_number')}
-            value={task?.number}
-            onValueChange={(number) => handleChange('number', number)}
-          />
+            <InputField
+              label={t('task_number')}
+              value={task?.number}
+              onValueChange={(number) => handleChange('number', number)}
+            />
 
-          <InputField
-            label={t('rate')}
-            value={task?.rate}
-            onValueChange={(rate) => handleChange('rate', rate)}
-          />
+            <InputField
+              label={t('rate')}
+              value={task?.rate}
+              onValueChange={(rate) => handleChange('rate', rate)}
+            />
 
-          <DebouncedCombobox
-            inputLabel={t('status')}
-            endpoint="/api/v1/task_statuses"
-            label="name"
-            onChange={(value: Record<TaskStatus>) =>
-              value.resource && handleChange('status_id', value.resource.id)
-            }
-            defaultValue={task?.status_id}
-            queryAdditional
-          />
+            <DebouncedCombobox
+              inputLabel={t('status')}
+              endpoint="/api/v1/task_statuses"
+              label="name"
+              onChange={(value: Record<TaskStatus>) =>
+                value.resource && handleChange('status_id', value.resource.id)
+              }
+              defaultValue={task?.status_id}
+              queryAdditional
+            />
 
-          <InputField
-            element="textarea"
-            value={task?.description}
-            onValueChange={(value) => handleChange('description', value)}
-          />
+            <InputField
+              element="textarea"
+              value={task?.description}
+              onValueChange={(value) => handleChange('description', value)}
+            />
+          </div>
         </div>
 
         <div>
