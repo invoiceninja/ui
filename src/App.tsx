@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isHosted } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
@@ -70,7 +71,7 @@ export function App() {
 
   return (
     <div className="App">
-      {user && !isEmailVerified && <VerifyBanner type="email" />}
+      {user && !isEmailVerified && isHosted() && <VerifyBanner type="email" />}
       <Toaster position="top-center" />
       {routes}
     </div>
