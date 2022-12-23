@@ -1,7 +1,8 @@
 {
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "github>whitesource/merge-confidence:beta",
     "config:base",
+    "github>whitesource/merge-confidence:beta",
     ":preserveSemverRanges"
   ],
   "baseBranches": ["develop"],
@@ -11,6 +12,6 @@
     }
   ],
   "prHourlyLimit": 5,
-  "prConcurrentLimit": 10,
+  "prConcurrentLimit": 5,
   "rangeStrategy": "auto"
 }
