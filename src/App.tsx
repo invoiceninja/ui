@@ -9,8 +9,10 @@
  */
 
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
-import { useEffect } from 'react';
+import { VerifyBanner } from 'components/VerifyBanner';
+import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -21,6 +23,10 @@ export function App() {
   const { i18n } = useTranslation();
 
   const company = useCurrentCompany();
+
+  const user = useCurrentUser();
+
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   const resolveLanguage = useResolveLanguage();
 
@@ -56,8 +62,15 @@ export function App() {
     }
   }, [darkMode, resolvedLanguage]);
 
+  useEffect(() => {
+    if (user) {
+      setIsEmailVerified(!!user.email_verified_at);
+    }
+  }, [user]);
+
   return (
     <div className="App">
+      {user && !isEmailVerified && <VerifyBanner type="email" />}
       <Toaster position="top-center" />
       {routes}
     </div>
