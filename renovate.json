@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "github>whitesource/merge-confidence:beta",
+    "config:base",
+    ":preserveSemverRanges"
+  ],
+  "baseBranches": ["develop"],
+  "packageRules": [
+    {
+      "updateTypes": ["minor", "patch", "pin", "digest"]
+    }
+  ],
+  "prHourlyLimit": 5,
+  "prConcurrentLimit": 10,
+  "rangeStrategy": "auto"
+}
