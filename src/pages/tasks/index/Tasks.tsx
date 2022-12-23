@@ -22,6 +22,8 @@ import { useStop } from '../common/hooks/useStop';
 import { useInvoiceTask } from '../common/hooks/useInvoiceTask';
 import { defaultColumns, taskColumns, useTaskColumns } from '../common/hooks';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
+import { Icon } from 'components/icons/Icon';
+import { MdNotStarted, MdStopCircle, MdTextSnippet } from 'react-icons/md';
 
 export function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -38,20 +40,29 @@ export function Tasks() {
   const actions = [
     (task: Task) =>
       !isTaskRunning(task) && (
-        <DropdownElement onClick={() => start(task)}>
+        <DropdownElement
+          onClick={() => start(task)}
+          icon={<Icon element={MdNotStarted} />}
+        >
           {t('start')}
         </DropdownElement>
       ),
     (task: Task) =>
       isTaskRunning(task) && (
-        <DropdownElement onClick={() => stop(task)}>
+        <DropdownElement
+          onClick={() => stop(task)}
+          icon={<Icon element={MdStopCircle} />}
+        >
           {t('stop')}
         </DropdownElement>
       ),
     (task: Task) =>
       !isTaskRunning(task) &&
       !task.invoice_id && (
-        <DropdownElement onClick={() => invoiceTask([task])}>
+        <DropdownElement
+          onClick={() => invoiceTask([task])}
+          icon={<Icon element={MdTextSnippet} />}
+        >
           {t('invoice_task')}
         </DropdownElement>
       ),

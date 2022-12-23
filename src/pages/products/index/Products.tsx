@@ -25,6 +25,8 @@ import {
   useProductColumns,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
+import { Icon } from 'components/icons/Icon';
+import { MdControlPointDuplicate } from 'react-icons/md';
 
 export function Products() {
   useTitle('products');
@@ -56,6 +58,7 @@ export function Products() {
         onClick={() =>
           navigate(route('/products/:id/clone', { id: product.id }))
         }
+        icon={<Icon element={MdControlPointDuplicate} />}
       >
         {t('clone')}
       </DropdownElement>

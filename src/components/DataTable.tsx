@@ -41,6 +41,8 @@ import {
 } from './tables';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
+import { Icon } from './icons/Icon';
+import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -196,15 +198,24 @@ export function DataTable<T extends object>(props: Props<T>) {
           }
         >
           <Dropdown label={t('more_actions')}>
-            <DropdownElement onClick={() => bulk('archive')}>
+            <DropdownElement
+              onClick={() => bulk('archive')}
+              icon={<Icon element={MdArchive} />}
+            >
               {t('archive')}
             </DropdownElement>
 
-            <DropdownElement onClick={() => bulk('restore')}>
+            <DropdownElement
+              onClick={() => bulk('restore')}
+              icon={<Icon element={MdRestore} />}
+            >
               {t('restore')}
             </DropdownElement>
 
-            <DropdownElement onClick={() => bulk('delete')}>
+            <DropdownElement
+              onClick={() => bulk('delete')}
+              icon={<Icon element={MdDelete} />}
+            >
               {t('delete')}
             </DropdownElement>
           </Dropdown>
@@ -329,6 +340,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                           to={route(props.linkToEdit, {
                             id: resource?.id,
                           })}
+                          icon={<Icon element={MdEdit} />}
                         >
                           {t(`edit_${props.resource}`)}
                         </DropdownElement>
@@ -337,6 +349,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                       {resource?.archived_at === 0 && (
                         <DropdownElement
                           onClick={() => bulk('archive', resource.id)}
+                          icon={<Icon element={MdArchive} />}
                         >
                           {t(`archive_${props.resource}`)}
                         </DropdownElement>
@@ -345,6 +358,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                       {resource?.archived_at > 0 && (
                         <DropdownElement
                           onClick={() => bulk('restore', resource.id)}
+                          icon={<Icon element={MdRestore} />}
                         >
                           {t(`restore_${props.resource}`)}
                         </DropdownElement>
@@ -353,6 +367,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                       {!resource?.is_deleted && (
                         <DropdownElement
                           onClick={() => bulk('delete', resource.id)}
+                          icon={<Icon element={MdDelete} />}
                         >
                           {t(`delete_${props.resource}`)}
                         </DropdownElement>

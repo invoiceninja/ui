@@ -56,6 +56,19 @@ import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
 import { useCallback } from 'react';
+import { Icon } from 'components/icons/Icon';
+import {
+  MdArchive,
+  MdCloudCircle,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdDone,
+  MdDownload,
+  MdMarkEmailRead,
+  MdPictureAsPdf,
+  MdRestore,
+  MdSend,
+} from 'react-icons/md';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -290,67 +303,103 @@ export function useActions() {
 
   const actions: Action<Quote>[] = [
     (quote) => (
-      <DropdownElement to={route('/quotes/:id/pdf', { id: quote.id })}>
+      <DropdownElement
+        to={route('/quotes/:id/pdf', { id: quote.id })}
+        icon={<Icon element={MdPictureAsPdf} />}
+      >
         {t('view_pdf')}
       </DropdownElement>
     ),
     (quote) => (
-      <DropdownElement onClick={() => downloadPdf(quote)}>
+      <DropdownElement
+        onClick={() => downloadPdf(quote)}
+        icon={<Icon element={MdDownload} />}
+      >
         {t('download_pdf')}
       </DropdownElement>
     ),
     (quote) => (
-      <DropdownElement to={route('/quotes/:id/email', { id: quote.id })}>
+      <DropdownElement
+        to={route('/quotes/:id/email', { id: quote.id })}
+        icon={<Icon element={MdSend} />}
+      >
         {t('email_quote')}
       </DropdownElement>
     ),
     (quote) => (
-      <DropdownElement onClick={() => quote && openClientPortal(quote)}>
+      <DropdownElement
+        onClick={() => quote && openClientPortal(quote)}
+        icon={<Icon element={MdCloudCircle} />}
+      >
         {t('client_portal')}
       </DropdownElement>
     ),
     () => <Divider withoutPadding />,
     (quote) => (
-      <DropdownElement onClick={() => cloneToQuote(quote)}>
+      <DropdownElement
+        onClick={() => cloneToQuote(quote)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_quote')}
       </DropdownElement>
     ),
     (quote) => (
-      <DropdownElement onClick={() => cloneToInvoice(quote)}>
+      <DropdownElement
+        onClick={() => cloneToInvoice(quote)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_invoice')}
       </DropdownElement>
     ),
     (quote) => (
-      <DropdownElement onClick={() => cloneToCredit(quote)}>
+      <DropdownElement
+        onClick={() => cloneToCredit(quote)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_credit')}
       </DropdownElement>
     ),
     (quote) => (
-      <DropdownElement onClick={() => cloneToRecurringInvoice(quote)}>
+      <DropdownElement
+        onClick={() => cloneToRecurringInvoice(quote)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_recurring_invoice')}
       </DropdownElement>
     ),
     (quote) => (
-      <DropdownElement onClick={() => cloneToPurchaseOrder(quote)}>
+      <DropdownElement
+        onClick={() => cloneToPurchaseOrder(quote)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
     () => <Divider withoutPadding />,
     (quote) =>
       quote.status_id === QuoteStatus.Draft && (
-        <DropdownElement onClick={() => markSent(quote)}>
+        <DropdownElement
+          onClick={() => markSent(quote)}
+          icon={<Icon element={MdMarkEmailRead} />}
+        >
           {t('mark_sent')}
         </DropdownElement>
       ),
     (quote) =>
       quote.status_id === QuoteStatus.Draft && (
-        <DropdownElement onClick={() => approve(quote)}>
+        <DropdownElement
+          onClick={() => approve(quote)}
+          icon={<Icon element={MdDone} />}
+        >
           {t('approve')}
         </DropdownElement>
       ),
     (quote) =>
       quote.status_id === QuoteStatus.Sent && (
-        <DropdownElement onClick={() => approve(quote)}>
+        <DropdownElement
+          onClick={() => approve(quote)}
+          icon={<Icon element={MdDone} />}
+        >
           {t('approve')}
         </DropdownElement>
       ),
@@ -358,21 +407,30 @@ export function useActions() {
     (quote) =>
       location.pathname.endsWith('/edit') &&
       quote.archived_at === 0 && (
-        <DropdownElement onClick={() => bulk(quote.id, 'archive')}>
+        <DropdownElement
+          onClick={() => bulk(quote.id, 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
           {t('archive_quote')}
         </DropdownElement>
       ),
     (quote) =>
       location.pathname.endsWith('/edit') &&
       quote.archived_at > 0 && (
-        <DropdownElement onClick={() => bulk(quote.id, 'restore')}>
+        <DropdownElement
+          onClick={() => bulk(quote.id, 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
           {t('restore_quote')}
         </DropdownElement>
       ),
     (quote) =>
       location.pathname.endsWith('/edit') &&
       !quote?.is_deleted && (
-        <DropdownElement onClick={() => bulk(quote.id, 'delete')}>
+        <DropdownElement
+          onClick={() => bulk(quote.id, 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
           {t('delete_quote')}
         </DropdownElement>
       ),

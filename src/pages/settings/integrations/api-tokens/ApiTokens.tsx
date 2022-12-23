@@ -30,6 +30,8 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
+import { Icon } from 'components/icons/Icon';
+import { MdArchive, MdEdit } from 'react-icons/md';
 
 export function ApiTokens() {
   const [t] = useTranslation();
@@ -115,11 +117,15 @@ export function ApiTokens() {
                             '/settings/integrations/api_tokens/:id/edit',
                             { id: token.id }
                           )}
+                          icon={<Icon element={MdEdit} />}
                         >
                           {t('edit_token')}
                         </DropdownElement>
 
-                        <DropdownElement onClick={() => archive(token.id)}>
+                        <DropdownElement
+                          onClick={() => archive(token.id)}
+                          icon={<Icon element={MdArchive} />}
+                        >
                           {t('archive_token')}
                         </DropdownElement>
                       </Dropdown>

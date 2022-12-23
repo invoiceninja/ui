@@ -21,9 +21,16 @@ import { useProjectQuery } from 'common/queries/projects';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
+import { Icon } from 'components/icons/Icon';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import {
+  MdArchive,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdRestore,
+} from 'react-icons/md';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { useBulkAction } from '../common/hooks/useBulkAction';
@@ -157,26 +164,38 @@ export function Edit() {
       {project && (
         <div className="flex justify-end">
           <Dropdown label={t('more_actions')}>
-            <DropdownElement to={route('/projects/:id/clone', { id })}>
+            <DropdownElement
+              to={route('/projects/:id/clone', { id })}
+              icon={<Icon element={MdControlPointDuplicate} />}
+            >
               {t('clone')}
             </DropdownElement>
 
             {getEntityState(project) === EntityState.Active && (
-              <DropdownElement onClick={() => bulk(project.id, 'archive')}>
+              <DropdownElement
+                onClick={() => bulk(project.id, 'archive')}
+                icon={<Icon element={MdArchive} />}
+              >
                 {t('archive_project')}
               </DropdownElement>
             )}
 
             {(getEntityState(project) === EntityState.Archived ||
               getEntityState(project) === EntityState.Deleted) && (
-              <DropdownElement onClick={() => bulk(project.id, 'restore')}>
+              <DropdownElement
+                onClick={() => bulk(project.id, 'restore')}
+                icon={<Icon element={MdRestore} />}
+              >
                 {t('restore_project')}
               </DropdownElement>
             )}
 
             {(getEntityState(project) === EntityState.Active ||
               getEntityState(project) === EntityState.Archived) && (
-              <DropdownElement onClick={() => bulk(project.id, 'delete')}>
+              <DropdownElement
+                onClick={() => bulk(project.id, 'delete')}
+                icon={<Icon element={MdDelete} />}
+              >
                 {t('delete_project')}
               </DropdownElement>
             )}

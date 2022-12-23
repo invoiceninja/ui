@@ -16,9 +16,11 @@ import prettyBytes from 'pretty-bytes';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { MdDelete, MdDownload, MdPageview } from 'react-icons/md';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { FileIcon } from './FileIcon';
+import { Icon } from './icons/Icon';
 import { PasswordConfirmation } from './PasswordConfirmation';
 import { Table, Tbody, Td, Th, Thead, Tr } from './tables';
 
@@ -85,7 +87,7 @@ export function DocumentsTable(props: Props) {
               <Td>{prettyBytes(document.size)}</Td>
               <Td>
                 <Dropdown label={t('more_actions')}>
-                  <DropdownElement>
+                  <DropdownElement icon={<Icon element={MdPageview} />}>
                     <a
                       target="_blank"
                       className="block w-full"
@@ -98,7 +100,7 @@ export function DocumentsTable(props: Props) {
                     </a>
                   </DropdownElement>
 
-                  <DropdownElement>
+                  <DropdownElement icon={<Icon element={MdDownload} />}>
                     <a
                       target="_blank"
                       className="block w-full"
@@ -116,6 +118,7 @@ export function DocumentsTable(props: Props) {
                       setDocumentId(document.id);
                       setIsPasswordConfirmModalOpen(true);
                     }}
+                    icon={<Icon element={MdDelete} />}
                   >
                     {t('delete')}
                   </DropdownElement>
