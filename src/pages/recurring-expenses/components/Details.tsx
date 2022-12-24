@@ -281,7 +281,6 @@ export function Details(props: Props) {
           value={recurringExpense?.frequency_id}
           onValueChange={(value) => handleChange('frequency_id', value)}
           errorMessage={errors?.errors.frequency_id}
-          withBlank
         >
           {Object.keys(frequencies).map((frequency, index) => (
             <option key={index} value={frequency}>

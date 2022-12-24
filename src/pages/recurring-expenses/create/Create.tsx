@@ -55,7 +55,7 @@ export function Create() {
 
   useEffect(() => {
     if (data && !recurringExpense) {
-      setRecurringExpense(data);
+      setRecurringExpense({ ...data, frequency_id: '5' });
     }
   }, [data]);
 
