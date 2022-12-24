@@ -676,19 +676,19 @@ export function useRecurringInvoiceFilters() {
     },
     {
       label: t('active'),
-      value: 'paid',
+      value: 'active',
       color: 'white',
       backgroundColor: '#22C55E',
     },
     {
       label: t('paused'),
-      value: 'unpaid',
+      value: 'paused',
       color: 'white',
       backgroundColor: '#F97316',
     },
     {
       label: t('completed'),
-      value: 'overdue',
+      value: 'completed',
       color: 'white',
       backgroundColor: '#93C5FD',
     },

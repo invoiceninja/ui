@@ -18,6 +18,7 @@ import {
   defaultColumns,
   purchaseOrderColumns,
   usePurchaseOrderColumns,
+  usePurchaseOrderFilters,
 } from '../common/hooks';
 
 export function PurchaseOrders() {
@@ -31,6 +32,8 @@ export function PurchaseOrders() {
 
   const columns = usePurchaseOrderColumns();
 
+  const filters = usePurchaseOrderFilters();
+
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
@@ -40,6 +43,9 @@ export function PurchaseOrders() {
         linkToCreate="/purchase_orders/create"
         linkToEdit="/purchase_orders/:id/edit"
         columns={columns}
+        customFilters={filters}
+        customFilterQueryKey="client_status"
+        customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={
           <DataTableColumnsPicker

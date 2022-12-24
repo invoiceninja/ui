@@ -47,6 +47,8 @@ import { Slider } from 'components/cards/Slider';
 import { EditSlider } from './components/EditSlider';
 import { Edit, Pause, Play } from 'react-feather';
 import { Link as ReactRouterLink } from 'react-router-dom';
+import { Card, Element } from '@invoiceninja/cards';
+import { ProjectSelector } from 'components/projects/ProjectSelector';
 
 interface Card {
   id: string;
@@ -79,8 +81,15 @@ export function Kanban() {
 
   const queryClient = useQueryClient();
 
+  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks');
+  const [projectId, setProjectId] = useState<string>();
+
   const { data: taskStatuses } = useTaskStatusesQuery();
-  const { data: tasks } = useTasksQuery({ limit: 1000 });
+
+  const { data: tasks } = useTasksQuery({
+    endpoint: apiEndpoint,
+    options: { limit: 1000 },
+  });
 
   const [board, setBoard] = useState<Board>();
   const [sliderType, setSliderType] = useState<SliderType>('view');
@@ -223,6 +232,16 @@ export function Kanban() {
     setIsKanbanViewSliderVisible(false);
     setCurrentTaskId(undefined);
   };
+  
+  useEffect(() => {
+    projectId
+      ? setApiEndpoint(
+          route('/api/v1/tasks?project_tasks=:projectId&limit=1000', {
+            projectId,
+          })
+        )
+      : setApiEndpoint('/api/v1/tasks?limit=1000');
+  }, [projectId]);
 
   return (
     <Default
@@ -287,9 +306,22 @@ export function Kanban() {
         {sliderType === 'edit' && <EditSlider />}
       </Slider>
 
+      <div className="grid grid-cols-12 gap-4">
+        <Card className="col-span-12 xl:col-span-4">
+          <Element leftSide={t('project')}>
+            <ProjectSelector
+              value={projectId}
+              onChange={(project) => setProjectId(project.id)}
+              onClearButtonClick={() => setProjectId(undefined)}
+              clearButton
+            />
+          </Element>
+        </Card>
+      </div>
+
       {board && (
         <div
-          className="flex pb-6 px-1 space-x-4 overflow-x-auto"
+          className="flex pb-6 space-x-4 overflow-x-auto mt-4"
           style={{ paddingRight: isKanbanViewSliderVisible ? 512 : 0 }}
         >
           <DragDropContext onDragEnd={onDragEnd}>
