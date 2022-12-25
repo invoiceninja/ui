@@ -21,6 +21,7 @@ import { Alert } from 'components/Alert';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Link } from '@invoiceninja/forms';
 import { toast } from 'common/helpers/toast/toast';
+import { MdInfoOutline } from 'react-icons/md';
 
 interface Props {
   endpoint: string;
@@ -75,17 +76,21 @@ export function Upload(props: Props) {
 
   const planWarning = (
     <Alert className="mb-4" type="warning" disableClosing>
-      {t('upgrade_to_upload_images')}
+      <div className="flex items-center">
+        <MdInfoOutline className="mr-2" fontSize={20} />
 
-      {user?.company_user && (
-        <Link
-          className="ml-10"
-          external
-          to={user.company_user.ninja_portal_url}
-        >
-          {t('plan_change')}
-        </Link>
-      )}
+        {t('upgrade_to_upload_images')}
+
+        {user?.company_user && (
+          <Link
+            className="ml-10"
+            external
+            to={user.company_user.ninja_portal_url}
+          >
+            {t('plan_change')}
+          </Link>
+        )}
+      </div>
     </Alert>
   );
 
