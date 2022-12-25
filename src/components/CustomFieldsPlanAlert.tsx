@@ -26,7 +26,7 @@ export function CustomFieldsPlanAlert(props: CommonProps) {
 
   return (
     <>
-      {!showAlert && (
+      {showAlert && (
         <div className={`${props.className}`}>
           <Alert className="mb-4" type="warning" disableClosing>
             {t('custom_fields_upgrade_plan')}
