@@ -35,6 +35,8 @@ export function Upload(props: Props) {
 
   const [formData, setFormData] = useState(new FormData());
 
+  const showPlanAlert = !enterprisePlan() && isHosted();
+
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {},
@@ -59,7 +61,7 @@ export function Upload(props: Props) {
   });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    disabled: !enterprisePlan() && isHosted(),
+    disabled: showPlanAlert,
     onDrop: (acceptedFiles) => {
       formData.append('_method', 'PUT');
 
@@ -73,7 +75,7 @@ export function Upload(props: Props) {
 
   const planWarning = (
     <Alert className="mb-4" type="warning" disableClosing>
-      {t('documents_upgrade_plan')}
+      {t('upgrade_to_upload_images')}
 
       {user?.company_user && (
         <Link
@@ -90,7 +92,7 @@ export function Upload(props: Props) {
   if (props.widgetOnly) {
     return (
       <>
-        {!enterprisePlan() && isHosted() && planWarning}
+        {showPlanAlert && planWarning}
 
         <div
           {...getRootProps()}
@@ -112,7 +114,7 @@ export function Upload(props: Props) {
 
   return (
     <>
-      {!enterprisePlan() && isHosted() && planWarning}
+      {showPlanAlert && planWarning}
 
       <Card title={t('upload')}>
         <Element leftSide={t('upload')}>
