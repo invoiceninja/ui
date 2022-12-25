@@ -29,7 +29,7 @@ export function CustomFieldsPlanAlert(props: CommonProps) {
       {showAlert && (
         <div className={`${props.className}`}>
           <Alert className="mb-4" type="warning" disableClosing>
-            {t('custom_fields_upgrade_plan')}
+            {t('requires_an_enterprise_plan')}
 
             {user?.company_user && (
               <Link
