@@ -25,7 +25,7 @@ import { Invoice } from 'common/interfaces/invoice';
 import { ChangeHandler } from 'pages/invoices/create/Create';
 import { useLocation, useParams } from 'react-router-dom';
 import { Upload } from 'pages/settings/company/documents/components';
-import { endpoint } from 'common/helpers';
+import { endpoint, isHosted } from 'common/helpers';
 import { useQueryClient } from 'react-query';
 import { DocumentsTable } from 'components/DocumentsTable';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
@@ -33,6 +33,9 @@ import { DesignSelector } from 'common/generic/DesignSelector';
 import { UserSelector } from 'components/users/UserSelector';
 import { VendorSelector } from 'components/vendors/VendorSelector';
 import { route } from 'common/helpers/route';
+import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
+import { proPlan } from 'common/guards/guards/pro-plan';
+import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 
 interface Props {
   invoice?: Invoice;
@@ -53,6 +56,8 @@ export function InvoiceFooter(props: Props) {
   const handleCustomFieldChange = useHandleCustomFieldChange();
   const handleCustomSurchargeFieldChange =
     useHandleCustomSurchargeFieldChange();
+
+  const disabledCustomFields = !proPlan() && !enterprisePlan() && isHosted();
 
   const surchargeValue = (index: number) => {
     switch (index) {
@@ -196,6 +201,8 @@ export function InvoiceFooter(props: Props) {
         </div>
 
         <div>
+          <CustomFieldsPlanAlert />
+
           {company &&
             ['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
               <Field
@@ -224,6 +231,7 @@ export function InvoiceFooter(props: Props) {
                       onValueChange={(value) =>
                         handleCustomSurchargeFieldChange(field, value)
                       }
+                      disabled={disabledCustomFields}
                     />
                   }
                 >

@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
+import { proPlan } from 'common/guards/guards/pro-plan';
+import { isHosted } from 'common/helpers';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer, Element } from '../../../../components/cards';
@@ -34,6 +37,9 @@ export function Field(props: Props) {
 
   const [initialValue, setInitialValue] = useState('');
   const [dropdownInitialValue, setDropdownInitialValue] = useState('');
+
+  const disabledInputCustomFields =
+    !proPlan() && !enterprisePlan() && isHosted();
 
   const [dropdownType, setDropdownType] = useState<AvailableTypes>(
     AvailableTypes.SingleLineText
@@ -94,6 +100,7 @@ export function Field(props: Props) {
             placeholder={props.placeholder}
             onChange={handleChange}
             value={initialValue}
+            disabled={disabledInputCustomFields}
           />
         }
       >

@@ -11,6 +11,7 @@
 import { Card } from '@invoiceninja/cards';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
+import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
 import { Field } from 'pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 
@@ -22,17 +23,21 @@ export function CustomFields() {
   const handleCustomFieldChange = useHandleCustomFieldChange();
 
   return (
-    <Card title={t('custom_fields')}>
-      {company &&
-        ['user1', 'user2', 'user3', 'user4'].map((field) => (
-          <Field
-            key={field}
-            initialValue={company.custom_fields[field]}
-            field={field}
-            placeholder={t('user_field')}
-            onChange={(value: any) => handleCustomFieldChange(field, value)}
-          />
-        ))}
-    </Card>
+    <>
+      <CustomFieldsPlanAlert />
+
+      <Card title={t('custom_fields')}>
+        {company &&
+          ['user1', 'user2', 'user3', 'user4'].map((field) => (
+            <Field
+              key={field}
+              initialValue={company.custom_fields[field]}
+              field={field}
+              placeholder={t('user_field')}
+              onChange={(value: any) => handleCustomFieldChange(field, value)}
+            />
+          ))}
+      </Card>
+    </>
   );
 }

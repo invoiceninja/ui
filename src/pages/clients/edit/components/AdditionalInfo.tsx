@@ -21,6 +21,7 @@ import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { useStaticsQuery } from 'common/queries/statics';
+import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
 import { DocumentsTable } from 'components/DocumentsTable';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
@@ -242,6 +243,8 @@ export function AdditionalInfo(props: Props) {
         </div>
 
         <div>
+          <CustomFieldsPlanAlert className="px-6" />
+
           <Element
             leftSide={
               <div className="inline-flex items-center space-x-2">
@@ -267,6 +270,8 @@ export function AdditionalInfo(props: Props) {
         </div>
 
         <div>
+          <CustomFieldsPlanAlert className="px-6" />
+
           <Element
             leftSide={
               <div className="inline-flex items-center space-x-2">

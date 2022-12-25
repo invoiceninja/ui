@@ -30,6 +30,7 @@ import { VendorSelector } from 'components/vendors/VendorSelector';
 import { DesignSelector } from 'common/generic/DesignSelector';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { route } from 'common/helpers/route';
+import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -170,6 +171,8 @@ export function CreditFooter(props: Props) {
         </div>
 
         <div>
+          <CustomFieldsPlanAlert />
+
           {company &&
             ['credit1', 'credit2', 'credit3', 'credit4'].map((field) => (
               <Field

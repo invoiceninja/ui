@@ -15,6 +15,7 @@ import { endpoint } from 'common/helpers';
 import { route } from 'common/helpers/route';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
+import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
 import { DocumentsTable } from 'components/DocumentsTable';
 import { MarkdownEditor } from 'components/forms/MarkdownEditor';
 import Toggle from 'components/forms/Toggle';
@@ -171,6 +172,8 @@ export function QuoteFooter(props: Props) {
         </div>
 
         <div>
+          <CustomFieldsPlanAlert />
+
           {company &&
             ['quote1', 'quote2', 'quote3', 'quote4'].map((field) => (
               <Field

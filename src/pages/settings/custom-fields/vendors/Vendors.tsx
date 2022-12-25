@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../../../components/cards';
@@ -16,12 +17,15 @@ import { Field } from '../components';
 
 export function Vendors() {
   const [t] = useTranslation();
+
   const title = `${t('custom_fields')}: ${t('vendors')}`;
+
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('custom_fields'), href: '/settings/custom_fields' },
     { name: t('vendors'), href: '/settings/custom_fields/vendors' },
   ];
+
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('custom_fields')}`;
   });
@@ -32,6 +36,8 @@ export function Vendors() {
       breadcrumbs={pages}
       docsLink="docs/advanced-settings/#custom_fields"
     >
+      <CustomFieldsPlanAlert />
+
       <Card title={title}>
         {['vendor1', 'vendor2', 'vendor3', 'vendor4'].map((field) => (
           <Field key={field} field={field} placeholder={t('vendor_field')} />
