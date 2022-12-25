@@ -16,6 +16,7 @@ import CommonProps from '../common/interfaces/common-props.interface';
 import { proPlan } from 'common/guards/guards/pro-plan';
 import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { isHosted } from 'common/helpers';
+import { MdInfoOutline } from 'react-icons/md';
 
 export function CustomFieldsPlanAlert(props: CommonProps) {
   const [t] = useTranslation();
@@ -29,17 +30,21 @@ export function CustomFieldsPlanAlert(props: CommonProps) {
       {showAlert && (
         <div className={`${props.className}`}>
           <Alert className="mb-4" type="warning" disableClosing>
-            {t('requires_an_enterprise_plan')}
+            <div className="flex items-center">
+              <MdInfoOutline className="mr-2" fontSize={20} />
 
-            {user?.company_user && (
-              <Link
-                className="ml-10"
-                external
-                to={user.company_user.ninja_portal_url}
-              >
-                {t('plan_change')}
-              </Link>
-            )}
+              {t('requires_an_enterprise_plan')}
+
+              {user?.company_user && (
+                <Link
+                  className="ml-10"
+                  external
+                  to={user.company_user.ninja_portal_url}
+                >
+                  {t('plan_change')}
+                </Link>
+              )}
+            </div>
           </Alert>
         </div>
       )}
