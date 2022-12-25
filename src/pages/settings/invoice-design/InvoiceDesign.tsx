@@ -8,7 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
+import { proPlan } from 'common/guards/guards/pro-plan';
+import { isHosted } from 'common/helpers';
 import { useTitle } from 'common/hooks/useTitle';
+import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
@@ -39,18 +43,23 @@ export function InvoiceDesign() {
   ];
 
   const onSave = useHandleCompanySave();
+
   const onCancel = useDiscardChanges();
+
+  const showPlanAlert = !proPlan() && !enterprisePlan() && isHosted();
 
   return (
     <Settings
       title={t('invoice_design')}
+      docsLink="docs/advanced-settings/#invoice_design"
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}
-      docsLink="docs/advanced-settings/#invoice_design"
+      disableSaveButton={showPlanAlert}
     >
-      <GeneralSettings />
+      {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
+      <GeneralSettings />
       <ClientDetails />
       <CompanyDetails />
       <CompanyAddress />

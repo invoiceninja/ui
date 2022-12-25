@@ -8,17 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
+import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
+import { endpoint, isHosted } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { User } from 'common/interfaces/user';
 import { defaultHeaders } from 'common/queries/common/headers';
 import { useBlankUserQuery } from 'common/queries/users';
+import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
 import { Settings } from 'components/layouts/Settings';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Details } from '../edit/components/Details';
@@ -71,7 +73,7 @@ export function Create() {
   }, [response?.data.data]);
 
   const onSave = (password: string) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     setIsPasswordConfirmModalOpen(false);
 
@@ -79,7 +81,7 @@ export function Create() {
       headers: { 'X-Api-Password': password, ...defaultHeaders() },
     })
       .then((response) => {
-        toast.success(t('created_user'), { id: toastId });
+        toast.success('created_user');
 
         navigate(
           route('/settings/users/:id/edit', {
@@ -88,20 +90,30 @@ export function Create() {
         );
       })
       .catch((error) => {
-        console.error(error);
-
-        error.response?.status === 412
-          ? toast.error(t('password_error_incorrect'), { id: toastId })
-          : toast.error(t('error_title'), { id: toastId });
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+        } else {
+          toast.error();
+          console.error(error);
+        }
       });
   };
+
+  const showPlanAlert = !enterprisePlan() && isHosted();
 
   return (
     <Settings
       title={t('new_user')}
       breadcrumbs={pages}
       onSaveClick={() => setIsPasswordConfirmModalOpen(true)}
+      disableSaveButton={showPlanAlert}
     >
+      {showPlanAlert && (
+        <AdvancedSettingsPlanAlert
+          message={t('add_users_not_supported') as string}
+        />
+      )}
+
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onSave={onSave}

@@ -10,7 +10,9 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, Link, SelectField } from '@invoiceninja/forms';
+import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { freePlan } from 'common/guards/guards/free-plan';
+import { proPlan } from 'common/guards/guards/pro-plan';
 import { endpoint, isHosted, isSelfHosted } from 'common/helpers';
 import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
 import { request } from 'common/helpers/request';
@@ -21,6 +23,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Settings as CompanySettings } from 'common/interfaces/company.interface';
 import { TemplateBody, Templates } from 'common/interfaces/statics';
 import { useStaticsQuery } from 'common/queries/statics';
+import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
 import { MarkdownEditor } from 'components/forms/MarkdownEditor';
 import { Settings } from 'components/layouts/Settings';
 import { useHandleCancel } from 'pages/invoices/edit/hooks/useHandleCancel';
@@ -159,14 +162,19 @@ export function TemplatesAndReminders() {
     ],
   };
 
+  const showPlanAlert = !proPlan() && !enterprisePlan() && isHosted();
+
   return (
     <Settings
       title={t('templates_and_reminders')}
-      breadcrumbs={pages}
       docsLink="docs/advanced-settings/#templates_and_reminders"
+      breadcrumbs={pages}
       onSaveClick={handleSave}
       onCancelClick={handleCancel}
+      disableSaveButton={showPlanAlert}
     >
+      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+
       <Card title={t('edit')}>
         <Element leftSide={t('template')}>
           <SelectField

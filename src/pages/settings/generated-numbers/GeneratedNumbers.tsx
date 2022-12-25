@@ -8,7 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
+import { proPlan } from 'common/guards/guards/pro-plan';
+import { isHosted } from 'common/helpers';
 import { useTitle } from 'common/hooks/useTitle';
+import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
 import { Tabs } from 'components/Tabs';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
@@ -33,15 +37,20 @@ export function GeneratedNumbers() {
 
   const onCancel = useDiscardChanges();
 
+  const showPlanAlert = !proPlan() && !enterprisePlan() && isHosted();
+
   return (
     <Settings
       title={t('generated_numbers')}
+      docsLink="docs/advanced-settings/#generated_numbers"
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}
-      docsLink="docs/advanced-settings/#generated_numbers"
+      disableSaveButton={showPlanAlert}
     >
       <Tabs tabs={tabs} className="mt-6" />
+
+      {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       <div className="my-4">
         <Outlet />

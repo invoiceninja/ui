@@ -8,8 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
+import { proPlan } from 'common/guards/guards/pro-plan';
+import { isHosted } from 'common/helpers';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
+import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
@@ -24,6 +28,7 @@ import {
 
 export function ClientPortal() {
   useTitle('client_portal');
+
   useInjectCompanyChanges();
 
   const [t] = useTranslation();
@@ -34,16 +39,22 @@ export function ClientPortal() {
   ];
 
   const onSave = useHandleCompanySave();
+
   const onCancel = useDiscardChanges();
+
+  const showPlanAlert = !proPlan() && !enterprisePlan() && isHosted();
 
   return (
     <Settings
       title={t('client_portal')}
-      breadcrumbs={pages}
       docsLink="docs/advanced-settings/#client_portal"
+      breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}
+      disableSaveButton={showPlanAlert}
     >
+      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+
       <SettingsComponent />
       <Authorization />
       <Registration />
