@@ -20,11 +20,13 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { ExpenseCategory } from 'common/interfaces/expense-category';
 import { Invoice } from 'common/interfaces/invoice';
+import { Payment } from 'common/interfaces/payment';
 import { useExpenseCategoryQuery } from 'common/queries/expense-categories';
 import { useExpenseQuery } from 'common/queries/expenses';
+import { usePaymentQuery } from 'common/queries/payments';
 import { useVendorQuery } from 'common/queries/vendor';
 import { useInvoicesQuery } from 'pages/invoices/common/queries';
-import { useBankAccountsQuery } from 'pages/settings/bank-accounts/common/queries';
+import { useBankAccountQuery } from 'pages/settings/bank-accounts/common/queries';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTransactionQuery } from '../common/queries';
@@ -45,50 +47,71 @@ export function Details(props: Props) {
 
   const { data: transaction } = useTransactionQuery({
     id: props.transactionId,
+    enabled: !!props.transactionId,
   });
 
-  const { data: bankAccountResponse } = useBankAccountsQuery({
+  const { data: bankAccountResponse } = useBankAccountQuery({
     id: transaction?.bank_integration_id || '',
-  });
-
-  const isCreditTransactionType =
-    transaction?.base_type === ApiTransactionType.Credit;
-
-  const { data: invoicesResponse } = useInvoicesQuery({
-    enabled: isCreditTransactionType,
-  });
-
-  const { data: vendorResponse } = useVendorQuery({
-    id: transaction?.vendor_id || '',
-    enabled: !isCreditTransactionType,
-  });
-
-  const { data: expenseResponse } = useExpenseQuery({
-    id: transaction?.expense_id || '',
-    enabled: !isCreditTransactionType,
-  });
-
-  const { data: expenseCategoryResponse } = useExpenseCategoryQuery({
-    id: transaction?.ninja_category_id || '',
-    enabled: !isCreditTransactionType,
+    enabled: !!transaction,
   });
 
   const [matchedInvoices, setMatchedInvoices] = useState<Invoice[]>();
 
+  const [matchedPayment, setMatchedPayment] = useState<Payment>();
+
   const [matchedExpenseCategory, setMatchedExpenseCategory] =
     useState<ExpenseCategory>();
+
+  const isCreditTransactionType =
+    transaction?.base_type === ApiTransactionType.Credit;
 
   const showTransactionMatchDetails =
     TransactionStatus.Converted !== transaction?.status_id;
 
-  useEffect(() => {
-    const filteredMatchedInvoices = invoicesResponse?.filter(({ id }) =>
-      transaction?.invoice_ids?.includes(id)
-    );
-    setMatchedInvoices(filteredMatchedInvoices);
+  const shouldEnableQueries =
+    transaction && !showTransactionMatchDetails && !!props.transactionId;
 
-    setMatchedExpenseCategory(expenseCategoryResponse?.data.data);
-  }, [transaction, expenseCategoryResponse, props.transactionId]);
+  const { data: invoicesResponse } = useInvoicesQuery({
+    enabled: isCreditTransactionType && shouldEnableQueries,
+  });
+
+  const { data: paymentResponse } = usePaymentQuery({
+    id: transaction?.payment_id || '',
+    enabled: isCreditTransactionType && shouldEnableQueries,
+  });
+
+  const { data: vendorResponse } = useVendorQuery({
+    id: transaction?.vendor_id || '',
+    enabled: !isCreditTransactionType && shouldEnableQueries,
+  });
+
+  const { data: expenseResponse } = useExpenseQuery({
+    id: transaction?.expense_id || '',
+    enabled: !isCreditTransactionType && shouldEnableQueries,
+  });
+
+  const { data: expenseCategoryResponse } = useExpenseCategoryQuery({
+    id: transaction?.ninja_category_id || '',
+    enabled: !isCreditTransactionType && shouldEnableQueries,
+  });
+
+  useEffect(() => {
+    if (transaction) {
+      const filteredMatchedInvoices = invoicesResponse?.filter(({ id }) =>
+        transaction?.invoice_ids?.includes(id)
+      );
+      setMatchedInvoices(filteredMatchedInvoices);
+
+      setMatchedExpenseCategory(expenseCategoryResponse?.data.data);
+
+      setMatchedPayment(paymentResponse?.data.data);
+    }
+  }, [
+    transaction,
+    expenseCategoryResponse,
+    paymentResponse,
+    props.transactionId,
+  ]);
 
   return (
     <div className="flex flex-col flex-1 border-b border-gray-200">
@@ -140,6 +163,21 @@ export function Details(props: Props) {
               </Link>
             </Element>
           ))}
+
+          {transaction?.payment_id && (
+            <Element
+              leftSide={t('payment')}
+              className="hover:bg-gray-100 cursor-pointer"
+            >
+              <Link
+                to={route('/payments/:id/edit', {
+                  id: matchedPayment?.id,
+                })}
+              >
+                {matchedPayment?.number}
+              </Link>
+            </Element>
+          )}
 
           {transaction?.vendor_id && (
             <Element

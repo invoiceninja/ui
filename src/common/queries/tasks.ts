@@ -15,14 +15,19 @@ import { Task } from 'common/interfaces/task';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 
-export function useTaskQuery(params: { id: string | undefined }) {
+interface TaskParams {
+  id?: string;
+  enabled?: boolean;
+}
+
+export function useTaskQuery(params: TaskParams) {
   return useQuery<Task>(
     route('/api/v1/tasks/:id', { id: params.id }),
     () =>
       request('GET', endpoint('/api/v1/tasks/:id', { id: params.id })).then(
         (response) => response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: params.enabled ?? true }
   );
 }
 
@@ -34,13 +39,26 @@ export function useBlankTaskQuery() {
   );
 }
 
-export function useTasksQuery(options = { limit: 10 }) {
-  return useQuery<GenericManyResponse<Task>>(route('/api/v1/tasks'), () =>
-    request(
-      'GET',
-      endpoint('/api/v1/tasks?limit=:limit', {
-        limit: options.limit.toString(),
-      })
-    ).then((response) => response.data)
+interface TasksParams {
+  options?: {
+    limit: number;
+  };
+  endpoint?: string;
+}
+
+export function useTasksQuery(params: TasksParams) {
+  return useQuery<GenericManyResponse<Task>>(
+    route(':endpoint?limit=:limit', {
+      endpoint: params.endpoint || '/api/v1/tasks',
+      limit: params.options?.limit.toString() || 10,
+    }),
+    () =>
+      request(
+        'GET',
+        endpoint(':endpoint?limit=:limit', {
+          endpoint: params.endpoint || '/api/v1/tasks',
+          limit: params.options?.limit.toString() || 10,
+        })
+      ).then((response) => response.data)
   );
 }

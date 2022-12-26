@@ -8,13 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { BankAccountDetails } from 'common/interfaces/bank-accounts';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { Settings } from '../../../../components/layouts/Settings';
-import { useBankAccountsQuery } from '../common/queries';
+import { useBankAccountQuery } from '../common/queries';
 import { Details } from '../components/Details';
 
 export function BankAccount() {
@@ -27,10 +28,13 @@ export function BankAccount() {
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
-    { name: t('bank_account_details'), href: `/bank_accounts/${id}` },
+    {
+      name: t('bank_account_details'),
+      href: route('/settings/bank_accounts/:id/details', { id }),
+    },
   ];
 
-  const { data: response } = useBankAccountsQuery({ id });
+  const { data: response } = useBankAccountQuery({ id });
 
   const [accountDetails, setAccountDetails] = useState<BankAccountDetails>();
 

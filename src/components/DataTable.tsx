@@ -84,12 +84,22 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [customFilter, setCustomFilter] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useAtom(datatablePerPageAtom);
-  const [sort, setSort] = useState('id|asc');
+  const [sort, setSort] = useState(
+    apiEndpoint.searchParams.get('sort') || 'id|asc'
+  );
   const [sortedBy, setSortedBy] = useState<string | undefined>(undefined);
   const [status, setStatus] = useState<string[]>(['active']);
   const [selected, setSelected] = useState<string[]>([]);
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const perPageParameter = apiEndpoint.searchParams.get('perPage');
+
+    if (perPageParameter) {
+      setPerPage(perPageParameter);
+    }
+  }, []);
 
   useEffect(() => {
     apiEndpoint.searchParams.set('per_page', perPage);

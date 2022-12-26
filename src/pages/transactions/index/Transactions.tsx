@@ -18,6 +18,7 @@ import { useEffect, useState } from 'react';
 import { Details } from '../components/Details';
 import { Slider } from 'components/cards/Slider';
 import { Transaction } from 'common/interfaces/transactions';
+import { useTransactionFilters } from '../common/hooks/useTransactionFilters';
 
 export function Transactions() {
   useTitle('transactions');
@@ -25,6 +26,8 @@ export function Transactions() {
   const [t] = useTranslation();
 
   const columns = useTransactionColumns();
+
+  const filters = useTransactionFilters();
 
   const pages = [{ name: t('transactions'), href: '/transactions' }];
 
@@ -86,6 +89,9 @@ export function Transactions() {
           linkToCreate="/transactions/create"
           linkToEdit="/transactions/:id/edit"
           onTableRowClick={getSelectedTransaction}
+          customFilters={filters}
+          customFilterQueryKey="client_status"
+          customFilterPlaceholder="status"
           rightSide={<ImportButton route="/transactions/import" />}
           withResourcefulActions
         />

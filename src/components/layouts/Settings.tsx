@@ -11,12 +11,15 @@
 import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { proPlan } from 'common/guards/guards/pro-plan';
 import { Breadcrumbs, Page } from 'components/Breadcrumbs';
-import { ReactNode } from 'react';
+import { useAtom } from 'jotai';
+import { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router-dom';
 import { classNames } from '../../common/helpers';
 import { SelectField } from '../forms';
 import { Default } from './Default';
+import { companySettingsErrorsAtom } from '../../pages/settings/common/atoms';
+import { ValidationAlert } from 'components/ValidationAlert';
 
 interface Props {
   title: string;
@@ -41,6 +44,10 @@ export function Settings(props: Props) {
   const [t] = useTranslation();
 
   const location = useLocation();
+
+  const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
+
+  const settingPathNameKey = location.pathname.split('/')[2];
 
   const basic = [
     {
@@ -152,6 +159,10 @@ export function Settings(props: Props) {
       visible: enterprisePlan(),
     },
   ];
+
+  useEffect(() => {
+    setErrors(undefined);
+  }, [settingPathNameKey]);
 
   return (
     <Default
@@ -276,6 +287,8 @@ export function Settings(props: Props) {
 
         <div className="col-span-12 md:col-span-8 lg:col-start-4 space-y-6 mt-5">
           {props.breadcrumbs && <Breadcrumbs pages={props.breadcrumbs} />}
+
+          {errors && <ValidationAlert errors={errors} />}
 
           {props.children}
         </div>
