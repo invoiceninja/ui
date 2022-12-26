@@ -169,7 +169,13 @@ export const settingsRoutes = (
       />
     </Route>
     <Route path="group_settings" element={<Settings.GroupSettings />} />
-    <Route path="subscriptions" element={<Settings.Subscriptions />} />
+    <Route path="subscriptions">
+      <Route path="" element={<Settings.Subscriptions />} />
+      <Route path="create" element={<Settings.CreateSubscription />} />
+      <Route path="overview" element={<Settings.SubscriptionOverview />} />
+      <Route path="settings" element={<Settings.SubscriptionSettings />} />
+      <Route path="webhook" element={<Settings.SubscriptionWebhook />} />
+    </Route>
     <Route path="users">
       <Route
         path=""

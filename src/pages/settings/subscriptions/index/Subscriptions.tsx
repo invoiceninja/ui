@@ -12,7 +12,7 @@ import { DataTable } from 'components/DataTable';
 import { Settings } from 'components/layouts/Settings';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useSubscriptionColumns } from './common/hooks/useSubscriptionColumns';
+import { useSubscriptionColumns } from '../common/hooks/useSubscriptionColumns';
 
 export function Subscriptions() {
   const [t] = useTranslation();
@@ -31,8 +31,8 @@ export function Subscriptions() {
   return (
     <Settings
       title={t('subscriptions')}
-      breadcrumbs={pages}
       docsLink="docs/advanced-settings/#subscriptions"
+      breadcrumbs={pages}
     >
       <DataTable
         resource="subscription"

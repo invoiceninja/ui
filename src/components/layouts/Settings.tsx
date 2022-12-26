@@ -140,6 +140,12 @@ export function Settings(props: Props) {
       visible: enterprisePlan(),
     },
     {
+      name: t('subscriptions'),
+      href: '/settings/subscriptions',
+      current: location.pathname.startsWith('/settings/subscriptions'),
+      visible: proPlan() || enterprisePlan(),
+    },
+    {
       name: t('user_management'),
       href: '/settings/users',
       current: location.pathname.startsWith('/settings/users'),
