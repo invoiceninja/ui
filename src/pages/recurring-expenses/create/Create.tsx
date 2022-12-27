@@ -106,7 +106,6 @@ export function Create() {
       breadcrumbs={pages}
       onBackClick="/recurring_expenses"
       onSaveClick={() => recurringExpense && onSave(recurringExpense)}
-      disableSaveButton={recurringExpense?.client_id.length === 0}
     >
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 xl:col-span-4">

@@ -98,7 +98,6 @@ export function Edit() {
           />
         )
       }
-      disableSaveButton={recurringExpense?.client_id.length === 0}
     >
       <div className="space-y-4">
         <Tabs tabs={tabs} />
