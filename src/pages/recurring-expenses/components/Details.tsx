@@ -21,7 +21,7 @@ import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { UserSelector } from 'components/users/UserSelector';
 import { VendorSelector } from 'components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
-import frequencies from 'common/constants/frequency';
+import frequencies from 'common/constants/recurring-expense-frequency';
 import dayjs from 'dayjs';
 
 export interface RecurringExpenseCardProps {
