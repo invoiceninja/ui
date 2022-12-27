@@ -172,9 +172,7 @@ export const settingsRoutes = (
     <Route path="subscriptions">
       <Route path="" element={<Settings.Subscriptions />} />
       <Route path="create" element={<Settings.CreateSubscription />} />
-      <Route path="overview" element={<Settings.SubscriptionOverview />} />
-      <Route path="settings" element={<Settings.SubscriptionSettings />} />
-      <Route path="webhook" element={<Settings.SubscriptionWebhook />} />
+      <Route path=":id/edit" element={<Settings.EditSubscription />} />
     </Route>
     <Route path="users">
       <Route

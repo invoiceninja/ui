@@ -275,7 +275,7 @@ export function Create() {
           {payment?.client_id && (
             <Element leftSide={t('invoices')}>
               <DebouncedCombobox
-                endpoint={route('/api/v1/invoices?payable=:clientId', {
+                endpoint={route('/api/v1/invoices', {
                   clientId: payment.client_id,
                 })}
                 label="number"

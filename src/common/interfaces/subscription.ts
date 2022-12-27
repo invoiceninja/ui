@@ -9,10 +9,10 @@
  */
 
 interface Headers {
-  header_key: string;
+  [key: string]: string;
 }
 
-interface Webhook {
+export interface Webhook {
   post_purchase_body: string;
   post_purchase_headers: Headers;
   post_purchase_rest_method: string;
@@ -21,6 +21,7 @@ interface Webhook {
 }
 
 export interface Subscription {
+  id: string;
   allow_cancellation: boolean;
   allow_plan_changes: boolean;
   allow_query_overrides: boolean;

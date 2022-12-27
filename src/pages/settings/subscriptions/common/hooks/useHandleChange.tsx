@@ -11,10 +11,12 @@
 import { Subscription } from 'common/interfaces/subscription';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
+import { set } from 'lodash';
 
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
-  setSubscription: Dispatch<SetStateAction<Subscription>>;
+  setSubscription: Dispatch<SetStateAction<Subscription | undefined>>;
+  subscription: Subscription | undefined;
 }
 
 export function useHandleChange(params: Params) {
@@ -23,9 +25,9 @@ export function useHandleChange(params: Params) {
     value: Subscription[keyof Subscription]
   ) => {
     params.setErrors(undefined);
-    params.setSubscription((prevState) => ({
-      ...prevState,
-      [property]: value,
-    }));
+
+    const subscription = { ...params.subscription };
+
+    params.setSubscription(set(subscription as Subscription, property, value));
   };
 }

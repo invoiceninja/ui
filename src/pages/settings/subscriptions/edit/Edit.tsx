@@ -13,7 +13,6 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Product } from 'common/interfaces/product';
 import { Subscription } from 'common/interfaces/subscription';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -22,17 +21,19 @@ import { Settings } from 'components/layouts/Settings';
 import { TabGroup } from 'components/TabGroup';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { Overview } from '../common/components/Overview';
 import { Settings as SubscriptionSettings } from '../common/components/Settings';
 import { Webhook } from '../common/components/Webhook';
 import { useBlankSubscriptionQuery } from '../common/hooks/useBlankSubscriptionQuery';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 
-export function Create() {
+export function Edit() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const { id } = useParams();
 
   const { data } = useBlankSubscriptionQuery();
 
@@ -41,7 +42,10 @@ export function Create() {
   const pages = [
     { name: t('settings'), href: '/settings' },
     { name: t('subscriptions'), href: '/settings/subscriptions' },
-    { name: t('new_subscription'), href: '/settings/subscriptions/create' },
+    {
+      name: t('edit_subscription'),
+      href: route('/settings/subscriptions/:id/edit', { id }),
+    },
   ];
 
   const tabs = [t('overview'), t('settings'), t('webhook')];
@@ -84,17 +88,13 @@ export function Create() {
     event.preventDefault();
 
     setErrors(undefined);
-
     toast.processing();
 
     request('POST', endpoint('/api/v1/subscriptions'), subscription)
-      .then((response: GenericSingleResourceResponse<Subscription>) => {
+      .then((response) => {
+        console.log(response);
         toast.success('created_subscription');
-        navigate(
-          route('/settings/subscriptions/:id/edit', {
-            id: response.data.data.id,
-          })
-        );
+        //navigate('/transactions');
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
