@@ -23,5 +23,4 @@ export default {
   [RecurringExpensesFrequency.FREQUENCY_TWO_WEEKS]: 'freq_two_weeks',
   [RecurringExpensesFrequency.FREQUENCY_TWO_YEARS]: 'freq_two_years',
   [RecurringExpensesFrequency.FREQUENCY_WEEKLY]: 'freq_weekly',
-  [RecurringExpensesFrequency.RECURS_INDEFINITELY]: 'freq_indefinetley',
 };

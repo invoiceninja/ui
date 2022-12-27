@@ -21,5 +21,4 @@ export const enum RecurringExpensesFrequency {
   FREQUENCY_ANNUALLY = '10',
   FREQUENCY_TWO_YEARS = '11',
   FREQUENCY_THREE_YEARS = '12',
-  RECURS_INDEFINITELY = '-1',
 }
