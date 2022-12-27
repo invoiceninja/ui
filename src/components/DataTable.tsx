@@ -67,6 +67,7 @@ interface Props<T> {
   leftSideChevrons?: ReactNode;
   staleTime?: number;
   onTableRowClick?: (resource: T) => unknown;
+  beforeFilter?: ReactNode;
 }
 
 export const datatablePerPageAtom = atomWithStorage('perPage', '10');
@@ -204,6 +205,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               )}
             </Inline>
           }
+          beforeFilter={props.beforeFilter}
         >
           <Dropdown label={t('more_actions')}>
             <DropdownElement onClick={() => bulk('archive')}>
