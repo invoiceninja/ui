@@ -33,7 +33,7 @@ export function CustomFieldsPlanAlert(props: CommonProps) {
             <div className="flex items-center">
               <MdInfoOutline className="mr-2" fontSize={20} />
 
-              {t('requires_an_enterprise_plan')}
+              {t('upgrade_to_paid_plan')}
 
               {user?.company_user && (
                 <Link
