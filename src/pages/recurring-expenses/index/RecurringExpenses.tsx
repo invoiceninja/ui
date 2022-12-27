@@ -9,9 +9,15 @@
  */
 import { useTitle } from 'common/hooks/useTitle';
 import { DataTable } from 'components/DataTable';
+import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { useActions, useRecurringExpenseColumns } from '../common/hooks';
+import {
+  defaultColumns,
+  recurringExpenseColumns,
+  useActions,
+  useRecurringExpenseColumns,
+} from '../common/hooks';
 
 export function RecurringExpenses() {
   useTitle('recurring_expenses');
@@ -41,6 +47,13 @@ export function RecurringExpenses() {
         linkToEdit="/recurring_expenses/:id/edit"
         customActions={actions}
         withResourcefulActions
+        leftSideChevrons={
+          <DataTableColumnsPicker
+            columns={recurringExpenseColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+            table="recurringExpense"
+          />
+        }
       />
     </Default>
   );
