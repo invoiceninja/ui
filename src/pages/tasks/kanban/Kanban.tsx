@@ -49,6 +49,7 @@ import { Edit, Pause, Play } from 'react-feather';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Card, Element } from '@invoiceninja/cards';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
+import { Inline } from 'components/Inline';
 
 interface Card {
   id: string;
@@ -232,7 +233,7 @@ export function Kanban() {
     setIsKanbanViewSliderVisible(false);
     setCurrentTaskId(undefined);
   };
-  
+
   useEffect(() => {
     projectId
       ? setApiEndpoint(
@@ -248,8 +249,11 @@ export function Kanban() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={
-        <Link to="/tasks" className="inline-flex items-center space-x-2">
-          <BsTable size={20} />
+        <Link to="/tasks">
+          <Inline>
+            <BsTable size={20} />
+            <span>{t('tasks')}</span>
+          </Inline>
         </Link>
       }
     >
