@@ -11,10 +11,9 @@
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
-import { useAccentColor } from 'common/hooks/useAccentColor';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
-import { MdNotificationImportant } from 'react-icons/md';
+import { MdError } from 'react-icons/md';
 import { Button } from './forms';
 
 interface Props {
@@ -23,8 +22,6 @@ interface Props {
 
 export function VerifyBanner(props: Props) {
   const [t] = useTranslation();
-
-  const accentColor = useAccentColor();
 
   const user = useCurrentUser();
 
@@ -42,11 +39,11 @@ export function VerifyBanner(props: Props) {
   };
 
   return (
-    <div className="flex absolute justify-center items-center z-20 w-full h-screen">
-      <div style={{ backgroundColor: accentColor }}>
+    <div className="flex absolute justify-center items-start mt-20 z-20 w-full h-screen">
+      <div className="bg-red-700">
         <div className="mx-auto py-3 px-3 sm:px-6">
           <div className="grid grid-flow-col gap-7 items-center sm:text-center">
-            <MdNotificationImportant color="white" fontSize={28} />
+            <MdError color="white" fontSize={28} />
             <span className="text-white font-medium hidden md:inline">
               {props.type === 'email'
                 ? t('email_not_verified')
@@ -59,7 +56,7 @@ export function VerifyBanner(props: Props) {
                   className="py-1 px-2 cursor-pointer"
                   onClick={handleResendEmail}
                 >
-                  {t('resend_email')}
+                  <span className="text-gray-800">{t('resend_email')}</span>
                 </Button>
               </span>
             )}
