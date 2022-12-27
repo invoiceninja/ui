@@ -35,13 +35,7 @@ import { expenseAtom } from 'pages/expenses/common/atoms';
 import paymentType from 'common/constants/payment-type';
 import { customField } from 'components/CustomField';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
-
-export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
-  column: TColumn;
-  id: keyof TResource;
-  label: string;
-  format?: (field: string | number, resource: TResource) => unknown;
-}[];
+import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 
 export const recurringExpenseColumns = [
   'status',
