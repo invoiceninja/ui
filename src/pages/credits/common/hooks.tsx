@@ -414,7 +414,7 @@ export function useActions() {
           onClick={() => bulk(credit.id, 'archive')}
           icon={<Icon element={MdArchive} />}
         >
-          {t('archive_credit')}
+          {t('archive')}
         </DropdownElement>
       ),
     (credit) =>
@@ -424,7 +424,7 @@ export function useActions() {
           onClick={() => bulk(credit.id, 'restore')}
           icon={<Icon element={MdRestore} />}
         >
-          {t('restore_credit')}
+          {t('restore')}
         </DropdownElement>
       ),
     (credit) =>
@@ -434,7 +434,7 @@ export function useActions() {
           onClick={() => bulk(credit.id, 'delete')}
           icon={<Icon element={MdDelete} />}
         >
-          {t('delete_credit')}
+          {t('delete')}
         </DropdownElement>
       ),
   ];

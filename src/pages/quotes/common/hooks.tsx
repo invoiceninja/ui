@@ -412,7 +412,7 @@ export function useActions() {
           onClick={() => bulk(quote.id, 'archive')}
           icon={<Icon element={MdArchive} />}
         >
-          {t('archive_quote')}
+          {t('archive')}
         </DropdownElement>
       ),
     (quote) =>
@@ -422,7 +422,7 @@ export function useActions() {
           onClick={() => bulk(quote.id, 'restore')}
           icon={<Icon element={MdRestore} />}
         >
-          {t('restore_quote')}
+          {t('restore')}
         </DropdownElement>
       ),
     (quote) =>
@@ -432,7 +432,7 @@ export function useActions() {
           onClick={() => bulk(quote.id, 'delete')}
           icon={<Icon element={MdDelete} />}
         >
-          {t('delete_quote')}
+          {t('delete')}
         </DropdownElement>
       ),
   ];

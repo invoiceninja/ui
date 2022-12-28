@@ -104,20 +104,20 @@ export function ApiWebhooks() {
                   <Td>
                     <Dropdown label={t('actions')}>
                       <DropdownElement
-                        onClick={() => archive(webhook.id)}
-                        icon={<Icon element={MdArchive} />}
-                      >
-                        {t('archive')}
-                      </DropdownElement>
-
-                      <DropdownElement
                         to={route(
                           '/settings/integrations/api_webhooks/:id/edit',
                           { id: webhook.id }
                         )}
                         icon={<Icon element={MdEdit} />}
                       >
-                        {t('edit_webhook')}
+                        {t('edit')}
+                      </DropdownElement>
+
+                      <DropdownElement
+                        onClick={() => archive(webhook.id)}
+                        icon={<Icon element={MdArchive} />}
+                      >
+                        {t('archive')}
                       </DropdownElement>
                     </Dropdown>
                   </Td>

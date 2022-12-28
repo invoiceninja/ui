@@ -12,7 +12,6 @@ import { AxiosError } from 'axios';
 import { bulk } from 'common/queries/clients';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { route } from 'common/helpers/route';
 import {
@@ -23,6 +22,7 @@ import {
 } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
 import { Icon } from 'components/icons/Icon';
+import { toast } from 'common/helpers/toast/toast';
 
 interface Props {
   clientId: string | undefined;
@@ -32,18 +32,18 @@ export function CustomResourcefulActions(props: Props) {
   const [t] = useTranslation();
 
   const handleResourcefulAction = (action: 'delete' | 'archive') => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     if (props.clientId)
       bulk([props.clientId], action)
         .then(() => {
-          toast.success(t(`${action}d_client`), { id: toastId });
+          toast.success(t(`${action}d_client`) || '');
         })
         .catch((error: AxiosError | unknown) => {
           console.error(error);
 
           toast.dismiss();
-          toast.error(t('error_title'));
+          toast.error();
         });
   };
 
@@ -85,6 +85,7 @@ export function CustomResourcefulActions(props: Props) {
         >
           {t('new_quote')}
         </DropdownElement>
+
         <DropdownElement
           to={route('/credits/create?client=:id', {
             id: props.clientId,

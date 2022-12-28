@@ -78,7 +78,7 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick={route('/expenses')}
+      onBackClick={'/expenses'}
       onSaveClick={() => expense && save(expense)}
       navigationTopRight={
         expense && (

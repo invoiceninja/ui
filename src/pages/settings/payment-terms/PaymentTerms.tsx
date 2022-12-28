@@ -119,13 +119,14 @@ export function PaymentTerms() {
                       })}
                       icon={<Icon element={MdEdit} />}
                     >
-                      {t('edit_payment_term')}
+                      {t('edit')}
                     </DropdownElement>
+
                     <DropdownElement
                       onClick={() => archive(paymentTerm.id)}
                       icon={<Icon element={MdArchive} />}
                     >
-                      {t('archive_payment_term')}
+                      {t('archive')}
                     </DropdownElement>
                   </Dropdown>
                 </Td>

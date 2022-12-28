@@ -119,14 +119,14 @@ export function ApiTokens() {
                           )}
                           icon={<Icon element={MdEdit} />}
                         >
-                          {t('edit_token')}
+                          {t('edit')}
                         </DropdownElement>
 
                         <DropdownElement
                           onClick={() => archive(token.id)}
                           icon={<Icon element={MdArchive} />}
                         >
-                          {t('archive_token')}
+                          {t('archive')}
                         </DropdownElement>
                       </Dropdown>
                     </Td>

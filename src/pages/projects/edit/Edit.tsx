@@ -176,7 +176,7 @@ export function Edit() {
                 onClick={() => bulk(project.id, 'archive')}
                 icon={<Icon element={MdArchive} />}
               >
-                {t('archive_project')}
+                {t('archive')}
               </DropdownElement>
             )}
 
@@ -186,7 +186,7 @@ export function Edit() {
                 onClick={() => bulk(project.id, 'restore')}
                 icon={<Icon element={MdRestore} />}
               >
-                {t('restore_project')}
+                {t('restore')}
               </DropdownElement>
             )}
 
@@ -196,7 +196,7 @@ export function Edit() {
                 onClick={() => bulk(project.id, 'delete')}
                 icon={<Icon element={MdDelete} />}
               >
-                {t('delete_project')}
+                {t('delete')}
               </DropdownElement>
             )}
           </Dropdown>

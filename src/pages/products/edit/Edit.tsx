@@ -324,7 +324,7 @@ export function Edit() {
               to={route('/products/:id/clone', { id })}
               icon={<Icon element={MdControlPointDuplicate} />}
             >
-              {t('clone_product')}
+              {t('clone')}
             </DropdownElement>
 
             {getEntityState(product.data.data) === EntityState.Active && (
@@ -334,7 +334,7 @@ export function Edit() {
                 }
                 icon={<Icon element={MdArchive} />}
               >
-                {t('archive_product')}
+                {t('archive')}
               </DropdownElement>
             )}
 
@@ -346,7 +346,7 @@ export function Edit() {
                 }
                 icon={<Icon element={MdRestore} />}
               >
-                {t('restore_product')}
+                {t('restore')}
               </DropdownElement>
             )}
 
@@ -358,7 +358,7 @@ export function Edit() {
                 }
                 icon={<Icon element={MdDelete} />}
               >
-                {t('delete_product')}
+                {t('delete')}
               </DropdownElement>
             )}
           </Dropdown>

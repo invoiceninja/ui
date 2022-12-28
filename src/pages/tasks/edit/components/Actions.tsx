@@ -86,7 +86,7 @@ export function Actions(props: Props) {
             onClick={() => bulk(task.id, 'archive')}
             icon={<Icon element={MdArchive} />}
           >
-            {t('archive_task')}
+            {t('archive')}
           </DropdownElement>
         )}
 
@@ -95,7 +95,7 @@ export function Actions(props: Props) {
             onClick={() => bulk(task.id, 'restore')}
             icon={<Icon element={MdRestore} />}
           >
-            {t('restore_task')}
+            {t('restore')}
           </DropdownElement>
         )}
 
@@ -104,7 +104,7 @@ export function Actions(props: Props) {
             onClick={() => bulk(task.id, 'delete')}
             icon={<Icon element={MdDelete} />}
           >
-            {t('delete_task')}
+            {t('delete')}
           </DropdownElement>
         )}
       </div>
