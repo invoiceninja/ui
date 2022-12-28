@@ -13,12 +13,28 @@ import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Subscription } from 'common/interfaces/subscription';
+import { route } from 'common/helpers/route';
 
 export function useBlankSubscriptionQuery() {
   return useQuery<Subscription>(
     '/api/v1/subscriptions/create',
     () =>
       request('GET', endpoint('/api/v1/subscriptions/create')).then(
+        (response: GenericSingleResourceResponse<Subscription>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}
+
+export function useSubscriptionQuery(params: { id: string | undefined }) {
+  return useQuery<Subscription>(
+    route('/api/v1/subscriptions/:id', { id: params.id }),
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/subscriptions/:id', { id: params.id })
+      ).then(
         (response: GenericSingleResourceResponse<Subscription>) =>
           response.data.data
       ),

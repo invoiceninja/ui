@@ -90,6 +90,7 @@ export function Create() {
     request('POST', endpoint('/api/v1/subscriptions'), subscription)
       .then((response: GenericSingleResourceResponse<Subscription>) => {
         toast.success('created_subscription');
+
         navigate(
           route('/settings/subscriptions/:id/edit', {
             id: response.data.data.id,

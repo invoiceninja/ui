@@ -35,8 +35,6 @@ interface OverviewSubscriptionProps extends SubscriptionProps {
 export function Overview(props: OverviewSubscriptionProps) {
   const [t] = useTranslation();
 
-  console.log(props.errors);
-
   return (
     <Card title={t('overview')}>
       <Element leftSide={t('name')} required>
@@ -51,8 +49,7 @@ export function Overview(props: OverviewSubscriptionProps) {
         <DebouncedCombobox
           endpoint={'/api/v1/group_settings'}
           label="name"
-          defaultValue=""
-          value={props.subscription.group_id}
+          defaultValue={props.subscription.group_id}
           onChange={(value: Record<GroupSettings>) =>
             value.resource && props.handleChange('group_id', value.resource.id)
           }

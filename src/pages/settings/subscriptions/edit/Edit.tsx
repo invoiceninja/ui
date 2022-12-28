@@ -21,11 +21,12 @@ import { Settings } from 'components/layouts/Settings';
 import { TabGroup } from 'components/TabGroup';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Overview } from '../common/components/Overview';
 import { Settings as SubscriptionSettings } from '../common/components/Settings';
 import { Webhook } from '../common/components/Webhook';
-import { useBlankSubscriptionQuery } from '../common/hooks/useBlankSubscriptionQuery';
+import { useSubscriptionQuery } from '../common/hooks/useBlankSubscriptionQuery';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 
 export function Edit() {
@@ -33,9 +34,11 @@ export function Edit() {
 
   const navigate = useNavigate();
 
+  const queryClient = useQueryClient();
+
   const { id } = useParams();
 
-  const { data } = useBlankSubscriptionQuery();
+  const { data } = useSubscriptionQuery({ id });
 
   const { data: productsData } = useProductsQuery();
 
@@ -64,17 +67,7 @@ export function Edit() {
 
   useEffect(() => {
     if (data) {
-      setSubscription({
-        ...data,
-        frequency_id: '5',
-        webhook_configuration: {
-          post_purchase_headers: {},
-          post_purchase_body: '',
-          post_purchase_rest_method: '',
-          post_purchase_url: '',
-          return_url: '',
-        },
-      });
+      setSubscription(data);
     }
   }, [data]);
 
@@ -88,13 +81,18 @@ export function Edit() {
     event.preventDefault();
 
     setErrors(undefined);
+
     toast.processing();
 
-    request('POST', endpoint('/api/v1/subscriptions'), subscription)
-      .then((response) => {
-        console.log(response);
-        toast.success('created_subscription');
-        //navigate('/transactions');
+    request('PUT', endpoint('/api/v1/subscriptions/:id', { id }), subscription)
+      .then(() => {
+        toast.success('updated_subscription');
+
+        queryClient.invalidateQueries(
+          route('/api/v1/subscriptions/:id', { id })
+        );
+
+        navigate('/settings/subscriptions');
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -109,7 +107,7 @@ export function Edit() {
 
   return (
     <Settings
-      title={t('new_subscription')}
+      title={t('edit_subscription')}
       breadcrumbs={pages}
       onSaveClick={handleSave}
       onCancelClick={() => navigate('/settings/subscriptions')}
