@@ -12,11 +12,12 @@ import { isHosted } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
-import { VerifyBanner } from 'components/VerifyBanner';
+import { VerifyModal } from 'components/VerifyModal';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 
@@ -27,6 +28,8 @@ export function App() {
 
   const user = useCurrentUser();
 
+  const location = useLocation();
+
   const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   const resolveLanguage = useResolveLanguage();
@@ -36,6 +39,8 @@ export function App() {
   const resolvedLanguage = company
     ? resolveLanguage(company.settings.language_id)
     : undefined;
+
+  const isLoginPage = location.pathname.startsWith('/login');
 
   useEffect(() => {
     document.body.classList.add('bg-gray-50', 'dark:bg-gray-900');
@@ -67,11 +72,16 @@ export function App() {
     if (user) {
       setIsEmailVerified(!!user.email_verified_at);
     }
-  }, [user]);
+  }, [user, company]);
 
   return (
     <div className="App">
-      {user && !isEmailVerified && isHosted() && <VerifyBanner type="email" />}
+      {user && (
+        <VerifyModal
+          visible={!isLoginPage && isEmailVerified && !isHosted()}
+          type="email"
+        />
+      )}
       <Toaster position="top-center" />
       {routes}
     </div>

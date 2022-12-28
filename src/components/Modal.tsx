@@ -22,6 +22,8 @@ interface Props {
   centerContent?: boolean;
   size?: 'small' | 'regular' | 'large';
   backgroundColor?: 'white' | 'gray';
+  disableClosing?: boolean;
+  withoutPadding?: boolean;
 }
 
 export function Modal(props: Props) {
@@ -37,8 +39,8 @@ export function Modal(props: Props) {
         as="div"
         className="fixed z-10 inset-0 overflow-y-auto"
         onClose={(value) => {
-          setOpen(value);
-          props.onClose(value);
+          !props.disableClosing && setOpen(value);
+          !props.disableClosing && props.onClose(value);
         }}
       >
         <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -72,7 +74,7 @@ export function Modal(props: Props) {
           >
             <div
               className={classNames(
-                'inline-block align-bottom rounded px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:p-6',
+                'inline-block align-bottom rounded text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full',
                 {
                   'max-w-sm':
                     props.size === 'small' || typeof props.size === 'undefined',
@@ -82,6 +84,7 @@ export function Modal(props: Props) {
                     props.backgroundColor === 'white' ||
                     typeof props.backgroundColor === 'undefined',
                   'bg-gray-50': props.backgroundColor === 'gray',
+                  'px-4 pt-5 pb-4 sm:p-6': !props.withoutPadding,
                 }
               )}
             >
@@ -100,17 +103,22 @@ export function Modal(props: Props) {
                   </div>
                 </div>
 
-                <X
-                  className="cursor-pointer"
-                  onClick={() => props.onClose(false)}
-                />
+                {!props.disableClosing && (
+                  <X
+                    className="cursor-pointer"
+                    onClick={() => props.onClose(false)}
+                  />
+                )}
               </div>
 
               {props.children && (
                 <div
                   className={classNames(
-                    'mt-5 sm:mt-6 text-sm text-gray-500 flex flex-col space-y-4',
-                    { 'justify-center items-center': props.centerContent }
+                    'text-sm text-gray-500 flex flex-col space-y-4',
+                    {
+                      'justify-center items-center': props.centerContent,
+                      'mt-5 sm:mt-6': !props.disableClosing,
+                    }
                   )}
                 >
                   {props.children}
