@@ -24,6 +24,7 @@ import { defaultColumns, taskColumns, useTaskColumns } from '../common/hooks';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { Icon } from 'components/icons/Icon';
 import { MdNotStarted, MdStopCircle, MdTextSnippet } from 'react-icons/md';
+import { Inline } from 'components/Inline';
 
 export function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -69,15 +70,7 @@ export function Tasks() {
   ];
 
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      navigationTopRight={
-        <Link to="/tasks/kanban" className="inline-flex items-center space-x-2">
-          <BsKanban size={20} />
-        </Link>
-      }
-    >
+    <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
         resource="task"
         columns={columns}
@@ -93,6 +86,14 @@ export function Tasks() {
             defaultColumns={defaultColumns}
             table="task"
           />
+        }
+        beforeFilter={
+          <Link to="/tasks/kanban">
+            <Inline>
+              <BsKanban size={20} />
+              <span>Kanban</span>
+            </Inline>
+          </Link>
         }
       />
     </Default>

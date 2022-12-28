@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isDemo } from 'common/helpers';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { DateFormat } from 'common/interfaces/date-format';
 import { Language } from 'common/interfaces/language';
@@ -91,19 +92,21 @@ export function Settings() {
           />
         </Element>
 
-        <Element leftSide={t('language')}>
-          <SelectField
-            onChange={handleChange}
-            id="settings.language_id"
-            value={company?.settings?.language_id || '1'}
-          >
-            {statics?.languages.map((language: Language) => (
-              <option value={language.id} key={language.id}>
-                {language.name}
-              </option>
-            ))}
-          </SelectField>
-        </Element>
+        {!isDemo() && (
+          <Element leftSide={t('language')}>
+            <SelectField
+              onChange={handleChange}
+              id="settings.language_id"
+              value={company?.settings?.language_id || '1'}
+            >
+              {statics?.languages.map((language: Language) => (
+                <option value={language.id} key={language.id}>
+                  {language.name}
+                </option>
+              ))}
+            </SelectField>
+          </Element>
+        )}
 
         <Element leftSide={t('timezone')}>
           <SelectField
