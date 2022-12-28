@@ -11,6 +11,7 @@
 import { Quote } from 'common/interfaces/quote';
 import { Badge } from 'components/Badge';
 import { useTranslation } from 'react-i18next';
+import { QuoteStatus as QuoteStatusEnum } from 'common/enums/quote-status';
 
 interface Props {
   entity: Quote;
@@ -28,19 +29,20 @@ export function QuoteStatus(props: Props) {
   if (props.entity.invoice_id)
     return <Badge variant="green">{t('converted')}</Badge>;
 
+  if (
+    props.entity.status_id === QuoteStatusEnum.Sent &&
+    new Date(props.entity.date) < new Date()
+  )
+    return <Badge variant="red">{t('expired')}</Badge>;
+
   switch (props.entity.status_id) {
-    case '-1':
-      return <Badge variant="red">{t('expired')}</Badge>;
-    case '1':
+    case QuoteStatusEnum.Draft:
       return <Badge variant="generic">{t('draft')}</Badge>;
-    case '2':
+    case QuoteStatusEnum.Sent:
       return <Badge variant="light-blue">{t('sent')}</Badge>;
-    case '3':
+    case QuoteStatusEnum.Approved:
       return <Badge variant="dark-blue">{t('approved')}</Badge>;
     default:
       return <Badge variant="light-blue">{t('error')}</Badge>;
-      break;
   }
-
-  return <></>;
 }
