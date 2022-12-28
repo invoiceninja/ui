@@ -59,9 +59,13 @@ export function MultipleProductSelector(props: Props) {
 
   useEffect(() => {
     if (props.products) {
-      const filteredProducts = props.products.filter(({ id }) =>
-        props.subscription[props.type].includes(id)
-      );
+      let filteredProducts: Product[] = [];
+
+      props.subscription[props.type].split(',').forEach((productId) => {
+        filteredProducts = filteredProducts.concat(
+          props.products?.filter(({ id }) => id === productId) || []
+        );
+      });
 
       setSelectedProducts(filteredProducts);
     }
