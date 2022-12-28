@@ -86,7 +86,7 @@ export function Settings(props: SubscriptionProps) {
       </Element>
 
       <Element
-        leftSide={t('required_registration')} // double check with David required is missing
+        leftSide={t('registration_required')}
         leftSideHelp={t('registration_required_help')}
       >
         <Toggle

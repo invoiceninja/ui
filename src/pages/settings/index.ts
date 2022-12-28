@@ -32,7 +32,6 @@ export * from './subscriptions/index';
 export * from './backup-restore';
 
 export * from './group-settings/GroupSettings';
-export * from './subscriptions/index/Subscriptions';
 export * from './users';
 export * from './payment-terms';
 export * from './tax-rates';
