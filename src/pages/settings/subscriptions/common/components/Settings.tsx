@@ -44,9 +44,9 @@ export function Settings(props: SubscriptionProps) {
         >
           <option defaultChecked></option>
           <option value="always">{t('enabled')}</option>
-          <option value="optout">{t('enabled_by_default')}</option>
-          <option value="optin">{t('disabled_by_default')}</option>
-          <option value="off">{t('off')}</option>
+          <option value="optout">{t('optout')}</option>
+          <option value="optin">{t('optin')}</option>
+          <option value="off">{t('disabled')}</option>
         </SelectField>
       </Element>
 
@@ -149,12 +149,38 @@ export function Settings(props: SubscriptionProps) {
         />
       </Element>
 
+      {props.subscription.allow_cancellation && (
+        <Element>
+          <InputField
+            label={t('refund_period')}
+            value={props.subscription.refund_period}
+            onValueChange={(value) =>
+              props.handleChange('refund_period', parseFloat(value) || 0)
+            }
+            errorMessage={props.errors?.errors.refund_period}
+          />
+        </Element>
+      )}
+
       <Element leftSide={t('trial_enabled')}>
         <Toggle
           checked={props.subscription.trial_enabled}
           onValueChange={(value) => props.handleChange('trial_enabled', value)}
         />
       </Element>
+
+      {props.subscription.trial_enabled && (
+        <Element>
+          <InputField
+            label={t('trial_duration')}
+            value={props.subscription.trial_duration}
+            onValueChange={(value) =>
+              props.handleChange('trial_duration', parseFloat(value) || 0)
+            }
+            errorMessage={props.errors?.errors.trial_duration}
+          />
+        </Element>
+      )}
 
       <Element leftSide={t('per_seat_enabled')}>
         <Toggle
@@ -164,6 +190,19 @@ export function Settings(props: SubscriptionProps) {
           }
         />
       </Element>
+
+      {props.subscription.per_seat_enabled && (
+        <Element>
+          <InputField
+            label={t('max_seats_limit')}
+            value={props.subscription.max_seats_limit}
+            onValueChange={(value) =>
+              props.handleChange('max_seats_limit', parseFloat(value) || 0)
+            }
+            errorMessage={props.errors?.errors.max_seats_limit}
+          />
+        </Element>
+      )}
     </Card>
   );
 }
