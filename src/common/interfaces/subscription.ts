@@ -12,7 +12,7 @@ interface Headers {
   [key: string]: string;
 }
 
-export interface Webhook {
+interface Webhook {
   post_purchase_body: string;
   post_purchase_headers: Headers;
   post_purchase_rest_method: string;
