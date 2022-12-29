@@ -57,6 +57,8 @@ export function VerifyModal(props: Props) {
         const companyUsers = response.data.data;
 
         dispatch(updateCompanyUsers(companyUsers));
+
+        toast.dismiss();
       })
       .catch((error) => {
         console.error(error);
@@ -67,51 +69,52 @@ export function VerifyModal(props: Props) {
   return (
     <Modal
       title=""
+      size="small"
       visible={props.visible}
       onClose={() => {}}
       disableClosing
       withoutPadding
     >
-      <div className="flex justify-center mt-5">
-        <div className="bg-gray-900 rounded-lg py-2 px-2 w-44">
-          <img src={logo} />
+      <div className="flex flex-col space-y-10 pt-6 pb-7 px-10 text-center">
+        <div className="flex justify-center">
+          <div className="bg-gray-900 rounded-lg py-2 px-2 w-44">
+            <img src={logo} />
+          </div>
         </div>
-      </div>
 
-      <div className="flex flex-col items-center pt-2 pb-4 sm:text-center">
-        {props.type === 'email' && (
-          <div className="flex flex-col">
-            <span className="text-gray-900 text-xl">
-              Please confirm your email address
-            </span>
+        <div className="flex flex-col space-y-1">
+          <span className="text-gray-900 text-xl">
+            {props.type === 'email'
+              ? t('confirm_your_email_address')
+              : t('confirm_your_phone_number')}
+          </span>
 
-            <span className="text-gray-500 text-lg">{user?.email}</span>
-          </div>
-        )}
+          <span className="text-gray-500 text-lg">
+            {props.type === 'email' ? user?.email : user?.phone}
+          </span>
+        </div>
 
-        {props.type === 'email' && (
-          <div className="flex justify-between items-center pt-6 pb-2 px-6 w-full">
-            <Button type="minimal" className="py-2" onClick={handleRefreshData}>
-              {t('refresh_data')}
-            </Button>
+        <div className="flex justify-between items-center w-full">
+          {props.type === 'email' && (
+            <>
+              <Button type="minimal" onClick={handleRefreshData}>
+                {t('refresh_data')}
+              </Button>
 
-            <Button
-              type="primary"
-              className="py-2 mr-4"
-              onClick={handleResendEmail}
-            >
-              {t('resend_email')}
-            </Button>
+              <Button
+                type="primary"
+                className="mr-4"
+                onClick={handleResendEmail}
+              >
+                {t('resend_email')}
+              </Button>
 
-            <Button
-              type="minimal"
-              className="py-2"
-              onClick={() => navigate('/logout')}
-            >
-              {t('logout')}
-            </Button>
-          </div>
-        )}
+              <Button type="minimal" onClick={() => navigate('/logout')}>
+                {t('logout')}
+              </Button>
+            </>
+          )}
+        </div>
       </div>
     </Modal>
   );

@@ -76,12 +76,10 @@ export function App() {
 
   return (
     <div className="App">
-      {user && (
-        <VerifyModal
-          visible={!isLoginPage && isEmailVerified && !isHosted()}
-          type="email"
-        />
-      )}
+      <VerifyModal
+        visible={!!user && !isLoginPage && isEmailVerified && !isHosted()}
+        type="email"
+      />
       <Toaster position="top-center" />
       {routes}
     </div>

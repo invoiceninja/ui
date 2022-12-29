@@ -20,7 +20,7 @@ interface Props {
   text?: string | null;
   children?: ReactNode;
   centerContent?: boolean;
-  size?: 'small' | 'regular' | 'large';
+  size?: 'extraSmall' | 'small' | 'regular' | 'large';
   backgroundColor?: 'white' | 'gray';
   disableClosing?: boolean;
   withoutPadding?: boolean;
@@ -77,7 +77,9 @@ export function Modal(props: Props) {
                 'inline-block align-bottom rounded text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full',
                 {
                   'max-w-sm':
-                    props.size === 'small' || typeof props.size === 'undefined',
+                    props.size === 'extraSmall' ||
+                    typeof props.size === 'undefined',
+                  'max-w-lg': props.size === 'small',
                   'max-w-7xl': props.size === 'large',
                   'max-w-2xl': props.size === 'regular',
                   'bg-white':
