@@ -67,7 +67,17 @@ export function Edit() {
 
   useEffect(() => {
     if (data) {
-      setSubscription(data);
+      setSubscription({
+        ...data,
+        webhook_configuration: {
+          ...data.webhook_configuration,
+          post_purchase_headers: Array.isArray(
+            data.webhook_configuration.post_purchase_headers
+          )
+            ? {}
+            : data.webhook_configuration.post_purchase_headers,
+        },
+      });
     }
   }, [data]);
 
