@@ -20,7 +20,12 @@ import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
 import { useInvoiceTask } from '../common/hooks/useInvoiceTask';
-import { defaultColumns, taskColumns, useTaskColumns } from '../common/hooks';
+import {
+  defaultColumns,
+  taskColumns,
+  useTaskColumns,
+  useTaskFilters,
+} from '../common/hooks';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { Inline } from 'components/Inline';
 
@@ -33,8 +38,12 @@ export function Tasks() {
   const columns = useTaskColumns();
 
   const start = useStart();
+
   const stop = useStop();
+
   const invoiceTask = useInvoiceTask();
+
+  const filters = useTaskFilters();
 
   const actions = [
     (task: Task) =>
@@ -68,6 +77,9 @@ export function Tasks() {
         bulkRoute="/api/v1/tasks/bulk"
         linkToEdit="/tasks/:id/edit"
         linkToCreate="/tasks/create"
+        customFilters={filters}
+        customFilterQueryKey="client_status"
+        customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={
           <DataTableColumnsPicker
