@@ -19,6 +19,8 @@ import { Totals } from 'pages/dashboard/components/Totals';
 import { UpcomingInvoices } from 'pages/dashboard/components/UpcomingInvoices';
 import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';
+import { ExpiredQuotes } from './components/ExpiredQuotes';
+import { UpcomingQuotes } from './components/UpcomingQuotes';
 
 export function Dashboard() {
   const [t] = useTranslation();
@@ -56,6 +58,14 @@ export function Dashboard() {
 
         <div className="col-span-12 lg:col-span-6">
           <PastDueInvoices />
+        </div>
+
+        <div className="col-span-12 lg:col-span-6">
+          <ExpiredQuotes />
+        </div>
+
+        <div className="col-span-12 lg:col-span-6">
+          <UpcomingQuotes />
         </div>
       </div>
     </Default>
