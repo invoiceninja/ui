@@ -77,7 +77,7 @@ export function App() {
   return (
     <div className="App">
       <VerifyModal
-        visible={!!user && !isLoginPage && isEmailVerified && !isHosted()}
+        visible={!!user && !isLoginPage && !isEmailVerified && !isHosted()}
         type="email"
       />
       <Toaster position="top-center" />

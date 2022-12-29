@@ -23,7 +23,6 @@ interface Props {
   size?: 'extraSmall' | 'small' | 'regular' | 'large';
   backgroundColor?: 'white' | 'gray';
   disableClosing?: boolean;
-  withoutPadding?: boolean;
 }
 
 export function Modal(props: Props) {
@@ -74,7 +73,7 @@ export function Modal(props: Props) {
           >
             <div
               className={classNames(
-                'inline-block align-bottom rounded text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full',
+                'inline-block align-bottom rounded px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:p-6',
                 {
                   'max-w-sm':
                     props.size === 'extraSmall' ||
@@ -86,7 +85,6 @@ export function Modal(props: Props) {
                     props.backgroundColor === 'white' ||
                     typeof props.backgroundColor === 'undefined',
                   'bg-gray-50': props.backgroundColor === 'gray',
-                  'px-4 pt-5 pb-4 sm:p-6': !props.withoutPadding,
                 }
               )}
             >

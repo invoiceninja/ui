@@ -73,9 +73,8 @@ export function VerifyModal(props: Props) {
       visible={props.visible}
       onClose={() => {}}
       disableClosing
-      withoutPadding
     >
-      <div className="flex flex-col space-y-10 pt-6 pb-7 px-10 text-center">
+      <div className="flex flex-col space-y-10 pb-1 px-3 text-center">
         <div className="flex justify-center">
           <div className="bg-gray-900 rounded-lg py-2 px-2 w-44">
             <img src={logo} />
