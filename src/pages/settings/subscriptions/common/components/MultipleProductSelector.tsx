@@ -10,11 +10,14 @@
 
 import { Product } from 'common/interfaces/product';
 import { Subscription } from 'common/interfaces/subscription';
-import { Button, SelectField } from '@invoiceninja/forms';
+import { SelectField } from '@invoiceninja/forms';
 import { MdClose } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useAccentColor } from 'common/hooks/useAccentColor';
+import { BiChevronRight } from 'react-icons/bi';
+import classNames from 'classnames';
 
 interface Props {
   type:
@@ -31,6 +34,8 @@ interface Props {
 }
 
 export function MultipleProductSelector(props: Props) {
+  const accentColor = useAccentColor();
+
   const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
@@ -112,32 +117,43 @@ export function MultipleProductSelector(props: Props) {
         </SelectField>
       )}
 
-      <div className="flex justify-center">
-        <div className="flex flex-col justify-start">
+      <div
+        className={classNames('flex justify-center', {
+          'border-b border-gray-200': selectedProducts.length,
+        })}
+      >
+        <ul
+          className={classNames('flex flex-col justify-start', {
+            'pb-3': selectedProducts.length,
+          })}
+        >
           {selectedProducts?.map((product, index) => (
-            <div
+            <li
               key={index}
-              className="flex flex-1 justify-start items-center space-x-2 mt-3"
+              className="flex flex-1 justify-between items-center mt-3"
             >
-              <span>
-                {product.product_key}{' '}
-                {formatMoney(
-                  product.price,
-                  company?.settings.country_id,
-                  company?.settings.currency_id
-                )}
-              </span>
+              <BiChevronRight fontSize={18} />
 
-              <Button
-                behavior="button"
-                type="minimal"
-                onClick={() => handleRemoveProduct(product.id)}
-              >
-                <MdClose />
-              </Button>
-            </div>
+              <div className="flex flex-1 justify-between items-center">
+                <span className="font-medium">
+                  {product.product_key}{' '}
+                  {formatMoney(
+                    product.price,
+                    company?.settings.country_id,
+                    company?.settings.currency_id
+                  )}
+                </span>
+
+                <MdClose
+                  className="cursor-pointer ml-20"
+                  color={accentColor}
+                  fontSize={19}
+                  onClick={() => handleRemoveProduct(product.id)}
+                />
+              </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </>
   );

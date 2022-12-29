@@ -9,7 +9,8 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { Button, InputField, SelectField } from '@invoiceninja/forms';
+import { InputField, SelectField } from '@invoiceninja/forms';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 import { Subscription } from 'common/interfaces/subscription';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,9 +21,15 @@ import { SubscriptionProps } from './Overview';
 export function Webhook(props: SubscriptionProps) {
   const [t] = useTranslation();
 
+  const accentColor = useAccentColor();
+
   const [headerKey, setHeaderKey] = useState<string>('');
 
   const [headerValue, setHeaderValue] = useState<string>('');
+
+  const headers = Object.entries(
+    props.subscription.webhook_configuration.post_purchase_headers
+  );
 
   const handleAddHeader = () => {
     props.handleChange(
@@ -55,7 +62,7 @@ export function Webhook(props: SubscriptionProps) {
 
   return (
     <Card title={t('webhook')}>
-      <Element leftSide={t('promo_code')}>
+      <Element leftSide={t('webhook_url')}>
         <InputField
           value={props.subscription.webhook_configuration.post_purchase_url}
           onValueChange={(value) =>
@@ -109,9 +116,7 @@ export function Webhook(props: SubscriptionProps) {
             />
           </div>
 
-          {Object.entries(
-            props.subscription.webhook_configuration.post_purchase_headers
-          )?.map(([key, value], index) => (
+          {headers?.map(([key, value], index) => (
             <div
               key={index}
               className="flex flex-1 justify-between items-center space-x-2 mt-4"
@@ -120,19 +125,16 @@ export function Webhook(props: SubscriptionProps) {
 
               <span className="flex-1 text-start">{value}</span>
 
-              <Button
-                behavior="button"
-                type="minimal"
+              <MdClose
+                className="cursor-pointer"
+                color={accentColor}
+                fontSize={22}
                 onClick={() => handleRemoveHeader(key)}
-              >
-                <MdClose fontSize={22} />
-              </Button>
+              />
             </div>
           ))}
 
-          {!Object.entries(
-            props.subscription.webhook_configuration.post_purchase_headers
-          ).length && (
+          {!headers.length && (
             <span className="text-gray-500 self-center mt-6 text-xl">
               {t('no_headers')}
             </span>
