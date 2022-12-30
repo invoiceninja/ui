@@ -108,15 +108,17 @@ export function Create() {
         toast.success('created_transaction');
         navigate('/transactions');
       })
-      .catch((error: AxiosError<GenericValidationBag<TransactionValidation>>) => {
-        if (error.response?.status === 422) {
-          setErrors(error.response.data);
-          toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
+      .catch(
+        (error: AxiosError<GenericValidationBag<TransactionValidation>>) => {
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+            toast.dismiss();
+          } else {
+            console.error(error);
+            toast.error();
+          }
         }
-      })
+      )
       .finally(() => setIsSaving(false));
   };
 
@@ -124,11 +126,11 @@ export function Create() {
     setTransaction((prevState) => ({
       ...prevState,
       base_type: TransactionType.Deposit,
-      currency_id: company?.settings?.currency_id,
+      currency_id: company?.settings.currency_id,
       date: date(new Date().toString(), 'YYYY-MM-DD'),
     }));
 
-    setCurrencySeparators(getCurrencySeparators(currencies[0]?.id));
+    setCurrencySeparators(getCurrencySeparators(company?.settings.currency_id));
   }, [currencies]);
 
   return (
@@ -158,7 +160,7 @@ export function Create() {
             </SelectField>
           </Element>
 
-          <Element required leftSide={t('date')}>
+          <Element leftSide={t('date')}>
             <InputField
               type="date"
               value={transaction?.date}
@@ -167,7 +169,7 @@ export function Create() {
             />
           </Element>
 
-          <Element required leftSide={t('amount')}>
+          <Element leftSide={t('amount')}>
             <DecimalNumberInput
               border
               precision={currencySeparators?.precision}
@@ -205,7 +207,7 @@ export function Create() {
             />
           </Element>
 
-          <Element required leftSide={t('description')}>
+          <Element leftSide={t('description')}>
             <InputField
               element="textarea"
               value={transaction?.description}

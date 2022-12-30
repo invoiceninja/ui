@@ -192,7 +192,7 @@ export function Edit() {
             </SelectField>
           </Element>
 
-          <Element required leftSide={t('date')}>
+          <Element leftSide={t('date')}>
             <InputField
               type="date"
               value={transaction?.date}
@@ -201,14 +201,14 @@ export function Edit() {
             />
           </Element>
 
-          <Element required leftSide={t('amount')}>
+          <Element leftSide={t('amount')}>
             <DecimalNumberInput
               border
               precision={currencySeparators?.precision}
               currency={currencySeparators}
               className="auto"
-              initialValue={transaction?.amount?.toString()}
-              value={transaction?.amount?.toString()}
+              initialValue={transaction.amount.toString()}
+              value={transaction.amount.toString()}
               onChange={(value: string) => handleChange('amount', value)}
               errorMessage={errors?.errors?.amount}
             />
@@ -238,7 +238,7 @@ export function Edit() {
             />
           </Element>
 
-          <Element required leftSide={t('description')}>
+          <Element leftSide={t('description')}>
             <InputField
               element="textarea"
               value={transaction?.description}
