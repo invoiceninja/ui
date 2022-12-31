@@ -72,12 +72,12 @@ export function App() {
     if (user) {
       setIsEmailVerified(!!user.email_verified_at);
     }
-  }, [user, company]);
+  }, [user]);
 
   return (
     <div className="App">
       <VerifyModal
-        visible={!!user && !isLoginPage && !isEmailVerified && !isHosted()}
+        visible={!!user && !isLoginPage && !isEmailVerified && isHosted()}
         type="email"
       />
       <Toaster position="top-center" />
