@@ -39,6 +39,7 @@ import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { EntityDropDown } from 'components/EntityDropDown';
 
 interface Props extends CommonProps {
   title?: string | null;
@@ -294,9 +295,13 @@ export function Default(props: Props) {
               <MenuIcon className="dark:text-gray-100" />
             </button>
             <div className="flex-1 px-4 md:px-8 flex items-center justify-between">
-              <h2 className="text-sm md:text-xl dark:text-gray-100">
-                {props.title}
-              </h2>
+              <div className="flex items-center">
+                <h2 className="text-sm md:text-xl dark:text-gray-100">
+                  {props.title}
+                </h2>
+
+                <EntityDropDown />
+              </div>
 
               <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
                 {props.onCancelClick && (
