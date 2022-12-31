@@ -78,6 +78,14 @@ export function Notifications() {
     { label: t('payment_success'), field: 'payment_success_all' },
     { label: t('payment_failure'), field: 'payment_failure_all' },
 
+    { label: t('purchase_order_created'), field: 'purchase_order_created_all' },
+    { label: t('purchase_order_sent'), field: 'purchase_order_sent_all' },
+    { label: t('purchase_order_viewed'), field: 'purchase_order_viewed_all' },
+    {
+      label: t('purchase_order_accepted'),
+      field: 'purchase_order_accepted_all',
+    },
+
     { label: t('quote_created'), field: 'quote_created_all' },
     { label: t('quote_sent'), field: 'quote_sent_all' },
     { label: t('quote_viewed'), field: 'quote_viewed_all' },
