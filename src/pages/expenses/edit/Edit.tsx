@@ -20,7 +20,7 @@ import { Tab, Tabs } from 'components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { useActions } from '../common/hooks';
+import { useActions, useHandleChange } from '../common/hooks';
 import { AdditionalInfo } from '../create/components/AdditionalInfo';
 import { Details } from '../create/components/Details';
 import { Notes } from '../create/components/Notes';
@@ -64,12 +64,7 @@ export function Edit() {
 
   const save = useSave({ setErrors });
 
-  const handleChange = <T extends keyof Expense>(
-    property: T,
-    value: Expense[typeof property]
-  ) => {
-    setExpense((expense) => expense && { ...expense, [property]: value });
-  };
+  const handleChange = useHandleChange({ setExpense, setErrors });
 
   useEffect(() => {
     if (data) {

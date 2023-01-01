@@ -17,7 +17,7 @@ import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-res
 
 export function useBlankRecurringExpenseQuery() {
   return useQuery<RecurringExpense>(
-    route('/api/v1/recurring_expenses/create'),
+    '/api/v1/recurring_expenses/create',
     () =>
       request('GET', endpoint('/api/v1/recurring_expenses/create')).then(
         (response: GenericSingleResourceResponse<RecurringExpense>) =>

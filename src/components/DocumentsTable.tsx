@@ -46,12 +46,14 @@ export function DocumentsTable(props: Props) {
       {},
       { headers: { 'X-Api-Password': password } }
     )
-      .then(() => toast.success('deleted_document'))
+      .then(() => {
+        toast.success('deleted_document');
+        props.onDocumentDelete?.();
+      })
       .catch((error) => {
         console.error(error);
         toast.error();
-      })
-      .finally(() => props.onDocumentDelete?.());
+      });
   };
 
   return (
@@ -66,7 +68,7 @@ export function DocumentsTable(props: Props) {
         </Thead>
 
         <Tbody>
-          {props.documents.length === 0 && (
+          {!props.documents.length && (
             <Tr>
               <Td colSpan={5}>{t('no_records_found')}</Td>
             </Tr>

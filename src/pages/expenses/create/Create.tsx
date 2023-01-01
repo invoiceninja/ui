@@ -28,6 +28,7 @@ import { AxiosError } from 'axios';
 import { route } from 'common/helpers/route';
 import { useAtom } from 'jotai';
 import { expenseAtom } from '../common/atoms';
+import { useHandleChange } from '../common/hooks';
 
 export function Create() {
   const [t] = useTranslation();
@@ -52,6 +53,9 @@ export function Create() {
   );
 
   const [errors, setErrors] = useState<ValidationBag>();
+
+  const handleChange = useHandleChange({ setExpense, setErrors });
+
   useEffect(() => {
     if (data && !expense) {
       setExpense(data);
@@ -65,13 +69,6 @@ export function Create() {
       mounted = true;
     }
   }, []);
-
-  const handleChange = <T extends keyof Expense>(
-    property: T,
-    value: Expense[typeof property]
-  ) => {
-    setExpense((expense) => expense && { ...expense, [property]: value });
-  };
 
   const onSave = (expense: Expense) => {
     toast.processing();

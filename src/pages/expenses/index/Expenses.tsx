@@ -33,11 +33,7 @@ export function Expenses() {
   const actions = useActions();
 
   return (
-    <Default
-      title={t('expenses')}
-      breadcrumbs={pages}
-      docsLink="docs/expenses/"
-    >
+    <Default title={t('expenses')} breadcrumbs={pages} docsLink="docs/expenses">
       <DataTable
         resource="expense"
         endpoint="/api/v1/expenses?include=client,vendor"

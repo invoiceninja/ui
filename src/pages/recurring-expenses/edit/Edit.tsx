@@ -8,7 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
+import { endpoint } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { RecurringExpense } from 'common/interfaces/recurring-expense';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -17,15 +21,18 @@ import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { ResourceActions } from 'components/ResourceActions';
 import { Tab, Tabs } from 'components/Tabs';
-import { useActions } from 'pages/recurring-expenses/common/hooks';
+import {
+  useActions,
+  useHandleChange,
+} from 'pages/recurring-expenses/common/hooks';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useQueryClient } from 'react-query';
+import { useNavigate, useParams } from 'react-router-dom';
 import { AdditionalInfo } from '../components/AdditionalInfo';
 import { Details } from '../components/Details';
 import { Notes } from '../components/Notes';
 import { TaxSettings } from '../components/Taxes';
-import { useSave } from './hooks/useSave';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -37,6 +44,10 @@ export function Edit() {
   const { id } = useParams();
 
   const { data } = useRecurringExpenseQuery({ id });
+
+  const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
 
   const pages: Page[] = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
@@ -65,17 +76,7 @@ export function Edit() {
 
   const [errors, setErrors] = useState<ValidationBag>();
 
-  const save = useSave({ setErrors });
-
-  const handleChange = <T extends keyof RecurringExpense>(
-    property: T,
-    value: RecurringExpense[typeof property]
-  ) => {
-    setRecurringExpense(
-      (recurringExpense) =>
-        recurringExpense && { ...recurringExpense, [property]: value }
-    );
-  };
+  const handleChange = useHandleChange({ setRecurringExpense, setErrors });
 
   useEffect(() => {
     if (data) {
@@ -83,12 +84,42 @@ export function Edit() {
     }
   }, [data]);
 
+  const handleSave = () => {
+    toast.processing();
+
+    setErrors(undefined);
+
+    request(
+      'PUT',
+      endpoint('/api/v1/recurring_expenses/:id', { id: recurringExpense!.id }),
+      recurringExpense
+    )
+      .then(() => {
+        toast.success('updated_recurring_expense');
+
+        queryClient.invalidateQueries(
+          route('/api/v1/recurring_expenses/:id', { id: recurringExpense!.id })
+        );
+
+        navigate('/recurring_expenses');
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        } else {
+          toast.error();
+          console.error(error);
+        }
+      });
+  };
+
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
       onBackClick="/recurring_expenses"
-      onSaveClick={() => recurringExpense && save(recurringExpense)}
+      onSaveClick={() => recurringExpense && handleSave()}
       navigationTopRight={
         recurringExpense && (
           <ResourceActions

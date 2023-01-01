@@ -28,6 +28,7 @@ import { recurringExpenseAtom } from '../common/atoms';
 import { useAtom } from 'jotai';
 import { RecurringExpense } from 'common/interfaces/recurring-expense';
 import { useBlankRecurringExpenseQuery } from 'common/queries/recurring-expense';
+import { useHandleChange } from '../common/hooks';
 
 export function Create() {
   const [t] = useTranslation();
@@ -53,6 +54,8 @@ export function Create() {
 
   const [errors, setErrors] = useState<ValidationBag>();
 
+  const handleChange = useHandleChange({ setRecurringExpense, setErrors });
+
   useEffect(() => {
     if (data && !recurringExpense) {
       setRecurringExpense({ ...data, frequency_id: '5' });
@@ -67,21 +70,12 @@ export function Create() {
     }
   }, []);
 
-  const handleChange = <T extends keyof RecurringExpense>(
-    property: T,
-    value: RecurringExpense[typeof property]
-  ) => {
-    setRecurringExpense(
-      (expense) => expense && { ...expense, [property]: value }
-    );
-  };
-
-  const onSave = (expense: RecurringExpense) => {
+  const onSave = (recurringExpense: RecurringExpense) => {
     toast.processing();
 
     setErrors(undefined);
 
-    request('POST', endpoint('/api/v1/recurring_expenses'), expense)
+    request('POST', endpoint('/api/v1/recurring_expenses'), recurringExpense)
       .then((response: GenericSingleResourceResponse<RecurringExpense>) => {
         toast.success('created_recurring_expense');
 

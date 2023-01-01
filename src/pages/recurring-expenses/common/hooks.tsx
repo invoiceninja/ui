@@ -36,6 +36,8 @@ import paymentType from 'common/constants/payment-type';
 import { customField } from 'components/CustomField';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { Dispatch, SetStateAction } from 'react';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 export const recurringExpenseColumns = [
   'status',
@@ -286,8 +288,7 @@ export function useRecurringExpenseColumns() {
       column: 'should_be_invoiced',
       id: 'should_be_invoiced',
       label: t('should_be_invoiced'),
-      format: (value, recurringExpense) =>
-        recurringExpense.should_be_invoiced ? t('yes') : t('no'),
+      format: (value) => (value ? t('yes') : t('no')),
     },
     {
       column: 'tax_name1',
@@ -447,7 +448,7 @@ export function useActions() {
       <DropdownElement
         onClick={() => cloneToRecurringExpense(recurringExpense)}
       >
-        {t('clone_to_recurring')}
+        {t('clone')}
       </DropdownElement>
     ),
     (recurringExpense) => (
@@ -458,4 +459,25 @@ export function useActions() {
   ];
 
   return actions;
+}
+
+interface HandleChangeRecurringExpenseParams {
+  setRecurringExpense: Dispatch<SetStateAction<RecurringExpense | undefined>>;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+}
+
+export function useHandleChange(params: HandleChangeRecurringExpenseParams) {
+  const { setRecurringExpense, setErrors } = params;
+
+  return <T extends keyof RecurringExpense>(
+    property: T,
+    value: RecurringExpense[typeof property]
+  ) => {
+    setErrors(undefined);
+
+    setRecurringExpense(
+      (recurringExpense) =>
+        recurringExpense && { ...recurringExpense, [property]: value }
+    );
+  };
 }

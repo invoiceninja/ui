@@ -30,7 +30,7 @@ export function TaxSettings(props: Props) {
 
   return (
     <Card title={t('taxes')} isLoading={!recurringExpense}>
-      {company?.enabled_expense_tax_rates === 0 && (
+      {!company?.enabled_expense_tax_rates && (
         <Element leftSide={t('expense_tax_help')}>
           <Link to="/settings/tax_settings">{t('settings')}</Link>
         </Element>

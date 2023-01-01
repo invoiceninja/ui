@@ -18,6 +18,7 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Expense } from 'common/interfaces/expense';
 import { RecurringExpense } from 'common/interfaces/recurring-expense';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { customField } from 'components/CustomField';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
@@ -26,6 +27,7 @@ import { StatusBadge } from 'components/StatusBadge';
 import { useAtom } from 'jotai';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { recurringExpenseAtom } from 'pages/recurring-expenses/common/atoms';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { expenseAtom } from './atoms';
@@ -73,7 +75,7 @@ export const expenseColumns = [
 type ExpenseColumns = typeof expenseColumns[number];
 
 export function useActions() {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
 
   const navigate = useNavigate();
 
@@ -81,15 +83,15 @@ export function useActions() {
 
   const [, setRecurringExpense] = useAtom(recurringExpenseAtom);
 
-  const cloneToExpense = (recurringExpense: Expense) => {
-    setExpense({ ...recurringExpense, documents: [], number: '' });
+  const cloneToExpense = (expense: Expense) => {
+    setExpense({ ...expense, documents: [], number: '' });
 
     navigate('/expenses/create');
   };
 
-  const cloneToRecurringExpense = (recurringExpense: Expense) => {
+  const cloneToRecurringExpense = (expense: Expense) => {
     setRecurringExpense({
-      ...(recurringExpense as RecurringExpense),
+      ...(expense as RecurringExpense),
       documents: [],
       number: '',
     });
@@ -354,4 +356,22 @@ export function useExpenseColumns() {
   return columns
     .filter((column) => list.includes(column.column))
     .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+}
+
+interface HandleChangeExpenseParams {
+  setExpense: Dispatch<SetStateAction<Expense | undefined>>;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+}
+
+export function useHandleChange(params: HandleChangeExpenseParams) {
+  const { setExpense, setErrors } = params;
+
+  return <T extends keyof Expense>(
+    property: T,
+    value: Expense[typeof property]
+  ) => {
+    setErrors(undefined);
+
+    setExpense((expense) => expense && { ...expense, [property]: value });
+  };
 }
