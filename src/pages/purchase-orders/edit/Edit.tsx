@@ -120,11 +120,13 @@ export function Edit() {
           errorMessage={errors?.errors.vendor_id}
         />
 
-        <Details
-          purchaseOrder={purchaseOrder}
-          handleChange={handleChange}
-          errors={errors}
-        />
+        {purchaseOrder && (
+          <Details
+            purchaseOrder={purchaseOrder}
+            handleChange={handleChange}
+            errors={errors}
+          />
+        )}
 
         <div className="col-span-12">
           {purchaseOrder ? (
@@ -151,21 +153,23 @@ export function Edit() {
           )}
         </div>
 
-        <Footer
-          purchaseOrder={purchaseOrder}
-          handleChange={handleChange}
-          errors={errors}
-        />
-
         {purchaseOrder && (
-          <InvoiceTotals
-            relationType="vendor_id"
-            resource={purchaseOrder}
-            invoiceSum={invoiceSum}
-            onChange={(property, value) =>
-              handleChange(property as keyof PurchaseOrder, value as string)
-            }
-          />
+          <>
+            <Footer
+              purchaseOrder={purchaseOrder}
+              handleChange={handleChange}
+              errors={errors}
+            />
+
+            <InvoiceTotals
+              relationType="vendor_id"
+              resource={purchaseOrder}
+              invoiceSum={invoiceSum}
+              onChange={(property, value) =>
+                handleChange(property as keyof PurchaseOrder, value as string)
+              }
+            />
+          </>
         )}
       </div>
 

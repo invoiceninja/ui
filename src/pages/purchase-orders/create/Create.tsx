@@ -48,6 +48,8 @@ export function Create() {
     },
   ];
 
+  let mounted = false;
+
   const [purchaseOrder, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const { data } = useBlankPurchaseOrderQuery({
@@ -55,7 +57,7 @@ export function Create() {
   });
 
   useEffect(() => {
-    if (typeof data !== 'undefined' && typeof purchaseOrder === 'undefined') {
+    if (data && !purchaseOrder) {
       const po = cloneDeep(data);
 
       if (typeof po.line_items === 'string') {
@@ -71,11 +73,17 @@ export function Create() {
 
       setPurchaseOrder(po);
     }
-
-    return () => {
-      setPurchaseOrder(undefined);
-    };
   }, [data]);
+
+  useEffect(() => {
+    if (mounted) {
+      return () => {
+        setPurchaseOrder(undefined);
+      };
+    } else {
+      mounted = true;
+    }
+  }, []);
 
   const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -123,11 +131,13 @@ export function Create() {
           errorMessage={errors?.errors.vendor_id}
         />
 
-        <Details
-          purchaseOrder={purchaseOrder}
-          handleChange={handleChange}
-          errors={errors}
-        />
+        {purchaseOrder && (
+          <Details
+            purchaseOrder={purchaseOrder}
+            handleChange={handleChange}
+            errors={errors}
+          />
+        )}
 
         <div className="col-span-12">
           {purchaseOrder ? (
@@ -154,21 +164,23 @@ export function Create() {
           )}
         </div>
 
-        <Footer
-          purchaseOrder={purchaseOrder}
-          handleChange={handleChange}
-          errors={errors}
-        />
-
         {purchaseOrder && (
-          <InvoiceTotals
-            relationType="vendor_id"
-            resource={purchaseOrder}
-            invoiceSum={invoiceSum}
-            onChange={(property, value) =>
-              handleChange(property as keyof PurchaseOrder, value as string)
-            }
-          />
+          <>
+            <Footer
+              purchaseOrder={purchaseOrder}
+              handleChange={handleChange}
+              errors={errors}
+            />
+
+            <InvoiceTotals
+              relationType="vendor_id"
+              resource={purchaseOrder}
+              invoiceSum={invoiceSum}
+              onChange={(property, value) =>
+                handleChange(property as keyof PurchaseOrder, value as string)
+              }
+            />
+          </>
         )}
       </div>
 

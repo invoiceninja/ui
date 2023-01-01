@@ -16,9 +16,11 @@ import { toast } from 'common/helpers/toast/toast';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { useAtom } from 'jotai';
 import { BulkAction } from 'pages/expenses/edit/hooks/useBulk';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
+import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
@@ -30,11 +32,25 @@ export type Action = (po: PurchaseOrder) => {
 };
 
 export function useActions() {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
 
   const navigate = useNavigate();
-  const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
+
   const queryClient = useQueryClient();
+
+  const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
+
+  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+
+  const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
+    setPurchaseOrder({
+      ...purchaseOrder,
+      number: '',
+      documents: [],
+    });
+
+    navigate('/purchase_orders/create');
+  };
 
   const invalidateCache = (id: string) => {
     queryClient.invalidateQueries(
@@ -112,8 +128,7 @@ export function useActions() {
       }),
       (po) => ({
         label: t('clone_to_purchase_order'),
-        onClick: () =>
-          navigate(route('/purchase_orders/:id/clone', { id: po.id })),
+        onClick: () => cloneToPurchaseOrder(po),
       }),
       (po) => ({
         label: t('vendor_portal'),
