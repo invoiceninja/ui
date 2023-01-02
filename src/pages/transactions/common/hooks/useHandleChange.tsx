@@ -17,7 +17,6 @@ import { useResolveCurrencySeparator } from './useResolveCurrencySeparator';
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
   setTransaction: Dispatch<SetStateAction<Transaction | undefined>>;
-  transaction: Transaction | undefined;
   setCurrencySeparators: Dispatch<
     SetStateAction<DecimalInputSeparators | undefined>
   >;
@@ -26,11 +25,13 @@ interface Params {
 export function useHandleChange(params: Params) {
   const resolveCurrencySeparator = useResolveCurrencySeparator();
 
+  const { setErrors, setCurrencySeparators, setTransaction } = params;
+
   return (
     property: keyof Transaction,
     value: Transaction[keyof Transaction]
   ) => {
-    params.setErrors(undefined);
+    setErrors(undefined);
 
     if (property === 'currency_id') {
       const resolvedCurrencySeparator = resolveCurrencySeparator(
@@ -38,12 +39,12 @@ export function useHandleChange(params: Params) {
       );
 
       if (resolvedCurrencySeparator) {
-        params.setCurrencySeparators(resolvedCurrencySeparator);
+        setCurrencySeparators(resolvedCurrencySeparator);
       }
     }
 
-    params.setTransaction(
-      (prevState) => prevState && { ...prevState, [property]: value }
+    setTransaction(
+      (transaction) => transaction && { ...transaction, [property]: value }
     );
   };
 }

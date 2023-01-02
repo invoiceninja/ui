@@ -156,11 +156,13 @@ export function TransactionMatchDetails(props: Props) {
       })
         .then((response: GenericSingleResourceResponse<Transaction[]>) => {
           queryClient.invalidateQueries('/api/v1/bank_transactions');
+
           queryClient.invalidateQueries(
             route('/api/v1/bank_transactions/:id', {
               id: props.transactionDetails.transaction_id,
             })
           );
+
           queryClient.invalidateQueries(
             route('/api/v1/expenses/:id', {
               id: response.data.data[0].expense_id,
@@ -197,12 +199,15 @@ export function TransactionMatchDetails(props: Props) {
       })
         .then((response: GenericSingleResourceResponse<Transaction[]>) => {
           queryClient.invalidateQueries('/api/v1/bank_transactions');
+
           queryClient.invalidateQueries('/api/v1/expenses');
+
           queryClient.invalidateQueries(
             route('/api/v1/bank_transactions/:id', {
               id: props.transactionDetails.transaction_id,
             })
           );
+
           queryClient.invalidateQueries(
             route('/api/v1/expenses/:id', {
               id: response.data.data[0].expense_id,

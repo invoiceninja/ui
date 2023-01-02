@@ -54,7 +54,6 @@ export function Edit() {
   const [transaction, setTransaction] = useState<Transaction>();
 
   const handleChange = useHandleChange({
-    transaction,
     setTransaction,
     setCurrencySeparators,
     setErrors,
