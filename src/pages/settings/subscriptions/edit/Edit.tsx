@@ -62,19 +62,30 @@ export function Edit() {
   const handleChange = useHandleChange({
     setErrors,
     setSubscription,
+    subscription,
   });
 
   useEffect(() => {
     if (data) {
+      const {
+        post_purchase_headers,
+        post_purchase_body,
+        post_purchase_rest_method,
+        post_purchase_url,
+        return_url,
+      } = data.webhook_configuration;
+
       setSubscription({
         ...data,
         webhook_configuration: {
           ...data.webhook_configuration,
-          post_purchase_headers: Array.isArray(
-            data.webhook_configuration.post_purchase_headers
-          )
+          post_purchase_headers: Array.isArray(post_purchase_headers)
             ? {}
-            : data.webhook_configuration.post_purchase_headers,
+            : post_purchase_headers,
+          post_purchase_body: post_purchase_body || '',
+          post_purchase_rest_method: post_purchase_rest_method || '',
+          post_purchase_url: post_purchase_url || '',
+          return_url: return_url || '',
         },
       });
     }

@@ -58,6 +58,7 @@ export function Create() {
   const handleChange = useHandleChange({
     setErrors,
     setSubscription,
+    subscription,
   });
 
   useEffect(() => {
