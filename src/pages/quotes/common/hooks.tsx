@@ -341,7 +341,7 @@ export function useActions() {
         onClick={() => cloneToQuote(quote)}
         icon={<Icon element={MdControlPointDuplicate} />}
       >
-        {t('clone_to_quote')}
+        {t('clone')}
       </DropdownElement>
     ),
     (quote) => (

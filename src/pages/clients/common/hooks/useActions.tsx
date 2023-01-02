@@ -21,49 +21,49 @@ export function useActions() {
   const [t] = useTranslation();
 
   const actions: Action<Client>[] = [
-    (resource: Client) => (
+    (client) => (
       <DropdownElement
-        to={route('/clients/:id/statement', { id: resource.id })}
+        to={route('/clients/:id/statement', { id: client.id })}
         icon={<Icon element={MdPictureAsPdf} />}
       >
         {t('view_statement')}
       </DropdownElement>
     ),
-    (resource: Client) => (
+    (client) => (
       <DropdownElement
-        onClick={() => window.open(resource.contacts[0].link, '__blank')}
+        onClick={() => window.open(client.contacts[0].link, '__blank')}
         icon={<Icon element={MdCloudCircle} />}
       >
         {t('client_portal')}
       </DropdownElement>
     ),
-    (resource: Client) => (
+    (client) => (
       <DropdownElement
-        to={route('/invoices/create?client=:id', { id: resource.id })}
+        to={route('/invoices/create?client=:id', { id: client.id })}
         icon={<Icon element={BiPlusCircle} />}
       >
         {t('new_invoice')}
       </DropdownElement>
     ),
-    (resource: Client) => (
+    (client) => (
       <DropdownElement
-        to={route('/payments/create?client=:id', { id: resource.id })}
+        to={route('/payments/create?client=:id', { id: client.id })}
         icon={<Icon element={BiPlusCircle} />}
       >
         {t('new_payment')}
       </DropdownElement>
     ),
-    (resource: Client) => (
+    (client) => (
       <DropdownElement
-        to={route('/quotes/create?client=:id', { id: resource.id })}
+        to={route('/quotes/create?client=:id', { id: client.id })}
         icon={<Icon element={BiPlusCircle} />}
       >
         {t('new_quote')}
       </DropdownElement>
     ),
-    (resource: Client) => (
+    (client) => (
       <DropdownElement
-        to={route('/credits/create?client=:id', { id: resource.id })}
+        to={route('/credits/create?client=:id', { id: client.id })}
         icon={<Icon element={BiPlusCircle} />}
       >
         {t('new_credit')}

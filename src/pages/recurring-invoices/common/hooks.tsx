@@ -344,7 +344,7 @@ export function useActions() {
         onClick={() => cloneToRecurringInvoice(recurringInvoice)}
         icon={<Icon element={MdControlPointDuplicate} />}
       >
-        {t('clone_to_recurring')}
+        {t('clone')}
       </DropdownElement>
     ),
     (recurringInvoice) => (

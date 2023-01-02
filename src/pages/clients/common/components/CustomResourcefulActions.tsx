@@ -37,12 +37,10 @@ export function CustomResourcefulActions(props: Props) {
     if (props.clientId)
       bulk([props.clientId], action)
         .then(() => {
-          toast.success(t(`${action}d_client`) || '');
+          toast.success(t(`${action}d_client`) || 'success');
         })
         .catch((error: AxiosError | unknown) => {
           console.error(error);
-
-          toast.dismiss();
           toast.error();
         });
   };
