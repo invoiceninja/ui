@@ -36,8 +36,6 @@ export function Upload(props: Props) {
 
   const [formData, setFormData] = useState(new FormData());
 
-  const showPlanAlert = !enterprisePlan() && isHosted();
-
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {},
@@ -62,7 +60,7 @@ export function Upload(props: Props) {
   });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    disabled: showPlanAlert,
+    disabled: !enterprisePlan() && isHosted(),
     onDrop: (acceptedFiles) => {
       formData.append('_method', 'PUT');
 
@@ -74,30 +72,28 @@ export function Upload(props: Props) {
     },
   });
 
-  const planWarning = (
-    <Alert className="mb-4" type="warning" disableClosing>
-      <div className="flex items-center">
-        <MdInfoOutline className="mr-2" fontSize={20} />
-
-        {t('upgrade_to_upload_images')}
-
-        {user?.company_user && (
-          <Link
-            className="ml-10"
-            external
-            to={user.company_user.ninja_portal_url}
-          >
-            {t('plan_change')}
-          </Link>
-        )}
-      </div>
-    </Alert>
-  );
-
   if (props.widgetOnly) {
     return (
       <>
-        {showPlanAlert && planWarning}
+        {!enterprisePlan() && isHosted() && (
+          <Alert className="mb-4" type="warning" disableClosing>
+            <div className="flex items-center">
+              <MdInfoOutline className="mr-2" fontSize={20} />
+
+              {t('upgrade_to_upload_images')}
+
+              {user?.company_user && (
+                <Link
+                  className="ml-10"
+                  external
+                  to={user.company_user.ninja_portal_url}
+                >
+                  {t('plan_change')}
+                </Link>
+              )}
+            </div>
+          </Alert>
+        )}
 
         <div
           {...getRootProps()}
@@ -119,7 +115,25 @@ export function Upload(props: Props) {
 
   return (
     <>
-      {showPlanAlert && planWarning}
+      {!enterprisePlan() && isHosted() && (
+        <Alert className="mb-4" type="warning" disableClosing>
+          <div className="flex items-center">
+            <MdInfoOutline className="mr-2" fontSize={20} />
+
+            {t('upgrade_to_upload_images')}
+
+            {user?.company_user && (
+              <Link
+                className="ml-10"
+                external
+                to={user.company_user.ninja_portal_url}
+              >
+                {t('plan_change')}
+              </Link>
+            )}
+          </div>
+        </Alert>
+      )}
 
       <Card title={t('upload')}>
         <Element leftSide={t('upload')}>
