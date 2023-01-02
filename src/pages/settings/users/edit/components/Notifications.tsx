@@ -30,6 +30,13 @@ export function Notifications(props: Props) {
     { id: 'invoice_late', label: 'invoice_late' },
     { id: 'payment_success', label: 'payment_success' },
     { id: 'payment_failure', label: 'payment_failure' },
+    { id: 'purchase_order_created', label: 'purchase_order_created' },
+    { id: 'purchase_order_sent', label: 'purchase_order_sent' },
+    { id: 'purchase_order_viewed', label: 'purchase_order_viewed' },
+    {
+      id: 'purchase_order_accepted',
+      label: 'purchase_order_accepted',
+    },
     { id: 'quote_created', label: 'quote_created' },
     { id: 'quote_sent', label: 'quote_sent' },
     { id: 'quote_viewed', label: 'quote_viewed' },
