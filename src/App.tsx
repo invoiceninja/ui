@@ -40,8 +40,6 @@ export function App() {
     ? resolveLanguage(company.settings.language_id)
     : undefined;
 
-  const isLoginPage = location.pathname.startsWith('/login');
-
   useEffect(() => {
     document.body.classList.add('bg-gray-50', 'dark:bg-gray-900');
 
@@ -70,14 +68,19 @@ export function App() {
 
   useEffect(() => {
     if (user) {
-      setIsEmailVerified(!!user.email_verified_at);
+      setIsEmailVerified(Boolean(user.email_verified_at));
     }
   }, [user]);
 
   return (
     <div className="App">
       <VerifyModal
-        visible={!!user && !isLoginPage && !isEmailVerified && isHosted()}
+        visible={
+          Boolean(user) &&
+          !location.pathname.startsWith('/login') &&
+          !isEmailVerified &&
+          isHosted()
+        }
         type="email"
       />
       <Toaster position="top-center" />
