@@ -24,7 +24,7 @@ import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
 import { Action } from 'components/ResourceActions';
 import { StatusBadge } from 'components/StatusBadge';
-import { useAtom } from 'jotai';
+import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { recurringExpenseAtom } from 'pages/recurring-expenses/common/atoms';
 import { Dispatch, SetStateAction } from 'react';
@@ -79,9 +79,9 @@ export function useActions() {
 
   const navigate = useNavigate();
 
-  const [, setExpense] = useAtom(expenseAtom);
+  const setExpense = useUpdateAtom(expenseAtom);
 
-  const [, setRecurringExpense] = useAtom(recurringExpenseAtom);
+  const setRecurringExpense = useUpdateAtom(recurringExpenseAtom);
 
   const cloneToExpense = (expense: Expense) => {
     setExpense({ ...expense, documents: [], number: '' });

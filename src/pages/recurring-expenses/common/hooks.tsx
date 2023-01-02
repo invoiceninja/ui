@@ -23,7 +23,6 @@ import { route } from 'common/helpers/route';
 import { Divider } from 'components/cards/Divider';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Action } from 'components/ResourceActions';
-import { useAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 import { recurringExpenseAtom } from './atoms';
 import { RecurringExpense } from 'common/interfaces/recurring-expense';
@@ -38,6 +37,7 @@ import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useUpdateAtom } from 'jotai/utils';
 
 export const recurringExpenseColumns = [
   'status',
@@ -403,9 +403,9 @@ export function useActions() {
 
   const navigate = useNavigate();
 
-  const [, setExpense] = useAtom(expenseAtom);
+  const setExpense = useUpdateAtom(expenseAtom);
 
-  const [, setRecurringExpense] = useAtom(recurringExpenseAtom);
+  const setRecurringExpense = useUpdateAtom(recurringExpenseAtom);
 
   const toggleStartStop = useToggleStartStop();
 

@@ -37,16 +37,14 @@ export function Create() {
 
   const { documentTitle } = useTitle('new_expense');
 
-  const { data } = useBlankExpenseQuery();
-
-  let mounted = false;
-
   const pages = [
     { name: t('expenses'), href: '/expenses' },
     { name: t('new_expense'), href: '/expenses/create' },
   ];
 
   const [expense, setExpense] = useAtom(expenseAtom);
+
+  const { data } = useBlankExpenseQuery({ enabled: !expense });
 
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
@@ -60,15 +58,9 @@ export function Create() {
     if (data && !expense) {
       setExpense(data);
     }
-  }, [data]);
 
-  useEffect(() => {
-    if (mounted) {
-      return () => setExpense(undefined);
-    } else {
-      mounted = true;
-    }
-  }, []);
+    return () => setExpense(undefined);
+  }, [data]);
 
   const onSave = (expense: Expense) => {
     toast.processing();

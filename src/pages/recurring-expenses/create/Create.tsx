@@ -37,8 +37,6 @@ export function Create() {
 
   const { documentTitle } = useTitle('new_recurring_expense');
 
-  const { data } = useBlankRecurringExpenseQuery();
-
   const pages = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
     { name: t('new_recurring_expense'), href: '/recurring_expenses/create' },
@@ -48,9 +46,11 @@ export function Create() {
     'by_rate'
   );
 
-  let mounted = false;
-
   const [recurringExpense, setRecurringExpense] = useAtom(recurringExpenseAtom);
+
+  const { data } = useBlankRecurringExpenseQuery({
+    enabled: !recurringExpense,
+  });
 
   const [errors, setErrors] = useState<ValidationBag>();
 
@@ -60,15 +60,9 @@ export function Create() {
     if (data && !recurringExpense) {
       setRecurringExpense({ ...data, frequency_id: '5' });
     }
-  }, [data]);
 
-  useEffect(() => {
-    if (mounted) {
-      return () => setRecurringExpense(undefined);
-    } else {
-      mounted = true;
-    }
-  }, []);
+    return () => setRecurringExpense(undefined);
+  }, [data]);
 
   const onSave = (recurringExpense: RecurringExpense) => {
     toast.processing();

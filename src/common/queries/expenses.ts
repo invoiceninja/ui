@@ -14,14 +14,18 @@ import { Expense } from 'common/interfaces/expense';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 
-export function useBlankExpenseQuery() {
+interface BlankQueryParams {
+  enabled?: boolean;
+}
+
+export function useBlankExpenseQuery(params: BlankQueryParams) {
   return useQuery<Expense>(
     route('/api/v1/expenses/create'),
     () =>
       request('GET', endpoint('/api/v1/expenses/create')).then(
         (response) => response.data.data
       ),
-    { staleTime: Infinity }
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }
 

@@ -15,7 +15,11 @@ import { route } from 'common/helpers/route';
 import { RecurringExpense } from 'common/interfaces/recurring-expense';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
-export function useBlankRecurringExpenseQuery() {
+interface BlankQueryParams {
+  enabled?: boolean;
+}
+
+export function useBlankRecurringExpenseQuery(params: BlankQueryParams) {
   return useQuery<RecurringExpense>(
     '/api/v1/recurring_expenses/create',
     () =>
@@ -23,7 +27,7 @@ export function useBlankRecurringExpenseQuery() {
         (response: GenericSingleResourceResponse<RecurringExpense>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }
 

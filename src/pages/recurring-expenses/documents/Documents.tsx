@@ -66,16 +66,20 @@ export function Documents() {
       <div className="space-y-4">
         <Tabs tabs={tabs} />
 
-        <Upload
-          widgetOnly
-          endpoint={endpoint('/api/v1/recurring_expenses/:id/upload', { id })}
-          onSuccess={invalidateCache}
-        />
+        <div className="w-2/3">
+          <Upload
+            widgetOnly
+            endpoint={endpoint('/api/v1/recurring_expenses/:id/upload', {
+              id,
+            })}
+            onSuccess={invalidateCache}
+          />
 
-        <DocumentsTable
-          documents={recurringExpense?.documents || []}
-          onDocumentDelete={invalidateCache}
-        />
+          <DocumentsTable
+            documents={recurringExpense?.documents || []}
+            onDocumentDelete={invalidateCache}
+          />
+        </div>
       </div>
     </Default>
   );
