@@ -16,7 +16,6 @@ import { set } from 'lodash';
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
   setSubscription: Dispatch<SetStateAction<Subscription | undefined>>;
-  subscription: Subscription | undefined;
 }
 
 export function useHandleChange(params: Params) {
@@ -26,8 +25,8 @@ export function useHandleChange(params: Params) {
   ) => {
     params.setErrors(undefined);
 
-    const subscription = { ...params.subscription };
-
-    params.setSubscription(set(subscription as Subscription, property, value));
+    params.setSubscription((subscription) =>
+      set(subscription as Subscription, property, value)
+    );
   };
 }

@@ -62,7 +62,6 @@ export function Edit() {
   const handleChange = useHandleChange({
     setErrors,
     setSubscription,
-    subscription,
   });
 
   useEffect(() => {
@@ -97,6 +96,8 @@ export function Edit() {
     request('PUT', endpoint('/api/v1/subscriptions/:id', { id }), subscription)
       .then(() => {
         toast.success('updated_subscription');
+
+        queryClient.invalidateQueries('/api/v1/subscriptions');
 
         queryClient.invalidateQueries(
           route('/api/v1/subscriptions/:id', { id })

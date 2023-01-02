@@ -22,6 +22,7 @@ import { Settings } from 'components/layouts/Settings';
 import { TabGroup } from 'components/TabGroup';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { Overview } from '../common/components/Overview';
 import { Settings as SubscriptionSettings } from '../common/components/Settings';
@@ -37,6 +38,8 @@ export function Create() {
   const { data } = useBlankSubscriptionQuery();
 
   const { data: productsData } = useProductsQuery();
+
+  const queryClient = useQueryClient();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -55,7 +58,6 @@ export function Create() {
   const handleChange = useHandleChange({
     setErrors,
     setSubscription,
-    subscription,
   });
 
   useEffect(() => {
@@ -90,6 +92,8 @@ export function Create() {
     request('POST', endpoint('/api/v1/subscriptions'), subscription)
       .then((response: GenericSingleResourceResponse<Subscription>) => {
         toast.success('created_subscription');
+
+        queryClient.invalidateQueries('/api/v1/subscriptions');
 
         navigate(
           route('/settings/subscriptions/:id/edit', {
