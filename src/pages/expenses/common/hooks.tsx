@@ -102,7 +102,7 @@ export function useActions() {
   const actions: Action<Expense>[] = [
     (expense) => (
       <DropdownElement onClick={() => cloneToExpense(expense)}>
-        {t('clone_to_expense')}
+        {t('clone')}
       </DropdownElement>
     ),
     (expense) => (
