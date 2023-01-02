@@ -16,7 +16,6 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
-import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
 import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
@@ -26,7 +25,6 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
-import { purchaseOrderAtom } from '../common/atoms';
 import { usePurchaseOrderQuery } from '../common/queries';
 import { Actions } from './components/Actions';
 import { Details } from './components/Details';
@@ -53,7 +51,7 @@ export function Edit() {
     },
   ];
 
-  const [purchaseOrder, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+  const [purchaseOrder, setPurchaseOrder] = useState<PurchaseOrder>();
 
   useEffect(() => {
     if (data) {

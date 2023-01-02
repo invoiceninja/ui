@@ -161,7 +161,9 @@ export function usePurchaseOrderColumns() {
         label: t('expense'),
         format: (field, purchaseOrder) =>
           purchaseOrder.expense && (
-            <Link to={route('/expenses/:id', { id: purchaseOrder.expense.id })}>
+            <Link
+              to={route('/expenses/:id/edit', { id: purchaseOrder.expense.id })}
+            >
               {purchaseOrder.expense.number}
             </Link>
           ),

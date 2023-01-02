@@ -127,7 +127,7 @@ export function useActions() {
         hideIf: po.expense_id.length <= 0,
       }),
       (po) => ({
-        label: t('clone_to_purchase_order'),
+        label: t('clone'),
         onClick: () => cloneToPurchaseOrder(po),
       }),
       (po) => ({
