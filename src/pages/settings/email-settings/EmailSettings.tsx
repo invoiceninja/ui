@@ -43,8 +43,6 @@ export function EmailSettings() {
   const onSave = useHandleCompanySave();
   const onCancel = useHandleCancel();
 
-  const showPlanAlert = !proPlan() && !enterprisePlan() && isHosted();
-
   return (
     <Settings
       title={t('email_settings')}
@@ -52,9 +50,11 @@ export function EmailSettings() {
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}
-      disableSaveButton={showPlanAlert}
+      disableSaveButton={!proPlan() && !enterprisePlan() && isHosted()}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+      {!proPlan() && !enterprisePlan() && isHosted() && (
+        <AdvancedSettingsPlanAlert />
+      )}
 
       <Card title={t('settings')}>
         <Element leftSide={t('attach_pdf')}>

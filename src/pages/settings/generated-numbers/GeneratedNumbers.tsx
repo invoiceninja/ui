@@ -37,8 +37,6 @@ export function GeneratedNumbers() {
 
   const onCancel = useDiscardChanges();
 
-  const showPlanAlert = !proPlan() && !enterprisePlan() && isHosted();
-
   return (
     <Settings
       title={t('generated_numbers')}
@@ -46,11 +44,13 @@ export function GeneratedNumbers() {
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}
-      disableSaveButton={showPlanAlert}
+      disableSaveButton={!proPlan() && !enterprisePlan() && isHosted()}
     >
       <Tabs tabs={tabs} className="mt-6" />
 
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+      {!proPlan() && !enterprisePlan() && isHosted() && (
+        <AdvancedSettingsPlanAlert />
+      )}
 
       <div className="my-4">
         <Outlet />

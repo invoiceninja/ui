@@ -162,8 +162,6 @@ export function TemplatesAndReminders() {
     ],
   };
 
-  const showPlanAlert = !proPlan() && !enterprisePlan() && isHosted();
-
   return (
     <Settings
       title={t('templates_and_reminders')}
@@ -171,9 +169,11 @@ export function TemplatesAndReminders() {
       breadcrumbs={pages}
       onSaveClick={handleSave}
       onCancelClick={handleCancel}
-      disableSaveButton={showPlanAlert}
+      disableSaveButton={!proPlan() && !enterprisePlan() && isHosted()}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+      {!proPlan() && !enterprisePlan() && isHosted() && (
+        <AdvancedSettingsPlanAlert />
+      )}
 
       <Card title={t('edit')}>
         <Element leftSide={t('template')}>

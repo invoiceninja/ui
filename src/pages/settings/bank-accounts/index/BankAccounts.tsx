@@ -46,15 +46,13 @@ export function BankAccounts() {
     );
   };
 
-  const showPlanAlert = !enterprisePlan() && isHosted();
-
   return (
     <Settings
       title={t('bank_accounts')}
       breadcrumbs={pages}
       docsLink="/docs/advanced-settings/#bank_accounts"
     >
-      {showPlanAlert && (
+      {!enterprisePlan() && isHosted() && (
         <AdvancedSettingsPlanAlert
           message={t('upgrade_to_connect_bank_account') as string}
         />

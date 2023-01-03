@@ -46,8 +46,6 @@ export function InvoiceDesign() {
 
   const onCancel = useDiscardChanges();
 
-  const showPlanAlert = !proPlan() && !enterprisePlan() && isHosted();
-
   return (
     <Settings
       title={t('invoice_design')}
@@ -55,9 +53,11 @@ export function InvoiceDesign() {
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}
-      disableSaveButton={showPlanAlert}
+      disableSaveButton={!proPlan() && !enterprisePlan() && isHosted()}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+      {!proPlan() && !enterprisePlan() && isHosted() && (
+        <AdvancedSettingsPlanAlert />
+      )}
 
       <GeneralSettings />
       <ClientDetails />

@@ -99,16 +99,14 @@ export function Create() {
       });
   };
 
-  const showPlanAlert = !enterprisePlan() && isHosted();
-
   return (
     <Settings
       title={t('new_user')}
       breadcrumbs={pages}
       onSaveClick={() => setIsPasswordConfirmModalOpen(true)}
-      disableSaveButton={showPlanAlert}
+      disableSaveButton={!enterprisePlan() && isHosted()}
     >
-      {showPlanAlert && (
+      {!enterprisePlan() && isHosted() && (
         <AdvancedSettingsPlanAlert
           message={t('add_users_not_supported') as string}
         />

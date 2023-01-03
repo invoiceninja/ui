@@ -42,8 +42,6 @@ export function ClientPortal() {
 
   const onCancel = useDiscardChanges();
 
-  const showPlanAlert = !proPlan() && !enterprisePlan() && isHosted();
-
   return (
     <Settings
       title={t('client_portal')}
@@ -51,9 +49,11 @@ export function ClientPortal() {
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}
-      disableSaveButton={showPlanAlert}
+      disableSaveButton={!proPlan() && !enterprisePlan() && isHosted()}
     >
-      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+      {!proPlan() && !enterprisePlan() && isHosted() && (
+        <AdvancedSettingsPlanAlert />
+      )}
 
       <SettingsComponent />
       <Authorization />
