@@ -75,7 +75,7 @@ export function ExpiredQuotes() {
       <DataTable
         resource="quote"
         columns={columns}
-        endpoint="/api/v1/quotes?include=client&expired=true&without_deleted_clients=true&per_page=50&page=1"
+        endpoint="/api/v1/quotes?include=client&client_status=expired&without_deleted_clients=true&per_page=50&page=1"
         withoutActions
         withoutPagination
         withoutPadding

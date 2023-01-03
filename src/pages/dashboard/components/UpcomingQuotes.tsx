@@ -75,7 +75,7 @@ export function UpcomingQuotes() {
       <DataTable
         resource="quote"
         columns={columns}
-        endpoint="/api/v1/quotes?include=client&upcoming=true&without_deleted_clients=true&per_page=50&page=1"
+        endpoint="/api/v1/quotes?include=client&client_status=upcoming&without_deleted_clients=true&per_page=50&page=1"
         withoutActions
         withoutPagination
         withoutPadding
