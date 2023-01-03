@@ -16,12 +16,11 @@ import { useExpenseQuery } from 'common/queries/expenses';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { ResourceActions } from 'components/ResourceActions';
-import { ResourceActions } from 'components/ResourceActions';
 import { Tab, Tabs } from 'components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
-import { useActions } from '../common/hooks';
+import { useActions, useHandleChange } from '../common/hooks';
 import { AdditionalInfo } from '../create/components/AdditionalInfo';
 import { Details } from '../create/components/Details';
 import { Notes } from '../create/components/Notes';
@@ -36,8 +35,6 @@ export function Edit() {
   const { id } = useParams();
 
   const { data } = useExpenseQuery({ id });
-
-  const actions = useActions();
 
   const pages: Page[] = [
     { name: t('expenses'), href: '/expenses' },

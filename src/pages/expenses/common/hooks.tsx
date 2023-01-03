@@ -17,15 +17,12 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Expense } from 'common/interfaces/expense';
-import { Divider } from 'components/cards/Divider';
 import { RecurringExpense } from 'common/interfaces/recurring-expense';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { customField } from 'components/CustomField';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
 import { Icon } from 'components/icons/Icon';
-import { Action } from 'components/ResourceActions';
 import { Action } from 'components/ResourceActions';
 import { StatusBadge } from 'components/StatusBadge';
 import { useUpdateAtom } from 'jotai/utils';
@@ -33,13 +30,7 @@ import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoice
 import { recurringExpenseAtom } from 'pages/recurring-expenses/common/atoms';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  MdArchive,
-  MdControlPointDuplicate,
-  MdDelete,
-  MdRestore,
-} from 'react-icons/md';
-import { useBulk } from '../edit/hooks/useBulk';
+import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { expenseAtom } from './atoms';
 import { ExpenseStatus } from './components/ExpenseStatus';
@@ -112,12 +103,18 @@ export function useActions() {
 
   const actions: Action<Expense>[] = [
     (expense) => (
-      <DropdownElement onClick={() => cloneToExpense(expense)}>
+      <DropdownElement
+        onClick={() => cloneToExpense(expense)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone')}
       </DropdownElement>
     ),
     (expense) => (
-      <DropdownElement onClick={() => cloneToRecurringExpense(expense)}>
+      <DropdownElement
+        onClick={() => cloneToRecurringExpense(expense)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_recurring')}
       </DropdownElement>
     ),
@@ -367,65 +364,6 @@ export function useExpenseColumns() {
   return columns
     .filter((column) => list.includes(column.column))
     .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
-}
-
-export function useActions() {
-  const [t] = useTranslation();
-
-  const bulk = useBulk();
-
-  const actions: Action<Expense>[] = [
-    (expense) => (
-      <>
-        <DropdownElement
-          to={route('/expenses/:id/clone', { id: expense.id })}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone_to_expense')}
-        </DropdownElement>
-        {/* <DropdownElement>{t('clone_to_recurring')}</DropdownElement> */}
-      </>
-    ),
-    () => <Divider withoutPadding />,
-    (expense) => (
-      <>
-        {expense.archived_at === 0 && (
-          <DropdownElement
-            onClick={() => bulk([expense.id], 'archive')}
-            icon={<Icon element={MdArchive} />}
-          >
-            {t('archive')}
-          </DropdownElement>
-        )}
-      </>
-    ),
-    (expense) => (
-      <>
-        {expense.archived_at > 0 && (
-          <DropdownElement
-            onClick={() => bulk([expense.id], 'restore')}
-            icon={<Icon element={MdRestore} />}
-          >
-            {t('restore')}
-          </DropdownElement>
-        )}
-      </>
-    ),
-    (expense) => (
-      <>
-        {!expense.is_deleted && (
-          <DropdownElement
-            onClick={() => bulk([expense.id], 'delete')}
-            icon={<Icon element={MdDelete} />}
-          >
-            {t('delete')}
-          </DropdownElement>
-        )}
-      </>
-    ),
-  ];
-
-  return actions;
 }
 
 interface HandleChangeExpenseParams {
