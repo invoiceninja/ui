@@ -12,14 +12,16 @@ import { date } from 'common/helpers';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { DataTable, DataTableColumns } from 'components/DataTable';
-import { t } from 'i18next';
 import { route } from 'common/helpers/route';
 import { Link } from 'components/forms/Link';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Card } from '@invoiceninja/cards';
 import { Quote } from 'common/interfaces/quote';
+import { useTranslation } from 'react-i18next';
 
 export function UpcomingQuotes() {
+  const [t] = useTranslation();
+
   const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
