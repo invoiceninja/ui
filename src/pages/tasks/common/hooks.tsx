@@ -19,6 +19,7 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Task } from 'common/interfaces/task';
 import { customField } from 'components/CustomField';
+import { SelectOption } from 'components/datatables/Actions';
 import dayjs from 'dayjs';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
@@ -263,4 +264,25 @@ export function useSave() {
         toast.error();
       });
   };
+}
+
+export function useTaskFilters() {
+  const [t] = useTranslation();
+
+  const filters: SelectOption[] = [
+    {
+      label: t('all'),
+      value: 'all',
+      color: 'black',
+      backgroundColor: '#e4e4e4',
+    },
+    {
+      label: t('invoiced'),
+      value: 'invoiced',
+      color: 'white',
+      backgroundColor: '#22C55E',
+    },
+  ];
+
+  return filters;
 }

@@ -120,7 +120,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const { data, isLoading, isError } = useQuery(
     [
-      apiEndpoint.pathname,
+      props.endpoint,
       perPage,
       currentPage,
       filter,
