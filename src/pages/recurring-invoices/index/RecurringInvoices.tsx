@@ -53,7 +53,7 @@ export function RecurringInvoices() {
         customActions={actions}
         customFilters={filters}
         customFilterQueryKey="client_status"
-        customFilterPlaceholder="invoice_status"
+        customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={
           <DataTableColumnsPicker
