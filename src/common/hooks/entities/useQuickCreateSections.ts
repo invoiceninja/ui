@@ -21,17 +21,17 @@ interface EntitySection {
 export function useQuickCreateSections() {
   const sections: EntitySection[] = [
     {
-      name: 'general',
+      name: 'income',
       icon: MdTag,
       visible: true,
     },
     {
-      name: 'purchase',
+      name: 'expense',
       icon: MdOutlineShoppingBag,
       visible: true,
     },
     {
-      name: 'common',
+      name: 'settings',
       icon: MdOutlineBuild,
       visible: isSelfHosted(),
     },

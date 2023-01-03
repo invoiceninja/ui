@@ -7,15 +7,18 @@ import classNames from 'classnames';
 import { useNavigate } from 'react-router-dom';
 import { useQuickCreateSections } from 'common/hooks/entities/useQuickCreateSections';
 import { useQuickCreateActions } from 'common/hooks/entities/useQuickCreateActions';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 
 export function QuickCreatePopover() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
-  const sections = useQuickCreateSections();
+  const accentColor = useAccentColor();
 
   const actions = useQuickCreateActions();
+
+  const sections = useQuickCreateSections();
 
   return (
     <Popover className="relative ml-6 mt-2">
@@ -41,20 +44,26 @@ export function QuickCreatePopover() {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel className="absolute left-full z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2 sm:px-0 lg:max-w-4xl">
-              <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                <div className="relative grid gap-6 bg-white px-5 py-5 lg:pl-8 lg:px-8 grid-cols-2 lg:grid-cols-3">
+            <Popover.Panel
+              className="absolute z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2 sm:px-0 lg:max-w-5xl"
+              style={{ left: '8.125rem' }}
+            >
+              <div className="flex justify-center overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                <div className="relative grid gap-0 bg-white px-1 py-4 lg:pl-3 lg:px-3 grid-cols-3">
                   {sections.map(
                     (section) =>
                       section.visible && (
                         <div
                           key={section.name}
-                          className="flex flex-col items-start rounded-lg py-4 transition duration-150 ease-in-out"
+                          className="flex flex-col items-start rounded-lg transition duration-150 ease-in-out"
                         >
                           <div className="flex items-center pl-3">
-                            <section.icon className="text-xl lg:text-3xl text-gray-500" />
+                            <section.icon
+                              className="text-base lg:text-2xl"
+                              color={accentColor}
+                            />
 
-                            <p className="text-base lg:text-xl font-medium text-gray-500 ml-1 md:ml-3">
+                            <p className="text-base lg:text-xl font-medium text-gray-500 ml-1 md:ml-2">
                               {t(section.name)}
                             </p>
                           </div>
@@ -66,7 +75,7 @@ export function QuickCreatePopover() {
                                 action.visible && (
                                   <div
                                     key={action.key}
-                                    className="flex items-center pl-4 lg:pl-6 py-1 cursor-pointer hover:bg-gray-100"
+                                    className="flex items-center pl-2 lg:pl-4 py-1 cursor-pointer hover:bg-gray-100"
                                     onClick={() => {
                                       !action.externalLink &&
                                         navigate(action.url);
@@ -75,11 +84,20 @@ export function QuickCreatePopover() {
                                         window.open(action.url, '_blank');
                                     }}
                                   >
-                                    <BiPlus className="text-sm md:text-base lg:text-base text-gray-800" />
+                                    <BiPlus
+                                      className="text-base lg:text-3xl"
+                                      color={accentColor}
+                                    />
 
-                                    <span className="ml-2 text-xs lg:text-sm text-gray-800">
-                                      {t(action.key)}
-                                    </span>
+                                    <div className="flex flex-col">
+                                      <span className="ml-2 text-sm lg:text-base text-gray-800">
+                                        {t(action.key)}
+                                      </span>
+
+                                      <span className="ml-2 text-xs text-gray-800">
+                                        {t(action.helperText)}
+                                      </span>
+                                    </div>
                                   </div>
                                 )
                             )}

@@ -21,9 +21,10 @@ import { useCurrentCompany } from '../useCurrentCompany';
 interface EntityAction {
   key: string;
   url: string;
-  section: 'general' | 'purchase' | 'common';
+  section: 'income' | 'expense' | 'settings';
   externalLink?: boolean;
   visible: boolean;
+  helperText: string;
 }
 
 export function useQuickCreateActions() {
@@ -59,104 +60,121 @@ export function useQuickCreateActions() {
     {
       key: 'client',
       url: '/clients/create',
-      section: 'general',
+      section: 'income',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'product',
       url: '/products/create',
-      section: 'general',
+      section: 'income',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'invoice',
       url: '/invoices/create',
-      section: 'general',
+      section: 'income',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'recurring_invoice',
       url: '/recurring_invoices/create',
-      section: 'general',
+      section: 'income',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'quote',
       url: '/quotes/create',
-      section: 'general',
+      section: 'income',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'credit',
       url: '/credits/create',
-      section: 'general',
+      section: 'income',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'payment',
       url: '/payments/create',
-      section: 'general',
+      section: 'income',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'subscription',
       url: '/settings/subscription/create',
-      section: 'general',
+      section: 'income',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'expense',
       url: '/expenses/create',
-      section: 'purchase',
+      section: 'expense',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'purchase_order',
       url: '/purchase_orders/create',
-      section: 'purchase',
+      section: 'expense',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'vendor',
       url: '/vendors/create',
-      section: 'purchase',
+      section: 'expense',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'transaction',
       url: '/transactions/create',
-      section: 'purchase',
+      section: 'expense',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'add_stripe',
       url: '/settings/gateways/create',
-      section: 'common',
+      section: 'settings',
       visible: Boolean(gateways?.length),
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'connect_bank',
       url: '/settings/bank_accounts/create',
-      section: 'common',
+      section: 'settings',
       visible: enterprisePlan() && Boolean(bankAccounts?.length),
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'tax_settings',
       url: '/settings/tax_rates/create',
-      section: 'common',
+      section: 'settings',
       visible: Boolean(taxRates?.length),
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'add_company_logo',
       url: '/settings/company_details/logo',
-      section: 'common',
+      section: 'settings',
       visible: Boolean(!currentCompany?.settings?.company_logo),
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'templates_and_reminders',
       url: '/settings/templates_and_reminders',
-      section: 'common',
+      section: 'settings',
       visible: true,
+      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
   ];
 
