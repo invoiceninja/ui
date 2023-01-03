@@ -13,6 +13,7 @@ import { MdOutlineContentCopy } from 'react-icons/md';
 
 interface Props {
   text: string;
+  className?: string;
 }
 
 export function CopyToClipboard(props: Props) {
@@ -25,7 +26,7 @@ export function CopyToClipboard(props: Props) {
   };
 
   return (
-    <div className="inline-flex space-x-2">
+    <div className={`inline-flex space-x-2 ${props.className}`}>
       <span>{value}</span>
 
       {value.length > 0 && (
