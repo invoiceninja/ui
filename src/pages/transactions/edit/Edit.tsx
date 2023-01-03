@@ -8,34 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { FormEvent, useEffect } from 'react';
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { transactionTypes } from 'common/constants/transactions';
-import { useCurrencies } from 'common/hooks/useCurrencies';
+import { Card } from '@invoiceninja/cards';
 import { useTitle } from 'common/hooks/useTitle';
 import { endpoint } from 'common/helpers';
-import {
-  TransactionInput,
-  TransactionResponse,
-} from 'common/interfaces/transactions';
+import { Transaction } from 'common/interfaces/transactions';
 import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
-import { useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { TransactionValidation } from '../common/validation/ValidationInterface';
 import { request } from 'common/helpers/request';
 import { useNavigate, useParams } from 'react-router-dom';
-import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { AxiosError } from 'axios';
-import { useTransactionQuery } from '../common/queries';
-import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
-import { ApiTransactionType, TransactionType } from 'common/enums/transactions';
-import { BankAccountSelector } from '../components/BankAccountSelector';
-import { GenericValidationBag } from 'common/interfaces/validation-bag';
+import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useTransactionQuery } from '../common/queries';
+import { useResolveCurrencySeparator } from '../common/hooks/useResolveCurrencySeparator';
+import { TransactionForm } from '../components/TransactionForm';
+import { useHandleChange } from '../common/hooks/useHandleChange';
+import { route } from 'common/helpers/route';
 import { useQueryClient } from 'react-query';
 
 export function Edit() {
@@ -45,32 +36,28 @@ export function Edit() {
 
   const { id } = useParams<string>();
 
-  const currencies = useCurrencies();
-
-  const resolveCurrency = useResolveCurrency();
+  const { data } = useTransactionQuery({ id });
 
   const queryClient = useQueryClient();
 
+  const resolveCurrencySeparator = useResolveCurrencySeparator();
+
   const { documentTitle } = useTitle('edit_transaction');
 
-  const [isSaving, setIsSaving] = useState<boolean>(false);
-
-  const [errors, setErrors] =
-    useState<GenericValidationBag<TransactionValidation>>();
-
-  const { data: response } = useTransactionQuery({ id });
-
-  const [transaction, setTransaction] = useState<TransactionInput>({
-    bank_integration_id: '',
-    amount: 0,
-    base_type: '',
-    currency_id: '',
-    date: '',
-    description: '',
-  });
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const [currencySeparators, setCurrencySeparators] =
     useState<DecimalInputSeparators>();
+
+  const [errors, setErrors] = useState<ValidationBag>();
+
+  const [transaction, setTransaction] = useState<Transaction>();
+
+  const handleChange = useHandleChange({
+    setTransaction,
+    setCurrencySeparators,
+    setErrors,
+  });
 
   const pages = [
     { name: t('transactions'), href: '/transactions' },
@@ -80,62 +67,20 @@ export function Edit() {
     },
   ];
 
-  const getCurrencySeparators = (currencyId: string) => {
-    const currency = resolveCurrency(currencyId) || currencies[0];
-    return {
-      decimalSeparator: currency?.decimal_separator,
-      precision: currency?.precision,
-      thousandSeparator: currency?.thousand_separator,
-    };
-  };
-
-  const getTransactionInputObject = (
-    responseDetails: TransactionResponse | undefined
-  ) => {
-    const { date, amount, currency_id, bank_integration_id, description } =
-      responseDetails || {};
-    setCurrencySeparators(getCurrencySeparators(currency_id || ''));
-    return {
-      base_type:
-        responseDetails?.base_type === ApiTransactionType.Credit
-          ? TransactionType.Deposit
-          : TransactionType.Withdrawal,
-      date: date || '',
-      amount: amount || 0,
-      currency_id: currency_id || '',
-      bank_integration_id: bank_integration_id || '',
-      description: description || '',
-    };
-  };
-
-  const handleChange = (
-    property: keyof TransactionInput,
-    value: TransactionInput[keyof TransactionInput]
-  ) => {
-    setErrors(undefined);
-
-    if (property === 'currency_id') {
-      setCurrencySeparators(getCurrencySeparators(value?.toString() || ''));
-    }
-
-    setTransaction((prevState) => ({ ...prevState, [property]: value }));
-  };
-
   const onSave = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setErrors(undefined);
-    setIsSaving(true);
+
+    setIsFormBusy(true);
+
     toast.processing();
 
-    request('PUT', endpoint('/api/v1/bank_transactions/:id', { id }), {
-      ...transaction,
-      amount: Number(transaction.amount),
-      base_type:
-        transaction.base_type === TransactionType.Deposit
-          ? ApiTransactionType.Credit
-          : ApiTransactionType.Debit,
-    })
+    request(
+      'PUT',
+      endpoint('/api/v1/bank_transactions/:id', { id }),
+      transaction
+    )
       .then(() => {
         toast.success('updated_transaction');
 
@@ -147,23 +92,31 @@ export function Edit() {
 
         navigate('/transactions');
       })
-      .catch(
-        (error: AxiosError<GenericValidationBag<TransactionValidation>>) => {
-          if (error.response?.status === 422) {
-            setErrors(error.response.data);
-            toast.dismiss();
-          } else {
-            console.error(error);
-            toast.error();
-          }
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        } else {
+          console.error(error);
+          toast.error();
         }
-      )
-      .finally(() => setIsSaving(false));
+      })
+      .finally(() => setIsFormBusy(false));
   };
 
   useEffect(() => {
-    setTransaction(getTransactionInputObject(response));
-  }, [response, currencies]);
+    if (!transaction) {
+      setTransaction(data);
+    } else {
+      const resolvedCurrencySeparator = resolveCurrencySeparator(
+        transaction.currency_id
+      );
+
+      if (resolvedCurrencySeparator) {
+        setCurrencySeparators(resolvedCurrencySeparator);
+      }
+    }
+  }, [data, transaction]);
 
   return (
     <Default
@@ -176,76 +129,16 @@ export function Edit() {
           title={documentTitle}
           withSaveButton
           onSaveClick={onSave}
-          disableSubmitButton={isSaving}
+          disableSubmitButton={isFormBusy}
         >
-          <Element required leftSide={t('type')}>
-            <SelectField
-              value={transaction?.base_type}
-              onValueChange={(value) => handleChange('base_type', value)}
-              errorMessage={errors?.errors?.base_type}
-            >
-              {Object.values(transactionTypes).map((transactionType) => (
-                <option key={transactionType} value={transactionType}>
-                  {t(transactionType)}
-                </option>
-              ))}
-            </SelectField>
-          </Element>
-
-          <Element required leftSide={t('date')}>
-            <InputField
-              type="date"
-              value={transaction?.date}
-              onValueChange={(value) => handleChange('date', value)}
-              errorMessage={errors?.errors?.date}
+          {transaction && currencySeparators && (
+            <TransactionForm
+              errors={errors}
+              transaction={transaction}
+              handleChange={handleChange}
+              currencySeparators={currencySeparators}
             />
-          </Element>
-
-          <Element required leftSide={t('amount')}>
-            <DecimalNumberInput
-              border
-              precision={currencySeparators?.precision}
-              currency={currencySeparators}
-              className="auto"
-              initialValue={transaction?.amount?.toString()}
-              value={transaction?.amount?.toString()}
-              onChange={(value: string) => handleChange('amount', value)}
-              errorMessage={errors?.errors?.amount}
-            />
-          </Element>
-
-          <Element required leftSide={t('currency')}>
-            <SelectField
-              defaultValue={transaction?.currency_id}
-              value={transaction?.currency_id}
-              onValueChange={(value) => handleChange('currency_id', value)}
-              errorMessage={errors?.errors?.currency_id}
-            >
-              {currencies?.map(({ id, name }) => (
-                <option key={id} value={id}>
-                  {t(name)}
-                </option>
-              ))}
-            </SelectField>
-          </Element>
-
-          <Element required leftSide={t('bank_account')}>
-            <BankAccountSelector
-              value={transaction.bank_integration_id}
-              onChange={(value) =>
-                handleChange('bank_integration_id', value?.id)
-              }
-            />
-          </Element>
-
-          <Element required leftSide={t('description')}>
-            <InputField
-              element="textarea"
-              value={transaction?.description}
-              onValueChange={(value) => handleChange('description', value)}
-              errorMessage={errors?.errors?.description}
-            />
-          </Element>
+          )}
         </Card>
       </Container>
     </Default>

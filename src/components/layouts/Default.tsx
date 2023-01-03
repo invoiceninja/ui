@@ -234,6 +234,21 @@ export function Default(props: Props) {
       },
     },
     {
+      name: t('recurring_expenses'),
+      href: '/recurring_expenses',
+      icon: Repeat,
+      current: location.pathname.startsWith('/recurring_expenses'),
+      visible:
+        enabled(ModuleBitmask.RecurringExpenses) &&
+        hasPermission('view_recurring_expense'),
+      rightButton: {
+        icon: PlusCircle,
+        to: '/recurring_expenses/create',
+        label: t('new_recurring_expense'),
+        visible: hasPermission('create_recurring_expense'),
+      },
+    },
+    {
       name: t('reports'),
       href: '/reports',
       icon: PieChart,

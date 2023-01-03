@@ -105,10 +105,10 @@ export function CompanyCreate(props: Props) {
       title={t('add_company')}
       visible={props.isModalOpen}
       onClose={() => props.setIsModalOpen(false)}
-      size="small"
       backgroundColor="white"
     >
-      <span className="text-lg text-gray-900">Are you sure?</span>
+      <span className="text-lg text-gray-900">{t('are_you_sure')}</span>
+
       <div className="flex justify-end space-x-4 mt-5">
         <Button
           className="text-gray-900"

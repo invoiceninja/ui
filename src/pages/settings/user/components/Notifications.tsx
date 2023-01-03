@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { trans } from 'common/helpers';
 import { injectInChangesWithData } from 'common/stores/slices/user';
 import { RootState } from 'common/stores/store';
 import { cloneDeep, set } from 'lodash';
@@ -71,12 +72,23 @@ export function Notifications() {
 
   const options: { label: string; field: string }[] = [
     { label: t('invoice_created'), field: 'invoice_created_all' },
-    { label: t('notification_invoice_sent'), field: 'invoice_sent_all' },
+    {
+      label: trans('invoice_sent', { count: '' }),
+      field: 'invoice_sent_all',
+    },
     { label: t('invoice_viewed'), field: 'invoice_viewed_all' },
     { label: t('invoice_late'), field: 'invoice_late_all' },
 
     { label: t('payment_success'), field: 'payment_success_all' },
     { label: t('payment_failure'), field: 'payment_failure_all' },
+
+    { label: t('purchase_order_created'), field: 'purchase_order_created_all' },
+    { label: t('purchase_order_sent'), field: 'purchase_order_sent_all' },
+    { label: t('purchase_order_viewed'), field: 'purchase_order_viewed_all' },
+    {
+      label: t('purchase_order_accepted'),
+      field: 'purchase_order_accepted_all',
+    },
 
     { label: t('quote_created'), field: 'quote_created_all' },
     { label: t('quote_sent'), field: 'quote_sent_all' },

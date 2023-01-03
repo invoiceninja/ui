@@ -42,7 +42,8 @@ export type ReactTableColumns =
   | 'task'
   | 'vendor'
   | 'purchaseOrder'
-  | 'expense';
+  | 'expense'
+  | 'recurringExpense';
 
 export interface Settings {
   accent_color: string;

@@ -27,7 +27,6 @@ export function CreateExpenseCategoryModal(props: Props) {
       title={t('create_expense_category')}
       visible={props.visible}
       onClose={() => props.setVisible(false)}
-      size="small"
     >
       <CreateExpenseCategoryForm
         setSelectedIds={props.setSelectedIds}
