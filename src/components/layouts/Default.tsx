@@ -39,7 +39,7 @@ import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
-import { EntityDropDown } from 'components/EntityDropDown';
+import { QuickCreatePopover } from 'components/QuickCreatePopover';
 
 interface Props extends CommonProps {
   title?: string | null;
@@ -300,7 +300,7 @@ export function Default(props: Props) {
                   {props.title}
                 </h2>
 
-                <EntityDropDown />
+                <QuickCreatePopover />
               </div>
 
               <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
