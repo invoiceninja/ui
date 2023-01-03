@@ -281,31 +281,35 @@ export function DebouncedCombobox(props: Props) {
               onFocus={props.onInputFocus}
             />
 
-            {props.clearButton && !props.disabled && !isLoading && (
-              <div className="absolute inset-y-0 right-0 mt-2.5 mr-1 cursor-pointer">
-                <X
-                  className="absolute inset-y-0 right-0 text-gray-400 h-4"
-                  onClick={() => {
-                    setSelectedOption({
-                      record: internalRecord,
-                      withoutEvents: true,
-                    });
+            {props.clearButton &&
+              (props.defaultValue || props.value) &&
+              !props.disabled &&
+              !isLoading && (
+                <div className="absolute inset-y-0 right-0 mt-2.5 mr-1 cursor-pointer">
+                  <X
+                    className="absolute inset-y-0 right-0 text-gray-400 h-4"
+                    onClick={() => {
+                      setSelectedOption({
+                        record: internalRecord,
+                        withoutEvents: true,
+                      });
 
-                    props.onClearButtonClick();
-                  }}
-                />
-              </div>
-            )}
+                      props.onClearButtonClick();
+                    }}
+                  />
+                </div>
+              )}
 
-            {!props.clearButton && !isLoading && (
-              <div className="absolute inset-y-0 right-0 mt-2.5 mr-1 cursor-pointer">
-                <ChevronDown
-                  className="absolute inset-y-0 right-0 text-gray-400 h-4"
-                  aria-hidden="true"
-                  onClick={() => openDropdownButton.current?.click()}
-                />
-              </div>
-            )}
+            {(!props.clearButton || (!props.defaultValue && !props.value)) &&
+              !isLoading && (
+                <div className="absolute inset-y-0 right-0 mt-2.5 mr-1 cursor-pointer">
+                  <ChevronDown
+                    className="absolute inset-y-0 right-0 text-gray-400 h-4"
+                    aria-hidden="true"
+                    onClick={() => openDropdownButton.current?.click()}
+                  />
+                </div>
+              )}
 
             {isLoading && (
               <div className="absolute inset-y-0 right-0 mt-2 mr-1.5 cursor-pointer">
