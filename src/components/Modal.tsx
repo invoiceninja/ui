@@ -20,8 +20,9 @@ interface Props {
   text?: string | null;
   children?: ReactNode;
   centerContent?: boolean;
-  size?: 'small' | 'regular' | 'large';
+  size?: 'extraSmall' | 'small' | 'regular' | 'large';
   backgroundColor?: 'white' | 'gray';
+  disableClosing?: boolean;
 }
 
 export function Modal(props: Props) {
@@ -37,8 +38,8 @@ export function Modal(props: Props) {
         as="div"
         className="fixed z-10 inset-0 overflow-y-auto"
         onClose={(value) => {
-          setOpen(value);
-          props.onClose(value);
+          !props.disableClosing && setOpen(value);
+          !props.disableClosing && props.onClose(value);
         }}
       >
         <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -75,7 +76,9 @@ export function Modal(props: Props) {
                 'inline-block align-bottom rounded px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:p-6',
                 {
                   'max-w-sm':
-                    props.size === 'small' || typeof props.size === 'undefined',
+                    props.size === 'extraSmall' ||
+                    typeof props.size === 'undefined',
+                  'max-w-lg': props.size === 'small',
                   'max-w-7xl': props.size === 'large',
                   'max-w-2xl': props.size === 'regular',
                   'bg-white':
@@ -100,17 +103,22 @@ export function Modal(props: Props) {
                   </div>
                 </div>
 
-                <X
-                  className="cursor-pointer"
-                  onClick={() => props.onClose(false)}
-                />
+                {!props.disableClosing && (
+                  <X
+                    className="cursor-pointer"
+                    onClick={() => props.onClose(false)}
+                  />
+                )}
               </div>
 
               {props.children && (
                 <div
                   className={classNames(
-                    'mt-5 sm:mt-6 text-sm text-gray-500 flex flex-col space-y-4',
-                    { 'justify-center items-center': props.centerContent }
+                    'text-sm text-gray-500 flex flex-col space-y-4',
+                    {
+                      'justify-center items-center': props.centerContent,
+                      'mt-5 sm:mt-6': !props.disableClosing,
+                    }
                   )}
                 >
                   {props.children}

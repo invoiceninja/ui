@@ -16,6 +16,7 @@ import { useExpenseQuery } from 'common/queries/expenses';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { ResourceActions } from 'components/ResourceActions';
+import { ResourceActions } from 'components/ResourceActions';
 import { Tab, Tabs } from 'components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,11 +29,15 @@ import { TaxSettings } from '../create/components/Taxes';
 import { useSave } from './hooks/useSave';
 
 export function Edit() {
+  const [t] = useTranslation();
+
   const { documentTitle } = useTitle('expense');
+
   const { id } = useParams();
+
   const { data } = useExpenseQuery({ id });
 
-  const [t] = useTranslation();
+  const actions = useActions();
 
   const pages: Page[] = [
     { name: t('expenses'), href: '/expenses' },
@@ -51,6 +56,7 @@ export function Edit() {
   ];
 
   const [expense, setExpense] = useState<Expense>();
+
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
   );
@@ -61,12 +67,7 @@ export function Edit() {
 
   const save = useSave({ setErrors });
 
-  const handleChange = <T extends keyof Expense>(
-    property: T,
-    value: Expense[typeof property]
-  ) => {
-    setExpense((expense) => expense && { ...expense, [property]: value });
-  };
+  const handleChange = useHandleChange({ setExpense, setErrors });
 
   useEffect(() => {
     if (data) {

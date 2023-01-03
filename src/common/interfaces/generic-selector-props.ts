@@ -11,6 +11,7 @@
 export interface GenericSelectorProps<T> {
   inputLabel?: string | null;
   value?: string | undefined;
+  defaultValue?: string | undefined;
   readonly?: boolean;
   clearButton?: boolean;
   onChange: (resource: T) => unknown;

@@ -16,17 +16,22 @@ import { Expense } from 'common/interfaces/expense';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   setErrors: (errors: ValidationBag | undefined) => unknown;
 }
 
-export function useSave(props: Props) {
+export function useSave(params: Props) {
   const queryClient = useQueryClient();
-  const { setErrors } = props;
+
+  const navigate = useNavigate();
+
+  const { setErrors } = params;
 
   return (expense: Expense) => {
     toast.processing();
+
     setErrors(undefined);
 
     request(
@@ -34,19 +39,23 @@ export function useSave(props: Props) {
       endpoint('/api/v1/expenses/:id', { id: expense.id }),
       expense
     )
-      .then(() => toast.success('updated_expense'))
-      .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-        toast.error();
+      .then(() => {
+        toast.success('updated_expense');
 
-        if (error.response?.status === 422) {
-          setErrors(error.response.data);
-        }
-      })
-      .finally(() =>
         queryClient.invalidateQueries(
           route('/api/v1/expenses/:id', { id: expense.id })
-        )
-      );
+        );
+
+        navigate('/expenses');
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          setErrors(error.response.data);
+          toast.dismiss();
+        } else {
+          console.error(error);
+          toast.error();
+        }
+      });
   };
 }

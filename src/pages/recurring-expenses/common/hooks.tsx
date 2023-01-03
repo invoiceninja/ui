@@ -8,43 +8,38 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import paymentType from 'common/constants/payment-type';
-import { date } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Expense } from 'common/interfaces/expense';
-import { Divider } from 'components/cards/Divider';
-import { RecurringExpense } from 'common/interfaces/recurring-expense';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { customField } from 'components/CustomField';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { EntityStatus } from 'components/EntityStatus';
-import { Icon } from 'components/icons/Icon';
-import { Action } from 'components/ResourceActions';
-import { Action } from 'components/ResourceActions';
 import { StatusBadge } from 'components/StatusBadge';
-import { useUpdateAtom } from 'jotai/utils';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
-import { recurringExpenseAtom } from 'pages/recurring-expenses/common/atoms';
-import { Dispatch, SetStateAction } from 'react';
+import recurringExpenseStatus from 'common/constants/recurring-expense';
+import recurringExpensesFrequency from 'common/constants/recurring-expense-frequency';
 import { useTranslation } from 'react-i18next';
-import {
-  MdArchive,
-  MdControlPointDuplicate,
-  MdDelete,
-  MdRestore,
-} from 'react-icons/md';
-import { useBulk } from '../edit/hooks/useBulk';
+import { date, endpoint } from 'common/helpers';
+import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { EntityStatus } from 'components/EntityStatus';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { Link } from '@invoiceninja/forms';
+import { route } from 'common/helpers/route';
+import { Divider } from 'components/cards/Divider';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Action } from 'components/ResourceActions';
 import { useNavigate } from 'react-router-dom';
-import { expenseAtom } from './atoms';
-import { ExpenseStatus } from './components/ExpenseStatus';
+import { recurringExpenseAtom } from './atoms';
+import { RecurringExpense } from 'common/interfaces/recurring-expense';
+import { RecurringExpenseStatus } from 'common/enums/recurring-expense-status';
+import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
+import { useQueryClient } from 'react-query';
+import { expenseAtom } from 'pages/expenses/common/atoms';
+import paymentType from 'common/constants/payment-type';
+import { customField } from 'components/CustomField';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { Dispatch, SetStateAction } from 'react';
+import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useUpdateAtom } from 'jotai/utils';
 
-export const expenseColumns = [
+export const recurringExpenseColumns = [
   'status',
   'number',
   'vendor',
@@ -81,79 +76,53 @@ export const expenseColumns = [
   'tax_rate3',
   'transaction_reference',
   'updated_at',
+  'frequency',
+  'remaining_cycles',
+  'next_send_date',
 ] as const;
 
-type ExpenseColumns = typeof expenseColumns[number];
+type RecurringExpenseColumns = typeof recurringExpenseColumns[number];
 
-export function useActions() {
-  const [t] = useTranslation();
-
-  const navigate = useNavigate();
-
-  const setExpense = useUpdateAtom(expenseAtom);
-
-  const setRecurringExpense = useUpdateAtom(recurringExpenseAtom);
-
-  const cloneToExpense = (expense: Expense) => {
-    setExpense({ ...expense, documents: [], number: '' });
-
-    navigate('/expenses/create');
-  };
-
-  const cloneToRecurringExpense = (expense: Expense) => {
-    setRecurringExpense({
-      ...(expense as RecurringExpense),
-      documents: [],
-      number: '',
-    });
-
-    navigate('/recurring_expenses/create');
-  };
-
-  const actions: Action<Expense>[] = [
-    (expense) => (
-      <DropdownElement onClick={() => cloneToExpense(expense)}>
-        {t('clone')}
-      </DropdownElement>
-    ),
-    (expense) => (
-      <DropdownElement onClick={() => cloneToRecurringExpense(expense)}>
-        {t('clone_to_recurring')}
-      </DropdownElement>
-    ),
-  ];
-
-  return actions;
-}
-
-export const defaultColumns: ExpenseColumns[] = [
+export const defaultColumns: RecurringExpenseColumns[] = [
   'status',
   'number',
-  'client',
   'vendor',
+  'client',
   'date',
+  'frequency',
+  'next_send_date',
+  'remaining_cycles',
   'amount',
   'public_notes',
+  'entity_state',
 ];
 
-export function useExpenseColumns() {
-  const { t } = useTranslation();
+export function useRecurringExpenseColumns() {
+  const [t] = useTranslation();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const currentUser = useCurrentUser();
-  const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
-  const columns: DataTableColumnsExtended<Expense, ExpenseColumns> = [
+  const formatMoney = useFormatMoney();
+
+  const currentUser = useCurrentUser();
+
+  const columns: DataTableColumnsExtended<
+    RecurringExpense,
+    RecurringExpenseColumns
+  > = [
     {
       column: 'status',
-      id: 'id',
+      id: 'status_id',
       label: t('status'),
-      format: (value, expense) => (
-        <Link to={route('/expenses/:id/edit', { id: expense.id })}>
-          <span className="inline-flex items-center space-x-4">
-            <ExpenseStatus entity={expense} />
-          </span>
+      format: (value, recurringExpense) => (
+        <Link
+          to={route('/recurring_expenses/:id/edit', {
+            id: recurringExpense.id,
+          })}
+        >
+          <StatusBadge for={recurringExpenseStatus} code={value} />
         </Link>
       ),
     },
@@ -161,8 +130,12 @@ export function useExpenseColumns() {
       column: 'number',
       id: 'number',
       label: t('number'),
-      format: (field, expense) => (
-        <Link to={route('/expenses/:id/edit', { id: expense.id })}>
+      format: (field, recurringExpense) => (
+        <Link
+          to={route('/recurring_expenses/:id/edit', {
+            id: recurringExpense.id,
+          })}
+        >
           {field}
         </Link>
       ),
@@ -171,10 +144,10 @@ export function useExpenseColumns() {
       column: 'vendor',
       id: 'vendor_id',
       label: t('vendor'),
-      format: (value, expense) =>
-        expense.vendor && (
+      format: (value, recurringExpense) =>
+        recurringExpense.vendor && (
           <Link to={route('/vendors/:id', { id: value.toString() })}>
-            {expense.vendor.name}
+            {recurringExpense.vendor.name}
           </Link>
         ),
     },
@@ -182,10 +155,10 @@ export function useExpenseColumns() {
       column: 'client',
       id: 'client_id',
       label: t('client'),
-      format: (value, expense) =>
-        expense.client && (
+      format: (value, recurringExpense) =>
+        recurringExpense.client && (
           <Link to={route('/clients/:id', { id: value.toString() })}>
-            {expense.client.display_name}
+            {recurringExpense.client.display_name}
           </Link>
         ),
     },
@@ -266,7 +239,7 @@ export function useExpenseColumns() {
       column: 'documents',
       id: 'documents',
       label: t('documents'),
-      format: (value, expense) => expense.documents.length,
+      format: (value, recurringExpense) => recurringExpense.documents.length,
     },
     {
       column: 'exchange_rate',
@@ -277,7 +250,8 @@ export function useExpenseColumns() {
       column: 'is_deleted',
       id: 'is_deleted',
       label: t('is_deleted'),
-      format: (value, expense) => (expense.is_deleted ? t('yes') : t('no')),
+      format: (value, recurringExpense) =>
+        recurringExpense.is_deleted ? t('yes') : t('no'),
     },
     {
       column: 'net_amount',
@@ -314,8 +288,7 @@ export function useExpenseColumns() {
       column: 'should_be_invoiced',
       id: 'should_be_invoiced',
       label: t('should_be_invoiced'),
-      format: (value, expense) =>
-        expense.should_be_invoiced ? t('yes') : t('no'),
+      format: (value) => (value ? t('yes') : t('no')),
     },
     {
       column: 'tax_name1',
@@ -358,90 +331,153 @@ export function useExpenseColumns() {
       label: t('updated_at'),
       format: (value) => date(value, dateFormat),
     },
+    {
+      column: 'frequency',
+      id: 'frequency_id',
+      label: t('frequency'),
+      format: (value) => (
+        <StatusBadge for={recurringExpensesFrequency} code={value} headless />
+      ),
+    },
+    {
+      column: 'next_send_date',
+      id: 'next_send_date',
+      label: t('next_send_date'),
+      format: (value) => date(value, dateFormat),
+    },
+    {
+      column: 'remaining_cycles',
+      id: 'remaining_cycles',
+      label: t('remaining_cycles'),
+      format: (value) => {
+        if (value.toString() === '-1') {
+          return <span>{t('endless')}</span>;
+        }
+        return <span>{value}</span>;
+      },
+    },
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.expense ||
-    defaultColumns;
+    currentUser?.company_user?.settings?.react_table_columns
+      ?.recurringExpense || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))
     .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
 }
 
+export function useToggleStartStop() {
+  const queryClient = useQueryClient();
+
+  return (recurringExpense: RecurringExpense, action: 'start' | 'stop') => {
+    toast.processing();
+
+    const url =
+      action === 'start'
+        ? '/api/v1/recurring_expenses/:id?start=true'
+        : '/api/v1/recurring_expenses/:id?stop=true';
+
+    request('PUT', endpoint(url, { id: recurringExpense.id }), recurringExpense)
+      .then(() => {
+        queryClient.invalidateQueries('/api/v1/recurring_expenses');
+
+        queryClient.invalidateQueries(
+          route('/api/v1/recurring_expenses/:id', {
+            id: recurringExpense.id,
+          })
+        );
+
+        toast.success(action === 'start' ? 'start' : 'stop');
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.error();
+      });
+  };
+}
+
 export function useActions() {
   const [t] = useTranslation();
 
-  const bulk = useBulk();
+  const navigate = useNavigate();
 
-  const actions: Action<Expense>[] = [
-    (expense) => (
-      <>
+  const setExpense = useUpdateAtom(expenseAtom);
+
+  const setRecurringExpense = useUpdateAtom(recurringExpenseAtom);
+
+  const toggleStartStop = useToggleStartStop();
+
+  const cloneToRecurringExpense = (recurringExpense: RecurringExpense) => {
+    setRecurringExpense({ ...recurringExpense, documents: [], number: '' });
+
+    navigate('/recurring_expenses/create');
+  };
+
+  const cloneToExpense = (recurringExpense: RecurringExpense) => {
+    setExpense({
+      ...(recurringExpense as Expense),
+      documents: [],
+      number: '',
+    });
+
+    navigate('/expenses/create');
+  };
+
+  const actions: Action<RecurringExpense>[] = [
+    (recurringExpense) =>
+      (recurringExpense.status_id === RecurringExpenseStatus.DRAFT ||
+        recurringExpense.status_id === RecurringExpenseStatus.PAUSED) && (
         <DropdownElement
-          to={route('/expenses/:id/clone', { id: expense.id })}
-          icon={<Icon element={MdControlPointDuplicate} />}
+          onClick={() => toggleStartStop(recurringExpense, 'start')}
         >
-          {t('clone_to_expense')}
+          {t('start')}
         </DropdownElement>
-        {/* <DropdownElement>{t('clone_to_recurring')}</DropdownElement> */}
-      </>
-    ),
+      ),
+    (recurringExpense) =>
+      recurringExpense.status_id === RecurringExpenseStatus.ACTIVE && (
+        <DropdownElement
+          onClick={() => toggleStartStop(recurringExpense, 'stop')}
+        >
+          {t('stop')}
+        </DropdownElement>
+      ),
     () => <Divider withoutPadding />,
-    (expense) => (
-      <>
-        {expense.archived_at === 0 && (
-          <DropdownElement
-            onClick={() => bulk([expense.id], 'archive')}
-            icon={<Icon element={MdArchive} />}
-          >
-            {t('archive')}
-          </DropdownElement>
-        )}
-      </>
+    (recurringExpense) => (
+      <DropdownElement
+        onClick={() => cloneToRecurringExpense(recurringExpense)}
+      >
+        {t('clone')}
+      </DropdownElement>
     ),
-    (expense) => (
-      <>
-        {expense.archived_at > 0 && (
-          <DropdownElement
-            onClick={() => bulk([expense.id], 'restore')}
-            icon={<Icon element={MdRestore} />}
-          >
-            {t('restore')}
-          </DropdownElement>
-        )}
-      </>
-    ),
-    (expense) => (
-      <>
-        {!expense.is_deleted && (
-          <DropdownElement
-            onClick={() => bulk([expense.id], 'delete')}
-            icon={<Icon element={MdDelete} />}
-          >
-            {t('delete')}
-          </DropdownElement>
-        )}
-      </>
+    (recurringExpense) => (
+      <DropdownElement onClick={() => cloneToExpense(recurringExpense)}>
+        {t('clone_to_expense')}
+      </DropdownElement>
     ),
   ];
 
   return actions;
 }
 
-interface HandleChangeExpenseParams {
-  setExpense: Dispatch<SetStateAction<Expense | undefined>>;
+interface HandleChangeRecurringExpenseParams {
+  setRecurringExpense: Dispatch<SetStateAction<RecurringExpense | undefined>>;
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
 }
 
-export function useHandleChange(params: HandleChangeExpenseParams) {
-  const { setExpense, setErrors } = params;
+export function useHandleChange(params: HandleChangeRecurringExpenseParams) {
+  const { setRecurringExpense, setErrors } = params;
 
-  return <T extends keyof Expense>(
+  return <T extends keyof RecurringExpense>(
     property: T,
-    value: Expense[typeof property]
+    value: RecurringExpense[typeof property]
   ) => {
     setErrors(undefined);
 
-    setExpense((expense) => expense && { ...expense, [property]: value });
+    setRecurringExpense(
+      (recurringExpense) =>
+        recurringExpense && { ...recurringExpense, [property]: value }
+    );
   };
 }
