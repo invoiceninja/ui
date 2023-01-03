@@ -9,25 +9,25 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { Expense } from 'common/interfaces/expense';
-import { useBlankExpenseQuery } from 'common/queries/expenses';
 import { Default } from 'components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Details } from './components/Details';
-import { Notes } from './components/Notes';
-import { AdditionalInfo } from './components/AdditionalInfo';
+import { Details } from '../components/Details';
+import { Notes } from '../components/Notes';
+import { AdditionalInfo } from '../components/AdditionalInfo';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
 import { useNavigate } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { TaxSettings } from './components/Taxes';
+import { TaxSettings } from '../components/Taxes';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { route } from 'common/helpers/route';
+import { recurringExpenseAtom } from '../common/atoms';
 import { useAtom } from 'jotai';
-import { expenseAtom } from '../common/atoms';
+import { RecurringExpense } from 'common/interfaces/recurring-expense';
+import { useBlankRecurringExpenseQuery } from 'common/queries/recurring-expense';
 import { useHandleChange } from '../common/hooks';
 
 export function Create() {
@@ -35,43 +35,47 @@ export function Create() {
 
   const navigate = useNavigate();
 
-  const { documentTitle } = useTitle('new_expense');
+  const { documentTitle } = useTitle('new_recurring_expense');
 
   const pages = [
-    { name: t('expenses'), href: '/expenses' },
-    { name: t('new_expense'), href: '/expenses/create' },
+    { name: t('recurring_expenses'), href: '/recurring_expenses' },
+    { name: t('new_recurring_expense'), href: '/recurring_expenses/create' },
   ];
-
-  const [expense, setExpense] = useAtom(expenseAtom);
-
-  const { data } = useBlankExpenseQuery({ enabled: !expense });
 
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
   );
 
+  const [recurringExpense, setRecurringExpense] = useAtom(recurringExpenseAtom);
+
+  const { data } = useBlankRecurringExpenseQuery({
+    enabled: !recurringExpense,
+  });
+
   const [errors, setErrors] = useState<ValidationBag>();
 
-  const handleChange = useHandleChange({ setExpense, setErrors });
+  const handleChange = useHandleChange({ setRecurringExpense, setErrors });
 
   useEffect(() => {
-    if (data && !expense) {
-      setExpense(data);
+    if (data && !recurringExpense) {
+      setRecurringExpense({ ...data, frequency_id: '5' });
     }
 
-    return () => setExpense(undefined);
+    return () => setRecurringExpense(undefined);
   }, [data]);
 
-  const onSave = (expense: Expense) => {
+  const onSave = (recurringExpense: RecurringExpense) => {
     toast.processing();
 
     setErrors(undefined);
 
-    request('POST', endpoint('/api/v1/expenses'), expense)
-      .then((response: GenericSingleResourceResponse<Expense>) => {
-        toast.success('created_expense');
+    request('POST', endpoint('/api/v1/recurring_expenses'), recurringExpense)
+      .then((response: GenericSingleResourceResponse<RecurringExpense>) => {
+        toast.success('created_recurring_expense');
 
-        navigate(route('/expenses/:id/edit', { id: response.data.data.id }));
+        navigate(
+          route('/recurring_expenses/:id/edit', { id: response.data.data.id })
+        );
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
@@ -88,13 +92,13 @@ export function Create() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/expenses"
-      onSaveClick={() => expense && onSave(expense)}
+      onBackClick="/recurring_expenses"
+      onSaveClick={() => recurringExpense && onSave(recurringExpense)}
     >
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 xl:col-span-4">
           <Details
-            expense={expense}
+            recurringExpense={recurringExpense}
             handleChange={handleChange}
             taxInputType={taxInputType}
             pageType="create"
@@ -103,14 +107,20 @@ export function Create() {
         </div>
 
         <div className="col-span-12 xl:col-span-4">
-          <Notes expense={expense} handleChange={handleChange} />
+          <Notes
+            recurringExpense={recurringExpense}
+            handleChange={handleChange}
+          />
         </div>
 
         <div className="col-span-12 xl:col-span-4 space-y-4">
-          <AdditionalInfo expense={expense} handleChange={handleChange} />
+          <AdditionalInfo
+            recurringExpense={recurringExpense}
+            handleChange={handleChange}
+          />
 
           <TaxSettings
-            expense={expense}
+            recurringExpense={recurringExpense}
             handleChange={handleChange}
             taxInputType={taxInputType}
             setTaxInputType={setTaxInputType}

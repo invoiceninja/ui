@@ -7,78 +7,53 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import recurringInvoice from 'common/constants/reccuring-invoice';
-import recurringInvoicesFrequency from 'common/constants/recurring-invoices-frequency';
-import { date } from 'common/helpers';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from 'common/hooks/useTitle';
-import { Expense } from 'common/interfaces/expense';
-import { DataTable, DataTableColumns } from 'components/DataTable';
-import { EntityStatus } from 'components/EntityStatus';
+import { DataTable } from 'components/DataTable';
+import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { Default } from 'components/layouts/Default';
-import { StatusBadge } from 'components/StatusBadge';
 import { useTranslation } from 'react-i18next';
+import {
+  defaultColumns,
+  recurringExpenseColumns,
+  useActions,
+  useRecurringExpenseColumns,
+} from '../common/hooks';
 
 export function RecurringExpenses() {
   useTitle('recurring_expenses');
 
-  const { t } = useTranslation();
-  const { dateFormat } = useCurrentCompanyDateFormats();
+  const [t] = useTranslation();
 
   const pages = [
     { name: t('recurring_expenses'), href: '/recurring_expenses' },
   ];
 
-  const columns: DataTableColumns<Expense> = [
-    {
-      id: 'status_id',
-      label: t('status'),
-      format: (value) => <StatusBadge for={recurringInvoice} code={value} />,
-    },
-    {
-      id: 'number',
-      label: t('number'),
-    },
+  const columns = useRecurringExpenseColumns();
 
-    {
-      id: 'frequency_id',
-      label: t('frequency'),
-      format: (value) => (
-        <StatusBadge for={recurringInvoicesFrequency} code={value} headless />
-      ),
-    },
-
-    {
-      id: 'next_send_date',
-      label: t('next_send_date'),
-      format: (value) => date(value, dateFormat),
-    },
-
-    { id: 'amount', label: t('amount') },
-    {
-      id: 'public_notes',
-      label: t('public_notes'),
-    },
-    {
-      id: 'entity_status',
-      label: t('entity_status'),
-      format: (value, resource) => <EntityStatus entity={resource} />,
-    },
-  ];
+  const actions = useActions();
 
   return (
     <Default
       title={t('recurring_expenses')}
       breadcrumbs={pages}
-      docsLink="docs/recurring-expenses/"
+      docsLink="docs/recurring-expenses"
     >
       <DataTable
         resource="recurring_expense"
-        endpoint="/api/v1/recurring_expenses"
+        endpoint="/api/v1/recurring_expenses?include=client,vendor"
         columns={columns}
+        bulkRoute="/api/v1/recurring_expenses/bulk"
         linkToCreate="/recurring_expenses/create"
         linkToEdit="/recurring_expenses/:id/edit"
+        customActions={actions}
         withResourcefulActions
+        leftSideChevrons={
+          <DataTableColumnsPicker
+            columns={recurringExpenseColumns as unknown as string[]}
+            defaultColumns={defaultColumns}
+            table="recurringExpense"
+          />
+        }
       />
     </Default>
   );

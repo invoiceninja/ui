@@ -16,14 +16,18 @@ import { route } from 'common/helpers/route';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Params } from './common/params.interface';
 
-export function useBlankExpenseQuery() {
+interface BlankQueryParams {
+  enabled?: boolean;
+}
+
+export function useBlankExpenseQuery(params: BlankQueryParams) {
   return useQuery<Expense>(
     route('/api/v1/expenses/create'),
     () =>
       request('GET', endpoint('/api/v1/expenses/create')).then(
         (response) => response.data.data
       ),
-    { staleTime: Infinity }
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }
 

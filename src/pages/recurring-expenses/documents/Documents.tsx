@@ -11,7 +11,7 @@
 import { endpoint } from 'common/helpers';
 import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
-import { useExpenseQuery } from 'common/queries/expenses';
+import { useRecurringExpenseQuery } from 'common/queries/recurring-expense';
 import { Page } from 'components/Breadcrumbs';
 import { DocumentsTable } from 'components/DocumentsTable';
 import { Default } from 'components/layouts/Default';
@@ -25,34 +25,40 @@ export function Documents() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('documents');
+
   const { id } = useParams();
 
   const pages: Page[] = [
-    { name: t('expenses'), href: '/expenses' },
-    { name: t('expense'), href: route('/expenses/:id/edit', { id }) },
+    { name: t('recurring_expenses'), href: '/recurring_expenses' },
+    {
+      name: t('recurring_expense'),
+      href: route('/recurring_expenses/:id/edit', { id }),
+    },
     {
       name: t('documents'),
-      href: route('/expenses/:id/documents', { id }),
+      href: route('/recurring_expenses/:id/documents', { id }),
     },
   ];
 
   const tabs: Tab[] = [
     {
       name: t('edit'),
-      href: route('/expenses/:id/edit', { id }),
+      href: route('/recurring_expenses/:id/edit', { id }),
     },
     {
       name: t('documents'),
-      href: route('/expenses/:id/documents', { id }),
+      href: route('/recurring_expenses/:id/documents', { id }),
     },
   ];
 
-  const { data: expense } = useExpenseQuery({ id });
+  const { data: recurringExpense } = useRecurringExpenseQuery({ id });
 
   const queryClient = useQueryClient();
 
   const invalidateCache = () => {
-    queryClient.invalidateQueries(route('/api/v1/expenses/:id', { id }));
+    queryClient.invalidateQueries(
+      route('/api/v1/recurring_expenses/:id', { id })
+    );
   };
 
   return (
@@ -63,12 +69,14 @@ export function Documents() {
         <div className="w-2/3">
           <Upload
             widgetOnly
-            endpoint={endpoint('/api/v1/expenses/:id/upload', { id })}
+            endpoint={endpoint('/api/v1/recurring_expenses/:id/upload', {
+              id,
+            })}
             onSuccess={invalidateCache}
           />
 
           <DocumentsTable
-            documents={expense?.documents || []}
+            documents={recurringExpense?.documents || []}
             onDocumentDelete={invalidateCache}
           />
         </div>

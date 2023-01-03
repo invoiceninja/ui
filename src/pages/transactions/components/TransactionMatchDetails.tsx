@@ -16,13 +16,13 @@ import { AxiosError } from 'axios';
 import { useQueryClient } from 'react-query';
 import { TransactionStatus } from 'common/enums/transactions';
 import { route } from 'common/helpers/route';
-import { TransactionResponse } from 'common/interfaces/transactions';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { ListBox } from './ListBox';
 import { Button } from '@invoiceninja/forms';
 import { MdContentCopy, MdLink } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { TabGroup } from 'components/TabGroup';
+import { Transaction } from 'common/interfaces/transactions';
 
 export interface TransactionDetails {
   base_type: string;
@@ -154,23 +154,23 @@ export function TransactionMatchDetails(props: Props) {
           },
         ],
       })
-        .then(
-          (response: GenericSingleResourceResponse<TransactionResponse[]>) => {
-            queryClient.invalidateQueries('/api/v1/bank_transactions');
-            queryClient.invalidateQueries(
-              route('/api/v1/bank_transactions/:id', {
-                id: props.transactionDetails.transaction_id,
-              })
-            );
-            queryClient.invalidateQueries(
-              route('/api/v1/expenses/:id', {
-                id: response.data.data[0].expense_id,
-              })
-            );
+        .then((response: GenericSingleResourceResponse<Transaction[]>) => {
+          queryClient.invalidateQueries('/api/v1/bank_transactions');
 
-            toast.success('converted_transaction');
-          }
-        )
+          queryClient.invalidateQueries(
+            route('/api/v1/bank_transactions/:id', {
+              id: props.transactionDetails.transaction_id,
+            })
+          );
+
+          queryClient.invalidateQueries(
+            route('/api/v1/expenses/:id', {
+              id: response.data.data[0].expense_id,
+            })
+          );
+
+          toast.success('converted_transaction');
+        })
         .catch((error: AxiosError) => {
           console.error(error);
           toast.error();
@@ -197,24 +197,25 @@ export function TransactionMatchDetails(props: Props) {
           },
         ],
       })
-        .then(
-          (response: GenericSingleResourceResponse<TransactionResponse[]>) => {
-            queryClient.invalidateQueries('/api/v1/bank_transactions');
-            queryClient.invalidateQueries('/api/v1/expenses');
-            queryClient.invalidateQueries(
-              route('/api/v1/bank_transactions/:id', {
-                id: props.transactionDetails.transaction_id,
-              })
-            );
-            queryClient.invalidateQueries(
-              route('/api/v1/expenses/:id', {
-                id: response.data.data[0].expense_id,
-              })
-            );
+        .then((response: GenericSingleResourceResponse<Transaction[]>) => {
+          queryClient.invalidateQueries('/api/v1/bank_transactions');
 
-            toast.success('linked_transaction');
-          }
-        )
+          queryClient.invalidateQueries('/api/v1/expenses');
+
+          queryClient.invalidateQueries(
+            route('/api/v1/bank_transactions/:id', {
+              id: props.transactionDetails.transaction_id,
+            })
+          );
+
+          queryClient.invalidateQueries(
+            route('/api/v1/expenses/:id', {
+              id: response.data.data[0].expense_id,
+            })
+          );
+
+          toast.success('linked_transaction');
+        })
         .catch((error: AxiosError) => {
           console.error(error);
           toast.error();
