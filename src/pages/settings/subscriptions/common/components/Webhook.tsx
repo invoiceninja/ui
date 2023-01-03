@@ -23,16 +23,18 @@ export function Webhook(props: SubscriptionProps) {
 
   const accentColor = useAccentColor();
 
+  const { subscription, handleChange, errors } = props;
+
   const [headerKey, setHeaderKey] = useState<string>('');
 
   const [headerValue, setHeaderValue] = useState<string>('');
 
   const headers = Object.entries(
-    props.subscription.webhook_configuration.post_purchase_headers
+    subscription.webhook_configuration.post_purchase_headers
   );
 
   const handleAddHeader = () => {
-    props.handleChange(
+    handleChange(
       `webhook_configuration.post_purchase_headers.${headerKey}` as keyof Subscription,
       headerValue
     );
@@ -45,17 +47,15 @@ export function Webhook(props: SubscriptionProps) {
   const handleRemoveHeader = (key: string) => {
     if (
       Object.prototype.hasOwnProperty.call(
-        props.subscription.webhook_configuration.post_purchase_headers,
+        subscription.webhook_configuration.post_purchase_headers,
         key
       )
     ) {
-      delete props.subscription.webhook_configuration.post_purchase_headers[
-        key
-      ];
+      delete subscription.webhook_configuration.post_purchase_headers[key];
 
-      props.handleChange(
+      handleChange(
         'webhook_configuration' as keyof Subscription,
-        props.subscription.webhook_configuration
+        subscription.webhook_configuration
       );
     }
   };
@@ -64,29 +64,27 @@ export function Webhook(props: SubscriptionProps) {
     <Card title={t('webhook')}>
       <Element leftSide={t('webhook_url')}>
         <InputField
-          value={props.subscription.webhook_configuration.post_purchase_url}
+          value={subscription.webhook_configuration.post_purchase_url}
           onValueChange={(value) =>
-            props.handleChange(
+            handleChange(
               'webhook_configuration.post_purchase_url' as keyof Subscription,
               value
             )
           }
-          errorMessage={props.errors?.errors.post_purchase_url}
+          errorMessage={errors?.errors.post_purchase_url}
         />
       </Element>
 
       <Element leftSide={t('rest_method')}>
         <SelectField
-          value={
-            props.subscription.webhook_configuration.post_purchase_rest_method
-          }
+          value={subscription.webhook_configuration.post_purchase_rest_method}
           onValueChange={(value) =>
-            props.handleChange(
+            handleChange(
               'webhook_configuration.post_purchase_rest_method' as keyof Subscription,
               value
             )
           }
-          errorMessage={props.errors?.errors.post_purchase_rest_method}
+          errorMessage={errors?.errors.post_purchase_rest_method}
         >
           <option defaultChecked></option>
           <option value="post">{t('post')}</option>

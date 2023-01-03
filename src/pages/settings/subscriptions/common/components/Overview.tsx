@@ -14,6 +14,7 @@ import { GroupSettings } from 'common/interfaces/group-settings';
 import { Product } from 'common/interfaces/product';
 import { Subscription } from 'common/interfaces/subscription';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { CopyToClipboard } from 'components/CopyToClipboard';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import { UserSelector } from 'components/users/UserSelector';
 import { useTranslation } from 'react-i18next';
@@ -35,13 +36,15 @@ interface OverviewSubscriptionProps extends SubscriptionProps {
 export function Overview(props: OverviewSubscriptionProps) {
   const [t] = useTranslation();
 
+  const { subscription, handleChange, errors, products } = props;
+
   return (
     <Card title={t('overview')}>
       <Element leftSide={t('name')} required>
         <InputField
-          value={props.subscription.name}
-          onValueChange={(value) => props.handleChange('name', value)}
-          errorMessage={props.errors?.errors.name}
+          value={subscription.name}
+          onValueChange={(value) => handleChange('name', value)}
+          errorMessage={errors?.errors.name}
         />
       </Element>
 
@@ -49,60 +52,67 @@ export function Overview(props: OverviewSubscriptionProps) {
         <DebouncedCombobox
           endpoint={'/api/v1/group_settings'}
           label="name"
-          defaultValue={props.subscription.group_id}
+          defaultValue={subscription.group_id}
           onChange={(value: Record<GroupSettings>) =>
-            value.resource && props.handleChange('group_id', value.resource.id)
+            value.resource && handleChange('group_id', value.resource.id)
           }
-          onClearButtonClick={() => props.handleChange('group_id', '')}
+          onClearButtonClick={() => handleChange('group_id', '')}
           queryAdditional
           clearButton
-          errorMessage={props.errors?.errors.group_id}
+          errorMessage={errors?.errors.group_id}
         />
       </Element>
 
       <Element leftSide={t('user')}>
         <UserSelector
-          value={props.subscription.assigned_user_id}
-          onChange={(user) => props.handleChange('assigned_user_id', user.id)}
-          onClearButtonClick={() => props.handleChange('assigned_user_id', '')}
+          value={subscription.assigned_user_id}
+          onChange={(user) => handleChange('assigned_user_id', user.id)}
+          onClearButtonClick={() => handleChange('assigned_user_id', '')}
           clearButton
-          errorMessage={props.errors?.errors.assigned_user_id}
+          errorMessage={errors?.errors.assigned_user_id}
         />
       </Element>
 
       <Element leftSide={t('products')}>
         <MultipleProductSelector
           type="product_ids"
-          handleChange={props.handleChange}
-          subscription={props.subscription}
-          products={props.products}
+          handleChange={handleChange}
+          subscription={subscription}
+          products={products}
         />
       </Element>
 
       <Element leftSide={t('recurring_products')}>
         <MultipleProductSelector
           type="recurring_product_ids"
-          handleChange={props.handleChange}
-          subscription={props.subscription}
-          products={props.products}
+          handleChange={handleChange}
+          subscription={subscription}
+          products={products}
         />
       </Element>
 
       <Element leftSide={t('optional_products')}>
         <MultipleProductSelector
           type="optional_product_ids"
-          handleChange={props.handleChange}
-          subscription={props.subscription}
-          products={props.products}
+          handleChange={handleChange}
+          subscription={subscription}
+          products={products}
         />
       </Element>
 
       <Element leftSide={t('optional_recurring_products')}>
         <MultipleProductSelector
           type="optional_recurring_product_ids"
-          handleChange={props.handleChange}
-          subscription={props.subscription}
-          products={props.products}
+          handleChange={handleChange}
+          subscription={subscription}
+          products={products}
+        />
+      </Element>
+
+      <Element leftSide={t('purchase_page')}>
+        <CopyToClipboard
+          className="break-all"
+          text={subscription.purchase_page}
         />
       </Element>
     </Card>

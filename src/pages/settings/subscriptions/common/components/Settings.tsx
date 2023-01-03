@@ -20,12 +20,14 @@ import { Subscription } from 'common/interfaces/subscription';
 export function Settings(props: SubscriptionProps) {
   const [t] = useTranslation();
 
+  const { subscription, handleChange, errors } = props;
+
   return (
     <Card title={t('settings')}>
       <Element leftSide={t('frequency')}>
         <SelectField
-          value={props.subscription.frequency_id}
-          onValueChange={(value) => props.handleChange('frequency_id', value)}
+          value={subscription.frequency_id}
+          onValueChange={(value) => handleChange('frequency_id', value)}
         >
           {Object.keys(frequencies).map((frequency, index) => (
             <option key={index} value={frequency}>
@@ -39,8 +41,8 @@ export function Settings(props: SubscriptionProps) {
 
       <Element leftSide={t('auto_bill')}>
         <SelectField
-          value={props.subscription.auto_bill}
-          onValueChange={(value) => props.handleChange('auto_bill', value)}
+          value={subscription.auto_bill}
+          onValueChange={(value) => handleChange('auto_bill', value)}
         >
           <option defaultChecked></option>
           <option value="always">{t('enabled')}</option>
@@ -52,9 +54,9 @@ export function Settings(props: SubscriptionProps) {
 
       <Element leftSide={t('promo_code')}>
         <InputField
-          value={props.subscription.promo_code}
-          onValueChange={(value) => props.handleChange('promo_code', value)}
-          errorMessage={props.errors?.errors.promo_code}
+          value={subscription.promo_code}
+          onValueChange={(value) => handleChange('promo_code', value)}
+          errorMessage={errors?.errors.promo_code}
         />
       </Element>
 
@@ -62,21 +64,21 @@ export function Settings(props: SubscriptionProps) {
         <Inline>
           <div className="w-full lg:w-1/2">
             <InputField
-              value={props.subscription.promo_discount}
+              value={subscription.promo_discount}
               onValueChange={(value) =>
-                props.handleChange('promo_discount', parseFloat(value) || 0)
+                handleChange('promo_discount', parseFloat(value) || 0)
               }
-              errorMessage={props.errors?.errors.promo_discount}
+              errorMessage={errors?.errors.promo_discount}
             />
           </div>
 
           <div className="w-full lg:w-1/2">
             <SelectField
-              value={props.subscription.is_amount_discount.toString()}
+              value={subscription.is_amount_discount.toString()}
               onValueChange={(value) =>
-                props.handleChange('is_amount_discount', JSON.parse(value))
+                handleChange('is_amount_discount', JSON.parse(value))
               }
-              errorMessage={props.errors?.errors.is_amount_discount}
+              errorMessage={errors?.errors.is_amount_discount}
             >
               <option value="true">{t('amount')}</option>
               <option value="false">{t('percent')}</option>
@@ -90,9 +92,9 @@ export function Settings(props: SubscriptionProps) {
         leftSideHelp={t('registration_required_help')}
       >
         <Toggle
-          checked={props.subscription.registration_required}
+          checked={subscription.registration_required}
           onValueChange={(value) =>
-            props.handleChange('registration_required', value)
+            handleChange('registration_required', value)
           }
         />
       </Element>
@@ -102,104 +104,98 @@ export function Settings(props: SubscriptionProps) {
         leftSideHelp={t('use_inventory_management_help')}
       >
         <Toggle
-          checked={props.subscription.use_inventory_management}
+          checked={subscription.use_inventory_management}
           onValueChange={(value) =>
-            props.handleChange('use_inventory_management', value)
+            handleChange('use_inventory_management', value)
           }
         />
       </Element>
 
       <Element leftSide={t('return_url')}>
         <InputField
-          value={props.subscription.webhook_configuration.return_url}
+          value={subscription.webhook_configuration.return_url}
           onValueChange={(value) =>
-            props.handleChange(
+            handleChange(
               'webhook_configuration.return_url' as keyof Subscription,
               value
             )
           }
-          errorMessage={props.errors?.errors.return_url}
+          errorMessage={errors?.errors.return_url}
         />
       </Element>
 
       <Element leftSide={t('allow_query_overrides')}>
         <Toggle
-          checked={props.subscription.allow_query_overrides}
+          checked={subscription.allow_query_overrides}
           onValueChange={(value) =>
-            props.handleChange('allow_query_overrides', value)
+            handleChange('allow_query_overrides', value)
           }
         />
       </Element>
 
       <Element leftSide={t('allow_plan_changes')}>
         <Toggle
-          checked={props.subscription.allow_plan_changes}
-          onValueChange={(value) =>
-            props.handleChange('allow_plan_changes', value)
-          }
+          checked={subscription.allow_plan_changes}
+          onValueChange={(value) => handleChange('allow_plan_changes', value)}
         />
       </Element>
 
       <Element leftSide={t('allow_cancellation')}>
         <Toggle
-          checked={props.subscription.allow_cancellation}
-          onValueChange={(value) =>
-            props.handleChange('allow_cancellation', value)
-          }
+          checked={subscription.allow_cancellation}
+          onValueChange={(value) => handleChange('allow_cancellation', value)}
         />
       </Element>
 
-      {props.subscription.allow_cancellation && (
+      {subscription.allow_cancellation && (
         <Element>
           <InputField
             label={t('refund_period')}
-            value={props.subscription.refund_period}
+            value={subscription.refund_period}
             onValueChange={(value) =>
-              props.handleChange('refund_period', parseFloat(value) || 0)
+              handleChange('refund_period', parseFloat(value) || 0)
             }
-            errorMessage={props.errors?.errors.refund_period}
+            errorMessage={errors?.errors.refund_period}
           />
         </Element>
       )}
 
       <Element leftSide={t('trial_enabled')}>
         <Toggle
-          checked={props.subscription.trial_enabled}
-          onValueChange={(value) => props.handleChange('trial_enabled', value)}
+          checked={subscription.trial_enabled}
+          onValueChange={(value) => handleChange('trial_enabled', value)}
         />
       </Element>
 
-      {props.subscription.trial_enabled && (
+      {subscription.trial_enabled && (
         <Element>
           <InputField
             label={t('trial_duration')}
-            value={props.subscription.trial_duration}
+            value={subscription.trial_duration}
             onValueChange={(value) =>
-              props.handleChange('trial_duration', parseFloat(value) || 0)
+              handleChange('trial_duration', parseFloat(value) || 0)
             }
-            errorMessage={props.errors?.errors.trial_duration}
+            errorMessage={errors?.errors.trial_duration}
           />
         </Element>
       )}
 
       <Element leftSide={t('per_seat_enabled')}>
         <Toggle
-          checked={props.subscription.per_seat_enabled}
-          onValueChange={(value) =>
-            props.handleChange('per_seat_enabled', value)
-          }
+          checked={subscription.per_seat_enabled}
+          onValueChange={(value) => handleChange('per_seat_enabled', value)}
         />
       </Element>
 
-      {props.subscription.per_seat_enabled && (
+      {subscription.per_seat_enabled && (
         <Element>
           <InputField
             label={t('max_seats_limit')}
-            value={props.subscription.max_seats_limit}
+            value={subscription.max_seats_limit}
             onValueChange={(value) =>
-              props.handleChange('max_seats_limit', parseFloat(value) || 0)
+              handleChange('max_seats_limit', parseFloat(value) || 0)
             }
-            errorMessage={props.errors?.errors.max_seats_limit}
+            errorMessage={errors?.errors.max_seats_limit}
           />
         </Element>
       )}
