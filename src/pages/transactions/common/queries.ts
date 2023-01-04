@@ -12,19 +12,37 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { TransactionResponse } from 'common/interfaces/transactions';
+import { Transaction } from 'common/interfaces/transactions';
 import { useQuery } from 'react-query';
 
-export function useTransactionQuery(params: { id: string | undefined }) {
-  return useQuery<TransactionResponse>(
+interface TransactionParams {
+  id: string | undefined;
+  enabled?: boolean;
+}
+
+export function useTransactionQuery(params: TransactionParams) {
+  return useQuery<Transaction>(
     route('/api/v1/bank_transactions/:id', { id: params.id }),
     () =>
       request(
         'GET',
         endpoint('/api/v1/bank_transactions/:id', { id: params.id })
       ).then(
-        (response: GenericSingleResourceResponse<TransactionResponse>) =>
-          response?.data?.data
-      )
+        (response: GenericSingleResourceResponse<Transaction>) =>
+          response.data.data
+      ),
+    { enabled: params.enabled ?? true, staleTime: Infinity }
+  );
+}
+
+export function useBlankTransactionQuery() {
+  return useQuery<Transaction>(
+    '/api/v1/bank_transactions/create',
+    () =>
+      request('GET', endpoint('/api/v1/bank_transactions/create')).then(
+        (response: GenericSingleResourceResponse<Transaction>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
   );
 }

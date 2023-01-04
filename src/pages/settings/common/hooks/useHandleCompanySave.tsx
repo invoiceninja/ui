@@ -9,22 +9,30 @@
  */
 
 import { AxiosError } from 'axios';
-import toast from 'react-hot-toast';
 import { endpoint } from 'common/helpers';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { updateRecord } from 'common/stores/slices/company-users';
-import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { request } from 'common/helpers/request';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useQueryClient } from 'react-query';
+import { toast } from 'common/helpers/toast/toast';
+import { useAtom } from 'jotai';
+import { companySettingsErrorsAtom } from '../atoms';
 
 export function useHandleCompanySave() {
-  const [t] = useTranslation();
-  const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
 
+  const queryClient = useQueryClient();
+
+  const companyChanges = useCompanyChanges();
+
+  const [, setErrors] = useAtom(companySettingsErrorsAtom);
+
   return () => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
+
+    setErrors(undefined);
 
     request(
       'PUT',
@@ -34,29 +42,17 @@ export function useHandleCompanySave() {
       .then((response) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
 
-        toast.success(t('updated_settings'), { id: toastId });
+        queryClient.invalidateQueries('/api/v1/statics');
+
+        toast.success('updated_settings');
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        toast.error(t('error_title'), { id: toastId });
-
-        console.error(error.response?.data);
-
         if (error.response?.status === 422) {
-          const message = (
-            <div>
-              {error.response.data.message}
-
-              {Object.keys(error.response?.data.errors).map((key, index) => (
-                <p className="text-sm" key={index}>
-                  {error.response?.data.errors[key]}
-                </p>
-              ))}
-            </div>
-          );
-
-          toast.error(message, { id: toastId });
+          setErrors(error.response.data);
+          toast.dismiss();
+        } else {
+          console.error(error);
+          toast.error();
         }
       });
   };

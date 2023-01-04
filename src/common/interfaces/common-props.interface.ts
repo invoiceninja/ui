@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ReactNode } from 'react';
+import { CSSProperties, ReactNode } from 'react';
 
 export default interface CommonProps {
   id?: any;
@@ -19,4 +19,5 @@ export default interface CommonProps {
   onClick?: any;
   innerRef?: any;
   disabled?: boolean;
+  style?: CSSProperties;
 }

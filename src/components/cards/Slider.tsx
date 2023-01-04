@@ -20,6 +20,8 @@ interface Props extends CommonProps {
   title?: string;
   actionChildren?: ReactNode;
   size: 'extraSmall' | 'small' | 'regular' | 'large' | 'extraLarge';
+  withContainer?: boolean;
+  withoutActionContainer?: boolean;
 }
 
 export function Slider(props: Props) {
@@ -63,13 +65,24 @@ export function Slider(props: Props) {
                     </div>
                   </div>
                   <div className="flex flex-1 flex-col justify-between items-center">
-                    <div className="flex flex-col flex-1 divide-y divide-gray-200 w-full">
+                    <div
+                      className={classNames(
+                        'flex flex-col flex-1 divide-y divide-gray-200 w-full',
+                        {
+                          'p-4': props.withContainer,
+                        }
+                      )}
+                    >
                       {props.children}
                     </div>
                   </div>
                 </div>
                 {props.actionChildren && (
-                  <div className="flex justify-center px-4 py-4">
+                  <div
+                    className={classNames('flex justify-center', {
+                      'p-4': !props.withoutActionContainer,
+                    })}
+                  >
                     {props.actionChildren}
                   </div>
                 )}

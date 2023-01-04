@@ -56,6 +56,7 @@ import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
 import { useCallback } from 'react';
+import { SelectOption } from 'components/datatables/Actions';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -698,4 +699,43 @@ export function useQuoteColumns() {
   return columns
     .filter((column) => list.includes(column.column))
     .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+}
+
+export function useQuoteFilters() {
+  const [t] = useTranslation();
+
+  const filters: SelectOption[] = [
+    {
+      label: t('all'),
+      value: 'all',
+      color: 'black',
+      backgroundColor: '#e4e4e4',
+    },
+    {
+      label: t('draft'),
+      value: 'draft',
+      color: 'white',
+      backgroundColor: '#6B7280',
+    },
+    {
+      label: t('sent'),
+      value: 'sent',
+      color: 'white',
+      backgroundColor: '#93C5FD',
+    },
+    {
+      label: t('approved'),
+      value: 'approved',
+      color: 'white',
+      backgroundColor: '#1D4ED8',
+    },
+    {
+      label: t('expired'),
+      value: 'expired',
+      color: 'white',
+      backgroundColor: '#e6b05c',
+    },
+  ];
+
+  return filters;
 }

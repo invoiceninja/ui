@@ -17,12 +17,13 @@ interface Props extends CommonProps {
 }
 
 export function NonClickableElement(props: Props) {
-  const { padding = 'regular', className } = props;
+  const { padding = 'regular', className, style } = props;
 
   return (
     <div
+      style={style}
       className={classNames(
-        `w-full text-leftblock hover:bg-gray-50 text-gray-700 hover:text-gray-900 text-sm ${className}`,
+        `w-full text-left block hover:bg-gray-50 text-gray-700 hover:text-gray-900 text-sm ${className}`,
         {
           'px-4 sm:px-6 py-4': padding == 'regular',
           'px-4 py-2': padding == 'small',

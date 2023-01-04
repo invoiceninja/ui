@@ -16,12 +16,13 @@ import { AxiosError } from 'axios';
 import { useQueryClient } from 'react-query';
 import { TransactionStatus } from 'common/enums/transactions';
 import { route } from 'common/helpers/route';
-import { TransactionResponse } from 'common/interfaces/transactions';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { ListBox } from './ListBox';
 import { Button } from '@invoiceninja/forms';
-import { MdContentCopy } from 'react-icons/md';
+import { MdContentCopy, MdLink } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
+import { TabGroup } from 'components/TabGroup';
+import { Transaction } from 'common/interfaces/transactions';
 
 export interface TransactionDetails {
   base_type: string;
@@ -49,6 +50,15 @@ export function TransactionMatchDetails(props: Props) {
   const [vendorIds, setVendorIds] = useState<string[]>([]);
 
   const [expenseCategoryIds, setExpenseCategoryIds] = useState<string[]>([]);
+
+  const [paymentIds, setPaymentIds] = useState<string[]>([]);
+
+  const [expenseIds, setExpenseIds] = useState<string[]>([]);
+
+  const tabs = [
+    props.isCreditTransactionType ? t('create_payment') : t('create_expense'),
+    props.isCreditTransactionType ? t('match_payment') : t('match_expense'),
+  ];
 
   const convertToPayment = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -87,6 +97,44 @@ export function TransactionMatchDetails(props: Props) {
     }
   };
 
+  const linkToPayment = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!paymentIds.length || isFormBusy) {
+      return;
+    } else {
+      setIsFormBusy(true);
+
+      toast.processing();
+
+      request('POST', endpoint('/api/v1/bank_transactions/match'), {
+        transactions: [
+          {
+            id: props.transactionDetails.transaction_id,
+            payment_id: paymentIds.join(','),
+          },
+        ],
+      })
+        .then(() => {
+          queryClient.invalidateQueries('/api/v1/bank_transactions');
+          queryClient.invalidateQueries('/api/v1/invoices');
+          queryClient.invalidateQueries('/api/v1/payments');
+          queryClient.invalidateQueries(
+            route('/api/v1/bank_transactions/:id', {
+              id: props.transactionDetails.transaction_id,
+            })
+          );
+
+          toast.success('linked_transaction');
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+          toast.error();
+        })
+        .finally(() => setIsFormBusy(false));
+    }
+  };
+
   const convertToExpense = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -106,23 +154,68 @@ export function TransactionMatchDetails(props: Props) {
           },
         ],
       })
-        .then(
-          (response: GenericSingleResourceResponse<TransactionResponse[]>) => {
-            queryClient.invalidateQueries('/api/v1/bank_transactions');
-            queryClient.invalidateQueries(
-              route('/api/v1/bank_transactions/:id', {
-                id: props.transactionDetails.transaction_id,
-              })
-            );
-            queryClient.invalidateQueries(
-              route('/api/v1/expenses/:id', {
-                id: response.data.data[0].expense_id,
-              })
-            );
+        .then((response: GenericSingleResourceResponse<Transaction[]>) => {
+          queryClient.invalidateQueries('/api/v1/bank_transactions');
 
-            toast.success('converted_transaction');
-          }
-        )
+          queryClient.invalidateQueries(
+            route('/api/v1/bank_transactions/:id', {
+              id: props.transactionDetails.transaction_id,
+            })
+          );
+
+          queryClient.invalidateQueries(
+            route('/api/v1/expenses/:id', {
+              id: response.data.data[0].expense_id,
+            })
+          );
+
+          toast.success('converted_transaction');
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+          toast.error();
+        })
+        .finally(() => setIsFormBusy(false));
+    }
+  };
+
+  const linkToExpense = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!expenseIds.length || isFormBusy) {
+      return;
+    } else {
+      setIsFormBusy(true);
+
+      toast.processing();
+
+      request('POST', endpoint('/api/v1/bank_transactions/match'), {
+        transactions: [
+          {
+            id: props.transactionDetails.transaction_id,
+            expense_id: expenseIds.join(','),
+          },
+        ],
+      })
+        .then((response: GenericSingleResourceResponse<Transaction[]>) => {
+          queryClient.invalidateQueries('/api/v1/bank_transactions');
+
+          queryClient.invalidateQueries('/api/v1/expenses');
+
+          queryClient.invalidateQueries(
+            route('/api/v1/bank_transactions/:id', {
+              id: props.transactionDetails.transaction_id,
+            })
+          );
+
+          queryClient.invalidateQueries(
+            route('/api/v1/expenses/:id', {
+              id: response.data.data[0].expense_id,
+            })
+          );
+
+          toast.success('linked_transaction');
+        })
         .catch((error: AxiosError) => {
           console.error(error);
           toast.error();
@@ -141,6 +234,8 @@ export function TransactionMatchDetails(props: Props) {
     vendorIds,
     invoiceIds,
     expenseCategoryIds,
+    paymentIds,
+    expenseIds,
   ]);
 
   useEffect(() => {
@@ -152,59 +247,119 @@ export function TransactionMatchDetails(props: Props) {
   return (
     <div className="flex flex-col flex-1">
       <div className="flex flex-col flex-1">
-        {props.isCreditTransactionType ? (
-          <ListBox
-            transactionDetails={props.transactionDetails}
-            dataKey="invoices"
-            setSelectedIds={setInvoiceIds}
-            selectedIds={invoiceIds}
-          />
-        ) : (
-          <>
-            <ListBox
-              transactionDetails={props.transactionDetails}
-              dataKey="vendors"
-              setSelectedIds={setVendorIds}
-              selectedIds={vendorIds}
-            />
-            <ListBox
-              className="mt-5"
-              transactionDetails={props.transactionDetails}
-              dataKey="categories"
-              setSelectedIds={setExpenseCategoryIds}
-              selectedIds={expenseCategoryIds}
-            />
-          </>
+        {!isTransactionConverted && (
+          <TabGroup
+            className="flex flex-col flex-1 border-t border-gray-200"
+            tabs={tabs}
+            height="full"
+            width="full"
+          >
+            <div>
+              {props.isCreditTransactionType ? (
+                <ListBox
+                  transactionDetails={props.transactionDetails}
+                  dataKey="invoices"
+                  setSelectedIds={setInvoiceIds}
+                  selectedIds={invoiceIds}
+                />
+              ) : (
+                <>
+                  <ListBox
+                    transactionDetails={props.transactionDetails}
+                    dataKey="vendors"
+                    setSelectedIds={setVendorIds}
+                    selectedIds={vendorIds}
+                  />
+                  <ListBox
+                    transactionDetails={props.transactionDetails}
+                    dataKey="categories"
+                    setSelectedIds={setExpenseCategoryIds}
+                    selectedIds={expenseCategoryIds}
+                  />
+                </>
+              )}
+
+              <div className="px-3 py-3 w-full border-t border-gray-200">
+                <Button
+                  className="w-full"
+                  onClick={
+                    props.isCreditTransactionType
+                      ? convertToPayment
+                      : convertToExpense
+                  }
+                  disableWithoutIcon={true}
+                  disabled={
+                    isFormBusy ||
+                    (props.isCreditTransactionType &&
+                      !invoiceIds.length &&
+                      !paymentIds.length) ||
+                    (!props.isCreditTransactionType &&
+                      !vendorIds.length &&
+                      !expenseCategoryIds.length &&
+                      !expenseIds.length)
+                  }
+                >
+                  <MdContentCopy fontSize={22} />
+
+                  <span>
+                    {props.isCreditTransactionType
+                      ? t('convert_to_payment')
+                      : t('convert_to_expense')}
+                  </span>
+                </Button>
+              </div>
+            </div>
+
+            <div>
+              {props.isCreditTransactionType ? (
+                <ListBox
+                  transactionDetails={props.transactionDetails}
+                  dataKey="payments"
+                  setSelectedIds={setPaymentIds}
+                  selectedIds={paymentIds}
+                />
+              ) : (
+                <ListBox
+                  transactionDetails={props.transactionDetails}
+                  dataKey="expenses"
+                  setSelectedIds={setExpenseIds}
+                  selectedIds={expenseIds}
+                />
+              )}
+
+              <div className="px-3 py-3 w-full border-t border-gray-200">
+                <Button
+                  className="w-full"
+                  onClick={
+                    props.isCreditTransactionType
+                      ? linkToPayment
+                      : linkToExpense
+                  }
+                  disableWithoutIcon={true}
+                  disabled={
+                    isFormBusy ||
+                    (props.isCreditTransactionType &&
+                      !invoiceIds.length &&
+                      !paymentIds.length) ||
+                    (!props.isCreditTransactionType &&
+                      !vendorIds.length &&
+                      !expenseCategoryIds.length &&
+                      !expenseIds.length)
+                  }
+                >
+                  <MdLink fontSize={22} />
+
+                  <span>
+                    {props.isCreditTransactionType
+                      ? t('link_to_payment')
+                      : t('link_to_expense')}
+                  </span>
+                </Button>
+              </div>
+            </div>
+          </TabGroup>
         )}
       </div>
-
-      {!isTransactionConverted && (
-        <div className="px-3 py-3 w-full border-t border-gray-200">
-          <Button
-            className="w-full"
-            onClick={
-              props.isCreditTransactionType
-                ? convertToPayment
-                : convertToExpense
-            }
-            disableWithoutIcon={true}
-            disabled={
-              isFormBusy ||
-              (props.isCreditTransactionType && !invoiceIds.length) ||
-              (!props.isCreditTransactionType &&
-                !vendorIds.length &&
-                !expenseCategoryIds.length)
-            }
-          >
-            {<MdContentCopy fontSize={22} />}
-            <span>
-              {props.isCreditTransactionType
-                ? t('convert_to_payment')
-                : t('convert_to_expense')}
-            </span>
-          </Button>
-        </div>
-      )}
     </div>
   );
 }

@@ -18,6 +18,8 @@ import { ListBoxItem } from './ListBoxItem';
 import { useInvoicesQuery } from 'pages/invoices/common/queries';
 import { useVendorsQuery } from 'common/queries/vendor';
 import { useExpenseCategoriesQuery } from 'common/queries/expense-categories';
+import { usePaymentsQuery } from 'common/queries/payments';
+import { useExpensesQuery } from 'common/queries/expenses';
 
 export interface ResourceItem {
   id: string;
@@ -28,6 +30,8 @@ export interface ResourceItem {
   statusId: string;
   amount: number;
   date: string;
+  should_be_invoiced: boolean;
+  payment_date: string;
 }
 
 export interface SearchInput {
@@ -40,7 +44,7 @@ export interface SearchInput {
 
 interface Props extends CommonProps {
   transactionDetails: TransactionDetails;
-  dataKey: 'invoices' | 'categories' | 'vendors';
+  dataKey: 'invoices' | 'categories' | 'vendors' | 'payments' | 'expenses';
   setSelectedIds: Dispatch<SetStateAction<string[]>>;
   selectedIds: string[];
 }
@@ -59,6 +63,10 @@ export function ListBox(props: Props) {
   const isVendorsDataKey = props.dataKey === 'vendors';
 
   const isExpenseCategoriesDataKey = props.dataKey === 'categories';
+
+  const isPaymentsDataKey = props.dataKey === 'payments';
+
+  const isExpensesDataKey = props.dataKey === 'expenses';
 
   const [clientId, setClientId] = useState<string>();
 
@@ -81,6 +89,18 @@ export function ListBox(props: Props) {
   const { data: expenseCategoriesResponse } = useExpenseCategoriesQuery({
     filter: searchParams.searchTerm,
     enabled: isExpenseCategoriesDataKey,
+  });
+
+  const { data: paymentsResponse } = usePaymentsQuery({
+    filter: searchParams.searchTerm,
+    enabled: isPaymentsDataKey,
+    matchTransactions: true,
+  });
+
+  const { data: expensesResponse } = useExpensesQuery({
+    filter: searchParams.searchTerm,
+    enabled: isExpensesDataKey,
+    matchTransactions: true,
   });
 
   const [resourceItems, setResourceItems] = useState<ResourceItem[]>();
@@ -124,6 +144,8 @@ export function ListBox(props: Props) {
       amount: resourceItem.amount,
       date: resourceItem.date,
       clientId: resourceItem.client_id,
+      should_be_invoiced: resourceItem.should_be_invoiced,
+      payment_date: resourceItem.payment_date,
     }));
   };
 
@@ -134,8 +156,12 @@ export function ListBox(props: Props) {
       setResourceItems(getFormattedResourceList(invoicesResponse));
     } else if (isVendorsDataKey) {
       setResourceItems(getFormattedResourceList(vendorsResponse));
-    } else {
+    } else if (isExpenseCategoriesDataKey) {
       setResourceItems(getFormattedResourceList(expenseCategoriesResponse));
+    } else if (isPaymentsDataKey) {
+      setResourceItems(getFormattedResourceList(paymentsResponse));
+    } else {
+      setResourceItems(getFormattedResourceList(expensesResponse));
     }
   }, [
     props.dataKey,
@@ -143,6 +169,8 @@ export function ListBox(props: Props) {
     vendorsResponse,
     expenseCategoriesResponse,
     clientsResponse,
+    paymentsResponse,
+    expensesResponse,
   ]);
 
   useEffect(() => {
@@ -158,7 +186,6 @@ export function ListBox(props: Props) {
       >
         <SearchArea
           dataKey={props.dataKey}
-          isInvoicesDataKey={isInvoicesDataKey}
           searchParams={searchParams}
           setIsFilterModalOpened={setIsFilterModalOpened}
           isFilterModalOpened={isFilterModalOpened}
@@ -182,6 +209,7 @@ export function ListBox(props: Props) {
                 isItemChecked={isItemChecked(resourceItem.id)}
                 resourceItem={resourceItem}
                 selectItem={selectItem}
+                dataKey={props.dataKey}
               />
             )
         )}

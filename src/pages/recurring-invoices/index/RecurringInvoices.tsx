@@ -18,6 +18,7 @@ import {
   recurringInvoiceColumns,
   useActions,
   useRecurringInvoiceColumns,
+  useRecurringInvoiceFilters,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 
@@ -31,6 +32,9 @@ export function RecurringInvoices() {
   ];
 
   const actions = useActions();
+
+  const filters = useRecurringInvoiceFilters();
+
   const columns = useRecurringInvoiceColumns();
 
   return (
@@ -47,6 +51,9 @@ export function RecurringInvoices() {
         linkToEdit="/recurring_invoices/:id/edit"
         bulkRoute="/api/v1/recurring_invoices/bulk"
         customActions={actions}
+        customFilters={filters}
+        customFilterQueryKey="client_status"
+        customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={
           <DataTableColumnsPicker
