@@ -74,7 +74,7 @@ export function SignInProviders() {
     request(
       'POST',
       endpoint('/api/v1/oauth_login?provider=google&id_token=:token', {
-        token: response.accessToken,
+        token: response.tokenObj.id_token,
       })
     ).then((response) => login(response));
   };
