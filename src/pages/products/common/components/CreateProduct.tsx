@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError, AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -24,6 +24,7 @@ import { Product } from 'common/interfaces/product';
 import { toast } from 'common/helpers/toast/toast';
 import { useHandleChange } from '../hooks';
 import { ProductForm } from './ProductForm';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
 interface Props {
   product?: Product;
@@ -51,7 +52,7 @@ export function CreateProduct(props: Props) {
       setIsFormBusy(true);
 
       request('POST', endpoint('/api/v1/products'), product)
-        .then((response: AxiosResponse) => {
+        .then((response: GenericSingleResourceResponse<Product>) => {
           toast.success('created_product');
 
           navigate(
@@ -62,7 +63,7 @@ export function CreateProduct(props: Props) {
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
-            setErrors(error.response.data.errors);
+            setErrors(error.response.data);
             toast.dismiss();
           } else {
             console.log(error);
