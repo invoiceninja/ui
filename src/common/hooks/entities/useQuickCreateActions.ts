@@ -24,7 +24,6 @@ interface EntityAction {
   section: 'income' | 'expense' | 'settings';
   externalLink?: boolean;
   visible: boolean;
-  helperText: string;
 }
 
 export function useQuickCreateActions() {
@@ -62,119 +61,102 @@ export function useQuickCreateActions() {
       url: '/clients/create',
       section: 'income',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'product',
       url: '/products/create',
       section: 'income',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'invoice',
       url: '/invoices/create',
       section: 'income',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'recurring_invoice',
       url: '/recurring_invoices/create',
       section: 'income',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'quote',
       url: '/quotes/create',
       section: 'income',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'credit',
       url: '/credits/create',
       section: 'income',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'payment',
       url: '/payments/create',
       section: 'income',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'subscription',
       url: '/settings/subscription/create',
       section: 'income',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'expense',
       url: '/expenses/create',
       section: 'expense',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'purchase_order',
       url: '/purchase_orders/create',
       section: 'expense',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'vendor',
       url: '/vendors/create',
       section: 'expense',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'transaction',
       url: '/transactions/create',
       section: 'expense',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
     {
       key: 'add_stripe',
       url: '/settings/gateways/create',
       section: 'settings',
-      visible: Boolean(gateways?.length),
-      helperText: 'Speak directly to your customers in a more meaningful way.',
+      visible: Boolean(!gateways?.length),
     },
     {
       key: 'connect_bank',
       url: '/settings/bank_accounts/create',
       section: 'settings',
-      visible: enterprisePlan() && Boolean(bankAccounts?.length),
-      helperText: 'Speak directly to your customers in a more meaningful way.',
+      visible: enterprisePlan() && Boolean(!bankAccounts?.length),
     },
     {
       key: 'tax_settings',
       url: '/settings/tax_rates/create',
       section: 'settings',
-      visible: Boolean(taxRates?.length),
-      helperText: 'Speak directly to your customers in a more meaningful way.',
+      visible: Boolean(!taxRates?.length),
     },
     {
       key: 'add_company_logo',
       url: '/settings/company_details/logo',
       section: 'settings',
-      visible: Boolean(!currentCompany?.settings?.company_logo),
-      helperText: 'Speak directly to your customers in a more meaningful way.',
+      visible: Boolean(!currentCompany?.settings.company_logo),
     },
     {
       key: 'templates_and_reminders',
       url: '/settings/templates_and_reminders',
       section: 'settings',
       visible: true,
-      helperText: 'Speak directly to your customers in a more meaningful way.',
     },
   ];
 
