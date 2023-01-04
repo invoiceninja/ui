@@ -333,7 +333,7 @@ export function useActions() {
       <DropdownElement
         onClick={() => cloneToRecurringInvoice(recurringInvoice)}
       >
-        {t('clone_to_recurring')}
+        {t('clone')}
       </DropdownElement>
     ),
     (recurringInvoice) => (

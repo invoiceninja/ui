@@ -147,7 +147,7 @@ export function useActions() {
     () => <Divider withoutPadding />,
     (invoice: Invoice) => (
       <DropdownElement onClick={() => cloneToInvoice(invoice)}>
-        {t('clone_to_invoice')}
+        {t('clone')}
       </DropdownElement>
     ),
     (invoice: Invoice) => (
