@@ -44,12 +44,9 @@ export function QuickCreatePopover() {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel
-              className="absolute z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2 sm:px-0 lg:max-w-5xl"
-              style={{ left: '8.125rem' }}
-            >
-              <div className="flex justify-center overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                <div className="relative grid gap-0 bg-white px-1 py-4 lg:pl-3 lg:px-3 grid-cols-3">
+            <Popover.Panel className="absolute left-5 md:-left-20 lg:left-full z-10 mt-3 w-screen max-w-md md:max-w-2xl -translate-x-1/2 transform px-2 lg:max-w-3xl">
+              <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
+                <div className="relative grid gap-y-4 md:gap-y-0 bg-white px-2 py-4 grid-cols-2 md:grid-cols-3">
                   {sections.map(
                     (section) =>
                       section.visible && (
@@ -59,11 +56,11 @@ export function QuickCreatePopover() {
                         >
                           <div className="flex items-center pl-3">
                             <section.icon
-                              className="text-base lg:text-2xl"
+                              className="text-base md:text-lg lg:text-2xl"
                               color={accentColor}
                             />
 
-                            <p className="text-base lg:text-xl font-medium text-gray-500 ml-1 md:ml-2">
+                            <p className="text-base md:text-lg lg:text-xl font-medium text-gray-500 ml-1 md:ml-2">
                               {t(section.name)}
                             </p>
                           </div>
@@ -75,7 +72,7 @@ export function QuickCreatePopover() {
                                 action.visible && (
                                   <div
                                     key={action.key}
-                                    className="flex items-center pl-2 lg:pl-4 py-1 cursor-pointer hover:bg-gray-100"
+                                    className="flex items-center pl-4 py-1 cursor-pointer hover:bg-gray-100"
                                     onClick={() => {
                                       !action.externalLink &&
                                         navigate(action.url);
@@ -85,19 +82,13 @@ export function QuickCreatePopover() {
                                     }}
                                   >
                                     <BiPlus
-                                      className="text-base lg:text-3xl"
+                                      className="text-base lg:text-xl"
                                       color={accentColor}
                                     />
 
-                                    <div className="flex flex-col">
-                                      <span className="ml-2 text-sm lg:text-base text-gray-800">
-                                        {t(action.key)}
-                                      </span>
-
-                                      <span className="ml-2 text-xs text-gray-800">
-                                        {t(action.helperText)}
-                                      </span>
-                                    </div>
+                                    <span className="ml-2 text-sm lg:text-base text-gray-800">
+                                      {t(action.key)}
+                                    </span>
                                   </div>
                                 )
                             )}
