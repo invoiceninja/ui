@@ -8,13 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTitle } from 'common/hooks/useTitle';
 import { DataTable } from 'components/DataTable';
 import { Settings } from 'components/layouts/Settings';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSubscriptionColumns } from '../common/hooks/useSubscriptionColumns';
 
 export function Subscriptions() {
+  const { documentTitle } = useTitle('subscriptions');
+
   const [t] = useTranslation();
 
   const columns = useSubscriptionColumns();
@@ -24,13 +26,9 @@ export function Subscriptions() {
     { name: t('subscriptions'), href: '/settings/subscriptions' },
   ];
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('subscriptions')}`;
-  });
-
   return (
     <Settings
-      title={t('subscriptions')}
+      title={documentTitle}
       docsLink="docs/advanced-settings/#subscriptions"
       breadcrumbs={pages}
     >
