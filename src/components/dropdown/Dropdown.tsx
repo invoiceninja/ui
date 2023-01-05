@@ -35,7 +35,8 @@ export function Dropdown(props: Props) {
         interactive={true}
         render={() => (
           <div
-            className={`box w-48 rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none ${props.className}`}
+            className={`box rounded-md shadow-lg py-1 bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none ${props.className}`}
+            style={{ minWidth: '12rem', maxWidth: '14.7rem' }}
           >
             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
             {/* @ts-ignore */}

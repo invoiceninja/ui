@@ -17,6 +17,7 @@ import { Quote } from 'common/interfaces/quote';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { Divider } from 'components/cards/Divider';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Icon } from 'components/icons/Icon';
 import { useAtom } from 'jotai';
 import { creditAtom } from 'pages/credits/common/atoms';
 import { invoiceAtom } from 'pages/invoices/common/atoms';
@@ -26,6 +27,20 @@ import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
 import { quoteAtom } from 'pages/quotes/common/atoms';
 import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
+import { BiPlusCircle } from 'react-icons/bi';
+import {
+  MdArchive,
+  MdCancel,
+  MdCloudCircle,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdDownload,
+  MdMarkEmailRead,
+  MdPaid,
+  MdPictureAsPdf,
+  MdRestore,
+  MdSend,
+} from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useHandleArchive } from '../hooks/useHandleArchive';
 import { useHandleCancel } from '../hooks/useHandleCancel';
@@ -94,31 +109,46 @@ export function useActions() {
 
   return [
     (invoice: Invoice) => (
-      <DropdownElement to={route('/invoices/:id/email', { id: invoice.id })}>
+      <DropdownElement
+        to={route('/invoices/:id/email', { id: invoice.id })}
+        icon={<Icon element={MdSend} />}
+      >
         {t('email_invoice')}
       </DropdownElement>
     ),
     (invoice: Invoice) => (
-      <DropdownElement to={route('/invoices/:id/pdf', { id: invoice.id })}>
+      <DropdownElement
+        to={route('/invoices/:id/pdf', { id: invoice.id })}
+        icon={<Icon element={MdPictureAsPdf} />}
+      >
         {t('view_pdf')}
       </DropdownElement>
     ),
     (invoice: Invoice) => (
-      <DropdownElement onClick={() => downloadPdf(invoice)}>
+      <DropdownElement
+        onClick={() => downloadPdf(invoice)}
+        icon={<Icon element={MdDownload} />}
+      >
         {t('download')}
       </DropdownElement>
     ),
     (invoice: Invoice) =>
       invoice.status_id === InvoiceStatus.Draft &&
       !invoice.is_deleted && (
-        <DropdownElement onClick={() => markSent(invoice)}>
+        <DropdownElement
+          onClick={() => markSent(invoice)}
+          icon={<Icon element={MdMarkEmailRead} />}
+        >
           {t('mark_sent')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
       parseInt(invoice.status_id) < parseInt(InvoiceStatus.Paid) &&
       !invoice.is_deleted && (
-        <DropdownElement onClick={() => markPaid(invoice)}>
+        <DropdownElement
+          onClick={() => markPaid(invoice)}
+          icon={<Icon element={MdPaid} />}
+        >
           {t('mark_paid')}
         </DropdownElement>
       ),
@@ -129,44 +159,66 @@ export function useActions() {
             invoiceId: invoice.id,
             clientId: invoice.client_id,
           })}
+          icon={<Icon element={BiPlusCircle} />}
         >
           {t('enter_payment')}
         </DropdownElement>
       ),
     (invoice: Invoice) => (
-      <DropdownElement onClick={() => invoice && openClientPortal(invoice)}>
+      <DropdownElement
+        onClick={() => invoice && openClientPortal(invoice)}
+        icon={<Icon element={MdCloudCircle} />}
+      >
         {t('client_portal')}
       </DropdownElement>
     ),
     (invoice: Invoice) =>
       invoice.status_id === InvoiceStatus.Sent && (
-        <DropdownElement onClick={() => cancel(invoice)}>
+        <DropdownElement
+          onClick={() => cancel(invoice)}
+          icon={<Icon element={MdCancel} />}
+        >
           {t('cancel_invoice')}
         </DropdownElement>
       ),
     () => <Divider withoutPadding />,
     (invoice: Invoice) => (
-      <DropdownElement onClick={() => cloneToInvoice(invoice)}>
+      <DropdownElement
+        onClick={() => cloneToInvoice(invoice)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_invoice')}
       </DropdownElement>
     ),
     (invoice: Invoice) => (
-      <DropdownElement onClick={() => cloneToQuote(invoice)}>
+      <DropdownElement
+        onClick={() => cloneToQuote(invoice)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_quote')}
       </DropdownElement>
     ),
     (invoice: Invoice) => (
-      <DropdownElement onClick={() => cloneToCredit(invoice)}>
+      <DropdownElement
+        onClick={() => cloneToCredit(invoice)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_credit')}
       </DropdownElement>
     ),
     (invoice: Invoice) => (
-      <DropdownElement onClick={() => cloneToRecurringInvoice(invoice)}>
+      <DropdownElement
+        onClick={() => cloneToRecurringInvoice(invoice)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_recurring')}
       </DropdownElement>
     ),
     (invoice: Invoice) => (
-      <DropdownElement onClick={() => cloneToPurchaseOrder(invoice)}>
+      <DropdownElement
+        onClick={() => cloneToPurchaseOrder(invoice)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
@@ -174,7 +226,10 @@ export function useActions() {
     (invoice: Invoice) =>
       location.pathname.endsWith('/edit') &&
       invoice.archived_at === 0 && (
-        <DropdownElement onClick={() => archive(invoice)}>
+        <DropdownElement
+          onClick={() => archive(invoice)}
+          icon={<Icon element={MdArchive} />}
+        >
           {t('archive')}
         </DropdownElement>
       ),
@@ -182,14 +237,20 @@ export function useActions() {
       location.pathname.endsWith('/edit') &&
       invoice.archived_at > 0 &&
       invoice.status_id !== InvoiceStatus.Cancelled && (
-        <DropdownElement onClick={() => restore(invoice)}>
+        <DropdownElement
+          onClick={() => restore(invoice)}
+          icon={<Icon element={MdRestore} />}
+        >
           {t('restore')}
         </DropdownElement>
       ),
     (invoice: Invoice) =>
       location.pathname.endsWith('/edit') &&
       !invoice.is_deleted && (
-        <DropdownElement onClick={() => destroy(invoice)}>
+        <DropdownElement
+          onClick={() => destroy(invoice)}
+          icon={<Icon element={MdDelete} />}
+        >
           {t('delete')}
         </DropdownElement>
       ),
