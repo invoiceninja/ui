@@ -30,9 +30,9 @@ export function QuoteStatus(props: Props) {
     return <Badge variant="green">{t('converted')}</Badge>;
 
   if (
+    props.entity.due_date &&
     props.entity.status_id === QuoteStatusEnum.Sent &&
-    new Date(props.entity.date) < new Date() &&
-    props.entity.due_date
+    new Date(props.entity.date) < new Date()
   )
     return <Badge variant="red">{t('expired')}</Badge>;
 
