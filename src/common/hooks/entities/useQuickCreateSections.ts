@@ -10,7 +10,7 @@
 
 import { isHosted } from 'common/helpers';
 import { IconType } from 'react-icons';
-import { MdOutlineBuild, MdOutlineShoppingBag, MdTag } from 'react-icons/md';
+import { MdAreaChart, MdOutlineBuild, MdOutlineShoppingBag } from 'react-icons/md';
 
 interface EntitySection {
   name: string;
@@ -22,7 +22,7 @@ export function useQuickCreateSections() {
   const sections: EntitySection[] = [
     {
       name: 'income',
-      icon: MdTag,
+      icon: MdAreaChart,
       visible: true,
     },
     {
