@@ -36,8 +36,6 @@ export function Edit() {
 
   const { data } = useExpenseQuery({ id });
 
-  const actions = useActions();
-
   const pages: Page[] = [
     { name: t('expenses'), href: '/expenses' },
     { name: t('edit_expense'), href: route('/expenses/:id', { id }) },
@@ -61,6 +59,8 @@ export function Edit() {
   );
 
   const [errors, setErrors] = useState<ValidationBag>();
+
+  const actions = useActions();
 
   const save = useSave({ setErrors });
 

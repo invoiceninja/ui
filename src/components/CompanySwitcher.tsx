@@ -27,6 +27,8 @@ import { CompanyEdit } from 'pages/settings/company/edit/CompanyEdit';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { isDemo, isHosted, isSelfHosted } from 'common/helpers';
 import { freePlan } from 'common/guards/guards/free-plan';
+import { Icon } from './icons/Icon';
+import { MdLogout, MdManageAccounts } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
 
 export function CompanySwitcher() {
@@ -162,21 +164,29 @@ export function CompanySwitcher() {
                   <DropdownElement
                     className="flex items-center"
                     onClick={() => setIsCompanyCreateModalOpened(true)}
+                    icon={<Icon element={BiPlusCircle} size={22} />}
                   >
-                    {<BiPlusCircle fontSize={22} />}
-                    <span className="ml-2">{t('add_company')}</span>
+                    <span>{t('add_company')}</span>
                   </DropdownElement>
                 </Menu.Item>
               )}
 
               <Menu.Item>
-                <DropdownElement to="/settings/account_management">
+                <DropdownElement
+                  to="/settings/account_management"
+                  icon={<Icon element={MdManageAccounts} size={22} />}
+                >
                   {t('account_management')}
                 </DropdownElement>
               </Menu.Item>
 
               <Menu.Item>
-                <DropdownElement to="/logout">{t('logout')}</DropdownElement>
+                <DropdownElement
+                  to="/logout"
+                  icon={<Icon element={MdLogout} size={22} />}
+                >
+                  {t('logout')}
+                </DropdownElement>
               </Menu.Item>
             </div>
           </Menu.Items>

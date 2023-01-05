@@ -22,11 +22,7 @@ import { authenticate } from 'common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import MicrosoftLogin from 'react-microsoft-login';
 import { ReactNode } from 'react';
-import {
-  GoogleLogin,
-  GoogleLoginResponse,
-  GoogleLoginResponseOffline,
-} from '@leecheuk/react-google-login';
+import { GoogleLogin, GoogleLoginResponse } from '@leecheuk/react-google-login';
 
 interface SignInProviderButtonProps {
   disabled?: boolean;
@@ -74,13 +70,11 @@ export function SignInProviders() {
     dispatch(changeCurrentIndex(currentIndex));
   };
 
-  const handleGoogle = (
-    response: GoogleLoginResponse | GoogleLoginResponseOffline
-  ) => {
+  const handleGoogle = (response: GoogleLoginResponse) => {
     request(
       'POST',
       endpoint('/api/v1/oauth_login?provider=google&id_token=:token', {
-        token: response.code,
+        token: response.tokenObj.id_token,
       })
     ).then((response) => login(response));
   };
@@ -141,7 +135,9 @@ export function SignInProviders() {
             </SignInProviderButton>
           )}
           buttonText="Login"
-          onSuccess={handleGoogle}
+          onSuccess={(response) =>
+            handleGoogle(response as GoogleLoginResponse)
+          }
           onFailure={handleGoogle}
           cookiePolicy={'single_host_origin'}
         />
