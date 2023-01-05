@@ -310,7 +310,7 @@ export function Default(props: Props) {
               <MenuIcon className="dark:text-gray-100" />
             </button>
             <div className="flex-1 px-4 md:px-8 flex items-center justify-between">
-              <div className="flex items-center">
+              <div className="flex items-center space-x-4">
                 <h2 className="text-sm md:text-xl dark:text-gray-100">
                   {props.title}
                 </h2>
