@@ -12,12 +12,14 @@ import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Icon } from 'components/icons/Icon';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
 import { useTranslation } from 'react-i18next';
+import { MdCreditCard, MdDownload } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
 import { useCreditQuery } from '../common/queries';
 
@@ -41,7 +43,10 @@ export function Pdf() {
       navigationTopRight={
         credit && (
           <Dropdown label={t('more_actions')}>
-            <DropdownElement onClick={() => downloadPdf(credit)}>
+            <DropdownElement
+              onClick={() => downloadPdf(credit)}
+              icon={<Icon element={MdDownload} />}
+            >
               {t('download')}
             </DropdownElement>
 
@@ -49,6 +54,7 @@ export function Pdf() {
               to={route('/credits/:id/email', {
                 id: credit.id,
               })}
+              icon={<Icon element={MdCreditCard} />}
             >
               {t('email_credit')}
             </DropdownElement>

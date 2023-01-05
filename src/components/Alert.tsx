@@ -15,6 +15,7 @@ import { X } from 'react-feather';
 
 interface Props extends CommonProps {
   type?: string | 'success' | 'warning' | 'danger';
+  disableClosing?: boolean;
 }
 
 export function Alert(props: Props) {
@@ -40,9 +41,11 @@ export function Alert(props: Props) {
         >
           <div className="flex items-center justify-between">
             <span>{props.children}</span>
-            <button type="button" className="px-4">
-              <X onClick={() => setVisible(false)} />
-            </button>
+            {!props.disableClosing && (
+              <button type="button" className="px-4">
+                <X onClick={() => setVisible(false)} />
+              </button>
+            )}
           </div>
         </div>
       </div>

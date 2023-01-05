@@ -10,15 +10,17 @@
 
 import { date, endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { toast } from 'common/helpers/toast/toast';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { Document } from 'common/interfaces/document.interface';
 import prettyBytes from 'pretty-bytes';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { MdDelete, MdDownload, MdPageview } from 'react-icons/md';
 import { Dropdown } from './dropdown/Dropdown';
 import { DropdownElement } from './dropdown/DropdownElement';
 import { FileIcon } from './FileIcon';
+import { Icon } from './icons/Icon';
 import { PasswordConfirmation } from './PasswordConfirmation';
 import { Table, Tbody, Td, Th, Thead, Tr } from './tables';
 
@@ -29,6 +31,7 @@ interface Props {
 
 export function DocumentsTable(props: Props) {
   const [t] = useTranslation();
+
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState(false);
 
@@ -37,7 +40,7 @@ export function DocumentsTable(props: Props) {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const destroy = (password: string) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request(
       'delete',
@@ -45,13 +48,14 @@ export function DocumentsTable(props: Props) {
       {},
       { headers: { 'X-Api-Password': password } }
     )
-      .then(() => toast.success(t('deleted_document'), { id: toastId }))
+      .then(() => {
+        toast.success('deleted_document');
+        props.onDocumentDelete?.();
+      })
       .catch((error) => {
         console.error(error);
-
-        toast.error(t('error_title'), { id: toastId });
-      })
-      .finally(() => props.onDocumentDelete?.());
+        toast.error();
+      });
   };
 
   return (
@@ -66,7 +70,7 @@ export function DocumentsTable(props: Props) {
         </Thead>
 
         <Tbody>
-          {props.documents.length === 0 && (
+          {!props.documents.length && (
             <Tr>
               <Td colSpan={5}>{t('no_records_found')}</Td>
             </Tr>
@@ -85,7 +89,7 @@ export function DocumentsTable(props: Props) {
               <Td>{prettyBytes(document.size)}</Td>
               <Td>
                 <Dropdown label={t('more_actions')}>
-                  <DropdownElement>
+                  <DropdownElement icon={<Icon element={MdPageview} />}>
                     <a
                       target="_blank"
                       className="block w-full"
@@ -98,7 +102,7 @@ export function DocumentsTable(props: Props) {
                     </a>
                   </DropdownElement>
 
-                  <DropdownElement>
+                  <DropdownElement icon={<Icon element={MdDownload} />}>
                     <a
                       target="_blank"
                       className="block w-full"
@@ -116,6 +120,7 @@ export function DocumentsTable(props: Props) {
                       setDocumentId(document.id);
                       setIsPasswordConfirmModalOpen(true);
                     }}
+                    icon={<Icon element={MdDelete} />}
                   >
                     {t('delete')}
                   </DropdownElement>

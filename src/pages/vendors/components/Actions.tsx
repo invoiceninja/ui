@@ -11,7 +11,9 @@
 import { Vendor } from 'common/interfaces/vendor';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Icon } from 'components/icons/Icon';
 import { useTranslation } from 'react-i18next';
+import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
 import { useBulk } from '../common/hooks/useBulk';
 
 interface Props {
@@ -27,19 +29,28 @@ export function Actions(props: Props) {
   return (
     <Dropdown label={t('more_actions')}>
       {vendor.archived_at === 0 && (
-        <DropdownElement onClick={() => bulk([vendor.id], 'archive')}>
+        <DropdownElement
+          onClick={() => bulk([vendor.id], 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
           {t('archive')}
         </DropdownElement>
       )}
 
       {vendor.archived_at > 0 && (
-        <DropdownElement onClick={() => bulk([vendor.id], 'restore')}>
+        <DropdownElement
+          onClick={() => bulk([vendor.id], 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
           {t('restore')}
         </DropdownElement>
       )}
 
       {!vendor.is_deleted && (
-        <DropdownElement onClick={() => bulk([vendor.id], 'delete')}>
+        <DropdownElement
+          onClick={() => bulk([vendor.id], 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
           {t('delete')}
         </DropdownElement>
       )}

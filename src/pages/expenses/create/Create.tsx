@@ -26,6 +26,9 @@ import { TaxSettings } from './components/Taxes';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
 import { route } from 'common/helpers/route';
+import { useAtom } from 'jotai';
+import { expenseAtom } from '../common/atoms';
+import { useHandleChange } from '../common/hooks';
 
 export function Create() {
   const [t] = useTranslation();
@@ -33,35 +36,35 @@ export function Create() {
   const navigate = useNavigate();
 
   const { documentTitle } = useTitle('new_expense');
-  const { data } = useBlankExpenseQuery();
 
   const pages = [
     { name: t('expenses'), href: '/expenses' },
     { name: t('new_expense'), href: '/expenses/create' },
   ];
 
-  const [expense, setExpense] = useState<Expense>();
+  const [expense, setExpense] = useAtom(expenseAtom);
+
+  const { data } = useBlankExpenseQuery({ enabled: !expense });
+
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
   );
 
   const [errors, setErrors] = useState<ValidationBag>();
 
+  const handleChange = useHandleChange({ setExpense, setErrors });
+
   useEffect(() => {
-    if (data) {
+    if (data && !expense) {
       setExpense(data);
     }
-  }, [data]);
 
-  const handleChange = <T extends keyof Expense>(
-    property: T,
-    value: Expense[typeof property]
-  ) => {
-    setExpense((expense) => expense && { ...expense, [property]: value });
-  };
+    return () => setExpense(undefined);
+  }, [data]);
 
   const onSave = (expense: Expense) => {
     toast.processing();
+
     setErrors(undefined);
 
     request('POST', endpoint('/api/v1/expenses'), expense)
@@ -70,12 +73,13 @@ export function Create() {
 
         navigate(route('/expenses/:id/edit', { id: response.data.data.id }));
       })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
-
+      .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {
-          setErrors(errors);
+          setErrors(error.response.data);
+          toast.dismiss();
+        } else {
+          console.error(error);
+          toast.error();
         }
       });
   };

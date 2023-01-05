@@ -8,12 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isHosted } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
-import { useEffect } from 'react';
+import { VerifyModal } from 'components/VerifyModal';
+import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
 import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 
@@ -21,6 +25,12 @@ export function App() {
   const { i18n } = useTranslation();
 
   const company = useCurrentCompany();
+
+  const user = useCurrentUser();
+
+  const location = useLocation();
+
+  const [isEmailVerified, setIsEmailVerified] = useState(false);
 
   const resolveLanguage = useResolveLanguage();
 
@@ -56,8 +66,23 @@ export function App() {
     }
   }, [darkMode, resolvedLanguage]);
 
+  useEffect(() => {
+    if (user) {
+      setIsEmailVerified(Boolean(user.email_verified_at));
+    }
+  }, [user]);
+
   return (
     <div className="App">
+      <VerifyModal
+        visible={
+          Boolean(user) &&
+          !location.pathname.startsWith('/login') &&
+          !isEmailVerified &&
+          isHosted()
+        }
+        type="email"
+      />
       <Toaster position="top-center" />
       {routes}
     </div>

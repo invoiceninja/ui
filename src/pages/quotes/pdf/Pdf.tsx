@@ -12,12 +12,14 @@ import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Icon } from 'components/icons/Icon';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
 import { useTranslation } from 'react-i18next';
+import { MdDownload, MdSend } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
 import { useQuoteQuery } from '../common/queries';
 
@@ -40,11 +42,17 @@ export function Pdf() {
       navigationTopRight={
         quote && (
           <Dropdown label={t('more_actions')}>
-            <DropdownElement onClick={() => downloadPdf(quote)}>
+            <DropdownElement
+              onClick={() => downloadPdf(quote)}
+              icon={<Icon element={MdDownload} />}
+            >
               {t('download')}
             </DropdownElement>
 
-            <DropdownElement to={route('/quotes/:id/email', { id: quote.id })}>
+            <DropdownElement
+              to={route('/quotes/:id/email', { id: quote.id })}
+              icon={<Icon element={MdSend} />}
+            >
               {t('email_quote')}
             </DropdownElement>
           </Dropdown>

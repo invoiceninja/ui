@@ -41,6 +41,8 @@ import {
 } from './tables';
 import { atomWithStorage } from 'jotai/utils';
 import { useAtom } from 'jotai';
+import { Icon } from './icons/Icon';
+import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -120,7 +122,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const { data, isLoading, isError } = useQuery(
     [
-      apiEndpoint.pathname,
+      props.endpoint,
       perPage,
       currentPage,
       filter,
@@ -208,15 +210,24 @@ export function DataTable<T extends object>(props: Props<T>) {
           beforeFilter={props.beforeFilter}
         >
           <Dropdown label={t('more_actions')}>
-            <DropdownElement onClick={() => bulk('archive')}>
+            <DropdownElement
+              onClick={() => bulk('archive')}
+              icon={<Icon element={MdArchive} />}
+            >
               {t('archive')}
             </DropdownElement>
 
-            <DropdownElement onClick={() => bulk('restore')}>
+            <DropdownElement
+              onClick={() => bulk('restore')}
+              icon={<Icon element={MdRestore} />}
+            >
               {t('restore')}
             </DropdownElement>
 
-            <DropdownElement onClick={() => bulk('delete')}>
+            <DropdownElement
+              onClick={() => bulk('delete')}
+              icon={<Icon element={MdDelete} />}
+            >
               {t('delete')}
             </DropdownElement>
           </Dropdown>
@@ -325,6 +336,21 @@ export function DataTable<T extends object>(props: Props<T>) {
                 {props.withResourcefulActions && (
                   <Td>
                     <Dropdown label={t('more_actions')}>
+                      {props.linkToEdit && (
+                        <DropdownElement
+                          to={route(props.linkToEdit, {
+                            id: resource?.id,
+                          })}
+                          icon={<Icon element={MdEdit} />}
+                        >
+                          {t('edit')}
+                        </DropdownElement>
+                      )}
+
+                      {props.linkToEdit && props.customActions && (
+                        <Divider withoutPadding />
+                      )}
+
                       {props.customActions &&
                         props.customActions?.map(
                           (action: any, index: number) => (
@@ -336,37 +362,30 @@ export function DataTable<T extends object>(props: Props<T>) {
 
                       {props.customActions && <Divider withoutPadding />}
 
-                      {props.linkToEdit && (
-                        <DropdownElement
-                          to={route(props.linkToEdit, {
-                            id: resource?.id,
-                          })}
-                        >
-                          {t(`edit_${props.resource}`)}
-                        </DropdownElement>
-                      )}
-
                       {resource?.archived_at === 0 && (
                         <DropdownElement
                           onClick={() => bulk('archive', resource.id)}
+                          icon={<Icon element={MdArchive} />}
                         >
-                          {t(`archive_${props.resource}`)}
+                          {t('archive')}
                         </DropdownElement>
                       )}
 
                       {resource?.archived_at > 0 && (
                         <DropdownElement
                           onClick={() => bulk('restore', resource.id)}
+                          icon={<Icon element={MdRestore} />}
                         >
-                          {t(`restore_${props.resource}`)}
+                          {t('restore')}
                         </DropdownElement>
                       )}
 
                       {!resource?.is_deleted && (
                         <DropdownElement
                           onClick={() => bulk('delete', resource.id)}
+                          icon={<Icon element={MdDelete} />}
                         >
-                          {t(`delete_${props.resource}`)}
+                          {t('delete')}
                         </DropdownElement>
                       )}
                     </Dropdown>

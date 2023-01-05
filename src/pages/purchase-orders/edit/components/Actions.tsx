@@ -17,11 +17,26 @@ import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useAtom } from 'jotai';
+import { Icon } from 'components/icons/Icon';
 import { BulkAction } from 'pages/expenses/edit/hooks/useBulk';
 import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
+import { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  MdArchive,
+  MdCloudCircle,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdDownload,
+  MdMarkEmailRead,
+  MdPageview,
+  MdPictureAsPdf,
+  MdRestore,
+  MdSend,
+  MdSwitchRight,
+} from 'react-icons/md';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
@@ -29,6 +44,7 @@ export type Action = (po: PurchaseOrder) => {
   label: string;
   onClick: () => unknown;
   hideIf?: boolean;
+  icon?: ReactElement;
 };
 
 export function useActions() {
@@ -75,15 +91,18 @@ export function useActions() {
         label: t('send_email'),
         onClick: () =>
           navigate(route('/purchase_orders/:id/email', { id: po.id })),
+        icon: <Icon element={MdSend} />,
       }),
       (po) => ({
         label: t('view_pdf'),
         onClick: () =>
           navigate(route('/purchase_orders/:id/pdf', { id: po.id })),
+        icon: <Icon element={MdPictureAsPdf} />,
       }),
       (po) => ({
         label: t('download'),
         onClick: () => downloadPdf(po),
+        icon: <Icon element={MdDownload} />,
       }),
       (po) => ({
         label: t('mark_sent'),
@@ -106,6 +125,7 @@ export function useActions() {
             .finally(() => invalidateCache(po.id));
         },
         hideIf: po.status_id === PurchaseOrderStatus.Sent,
+        icon: <Icon element={MdMarkEmailRead} />,
       }),
       (po) => ({
         label: t('convert_to_expense'),
@@ -119,20 +139,24 @@ export function useActions() {
             })
             .finally(() => invalidateCache(po.id)),
         hideIf: po.expense_id.length > 0,
+        icon: <Icon element={MdSwitchRight} />,
       }),
       (po) => ({
         label: `${t('view')} ${t('expense')}`,
         onClick: () =>
           navigate(route('/expenses/:id/edit', { id: po.expense_id })),
         hideIf: po.expense_id.length <= 0,
+        icon: <Icon element={MdPageview} />,
       }),
       (po) => ({
         label: t('clone'),
         onClick: () => cloneToPurchaseOrder(po),
+        icon: <Icon element={MdControlPointDuplicate} />,
       }),
       (po) => ({
         label: t('vendor_portal'),
         onClick: () => openClientPortal(po),
+        icon: <Icon element={MdCloudCircle} />,
       }),
       (po) => ({
         label: t('archive'),
@@ -145,6 +169,7 @@ export function useActions() {
             })
             .finally(() => invalidateCache(po.id)),
         hideIf: po.archived_at > 0,
+        icon: <Icon element={MdArchive} />,
       }),
       (po) => ({
         label: t('restore'),
@@ -157,6 +182,7 @@ export function useActions() {
             })
             .finally(() => invalidateCache(po.id)),
         hideIf: po.archived_at === 0,
+        icon: <Icon element={MdRestore} />,
       }),
       (po) => ({
         label: t('delete'),
@@ -169,6 +195,7 @@ export function useActions() {
             })
             .finally(() => invalidateCache(po.id)),
         hideIf: po.is_deleted,
+        icon: <Icon element={MdDelete} />,
       }),
     ];
 
@@ -193,6 +220,7 @@ export function Actions(props: Props) {
             <DropdownElement
               key={index}
               onClick={action(props.purchaseOrder).onClick}
+              icon={action(props.purchaseOrder).icon}
             >
               {action(props.purchaseOrder).label}
             </DropdownElement>

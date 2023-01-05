@@ -20,8 +20,15 @@ import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { useStart } from '../common/hooks/useStart';
 import { useStop } from '../common/hooks/useStop';
 import { useInvoiceTask } from '../common/hooks/useInvoiceTask';
-import { defaultColumns, taskColumns, useTaskColumns } from '../common/hooks';
+import {
+  defaultColumns,
+  taskColumns,
+  useTaskColumns,
+  useTaskFilters,
+} from '../common/hooks';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
+import { Icon } from 'components/icons/Icon';
+import { MdNotStarted, MdStopCircle, MdTextSnippet } from 'react-icons/md';
 import { Inline } from 'components/Inline';
 
 export function Tasks() {
@@ -33,26 +40,39 @@ export function Tasks() {
   const columns = useTaskColumns();
 
   const start = useStart();
+
   const stop = useStop();
+
   const invoiceTask = useInvoiceTask();
+
+  const filters = useTaskFilters();
 
   const actions = [
     (task: Task) =>
       !isTaskRunning(task) && (
-        <DropdownElement onClick={() => start(task)}>
+        <DropdownElement
+          onClick={() => start(task)}
+          icon={<Icon element={MdNotStarted} />}
+        >
           {t('start')}
         </DropdownElement>
       ),
     (task: Task) =>
       isTaskRunning(task) && (
-        <DropdownElement onClick={() => stop(task)}>
+        <DropdownElement
+          onClick={() => stop(task)}
+          icon={<Icon element={MdStopCircle} />}
+        >
           {t('stop')}
         </DropdownElement>
       ),
     (task: Task) =>
       !isTaskRunning(task) &&
       !task.invoice_id && (
-        <DropdownElement onClick={() => invoiceTask([task])}>
+        <DropdownElement
+          onClick={() => invoiceTask([task])}
+          icon={<Icon element={MdTextSnippet} />}
+        >
           {t('invoice_task')}
         </DropdownElement>
       ),
@@ -68,6 +88,9 @@ export function Tasks() {
         bulkRoute="/api/v1/tasks/bulk"
         linkToEdit="/tasks/:id/edit"
         linkToCreate="/tasks/create"
+        customFilters={filters}
+        customFilterQueryKey="client_status"
+        customFilterPlaceholder="status"
         withResourcefulActions
         leftSideChevrons={
           <DataTableColumnsPicker

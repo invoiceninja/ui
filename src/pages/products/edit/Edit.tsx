@@ -30,6 +30,13 @@ import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import Toggle from 'components/forms/Toggle';
+import { Icon } from 'components/icons/Icon';
+import {
+  MdArchive,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdRestore,
+} from 'react-icons/md';
 
 export function Edit() {
   const { id } = useParams();
@@ -313,8 +320,11 @@ export function Edit() {
       {product && (
         <div className="flex justify-end">
           <Dropdown label={t('more_actions')}>
-            <DropdownElement to={route('/products/:id/clone', { id })}>
-              {t('clone_product')}
+            <DropdownElement
+              to={route('/products/:id/clone', { id })}
+              icon={<Icon element={MdControlPointDuplicate} />}
+            >
+              {t('clone')}
             </DropdownElement>
 
             {getEntityState(product.data.data) === EntityState.Active && (
@@ -322,8 +332,9 @@ export function Edit() {
                 onClick={() =>
                   handleResourcefulAction('archive', product.data.data.id)
                 }
+                icon={<Icon element={MdArchive} />}
               >
-                {t('archive_product')}
+                {t('archive')}
               </DropdownElement>
             )}
 
@@ -333,8 +344,9 @@ export function Edit() {
                 onClick={() =>
                   handleResourcefulAction('restore', product.data.data.id)
                 }
+                icon={<Icon element={MdRestore} />}
               >
-                {t('restore_product')}
+                {t('restore')}
               </DropdownElement>
             )}
 
@@ -344,8 +356,9 @@ export function Edit() {
                 onClick={() =>
                   handleResourcefulAction('delete', product.data.data.id)
                 }
+                icon={<Icon element={MdDelete} />}
               >
-                {t('delete_product')}
+                {t('delete')}
               </DropdownElement>
             )}
           </Dropdown>
