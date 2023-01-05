@@ -8,11 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
-import { proPlan } from 'common/guards/guards/pro-plan';
-import { isHosted } from 'common/helpers';
+import { useShouldDisableCustomFields } from 'common/hooks/useShouldDisableCustomFields';
+import { useTitle } from 'common/hooks/useTitle';
 import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
@@ -21,9 +19,11 @@ import { Settings } from '../../../../components/layouts/Settings';
 import { Field } from '../components';
 
 export function Invoices() {
+  const { documentTitle } = useTitle('custom_fields');
+
   const [t] = useTranslation();
 
-  const disabledCustomFields = !proPlan() && !enterprisePlan() && isHosted();
+  const disabledCustomFields = useShouldDisableCustomFields();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -31,13 +31,9 @@ export function Invoices() {
     { name: t('invoices'), href: '/settings/custom_fields/invoices' },
   ];
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('custom_fields')}`;
-  });
-
   return (
     <Settings
-      title={t('custom_fields')}
+      title={documentTitle}
       breadcrumbs={pages}
       docsLink="docs/advanced-settings/#custom_fields"
     >

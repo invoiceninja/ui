@@ -245,18 +245,6 @@ export function AdditionalInfo(props: Props) {
         <div>
           <CustomFieldsPlanAlert className="px-6" />
 
-          <Element
-            leftSide={
-              <div className="inline-flex items-center space-x-2">
-                <span>{t('note')}</span>
-                <span className="text-red-600">*</span>
-              </div>
-            }
-          >
-            Custom fields apply to all clients, they are not specific to this
-            one. <i>Needs translation.</i>
-          </Element>
-
           {company &&
             ['client1', 'client2', 'client3', 'client4'].map((field) => (
               <Field
@@ -271,18 +259,6 @@ export function AdditionalInfo(props: Props) {
 
         <div>
           <CustomFieldsPlanAlert className="px-6" />
-
-          <Element
-            leftSide={
-              <div className="inline-flex items-center space-x-2">
-                <span>{t('note')}</span>
-                <span className="text-red-600">*</span>
-              </div>
-            }
-          >
-            Custom fields apply to all contacts, they are not specific to this
-            one. <i>Needs translation.</i>
-          </Element>
 
           {company &&
             ['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (

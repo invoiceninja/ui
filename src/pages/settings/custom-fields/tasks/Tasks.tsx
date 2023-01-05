@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useTitle } from 'common/hooks/useTitle';
 import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
-import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../../../components/cards';
 import { Settings } from '../../../../components/layouts/Settings';
 import { Field } from '../components';
 
 export function Tasks() {
-  const [t] = useTranslation();
+  const { documentTitle } = useTitle('custom_fields');
 
-  const title = `${t('custom_fields')}: ${t('tasks')}`;
+  const [t] = useTranslation();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -26,19 +26,15 @@ export function Tasks() {
     { name: t('tasks'), href: '/settings/custom_fields/tasks' },
   ];
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t('custom_fields')}`;
-  });
-
   return (
     <Settings
-      title={t('custom_fields')}
+      title={documentTitle}
       breadcrumbs={pages}
       docsLink="docs/advanced-settings/#custom_fields"
     >
       <CustomFieldsPlanAlert />
 
-      <Card title={title}>
+      <Card title={`${t('custom_fields')}: ${t('tasks')}`}>
         {['tasks1', 'tasks2', 'tasks3', 'tasks4'].map((field) => (
           <Field key={field} field={field} placeholder={t('tasks_field')} />
         ))}

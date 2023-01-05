@@ -13,22 +13,20 @@ import { useTranslation } from 'react-i18next';
 import { Alert } from './Alert';
 import { Link } from './forms';
 import CommonProps from '../common/interfaces/common-props.interface';
-import { proPlan } from 'common/guards/guards/pro-plan';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
-import { isHosted } from 'common/helpers';
 import { MdInfoOutline } from 'react-icons/md';
+import { useShouldDisableCustomFields } from 'common/hooks/useShouldDisableCustomFields';
 
 export function CustomFieldsPlanAlert(props: CommonProps) {
   const [t] = useTranslation();
 
   const user = useCurrentUser();
 
-  const showAlert = !proPlan() && !enterprisePlan() && isHosted();
+  const showAlert = useShouldDisableCustomFields();
 
   return (
     <>
       {showAlert && (
-        <div className={`${props.className}`}>
+        <div className={props.className}>
           <Alert className="mb-4" type="warning" disableClosing>
             <div className="flex items-center">
               <MdInfoOutline className="mr-2" fontSize={20} />

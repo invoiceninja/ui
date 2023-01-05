@@ -8,14 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
-import { proPlan } from 'common/guards/guards/pro-plan';
-import { endpoint, isHosted } from 'common/helpers';
+import { Card } from '@invoiceninja/cards';
+import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useShouldDisableCustomFields } from 'common/hooks/useShouldDisableCustomFields';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
 import { Field } from 'pages/settings/custom-fields/components';
@@ -32,7 +31,7 @@ export function ProductFields() {
 
   const handleCustomFieldChange = useHandleCustomFieldChange();
 
-  const disabledCustomFields = !proPlan() && !enterprisePlan() && isHosted();
+  const disabledCustomFields = useShouldDisableCustomFields();
 
   const onSave = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -68,19 +67,6 @@ export function ProductFields() {
         disableSubmitButton={disabledCustomFields}
         disableWithoutIcon={disabledCustomFields}
       >
-        <Element
-          leftSide={
-            <div className="inline-flex items-center space-x-2">
-              <span>{t('note')}</span>
-              <span className="text-red-600">*</span>
-            </div>
-          }
-        >
-          Custom fields apply to all products, they are not specific to this
-          one.
-          <i>Needs translation.</i>
-        </Element>
-
         {company &&
           ['product1', 'product2', 'product3', 'product4'].map((field) => (
             <Field

@@ -34,7 +34,7 @@ export function CustomFields() {
               initialValue={company.custom_fields[field]}
               field={field}
               placeholder={t('user_field')}
-              onChange={(value: any) => handleCustomFieldChange(field, value)}
+              onChange={(value) => handleCustomFieldChange(field, value)}
             />
           ))}
       </Card>

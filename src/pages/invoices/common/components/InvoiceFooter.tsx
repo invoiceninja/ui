@@ -25,7 +25,7 @@ import { Invoice } from 'common/interfaces/invoice';
 import { ChangeHandler } from 'pages/invoices/create/Create';
 import { useLocation, useParams } from 'react-router-dom';
 import { Upload } from 'pages/settings/company/documents/components';
-import { endpoint, isHosted } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { useQueryClient } from 'react-query';
 import { DocumentsTable } from 'components/DocumentsTable';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
@@ -34,8 +34,7 @@ import { UserSelector } from 'components/users/UserSelector';
 import { VendorSelector } from 'components/vendors/VendorSelector';
 import { route } from 'common/helpers/route';
 import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
-import { proPlan } from 'common/guards/guards/pro-plan';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
+import { useShouldDisableCustomFields } from 'common/hooks/useShouldDisableCustomFields';
 
 interface Props {
   invoice?: Invoice;
@@ -57,7 +56,7 @@ export function InvoiceFooter(props: Props) {
   const handleCustomSurchargeFieldChange =
     useHandleCustomSurchargeFieldChange();
 
-  const disabledCustomFields = !proPlan() && !enterprisePlan() && isHosted();
+  const disabledCustomFields = useShouldDisableCustomFields();
 
   const surchargeValue = (index: number) => {
     switch (index) {
