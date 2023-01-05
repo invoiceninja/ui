@@ -27,11 +27,13 @@ import { customField } from 'components/CustomField';
 import { SelectOption } from 'components/datatables/Actions';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
+import { Icon } from 'components/icons/Icon';
 import { Action } from 'components/ResourceActions';
 import { StatusBadge } from 'components/StatusBadge';
 import { useAtom } from 'jotai';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
+import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { purchaseOrderAtom } from './atoms';
 
@@ -352,7 +354,10 @@ export function useActions() {
 
   const actions: Action<PurchaseOrder>[] = [
     (purchaseOrder) => (
-      <DropdownElement onClick={() => cloneToPurchaseOrder(purchaseOrder)}>
+      <DropdownElement
+        onClick={() => cloneToPurchaseOrder(purchaseOrder)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone')}
       </DropdownElement>
     ),
