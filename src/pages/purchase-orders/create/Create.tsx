@@ -48,8 +48,6 @@ export function Create() {
     },
   ];
 
-  let mounted = false;
-
   const [purchaseOrder, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const { data } = useBlankPurchaseOrderQuery({
@@ -73,17 +71,9 @@ export function Create() {
 
       setPurchaseOrder(po);
     }
-  }, [data]);
 
-  useEffect(() => {
-    if (mounted) {
-      return () => {
-        setPurchaseOrder(undefined);
-      };
-    } else {
-      mounted = true;
-    }
-  }, []);
+    return () => setPurchaseOrder(undefined);
+  }, [data]);
 
   const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();
   const [errors, setErrors] = useState<ValidationBag>();
