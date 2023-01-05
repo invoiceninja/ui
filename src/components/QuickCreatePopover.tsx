@@ -1,6 +1,5 @@
 import { Fragment } from 'react';
 import { Popover, Transition } from '@headlessui/react';
-import { MdArrowDropDown } from 'react-icons/md';
 import { BiPlus } from 'react-icons/bi';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
@@ -9,31 +8,29 @@ import { useQuickCreateSections } from 'common/hooks/entities/useQuickCreateSect
 import { useQuickCreateActions } from 'common/hooks/entities/useQuickCreateActions';
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import { isHosted, isSelfHosted } from 'common/helpers';
+import { MdArrowDropDown } from 'react-icons/md';
 
 export function QuickCreatePopover() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-
   const accentColor = useAccentColor();
-
   const actions = useQuickCreateActions();
-
   const sections = useQuickCreateSections();
 
   return (
-    <Popover className="relative ml-6 mt-2">
+    <Popover className="relative mt-2">
       {({ open }) => (
         <>
           <Popover.Button
             className={classNames(
               open ? 'text-gray-500' : 'text-gray-900',
-              'group inline-flex items-center rounded-md bg-white text-base font-medium hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-200 focus:ring-offset-2'
+              'group inline-flex items-center rounded bg-white text-base font-medium hover:text-gray-900 focus:outline-none focus:ring-1 focus:ring-gray-200 focus:ring-offset-2'
             )}
           >
-            <BiPlus className="cursor-pointer text-xl md:text-2xl" />
+            <BiPlus className="cursor-pointer text-xl" />
 
-            <MdArrowDropDown className="cursor-pointer text-xl md:text-2xl" />
+            <MdArrowDropDown className="cursor-pointer text-xl" />
           </Popover.Button>
 
           <Transition
@@ -72,23 +69,23 @@ export function QuickCreatePopover() {
                         >
                           <div className="flex items-center pl-3">
                             <section.icon
-                              className="text-base md:text-lg lg:text-2xl"
+                              className="text-base"
                               color={accentColor}
                             />
 
-                            <p className="text-base md:text-lg lg:text-xl font-medium text-gray-500 ml-1 md:ml-2">
+                            <p className="uppercase text-sm tracking-wide font-medium text-gray-800 ml-1 md:ml-2">
                               {t(section.name)}
                             </p>
                           </div>
 
-                          <div className="flex flex-col w-full mt-2">
+                          <div className="flex flex-col w-full mt-2 space-y-2">
                             {actions.map(
                               (action) =>
                                 action.section === section.name &&
                                 action.visible && (
                                   <div
                                     key={action.key}
-                                    className="flex items-center pl-4 py-1 cursor-pointer hover:bg-gray-100"
+                                    className="flex items-center pl-3 space-x-1 py-1 cursor-pointer hover:bg-gray-100 rounded"
                                     onClick={() => {
                                       !action.externalLink &&
                                         navigate(action.url);
@@ -97,12 +94,9 @@ export function QuickCreatePopover() {
                                         window.open(action.url, '_blank');
                                     }}
                                   >
-                                    <BiPlus
-                                      className="text-base lg:text-xl"
-                                      color={accentColor}
-                                    />
+                                    <BiPlus className="text-base text-gray-600" />
 
-                                    <span className="ml-2 text-sm lg:text-base text-gray-800">
+                                    <span className="text-sm text-gray-800">
                                       {t(action.key)}
                                     </span>
                                   </div>
