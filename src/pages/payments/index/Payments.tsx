@@ -23,6 +23,8 @@ import {
   usePaymentColumns,
 } from '../common/hooks/usePaymentColumns';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
+import { Icon } from 'components/icons/Icon';
+import { MdPayment, MdSend, MdSettingsBackupRestore } from 'react-icons/md';
 
 export function Payments() {
   useTitle('payments');
@@ -39,7 +41,10 @@ export function Payments() {
     (resource: Payment) =>
       resource.amount - resource.applied > 0 &&
       !resource.is_deleted && (
-        <DropdownElement to={route('/payments/:id/apply', { id: resource.id })}>
+        <DropdownElement
+          to={route('/payments/:id/apply', { id: resource.id })}
+          icon={<Icon element={MdPayment} />}
+        >
           {t('apply_payment')}
         </DropdownElement>
       ),
@@ -48,12 +53,16 @@ export function Payments() {
       !resource.is_deleted && (
         <DropdownElement
           to={route('/payments/:id/refund', { id: resource.id })}
+          icon={<Icon element={MdSettingsBackupRestore} />}
         >
           {t('refund_payment')}
         </DropdownElement>
       ),
     (resource: Payment) => (
-      <DropdownElement onClick={() => emailPayment(resource)}>
+      <DropdownElement
+        onClick={() => emailPayment(resource)}
+        icon={<Icon element={MdSend} />}
+      >
         {t('email_payment')}
       </DropdownElement>
     ),

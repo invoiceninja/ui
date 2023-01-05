@@ -25,11 +25,17 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
 import { SelectOption } from 'components/datatables/Actions';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
+import { Icon } from 'components/icons/Icon';
+import { Action } from 'components/ResourceActions';
 import { StatusBadge } from 'components/StatusBadge';
+import { useAtom } from 'jotai';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
+import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
+import { purchaseOrderAtom } from './atoms';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -157,7 +163,9 @@ export function usePurchaseOrderColumns() {
         label: t('expense'),
         format: (field, purchaseOrder) =>
           purchaseOrder.expense && (
-            <Link to={route('/expenses/:id', { id: purchaseOrder.expense.id })}>
+            <Link
+              to={route('/expenses/:id/edit', { id: purchaseOrder.expense.id })}
+            >
               {purchaseOrder.expense.number}
             </Link>
           ),
@@ -329,4 +337,31 @@ export function usePurchaseOrderFilters() {
   ];
 
   return filters;
+}
+
+export function useActions() {
+  const [t] = useTranslation();
+
+  const navigate = useNavigate();
+
+  const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
+
+  const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
+    setPurchaseOrder({ ...purchaseOrder, number: '', documents: [] });
+
+    navigate('/purchase_orders/create');
+  };
+
+  const actions: Action<PurchaseOrder>[] = [
+    (purchaseOrder) => (
+      <DropdownElement
+        onClick={() => cloneToPurchaseOrder(purchaseOrder)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
+        {t('clone')}
+      </DropdownElement>
+    ),
+  ];
+
+  return actions;
 }

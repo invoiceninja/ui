@@ -29,6 +29,8 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
+import { Icon } from 'components/icons/Icon';
+import { MdArchive, MdEdit } from 'react-icons/md';
 
 export function ApiWebhooks() {
   const [t] = useTranslation();
@@ -101,17 +103,21 @@ export function ApiWebhooks() {
                   <Td>{webhook.rest_method.toUpperCase()}</Td>
                   <Td>
                     <Dropdown label={t('actions')}>
-                      <DropdownElement onClick={() => archive(webhook.id)}>
-                        {t('archive')}
-                      </DropdownElement>
-
                       <DropdownElement
                         to={route(
                           '/settings/integrations/api_webhooks/:id/edit',
                           { id: webhook.id }
                         )}
+                        icon={<Icon element={MdEdit} />}
                       >
-                        {t('edit_webhook')}
+                        {t('edit')}
+                      </DropdownElement>
+
+                      <DropdownElement
+                        onClick={() => archive(webhook.id)}
+                        icon={<Icon element={MdArchive} />}
+                      >
+                        {t('archive')}
                       </DropdownElement>
                     </Dropdown>
                   </Td>
