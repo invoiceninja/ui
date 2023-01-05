@@ -43,6 +43,6 @@ export function QuoteStatus(props: Props) {
     case QuoteStatusEnum.Approved:
       return <Badge variant="dark-blue">{t('approved')}</Badge>;
     default:
-      return <Badge variant="light-blue">{t('error')}</Badge>;
+      return <Badge variant="light-blue">{t('due_date')}</Badge>;
   }
 }
