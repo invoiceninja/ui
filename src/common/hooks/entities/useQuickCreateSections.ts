@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isSelfHosted } from 'common/helpers';
+import { isHosted } from 'common/helpers';
 import { IconType } from 'react-icons';
 import { MdOutlineBuild, MdOutlineShoppingBag, MdTag } from 'react-icons/md';
 
@@ -33,7 +33,7 @@ export function useQuickCreateSections() {
     {
       name: 'settings',
       icon: MdOutlineBuild,
-      visible: isSelfHosted(),
+      visible: isHosted(),
     },
   ];
 

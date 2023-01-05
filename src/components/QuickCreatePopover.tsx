@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQuickCreateSections } from 'common/hooks/entities/useQuickCreateSections';
 import { useQuickCreateActions } from 'common/hooks/entities/useQuickCreateActions';
 import { useAccentColor } from 'common/hooks/useAccentColor';
+import { isHosted, isSelfHosted } from 'common/helpers';
 
 export function QuickCreatePopover() {
   const [t] = useTranslation();
@@ -44,9 +45,24 @@ export function QuickCreatePopover() {
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
-            <Popover.Panel className="absolute left-5 md:-left-20 lg:left-full z-10 mt-3 w-screen max-w-md md:max-w-2xl -translate-x-1/2 transform px-2 lg:max-w-3xl">
+            <Popover.Panel
+              className={classNames(
+                'absolute left-5 lg:left-full z-10 mt-3 w-screen max-w-md -translate-x-1/2 transform px-2',
+                {
+                  'md:-left-20 md:max-w-2xl lg:max-w-3xl': isHosted(),
+                  'md:left-8 lg:max-w-lg': isSelfHosted(),
+                }
+              )}
+            >
               <div className="overflow-hidden rounded-lg shadow-lg ring-1 ring-black ring-opacity-5">
-                <div className="relative grid gap-y-4 md:gap-y-0 bg-white px-2 py-4 grid-cols-2 md:grid-cols-3">
+                <div
+                  className={classNames(
+                    'relative grid gap-y-4 md:gap-y-0 bg-white px-2 py-4 grid-cols-2',
+                    {
+                      'md:grid-cols-3': isHosted(),
+                    }
+                  )}
+                >
                   {sections.map(
                     (section) =>
                       section.visible && (
