@@ -10,15 +10,14 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, Link, SelectField } from '@invoiceninja/forms';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { freePlan } from 'common/guards/guards/free-plan';
-import { proPlan } from 'common/guards/guards/pro-plan';
 import { endpoint, isHosted, isSelfHosted } from 'common/helpers';
 import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
 import { request } from 'common/helpers/request';
 import { EmailTemplate } from 'common/hooks/emails/useResolveTemplate';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Settings as CompanySettings } from 'common/interfaces/company.interface';
 import { TemplateBody, Templates } from 'common/interfaces/statics';
@@ -57,6 +56,8 @@ export function TemplatesAndReminders() {
   const [templateBody, setTemplateBody] = useState<TemplateBody>();
   const [preview, setPreview] = useState<EmailTemplate>();
   const canChangeEmailTemplate = (isHosted() && !freePlan()) || isSelfHosted();
+
+  const showPlanAlert = useShouldDisableAdvanceSettings();
 
   useEffect(() => {
     if (statics?.templates && company) {
@@ -169,11 +170,9 @@ export function TemplatesAndReminders() {
       breadcrumbs={pages}
       onSaveClick={handleSave}
       onCancelClick={handleCancel}
-      disableSaveButton={!proPlan() && !enterprisePlan() && isHosted()}
+      disableSaveButton={showPlanAlert}
     >
-      {!proPlan() && !enterprisePlan() && isHosted() && (
-        <AdvancedSettingsPlanAlert />
-      )}
+      {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       <Card title={t('edit')}>
         <Element leftSide={t('template')}>

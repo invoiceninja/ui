@@ -26,7 +26,7 @@ export function AdvancedSettingsPlanAlert(props: Props) {
 
   return (
     <>
-      <div className={`${props.className}`}>
+      <div className={props.className}>
         <Alert className="mb-4" type="warning" disableClosing>
           <div className="flex items-center">
             <MdInfoOutline className="mr-2" fontSize={20} />

@@ -90,12 +90,9 @@ export function Create() {
         );
       })
       .catch((error) => {
-        if (error.response?.status === 412) {
-          toast.error('password_error_incorrect');
-        } else {
-          toast.error();
-          console.error(error);
-        }
+        error.response?.status === 412
+          ? toast.error('password_error_incorrect')
+          : toast.error();
       });
   };
 
