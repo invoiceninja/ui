@@ -27,7 +27,7 @@ import {
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@invoiceninja/forms';
 import { Breadcrumbs, Page } from 'components/Breadcrumbs';
 import { useSelector } from 'react-redux';
@@ -66,6 +66,7 @@ export function Default(props: Props) {
 
   const hasPermission = useHasPermission();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navigation: NavigationItem[] = [
     {
@@ -325,9 +326,13 @@ export function Default(props: Props) {
                   </Button>
                 )}
 
-                {props.onBackClick && (
+                {(props.onBackClick && (
                   <Button to={props.onBackClick} type="secondary">
                     {props.backButtonLabel ?? t('back')}
+                  </Button>
+                )) || (
+                  <Button onClick={() => navigate(-1)} type="secondary">
+                    {t('back')}
                   </Button>
                 )}
 
