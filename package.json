@@ -14,7 +14,7 @@
     "@tippyjs/react": "^4.2.6",
     "@uiw/react-md-editor": "^3.19.8",
     "array-move": "^4.0.0",
-    "axios": "^0.27.2",
+    "axios": "^1.0.0",
     "classnames": "^2.3.2",
     "collect.js": "^4.34.3",
     "currency.js": "^2.0.4",
