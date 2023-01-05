@@ -14,8 +14,10 @@ import { Invoice } from 'common/interfaces/invoice';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import Toggle from 'components/forms/Toggle';
+import { Icon } from 'components/icons/Icon';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
+import { MdDownload, MdSend } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
 
 interface Props {
@@ -49,11 +51,17 @@ export function Actions(props: Props) {
       </span>
 
       <Dropdown label={t('more_actions')}>
-        <DropdownElement to={route('/invoices/:id/email', { id })}>
+        <DropdownElement
+          to={route('/invoices/:id/email', { id })}
+          icon={<Icon element={MdSend} />}
+        >
           {t('email_invoice')}
         </DropdownElement>
 
-        <DropdownElement onClick={() => downloadPdf(props.invoice)}>
+        <DropdownElement
+          onClick={() => downloadPdf(props.invoice)}
+          icon={<Icon element={MdDownload} />}
+        >
           {t('download')}
         </DropdownElement>
       </Dropdown>

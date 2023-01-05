@@ -32,6 +32,8 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
+import { Icon } from 'components/icons/Icon';
+import { MdArchive, MdEdit } from 'react-icons/md';
 
 export function PaymentTerms() {
   const [t] = useTranslation();
@@ -115,11 +117,16 @@ export function PaymentTerms() {
                       to={route('/settings/payment_terms/:id/edit', {
                         id: paymentTerm.id,
                       })}
+                      icon={<Icon element={MdEdit} />}
                     >
-                      {t('edit_payment_term')}
+                      {t('edit')}
                     </DropdownElement>
-                    <DropdownElement onClick={() => archive(paymentTerm.id)}>
-                      {t('archive_payment_term')}
+
+                    <DropdownElement
+                      onClick={() => archive(paymentTerm.id)}
+                      icon={<Icon element={MdArchive} />}
+                    >
+                      {t('archive')}
                     </DropdownElement>
                   </Dropdown>
                 </Td>
