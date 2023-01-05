@@ -17,6 +17,7 @@ import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
   purchaseOrderColumns,
+  useActions,
   usePurchaseOrderColumns,
   usePurchaseOrderFilters,
 } from '../common/hooks';
@@ -34,6 +35,8 @@ export function PurchaseOrders() {
 
   const filters = usePurchaseOrderFilters();
 
+  const actions = useActions();
+
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
@@ -43,6 +46,7 @@ export function PurchaseOrders() {
         linkToCreate="/purchase_orders/create"
         linkToEdit="/purchase_orders/:id/edit"
         columns={columns}
+        customActions={actions}
         customFilters={filters}
         customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
