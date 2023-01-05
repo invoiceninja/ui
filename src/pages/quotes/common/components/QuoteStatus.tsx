@@ -31,7 +31,8 @@ export function QuoteStatus(props: Props) {
 
   if (
     props.entity.status_id === QuoteStatusEnum.Sent &&
-    new Date(props.entity.date) < new Date()
+    new Date(props.entity.date) < new Date() &&
+    props.entity.due_date
   )
     return <Badge variant="red">{t('expired')}</Badge>;
 
