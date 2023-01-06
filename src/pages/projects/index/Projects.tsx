@@ -21,6 +21,8 @@ import {
   useProjectColumns,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
+import { Icon } from 'components/icons/Icon';
+import { MdControlPointDuplicate } from 'react-icons/md';
 
 export function Projects() {
   useTitle('projects');
@@ -32,7 +34,10 @@ export function Projects() {
 
   const actions = [
     (project: Project) => (
-      <DropdownElement to={route('/projects/:id/clone', { id: project.id })}>
+      <DropdownElement
+        to={route('/projects/:id/clone', { id: project.id })}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone')}
       </DropdownElement>
     ),

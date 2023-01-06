@@ -12,7 +12,10 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { BankAccountDetails } from 'common/interfaces/bank-accounts';
+import {
+  BankAccount,
+  BankAccountDetails,
+} from 'common/interfaces/bank-accounts';
 import { route } from 'common/helpers/route';
 
 interface BankAccountParams {
@@ -32,5 +35,17 @@ export function useBankAccountQuery(params: BankAccountParams) {
           response.data.data
       ),
     { enabled: params.enabled ?? true, staleTime: Infinity }
+  );
+}
+
+export function useBankAccountsQuery() {
+  return useQuery<BankAccount[]>(
+    '/api/v1/bank_integrations',
+    () =>
+      request('GET', endpoint('/api/v1/bank_integrations')).then(
+        (response: GenericSingleResourceResponse<BankAccount[]>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
   );
 }

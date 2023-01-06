@@ -29,6 +29,13 @@ import { Spinner } from 'components/Spinner';
 import { productAtom } from '../common/atoms';
 import { Product } from 'common/interfaces/product';
 import { useUpdateAtom } from 'jotai/utils';
+import { Icon } from 'components/icons/Icon';
+import {
+  MdArchive,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdRestore,
+} from 'react-icons/md';
 
 export function Edit() {
   const { id } = useParams();
@@ -131,15 +138,19 @@ export function Edit() {
       {product && (
         <div className="flex justify-end">
           <Dropdown label={t('more_actions')}>
-            <DropdownElement onClick={() => cloneToProduct()}>
+            <DropdownElement
+              onClick={cloneToProduct}
+              icon={<Icon element={MdControlPointDuplicate} />}
+            >
               {t('clone')}
             </DropdownElement>
 
             {getEntityState(product) === EntityState.Active && (
               <DropdownElement
                 onClick={() => handleResourcefulAction('archive', product.id)}
+                icon={<Icon element={MdArchive} />}
               >
-                {t('archive_product')}
+                {t('archive')}
               </DropdownElement>
             )}
 
@@ -147,8 +158,9 @@ export function Edit() {
               getEntityState(product) === EntityState.Deleted) && (
               <DropdownElement
                 onClick={() => handleResourcefulAction('restore', product.id)}
+                icon={<Icon element={MdRestore} />}
               >
-                {t('restore_product')}
+                {t('restore')}
               </DropdownElement>
             )}
 
@@ -156,8 +168,9 @@ export function Edit() {
               getEntityState(product) === EntityState.Archived) && (
               <DropdownElement
                 onClick={() => handleResourcefulAction('delete', product.id)}
+                icon={<Icon element={MdDelete} />}
               >
-                {t('delete_product')}
+                {t('delete')}
               </DropdownElement>
             )}
           </Dropdown>

@@ -26,12 +26,15 @@ import { useLocation, useParams } from 'react-router-dom';
 import { PurchaseOrderCardProps } from './Details';
 
 export function Footer(props: PurchaseOrderCardProps) {
-  const { t } = useTranslation();
+  const [t] = useTranslation();
+
   const { id } = useParams();
-  const { purchaseOrder, handleChange } = props;
+
+  const location = useLocation();
 
   const queryClient = useQueryClient();
-  const location = useLocation();
+
+  const { purchaseOrder, handleChange } = props;
 
   const tabs = [
     t('terms'),
@@ -51,28 +54,28 @@ export function Footer(props: PurchaseOrderCardProps) {
       <TabGroup tabs={tabs}>
         <div>
           <MarkdownEditor
-            value={purchaseOrder?.terms || ''}
+            value={purchaseOrder.terms || ''}
             onChange={(value) => handleChange('terms', value)}
           />
         </div>
 
         <div>
           <MarkdownEditor
-            value={purchaseOrder?.footer || ''}
+            value={purchaseOrder.footer || ''}
             onChange={(value) => handleChange('footer', value)}
           />
         </div>
 
         <div>
           <MarkdownEditor
-            value={purchaseOrder?.public_notes || ''}
+            value={purchaseOrder.public_notes || ''}
             onChange={(value) => handleChange('public_notes', value)}
           />
         </div>
 
         <div>
           <MarkdownEditor
-            value={purchaseOrder?.private_notes || ''}
+            value={purchaseOrder.private_notes || ''}
             onChange={(value) => handleChange('private_notes', value)}
           />
         </div>
@@ -82,7 +85,7 @@ export function Footer(props: PurchaseOrderCardProps) {
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <UserSelector
                 inputLabel={t('User')}
-                value={purchaseOrder?.assigned_user_id}
+                value={purchaseOrder.assigned_user_id}
                 onChange={(user) => handleChange('assigned_user_id', user.id)}
               />
             </div>
@@ -90,7 +93,7 @@ export function Footer(props: PurchaseOrderCardProps) {
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <ProjectSelector
                 inputLabel={t('project')}
-                value={purchaseOrder?.project_id}
+                value={purchaseOrder.project_id}
                 onChange={(project) => handleChange('project_id', project.id)}
               />
             </div>
@@ -98,7 +101,7 @@ export function Footer(props: PurchaseOrderCardProps) {
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <ClientSelector
                 inputLabel={t('client')}
-                value={purchaseOrder?.client_id}
+                value={purchaseOrder.client_id}
                 onChange={(client) => handleChange('client_id', client.id)}
               />
             </div>
@@ -106,7 +109,7 @@ export function Footer(props: PurchaseOrderCardProps) {
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <InputField
                 label={t('exchange_rate')}
-                value={purchaseOrder?.exchange_rate || 1.0}
+                value={purchaseOrder.exchange_rate || 1.0}
                 onValueChange={(value) =>
                   handleChange('exchange_rate', parseFloat(value) || 1.0)
                 }
@@ -116,7 +119,7 @@ export function Footer(props: PurchaseOrderCardProps) {
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <DesignSelector
                 inputLabel={t('design')}
-                value={purchaseOrder?.design_id}
+                value={purchaseOrder.design_id}
                 onChange={(design) => handleChange('design_id', design.id)}
               />
             </div>
@@ -136,7 +139,7 @@ export function Footer(props: PurchaseOrderCardProps) {
             />
 
             <DocumentsTable
-              documents={purchaseOrder?.documents || []}
+              documents={purchaseOrder.documents || []}
               onDocumentDelete={onSuccess}
             />
           </div>

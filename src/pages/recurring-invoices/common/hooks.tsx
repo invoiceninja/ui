@@ -50,6 +50,13 @@ import recurringInvoicesFrequency from 'common/constants/recurring-invoices-freq
 import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
 import { SelectOption } from 'components/datatables/Actions';
+import { Icon } from 'components/icons/Icon';
+import {
+  MdControlPointDuplicate,
+  MdNotStarted,
+  MdPictureAsPdf,
+  MdStopCircle,
+} from 'react-icons/md';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -307,6 +314,7 @@ export function useActions() {
         to={route('/recurring_invoices/:id/pdf', {
           id: recurringInvoice.id,
         })}
+        icon={<Icon element={MdPictureAsPdf} />}
       >
         {t('view_pdf')}
       </DropdownElement>
@@ -316,6 +324,7 @@ export function useActions() {
         recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED) && (
         <DropdownElement
           onClick={() => toggleStartStop(recurringInvoice, 'start')}
+          icon={<Icon element={MdNotStarted} />}
         >
           {t('start')}
         </DropdownElement>
@@ -324,6 +333,7 @@ export function useActions() {
       recurringInvoice.status_id === RecurringInvoiceStatus.ACTIVE && (
         <DropdownElement
           onClick={() => toggleStartStop(recurringInvoice, 'stop')}
+          icon={<Icon element={MdStopCircle} />}
         >
           {t('stop')}
         </DropdownElement>
@@ -332,27 +342,40 @@ export function useActions() {
     (recurringInvoice) => (
       <DropdownElement
         onClick={() => cloneToRecurringInvoice(recurringInvoice)}
+        icon={<Icon element={MdControlPointDuplicate} />}
       >
         {t('clone')}
       </DropdownElement>
     ),
     (recurringInvoice) => (
-      <DropdownElement onClick={() => cloneToInvoice(recurringInvoice)}>
+      <DropdownElement
+        onClick={() => cloneToInvoice(recurringInvoice)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_invoice')}
       </DropdownElement>
     ),
     (recurringInvoice) => (
-      <DropdownElement onClick={() => cloneToQuote(recurringInvoice)}>
+      <DropdownElement
+        onClick={() => cloneToQuote(recurringInvoice)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_quote')}
       </DropdownElement>
     ),
     (recurringInvoice) => (
-      <DropdownElement onClick={() => cloneToCredit(recurringInvoice)}>
+      <DropdownElement
+        onClick={() => cloneToCredit(recurringInvoice)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_credit')}
       </DropdownElement>
     ),
     (recurringInvoice) => (
-      <DropdownElement onClick={() => cloneToPurchaseOrder(recurringInvoice)}>
+      <DropdownElement
+        onClick={() => cloneToPurchaseOrder(recurringInvoice)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),

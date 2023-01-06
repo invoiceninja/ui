@@ -27,7 +27,7 @@ import {
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@invoiceninja/forms';
 import { Breadcrumbs, Page } from 'components/Breadcrumbs';
 import { useSelector } from 'react-redux';
@@ -39,6 +39,7 @@ import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { QuickCreatePopover } from 'components/QuickCreatePopover';
 
 interface Props extends CommonProps {
   title?: string | null;
@@ -65,6 +66,7 @@ export function Default(props: Props) {
 
   const hasPermission = useHasPermission();
   const location = useLocation();
+  const navigate = useNavigate();
 
   const navigation: NavigationItem[] = [
     {
@@ -309,9 +311,13 @@ export function Default(props: Props) {
               <MenuIcon className="dark:text-gray-100" />
             </button>
             <div className="flex-1 px-4 md:px-8 flex items-center justify-between">
-              <h2 className="text-sm md:text-xl dark:text-gray-100">
-                {props.title}
-              </h2>
+              <div className="flex items-center space-x-4">
+                <h2 className="text-sm md:text-xl dark:text-gray-100">
+                  {props.title}
+                </h2>
+
+                <QuickCreatePopover />
+              </div>
 
               <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
                 {props.onCancelClick && (
@@ -320,9 +326,13 @@ export function Default(props: Props) {
                   </Button>
                 )}
 
-                {props.onBackClick && (
+                {(props.onBackClick && (
                   <Button to={props.onBackClick} type="secondary">
                     {props.backButtonLabel ?? t('back')}
+                  </Button>
+                )) || (
+                  <Button onClick={() => navigate(-1)} type="secondary">
+                    {t('back')}
                   </Button>
                 )}
 
