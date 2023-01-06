@@ -18,6 +18,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Task } from 'common/interfaces/task';
+import { Divider } from 'components/cards/Divider';
 import { customField } from 'components/CustomField';
 import { SelectOption } from 'components/datatables/Actions';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
@@ -339,6 +340,7 @@ export function useActions() {
           {t('stop')}
         </DropdownElement>
       ),
+    () => <Divider withoutPadding />,
     (task: Task) => (
       <DropdownElement
         onClick={() => cloneToTask(task)}
