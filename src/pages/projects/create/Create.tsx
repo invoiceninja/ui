@@ -23,10 +23,12 @@ import { useBlankProjectQuery } from 'common/queries/projects';
 import { Container } from 'components/Container';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { Default } from 'components/layouts/Default';
+import { useAtom } from 'jotai';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { projectAtom } from '../common/atoms';
 
 export function Create() {
   const { documentTitle } = useTitle('new_project');
@@ -41,7 +43,7 @@ export function Create() {
   const { data: blankProject } = useBlankProjectQuery();
 
   const [searchParams] = useSearchParams();
-  const [project, setProject] = useState<Project>();
+  const [project, setProject] = useAtom(projectAtom);
   const [errors, setErrors] = useState<ValidationBag>();
 
   const company = useCurrentCompany();
@@ -52,13 +54,21 @@ export function Create() {
     setProject((project) => project && { ...project, [property]: value });
   };
 
+  let mounted = false;
+
   useEffect(() => {
-    if (blankProject) {
+    if (blankProject && !project) {
       setProject({
         ...blankProject,
         task_rate: company?.settings.default_task_rate || 0,
         client_id: searchParams.get('client') || '',
       });
+    }
+
+    if (mounted) {
+      return () => setProject(undefined);
+    } else {
+      mounted = true;
     }
   }, [blankProject]);
 

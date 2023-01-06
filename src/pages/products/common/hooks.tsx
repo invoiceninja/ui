@@ -20,10 +20,12 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import { customField } from 'components/CustomField';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
+import { Icon } from 'components/icons/Icon';
 import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { productAtom } from './atoms';
 
@@ -227,7 +229,10 @@ export function useActions() {
 
   const actions = [
     (product: Product) => (
-      <DropdownElement onClick={() => cloneToProduct(product)}>
+      <DropdownElement
+        onClick={() => cloneToProduct(product)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone')}
       </DropdownElement>
     ),
