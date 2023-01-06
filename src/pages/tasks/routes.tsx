@@ -13,7 +13,6 @@ import { enabled } from 'common/guards/guards/enabled';
 import { permission } from 'common/guards/guards/permission';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
-import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Tasks } from './index/Tasks';
@@ -66,18 +65,6 @@ export const taskRoutes = (
             () => permission('edit_task'),
           ]}
           component={<Edit />}
-        />
-      }
-    />
-    <Route
-      path=":id/clone"
-      element={
-        <Guard
-          guards={[
-            () => enabled(ModuleBitmask.Tasks),
-            () => permission('create_task'),
-          ]}
-          component={<Clone />}
         />
       }
     />
