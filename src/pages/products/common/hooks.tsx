@@ -247,11 +247,11 @@ interface Params {
 }
 
 export function useHandleChange(params: Params) {
-  const { setErrors, setProduct: setTransaction } = params;
+  const { setErrors, setProduct } = params;
 
   return (property: keyof Product, value: Product[keyof Product]) => {
     setErrors(undefined);
 
-    setTransaction((product) => product && { ...product, [property]: value });
+    setProduct((product) => product && { ...product, [property]: value });
   };
 }

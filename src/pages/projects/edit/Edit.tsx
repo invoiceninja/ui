@@ -179,7 +179,7 @@ export function Edit() {
         <div className="flex justify-end">
           <Dropdown label={t('more_actions')}>
             <DropdownElement
-              onClick={() => cloneToProject()}
+              onClick={cloneToProject}
               icon={<Icon element={MdControlPointDuplicate} />}
             >
               {t('clone')}
