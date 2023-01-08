@@ -344,13 +344,16 @@ export function Reports() {
     setIsPendingExport(true);
     setErrors(undefined);
 
+    const { client_id } = report.payload;
+
     request(
       'POST',
       endpoint(report.endpoint),
       {
         ...report.payload,
-        client_id:
-          report.payload.client_id === 'all' ? null : report.payload.client_id,
+        ...(client_id && {
+          client_id: client_id === 'all' ? null : client_id,
+        }),
       },
       {
         responseType: report.payload.send_email ? 'json' : 'blob',
