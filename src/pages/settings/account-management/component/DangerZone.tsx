@@ -109,8 +109,14 @@ export function DangerZone() {
       </Modal>
 
       <Modal
-        title={t('cancel_account')}
-        text={t('cancel_account_message')}
+        title={
+          state?.api.length > 1 ? t('delete_company') : t('cancel_account')
+        }
+        text={
+          state?.api.length > 1
+            ? `${t('delete_company_message')} (${company?.settings.name})`
+            : t('cancel_account_message')
+        }
         visible={isDeleteModalOpen}
         onClose={setIsDeleteModalOpen}
       >
@@ -158,10 +164,7 @@ export function DangerZone() {
         </ClickableElement>
 
         <span className="flex pl-6 mb-2">
-          <i className="text-xs font-semibold">
-            * This action will permanently delete data from the currently
-            selected company ({company?.settings.name}).
-          </i>
+          <i className="text-xs font-semibold">* {t('purge_data_message')}</i>
         </span>
 
         <ClickableElement
@@ -175,8 +178,8 @@ export function DangerZone() {
           <i className="text-xs font-semibold">
             *{' '}
             {state?.api.length > 1
-              ? `This action will permanently delete the currently selected company (${company?.settings.name}).`
-              : 'This action will permanently delete your Invoice Ninja account.'}
+              ? `${t('delete_company_message')} (${company?.settings.name})`
+              : t('cancel_account_message')}
           </i>
         </span>
       </Card>
