@@ -25,6 +25,7 @@ interface Props {
   onSaveClick?: any;
   saveButtonLabel?: string | null;
   disableSubmitButton?: boolean;
+  disableWithoutIcon?: boolean;
   className?: string;
   withContainer?: boolean;
   style?: React.CSSProperties;
@@ -99,6 +100,7 @@ export function Card(props: Props) {
                   <Button
                     onClick={props.onSaveClick}
                     disabled={props.disableSubmitButton}
+                    disableWithoutIcon={props.disableWithoutIcon}
                   >
                     {props.saveButtonLabel ?? t('save')}
                   </Button>
