@@ -17,11 +17,15 @@ import { ChangeEvent, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { route } from 'common/helpers/route';
+import { useSelector } from 'react-redux';
+import { RootState } from 'common/stores/store';
 
 export function DangerZone() {
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
+
+  const state = useSelector((state: RootState) => state.companyUsers);
 
   const [password, setPassword] = useState('');
   const [feedback, setFeedback] = useState('');
@@ -153,12 +157,28 @@ export function DangerZone() {
           {t('purge_data')}
         </ClickableElement>
 
+        <span className="flex pl-6 mb-2">
+          <i className="text-xs font-semibold">
+            * This action will permanently delete data from the currently
+            selected company ({company?.settings.name}).
+          </i>
+        </span>
+
         <ClickableElement
           onClick={() => setIsDeleteModalOpen(true)}
           className="text-red-500 hover:text-red-600"
         >
-          {t('cancel_account')}
+          {state?.api.length > 1 ? t('delete_company') : t('cancel_account')}
         </ClickableElement>
+
+        <span className="flex pl-6 mb-2">
+          <i className="text-xs font-semibold">
+            *{' '}
+            {state?.api.length > 1
+              ? `This action will permanently delete the currently selected company (${company?.settings.name}).`
+              : 'This action will permanently delete your Invoice Ninja account.'}
+          </i>
+        </span>
       </Card>
     </>
   );
