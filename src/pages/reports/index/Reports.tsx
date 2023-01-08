@@ -15,9 +15,10 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
+import { Client } from 'common/interfaces/client';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useClientsQuery } from 'common/queries/clients';
 import { Page } from 'components/Breadcrumbs';
-import { ClientSelector } from 'components/clients/ClientSelector';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useState } from 'react';
@@ -224,7 +225,7 @@ const reports: Report[] = [
     payload: {
       start_date: '',
       end_date: '',
-      client_id: '',
+      client_id: 'all',
       date_key: '',
       date_range: 'all',
       report_keys: [],
@@ -282,6 +283,8 @@ const ranges: Range[] = [
 export function Reports() {
   const { documentTitle } = useTitle('reports');
   const { t } = useTranslation();
+
+  const { data: clients } = useClientsQuery({});
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
@@ -341,9 +344,18 @@ export function Reports() {
     setIsPendingExport(true);
     setErrors(undefined);
 
-    request('POST', endpoint(report.endpoint), report.payload, {
-      responseType: report.payload.send_email ? 'json' : 'blob',
-    })
+    request(
+      'POST',
+      endpoint(report.endpoint),
+      {
+        ...report.payload,
+        client_id:
+          report.payload.client_id === 'all' ? null : report.payload.client_id,
+      },
+      {
+        responseType: report.payload.send_email ? 'json' : 'blob',
+      }
+    )
       .then((response) => {
         if (report.payload.send_email) {
           return toast.success();
@@ -490,11 +502,20 @@ export function Reports() {
 
           {report.identifier === 'product_sales' && (
             <Element leftSide={t('client')}>
-              <ClientSelector
-                onChange={(client) =>
-                  handlePayloadChange('client_id', client.id)
+              <SelectField
+                value={report.payload.client_id}
+                onValueChange={(value) =>
+                  handlePayloadChange('client_id', value)
                 }
-              />
+              >
+                <option value="all">{t('all')}</option>
+
+                {clients?.map((client: Client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.name}
+                  </option>
+                ))}
+              </SelectField>
             </Element>
           )}
         </Card>
