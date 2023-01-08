@@ -33,6 +33,8 @@ import { DesignSelector } from 'common/generic/DesignSelector';
 import { UserSelector } from 'components/users/UserSelector';
 import { VendorSelector } from 'components/vendors/VendorSelector';
 import { route } from 'common/helpers/route';
+import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
+import { useShouldDisableCustomFields } from 'common/hooks/useShouldDisableCustomFields';
 
 interface Props {
   invoice?: Invoice;
@@ -53,6 +55,8 @@ export function InvoiceFooter(props: Props) {
   const handleCustomFieldChange = useHandleCustomFieldChange();
   const handleCustomSurchargeFieldChange =
     useHandleCustomSurchargeFieldChange();
+
+  const disabledCustomFields = useShouldDisableCustomFields();
 
   const surchargeValue = (index: number) => {
     switch (index) {
@@ -196,6 +200,8 @@ export function InvoiceFooter(props: Props) {
         </div>
 
         <div>
+          <CustomFieldsPlanAlert />
+
           {company &&
             ['invoice1', 'invoice2', 'invoice3', 'invoice4'].map((field) => (
               <Field
@@ -224,6 +230,7 @@ export function InvoiceFooter(props: Props) {
                       onValueChange={(value) =>
                         handleCustomSurchargeFieldChange(field, value)
                       }
+                      disabled={disabledCustomFields}
                     />
                   }
                 >

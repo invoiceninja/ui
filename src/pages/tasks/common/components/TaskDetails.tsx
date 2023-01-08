@@ -17,6 +17,7 @@ import { TaskStatus } from 'common/interfaces/task-status';
 import { User } from 'common/interfaces/user';
 import { ClientSelector } from 'components/clients/ClientSelector';
 import { CustomField } from 'components/CustomField';
+import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { TabGroup } from 'components/TabGroup';
@@ -154,6 +155,8 @@ export function TaskDetails(props: Props) {
             </div>
 
             <div>
+              <CustomFieldsPlanAlert />
+
               {company &&
                 ['task1', 'task2', 'task3', 'task4'].map((field) => (
                   <Field
