@@ -348,9 +348,9 @@ export function Reports() {
       endpoint(report.endpoint),
       {
         ...report.payload,
-        ...{
+        ...(report.identifier === 'product_sales' && {
           client_id: !client_id ? null : client_id,
-        },
+        }),
       },
       {
         responseType: report.payload.send_email ? 'json' : 'blob',
