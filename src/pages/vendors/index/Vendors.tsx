@@ -13,14 +13,13 @@ import { Page } from 'components/Breadcrumbs';
 import { DataTable } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { Link as ReactRouterLink } from 'react-router-dom';
-import { Download } from 'react-feather';
 import {
   defaultColumns,
   useVendorColumns,
   vendorColumns,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
+import { ImportButton } from 'components/import/ImportButton';
 
 export function Vendors() {
   const { documentTitle } = useTitle('vendors');
@@ -28,21 +27,6 @@ export function Vendors() {
   const [t] = useTranslation();
 
   const pages: Page[] = [{ name: t('vendors'), href: '/vendors' }];
-
-  const importButton = (
-    <ReactRouterLink to="/expenses/import">
-      <button className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600">
-        <svg
-          className="w-4 h-4 mr-2"
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="3 3 20 20"
-        >
-          <Download />
-        </svg>
-        <span>{t('import')}</span>
-      </button>
-    </ReactRouterLink>
-  );
 
   const columns = useVendorColumns();
 
@@ -55,7 +39,7 @@ export function Vendors() {
         linkToCreate="/vendors/create"
         linkToEdit="/vendors/:id/edit"
         withResourcefulActions
-        rightSide={importButton}
+        rightSide={<ImportButton route="/vendors/import" />}
         leftSideChevrons={
           <DataTableColumnsPicker
             columns={vendorColumns as unknown as string[]}
