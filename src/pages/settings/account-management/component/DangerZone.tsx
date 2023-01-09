@@ -14,11 +14,11 @@ import { request } from 'common/helpers/request';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Modal } from 'components/Modal';
 import { ChangeEvent, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { route } from 'common/helpers/route';
 import { useSelector } from 'react-redux';
 import { RootState } from 'common/stores/store';
+import { toast } from 'common/helpers/toast/toast';
 
 export function DangerZone() {
   const [t] = useTranslation();
@@ -36,7 +36,7 @@ export function DangerZone() {
   const [purgeInputField, setPurgeInputField] = useState('');
 
   const purge = () => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request(
       'POST',
@@ -46,17 +46,17 @@ export function DangerZone() {
       { cancellation_message: feedback },
       { headers: { 'X-Api-Password': password } }
     )
-      .then(() => toast.success(t('purge_successful'), { id: toastId }))
+      .then(() => toast.success('purge_successful'))
       .catch((error) => {
         console.error(error);
 
-        toast.error(t('error_title'), { id: toastId });
+        toast.error();
       })
       .finally(() => setIsPurgeModalOpen(false));
   };
 
   const destroy = () => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request(
       'DELETE',
@@ -70,7 +70,7 @@ export function DangerZone() {
       .catch((error) => {
         console.error(error);
 
-        toast.error(t('error_title'), { id: toastId });
+        toast.error();
       });
   };
 
@@ -155,7 +155,7 @@ export function DangerZone() {
         )}
       </Modal>
 
-      <Card title="Danger Zone">
+      <Card title={t('danger_zone')}>
         <ClickableElement
           onClick={() => setIsPurgeModalOpen(true)}
           className="text-red-500 hover:text-red-600"
@@ -163,25 +163,12 @@ export function DangerZone() {
           {t('purge_data')}
         </ClickableElement>
 
-        <span className="flex pl-6 mb-2">
-          <i className="text-xs font-semibold">* {t('purge_data_message')}</i>
-        </span>
-
         <ClickableElement
           onClick={() => setIsDeleteModalOpen(true)}
           className="text-red-500 hover:text-red-600"
         >
           {state?.api.length > 1 ? t('delete_company') : t('cancel_account')}
         </ClickableElement>
-
-        <span className="flex pl-6 mb-2">
-          <i className="text-xs font-semibold">
-            *{' '}
-            {state?.api.length > 1
-              ? `${t('delete_company_message')} (${company?.settings.name})`
-              : t('cancel_account_message')}
-          </i>
-        </span>
       </Card>
     </>
   );
