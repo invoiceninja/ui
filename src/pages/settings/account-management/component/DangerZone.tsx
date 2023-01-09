@@ -25,7 +25,7 @@ export function DangerZone() {
 
   const company = useCurrentCompany();
 
-  const state = useSelector((state: RootState) => state.companyUsers);
+  const companyUsers = useSelector((state: RootState) => state.companyUsers);
 
   const [password, setPassword] = useState('');
   const [feedback, setFeedback] = useState('');
@@ -110,10 +110,12 @@ export function DangerZone() {
 
       <Modal
         title={
-          state?.api.length > 1 ? t('delete_company') : t('cancel_account')
+          companyUsers?.api.length > 1
+            ? t('delete_company')
+            : t('cancel_account')
         }
         text={
-          state?.api.length > 1
+          companyUsers?.api.length > 1
             ? `${t('delete_company_message')} (${company?.settings.name})`
             : t('cancel_account_message')
         }
@@ -167,7 +169,9 @@ export function DangerZone() {
           onClick={() => setIsDeleteModalOpen(true)}
           className="text-red-500 hover:text-red-600"
         >
-          {state?.api.length > 1 ? t('delete_company') : t('cancel_account')}
+          {companyUsers?.api.length > 1
+            ? t('delete_company')
+            : t('cancel_account')}
         </ClickableElement>
       </Card>
     </>
