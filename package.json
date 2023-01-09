@@ -36,7 +36,7 @@
     "react-hot-toast": "^2.4.0",
     "react-i18next": "^12.1.1",
     "react-icons": "^4.7.1",
-    "react-json-tree": "^0.17.0",
+    "react-json-tree": "^0.18.0",
     "react-microsoft-login": "^1.15.0",
     "react-qr-code": "^2.0.8",
     "react-query": "^3.39.2",
