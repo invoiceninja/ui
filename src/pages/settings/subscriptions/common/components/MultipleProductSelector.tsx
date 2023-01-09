@@ -62,6 +62,18 @@ export function MultipleProductSelector(props: Props) {
     }
   };
 
+  const getOptionLabelText = (productKey: string, price: number) => {
+    return (
+      productKey +
+      ' ' +
+      formatMoney(
+        price,
+        company?.settings.country_id,
+        company?.settings.currency_id
+      ).toString()
+    );
+  };
+
   useEffect(() => {
     if (props.products) {
       let filteredProducts: Product[] = [];
@@ -106,12 +118,7 @@ export function MultipleProductSelector(props: Props) {
         >
           {props.products.map((product, index) => (
             <option key={index} value={product.id}>
-              {product.product_key}{' '}
-              {formatMoney(
-                product.price,
-                company?.settings.country_id,
-                company?.settings.currency_id
-              )}
+              {getOptionLabelText(product.product_key, product.price)}
             </option>
           ))}
         </SelectField>
@@ -135,14 +142,17 @@ export function MultipleProductSelector(props: Props) {
               <BiChevronRight fontSize={18} />
 
               <div className="flex flex-1 justify-between items-center">
-                <span className="font-medium">
-                  {product.product_key}{' '}
-                  {formatMoney(
-                    product.price,
-                    company?.settings.country_id,
-                    company?.settings.currency_id
-                  )}
-                </span>
+                <div className="flex space-x-2 font-medium">
+                  <span>{product.product_key}</span>
+
+                  <span>
+                    {formatMoney(
+                      product.price,
+                      company?.settings.country_id,
+                      company?.settings.currency_id
+                    )}
+                  </span>
+                </div>
 
                 <MdClose
                   className="cursor-pointer ml-20"

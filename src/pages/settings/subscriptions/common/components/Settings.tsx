@@ -31,9 +31,7 @@ export function Settings(props: SubscriptionProps) {
         >
           {Object.keys(frequencies).map((frequency, index) => (
             <option key={index} value={frequency}>
-              {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-              {/* @ts-ignore */}
-              {t(frequencies[frequency])}
+              {t(frequencies[frequency as keyof typeof frequencies])}
             </option>
           ))}
         </SelectField>

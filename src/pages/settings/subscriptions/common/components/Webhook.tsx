@@ -46,7 +46,7 @@ export function Webhook(props: SubscriptionProps) {
 
   const handleRemoveHeader = (key: string) => {
     if (
-      Object.prototype.hasOwnProperty.call(
+      Object.hasOwn(
         subscription.webhook_configuration.post_purchase_headers,
         key
       )

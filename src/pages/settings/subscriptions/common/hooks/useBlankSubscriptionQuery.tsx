@@ -27,7 +27,11 @@ export function useBlankSubscriptionQuery() {
   );
 }
 
-export function useSubscriptionQuery(params: { id: string | undefined }) {
+interface SubscriptionParams {
+  id: string | undefined;
+}
+
+export function useSubscriptionQuery(params: SubscriptionParams) {
   return useQuery<Subscription>(
     route('/api/v1/subscriptions/:id', { id: params.id }),
     () =>

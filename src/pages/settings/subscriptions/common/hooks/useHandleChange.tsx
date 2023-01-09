@@ -11,7 +11,7 @@
 import { Subscription } from 'common/interfaces/subscription';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
-import { set } from 'lodash';
+import { cloneDeep, set } from 'lodash';
 
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
@@ -26,7 +26,7 @@ export function useHandleChange(params: Params) {
   ) => {
     params.setErrors(undefined);
 
-    const subscription = { ...params.subscription };
+    const subscription = cloneDeep(params.subscription);
 
     params.setSubscription(set(subscription as Subscription, property, value));
   };

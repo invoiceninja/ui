@@ -29,6 +29,7 @@ import { Settings as SubscriptionSettings } from '../common/components/Settings'
 import { Webhook } from '../common/components/Webhook';
 import { useBlankSubscriptionQuery } from '../common/hooks/useBlankSubscriptionQuery';
 import { useHandleChange } from '../common/hooks/useHandleChange';
+import { Frequency } from 'common/enums/frequency';
 
 export function Create() {
   const [t] = useTranslation();
@@ -65,7 +66,7 @@ export function Create() {
     if (data) {
       setSubscription({
         ...data,
-        frequency_id: '5',
+        frequency_id: Frequency.Monthly,
         webhook_configuration: {
           post_purchase_headers: {},
           post_purchase_body: '',
