@@ -15,10 +15,9 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
-import { Client } from 'common/interfaces/client';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useClientsQuery } from 'common/queries/clients';
 import { Page } from 'components/Breadcrumbs';
+import { ClientSelector } from 'components/clients/ClientSelector';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useState } from 'react';
@@ -225,7 +224,7 @@ const reports: Report[] = [
     payload: {
       start_date: '',
       end_date: '',
-      client_id: 'all',
+      client_id: '',
       date_key: '',
       date_range: 'all',
       report_keys: [],
@@ -283,8 +282,6 @@ const ranges: Range[] = [
 export function Reports() {
   const { documentTitle } = useTitle('reports');
   const { t } = useTranslation();
-
-  const { data: clients } = useClientsQuery({});
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
@@ -351,9 +348,9 @@ export function Reports() {
       endpoint(report.endpoint),
       {
         ...report.payload,
-        ...(client_id && {
-          client_id: client_id === 'all' ? null : client_id,
-        }),
+        ...{
+          client_id: !client_id ? null : client_id,
+        },
       },
       {
         responseType: report.payload.send_email ? 'json' : 'blob',
@@ -505,20 +502,13 @@ export function Reports() {
 
           {report.identifier === 'product_sales' && (
             <Element leftSide={t('client')}>
-              <SelectField
+              <ClientSelector
                 value={report.payload.client_id}
-                onValueChange={(value) =>
-                  handlePayloadChange('client_id', value)
+                onChange={(client) =>
+                  handlePayloadChange('client_id', client.id)
                 }
-              >
-                <option value="all">{t('all')}</option>
-
-                {clients?.map((client: Client) => (
-                  <option key={client.id} value={client.id}>
-                    {client.name}
-                  </option>
-                ))}
-              </SelectField>
+                withoutAction={true}
+              />
             </Element>
           )}
         </Card>
