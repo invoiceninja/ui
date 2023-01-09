@@ -343,19 +343,14 @@ export function Reports() {
 
     const { client_id } = report.payload;
 
-    request(
-      'POST',
-      endpoint(report.endpoint),
-      {
-        ...report.payload,
-        ...(report.identifier === 'product_sales' && {
-          client_id: !client_id ? null : client_id,
-        }),
-      },
-      {
-        responseType: report.payload.send_email ? 'json' : 'blob',
-      }
-    )
+    const updatedPayload =
+      report.identifier === 'product_sales'
+        ? { ...report.payload, client_id: client_id || null }
+        : report.payload;
+
+    request('POST', endpoint(report.endpoint), updatedPayload, {
+      responseType: report.payload.send_email ? 'json' : 'blob',
+    })
       .then((response) => {
         if (report.payload.send_email) {
           return toast.success();
@@ -507,6 +502,8 @@ export function Reports() {
                 onChange={(client) =>
                   handlePayloadChange('client_id', client.id)
                 }
+                clearButton
+                onClearButtonClick={() => handlePayloadChange('client_id', '')}
                 withoutAction={true}
               />
             </Element>
