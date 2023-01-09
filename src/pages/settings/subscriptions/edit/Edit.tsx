@@ -13,6 +13,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
+import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
 import { Product } from 'common/interfaces/product';
 import { Subscription } from 'common/interfaces/subscription';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -50,6 +51,8 @@ export function Edit() {
       href: route('/settings/subscriptions/:id/edit', { id }),
     },
   ];
+
+  const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const tabs = [t('overview'), t('settings'), t('webhook')];
 
@@ -132,8 +135,7 @@ export function Edit() {
       title={t('edit_subscription')}
       breadcrumbs={pages}
       onSaveClick={handleSave}
-      onCancelClick={() => navigate('/settings/subscriptions')}
-      disableSaveButton={!subscription}
+      disableSaveButton={!subscription || showPlanAlert}
     >
       <TabGroup tabs={tabs}>
         <div>

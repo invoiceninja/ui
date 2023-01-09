@@ -30,6 +30,8 @@ import { Webhook } from '../common/components/Webhook';
 import { useBlankSubscriptionQuery } from '../common/hooks/useBlankSubscriptionQuery';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { Frequency } from 'common/enums/frequency';
+import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
+import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
 
 export function Create() {
   const [t] = useTranslation();
@@ -41,6 +43,8 @@ export function Create() {
   const { data: productsData } = useProductsQuery();
 
   const queryClient = useQueryClient();
+
+  const showPlanAlert = useShouldDisableAdvanceSettings();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -119,9 +123,10 @@ export function Create() {
       title={t('new_subscription')}
       breadcrumbs={pages}
       onSaveClick={handleSave}
-      onCancelClick={() => navigate('/settings/subscriptions')}
-      disableSaveButton={!subscription}
+      disableSaveButton={!subscription || showPlanAlert}
     >
+      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+
       <TabGroup tabs={tabs}>
         <div>
           {subscription && (
