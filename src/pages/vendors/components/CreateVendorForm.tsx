@@ -22,18 +22,14 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { route } from 'common/helpers/route';
 
 interface Props {
-  setVisible?: Dispatch<SetStateAction<boolean>>;
-  setSelectedIds?: Dispatch<SetStateAction<string[]>>;
+  setVisible: Dispatch<SetStateAction<boolean>>;
+  setSelectedIds: Dispatch<SetStateAction<string[]>>;
 }
 
 export function CreateVendorForm(props: Props) {
   const [t] = useTranslation();
-
-  const navigate = useNavigate();
 
   const { data } = useBlankVendorQuery();
 
@@ -102,15 +98,9 @@ export function CreateVendorForm(props: Props) {
           })
         );
 
-        if (props.setSelectedIds) {
-          props.setSelectedIds([response[0].data.data.id]);
-        }
+        props.setSelectedIds([response[0].data.data.id]);
 
-        if (props.setVisible) {
-          props.setVisible(false);
-        } else {
-          navigate(route('/vendors/:id', { id: response[0].data.data.id }));
-        }
+        props.setVisible(false);
       })
       .catch((error: AxiosError) => {
         console.error(error);
