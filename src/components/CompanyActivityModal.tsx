@@ -10,6 +10,8 @@
 
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AiOutlineArrowRight } from 'react-icons/ai';
+import { MdWarning } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './forms';
 import { Modal } from './Modal';
@@ -26,22 +28,33 @@ export function CompanyActivityModal(props: Props) {
 
   return (
     <Modal
-      title="Company activity"
+      title={t('company_activity')}
       size="small"
       visible={props.visible}
       onClose={() => props.setVisible(false)}
     >
       <div className="flex flex-col justify-center space-y-7 pb-1 px-3 text-center">
-        <span className="text-gray-800 text-lg font-medium">
-          This company has not yet been activated
-        </span>
+        <div className="flex justify-center items-center space-x-3">
+          <MdWarning fontSize={22} color="#e6b05c" />
+
+          <span className="text-gray-800 text-base font-medium">
+            {t('company_disabled_warning')}.
+          </span>
+        </div>
 
         <div className="flex justify-end items-center w-full">
           <Button
             type="primary"
-            onClick={() => navigate('/settings/account_management')}
+            onClick={() => {
+              navigate('/settings/account_management');
+              props.setVisible(false);
+            }}
           >
-            {t('settings')}
+            <div className="flex items-center">
+              {t('settings')}
+
+              <AiOutlineArrowRight className="ml-2" fontSize={18} />
+            </div>
           </Button>
         </div>
       </div>
