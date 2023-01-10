@@ -33,7 +33,7 @@ export function App() {
 
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
 
-  const [isCompanyActivityModalShown, setIsCompanyActivityModalShown] =
+  const [showCompanyActivityModal, setShowCompanyActivityModal] =
     useState<boolean>(false);
 
   const resolveLanguage = useResolveLanguage();
@@ -80,7 +80,7 @@ export function App() {
     const modalShown = sessionStorage.getItem('COMPANY-ACTIVITY-SHOWN');
 
     if (company && (modalShown === 'false' || !modalShown)) {
-      setIsCompanyActivityModalShown(!company.is_disabled);
+      setShowCompanyActivityModal(company.is_disabled);
 
       sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'true');
     }
@@ -99,8 +99,8 @@ export function App() {
       />
 
       <CompanyActivityModal
-        visible={Boolean(company) && isCompanyActivityModalShown}
-        setVisible={setIsCompanyActivityModalShown}
+        visible={Boolean(company) && showCompanyActivityModal}
+        setVisible={setShowCompanyActivityModal}
       />
 
       <Toaster position="top-center" />
