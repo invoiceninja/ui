@@ -34,7 +34,7 @@ export function App() {
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
 
   const [isCompanyActivityModalShown, setIsCompanyActivityModalShown] =
-    useState<boolean>(true);
+    useState<boolean>(false);
 
   const resolveLanguage = useResolveLanguage();
 
@@ -77,12 +77,12 @@ export function App() {
   }, [user]);
 
   useEffect(() => {
-    const modalShown = sessionStorage.getItem('activityModalShown');
+    const modalShown = sessionStorage.getItem('COMPANY-ACTIVITY-SHOWN');
 
-    if (company && !modalShown) {
+    if (company && (modalShown === 'false' || !modalShown)) {
       setIsCompanyActivityModalShown(!company.is_disabled);
 
-      sessionStorage.setItem('activityModalShown', 'true');
+      sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'true');
     }
   }, [company]);
 
@@ -99,7 +99,7 @@ export function App() {
       />
 
       <CompanyActivityModal
-        visible={Boolean(company) && isCompanyActivityModalShown && isHosted()}
+        visible={Boolean(company) && isCompanyActivityModalShown}
         setVisible={setIsCompanyActivityModalShown}
       />
 
