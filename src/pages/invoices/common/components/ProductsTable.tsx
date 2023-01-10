@@ -147,7 +147,12 @@ export function ProductsTable(props: Props) {
 
               {!resource?.[relationType] ? (
                 <Tr>
-                  <Td colSpan={100}>{t('no_client_selected')}.</Td>
+                  <Td colSpan={100}>
+                    {props.relationType === 'vendor_id'
+                      ? t('please_select_a_vendor')
+                      : t('please_select_a_client')}
+                    .
+                  </Td>
                 </Tr>
               ) : (
                 <Fragment />

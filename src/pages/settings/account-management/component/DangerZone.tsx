@@ -14,14 +14,18 @@ import { request } from 'common/helpers/request';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Modal } from 'components/Modal';
 import { ChangeEvent, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { route } from 'common/helpers/route';
+import { useSelector } from 'react-redux';
+import { RootState } from 'common/stores/store';
+import { toast } from 'common/helpers/toast/toast';
 
 export function DangerZone() {
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
+
+  const companyUsers = useSelector((state: RootState) => state.companyUsers);
 
   const [password, setPassword] = useState('');
   const [feedback, setFeedback] = useState('');
@@ -32,7 +36,7 @@ export function DangerZone() {
   const [purgeInputField, setPurgeInputField] = useState('');
 
   const purge = () => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request(
       'POST',
@@ -42,17 +46,17 @@ export function DangerZone() {
       { cancellation_message: feedback },
       { headers: { 'X-Api-Password': password } }
     )
-      .then(() => toast.success(t('purge_successful'), { id: toastId }))
+      .then(() => toast.success('purge_successful'))
       .catch((error) => {
         console.error(error);
 
-        toast.error(t('error_title'), { id: toastId });
+        toast.error();
       })
       .finally(() => setIsPurgeModalOpen(false));
   };
 
   const destroy = () => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request(
       'DELETE',
@@ -66,7 +70,7 @@ export function DangerZone() {
       .catch((error) => {
         console.error(error);
 
-        toast.error(t('error_title'), { id: toastId });
+        toast.error();
       });
   };
 
@@ -105,8 +109,16 @@ export function DangerZone() {
       </Modal>
 
       <Modal
-        title={t('cancel_account')}
-        text={t('cancel_account_message')}
+        title={
+          companyUsers?.api.length > 1
+            ? t('delete_company')
+            : t('cancel_account')
+        }
+        text={
+          companyUsers?.api.length > 1
+            ? `${t('delete_company_message')} (${company?.settings.name})`
+            : t('cancel_account_message')
+        }
         visible={isDeleteModalOpen}
         onClose={setIsDeleteModalOpen}
       >
@@ -145,7 +157,7 @@ export function DangerZone() {
         )}
       </Modal>
 
-      <Card title="Danger Zone">
+      <Card title={t('danger_zone')}>
         <ClickableElement
           onClick={() => setIsPurgeModalOpen(true)}
           className="text-red-500 hover:text-red-600"
@@ -157,7 +169,9 @@ export function DangerZone() {
           onClick={() => setIsDeleteModalOpen(true)}
           className="text-red-500 hover:text-red-600"
         >
-          {t('cancel_account')}
+          {companyUsers?.api.length > 1
+            ? t('delete_company')
+            : t('cancel_account')}
         </ClickableElement>
       </Card>
     </>

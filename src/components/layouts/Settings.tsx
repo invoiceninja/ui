@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
-import { proPlan } from 'common/guards/guards/pro-plan';
 import { Breadcrumbs, Page } from 'components/Breadcrumbs';
 import { useAtom } from 'jotai';
 import { ReactNode, useEffect } from 'react';
@@ -37,7 +35,6 @@ interface AdvanceSetting {
   href: string;
   current: boolean;
   children?: AdvanceSetting[];
-  visible: boolean;
 }
 
 export function Settings(props: Props) {
@@ -112,25 +109,21 @@ export function Settings(props: Props) {
       name: t('invoice_design'),
       href: '/settings/invoice_design',
       current: location.pathname.startsWith('/settings/invoice_design'),
-      visible: proPlan() || enterprisePlan(),
     },
     {
       name: t('generated_numbers'),
       href: '/settings/generated_numbers',
       current: location.pathname.startsWith('/settings/generated_numbers'),
-      visible: proPlan() || enterprisePlan(),
     },
     {
       name: t('client_portal'),
       href: '/settings/client_portal',
       current: location.pathname.startsWith('/settings/client_portal'),
-      visible: proPlan() || enterprisePlan(),
     },
     {
       name: t('email_settings'),
       href: '/settings/email_settings',
       current: location.pathname.startsWith('/settings/email_settings'),
-      visible: proPlan() || enterprisePlan(),
     },
     {
       name: t('templates_and_reminders'),
@@ -138,19 +131,16 @@ export function Settings(props: Props) {
       current: location.pathname.startsWith(
         '/settings/templates_and_reminders'
       ),
-      visible: proPlan() || enterprisePlan(),
     },
     {
       name: t('bank_accounts'),
       href: '/settings/bank_accounts',
       current: location.pathname.startsWith('/settings/bank_accounts'),
-      visible: enterprisePlan(),
     },
     {
       name: t('user_management'),
       href: '/settings/users',
       current: location.pathname.startsWith('/settings/users'),
-      visible: enterprisePlan(),
     },
   ];
 
@@ -214,68 +204,60 @@ export function Settings(props: Props) {
           </a>
 
           <SelectField className="lg:hidden">
-            {advanced.map(
-              (item) =>
-                item.visible && (
-                  <option
-                    key={item.name}
-                    value={item.href}
-                    className={classNames(
-                      item.current
-                        ? 'bg-gray-200 text-gray-900'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                      'flex items-center px-3 py-2 text-sm font-medium rounded'
-                    )}
-                    aria-current={item.current ? 'page' : undefined}
-                  >
-                    {item.name}
-                  </option>
-                )
-            )}
+            {advanced.map((item) => (
+              <option
+                key={item.name}
+                value={item.href}
+                className={classNames(
+                  item.current
+                    ? 'bg-gray-200 text-gray-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                  'flex items-center px-3 py-2 text-sm font-medium rounded'
+                )}
+                aria-current={item.current ? 'page' : undefined}
+              >
+                {item.name}
+              </option>
+            ))}
           </SelectField>
 
           <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
-            {advanced.map(
-              (item, index) =>
-                item.visible && (
-                  <div key={index}>
-                    <Link
-                      key={item.name}
-                      to={item.href}
-                      className={classNames(
-                        item.current
-                          ? 'bg-gray-200 text-gray-900'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                        item.children ? 'rounded-t' : 'rounded',
-                        'flex items-center px-3 py-2 text-sm font-medium'
-                      )}
-                      aria-current={item.current ? 'page' : undefined}
-                    >
-                      <span className="truncate">{item.name}</span>
-                    </Link>
+            {advanced.map((item, index) => (
+              <div key={index}>
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={classNames(
+                    item.current
+                      ? 'bg-gray-200 text-gray-900'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                    item.children ? 'rounded-t' : 'rounded',
+                    'flex items-center px-3 py-2 text-sm font-medium'
+                  )}
+                  aria-current={item.current ? 'page' : undefined}
+                >
+                  <span className="truncate">{item.name}</span>
+                </Link>
 
-                    {item.children && item.current && (
-                      <div className="bg-gray-100 space-y-4 py-3 rounded-b">
-                        {item.children &&
-                          item.children.map((item, index) => (
-                            <Link
-                              key={index}
-                              to={item.href}
-                              className={classNames(
-                                item.current
-                                  ? 'text-gray-900 font-semibold'
-                                  : '',
-                                'ml-4 px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
-                              )}
-                            >
-                              {item.name}
-                            </Link>
-                          ))}
-                      </div>
-                    )}
+                {item.children && item.current && (
+                  <div className="bg-gray-100 space-y-4 py-3 rounded-b">
+                    {item.children &&
+                      item.children.map((item, index) => (
+                        <Link
+                          key={index}
+                          to={item.href}
+                          className={classNames(
+                            item.current ? 'text-gray-900 font-semibold' : '',
+                            'ml-4 px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
+                          )}
+                        >
+                          {item.name}
+                        </Link>
+                      ))}
                   </div>
-                )
-            )}
+                )}
+              </div>
+            ))}
           </nav>
         </div>
 

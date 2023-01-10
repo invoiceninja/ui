@@ -17,6 +17,7 @@ import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
+import { ClientSelector } from 'components/clients/ClientSelector';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { useState } from 'react';
@@ -35,6 +36,7 @@ type Identifier =
   | 'recurring_invoice'
   | 'payment'
   | 'product'
+  | 'product_sales'
   | 'task'
   | 'profitloss';
 
@@ -49,6 +51,7 @@ interface Payload {
   start_date: string;
   end_date: string;
   date_key?: string;
+  client_id?: string;
   date_range: string;
   report_keys: string[];
   send_email: boolean;
@@ -215,6 +218,20 @@ const reports: Report[] = [
     },
   },
   {
+    identifier: 'product_sales',
+    label: 'product_sales',
+    endpoint: '/api/v1/reports/products',
+    payload: {
+      start_date: '',
+      end_date: '',
+      client_id: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
+  {
     identifier: 'task',
     label: 'task',
     endpoint: '/api/v1/reports/tasks',
@@ -324,7 +341,14 @@ export function Reports() {
     setIsPendingExport(true);
     setErrors(undefined);
 
-    request('POST', endpoint(report.endpoint), report.payload, {
+    const { client_id } = report.payload;
+
+    const updatedPayload =
+      report.identifier === 'product_sales'
+        ? { ...report.payload, client_id: client_id || null }
+        : report.payload;
+
+    request('POST', endpoint(report.endpoint), updatedPayload, {
       responseType: report.payload.send_email ? 'json' : 'blob',
     })
       .then((response) => {
@@ -467,6 +491,20 @@ export function Reports() {
                   handleCustomDateChange('end_date', value)
                 }
                 errorMessage={errors?.errors?.end_date}
+              />
+            </Element>
+          )}
+
+          {report.identifier === 'product_sales' && (
+            <Element leftSide={t('client')}>
+              <ClientSelector
+                value={report.payload.client_id}
+                onChange={(client) =>
+                  handlePayloadChange('client_id', client.id)
+                }
+                clearButton
+                onClearButtonClick={() => handlePayloadChange('client_id', '')}
+                withoutAction={true}
               />
             </Element>
           )}
