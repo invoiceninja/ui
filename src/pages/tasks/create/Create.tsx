@@ -30,10 +30,10 @@ export function Create() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('new_task');
-  const { data } = useBlankTaskQuery();
-  const { data: taskStatuses } = useTaskStatusesQuery();
 
-  let mounted = false;
+  const { data } = useBlankTaskQuery();
+
+  const { data: taskStatuses } = useTaskStatusesQuery();
 
   const pages = [
     { name: t('tasks'), href: '/tasks' },
@@ -63,11 +63,7 @@ export function Create() {
       );
     }
 
-    if (mounted) {
-      return () => setTask(undefined);
-    } else {
-      mounted = true;
-    }
+    return () => setTask(undefined);
   }, [data, taskStatuses]);
 
   const handleChange = (property: keyof Task, value: unknown) => {

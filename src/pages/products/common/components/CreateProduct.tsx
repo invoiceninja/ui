@@ -74,18 +74,12 @@ export function CreateProduct(props: Props) {
     }
   };
 
-  let mounted = false;
-
   useEffect(() => {
     if (!product) {
       setProduct(props.product);
     }
 
-    if (mounted) {
-      return () => setProduct(undefined);
-    } else {
-      mounted = true;
-    }
+    return () => setProduct(undefined);
   }, [props.product]);
 
   return (

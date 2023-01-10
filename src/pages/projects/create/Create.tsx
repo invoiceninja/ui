@@ -54,8 +54,6 @@ export function Create() {
     setProject((project) => project && { ...project, [property]: value });
   };
 
-  let mounted = false;
-
   useEffect(() => {
     if (blankProject && !project) {
       setProject({
@@ -65,11 +63,7 @@ export function Create() {
       });
     }
 
-    if (mounted) {
-      return () => setProject(undefined);
-    } else {
-      mounted = true;
-    }
+    return () => setProject(undefined);
   }, [blankProject]);
 
   useEffect(() => {
