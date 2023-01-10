@@ -17,6 +17,7 @@ import { VendorContact } from 'common/interfaces/vendor-contact';
 import { Divider } from 'components/cards/Divider';
 import { CountrySelector } from 'components/CountrySelector';
 import { CustomField } from 'components/CustomField';
+import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
 import Toggle from 'components/forms/Toggle';
 import { UserSelector } from 'components/users/UserSelector';
 import { set } from 'lodash';
@@ -299,6 +300,8 @@ export function Form(props: Props) {
         </Card>
 
         <Card title={t('custom_fields')}>
+          <CustomFieldsPlanAlert className="px-6" />
+
           {company &&
             ['vendor1', 'vendor2', 'vendor3', 'vendor4'].map((field) => (
               <Field
