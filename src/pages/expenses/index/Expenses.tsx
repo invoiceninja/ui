@@ -17,6 +17,7 @@ import {
   expenseColumns,
   useActions,
   useExpenseColumns,
+  useExpenseFilters,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { ImportButton } from 'components/import/ImportButton';
@@ -32,6 +33,8 @@ export function Expenses() {
 
   const actions = useActions();
 
+  const filters = useExpenseFilters();
+
   return (
     <Default title={t('expenses')} breadcrumbs={pages} docsLink="docs/expenses">
       <DataTable
@@ -42,6 +45,9 @@ export function Expenses() {
         linkToCreate="/expenses/create"
         linkToEdit="/expenses/:id/edit"
         customActions={actions}
+        customFilters={filters}
+        customFilterQueryKey="client_status"
+        customFilterPlaceholder="status"
         withResourcefulActions
         rightSide={<ImportButton route="/expenses/import" />}
         leftSideChevrons={

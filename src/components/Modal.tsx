@@ -88,27 +88,29 @@ export function Modal(props: Props) {
                 }
               )}
             >
-              <div className="flex justify-between items-start">
-                <div>
+              <div className="flex flex-col justify-between items-start">
+                <div className="flex w-full justify-between">
                   <Dialog.Title
                     as="h3"
                     className="text-lg leading-6 font-medium text-gray-900"
                   >
                     {props.title}
                   </Dialog.Title>
-                  <div className="mt-2">
-                    {props.text && (
-                      <p className="text-sm text-gray-500">{props.text}</p>
-                    )}
-                  </div>
+
+                  {!props.disableClosing && (
+                    <X
+                      className="cursor-pointer"
+                      onClick={() => props.onClose(false)}
+                      fontSize={22}
+                    />
+                  )}
                 </div>
 
-                {!props.disableClosing && (
-                  <X
-                    className="cursor-pointer"
-                    onClick={() => props.onClose(false)}
-                  />
-                )}
+                <div className="mt-2">
+                  {props.text && (
+                    <p className="text-sm text-gray-500">{props.text}</p>
+                  )}
+                </div>
               </div>
 
               {props.children && (
