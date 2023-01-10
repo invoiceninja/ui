@@ -102,7 +102,7 @@ export function App() {
       />
 
       <PhoneVerificationModal
-        visible={Boolean(account) && showSmsVerificationModal && !isHosted()}
+        visible={Boolean(account) && showSmsVerificationModal && isHosted()}
         setVisible={setShowSmsVerificationModal}
       />
 
