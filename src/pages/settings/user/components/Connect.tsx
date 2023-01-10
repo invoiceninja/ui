@@ -18,9 +18,26 @@ export function Connect() {
 
   const user = useCurrentUser();
 
+  const microsoftClientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
+
   const handleConnectEmail = () => {
+    const microsoftUrl =
+      'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?';
+
+    const redirectUri = window.location.origin + '/auth/microsoft';
+
+    const scope =
+      'User.Read+email+Mail.Send+offline_access+profile+User.Read+openid';
+
     window.open(
-      'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=1023b9ce-5b09-4f04-98f8-e1ed85a72332&redirect_uri=https://app.invoicing.co/auth/microsoft&scope=User.Read+email+Mail.Send+offline_access+profile+User.Read+openid&response_type=code&react=true'
+      microsoftUrl +
+        'client_id=' +
+        microsoftClientId +
+        '&redirect_uri=' +
+        redirectUri +
+        '&scope=' +
+        scope +
+        '&response_type=code&react=true'
     );
   };
 
@@ -32,22 +49,36 @@ export function Connect() {
             <Button type="minimal">{t('connect_google')}</Button>
           </Element>
 
-          <Element leftSide="Microsoft" onClick={handleConnectEmail}>
+          <Element leftSide="Microsoft">
             <Button type="minimal">{t('connect_microsoft')}</Button>
           </Element>
         </>
       )}
 
       {user?.oauth_provider_id === 'google' && (
-        <Element leftSide="Gmail">
-          <Button type="minimal">{t('connect_gmail')}</Button>
-        </Element>
+        <>
+          <Element leftSide="Google">
+            <Button type="minimal">{t('disconnect_google')}</Button>
+          </Element>
+
+          <Element leftSide="Gmail">
+            <Button type="minimal">{t('connect_gmail')}</Button>
+          </Element>
+        </>
       )}
 
       {user?.oauth_provider_id === 'microsoft' && (
-        <Element leftSide="Email">
-          <Button type="minimal">{t('connect_email')}</Button>
-        </Element>
+        <>
+          <Element leftSide="Microsoft">
+            <Button type="minimal">{t('disconnect_microsoft')}</Button>
+          </Element>
+
+          <Element leftSide="Email">
+            <Button type="minimal" onClick={handleConnectEmail}>
+              {t('connect_email')}
+            </Button>
+          </Element>
+        </>
       )}
     </Card>
   );
