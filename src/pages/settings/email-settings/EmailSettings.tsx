@@ -12,7 +12,9 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { trans } from 'common/helpers';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from 'common/hooks/useTitle';
+import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
 import { Divider } from 'components/cards/Divider';
 import { MarkdownEditor } from 'components/forms/MarkdownEditor';
 import Toggle from 'components/forms/Toggle';
@@ -40,14 +42,19 @@ export function EmailSettings() {
   const onSave = useHandleCompanySave();
   const onCancel = useHandleCancel();
 
+  const showPlanAlert = useShouldDisableAdvanceSettings();
+
   return (
     <Settings
       title={t('email_settings')}
-      breadcrumbs={pages}
       docsLink="docs/advanced-settings/#email_settings"
+      breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}
+      disableSaveButton={showPlanAlert}
     >
+      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+
       <Card title={t('settings')}>
         <Element leftSide={t('attach_pdf')}>
           <Toggle

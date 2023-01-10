@@ -21,6 +21,7 @@ import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { useStaticsQuery } from 'common/queries/statics';
+import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
 import { DocumentsTable } from 'components/DocumentsTable';
 import Toggle from 'components/forms/Toggle';
 import { TabGroup } from 'components/TabGroup';
@@ -242,17 +243,7 @@ export function AdditionalInfo(props: Props) {
         </div>
 
         <div>
-          <Element
-            leftSide={
-              <div className="inline-flex items-center space-x-2">
-                <span>{t('note')}</span>
-                <span className="text-red-600">*</span>
-              </div>
-            }
-          >
-            Custom fields apply to all clients, they are not specific to this
-            one. <i>Needs translation.</i>
-          </Element>
+          <CustomFieldsPlanAlert className="px-6" />
 
           {company &&
             ['client1', 'client2', 'client3', 'client4'].map((field) => (
@@ -267,17 +258,7 @@ export function AdditionalInfo(props: Props) {
         </div>
 
         <div>
-          <Element
-            leftSide={
-              <div className="inline-flex items-center space-x-2">
-                <span>{t('note')}</span>
-                <span className="text-red-600">*</span>
-              </div>
-            }
-          >
-            Custom fields apply to all contacts, they are not specific to this
-            one. <i>Needs translation.</i>
-          </Element>
+          <CustomFieldsPlanAlert className="px-6" />
 
           {company &&
             ['contact1', 'contact2', 'contact3', 'contact4'].map((field) => (

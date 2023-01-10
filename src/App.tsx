@@ -34,7 +34,7 @@ export function App() {
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
 
   const [isCompanyActivityModalShown, setIsCompanyActivityModalShown] =
-    useState<boolean>(false);
+    useState<boolean>(true);
 
   const resolveLanguage = useResolveLanguage();
 
@@ -71,7 +71,7 @@ export function App() {
   }, [darkMode, resolvedLanguage]);
 
   useEffect(() => {
-    if (user) {
+    if (user && Object.keys(user).length) {
       setIsEmailVerified(Boolean(user.email_verified_at));
     }
   }, [user]);
@@ -90,8 +90,8 @@ export function App() {
     <div className="App">
       <VerifyModal
         visible={
-          Boolean(user) &&
           !location.pathname.startsWith('/login') &&
+          !location.pathname.startsWith('/register') &&
           !isEmailVerified &&
           isHosted()
         }

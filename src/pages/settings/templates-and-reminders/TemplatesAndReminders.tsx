@@ -17,10 +17,12 @@ import { request } from 'common/helpers/request';
 import { EmailTemplate } from 'common/hooks/emails/useResolveTemplate';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Settings as CompanySettings } from 'common/interfaces/company.interface';
 import { TemplateBody, Templates } from 'common/interfaces/statics';
 import { useStaticsQuery } from 'common/queries/statics';
+import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
 import { MarkdownEditor } from 'components/forms/MarkdownEditor';
 import { Settings } from 'components/layouts/Settings';
 import { useHandleCancel } from 'pages/invoices/edit/hooks/useHandleCancel';
@@ -54,6 +56,8 @@ export function TemplatesAndReminders() {
   const [templateBody, setTemplateBody] = useState<TemplateBody>();
   const [preview, setPreview] = useState<EmailTemplate>();
   const canChangeEmailTemplate = (isHosted() && !freePlan()) || isSelfHosted();
+
+  const showPlanAlert = useShouldDisableAdvanceSettings();
 
   useEffect(() => {
     if (statics?.templates && company) {
@@ -162,11 +166,14 @@ export function TemplatesAndReminders() {
   return (
     <Settings
       title={t('templates_and_reminders')}
-      breadcrumbs={pages}
       docsLink="docs/advanced-settings/#templates_and_reminders"
+      breadcrumbs={pages}
       onSaveClick={handleSave}
       onCancelClick={handleCancel}
+      disableSaveButton={showPlanAlert}
     >
+      {showPlanAlert && <AdvancedSettingsPlanAlert />}
+
       <Card title={t('edit')}>
         <Element leftSide={t('template')}>
           <SelectField

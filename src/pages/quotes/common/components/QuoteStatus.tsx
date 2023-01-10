@@ -29,12 +29,6 @@ export function QuoteStatus(props: Props) {
   if (props.entity.invoice_id)
     return <Badge variant="green">{t('converted')}</Badge>;
 
-  if (
-    props.entity.status_id === QuoteStatusEnum.Sent &&
-    new Date(props.entity.date) < new Date()
-  )
-    return <Badge variant="red">{t('expired')}</Badge>;
-
   switch (props.entity.status_id) {
     case QuoteStatusEnum.Draft:
       return <Badge variant="generic">{t('draft')}</Badge>;
@@ -42,6 +36,8 @@ export function QuoteStatus(props: Props) {
       return <Badge variant="light-blue">{t('sent')}</Badge>;
     case QuoteStatusEnum.Approved:
       return <Badge variant="dark-blue">{t('approved')}</Badge>;
+    case QuoteStatusEnum.Expired:
+      return <Badge variant="red">{t('expired')}</Badge>;
     default:
       return <Badge variant="light-blue">{t('error')}</Badge>;
   }
