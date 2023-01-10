@@ -28,7 +28,7 @@ export function CompanyActivityModal(props: Props) {
 
   return (
     <Modal
-      title={t('company_activity')}
+      title={t('activate_company')}
       size="small"
       visible={props.visible}
       onClose={() => props.setVisible(false)}
