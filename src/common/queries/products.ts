@@ -13,24 +13,19 @@ import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { endpoint } from '../helpers';
-import { Params } from './common/params.interface';
+import { Product } from 'common/interfaces/product';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
-export function useProductsQuery(params: Params) {
-  return useQuery(['/api/v1/products', params], () => {
-    return request(
-      'GET',
-      endpoint(
-        '/api/v1/products?per_page=:perPage&page=:currentPage&filter=:filter&status=:status&sort=:sort',
-        {
-          perPage: params.perPage,
-          currentPage: params.currentPage,
-          filter: params.filter,
-          status: params.status,
-          sort: params.sort ?? 'id|asc',
-        }
-      )
-    );
-  });
+export function useProductsQuery() {
+  return useQuery<Product[]>(
+    '/api/v1/products',
+    () =>
+      request('GET', endpoint('/api/v1/products?per_page=500')).then(
+        (response: GenericSingleResourceResponse<Product[]>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
+  );
 }
 
 export function useProductQuery(params: { id: string | undefined }) {

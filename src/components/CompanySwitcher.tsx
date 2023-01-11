@@ -40,10 +40,6 @@ export function CompanySwitcher() {
 
   const canUserAddCompany = isSelfHosted() || (isHosted() && !freePlan());
 
-  const isCompanyEditAlreadyOpened = localStorage.getItem(
-    'COMPANY-EDIT-OPENED'
-  );
-
   const dispatch = useDispatch();
 
   const queryClient = useQueryClient();
@@ -89,16 +85,18 @@ export function CompanySwitcher() {
     if (isDemo()) {
       setShouldShowAddCompany(false);
     }
+  }, [currentCompany]);
 
+  useEffect(() => {
     if (
       currentCompany &&
       currentCompany?.settings?.name.includes(t('untitled')) &&
-      isCompanyEditAlreadyOpened !== 'true'
+      localStorage.getItem('COMPANY-EDIT-OPENED') !== 'true'
     ) {
       localStorage.setItem('COMPANY-EDIT-OPENED', 'true');
       setIsCompanyEditModalOpened(true);
     }
-  }, [currentCompany]);
+  }, []);
 
   return (
     <>
