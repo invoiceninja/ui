@@ -294,6 +294,8 @@ export function DebouncedCombobox(props: Props) {
                         withoutEvents: true,
                       });
 
+                      debouncedSearch('');
+
                       props.onClearButtonClick();
                     }}
                   />
