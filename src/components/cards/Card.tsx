@@ -10,25 +10,32 @@
 
 import classNames from 'classnames';
 import { Spinner } from 'components/Spinner';
-import React, { ReactNode } from 'react';
+import React, { CSSProperties, FormEvent, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer } from '.';
 import { Button } from '../forms';
 import { Element } from 'components/cards/Element';
+import { Dropdown } from 'components/dropdown/Dropdown';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Icon } from 'components/icons/Icon';
+import { BiPlusCircle, BiSave } from 'react-icons/bi';
 
 interface Props {
   children: ReactNode;
   title?: string | null;
   description?: string;
   withSaveButton?: boolean;
-  onFormSubmit?: (event: React.FormEvent<HTMLFormElement>) => any;
-  onSaveClick?: any;
+  withCreateOption?: boolean;
+  onFormSubmit?: (event: FormEvent<HTMLFormElement>) => unknown;
+  onSaveClick?: (event: FormEvent<HTMLFormElement>) => unknown;
+  onCreateClick?: (event: FormEvent<HTMLFormElement>) => unknown;
   saveButtonLabel?: string | null;
+  createButtonLabel?: string | null;
   disableSubmitButton?: boolean;
   disableWithoutIcon?: boolean;
   className?: string;
   withContainer?: boolean;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   withScrollableBody?: boolean;
   additionalAction?: ReactNode;
   isLoading?: boolean;
@@ -96,7 +103,7 @@ export function Card(props: Props) {
               <div className="sm:py-5 sm:px-6 flex justify-end space-x-4">
                 {props.additionalAction}
 
-                {props.withSaveButton && (
+                {props.withSaveButton && !props.withCreateOption && (
                   <Button
                     onClick={props.onSaveClick}
                     disabled={props.disableSubmitButton}
@@ -104,6 +111,28 @@ export function Card(props: Props) {
                   >
                     {props.saveButtonLabel ?? t('save')}
                   </Button>
+                )}
+
+                {props.withSaveButton && props.withCreateOption && (
+                  <Dropdown
+                    label={t('actions')}
+                    cardActions
+                    disabled={props.disableSubmitButton}
+                  >
+                    <DropdownElement
+                      icon={<Icon element={BiSave} />}
+                      onClick={props.onSaveClick}
+                    >
+                      {props.saveButtonLabel ?? t('save')}
+                    </DropdownElement>
+
+                    <DropdownElement
+                      icon={<Icon element={BiPlusCircle} />}
+                      onClick={props.onCreateClick}
+                    >
+                      {props.createButtonLabel ?? t('create')}
+                    </DropdownElement>
+                  </Dropdown>
                 )}
               </div>
             </dl>

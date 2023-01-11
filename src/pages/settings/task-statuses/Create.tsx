@@ -14,20 +14,32 @@ import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
+import { useAccentColor } from 'common/hooks/useAccentColor';
+import { useTitle } from 'common/hooks/useTitle';
+import { TaskStatus } from 'common/interfaces/task-status';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useBlankTaskStatusQuery } from 'common/queries/task-statuses';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { ColorPicker } from 'components/forms/ColorPicker';
 import { Settings } from 'components/layouts/Settings';
-import { useFormik } from 'formik';
-import { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { useHandleChange } from './common/hooks';
 
 export function Create() {
+  const { documentTitle } = useTitle('new_task_status');
+
   const [t] = useTranslation();
+
+  const navigate = useNavigate();
+
+  const accentColor = useAccentColor();
+
+  const queryClient = useQueryClient();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -35,36 +47,47 @@ export function Create() {
     { name: t('new_task_status'), href: '/settings/task_statuses/create' },
   ];
 
-  const [errors, setErrors] = useState<Record<string, any>>({});
-  const navigate = useNavigate();
-  const queryClient = useQueryClient();
+  const { data: blankTaskStatus } = useBlankTaskStatusQuery();
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'new_task_status'
-    )}`;
+  const [errors, setErrors] = useState<ValidationBag>();
+
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+
+  const [taskStatus, setTaskStatus] = useState<TaskStatus>();
+
+  const handleChange = useHandleChange({
+    setErrors,
+    setTaskStatus,
   });
 
-  const formik = useFormik({
-    initialValues: {
-      name: '',
-      color: '',
-    },
-    onSubmit: (values) => {
-      setErrors({});
+  const handleSave = (
+    event: FormEvent<HTMLFormElement>,
+    actionType: string
+  ) => {
+    event.preventDefault();
 
-      request('POST', endpoint('/api/v1/task_statuses'), values)
+    if (!isFormBusy) {
+      toast.processing();
+
+      setErrors(undefined);
+
+      setIsFormBusy(true);
+
+      request('POST', endpoint('/api/v1/task_statuses'), taskStatus)
         .then((response) => {
-          toast.dismiss();
-          toast.success(t('created_task_status'));
+          toast.success('created_task_status');
 
           queryClient.invalidateQueries('/api/v1/task_statuses');
 
-          navigate(
-            route('/settings/task_statuses/:id/edit', {
-              id: response.data.data.id,
-            })
-          );
+          if (actionType === 'save') {
+            navigate(
+              route('/settings/task_statuses/:id/edit', {
+                id: response.data.data.id,
+              })
+            );
+          } else {
+            setTaskStatus(blankTaskStatus);
+          }
         })
         .catch((error: AxiosError<ValidationBag>) => {
           toast.dismiss();
@@ -72,11 +95,17 @@ export function Create() {
 
           error.response?.status === 422
             ? setErrors(error.response.data)
-            : toast.error(t('error_title'));
+            : toast.error();
         })
-        .finally(() => formik.setSubmitting(false));
-    },
-  });
+        .finally(() => setIsFormBusy(false));
+    }
+  };
+
+  useEffect(() => {
+    if (blankTaskStatus) {
+      setTaskStatus(blankTaskStatus);
+    }
+  }, [blankTaskStatus]);
 
   return (
     <Settings title={t('task_statuses')}>
@@ -84,24 +113,26 @@ export function Create() {
         <Breadcrumbs pages={pages} />
 
         <Card
+          title={documentTitle}
           withSaveButton
-          disableSubmitButton={formik.isSubmitting}
-          onFormSubmit={formik.handleSubmit}
-          title={t('new_task_status')}
+          withCreateOption
+          disableSubmitButton={isFormBusy}
+          onSaveClick={(event) => handleSave(event, 'save')}
+          onCreateClick={(event) => handleSave(event, 'create')}
         >
           <CardContainer>
             <InputField
-              type="text"
-              id="name"
-              label={t('name')}
-              errorMessage={errors?.errors?.name}
               required
-              onChange={formik.handleChange}
+              label={t('name')}
+              value={taskStatus?.name}
+              onValueChange={(value) => handleChange('name', value)}
+              errorMessage={errors?.errors.name}
             />
 
             <InputLabel>{t('color')}</InputLabel>
             <ColorPicker
-              onValueChange={(color) => formik.setFieldValue('color', color)}
+              value={taskStatus?.color || accentColor}
+              onValueChange={(color) => handleChange('color', color)}
             />
           </CardContainer>
         </Card>

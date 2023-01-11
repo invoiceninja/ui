@@ -14,14 +14,19 @@ import { ChevronDown } from 'react-feather';
 import { cloneElement, useRef, useState } from 'react';
 import { DropdownElement } from './DropdownElement';
 import { useClickAway } from 'react-use';
+import classNames from 'classnames';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 
 interface Props extends CommonProps {
   label?: string | null;
+  cardActions?: boolean;
 }
 
 export function Dropdown(props: Props) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
+
+  const accentColor = useAccentColor();
 
   useClickAway(ref, () => {
     visible && setVisible(false);
@@ -53,7 +58,16 @@ export function Dropdown(props: Props) {
           type="button"
           disabled={props.disabled}
           onClick={() => setVisible(!visible)}
-          className="hover:bg-white inline-flex text-gray-900 border border-transparent hover:border-gray-300 dark:border-transparent items-center space-x-2 justify-center py-1.5 px-3 rounded text-sm  dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 disabled:cursor-not-allowed"
+          className={classNames(
+            `inline-flex text-gray-900 border border-transparent dark:border-transparent items-center space-x-2 justify-center py-1.5 px-3 rounded text-sm  dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-75 ${props.className}`,
+            {
+              'hover:bg-white hover:border-gray-300': !props.cardActions,
+            }
+          )}
+          style={{
+            backgroundColor: props.cardActions && accentColor,
+            color: props.cardActions ? 'white' : '',
+          }}
         >
           <span>{props.label}</span>
           <ChevronDown size={14} />
