@@ -152,14 +152,16 @@ export function CompanyEdit(props: Props) {
   };
 
   useEffect(() => {
-    if (currentCompany?.id && !companyId) {
-      setCompanyId('');
-    }
-    if (companyId === '') {
-      setCompanyId(currentCompany?.id);
-      fetchCompanyDetails(currentCompany?.id);
+    if (currentCompany?.id) {
+      setCompanyId(currentCompany.id);
     }
   }, [currentCompany]);
+
+  useEffect(() => {
+    if (companyId) {
+      fetchCompanyDetails(companyId);
+    }
+  }, [companyId]);
 
   return (
     <Modal
