@@ -11,7 +11,7 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
+import { endpoint, isProduction } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
@@ -63,7 +63,9 @@ export function Create() {
       });
     }
 
-    return () => setProject(undefined);
+    return () => {
+      isProduction() && setProject(undefined);
+    };
   }, [blankProject]);
 
   useEffect(() => {

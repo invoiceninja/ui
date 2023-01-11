@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
+import { endpoint, isProduction } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
@@ -63,7 +63,9 @@ export function Create() {
       );
     }
 
-    return () => setTask(undefined);
+    return () => {
+      isProduction() && setTask(undefined);
+    };
   }, [data, taskStatuses]);
 
   const handleChange = (property: keyof Task, value: unknown) => {

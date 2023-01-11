@@ -12,7 +12,7 @@ import { AxiosError } from 'axios';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
-import { endpoint } from 'common/helpers';
+import { endpoint, isProduction } from 'common/helpers';
 import { Card } from '@invoiceninja/cards';
 import { useTitle } from 'common/hooks/useTitle';
 import { request } from 'common/helpers/request';
@@ -79,7 +79,9 @@ export function CreateProduct(props: Props) {
       setProduct(props.product);
     }
 
-    return () => setProduct(undefined);
+    return () => {
+      isProduction() && setProduct(undefined);
+    };
   }, [props.product]);
 
   return (
