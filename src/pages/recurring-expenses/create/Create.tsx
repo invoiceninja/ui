@@ -16,7 +16,7 @@ import { Details } from '../components/Details';
 import { Notes } from '../components/Notes';
 import { AdditionalInfo } from '../components/AdditionalInfo';
 import { request } from 'common/helpers/request';
-import { endpoint } from 'common/helpers';
+import { endpoint, isProduction } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
 import { useNavigate } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
@@ -61,7 +61,9 @@ export function Create() {
       setRecurringExpense({ ...data, frequency_id: '5' });
     }
 
-    return () => setRecurringExpense(undefined);
+    return () => {
+      isProduction() && setRecurringExpense(undefined)
+    };
   }, [data]);
 
   const onSave = (recurringExpense: RecurringExpense) => {
