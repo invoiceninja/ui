@@ -15,6 +15,7 @@ import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldCha
 import { Task } from 'common/interfaces/task';
 import { TaskStatus } from 'common/interfaces/task-status';
 import { User } from 'common/interfaces/user';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { ClientSelector } from 'components/clients/ClientSelector';
 import { CustomField } from 'components/CustomField';
 import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
@@ -28,12 +29,14 @@ import { useLocation } from 'react-router-dom';
 interface Props {
   task: Task;
   handleChange: (property: keyof Task, value: unknown) => unknown;
+  errors: ValidationBag | undefined;
+  taskModal?: boolean;
 }
 
 export function TaskDetails(props: Props) {
   const [t] = useTranslation();
 
-  const { task, handleChange } = props;
+  const { task, handleChange, errors } = props;
 
   const company = useCurrentCompany();
   const location = useLocation();
@@ -48,6 +51,7 @@ export function TaskDetails(props: Props) {
             value={task.client_id}
             clearButton={Boolean(task.client_id)}
             onClearButtonClick={() => handleChange('client_id', '')}
+            errorMessage={errors?.errors.client_id}
           />
         </Element>
 
@@ -57,6 +61,7 @@ export function TaskDetails(props: Props) {
             value={task.project_id}
             clearButton={Boolean(task.project_id)}
             onClearButtonClick={() => handleChange('project_id', '')}
+            errorMessage={errors?.errors.project_id}
           />
         </Element>
 
@@ -75,6 +80,7 @@ export function TaskDetails(props: Props) {
             onClearButtonClick={() => handleChange('assigned_user_id', '')}
             queryAdditional
             defaultValue={task.assigned_user_id}
+            errorMessage={errors?.errors.assigned_user_id}
           />
         </Element>
 
@@ -102,6 +108,7 @@ export function TaskDetails(props: Props) {
           <InputField
             value={task.number}
             onValueChange={(value) => handleChange('number', value)}
+            errorMessage={errors?.errors.number}
           />
         </Element>
 
@@ -109,6 +116,7 @@ export function TaskDetails(props: Props) {
           <InputField
             value={task.rate}
             onValueChange={(value) => handleChange('rate', value)}
+            errorMessage={errors?.errors.rate}
           />
         </Element>
 
@@ -121,6 +129,8 @@ export function TaskDetails(props: Props) {
             }
             defaultValue={task.status_id}
             queryAdditional
+            errorMessage={errors?.errors.status_id}
+            disabled={props.taskModal}
           />
         </Element>
 
@@ -151,6 +161,7 @@ export function TaskDetails(props: Props) {
                 element="textarea"
                 value={task.description}
                 onValueChange={(value) => handleChange('description', value)}
+                errorMessage={errors?.errors.description}
               />
             </div>
 
@@ -182,6 +193,7 @@ export function TaskDetails(props: Props) {
             element="textarea"
             value={task.description}
             onValueChange={(value) => handleChange('description', value)}
+            errorMessage={errors?.errors.description}
           />
         </Card>
       )}

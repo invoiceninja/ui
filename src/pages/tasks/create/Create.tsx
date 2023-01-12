@@ -8,12 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useTaskStatusesQuery } from 'common/queries/task-statuses';
 import { useBlankTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
@@ -37,6 +39,8 @@ export function Create() {
   ];
 
   const [task, setTask] = useState<Task>();
+
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const navigate = useNavigate();
 
@@ -66,10 +70,14 @@ export function Create() {
 
         navigate(route('/tasks/:id/edit', { id: response.data.data.id }));
       })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       });
   };
 
@@ -80,7 +88,9 @@ export function Create() {
       onSaveClick={() => task && handleSave(task)}
       breadcrumbs={pages}
     >
-      {task && <TaskDetails task={task} handleChange={handleChange} />}
+      {task && (
+        <TaskDetails task={task} handleChange={handleChange} errors={errors} />
+      )}
       {task && <TaskTable task={task} handleChange={handleChange} />}
     </Default>
   );

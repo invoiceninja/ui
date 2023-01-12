@@ -50,6 +50,9 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 import { Card, Element } from '@invoiceninja/cards';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { Inline } from 'components/Inline';
+import { MdOutlineAddBox } from 'react-icons/md';
+import { useAccentColor } from 'common/hooks/useAccentColor';
+import { CreateTaskModal, TaskDetails } from './components/CreateTaskModal';
 
 interface Card {
   id: string;
@@ -82,8 +85,14 @@ export function Kanban() {
 
   const queryClient = useQueryClient();
 
+  const accentColor = useAccentColor();
+
   const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks');
   const [projectId, setProjectId] = useState<string>();
+
+  const [taskDetails, setTaskDetails] = useState<TaskDetails>();
+
+  const [isTaskModalOpened, setIsTaskModalOpened] = useState<boolean>(false);
 
   const { data: taskStatuses } = useTaskStatusesQuery();
 
@@ -237,11 +246,14 @@ export function Kanban() {
   useEffect(() => {
     projectId
       ? setApiEndpoint(
-          route('/api/v1/tasks?project_tasks=:projectId&limit=1000', {
-            projectId,
-          })
+          route(
+            '/api/v1/tasks?project_tasks=:projectId&limit=1000&per_page=500',
+            {
+              projectId,
+            }
+          )
         )
-      : setApiEndpoint('/api/v1/tasks?limit=1000');
+      : setApiEndpoint('/api/v1/tasks?limit=1000&per_page=500');
   }, [projectId]);
 
   return (
@@ -336,10 +348,20 @@ export function Kanban() {
                     className="bg-white rounded shadow select-none h-max"
                     style={{ minWidth: 360 }}
                   >
-                    <div className="border-b border-gray-200 px-4 py-5">
+                    <div className="flex items-center justify-between border-b border-gray-200 px-4 py-5">
                       <h3 className="leading-6 font-medium text-gray-900">
                         {board.title}
                       </h3>
+
+                      <MdOutlineAddBox
+                        className="cursor-pointer"
+                        fontSize={28}
+                        color={accentColor}
+                        onClick={() => {
+                          setTaskDetails({ taskStatusId: board.id, projectId });
+                          setIsTaskModalOpened(true);
+                        }}
+                      />
                     </div>
 
                     <div
@@ -415,6 +437,13 @@ export function Kanban() {
           </DragDropContext>
         </div>
       )}
+
+      <CreateTaskModal
+        visible={isTaskModalOpened}
+        setVisible={setIsTaskModalOpened}
+        details={taskDetails}
+        apiEndPoint={apiEndpoint}
+      />
     </Default>
   );
 }
