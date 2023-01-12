@@ -12,6 +12,7 @@ import { isHosted } from 'common/helpers';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
+import { CompanyActivityModal } from 'components/CompanyActivityModal';
 import { VerifyModal } from 'components/VerifyModal';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
@@ -30,7 +31,10 @@ export function App() {
 
   const location = useLocation();
 
-  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
+  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
+
+  const [showCompanyActivityModal, setShowCompanyActivityModal] =
+    useState<boolean>(false);
 
   const resolveLanguage = useResolveLanguage();
 
@@ -72,6 +76,16 @@ export function App() {
     }
   }, [user]);
 
+  useEffect(() => {
+    const modalShown = sessionStorage.getItem('COMPANY-ACTIVITY-SHOWN');
+
+    if (company && (modalShown === 'false' || !modalShown)) {
+      setShowCompanyActivityModal(company.is_disabled);
+
+      sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'true');
+    }
+  }, [company]);
+
   return (
     <div className="App">
       <VerifyModal
@@ -83,7 +97,14 @@ export function App() {
         }
         type="email"
       />
+
+      <CompanyActivityModal
+        visible={Boolean(company) && showCompanyActivityModal}
+        setVisible={setShowCompanyActivityModal}
+      />
+
       <Toaster position="top-center" />
+
       {routes}
     </div>
   );

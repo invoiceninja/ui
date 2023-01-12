@@ -72,6 +72,8 @@ export function CompanySwitcher() {
 
     localStorage.setItem('COMPANY-EDIT-OPENED', 'false');
 
+    sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'false');
+
     queryClient.invalidateQueries();
 
     window.location.href = route('/');

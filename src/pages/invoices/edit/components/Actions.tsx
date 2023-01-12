@@ -187,7 +187,7 @@ export function useActions() {
         onClick={() => cloneToInvoice(invoice)}
         icon={<Icon element={MdControlPointDuplicate} />}
       >
-        {t('clone_to_invoice')}
+        {t('clone')}
       </DropdownElement>
     ),
     (invoice: Invoice) => (
