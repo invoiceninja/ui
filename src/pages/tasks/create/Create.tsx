@@ -20,7 +20,7 @@ import { useTaskStatusesQuery } from 'common/queries/task-statuses';
 import { useBlankTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
 import { useAtom } from 'jotai';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { taskAtom } from '../common/atoms';
