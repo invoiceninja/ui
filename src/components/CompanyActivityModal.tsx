@@ -10,8 +10,6 @@
 
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AiOutlineArrowRight } from 'react-icons/ai';
-import { MdWarning } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './forms';
 import { Modal } from './Modal';
