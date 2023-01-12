@@ -13,7 +13,6 @@ import { enabled } from 'common/guards/guards/enabled';
 import { permission } from 'common/guards/guards/permission';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
-import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
 import { Documents } from './documents/Documents';
 import { Edit } from './edit/Edit';
@@ -61,6 +60,5 @@ export const projectRoutes = (
       <Route path="edit" element={<Edit />} />
       <Route path="documents" element={<Documents />} />
     </Route>
-    <Route path="/projects/:id/clone" element={<Clone />} />
   </Route>
 );

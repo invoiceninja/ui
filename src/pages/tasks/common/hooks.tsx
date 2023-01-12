@@ -18,18 +18,33 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Task } from 'common/interfaces/task';
+import { Divider } from 'components/cards/Divider';
 import { customField } from 'components/CustomField';
 import { SelectOption } from 'components/datatables/Actions';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Icon } from 'components/icons/Icon';
 import dayjs from 'dayjs';
+import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
+import {
+  MdControlPointDuplicate,
+  MdNotStarted,
+  MdStopCircle,
+  MdTextSnippet,
+} from 'react-icons/md';
 import { useQueryClient } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import { taskAtom } from './atoms';
 import { TaskStatus } from './components/TaskStatus';
 import {
   calculateEntityState,
   isTaskRunning,
 } from './helpers/calculate-entity-state';
 import { calculateTime, parseTimeLog } from './helpers/calculate-time';
+import { useInvoiceTask } from './hooks/useInvoiceTask';
+import { useStart } from './hooks/useStart';
+import { useStop } from './hooks/useStop';
 
 export const taskColumns = [
   'status',
@@ -285,4 +300,66 @@ export function useTaskFilters() {
   ];
 
   return filters;
+}
+
+export function useActions() {
+  const [t] = useTranslation();
+
+  const navigate = useNavigate();
+
+  const start = useStart();
+
+  const stop = useStop();
+
+  const invoiceTask = useInvoiceTask();
+
+  const setTask = useUpdateAtom(taskAtom);
+
+  const cloneToTask = (task: Task) => {
+    setTask({ ...task, id: '', documents: [], number: '' });
+
+    navigate('/tasks/create');
+  };
+
+  const actions = [
+    (task: Task) =>
+      !isTaskRunning(task) && (
+        <DropdownElement
+          onClick={() => start(task)}
+          icon={<Icon element={MdNotStarted} />}
+        >
+          {t('start')}
+        </DropdownElement>
+      ),
+    (task: Task) =>
+      isTaskRunning(task) && (
+        <DropdownElement
+          onClick={() => stop(task)}
+          icon={<Icon element={MdStopCircle} />}
+        >
+          {t('stop')}
+        </DropdownElement>
+      ),
+    () => <Divider withoutPadding />,
+    (task: Task) => (
+      <DropdownElement
+        onClick={() => cloneToTask(task)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
+        {t('clone')}
+      </DropdownElement>
+    ),
+    (task: Task) =>
+      !isTaskRunning(task) &&
+      !task.invoice_id && (
+        <DropdownElement
+          onClick={() => invoiceTask([task])}
+          icon={<Icon element={MdTextSnippet} />}
+        >
+          {t('invoice_task')}
+        </DropdownElement>
+      ),
+  ];
+
+  return actions;
 }

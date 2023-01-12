@@ -9,20 +9,16 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { Project } from 'common/interfaces/project';
 import { DataTable } from 'components/DataTable';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
 import {
   defaultColumns,
   projectColumns,
+  useActions,
   useProjectColumns,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
-import { Icon } from 'components/icons/Icon';
-import { MdControlPointDuplicate } from 'react-icons/md';
 
 export function Projects() {
   useTitle('projects');
@@ -30,18 +26,10 @@ export function Projects() {
   const [t] = useTranslation();
 
   const pages = [{ name: t('projects'), href: '/projects' }];
+
   const columns = useProjectColumns();
 
-  const actions = [
-    (project: Project) => (
-      <DropdownElement
-        to={route('/projects/:id/clone', { id: project.id })}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
-  ];
+  const actions = useActions();
 
   return (
     <Default

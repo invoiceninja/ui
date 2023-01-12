@@ -17,9 +17,15 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Project } from 'common/interfaces/project';
 import { customField } from 'components/CustomField';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
+import { Icon } from 'components/icons/Icon';
+import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
+import { MdControlPointDuplicate } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
+import { projectAtom } from './atoms';
 
 export const projectColumns = [
   'name',
@@ -199,4 +205,31 @@ export function useProjectColumns() {
   return columns
     .filter((column) => list.includes(column.column))
     .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+}
+
+export function useActions() {
+  const [t] = useTranslation();
+
+  const navigate = useNavigate();
+
+  const setProject = useUpdateAtom(projectAtom);
+
+  const cloneToProject = (project: Project) => {
+    setProject({ ...project, id: '', documents: [], number: '' });
+
+    navigate('/projects/create');
+  };
+
+  const actions = [
+    (project: Project) => (
+      <DropdownElement
+        onClick={() => cloneToProject(project)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
+        {t('clone')}
+      </DropdownElement>
+    ),
+  ];
+
+  return actions;
 }

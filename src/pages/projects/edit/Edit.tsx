@@ -22,6 +22,7 @@ import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { Icon } from 'components/icons/Icon';
+import { useUpdateAtom } from 'jotai/utils';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -32,11 +33,14 @@ import {
   MdRestore,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { projectAtom } from '../common/atoms';
 import { useBulkAction } from '../common/hooks/useBulkAction';
 
 export function Edit() {
   const [t] = useTranslation();
+
+  const navigate = useNavigate();
 
   const { id } = useParams();
   const { data } = useProjectQuery({ id });
@@ -46,6 +50,16 @@ export function Edit() {
 
   const queryClient = useQueryClient();
   const bulk = useBulkAction();
+
+  const setProjectAtom = useUpdateAtom(projectAtom);
+
+  const cloneToProject = () => {
+    setProjectAtom(
+      project && { ...project, id: '', documents: [], number: '' }
+    );
+
+    navigate('/projects/create');
+  };
 
   useEffect(() => {
     if (data) {
@@ -165,7 +179,7 @@ export function Edit() {
         <div className="flex justify-end">
           <Dropdown label={t('more_actions')}>
             <DropdownElement
-              to={route('/projects/:id/clone', { id })}
+              onClick={cloneToProject}
               icon={<Icon element={MdControlPointDuplicate} />}
             >
               {t('clone')}
