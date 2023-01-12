@@ -28,6 +28,7 @@ export function RecurringExpenses() {
       withResourcefulActions
       bulkRoute="/api/v1/recurring_expenses/bulk"
       linkToCreate={route('/recurring_expenses/create?client=:id', { id: id })}
+      linkToEdit="/recurring_expenses/:id/edit"
       staleTime={dataTableStaleTime}
     />
   );
