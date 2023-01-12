@@ -17,32 +17,46 @@ import { Modal } from './Modal';
 interface Props {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
+  type: 'activity' | 'phone';
 }
 
-export function CompanyActivityModal(props: Props) {
+export function AccountWarningsModal(props: Props) {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
   return (
     <Modal
-      title={t('activate_company')}
+      title={
+        props.type === 'activity'
+          ? t('activate_company')
+          : t('verify_phone_number')
+      }
       visible={props.visible}
       onClose={() => props.setVisible(false)}
     >
       <div className="text-gray-900">
-        <p>{t('company_disabled_warning')}.</p>
+        <p>
+          {props.type === 'activity'
+            ? t('company_disabled_warning')
+            : t('verify_phone_number_help')}
+          .
+        </p>
 
         <Button
           type="minimal"
           onClick={() => {
-            navigate('/settings/account_management');
+            navigate(
+              props.type === 'activity'
+                ? '/settings/account_management'
+                : '/settings/user_details/enable_two_factor'
+            );
             props.setVisible(false);
           }}
         >
           {t('go_to_settings')}
         </Button>
       </div>
-    </Modal >
+    </Modal>
   );
 }
