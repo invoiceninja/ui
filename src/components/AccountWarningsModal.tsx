@@ -54,7 +54,9 @@ export function AccountWarningsModal(props: Props) {
             props.setVisible(false);
           }}
         >
-          {t('go_to_settings')}
+          {props.type === 'activity'
+            ? t('activate_company')
+            : t('verify_phone_number')}
         </Button>
       </div>
     </Modal>
