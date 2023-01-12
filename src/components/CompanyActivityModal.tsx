@@ -29,35 +29,22 @@ export function CompanyActivityModal(props: Props) {
   return (
     <Modal
       title={t('activate_company')}
-      size="small"
       visible={props.visible}
       onClose={() => props.setVisible(false)}
     >
-      <div className="flex flex-col justify-center space-y-7 pb-1 px-3 text-center">
-        <div className="flex justify-center items-center space-x-3">
-          <MdWarning fontSize={22} color="#e6b05c" />
+      <div className="text-gray-900">
+        <p>{t('company_disabled_warning')}.</p>
 
-          <span className="text-gray-800 text-base font-medium">
-            {t('company_disabled_warning')}.
-          </span>
-        </div>
-
-        <div className="flex justify-end items-center w-full">
-          <Button
-            type="primary"
-            onClick={() => {
-              navigate('/settings/account_management');
-              props.setVisible(false);
-            }}
-          >
-            <div className="flex items-center">
-              {t('settings')}
-
-              <AiOutlineArrowRight className="ml-2" fontSize={18} />
-            </div>
-          </Button>
-        </div>
+        <Button
+          type="minimal"
+          onClick={() => {
+            navigate('/settings/account_management');
+            props.setVisible(false);
+          }}
+        >
+          {t('go_to_settings')}
+        </Button>
       </div>
-    </Modal>
+    </Modal >
   );
 }
