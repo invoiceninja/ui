@@ -10,7 +10,7 @@
 
 import classNames from 'classnames';
 import { Spinner } from 'components/Spinner';
-import React, { CSSProperties, FormEvent, ReactNode } from 'react';
+import { CSSProperties, FormEvent, ReactNode, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer } from '.';
 import { Button } from '../forms';
@@ -47,6 +47,8 @@ export function Card(props: Props) {
   const [t] = useTranslation();
 
   const { padding = 'regular' } = props;
+
+  const [isSaveButtonActive, setIsSaveButtonActive] = useState(true);
 
   return (
     <div
@@ -114,25 +116,55 @@ export function Card(props: Props) {
                 )}
 
                 {props.withSaveButton && props.withCreateOption && (
-                  <Dropdown
-                    label={t('actions')}
-                    cardActions
-                    disabled={props.disableSubmitButton}
-                  >
-                    <DropdownElement
-                      icon={<Icon element={BiSave} />}
-                      onClick={props.onSaveClick}
-                    >
-                      {props.saveButtonLabel ?? t('save')}
-                    </DropdownElement>
+                  <div className="flex">
+                    {isSaveButtonActive ? (
+                      <Button
+                        className="rounded-br-none rounded-tr-none pl-3 pr-2"
+                        onClick={props.onSaveClick}
+                        disabled={props.disableSubmitButton}
+                        disableWithoutIcon={props.disableWithoutIcon}
+                      >
+                        {props.saveButtonLabel ?? t('save')}
+                      </Button>
+                    ) : (
+                      <Button
+                        className="rounded-br-none rounded-tr-none pl-3 pr-2"
+                        onClick={props.onCreateClick}
+                        disabled={props.disableSubmitButton}
+                        disableWithoutIcon={props.disableWithoutIcon}
+                      >
+                        {props.createButtonLabel ?? t('create')}
+                      </Button>
+                    )}
 
-                    <DropdownElement
-                      icon={<Icon element={BiPlusCircle} />}
-                      onClick={props.onCreateClick}
+                    <Dropdown
+                      className="rounded-bl-none rounded-tl-none h-full px-1"
+                      cardActions
+                      disabled={props.disableSubmitButton}
                     >
-                      {props.createButtonLabel ?? t('create')}
-                    </DropdownElement>
-                  </Dropdown>
+                      <div>
+                        {!isSaveButtonActive && (
+                          <DropdownElement
+                            icon={<Icon element={BiSave} />}
+                            onClick={() => setIsSaveButtonActive(true)}
+                          >
+                            {props.saveButtonLabel ?? t('save')}
+                          </DropdownElement>
+                        )}
+                      </div>
+
+                      <div>
+                        {isSaveButtonActive && (
+                          <DropdownElement
+                            icon={<Icon element={BiPlusCircle} />}
+                            onClick={() => setIsSaveButtonActive(false)}
+                          >
+                            {props.createButtonLabel ?? t('create')}
+                          </DropdownElement>
+                        )}
+                      </div>
+                    </Dropdown>
+                  </div>
                 )}
               </div>
             </dl>

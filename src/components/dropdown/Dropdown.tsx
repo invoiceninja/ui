@@ -62,6 +62,7 @@ export function Dropdown(props: Props) {
             `inline-flex text-gray-900 border border-transparent dark:border-transparent items-center space-x-2 justify-center py-1.5 px-3 rounded text-sm  dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-75 ${props.className}`,
             {
               'hover:bg-white hover:border-gray-300': !props.cardActions,
+              'hover:opacity-90': props.cardActions,
             }
           )}
           style={{
@@ -69,8 +70,8 @@ export function Dropdown(props: Props) {
             color: props.cardActions ? 'white' : '',
           }}
         >
-          <span>{props.label}</span>
-          <ChevronDown size={14} />
+          {!props.cardActions && <span>{props.label}</span>}
+          <ChevronDown size={!props.cardActions ? 14 : 18} />
         </button>
       </Tippy>
     </div>
