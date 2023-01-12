@@ -71,7 +71,7 @@ export function Dropdown(props: Props) {
           }}
         >
           {!props.cardActions && <span>{props.label}</span>}
-          <ChevronDown size={!props.cardActions ? 14 : 18} />
+          <ChevronDown size={props.cardActions ? 18 : 14} />
         </button>
       </Tippy>
     </div>
