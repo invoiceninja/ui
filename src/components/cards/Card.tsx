@@ -10,7 +10,7 @@
 
 import classNames from 'classnames';
 import { Spinner } from 'components/Spinner';
-import { CSSProperties, FormEvent, ReactNode, useState } from 'react';
+import { CSSProperties, FormEvent, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer } from '.';
 import { Button } from '../forms';
@@ -18,7 +18,7 @@ import { Element } from 'components/cards/Element';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Icon } from 'components/icons/Icon';
-import { BiPlusCircle, BiSave } from 'react-icons/bi';
+import { BiPlusCircle } from 'react-icons/bi';
 
 interface Props {
   children: ReactNode;
@@ -47,8 +47,6 @@ export function Card(props: Props) {
   const [t] = useTranslation();
 
   const { padding = 'regular' } = props;
-
-  const [isSaveButtonActive, setIsSaveButtonActive] = useState(true);
 
   return (
     <div
@@ -117,52 +115,28 @@ export function Card(props: Props) {
 
                 {props.withSaveButton && props.withCreateOption && (
                   <div className="flex">
-                    {isSaveButtonActive ? (
-                      <Button
-                        className="rounded-br-none rounded-tr-none pl-3 pr-2"
-                        onClick={props.onSaveClick}
-                        disabled={props.disableSubmitButton}
-                        disableWithoutIcon={props.disableWithoutIcon}
-                      >
-                        {props.saveButtonLabel ?? t('save')}
-                      </Button>
-                    ) : (
-                      <Button
-                        className="rounded-br-none rounded-tr-none pl-3 pr-2"
-                        onClick={props.onCreateClick}
-                        disabled={props.disableSubmitButton}
-                        disableWithoutIcon={props.disableWithoutIcon}
-                      >
-                        {props.createButtonLabel ?? t('create')}
-                      </Button>
-                    )}
+                    <Button
+                      className="rounded-br-none rounded-tr-none px-3"
+                      onClick={props.onSaveClick}
+                      disabled={props.disableSubmitButton}
+                      disableWithoutIcon={props.disableWithoutIcon}
+                    >
+                      {props.saveButtonLabel ?? t('save')}
+                    </Button>
 
                     <Dropdown
-                      className="rounded-bl-none rounded-tl-none h-full px-1"
+                      className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
                       cardActions
                       disabled={props.disableSubmitButton}
                     >
-                      <div>
-                        {!isSaveButtonActive && (
-                          <DropdownElement
-                            icon={<Icon element={BiSave} />}
-                            onClick={() => setIsSaveButtonActive(true)}
-                          >
-                            {props.saveButtonLabel ?? t('save')}
-                          </DropdownElement>
-                        )}
-                      </div>
-
-                      <div>
-                        {isSaveButtonActive && (
-                          <DropdownElement
-                            icon={<Icon element={BiPlusCircle} />}
-                            onClick={() => setIsSaveButtonActive(false)}
-                          >
-                            {props.createButtonLabel ?? t('create')}
-                          </DropdownElement>
-                        )}
-                      </div>
+                      <DropdownElement
+                        icon={<Icon element={BiPlusCircle} />}
+                        disabled={props.disableSubmitButton}
+                        onClick={props.onCreateClick}
+                      >
+                        {props.createButtonLabel ??
+                          `${t('save')}/${t('create')}`}
+                      </DropdownElement>
                     </Dropdown>
                   </div>
                 )}

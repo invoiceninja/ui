@@ -11,7 +11,14 @@
 import Tippy from '@tippyjs/react/headless';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { ChevronDown } from 'react-feather';
-import { cloneElement, useRef, useState } from 'react';
+import {
+  Children,
+  cloneElement,
+  ReactNode,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { DropdownElement } from './DropdownElement';
 import { useClickAway } from 'react-use';
 import classNames from 'classnames';
@@ -28,9 +35,15 @@ export function Dropdown(props: Props) {
 
   const accentColor = useAccentColor();
 
+  const [children, setChildren] = useState<ReactNode>();
+
   useClickAway(ref, () => {
     visible && setVisible(false);
   });
+
+  useEffect(() => {
+    setChildren(Children.toArray(props.children));
+  }, [props.children]);
 
   return (
     <div ref={ref}>
@@ -45,7 +58,7 @@ export function Dropdown(props: Props) {
           >
             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
             {/* @ts-ignore */}
-            {props.children?.map((child, index: number) =>
+            {children?.map((child, index: number) =>
               child && child['type'] == DropdownElement
                 ? cloneElement(child, { setVisible, key: index })
                 : child
