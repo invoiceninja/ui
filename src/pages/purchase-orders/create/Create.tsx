@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isProduction } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
@@ -72,7 +73,9 @@ export function Create() {
       setPurchaseOrder(po);
     }
 
-    return () => setPurchaseOrder(undefined);
+    return () => {
+      isProduction() && setPurchaseOrder(undefined)
+    };
   }, [data]);
 
   const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();

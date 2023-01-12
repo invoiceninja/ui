@@ -103,3 +103,7 @@ export function isDemo() {
 
   return endpoint === apiEndpoint();
 }
+
+export function isProduction() {
+  return import.meta.env.PROD;
+}

@@ -11,7 +11,6 @@
 import { Guard } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
-import { Clone } from './clone/Clone';
 import { Create } from './create/Create';
 import { Documents } from './documents/Documents';
 import { Edit } from './edit/Edit';
@@ -63,7 +62,6 @@ export const productRoutes = (
     >
       <Route path="product_fields" element={<ProductFields />} />
       <Route path="" element={<Show />} />
-      <Route path="clone" element={<Clone />} />
       <Route path="documents" element={<Documents />} />
     </Route>
     <Route

@@ -14,6 +14,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
 import { PhoneVerificationModal } from 'components/PhoneVerificationModal';
+import { CompanyActivityModal } from 'components/CompanyActivityModal';
 import { VerifyModal } from 'components/VerifyModal';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
@@ -34,7 +35,10 @@ export function App() {
 
   const account = useCurrentAccount();
 
-  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
+  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
+
+  const [showCompanyActivityModal, setShowCompanyActivityModal] =
+    useState<boolean>(false);
 
   const [showSmsVerificationModal, setShowSmsVerificationModal] =
     useState<boolean>(false);
@@ -89,6 +93,16 @@ export function App() {
     }
   }, [account]);
 
+  useEffect(() => {
+    const modalShown = sessionStorage.getItem('COMPANY-ACTIVITY-SHOWN');
+
+    if (company && (modalShown === 'false' || !modalShown)) {
+      setShowCompanyActivityModal(company.is_disabled);
+
+      sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'true');
+    }
+  }, [company]);
+
   return (
     <div className="App">
       <VerifyModal
@@ -104,6 +118,11 @@ export function App() {
       <PhoneVerificationModal
         visible={Boolean(account) && showSmsVerificationModal && isHosted()}
         setVisible={setShowSmsVerificationModal}
+      />
+
+      <CompanyActivityModal
+        visible={Boolean(company) && showCompanyActivityModal}
+        setVisible={setShowCompanyActivityModal}
       />
 
       <Toaster position="top-center" />

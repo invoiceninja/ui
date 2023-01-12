@@ -57,7 +57,7 @@ export function TransactionMatchDetails(props: Props) {
 
   const tabs = [
     props.isCreditTransactionType ? t('create_payment') : t('create_expense'),
-    props.isCreditTransactionType ? t('match_payment') : t('match_expense'),
+    props.isCreditTransactionType ? t('link_payment') : t('link_expense'),
   ];
 
   const convertToPayment = (event: FormEvent<HTMLFormElement>) => {
@@ -303,8 +303,8 @@ export function TransactionMatchDetails(props: Props) {
 
                   <span>
                     {props.isCreditTransactionType
-                      ? t('convert_to_payment')
-                      : t('convert_to_expense')}
+                      ? t('create_payment')
+                      : t('create_expense')}
                   </span>
                 </Button>
               </div>
@@ -351,8 +351,8 @@ export function TransactionMatchDetails(props: Props) {
 
                   <span>
                     {props.isCreditTransactionType
-                      ? t('link_to_payment')
-                      : t('link_to_expense')}
+                      ? t('link_payment')
+                      : t('link_expense')}
                   </span>
                 </Button>
               </div>

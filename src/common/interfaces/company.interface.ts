@@ -26,6 +26,7 @@ export interface Company {
   enable_product_quantity: boolean;
   show_task_end_date: boolean;
   use_quote_terms_on_conversion: boolean;
+  is_disabled: boolean;
   enable_applying_payments: boolean;
   enabled_expense_tax_rates: number;
   stock_notification: boolean;
