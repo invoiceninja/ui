@@ -14,10 +14,18 @@ import { route } from 'common/helpers/route';
 import { User } from 'common/interfaces/user';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Icon } from 'components/icons/Icon';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import {
+  MdArchive,
+  MdDelete,
+  MdRemove,
+  MdRestore,
+  MdSend,
+} from 'react-icons/md';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -104,7 +112,10 @@ export function Actions(props: Props) {
 
       <Dropdown label={t('more_actions')} className="divide-y">
         <div>
-          <DropdownElement onClick={() => invite()}>
+          <DropdownElement
+            onClick={() => invite()}
+            icon={<Icon element={MdSend} />}
+          >
             {t('resend_email')}
           </DropdownElement>
 
@@ -113,6 +124,7 @@ export function Actions(props: Props) {
               setAction('remove');
               setIsPasswordConfirmModalOpen(true);
             }}
+            icon={<Icon element={MdRemove} />}
           >
             {t('remove')}
           </DropdownElement>
@@ -125,6 +137,7 @@ export function Actions(props: Props) {
                 setAction('archive');
                 setIsPasswordConfirmModalOpen(true);
               }}
+              icon={<Icon element={MdArchive} />}
             >
               {t('archive')}
             </DropdownElement>
@@ -136,6 +149,7 @@ export function Actions(props: Props) {
                 setAction('restore');
                 setIsPasswordConfirmModalOpen(true);
               }}
+              icon={<Icon element={MdRestore} />}
             >
               {t('restore')}
             </DropdownElement>
@@ -147,6 +161,7 @@ export function Actions(props: Props) {
                 setAction('delete');
                 setIsPasswordConfirmModalOpen(true);
               }}
+              icon={<Icon element={MdDelete} />}
             >
               {t('delete')}
             </DropdownElement>

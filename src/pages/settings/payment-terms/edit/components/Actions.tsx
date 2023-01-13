@@ -11,7 +11,9 @@
 import { PaymentTerm } from 'common/interfaces/payment-term';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Icon } from 'components/icons/Icon';
 import { useTranslation } from 'react-i18next';
+import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
 import { useHandleArchive } from '../hooks/useHandleArchive';
 import { useHandleDelete } from '../hooks/useHandleDelete';
 import { useHandleRestore } from '../hooks/useHandleRestore';
@@ -30,19 +32,28 @@ export function Actions(props: Props) {
   return (
     <Dropdown label={t('more_actions')}>
       {!props.paymentTerm.archived_at && !props.paymentTerm.is_deleted && (
-        <DropdownElement onClick={() => archive(props.paymentTerm.id)}>
+        <DropdownElement
+          onClick={() => archive(props.paymentTerm.id)}
+          icon={<Icon element={MdArchive} />}
+        >
           {t('archive')}
         </DropdownElement>
       )}
 
       {(props.paymentTerm.archived_at || props.paymentTerm.is_deleted) && (
-        <DropdownElement onClick={() => restore(props.paymentTerm.id)}>
+        <DropdownElement
+          onClick={() => restore(props.paymentTerm.id)}
+          icon={<Icon element={MdRestore} />}
+        >
           {t('restore')}
         </DropdownElement>
       )}
 
       {!props.paymentTerm.is_deleted && (
-        <DropdownElement onClick={() => destroy(props.paymentTerm.id)}>
+        <DropdownElement
+          onClick={() => destroy(props.paymentTerm.id)}
+          icon={<Icon element={MdDelete} />}
+        >
           {t('delete')}
         </DropdownElement>
       )}

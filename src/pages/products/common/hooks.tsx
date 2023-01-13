@@ -16,10 +16,18 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Product } from 'common/interfaces/product';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { customField } from 'components/CustomField';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
+import { Icon } from 'components/icons/Icon';
+import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdControlPointDuplicate } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
+import { productAtom } from './atoms';
 
 export const productColumns = [
   'product_key',
@@ -204,4 +212,46 @@ export function useProductColumns() {
   return columns
     .filter((column) => list.includes(column.column))
     .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+}
+
+export function useActions() {
+  const [t] = useTranslation();
+
+  const navigate = useNavigate();
+
+  const setProduct = useUpdateAtom(productAtom);
+
+  const cloneToProduct = (product: Product) => {
+    setProduct({ ...product, id: '', documents: [] });
+
+    navigate('/products/create');
+  };
+
+  const actions = [
+    (product: Product) => (
+      <DropdownElement
+        onClick={() => cloneToProduct(product)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
+        {t('clone')}
+      </DropdownElement>
+    ),
+  ];
+
+  return actions;
+}
+
+interface Params {
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  setProduct: Dispatch<SetStateAction<Product | undefined>>;
+}
+
+export function useHandleChange(params: Params) {
+  const { setErrors, setProduct } = params;
+
+  return (property: keyof Product, value: Product[keyof Product]) => {
+    setErrors(undefined);
+
+    setProduct((product) => product && { ...product, [property]: value });
+  };
 }

@@ -25,12 +25,14 @@ import { useDocumentsQuery } from 'common/queries/documents';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { FileIcon } from 'components/FileIcon';
+import { Icon } from 'components/icons/Icon';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { Spinner } from 'components/Spinner';
 import prettyBytes from 'pretty-bytes';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { MdDelete, MdDownload, MdPageview } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
 
 export function Table() {
@@ -103,7 +105,7 @@ export function Table() {
                 <Td>{prettyBytes(document.size)}</Td>
                 <Td>
                   <Dropdown label={t('more_actions')}>
-                    <DropdownElement>
+                    <DropdownElement icon={<Icon element={MdPageview} />}>
                       <a
                         target="_blank"
                         className="block w-full"
@@ -116,7 +118,7 @@ export function Table() {
                       </a>
                     </DropdownElement>
 
-                    <DropdownElement>
+                    <DropdownElement icon={<Icon element={MdDownload} />}>
                       <a
                         className="block w-full"
                         href={endpoint('/documents/:hash', {
@@ -132,6 +134,7 @@ export function Table() {
                         setDocument(document.id);
                         setPasswordConfirmModalOpen(true);
                       }}
+                      icon={<Icon element={MdDelete} />}
                     >
                       {t('delete')}
                     </DropdownElement>

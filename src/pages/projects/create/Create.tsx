@@ -11,7 +11,7 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
+import { endpoint, isProduction } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
@@ -23,10 +23,12 @@ import { useBlankProjectQuery } from 'common/queries/projects';
 import { Container } from 'components/Container';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { Default } from 'components/layouts/Default';
+import { useAtom } from 'jotai';
 import React, { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { projectAtom } from '../common/atoms';
 
 export function Create() {
   const { documentTitle } = useTitle('new_project');
@@ -41,7 +43,7 @@ export function Create() {
   const { data: blankProject } = useBlankProjectQuery();
 
   const [searchParams] = useSearchParams();
-  const [project, setProject] = useState<Project>();
+  const [project, setProject] = useAtom(projectAtom);
   const [errors, setErrors] = useState<ValidationBag>();
 
   const company = useCurrentCompany();
@@ -53,13 +55,17 @@ export function Create() {
   };
 
   useEffect(() => {
-    if (blankProject) {
+    if (blankProject && !project) {
       setProject({
         ...blankProject,
         task_rate: company?.settings.default_task_rate || 0,
         client_id: searchParams.get('client') || '',
       });
     }
+
+    return () => {
+      isProduction() && setProject(undefined);
+    };
   }, [blankProject]);
 
   useEffect(() => {

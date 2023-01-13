@@ -10,19 +10,14 @@
 
 import { Link } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
-import { Task } from 'common/interfaces/task';
 import { DataTable } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { isTaskRunning } from '../common/helpers/calculate-entity-state';
 import { BsKanban } from 'react-icons/bs';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { useStart } from '../common/hooks/useStart';
-import { useStop } from '../common/hooks/useStop';
-import { useInvoiceTask } from '../common/hooks/useInvoiceTask';
 import {
   defaultColumns,
   taskColumns,
+  useActions,
   useTaskColumns,
   useTaskFilters,
 } from '../common/hooks';
@@ -31,41 +26,16 @@ import { Inline } from 'components/Inline';
 
 export function Tasks() {
   const { documentTitle } = useTitle('tasks');
+
   const [t] = useTranslation();
 
   const pages = [{ name: t('tasks'), href: '/tasks' }];
 
   const columns = useTaskColumns();
 
-  const start = useStart();
-
-  const stop = useStop();
-
-  const invoiceTask = useInvoiceTask();
-
   const filters = useTaskFilters();
 
-  const actions = [
-    (task: Task) =>
-      !isTaskRunning(task) && (
-        <DropdownElement onClick={() => start(task)}>
-          {t('start')}
-        </DropdownElement>
-      ),
-    (task: Task) =>
-      isTaskRunning(task) && (
-        <DropdownElement onClick={() => stop(task)}>
-          {t('stop')}
-        </DropdownElement>
-      ),
-    (task: Task) =>
-      !isTaskRunning(task) &&
-      !task.invoice_id && (
-        <DropdownElement onClick={() => invoiceTask([task])}>
-          {t('invoice_task')}
-        </DropdownElement>
-      ),
-  ];
+  const actions = useActions();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>

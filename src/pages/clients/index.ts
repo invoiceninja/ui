@@ -20,4 +20,4 @@ export * from './show/pages/Credits';
 export * from './show/pages/Projects';
 export * from './show/pages/Tasks';
 export * from './show/pages/Expenses';
-export * from './show/pages/RecurringExpenses';
+export { RecurringExpenses } from './show/pages/RecurringExpenses';

@@ -9,9 +9,11 @@
  */
 
 import { isHosted } from 'common/helpers';
+import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
+import { AccountWarningsModal } from 'components/AccountWarningsModal';
 import { VerifyModal } from 'components/VerifyModal';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
@@ -30,7 +32,15 @@ export function App() {
 
   const location = useLocation();
 
-  const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const account = useCurrentAccount();
+
+  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
+
+  const [showCompanyActivityModal, setShowCompanyActivityModal] =
+    useState<boolean>(false);
+
+  const [showSmsVerificationModal, setShowSmsVerificationModal] =
+    useState<boolean>(false);
 
   const resolveLanguage = useResolveLanguage();
 
@@ -67,23 +77,57 @@ export function App() {
   }, [darkMode, resolvedLanguage]);
 
   useEffect(() => {
-    if (user) {
+    if (user && Object.keys(user).length) {
       setIsEmailVerified(Boolean(user.email_verified_at));
     }
   }, [user]);
+
+  useEffect(() => {
+    const modalShown = sessionStorage.getItem('PHONE-VERIFICATION-SHOWN');
+
+    if (account && (modalShown === 'false' || !modalShown)) {
+      setShowSmsVerificationModal(!account?.account_sms_verified);
+
+      sessionStorage.setItem('PHONE-VERIFICATION-SHOWN', 'true');
+    }
+  }, [account]);
+
+  useEffect(() => {
+    const modalShown = sessionStorage.getItem('COMPANY-ACTIVITY-SHOWN');
+
+    if (company && (modalShown === 'false' || !modalShown)) {
+      setShowCompanyActivityModal(company.is_disabled);
+
+      sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'true');
+    }
+  }, [company]);
 
   return (
     <div className="App">
       <VerifyModal
         visible={
-          Boolean(user) &&
           !location.pathname.startsWith('/login') &&
+          !location.pathname.startsWith('/register') &&
           !isEmailVerified &&
           isHosted()
         }
         type="email"
       />
+
+      <AccountWarningsModal
+        type="activity"
+        visible={Boolean(company) && showCompanyActivityModal}
+        setVisible={setShowCompanyActivityModal}
+      />
+
+      <AccountWarningsModal
+        type="phone"
+        visible={Boolean(account) && showSmsVerificationModal && isHosted()}
+        setVisible={setShowSmsVerificationModal}
+      />
+
       <Toaster position="top-center" />
+
       {routes}
     </div>
   );

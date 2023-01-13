@@ -58,6 +58,19 @@ import { useResolveCountry } from 'common/hooks/useResolveCountry';
 import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
+import { Icon } from 'components/icons/Icon';
+import {
+  MdArchive,
+  MdCloudCircle,
+  MdControlPointDuplicate,
+  MdCreditCard,
+  MdCreditScore,
+  MdDelete,
+  MdDownload,
+  MdMarkEmailRead,
+  MdPictureAsPdf,
+  MdRestore,
+} from 'react-icons/md';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -297,22 +310,34 @@ export function useActions() {
 
   const actions: Action<Credit>[] = [
     (credit) => (
-      <DropdownElement to={route('/credits/:id/pdf', { id: credit.id })}>
+      <DropdownElement
+        to={route('/credits/:id/pdf', { id: credit.id })}
+        icon={<Icon element={MdPictureAsPdf} />}
+      >
         {t('view_pdf')}
       </DropdownElement>
     ),
     (credit) => (
-      <DropdownElement onClick={() => downloadPdf(credit)}>
+      <DropdownElement
+        onClick={() => downloadPdf(credit)}
+        icon={<Icon element={MdDownload} />}
+      >
         {t('download_pdf')}
       </DropdownElement>
     ),
     (credit) => (
-      <DropdownElement to={route('/credits/:id/email', { id: credit.id })}>
+      <DropdownElement
+        to={route('/credits/:id/email', { id: credit.id })}
+        icon={<Icon element={MdCreditCard} />}
+      >
         {t('email_credit')}
       </DropdownElement>
     ),
     (credit) => (
-      <DropdownElement onClick={() => credit && openClientPortal(credit)}>
+      <DropdownElement
+        onClick={() => credit && openClientPortal(credit)}
+        icon={<Icon element={MdCloudCircle} />}
+      >
         {t('client_portal')}
       </DropdownElement>
     ),
@@ -324,6 +349,7 @@ export function useActions() {
             '/payments/create?client=:clientId&credit=:creditId&type=1',
             { clientId: credit.client_id, creditId: credit.id }
           )}
+          icon={<Icon element={MdCreditScore} />}
         >
           {t('apply_credit')}
         </DropdownElement>
@@ -331,34 +357,52 @@ export function useActions() {
     (credit) =>
       credit.status_id === CreditStatus.Draft && (
         <div>
-          <DropdownElement onClick={() => markSent(credit)}>
+          <DropdownElement
+            onClick={() => markSent(credit)}
+            icon={<Icon element={MdMarkEmailRead} />}
+          >
             {t('mark_sent')}
           </DropdownElement>
         </div>
       ),
     () => <Divider withoutPadding />,
     (credit) => (
-      <DropdownElement onClick={() => cloneToCredit(credit)}>
-        {t('clone_to_credit')}
+      <DropdownElement
+        onClick={() => cloneToCredit(credit)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
+        {t('clone')}
       </DropdownElement>
     ),
     (credit) => (
-      <DropdownElement onClick={() => cloneToInvoice(credit)}>
+      <DropdownElement
+        onClick={() => cloneToInvoice(credit)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_invoice')}
       </DropdownElement>
     ),
     (credit) => (
-      <DropdownElement onClick={() => cloneToQuote(credit)}>
+      <DropdownElement
+        onClick={() => cloneToQuote(credit)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_quote')}
       </DropdownElement>
     ),
     (credit) => (
-      <DropdownElement onClick={() => cloneToRecurringInvoice(credit)}>
+      <DropdownElement
+        onClick={() => cloneToRecurringInvoice(credit)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_recurring_invoice')}
       </DropdownElement>
     ),
     (credit) => (
-      <DropdownElement onClick={() => cloneToPurchaseOrder(credit)}>
+      <DropdownElement
+        onClick={() => cloneToPurchaseOrder(credit)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
@@ -366,22 +410,31 @@ export function useActions() {
     (credit) =>
       location.pathname.endsWith('/edit') &&
       credit.archived_at === 0 && (
-        <DropdownElement onClick={() => bulk(credit.id, 'archive')}>
-          {t('archive_credit')}
+        <DropdownElement
+          onClick={() => bulk(credit.id, 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
         </DropdownElement>
       ),
     (credit) =>
       location.pathname.endsWith('/edit') &&
       credit.archived_at > 0 && (
-        <DropdownElement onClick={() => bulk(credit.id, 'restore')}>
-          {t('restore_credit')}
+        <DropdownElement
+          onClick={() => bulk(credit.id, 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
         </DropdownElement>
       ),
     (credit) =>
       location.pathname.endsWith('/edit') &&
       !credit?.is_deleted && (
-        <DropdownElement onClick={() => bulk(credit.id, 'delete')}>
-          {t('delete_credit')}
+        <DropdownElement
+          onClick={() => bulk(credit.id, 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
         </DropdownElement>
       ),
   ];

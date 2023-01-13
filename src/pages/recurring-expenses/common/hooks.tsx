@@ -38,6 +38,12 @@ import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoice
 import { Dispatch, SetStateAction } from 'react';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useUpdateAtom } from 'jotai/utils';
+import { Icon } from 'components/icons/Icon';
+import {
+  MdControlPointDuplicate,
+  MdNotStarted,
+  MdStopCircle,
+} from 'react-icons/md';
 
 export const recurringExpenseColumns = [
   'status',
@@ -431,6 +437,7 @@ export function useActions() {
         recurringExpense.status_id === RecurringExpenseStatus.PAUSED) && (
         <DropdownElement
           onClick={() => toggleStartStop(recurringExpense, 'start')}
+          icon={<Icon element={MdNotStarted} />}
         >
           {t('start')}
         </DropdownElement>
@@ -439,6 +446,7 @@ export function useActions() {
       recurringExpense.status_id === RecurringExpenseStatus.ACTIVE && (
         <DropdownElement
           onClick={() => toggleStartStop(recurringExpense, 'stop')}
+          icon={<Icon element={MdStopCircle} />}
         >
           {t('stop')}
         </DropdownElement>
@@ -447,12 +455,16 @@ export function useActions() {
     (recurringExpense) => (
       <DropdownElement
         onClick={() => cloneToRecurringExpense(recurringExpense)}
+        icon={<Icon element={MdControlPointDuplicate} />}
       >
         {t('clone')}
       </DropdownElement>
     ),
     (recurringExpense) => (
-      <DropdownElement onClick={() => cloneToExpense(recurringExpense)}>
+      <DropdownElement
+        onClick={() => cloneToExpense(recurringExpense)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_expense')}
       </DropdownElement>
     ),

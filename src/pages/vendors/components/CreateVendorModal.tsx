@@ -29,10 +29,12 @@ export function CreateVendorModal(props: Props) {
       onClose={() => props.setVisible(false)}
       size="large"
     >
-      <CreateVendorForm
-        setSelectedIds={props.setSelectedIds}
-        setVisible={props.setVisible}
-      />
+      {props.setSelectedIds && (
+        <CreateVendorForm
+          setSelectedIds={props.setSelectedIds}
+          setVisible={props.setVisible}
+        />
+      )}
     </Modal>
   );
 }

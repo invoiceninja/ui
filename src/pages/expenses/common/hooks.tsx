@@ -20,8 +20,10 @@ import { Expense } from 'common/interfaces/expense';
 import { RecurringExpense } from 'common/interfaces/recurring-expense';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { customField } from 'components/CustomField';
+import { SelectOption } from 'components/datatables/Actions';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
+import { Icon } from 'components/icons/Icon';
 import { Action } from 'components/ResourceActions';
 import { StatusBadge } from 'components/StatusBadge';
 import { useUpdateAtom } from 'jotai/utils';
@@ -29,6 +31,7 @@ import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoice
 import { recurringExpenseAtom } from 'pages/recurring-expenses/common/atoms';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { expenseAtom } from './atoms';
 import { ExpenseStatus } from './components/ExpenseStatus';
@@ -101,12 +104,18 @@ export function useActions() {
 
   const actions: Action<Expense>[] = [
     (expense) => (
-      <DropdownElement onClick={() => cloneToExpense(expense)}>
+      <DropdownElement
+        onClick={() => cloneToExpense(expense)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone')}
       </DropdownElement>
     ),
     (expense) => (
-      <DropdownElement onClick={() => cloneToRecurringExpense(expense)}>
+      <DropdownElement
+        onClick={() => cloneToRecurringExpense(expense)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
         {t('clone_to_recurring')}
       </DropdownElement>
     ),
@@ -374,4 +383,49 @@ export function useHandleChange(params: HandleChangeExpenseParams) {
 
     setExpense((expense) => expense && { ...expense, [property]: value });
   };
+}
+
+export function useExpenseFilters() {
+  const [t] = useTranslation();
+
+  const filters: SelectOption[] = [
+    {
+      label: t('all'),
+      value: 'all',
+      color: 'black',
+      backgroundColor: '#e4e4e4',
+    },
+    {
+      label: t('logged'),
+      value: 'logged',
+      color: 'white',
+      backgroundColor: '#6B7280',
+    },
+    {
+      label: t('pending'),
+      value: 'pending',
+      color: 'white',
+      backgroundColor: '#93C5FD',
+    },
+    {
+      label: t('invoiced'),
+      value: 'invoiced',
+      color: 'white',
+      backgroundColor: '#1D4ED8',
+    },
+    {
+      label: t('paid'),
+      value: 'paid',
+      color: 'white',
+      backgroundColor: '#22C55E',
+    },
+    {
+      label: t('unpaid'),
+      value: 'unpaid',
+      color: 'white',
+      backgroundColor: '#e6b05c',
+    },
+  ];
+
+  return filters;
 }
