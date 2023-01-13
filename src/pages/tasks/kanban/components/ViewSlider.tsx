@@ -50,6 +50,8 @@ export function ViewSlider() {
 
   const isTaskActive = currentTask && isTaskRunning(currentTask);
 
+  const timeLogs = currentTask && formatTimeLog(currentTask.time_log);
+
   const onSuccess = () => {
     queryClient.invalidateQueries(
       route('/api/v1/tasks/:id', { id: currentTask?.id })
@@ -58,9 +60,7 @@ export function ViewSlider() {
 
   useEffect(() => {
     if (currentTask && isTaskActive) {
-      const timeLogs = formatTimeLog(currentTask.time_log);
-
-      if (timeLogs.length) {
+      if (timeLogs && timeLogs.length) {
         const lastTimeLog = timeLogs[timeLogs.length - 1];
 
         const [, startTaskTime, endTaskTime] = lastTimeLog;
@@ -115,8 +115,8 @@ export function ViewSlider() {
               </div>
             </NonClickableElement>
 
-            {formatTimeLog(currentTask.time_log)?.map(([date, start, end], i) =>
-              i < formatTimeLog(currentTask.time_log).length - 1 ? (
+            {timeLogs?.map(([date, start, end], i) =>
+              i < timeLogs.length - 1 ? (
                 <ClickableElement key={i}>
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col">
