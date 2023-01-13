@@ -9,7 +9,7 @@
  */
 
 import { ClickableElement, Element } from '@invoiceninja/cards';
-import { endpoint } from 'common/helpers';
+import { endpoint, isProduction } from 'common/helpers';
 import { route } from 'common/helpers/route';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useAccentColor } from 'common/hooks/useAccentColor';
@@ -20,7 +20,12 @@ import { TabGroup } from 'components/TabGroup';
 import { useAtom } from 'jotai';
 import { Upload } from 'pages/settings/company/documents/components';
 import { TaskStatus } from 'pages/tasks/common/components/TaskStatus';
-import { calculateTime } from 'pages/tasks/common/helpers/calculate-time';
+import { isTaskRunning } from 'pages/tasks/common/helpers/calculate-entity-state';
+import {
+  calculateTime,
+  calculateTimeDifference,
+} from 'pages/tasks/common/helpers/calculate-time';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { currentTaskAtom } from '../common/atoms';
@@ -28,7 +33,10 @@ import { useFormatTimeLog } from '../common/hooks';
 
 export function ViewSlider() {
   const [t] = useTranslation();
+
   const [currentTask] = useAtom(currentTaskAtom);
+
+  const [runningLogTime, setRunningLogTime] = useState<string>();
 
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
@@ -37,11 +45,45 @@ export function ViewSlider() {
 
   const queryClient = useQueryClient();
 
+  const [intervalValue, setIntervalValue] =
+    useState<ReturnType<typeof setInterval>>();
+
+  const isTaskActive = currentTask && isTaskRunning(currentTask);
+
   const onSuccess = () => {
     queryClient.invalidateQueries(
       route('/api/v1/tasks/:id', { id: currentTask?.id })
     );
   };
+
+  useEffect(() => {
+    if (currentTask && isTaskActive) {
+      const timeLogs = formatTimeLog(currentTask.time_log);
+
+      if (timeLogs.length) {
+        const lastTimeLog = timeLogs[timeLogs.length - 1];
+
+        const [, startTaskTime, endTaskTime] = lastTimeLog;
+
+        const currentInterval = setInterval(() => {
+          setRunningLogTime(
+            calculateTimeDifference(startTaskTime, endTaskTime).toString()
+          );
+        }, 1000);
+
+        setIntervalValue(currentInterval);
+      }
+    }
+
+    if (!isTaskActive && intervalValue) {
+      clearInterval(intervalValue);
+      setRunningLogTime('00:00:00');
+    }
+
+    return () => {
+      isProduction() && clearInterval(intervalValue);
+    };
+  }, [isTaskActive]);
 
   return (
     <TabGroup tabs={[t('overview'), t('documents')]} width="full">
@@ -73,15 +115,37 @@ export function ViewSlider() {
               </div>
             </NonClickableElement>
 
-            {formatTimeLog(currentTask.time_log).map(
-              ([date, start, end], i) => (
+            {formatTimeLog(currentTask.time_log)?.map(([date, start, end], i) =>
+              i < formatTimeLog(currentTask.time_log).length - 1 ? (
                 <ClickableElement key={i}>
-                  <div>
-                    <p>{date}</p>
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <p>{date}</p>
 
-                    <small>
-                      {start} - {end}
-                    </small>
+                      <small>
+                        {start} - {end}
+                      </small>
+                    </div>
+
+                    <p>{calculateTimeDifference(start, end)}</p>
+                  </div>
+                </ClickableElement>
+              ) : (
+                <ClickableElement key={i}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex flex-col">
+                      <p>{date}</p>
+
+                      <small>
+                        {start} - {end}
+                      </small>
+                    </div>
+
+                    <p>
+                      {isTaskActive
+                        ? runningLogTime
+                        : calculateTimeDifference(start, end)}
+                    </p>
                   </div>
                 </ClickableElement>
               )

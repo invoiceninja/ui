@@ -41,3 +41,34 @@ export function calculateTime(log: string) {
 
   return new Date(seconds * 1000).toISOString().slice(11, 19);
 }
+
+export function calculateTimeDifference(start: string, end: string) {
+  const timeStart = new Date();
+  const timeEnd = new Date();
+
+  const startTimeValues = start.split(':');
+  const endTimeValues = end.split(':');
+
+  timeStart.setHours(
+    Number(startTimeValues[0]),
+    Number(startTimeValues[1]),
+    Number(startTimeValues[2]),
+    0
+  );
+
+  if (end !== 'Now') {
+    timeEnd.setHours(
+      Number(endTimeValues[0]),
+      Number(endTimeValues[1]),
+      Number(endTimeValues[2]),
+      0
+    );
+  }
+
+  const millisecondsDifference = timeEnd.valueOf() - timeStart.valueOf();
+
+  return (
+    millisecondsDifference &&
+    new Date(millisecondsDifference).toISOString().slice(11, 19)
+  );
+}
