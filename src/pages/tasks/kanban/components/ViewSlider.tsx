@@ -9,7 +9,7 @@
  */
 
 import { ClickableElement, Element } from '@invoiceninja/cards';
-import { endpoint, isProduction } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { route } from 'common/helpers/route';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useAccentColor } from 'common/hooks/useAccentColor';
@@ -30,6 +30,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
+import { sliderIntervalAtom } from '../../common/atoms';
 
 export function ViewSlider() {
   const [t] = useTranslation();
@@ -45,12 +46,9 @@ export function ViewSlider() {
 
   const queryClient = useQueryClient();
 
-  const [intervalValue, setIntervalValue] =
-    useState<ReturnType<typeof setInterval>>();
+  const [intervalValue, setIntervalValue] = useAtom(sliderIntervalAtom);
 
   const isTaskActive = currentTask && isTaskRunning(currentTask);
-
-  const timeLogs = currentTask && formatTimeLog(currentTask.time_log);
 
   const onSuccess = () => {
     queryClient.invalidateQueries(
@@ -58,9 +56,13 @@ export function ViewSlider() {
     );
   };
 
+  let alreadySetInterval = false;
+
   useEffect(() => {
-    if (currentTask && isTaskActive) {
-      if (timeLogs && timeLogs.length) {
+    if (currentTask && isTaskActive && !alreadySetInterval) {
+      const timeLogs = formatTimeLog(currentTask.time_log);
+
+      if (timeLogs.length) {
         const lastTimeLog = timeLogs[timeLogs.length - 1];
 
         const [, startTaskTime, endTaskTime] = lastTimeLog;
@@ -71,19 +73,21 @@ export function ViewSlider() {
           );
         }, 1000);
 
+        alreadySetInterval = true;
+
         setIntervalValue(currentInterval);
       }
     }
+  }, [isTaskActive]);
 
+  useEffect(() => {
     if (!isTaskActive && intervalValue) {
       clearInterval(intervalValue);
+      setIntervalValue(undefined);
       setRunningLogTime('00:00:00');
+      alreadySetInterval = false;
     }
-
-    return () => {
-      isProduction() && clearInterval(intervalValue);
-    };
-  }, [isTaskActive]);
+  }, [isTaskActive, intervalValue]);
 
   return (
     <TabGroup tabs={[t('overview'), t('documents')]} width="full">
@@ -115,8 +119,8 @@ export function ViewSlider() {
               </div>
             </NonClickableElement>
 
-            {timeLogs?.map(([date, start, end], i) =>
-              i < timeLogs.length - 1 ? (
+            {formatTimeLog(currentTask.time_log)?.map(([date, start, end], i) =>
+              i < formatTimeLog(currentTask.time_log).length - 1 ? (
                 <ClickableElement key={i}>
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col">

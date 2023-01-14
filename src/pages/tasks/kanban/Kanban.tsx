@@ -50,6 +50,7 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 import { Card, Element } from '@invoiceninja/cards';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { Inline } from 'components/Inline';
+import { mainIntervalAtom, sliderIntervalAtom } from '../common/atoms';
 
 interface Card {
   id: string;
@@ -82,7 +83,9 @@ export function Kanban() {
 
   const queryClient = useQueryClient();
 
-  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks');
+  const [apiEndpoint, setApiEndpoint] = useState(
+    '/api/v1/tasks?limit=1000&per_page=500'
+  );
   const [projectId, setProjectId] = useState<string>();
 
   const { data: taskStatuses } = useTaskStatusesQuery();
@@ -95,6 +98,8 @@ export function Kanban() {
   const [board, setBoard] = useState<Board>();
   const [sliderType, setSliderType] = useState<SliderType>('view');
 
+  const [taskCards, setTaskCards] = useState<Card[]>();
+
   const [currentTask] = useAtom(currentTaskAtom);
   const [currentTaskId, setCurrentTaskId] = useAtom(currentTaskIdAtom);
 
@@ -102,10 +107,51 @@ export function Kanban() {
     isKanbanViewSliderVisibleAtom
   );
 
+  const [viewSliderInterval, setViewSliderInterval] =
+    useAtom(sliderIntervalAtom);
+
+  const [mainInterval, setMainInterval] = useAtom(mainIntervalAtom);
+
+  let mainIntervalLocalValue: ReturnType<typeof setInterval> | undefined =
+    undefined;
+
   const startTask = useStart();
   const stopTask = useStop();
 
   useHandleCurrentTask(currentTaskId);
+
+  const updateCardTime = (passedTaskCards?: Card[]) => {
+    if (passedTaskCards) {
+      const updatedCards = passedTaskCards?.map((currentCard) => ({
+        ...currentCard,
+        description: calculateTime(currentCard.task.time_log),
+      }));
+
+      setTaskCards(updatedCards);
+    } else {
+      const updatedCards = taskCards?.map((currentCard) => ({
+        ...currentCard,
+        description: calculateTime(currentCard.task.time_log),
+      }));
+
+      setTaskCards(updatedCards);
+    }
+  };
+
+  const runInterval = (passedTaskCards?: Card[]) => {
+    if (mainInterval) {
+      clearInterval(mainInterval);
+      setMainInterval(undefined);
+    }
+
+    const interval = setInterval(() => {
+      updateCardTime(passedTaskCards);
+    }, 1000);
+
+    mainIntervalLocalValue = interval;
+
+    setMainInterval(interval);
+  };
 
   useEffect(() => {
     if (taskStatuses && tasks) {
@@ -134,6 +180,20 @@ export function Kanban() {
       columns.map(
         (c) => (c.cards = c.cards.sort((a, b) => a.sortOrder - b.sortOrder))
       );
+
+      const availableTaskCards: Card[] = [];
+
+      columns.forEach((element) => {
+        element.cards.forEach((card) => {
+          availableTaskCards.push(card);
+        });
+      });
+
+      if (!mainIntervalLocalValue) {
+        runInterval(availableTaskCards);
+      }
+
+      setTaskCards(availableTaskCards);
 
       setBoard((current) => ({ ...current, columns }));
     }
@@ -229,20 +289,44 @@ export function Kanban() {
     setCurrentTaskId(id);
   };
 
+  const getCardTime = (cardId: string) => {
+    const foundTaskCard = taskCards?.filter(({ id }) => id === cardId);
+
+    return foundTaskCard?.length ? foundTaskCard[0].description : '';
+  };
+
   const handleKanbanClose = () => {
     setIsKanbanViewSliderVisible(false);
     setCurrentTaskId(undefined);
+    clearInterval(viewSliderInterval);
+    setViewSliderInterval(undefined);
   };
 
   useEffect(() => {
     projectId
       ? setApiEndpoint(
-          route('/api/v1/tasks?project_tasks=:projectId&limit=1000', {
-            projectId,
-          })
+          route(
+            '/api/v1/tasks?project_tasks=:projectId&limit=1000&per_page=500',
+            {
+              projectId,
+            }
+          )
         )
-      : setApiEndpoint('/api/v1/tasks?limit=1000');
+      : setApiEndpoint('/api/v1/tasks?limit=1000&per_page=500');
   }, [projectId]);
+
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (mounted && mainInterval) {
+      return () => {
+        clearInterval(mainInterval);
+        setMainInterval(undefined);
+      };
+    } else {
+      setMounted(true);
+    }
+  }, [mounted, mainInterval]);
 
   return (
     <Default
@@ -285,7 +369,10 @@ export function Kanban() {
             {currentTask && !isTaskRunning(currentTask) && (
               <button
                 className="flex justify-center items-center text-sm p-4 space-x-2 w-full hover:bg-gray-50"
-                onClick={() => startTask(currentTask)}
+                onClick={() => {
+                  startTask(currentTask);
+                  runInterval();
+                }}
               >
                 <Play size={18} />
                 <span>{t('start')}</span>
@@ -295,7 +382,10 @@ export function Kanban() {
             {currentTask && isTaskRunning(currentTask) && (
               <button
                 className="flex justify-center items-center text-sm p-4 space-x-2 w-full hover:bg-gray-50"
-                onClick={() => stopTask(currentTask)}
+                onClick={() => {
+                  stopTask(currentTask);
+                  runInterval();
+                }}
               >
                 <Pause size={18} />
                 <span>{t('stop')}</span>
@@ -365,7 +455,7 @@ export function Kanban() {
                                 className="px-4 sm:px-6 py-4 bg-gray-50 hover:bg-gray-100"
                               >
                                 <p>{card.title}</p>
-                                <small>{card.description}</small>
+                                <small>{getCardTime(card.id)}</small>
                               </div>
                             )}
                           </Draggable>
@@ -388,7 +478,10 @@ export function Kanban() {
                             {isTaskRunning(card.task) && (
                               <button
                                 className="w-full hover:bg-gray-200 py-2 rounded-br"
-                                onClick={() => stopTask(card.task)}
+                                onClick={() => {
+                                  stopTask(card.task);
+                                  runInterval();
+                                }}
                               >
                                 {t('stop')}
                               </button>
@@ -397,7 +490,10 @@ export function Kanban() {
                             {!isTaskRunning(card.task) && (
                               <button
                                 className="w-full hover:bg-gray-200 py-2 rounded-br"
-                                onClick={() => startTask(card.task)}
+                                onClick={() => {
+                                  startTask(card.task);
+                                  runInterval();
+                                }}
                               >
                                 {t('start')}
                               </button>
