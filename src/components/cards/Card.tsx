@@ -105,16 +105,15 @@ export function Card(props: Props) {
               <div className="sm:py-5 sm:px-6 flex justify-end space-x-4">
                 {props.additionalAction}
 
-                {props.withSaveButton &&
-                  !props.additionalSaveOptions?.length && (
-                    <Button
-                      onClick={props.onSaveClick}
-                      disabled={props.disableSubmitButton}
-                      disableWithoutIcon={props.disableWithoutIcon}
-                    >
-                      {props.saveButtonLabel ?? t('save')}
-                    </Button>
-                  )}
+                {props.withSaveButton && !props.additionalSaveOptions && (
+                  <Button
+                    onClick={props.onSaveClick}
+                    disabled={props.disableSubmitButton}
+                    disableWithoutIcon={props.disableWithoutIcon}
+                  >
+                    {props.saveButtonLabel ?? t('save')}
+                  </Button>
+                )}
 
                 {props.withSaveButton && props.additionalSaveOptions && (
                   <div className="flex">
