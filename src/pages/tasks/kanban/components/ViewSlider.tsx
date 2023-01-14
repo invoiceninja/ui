@@ -46,6 +46,9 @@ export function ViewSlider() {
 
   const queryClient = useQueryClient();
 
+  const currentTaskTimeLogs =
+    currentTask && formatTimeLog(currentTask.time_log);
+
   const [intervalValue, setIntervalValue] = useAtom(sliderIntervalAtom);
 
   const isTaskActive = currentTask && isTaskRunning(currentTask);
@@ -119,8 +122,8 @@ export function ViewSlider() {
               </div>
             </NonClickableElement>
 
-            {formatTimeLog(currentTask.time_log)?.map(([date, start, end], i) =>
-              i < formatTimeLog(currentTask.time_log).length - 1 ? (
+            {currentTaskTimeLogs?.map(([date, start, end], i) =>
+              i < currentTaskTimeLogs.length - 1 ? (
                 <ClickableElement key={i}>
                   <div className="flex items-center justify-between">
                     <div className="flex flex-col">
