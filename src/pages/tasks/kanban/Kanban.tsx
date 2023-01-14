@@ -52,7 +52,10 @@ import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { Inline } from 'components/Inline';
 import { MdOutlineAddBox } from 'react-icons/md';
 import { useAccentColor } from 'common/hooks/useAccentColor';
-import { CreateTaskModal, TaskDetails } from './components/CreateTaskModal';
+import {
+  CreateTaskModal,
+  TaskDetails,
+} from '../common/components/CreateTaskModal';
 
 interface Card {
   id: string;
