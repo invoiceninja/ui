@@ -29,7 +29,6 @@ interface Props {
   title?: string | null;
   description?: string;
   withSaveButton?: boolean;
-  withCreateOption?: boolean;
   additionalSaveOptions?: ButtonOption[];
   onFormSubmit?: (event: FormEvent<HTMLFormElement>) => unknown;
   onSaveClick?: (event: FormEvent<HTMLFormElement>) => unknown;

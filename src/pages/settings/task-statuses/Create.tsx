@@ -126,7 +126,6 @@ export function Create() {
         <Card
           title={documentTitle}
           withSaveButton
-          withCreateOption
           disableSubmitButton={isFormBusy}
           onSaveClick={(event) => handleSave(event, 'save')}
           additionalSaveOptions={saveOptions}
