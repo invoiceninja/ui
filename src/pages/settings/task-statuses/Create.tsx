@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer } from '@invoiceninja/cards';
+import { ButtonOption, Card, CardContainer } from '@invoiceninja/cards';
 import { InputField, InputLabel } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
@@ -23,9 +23,11 @@ import { useBlankTaskStatusQuery } from 'common/queries/task-statuses';
 import { Breadcrumbs } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { ColorPicker } from 'components/forms/ColorPicker';
+import { Icon } from 'components/icons/Icon';
 import { Settings } from 'components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BiPlusCircle } from 'react-icons/bi';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { useHandleChange } from './common/hooks';
@@ -107,6 +109,15 @@ export function Create() {
     }
   }, [blankTaskStatus]);
 
+  const saveOptions: ButtonOption[] = [
+    {
+      onClick: (event: FormEvent<HTMLFormElement>) =>
+        handleSave(event, 'create'),
+      text: `${t('save')} / ${t('create')}`,
+      icon: <Icon element={BiPlusCircle} />,
+    },
+  ];
+
   return (
     <Settings title={t('task_statuses')}>
       <Container className="space-y-6">
@@ -118,7 +129,7 @@ export function Create() {
           withCreateOption
           disableSubmitButton={isFormBusy}
           onSaveClick={(event) => handleSave(event, 'save')}
-          onCreateClick={(event) => handleSave(event, 'create')}
+          additionalSaveOptions={saveOptions}
         >
           <CardContainer>
             <InputField

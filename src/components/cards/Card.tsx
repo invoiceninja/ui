@@ -10,15 +10,19 @@
 
 import classNames from 'classnames';
 import { Spinner } from 'components/Spinner';
-import { CSSProperties, FormEvent, ReactNode } from 'react';
+import { CSSProperties, FormEvent, ReactElement, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer } from '.';
 import { Button } from '../forms';
 import { Element } from 'components/cards/Element';
 import { Dropdown } from 'components/dropdown/Dropdown';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Icon } from 'components/icons/Icon';
-import { BiPlusCircle } from 'react-icons/bi';
+
+export interface ButtonOption {
+  text: string;
+  onClick: (event: FormEvent<HTMLFormElement>) => unknown;
+  icon?: ReactElement;
+}
 
 interface Props {
   children: ReactNode;
@@ -26,11 +30,10 @@ interface Props {
   description?: string;
   withSaveButton?: boolean;
   withCreateOption?: boolean;
+  additionalSaveOptions?: ButtonOption[];
   onFormSubmit?: (event: FormEvent<HTMLFormElement>) => unknown;
   onSaveClick?: (event: FormEvent<HTMLFormElement>) => unknown;
-  onCreateClick?: (event: FormEvent<HTMLFormElement>) => unknown;
   saveButtonLabel?: string | null;
-  createButtonLabel?: string | null;
   disableSubmitButton?: boolean;
   disableWithoutIcon?: boolean;
   className?: string;
@@ -103,17 +106,18 @@ export function Card(props: Props) {
               <div className="sm:py-5 sm:px-6 flex justify-end space-x-4">
                 {props.additionalAction}
 
-                {props.withSaveButton && !props.withCreateOption && (
-                  <Button
-                    onClick={props.onSaveClick}
-                    disabled={props.disableSubmitButton}
-                    disableWithoutIcon={props.disableWithoutIcon}
-                  >
-                    {props.saveButtonLabel ?? t('save')}
-                  </Button>
-                )}
+                {props.withSaveButton &&
+                  !props.additionalSaveOptions?.length && (
+                    <Button
+                      onClick={props.onSaveClick}
+                      disabled={props.disableSubmitButton}
+                      disableWithoutIcon={props.disableWithoutIcon}
+                    >
+                      {props.saveButtonLabel ?? t('save')}
+                    </Button>
+                  )}
 
-                {props.withSaveButton && props.withCreateOption && (
+                {props.withSaveButton && props.additionalSaveOptions && (
                   <div className="flex">
                     <Button
                       className="rounded-br-none rounded-tr-none px-3"
@@ -129,14 +133,16 @@ export function Card(props: Props) {
                       cardActions
                       disabled={props.disableSubmitButton}
                     >
-                      <DropdownElement
-                        icon={<Icon element={BiPlusCircle} />}
-                        disabled={props.disableSubmitButton}
-                        onClick={props.onCreateClick}
-                      >
-                        {props.createButtonLabel ??
-                          `${t('save')}/${t('create')}`}
-                      </DropdownElement>
+                      {props.additionalSaveOptions.map((action, i) => (
+                        <DropdownElement
+                          key={i}
+                          icon={action.icon}
+                          disabled={props.disableSubmitButton}
+                          onClick={action.onClick}
+                        >
+                          {action.text}
+                        </DropdownElement>
+                      ))}
                     </Dropdown>
                   </div>
                 )}
