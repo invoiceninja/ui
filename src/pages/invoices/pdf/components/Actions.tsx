@@ -31,24 +31,34 @@ interface Props {
 
 export function Actions(props: Props) {
   const [t] = useTranslation();
+
   const { id } = useParams();
+
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
 
+  const {
+    deliveryNote,
+    setDeliveryNote,
+    blobUrl,
+    invoice,
+    onHandleDeliveryNote,
+  } = props;
+
   const handleDeliveryNoteChange = (value: boolean) => {
-    props.setDeliveryNote(value);
+    setDeliveryNote(value);
 
     value
-      ? props.onHandleDeliveryNote(
+      ? onHandleDeliveryNote(
           endpoint('/api/v1/invoices/:id/delivery_note?per_page=999999', {
             id,
           }),
           true
         )
-      : props.onHandleDeliveryNote(props.blobUrl, false);
+      : onHandleDeliveryNote(blobUrl, false);
   };
 
   useEffect(() => {
-    handleDeliveryNoteChange(props.deliveryNote);
+    handleDeliveryNoteChange(deliveryNote);
   }, []);
 
   return (
@@ -56,7 +66,7 @@ export function Actions(props: Props) {
       <span className="inline-flex items-center">
         <Toggle
           label={t('delivery_note')}
-          checked={props.deliveryNote}
+          checked={deliveryNote}
           onChange={handleDeliveryNoteChange}
         />
       </span>
@@ -70,7 +80,7 @@ export function Actions(props: Props) {
         </DropdownElement>
 
         <DropdownElement
-          onClick={() => downloadPdf(props.invoice)}
+          onClick={() => downloadPdf(invoice)}
           icon={<Icon element={MdDownload} />}
         >
           {t('download')}
