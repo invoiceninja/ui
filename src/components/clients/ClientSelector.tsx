@@ -48,7 +48,6 @@ export function ClientSelector(props: ClientSelectorProps) {
         actionLabel={props.withoutAction ? '' : t('new_client')}
         onActionClick={() => setIsModalOpen(true)}
         sortBy="display_name|asc"
-        staleTime={500}
       />
     </>
   );
