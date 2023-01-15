@@ -49,7 +49,7 @@ export function Actions(props: Props) {
 
   useEffect(() => {
     handleDeliveryNoteChange(props.deliveryNote);
-  }, [props.deliveryNote]);
+  }, []);
 
   return (
     <>
