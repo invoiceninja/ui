@@ -12,17 +12,17 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { Statics } from 'common/interfaces/statics';
 import { useQuery } from 'react-query';
-import { useLocation } from 'react-router-dom';
 
 export function useStaticsQuery() {
-  const location = useLocation();
-
   return useQuery<Statics>(
     '/api/v1/statics',
     () =>
       request('GET', endpoint('/api/v1/statics')).then(
         (response) => response.data
       ),
-    { enabled: !location.pathname.startsWith('/login'), staleTime: Infinity }
+    {
+      enabled: Boolean(localStorage.getItem('X-NINJA-TOKEN')),
+      staleTime: Infinity,
+    }
   );
 }
