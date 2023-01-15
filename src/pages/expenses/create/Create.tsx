@@ -20,7 +20,7 @@ import { AdditionalInfo } from './components/AdditionalInfo';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { TaxSettings } from './components/Taxes';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -36,6 +36,8 @@ export function Create() {
   const navigate = useNavigate();
 
   const { documentTitle } = useTitle('new_expense');
+
+  const [searchParams] = useSearchParams();
 
   const pages = [
     { name: t('expenses'), href: '/expenses' },
@@ -57,6 +59,16 @@ export function Create() {
   useEffect(() => {
     if (data && !expense) {
       setExpense(data);
+    }
+
+    if (searchParams.has('vendor')) {
+      setExpense(
+        (current) =>
+          current && {
+            ...current,
+            vendor_id: searchParams.get('vendor') as string,
+          }
+      );
     }
 
     return () => setExpense(undefined);
