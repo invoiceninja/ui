@@ -19,5 +19,5 @@ export * from './show/pages/RecurringInvoices';
 export * from './show/pages/Credits';
 export * from './show/pages/Projects';
 export * from './show/pages/Tasks';
-export * from './show/pages/Expenses';
+export { Expenses } from './show/pages/Expenses';
 export { RecurringExpenses } from './show/pages/RecurringExpenses';
