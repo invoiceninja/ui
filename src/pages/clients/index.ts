@@ -18,6 +18,6 @@ export * from './show/pages/Payments';
 export * from './show/pages/RecurringInvoices';
 export * from './show/pages/Credits';
 export * from './show/pages/Projects';
-export * from './show/pages/Tasks';
+export { Tasks } from './show/pages/Tasks';
 export { Expenses } from './show/pages/Expenses';
 export { RecurringExpenses } from './show/pages/RecurringExpenses';

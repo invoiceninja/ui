@@ -61,6 +61,16 @@ export function Create() {
       setExpense(data);
     }
 
+    if (searchParams.has('vendor')) {
+      setExpense(
+        (current) =>
+          current && {
+            ...current,
+            vendor_id: searchParams.get('vendor') as string,
+          }
+      );
+    }
+
     if (searchParams.has('client')) {
       setExpense(
         (prevState) =>
