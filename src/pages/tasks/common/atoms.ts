@@ -12,11 +12,3 @@ import { Task } from 'common/interfaces/task';
 import { atom } from 'jotai';
 
 export const taskAtom = atom<Task | undefined>(undefined);
-
-export const sliderIntervalAtom = atom<
-  ReturnType<typeof setInterval> | undefined
->(undefined);
-
-export const mainIntervalAtom = atom<
-  ReturnType<typeof setInterval> | undefined
->(undefined);

@@ -27,48 +27,47 @@ export function parseTimeLog(log: string) {
   return parsed;
 }
 
-export function calculateTime(log: string) {
+interface CalculateTimeOptions {
+  inSeconds?: boolean;
+  calculateLastTimeLog?: boolean;
+}
+
+export function calculateTime(log: string, options?: CalculateTimeOptions) {
   const times = parseTimeLog(log);
 
   let seconds = 0;
 
-  times.map(([start, stop]) => {
-    const startTime = start ? dayjs.unix(start) : dayjs();
-    const stopTime = stop ? dayjs.unix(stop) : dayjs();
+  if (options?.calculateLastTimeLog) {
+    const lastLogIndex = times.length - 1;
 
-    seconds += stopTime.diff(startTime, 'seconds');
-  });
+    const start = times[lastLogIndex][0];
+    const startTime = start ? dayjs.unix(start) : dayjs();
+
+    seconds += dayjs().diff(startTime, 'seconds');
+  } else {
+    times.map(([start, stop]) => {
+      const startTime = start ? dayjs.unix(start) : dayjs();
+      const stopTime = stop ? dayjs.unix(stop) : dayjs();
+
+      seconds += stopTime.diff(startTime, 'seconds');
+    });
+  }
+
+  if (options?.inSeconds) {
+    return seconds.toString();
+  }
 
   return new Date(seconds * 1000).toISOString().slice(11, 19);
 }
 
-export function calculateTimeDifference(start: string, end: string) {
-  const timeStart = new Date();
-  const timeEnd = new Date();
+export function calculateDifferenceBetweenLogs(log: string, logIndex: number) {
+  const times = parseTimeLog(log);
+  const logTimes = times[logIndex];
 
-  const startTimeValues = start.split(':');
-  const endTimeValues = end.split(':');
+  const start = logTimes ? dayjs.unix(logTimes[0]) : dayjs();
+  const end = logTimes ? dayjs.unix(logTimes[1]) : dayjs();
 
-  timeStart.setHours(
-    Number(startTimeValues[0]),
-    Number(startTimeValues[1]),
-    Number(startTimeValues[2]),
-    0
-  );
+  const seconds = end.diff(start, 'seconds');
 
-  if (end !== 'Now') {
-    timeEnd.setHours(
-      Number(endTimeValues[0]),
-      Number(endTimeValues[1]),
-      Number(endTimeValues[2]),
-      0
-    );
-  }
-
-  const millisecondsDifference = timeEnd.valueOf() - timeStart.valueOf();
-
-  return (
-    millisecondsDifference &&
-    new Date(millisecondsDifference).toISOString().slice(11, 19)
-  );
+  return new Date(seconds * 1000).toISOString().slice(11, 19);
 }

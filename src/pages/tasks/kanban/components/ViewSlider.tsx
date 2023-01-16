@@ -23,21 +23,18 @@ import { TaskStatus } from 'pages/tasks/common/components/TaskStatus';
 import { isTaskRunning } from 'pages/tasks/common/helpers/calculate-entity-state';
 import {
   calculateTime,
-  calculateTimeDifference,
+  calculateDifferenceBetweenLogs,
 } from 'pages/tasks/common/helpers/calculate-time';
-import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
-import { sliderIntervalAtom } from '../../common/atoms';
+import { TaskClock } from './TaskClock';
 
 export function ViewSlider() {
   const [t] = useTranslation();
 
   const [currentTask] = useAtom(currentTaskAtom);
-
-  const [runningLogTime, setRunningLogTime] = useState<string>();
 
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
@@ -49,8 +46,6 @@ export function ViewSlider() {
   const currentTaskTimeLogs =
     currentTask && formatTimeLog(currentTask.time_log);
 
-  const [intervalValue, setIntervalValue] = useAtom(sliderIntervalAtom);
-
   const isTaskActive = currentTask && isTaskRunning(currentTask);
 
   const onSuccess = () => {
@@ -58,39 +53,6 @@ export function ViewSlider() {
       route('/api/v1/tasks/:id', { id: currentTask?.id })
     );
   };
-
-  let alreadySetInterval = false;
-
-  useEffect(() => {
-    if (currentTask && isTaskActive && !alreadySetInterval) {
-      const timeLogs = formatTimeLog(currentTask.time_log);
-
-      if (timeLogs.length) {
-        const lastTimeLog = timeLogs[timeLogs.length - 1];
-
-        const [, startTaskTime, endTaskTime] = lastTimeLog;
-
-        const currentInterval = setInterval(() => {
-          setRunningLogTime(
-            calculateTimeDifference(startTaskTime, endTaskTime).toString()
-          );
-        }, 1000);
-
-        alreadySetInterval = true;
-
-        setIntervalValue(currentInterval);
-      }
-    }
-  }, [isTaskActive]);
-
-  useEffect(() => {
-    if (!isTaskActive && intervalValue) {
-      clearInterval(intervalValue);
-      setIntervalValue(undefined);
-      setRunningLogTime('00:00:00');
-      alreadySetInterval = false;
-    }
-  }, [isTaskActive, intervalValue]);
 
   return (
     <TabGroup tabs={[t('overview'), t('documents')]} width="full">
@@ -134,7 +96,9 @@ export function ViewSlider() {
                       </small>
                     </div>
 
-                    <p>{calculateTimeDifference(start, end)}</p>
+                    <p>
+                      {calculateDifferenceBetweenLogs(currentTask.time_log, i)}
+                    </p>
                   </div>
                 </ClickableElement>
               ) : (
@@ -148,11 +112,16 @@ export function ViewSlider() {
                       </small>
                     </div>
 
-                    <p>
-                      {isTaskActive
-                        ? runningLogTime
-                        : calculateTimeDifference(start, end)}
-                    </p>
+                    <div>
+                      {isTaskActive ? (
+                        <TaskClock
+                          task={currentTask}
+                          calculateLastTimeLog={true}
+                        />
+                      ) : (
+                        calculateDifferenceBetweenLogs(currentTask.time_log, i)
+                      )}
+                    </div>
                   </div>
                 </ClickableElement>
               )
