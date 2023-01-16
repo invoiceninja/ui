@@ -250,13 +250,13 @@ export function Kanban() {
     projectId
       ? setApiEndpoint(
           route(
-            '/api/v1/tasks?project_tasks=:projectId&limit=1000&per_page=500',
+            '/api/v1/tasks?project_tasks=:projectId&limit=1000&per_page=1000',
             {
               projectId,
             }
           )
         )
-      : setApiEndpoint('/api/v1/tasks?limit=1000&per_page=500');
+      : setApiEndpoint('/api/v1/tasks?limit=1000&per_page=1000');
   }, [projectId]);
 
   return (
