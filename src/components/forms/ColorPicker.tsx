@@ -49,7 +49,7 @@ export function ColorPicker(props: Props) {
 
       <div
         style={{ backgroundColor: color }}
-        className="w-16 h-6 cursor-pointer shadow rounded-md"
+        className="w-6 h-6 cursor-pointer shadow rounded-full"
         onClick={() => setIsModalOpen(true)}
       ></div>
     </div>
