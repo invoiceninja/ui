@@ -50,6 +50,11 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 import { Card, Element } from '@invoiceninja/cards';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { Inline } from 'components/Inline';
+import { MdAddCircle } from 'react-icons/md';
+import {
+  CreateTaskModal,
+  TaskDetails,
+} from '../common/components/CreateTaskModal';
 import { TaskClock } from './components/TaskClock';
 
 interface CardItem {
@@ -85,6 +90,10 @@ export function Kanban() {
 
   const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks?per_page=1000');
   const [projectId, setProjectId] = useState<string>();
+
+  const [taskDetails, setTaskDetails] = useState<TaskDetails>();
+
+  const [isTaskModalOpened, setIsTaskModalOpened] = useState<boolean>(false);
 
   const { data: taskStatuses } = useTaskStatusesQuery();
 
@@ -336,10 +345,19 @@ export function Kanban() {
                     className="bg-white rounded shadow select-none h-max"
                     style={{ minWidth: 360 }}
                   >
-                    <div className="border-b border-gray-200 px-4 py-5">
+                    <div className="flex items-center justify-between border-b border-gray-200 px-4 py-5">
                       <h3 className="leading-6 font-medium text-gray-900">
                         {board.title}
                       </h3>
+
+                      <MdAddCircle
+                        className="cursor-pointer text-gray-500 hover:text-gray-800"
+                        fontSize={22}
+                        onClick={() => {
+                          setTaskDetails({ taskStatusId: board.id, projectId });
+                          setIsTaskModalOpened(true);
+                        }}
+                      />
                     </div>
 
                     <div
@@ -421,6 +439,13 @@ export function Kanban() {
           </DragDropContext>
         </div>
       )}
+
+      <CreateTaskModal
+        visible={isTaskModalOpened}
+        setVisible={setIsTaskModalOpened}
+        details={taskDetails}
+        apiEndPoint={apiEndpoint}
+      />
     </Default>
   );
 }
