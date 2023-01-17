@@ -18,7 +18,7 @@ import { Details } from './components/Details';
 import { Notes } from './components/Notes';
 import { AdditionalInfo } from './components/AdditionalInfo';
 import { request } from 'common/helpers/request';
-import { endpoint } from 'common/helpers';
+import { endpoint, isProduction } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
@@ -71,7 +71,19 @@ export function Create() {
       );
     }
 
-    return () => setExpense(undefined);
+    if (searchParams.has('client')) {
+      setExpense(
+        (prevState) =>
+          prevState && {
+            ...prevState,
+            client_id: searchParams.get('client') as string,
+          }
+      );
+    }
+
+    return () => {
+      isProduction() && setExpense(undefined);
+    };
   }, [data]);
 
   const onSave = (expense: Expense) => {
