@@ -55,8 +55,9 @@ import {
   CreateTaskModal,
   TaskDetails,
 } from '../common/components/CreateTaskModal';
+import { TaskClock } from './components/TaskClock';
 
-interface Card {
+interface CardItem {
   id: string;
   title: string;
   description: string;
@@ -67,7 +68,7 @@ interface Card {
 interface Column {
   id: string;
   title: string;
-  cards: Card[];
+  cards: CardItem[];
 }
 
 interface Board {
@@ -382,7 +383,13 @@ export function Kanban() {
                                 className="px-4 sm:px-6 py-4 bg-gray-50 hover:bg-gray-100"
                               >
                                 <p>{card.title}</p>
-                                <small>{card.description}</small>
+                                <small>
+                                  {isTaskRunning(card.task) ? (
+                                    <TaskClock task={card.task} />
+                                  ) : (
+                                    card.description
+                                  )}
+                                </small>
                               </div>
                             )}
                           </Draggable>
