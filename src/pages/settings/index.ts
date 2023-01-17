@@ -42,3 +42,4 @@ export * from './integrations/api-webhooks';
 export * from './integrations/google-analytics';
 export * from './expense-categories';
 export * from './gateways';
+export * from './designer/Designer';

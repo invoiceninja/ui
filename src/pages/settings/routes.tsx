@@ -159,5 +159,6 @@ export const settingsRoutes = (
       <Route path="create" element={<Settings.CreateGateway />} />
       <Route path=":id/edit" element={<Settings.EditGateway />} />
     </Route>
+    <Route path="designer" element={<Settings.Designer />} />
   </Route>
 );
