@@ -8,14 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { request } from 'common/helpers/request';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
 import { endpoint } from '../helpers';
 import { Payment } from 'common/interfaces/payment';
 import { Params } from './common/params.interface';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { toast } from 'common/helpers/toast/toast';
 
 interface PaymentParams {
   id: string | undefined;
@@ -73,12 +74,26 @@ export function useBlankPaymentQuery() {
   );
 }
 
-export function bulk(
-  id: string[],
-  action: 'archive' | 'restore' | 'delete' | 'email'
-): Promise<AxiosResponse> {
-  return request('POST', endpoint('/api/v1/payments/bulk'), {
-    action,
-    ids: Array.from(id),
-  });
+export function useBulk() {
+  const queryClient = useQueryClient();
+
+  return (id: string, action: 'archive' | 'restore' | 'delete' | 'email') => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/payments/bulk'), {
+      action,
+      ids: [id],
+    })
+      .then(() => {
+        const translationKeyword = action === 'email' ? 'emaile' : action;
+
+        toast.success(`${translationKeyword}d_payment`);
+
+        queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+        toast.error();
+      });
+  };
 }
