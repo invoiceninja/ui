@@ -15,7 +15,7 @@ import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { InvoiceViewer } from '../common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { Actions } from './components/Actions';
@@ -29,11 +29,19 @@ export function Pdf() {
   const [blobUrl, setBlobUrl] = useState('');
   const [invoice, setInvoice] = useState<Invoice>();
 
+  const [deliveryNote, setDeliveryNote] = useState<boolean>(false);
+
+  const [searchParams] = useSearchParams();
+
   const url = useGeneratePdfUrl({ resourceType: 'invoice' });
 
   useEffect(() => {
     if (data) {
       setInvoice(data);
+
+      if (searchParams.has('delivery_note')) {
+        setDeliveryNote(true);
+      }
     }
   }, [data]);
 
@@ -54,7 +62,9 @@ export function Pdf() {
           <Actions
             invoice={invoice}
             blobUrl={blobUrl}
-            onHandleDeliveryNote={(value, isDeliveryNote) =>
+            deliveryNote={deliveryNote}
+            setDeliveryNote={setDeliveryNote}
+            onHandleDeliveryNote={(value, isDeliveryNote = deliveryNote) =>
               isDeliveryNote
                 ? setPdfUrl(value)
                 : setPdfUrl(url(invoice as Invoice))

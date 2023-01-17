@@ -20,7 +20,7 @@ import { Default } from 'components/layouts/Default';
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { taskAtom } from '../common/atoms';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
@@ -30,6 +30,8 @@ export function Create() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('new_task');
+
+  const [searchParams] = useSearchParams();
 
   const { data } = useBlankTaskQuery();
 
@@ -59,6 +61,16 @@ export function Create() {
             ...prevState,
             status_id:
               taskStatuses.data.length > 0 ? taskStatuses.data[0].id : '',
+          }
+      );
+    }
+
+    if (searchParams.has('client')) {
+      setTask(
+        (prevState) =>
+          prevState && {
+            ...prevState,
+            client_id: searchParams.get('client') as string,
           }
       );
     }
