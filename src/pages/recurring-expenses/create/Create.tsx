@@ -16,9 +16,9 @@ import { Details } from '../components/Details';
 import { Notes } from '../components/Notes';
 import { AdditionalInfo } from '../components/AdditionalInfo';
 import { request } from 'common/helpers/request';
-import { endpoint } from 'common/helpers';
+import { endpoint, isProduction } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { TaxSettings } from '../components/Taxes';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -29,11 +29,14 @@ import { useAtom } from 'jotai';
 import { RecurringExpense } from 'common/interfaces/recurring-expense';
 import { useBlankRecurringExpenseQuery } from 'common/queries/recurring-expense';
 import { useHandleChange } from '../common/hooks';
+import { RecurringExpensesFrequency } from 'common/enums/recurring-expense-frequency';
 
 export function Create() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
 
   const { documentTitle } = useTitle('new_recurring_expense');
 
@@ -58,10 +61,35 @@ export function Create() {
 
   useEffect(() => {
     if (data && !recurringExpense) {
-      setRecurringExpense({ ...data, frequency_id: '5' });
+      setRecurringExpense({
+        ...data,
+        frequency_id: RecurringExpensesFrequency.FREQUENCY_MONTHLY,
+      });
     }
 
-    return () => setRecurringExpense(undefined);
+    if (searchParams.has('client')) {
+      setRecurringExpense(
+        (current) =>
+          current && {
+            ...current,
+            client_id: searchParams.get('client') as string,
+          }
+      );
+    }
+
+    if (searchParams.has('vendor')) {
+      setRecurringExpense(
+        (current) =>
+          current && {
+            ...current,
+            vendor_id: searchParams.get('vendor') as string,
+          }
+      );
+    }
+
+    return () => {
+      isProduction() && setRecurringExpense(undefined);
+    };
   }, [data]);
 
   const onSave = (recurringExpense: RecurringExpense) => {

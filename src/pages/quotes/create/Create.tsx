@@ -9,6 +9,7 @@
  */
 
 import { blankInvitation } from 'common/constants/blank-invitation';
+import { isProduction } from 'common/helpers';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
@@ -86,7 +87,7 @@ export function Create() {
     }
 
     return () => {
-      setQuote(undefined);
+      isProduction() && setQuote(undefined);
     };
   }, [data]);
 

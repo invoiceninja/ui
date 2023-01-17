@@ -7,10 +7,8 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-export * from './Product';
-export * from './index/Products';
-export * from './edit/Edit';
-export * from './create/Create';
-export * from './show/Show';
-export * from './documents/Documents';
-export * from './edit/ProductFields';
+
+import { Project } from 'common/interfaces/project';
+import { atom } from 'jotai';
+
+export const projectAtom = atom<Project | undefined>(undefined);

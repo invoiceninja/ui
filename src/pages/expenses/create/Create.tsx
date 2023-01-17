@@ -18,9 +18,9 @@ import { Details } from './components/Details';
 import { Notes } from './components/Notes';
 import { AdditionalInfo } from './components/AdditionalInfo';
 import { request } from 'common/helpers/request';
-import { endpoint } from 'common/helpers';
+import { endpoint, isProduction } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { TaxSettings } from './components/Taxes';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -36,6 +36,8 @@ export function Create() {
   const navigate = useNavigate();
 
   const { documentTitle } = useTitle('new_expense');
+
+  const [searchParams] = useSearchParams();
 
   const pages = [
     { name: t('expenses'), href: '/expenses' },
@@ -59,7 +61,29 @@ export function Create() {
       setExpense(data);
     }
 
-    return () => setExpense(undefined);
+    if (searchParams.has('vendor')) {
+      setExpense(
+        (current) =>
+          current && {
+            ...current,
+            vendor_id: searchParams.get('vendor') as string,
+          }
+      );
+    }
+
+    if (searchParams.has('client')) {
+      setExpense(
+        (prevState) =>
+          prevState && {
+            ...prevState,
+            client_id: searchParams.get('client') as string,
+          }
+      );
+    }
+
+    return () => {
+      isProduction() && setExpense(undefined);
+    };
   }, [data]);
 
   const onSave = (expense: Expense) => {

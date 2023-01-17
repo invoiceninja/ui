@@ -53,8 +53,14 @@ import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { Inline } from 'components/Inline';
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import { CreateTaskStatusModal } from 'pages/settings/task-statuses/components/CreateTaskStatusModal';
+import { MdAddCircle } from 'react-icons/md';
+import {
+  CreateTaskModal,
+  TaskDetails,
+} from '../common/components/CreateTaskModal';
+import { TaskClock } from './components/TaskClock';
 
-interface CardColumn {
+interface CardItem {
   id: string;
   title: string;
   description: string;
@@ -65,7 +71,7 @@ interface CardColumn {
 interface Column {
   id: string;
   title: string;
-  cards: CardColumn[];
+  cards: CardItem[];
 }
 
 interface Board {
@@ -90,14 +96,17 @@ export function Kanban() {
   const [isTaskStatusModalOpened, setIsTaskStatusModalOpened] =
     useState<boolean>(false);
 
-  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks');
+  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks?per_page=1000');
   const [projectId, setProjectId] = useState<string>();
+
+  const [taskDetails, setTaskDetails] = useState<TaskDetails>();
+
+  const [isTaskModalOpened, setIsTaskModalOpened] = useState<boolean>(false);
 
   const { data: taskStatuses } = useTaskStatusesQuery();
 
   const { data: tasks } = useTasksQuery({
     endpoint: apiEndpoint,
-    options: { limit: 1000 },
   });
 
   const [board, setBoard] = useState<Board>();
@@ -245,11 +254,11 @@ export function Kanban() {
   useEffect(() => {
     projectId
       ? setApiEndpoint(
-          route('/api/v1/tasks?project_tasks=:projectId&limit=1000', {
+          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
             projectId,
           })
         )
-      : setApiEndpoint('/api/v1/tasks?limit=1000');
+      : setApiEndpoint('/api/v1/tasks?per_page=1000');
   }, [projectId]);
 
   return (
@@ -345,10 +354,22 @@ export function Kanban() {
                       className="bg-white rounded shadow select-none h-max"
                       style={{ minWidth: 360 }}
                     >
-                      <div className="border-b border-gray-200 px-4 py-5">
+                      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-5">
                         <h3 className="leading-6 font-medium text-gray-900">
                           {board.title}
                         </h3>
+
+                        <MdAddCircle
+                          className="cursor-pointer text-gray-500 hover:text-gray-800"
+                          fontSize={22}
+                          onClick={() => {
+                            setTaskDetails({
+                              taskStatusId: board.id,
+                              projectId,
+                            });
+                            setIsTaskModalOpened(true);
+                          }}
+                        />
                       </div>
 
                       <div
@@ -374,7 +395,13 @@ export function Kanban() {
                                   className="px-4 sm:px-6 py-4 bg-gray-50 hover:bg-gray-100"
                                 >
                                   <p>{card.title}</p>
-                                  <small>{card.description}</small>
+                                  <small>
+                                    {isTaskRunning(card.task) ? (
+                                      <TaskClock task={card.task} />
+                                    ) : (
+                                      card.description
+                                    )}
+                                  </small>
                                 </div>
                               )}
                             </Draggable>
@@ -442,6 +469,13 @@ export function Kanban() {
       <CreateTaskStatusModal
         visible={isTaskStatusModalOpened}
         setVisible={setIsTaskStatusModalOpened}
+      />
+
+      <CreateTaskModal
+        visible={isTaskModalOpened}
+        setVisible={setIsTaskModalOpened}
+        details={taskDetails}
+        apiEndPoint={apiEndpoint}
       />
     </Default>
   );

@@ -9,17 +9,35 @@
  */
 
 import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
+import { EntityState } from 'common/enums/entity-state';
+import { date, getEntityState } from 'common/helpers';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Product } from 'common/interfaces/product';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { customField } from 'components/CustomField';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
+import { Icon } from 'components/icons/Icon';
+import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
+import {
+  MdArchive,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdRestore,
+} from 'react-icons/md';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { productAtom } from './atoms';
+import { bulk } from 'common/queries/products';
+import { useQueryClient } from 'react-query';
+import { Divider } from 'components/cards/Divider';
 
 export const productColumns = [
   'product_key',
@@ -204,4 +222,103 @@ export function useProductColumns() {
   return columns
     .filter((column) => list.includes(column.column))
     .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+}
+
+export function useActions() {
+  const [t] = useTranslation();
+
+  const navigate = useNavigate();
+
+  const location = useLocation();
+
+  const queryClient = useQueryClient();
+
+  const setProduct = useUpdateAtom(productAtom);
+
+  const isEditPage = location.pathname.endsWith('/edit');
+
+  const cloneToProduct = (product: Product) => {
+    setProduct({ ...product, id: '', documents: [] });
+
+    navigate('/products/create');
+  };
+
+  const handleResourcefulAction = (
+    action: 'archive' | 'restore' | 'delete',
+    id: string
+  ) => {
+    toast.processing();
+
+    bulk([id], action)
+      .then(() => {
+        toast.success(t(`${action}d_product`) || '');
+
+        queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error();
+      });
+  };
+
+  const actions = [
+    (product: Product) => (
+      <DropdownElement
+        onClick={() => cloneToProduct(product)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
+        {t('clone')}
+      </DropdownElement>
+    ),
+    () => isEditPage && <Divider withoutPadding />,
+    (product: Product) =>
+      getEntityState(product) === EntityState.Active &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => handleResourcefulAction('archive', product.id)}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (product: Product) =>
+      (getEntityState(product) === EntityState.Archived ||
+        getEntityState(product) === EntityState.Deleted) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => handleResourcefulAction('restore', product.id)}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (product: Product) =>
+      (getEntityState(product) === EntityState.Active ||
+        getEntityState(product) === EntityState.Archived) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => handleResourcefulAction('delete', product.id)}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
+  ];
+
+  return actions;
+}
+
+interface Params {
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  setProduct: Dispatch<SetStateAction<Product | undefined>>;
+}
+
+export function useHandleChange(params: Params) {
+  const { setErrors, setProduct } = params;
+
+  return (property: keyof Product, value: Product[keyof Product]) => {
+    setErrors(undefined);
+
+    setProduct((product) => product && { ...product, [property]: value });
+  };
 }
