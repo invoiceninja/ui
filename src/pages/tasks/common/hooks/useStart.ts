@@ -35,15 +35,12 @@ export function useStart() {
           route('/api/v1/tasks/:id', { id: task.id })
         );
 
-        queryClient.invalidateQueries('/api/v1/tasks?limit=1000&per_page=500');
+        queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
 
         queryClient.invalidateQueries(
-          route(
-            '/api/v1/tasks?project_tasks=:projectId&limit=1000&per_page=500',
-            {
-              projectId: task.project_id,
-            }
-          )
+          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
+            projectId: task.project_id,
+          })
         );
       })
       .catch((error) => {

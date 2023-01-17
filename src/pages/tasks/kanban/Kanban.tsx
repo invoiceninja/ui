@@ -83,16 +83,13 @@ export function Kanban() {
 
   const queryClient = useQueryClient();
 
-  const [apiEndpoint, setApiEndpoint] = useState(
-    '/api/v1/tasks?limit=1000&per_page=500'
-  );
+  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks?per_page=500');
   const [projectId, setProjectId] = useState<string>();
 
   const { data: taskStatuses } = useTaskStatusesQuery();
 
   const { data: tasks } = useTasksQuery({
     endpoint: apiEndpoint,
-    options: { limit: 1000 },
   });
 
   const [board, setBoard] = useState<Board>();
@@ -240,14 +237,11 @@ export function Kanban() {
   useEffect(() => {
     projectId
       ? setApiEndpoint(
-          route(
-            '/api/v1/tasks?project_tasks=:projectId&limit=1000&per_page=500',
-            {
-              projectId,
-            }
-          )
+          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
+            projectId,
+          })
         )
-      : setApiEndpoint('/api/v1/tasks?limit=1000&per_page=500');
+      : setApiEndpoint('/api/v1/tasks?per_page=1000');
   }, [projectId]);
 
   return (

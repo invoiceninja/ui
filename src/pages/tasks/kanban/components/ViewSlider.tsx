@@ -34,19 +34,16 @@ import { TaskClock } from './TaskClock';
 export function ViewSlider() {
   const [t] = useTranslation();
 
-  const [currentTask] = useAtom(currentTaskAtom);
-
-  const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
-  const formatTimeLog = useFormatTimeLog();
-  const accentColor = useAccentColor();
-
   const queryClient = useQueryClient();
+  const accentColor = useAccentColor();
+  const formatMoney = useFormatMoney();
+  const formatTimeLog = useFormatTimeLog();
+
+  const [currentTask] = useAtom(currentTaskAtom);
 
   const currentTaskTimeLogs =
     currentTask && formatTimeLog(currentTask.time_log);
-
-  const isTaskActive = currentTask && isTaskRunning(currentTask);
 
   const onSuccess = () => {
     queryClient.invalidateQueries(
@@ -84,48 +81,31 @@ export function ViewSlider() {
               </div>
             </NonClickableElement>
 
-            {currentTaskTimeLogs?.map(([date, start, end], i) =>
-              i < currentTaskTimeLogs.length - 1 ? (
-                <ClickableElement key={i}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <p>{date}</p>
+            {currentTaskTimeLogs?.map(([date, start, end], i) => (
+              <ClickableElement key={i}>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
+                    <p>{date}</p>
 
-                      <small>
-                        {start} - {end}
-                      </small>
-                    </div>
-
-                    <p>
-                      {calculateDifferenceBetweenLogs(currentTask.time_log, i)}
-                    </p>
+                    <small>
+                      {start} - {end}
+                    </small>
                   </div>
-                </ClickableElement>
-              ) : (
-                <ClickableElement key={i}>
-                  <div className="flex items-center justify-between">
-                    <div className="flex flex-col">
-                      <p>{date}</p>
 
-                      <small>
-                        {start} - {end}
-                      </small>
-                    </div>
-
-                    <div>
-                      {isTaskActive ? (
-                        <TaskClock
-                          task={currentTask}
-                          calculateLastTimeLog={true}
-                        />
-                      ) : (
-                        calculateDifferenceBetweenLogs(currentTask.time_log, i)
-                      )}
-                    </div>
+                  <div>
+                    {isTaskRunning(currentTask) &&
+                    i === currentTaskTimeLogs.length - 1 ? (
+                      <TaskClock
+                        task={currentTask}
+                        calculateLastTimeLog={true}
+                      />
+                    ) : (
+                      calculateDifferenceBetweenLogs(currentTask.time_log, i)
+                    )}
                   </div>
-                </ClickableElement>
-              )
-            )}
+                </div>
+              </ClickableElement>
+            ))}
           </>
         )}
       </div>
