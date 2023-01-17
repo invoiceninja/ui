@@ -40,25 +40,21 @@ export function useBlankTaskQuery() {
 }
 
 interface TasksParams {
-  options?: {
-    limit: number;
-  };
   endpoint?: string;
 }
 
 export function useTasksQuery(params: TasksParams) {
   return useQuery<GenericManyResponse<Task>>(
-    route(':endpoint?limit=:limit', {
+    route(':endpoint', {
       endpoint: params.endpoint || '/api/v1/tasks',
-      limit: params.options?.limit.toString() || 10,
     }),
     () =>
       request(
         'GET',
-        endpoint(':endpoint?limit=:limit', {
+        endpoint(':endpoint', {
           endpoint: params.endpoint || '/api/v1/tasks',
-          limit: params.options?.limit.toString() || 10,
         })
-      ).then((response) => response.data)
+      ).then((response) => response.data),
+    { staleTime: Infinity }
   );
 }

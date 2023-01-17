@@ -50,8 +50,9 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 import { Card, Element } from '@invoiceninja/cards';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { Inline } from 'components/Inline';
+import { TaskClock } from './components/TaskClock';
 
-interface Card {
+interface CardItem {
   id: string;
   title: string;
   description: string;
@@ -62,7 +63,7 @@ interface Card {
 interface Column {
   id: string;
   title: string;
-  cards: Card[];
+  cards: CardItem[];
 }
 
 interface Board {
@@ -82,14 +83,13 @@ export function Kanban() {
 
   const queryClient = useQueryClient();
 
-  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks');
+  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks?per_page=1000');
   const [projectId, setProjectId] = useState<string>();
 
   const { data: taskStatuses } = useTaskStatusesQuery();
 
   const { data: tasks } = useTasksQuery({
     endpoint: apiEndpoint,
-    options: { limit: 1000 },
   });
 
   const [board, setBoard] = useState<Board>();
@@ -237,11 +237,11 @@ export function Kanban() {
   useEffect(() => {
     projectId
       ? setApiEndpoint(
-          route('/api/v1/tasks?project_tasks=:projectId&limit=1000', {
+          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
             projectId,
           })
         )
-      : setApiEndpoint('/api/v1/tasks?limit=1000');
+      : setApiEndpoint('/api/v1/tasks?per_page=1000');
   }, [projectId]);
 
   return (
@@ -365,7 +365,13 @@ export function Kanban() {
                                 className="px-4 sm:px-6 py-4 bg-gray-50 hover:bg-gray-100"
                               >
                                 <p>{card.title}</p>
-                                <small>{card.description}</small>
+                                <small>
+                                  {isTaskRunning(card.task) ? (
+                                    <TaskClock task={card.task} />
+                                  ) : (
+                                    card.description
+                                  )}
+                                </small>
                               </div>
                             )}
                           </Draggable>
