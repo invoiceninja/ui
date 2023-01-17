@@ -50,8 +50,7 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 import { Card, Element } from '@invoiceninja/cards';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { Inline } from 'components/Inline';
-import { MdOutlineAddBox } from 'react-icons/md';
-import { useAccentColor } from 'common/hooks/useAccentColor';
+import { MdAddCircle } from 'react-icons/md';
 import {
   CreateTaskModal,
   TaskDetails,
@@ -87,8 +86,6 @@ export function Kanban() {
   ];
 
   const queryClient = useQueryClient();
-
-  const accentColor = useAccentColor();
 
   const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks?per_page=1000');
   const [projectId, setProjectId] = useState<string>();
@@ -352,10 +349,9 @@ export function Kanban() {
                         {board.title}
                       </h3>
 
-                      <MdOutlineAddBox
-                        className="cursor-pointer"
-                        fontSize={28}
-                        color={accentColor}
+                      <MdAddCircle
+                        className="cursor-pointer text-gray-500 hover:text-gray-800"
+                        fontSize={22}
                         onClick={() => {
                           setTaskDetails({ taskStatusId: board.id, projectId });
                           setIsTaskModalOpened(true);
