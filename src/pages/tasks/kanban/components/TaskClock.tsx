@@ -23,10 +23,6 @@ export function TaskClock(props: Props) {
 
   const isTaskActive = props.task && isTaskRunning(props.task);
 
-  let alreadySetInterval = false;
-
-  let mounted = false;
-
   let mainIntervalLocalValue: ReturnType<typeof setInterval> | undefined =
     undefined;
 
@@ -36,22 +32,17 @@ export function TaskClock(props: Props) {
       calculateLastTimeLog: Boolean(props.calculateLastTimeLog),
     });
 
-    if (isTaskActive && !alreadySetInterval) {
+    if (isTaskActive) {
       setSeconds(Number(calculation));
 
       mainIntervalLocalValue = setInterval(() => {
         setSeconds((current) => current + 1);
       }, 1000);
-
-      alreadySetInterval = true;
     }
 
     return () => {
-      if (mounted && mainIntervalLocalValue) {
+      if (mainIntervalLocalValue) {
         clearInterval(mainIntervalLocalValue);
-        alreadySetInterval = false;
-      } else {
-        mounted = true;
       }
     };
   }, []);

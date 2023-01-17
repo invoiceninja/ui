@@ -83,7 +83,7 @@ export function Kanban() {
 
   const queryClient = useQueryClient();
 
-  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks?per_page=500');
+  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks?per_page=1000');
   const [projectId, setProjectId] = useState<string>();
 
   const { data: taskStatuses } = useTaskStatusesQuery();
