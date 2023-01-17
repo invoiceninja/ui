@@ -28,8 +28,8 @@ describe('InvoiceSum test invoice calculation', () => {
   it('Line Item Calc', () => {
     const invoiceSum = new InvoiceSum(invoice, USD).build();
 
-    expect(invoiceSum.invoice.amount).toEqual(3723);
-    expect(invoiceSum.invoice.balance).toEqual(3723);
+    expect(invoiceSum.invoice.amount).toEqual(3963.9);
+    expect(invoiceSum.invoice.balance).toEqual(3963.9);
   });
 
   it('Single line item', () => {
