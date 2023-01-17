@@ -100,21 +100,19 @@ export function CreateTaskStatusModal(props: Props) {
         setTaskStatus(blankTaskStatus);
       }}
     >
-      <div className="space-y-6 px-4">
-        <InputField
-          required
-          label={t('name')}
-          value={taskStatus?.name}
-          onValueChange={(value) => handleChange('name', value)}
-          errorMessage={errors?.errors.name}
-        />
+      <InputField
+        required
+        label={t('name')}
+        value={taskStatus?.name}
+        onValueChange={(value) => handleChange('name', value)}
+        errorMessage={errors?.errors.name}
+      />
 
-        <InputLabel>{t('color')}</InputLabel>
-        <ColorPicker
-          value={taskStatus?.color || accentColor}
-          onValueChange={(color) => handleChange('color', color)}
-        />
-      </div>
+      <InputLabel>{t('color')}</InputLabel>
+      <ColorPicker
+        value={taskStatus?.color || accentColor}
+        onValueChange={(color) => handleChange('color', color)}
+      />
 
       <Button className="self-end" disabled={isFormBusy} onClick={handleSave}>
         {t('save')}
