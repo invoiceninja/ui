@@ -76,18 +76,13 @@ export function CreateTaskModal(props: Props) {
         .then(() => {
           toast.success('created_task');
 
-          queryClient.invalidateQueries(
-            '/api/v1/tasks?limit=1000&per_page=500'
-          );
+          queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
 
           queryClient.invalidateQueries(
             task.project_id &&
-              route(
-                '/api/v1/tasks?project_tasks=:project_id&limit=1000&per_page=500',
-                {
-                  project_id: task.project_id,
-                }
-              )
+              route('/api/v1/tasks?project_tasks=:project_id&per_page=1000', {
+                project_id: task.project_id,
+              })
           );
 
           setTask(data);

@@ -90,7 +90,7 @@ export function Kanban() {
 
   const accentColor = useAccentColor();
 
-  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks');
+  const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks?per_page=1000');
   const [projectId, setProjectId] = useState<string>();
 
   const [taskDetails, setTaskDetails] = useState<TaskDetails>();
@@ -101,7 +101,6 @@ export function Kanban() {
 
   const { data: tasks } = useTasksQuery({
     endpoint: apiEndpoint,
-    options: { limit: 1000 },
   });
 
   const [board, setBoard] = useState<Board>();
@@ -249,14 +248,11 @@ export function Kanban() {
   useEffect(() => {
     projectId
       ? setApiEndpoint(
-          route(
-            '/api/v1/tasks?project_tasks=:projectId&limit=1000&per_page=1000',
-            {
-              projectId,
-            }
-          )
+          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
+            projectId,
+          })
         )
-      : setApiEndpoint('/api/v1/tasks?limit=1000&per_page=1000');
+      : setApiEndpoint('/api/v1/tasks?per_page=1000');
   }, [projectId]);
 
   return (
