@@ -123,7 +123,7 @@ export function useResolveTotalVariable(props: Props) {
     if (variable == '$taxes' && invoiceSum) {
       return (
         <Element leftSide={`${resolveTranslation(variable, '$')}:`}>
-          {invoiceSum?.taxMap.map((item, index) => (
+          {invoiceSum?.getTaxMap().map((item, index) => (
             <div key={index} className="flex space-x-6">
               <span>{item.name}</span>
               <span>{formatMoney(item.total)}</span>

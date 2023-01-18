@@ -23,7 +23,7 @@ export interface TaxItem {
 }
 
 export class InvoiceSum {
-  public taxMap = collect<TaxItem>();
+  protected taxMap = collect<TaxItem>();
   protected totalTaxMap: Record<string, unknown>[] = [];
 
   public declare invoiceItems: InvoiceItemSum;
@@ -52,6 +52,10 @@ export class InvoiceSum {
       .calculatePartial();
 
     return this;
+  }
+
+  public getTaxMap() {
+    return this.taxMap;
   }
 
   protected calculateLineItems() {
