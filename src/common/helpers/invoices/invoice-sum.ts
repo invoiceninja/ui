@@ -201,9 +201,9 @@ export class InvoiceSum {
         name: taxName as string,
         total: totalLineTax as number,
       });
-
-      this.totalTaxes += this.invoiceItems.totalTaxes;
     });
+
+    this.totalTaxes += this.invoiceItems.totalTaxes;
 
     return this;
   }
