@@ -39,12 +39,14 @@ import {
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { Divider } from 'components/cards/Divider';
 
 export type Action = (po: PurchaseOrder) => {
   label: string;
   onClick: () => unknown;
   hideIf?: boolean;
   icon?: ReactElement;
+  showDivider?: boolean;
 };
 
 export function useActions() {
@@ -149,14 +151,14 @@ export function useActions() {
         icon: <Icon element={MdPageview} />,
       }),
       (po) => ({
-        label: t('clone'),
-        onClick: () => cloneToPurchaseOrder(po),
-        icon: <Icon element={MdControlPointDuplicate} />,
-      }),
-      (po) => ({
         label: t('vendor_portal'),
         onClick: () => openClientPortal(po),
         icon: <Icon element={MdCloudCircle} />,
+      }),
+      (po) => ({
+        label: t('clone'),
+        onClick: () => cloneToPurchaseOrder(po),
+        icon: <Icon element={MdControlPointDuplicate} />,
       }),
       (po) => ({
         label: t('archive'),
@@ -170,6 +172,7 @@ export function useActions() {
             .finally(() => invalidateCache(po.id)),
         hideIf: po.archived_at > 0,
         icon: <Icon element={MdArchive} />,
+        showDivider: true,
       }),
       (po) => ({
         label: t('restore'),
@@ -182,6 +185,7 @@ export function useActions() {
             })
             .finally(() => invalidateCache(po.id)),
         hideIf: po.archived_at === 0,
+        showDivider: true,
         icon: <Icon element={MdRestore} />,
       }),
       (po) => ({
@@ -217,13 +221,19 @@ export function Actions(props: Props) {
       {actions().map(
         (action, index) =>
           !action(props.purchaseOrder).hideIf && (
-            <DropdownElement
-              key={index}
-              onClick={action(props.purchaseOrder).onClick}
-              icon={action(props.purchaseOrder).icon}
-            >
-              {action(props.purchaseOrder).label}
-            </DropdownElement>
+            <>
+              {action(props.purchaseOrder).showDivider && (
+                <Divider withoutPadding />
+              )}
+
+              <DropdownElement
+                key={index}
+                onClick={action(props.purchaseOrder).onClick}
+                icon={action(props.purchaseOrder).icon}
+              >
+                {action(props.purchaseOrder).label}
+              </DropdownElement>
+            </>
           )
       )}
     </Dropdown>
