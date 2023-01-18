@@ -101,9 +101,14 @@ export function Create() {
   };
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      disableSaveButton={!project}
+      onSaveClick={onSave}
+    >
       <Container>
-        <Card title={documentTitle} withSaveButton onSaveClick={onSave}>
+        <Card title={documentTitle}>
           <Element leftSide={t('project_name')}>
             <InputField
               value={project?.name}
