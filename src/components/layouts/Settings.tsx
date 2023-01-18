@@ -163,7 +163,7 @@ export function Settings(props: Props) {
       disableSaveButton={props.disableSaveButton}
     >
       <div className="grid grid-cols-12 lg:gap-10">
-        <div className="col-span-12 md:col-span-4 lg:col-span-3">
+        <div className="col-span-12 lg:col-span-3">
           <a className="flex items-center py-4 px-3 text-xs uppercase font-medium text-gray-600">
             <span className="truncate">{t('basic_settings')}</span>
           </a>
@@ -266,7 +266,7 @@ export function Settings(props: Props) {
           </nav>
         </div>
 
-        <div className="col-span-12 md:col-span-8 lg:col-start-4 space-y-6 mt-5">
+        <div className="col-span-12 lg:col-start-4 space-y-6 mt-5">
           {props.breadcrumbs && <Breadcrumbs pages={props.breadcrumbs} />}
 
           {errors && <ValidationAlert errors={errors} />}
