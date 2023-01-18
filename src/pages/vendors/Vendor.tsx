@@ -47,7 +47,7 @@ export function Vendor() {
   const tabs: Tab[] = [
     {
       name: t('purchase_orders'),
-      href: route('/vendors/:id/purchase_orders', { id }),
+      href: route('/vendors/:id', { id }),
     },
     {
       name: t('expenses'),

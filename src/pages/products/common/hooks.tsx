@@ -9,8 +9,10 @@
  */
 
 import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
+import { EntityState } from 'common/enums/entity-state';
+import { date, getEntityState } from 'common/helpers';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
@@ -25,9 +27,17 @@ import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdControlPointDuplicate } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
+import {
+  MdArchive,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdRestore,
+} from 'react-icons/md';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { productAtom } from './atoms';
+import { bulk } from 'common/queries/products';
+import { useQueryClient } from 'react-query';
+import { Divider } from 'components/cards/Divider';
 
 export const productColumns = [
   'product_key',
@@ -219,12 +229,36 @@ export function useActions() {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+  const queryClient = useQueryClient();
+
   const setProduct = useUpdateAtom(productAtom);
+
+  const isEditPage = location.pathname.endsWith('/edit');
 
   const cloneToProduct = (product: Product) => {
     setProduct({ ...product, id: '', documents: [] });
 
     navigate('/products/create');
+  };
+
+  const handleResourcefulAction = (
+    action: 'archive' | 'restore' | 'delete',
+    id: string
+  ) => {
+    toast.processing();
+
+    bulk([id], action)
+      .then(() => {
+        toast.success(t(`${action}d_product`) || '');
+
+        queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error();
+      });
   };
 
   const actions = [
@@ -236,6 +270,39 @@ export function useActions() {
         {t('clone')}
       </DropdownElement>
     ),
+    () => isEditPage && <Divider withoutPadding />,
+    (product: Product) =>
+      getEntityState(product) === EntityState.Active &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => handleResourcefulAction('archive', product.id)}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (product: Product) =>
+      (getEntityState(product) === EntityState.Archived ||
+        getEntityState(product) === EntityState.Deleted) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => handleResourcefulAction('restore', product.id)}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (product: Product) =>
+      (getEntityState(product) === EntityState.Active ||
+        getEntityState(product) === EntityState.Archived) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => handleResourcefulAction('delete', product.id)}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
   ];
 
   return actions;

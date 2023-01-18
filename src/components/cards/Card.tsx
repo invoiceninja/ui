@@ -10,25 +10,34 @@
 
 import classNames from 'classnames';
 import { Spinner } from 'components/Spinner';
-import React, { ReactNode } from 'react';
+import { CSSProperties, FormEvent, ReactElement, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer } from '.';
 import { Button } from '../forms';
 import { Element } from 'components/cards/Element';
+import { Dropdown } from 'components/dropdown/Dropdown';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
+
+export interface ButtonOption {
+  text: string;
+  onClick: (event: FormEvent<HTMLFormElement>) => unknown;
+  icon?: ReactElement;
+}
 
 interface Props {
   children: ReactNode;
   title?: string | null;
   description?: string;
   withSaveButton?: boolean;
-  onFormSubmit?: (event: React.FormEvent<HTMLFormElement>) => any;
-  onSaveClick?: any;
+  additionalSaveOptions?: ButtonOption[];
+  onFormSubmit?: (event: FormEvent<HTMLFormElement>) => unknown;
+  onSaveClick?: (event: FormEvent<HTMLFormElement>) => unknown;
   saveButtonLabel?: string | null;
   disableSubmitButton?: boolean;
   disableWithoutIcon?: boolean;
   className?: string;
   withContainer?: boolean;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   withScrollableBody?: boolean;
   additionalAction?: ReactNode;
   isLoading?: boolean;
@@ -96,7 +105,7 @@ export function Card(props: Props) {
               <div className="sm:py-5 sm:px-6 flex justify-end space-x-4">
                 {props.additionalAction}
 
-                {props.withSaveButton && (
+                {props.withSaveButton && !props.additionalSaveOptions && (
                   <Button
                     onClick={props.onSaveClick}
                     disabled={props.disableSubmitButton}
@@ -104,6 +113,36 @@ export function Card(props: Props) {
                   >
                     {props.saveButtonLabel ?? t('save')}
                   </Button>
+                )}
+
+                {props.withSaveButton && props.additionalSaveOptions && (
+                  <div className="flex">
+                    <Button
+                      className="rounded-br-none rounded-tr-none px-3"
+                      onClick={props.onSaveClick}
+                      disabled={props.disableSubmitButton}
+                      disableWithoutIcon={props.disableWithoutIcon}
+                    >
+                      {props.saveButtonLabel ?? t('save')}
+                    </Button>
+
+                    <Dropdown
+                      className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+                      cardActions
+                      disabled={props.disableSubmitButton}
+                    >
+                      {props.additionalSaveOptions.map((action, i) => (
+                        <DropdownElement
+                          key={i}
+                          icon={action.icon}
+                          disabled={props.disableSubmitButton}
+                          onClick={action.onClick}
+                        >
+                          {action.text}
+                        </DropdownElement>
+                      ))}
+                    </Dropdown>
+                  </div>
                 )}
               </div>
             </dl>

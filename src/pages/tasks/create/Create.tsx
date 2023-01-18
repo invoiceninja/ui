@@ -8,19 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
 import { endpoint, isProduction } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useTaskStatusesQuery } from 'common/queries/task-statuses';
 import { useBlankTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
 import { useAtom } from 'jotai';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { taskAtom } from '../common/atoms';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
@@ -30,6 +32,8 @@ export function Create() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('new_task');
+
+  const [searchParams] = useSearchParams();
 
   const { data } = useBlankTaskQuery();
 
@@ -41,6 +45,8 @@ export function Create() {
   ];
 
   const [task, setTask] = useAtom(taskAtom);
+
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const navigate = useNavigate();
 
@@ -59,6 +65,16 @@ export function Create() {
             ...prevState,
             status_id:
               taskStatuses.data.length > 0 ? taskStatuses.data[0].id : '',
+          }
+      );
+    }
+
+    if (searchParams.has('client')) {
+      setTask(
+        (prevState) =>
+          prevState && {
+            ...prevState,
+            client_id: searchParams.get('client') as string,
           }
       );
     }
@@ -85,10 +101,14 @@ export function Create() {
 
         navigate(route('/tasks/:id/edit', { id: response.data.data.id }));
       })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       });
   };
 
@@ -99,7 +119,9 @@ export function Create() {
       onSaveClick={() => task && handleSave(task)}
       breadcrumbs={pages}
     >
-      {task && <TaskDetails task={task} handleChange={handleChange} />}
+      {task && (
+        <TaskDetails task={task} handleChange={handleChange} errors={errors} />
+      )}
       {task && <TaskTable task={task} handleChange={handleChange} />}
     </Default>
   );

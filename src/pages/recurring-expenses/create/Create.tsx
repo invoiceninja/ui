@@ -77,6 +77,16 @@ export function Create() {
       );
     }
 
+    if (searchParams.has('vendor')) {
+      setRecurringExpense(
+        (current) =>
+          current && {
+            ...current,
+            vendor_id: searchParams.get('vendor') as string,
+          }
+      );
+    }
+
     return () => {
       isProduction() && setRecurringExpense(undefined);
     };

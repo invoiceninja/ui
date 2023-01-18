@@ -15,6 +15,19 @@ import { GenericManyResponse } from 'common/interfaces/generic-many-response';
 import { TaskStatus } from 'common/interfaces/task-status';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+
+export function useBlankTaskStatusQuery() {
+  return useQuery<TaskStatus>(
+    '/api/v1/task_statuses/create',
+    () =>
+      request('GET', endpoint('/api/v1/task_statuses/create')).then(
+        (response: GenericSingleResourceResponse<TaskStatus>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}
 
 export function useTaskStatusesQuery() {
   return useQuery<GenericManyResponse<TaskStatus>>(
