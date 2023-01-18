@@ -53,8 +53,8 @@ export function VerifyModal(props: Props) {
       <div className="flex flex-col justify-center space-y-7 pb-1 px-3 text-left">
         <span className="text-gray-800 text-xl font-semibold">
           {props.type === 'email'
-            ? t('confirm_your_email_address')
-            : t('confirm_your_phone_number')}
+            ? t('confirmation_required', {'link':''})
+            : t('verify_phone_number_help')}
         </span>
 
         <span className="text-base">
