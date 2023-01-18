@@ -123,14 +123,11 @@ export function Create() {
       title={documentTitle}
       breadcrumbs={pages}
       onBackClick="/transactions"
+      disableSaveButton={!transaction || isFormBusy}
+      onSaveClick={onSave}
     >
       <Container>
-        <Card
-          title={documentTitle}
-          withSaveButton
-          onSaveClick={onSave}
-          disableSubmitButton={isFormBusy}
-        >
+        <Card title={documentTitle}>
           {currencySeparators && transaction && (
             <TransactionForm
               errors={errors}
