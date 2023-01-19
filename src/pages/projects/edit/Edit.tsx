@@ -65,6 +65,19 @@ export function Edit() {
         />
       </Element>
 
+      <Element leftSide={t('client')}>
+        <DebouncedCombobox
+          defaultValue={project?.client_id}
+          endpoint="/api/v1/clients"
+          label="display_name"
+          onChange={(value) => handleChange('client_id', value.value)}
+          clearButton={Boolean(project?.client_id)}
+          onClearButtonClick={() => handleChange('client_id', '')}
+          errorMessage={errors?.errors.client_id}
+          queryAdditional
+        />
+      </Element>
+
       <Element leftSide={t('user')}>
         <DebouncedCombobox
           defaultValue={project?.assigned_user_id}
