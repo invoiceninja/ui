@@ -149,7 +149,8 @@ export function CompanySwitcher() {
                     <DropdownElement onClick={() => switchCompany(index)}>
                       <div className="flex items-center space-x-3">
                         <span>
-                          {record.company.settings.name || t('new_company')}
+                          {record.company.settings.name ||
+                            t('untitled_company')}
                         </span>
 
                         {state.currentIndex === index && <Check size={18} />}

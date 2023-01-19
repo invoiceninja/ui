@@ -16,8 +16,14 @@ import { NumberFormatter } from '../number-formatter';
 import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 
+export interface TaxItem {
+  key?: string;
+  name: string;
+  total: number;
+}
+
 export class InvoiceSum {
-  protected taxMap = collect();
+  protected taxMap = collect<TaxItem>();
   protected totalTaxMap: Record<string, unknown>[] = [];
 
   public declare invoiceItems: InvoiceItemSum;
@@ -46,6 +52,10 @@ export class InvoiceSum {
       .calculatePartial();
 
     return this;
+  }
+
+  public getTaxMap() {
+    return this.taxMap;
   }
 
   protected calculateLineItems() {
@@ -176,27 +186,28 @@ export class InvoiceSum {
 
     this.taxMap = collect();
 
-    const keys = this.invoiceItems.taxCollection.pluck('key').unique();
-    const values = this.invoiceItems.taxCollection;
+    let taxCollection = collect<TaxItem>();
+    taxCollection = this.invoiceItems.taxCollection.pluck('items');
+
+    const keys = taxCollection.pluck('key').unique();
 
     keys.map((key) => {
-      const taxName = values
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        .filter((value) => value[key as string] == key)
-        .pluck('tax_name')
+      const taxName = taxCollection
+        .filter((item) => item.key === key)
+        .pluck('name')
         .first();
 
-      const totalLineTax = values
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        .filter((value) => value[key as string] === key)
+      const totalLineTax = taxCollection
+        .filter((item) => item.key === key)
         .sum('total');
 
-      this.taxMap.push({ name: taxName, total: totalLineTax });
-
-      this.totalTaxes += this.invoiceItems.totalTaxes;
+      this.taxMap.push({
+        name: taxName as string,
+        total: totalLineTax as number,
+      });
     });
+
+    this.totalTaxes += this.invoiceItems.totalTaxes;
 
     return this;
   }

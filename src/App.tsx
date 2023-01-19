@@ -19,7 +19,6 @@ import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useLocation } from 'react-router-dom';
 import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 
@@ -30,11 +29,9 @@ export function App() {
 
   const user = useCurrentUser();
 
-  const location = useLocation();
-
   const account = useCurrentAccount();
 
-  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(false);
+  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
 
   const [showCompanyActivityModal, setShowCompanyActivityModal] =
     useState<boolean>(false);
@@ -104,15 +101,7 @@ export function App() {
 
   return (
     <div className="App">
-      <VerifyModal
-        visible={
-          !location.pathname.startsWith('/login') &&
-          !location.pathname.startsWith('/register') &&
-          !isEmailVerified &&
-          isHosted()
-        }
-        type="email"
-      />
+      <VerifyModal visible={!isEmailVerified && isHosted()} type="email" />
 
       <AccountWarningsModal
         type="activity"
