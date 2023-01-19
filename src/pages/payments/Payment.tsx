@@ -9,16 +9,27 @@
  */
 
 import { route } from 'common/helpers/route';
+import { Payment as PaymentEntity } from 'common/interfaces/payment';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
 import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
+import { ResourceActions } from 'components/ResourceActions';
 import { Tab, Tabs } from 'components/Tabs';
+import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
+import { useActions } from './common/hooks/useActions';
+import { useSave } from './edit/hooks/useSave';
 
 export function Payment() {
-  const { id } = useParams();
   const [t] = useTranslation();
+
+  const { id } = useParams();
+
+  const [paymentValue, setPaymentValue] = useState<PaymentEntity>();
+
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const pages: Page[] = [
     { name: t('payments'), href: '/payments' },
@@ -43,12 +54,39 @@ export function Payment() {
     },
   ];
 
+  const onSave = useSave(setErrors);
+
+  const actions = useActions();
+
   return (
-    <Default title={t('payment')} breadcrumbs={pages}>
+    <Default
+      title={t('payment')}
+      breadcrumbs={pages}
+      onSaveClick={(event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        onSave(paymentValue as unknown as PaymentEntity);
+      }}
+      disableSaveButton={!paymentValue}
+      navigationTopRight={
+        paymentValue && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={paymentValue}
+            actions={actions}
+          />
+        )
+      }
+    >
       <Container>
         <Tabs tabs={tabs} />
 
-        <Outlet />
+        <Outlet
+          context={{
+            errors,
+            payment: paymentValue,
+            setPayment: setPaymentValue,
+          }}
+        />
       </Container>
     </Default>
   );
