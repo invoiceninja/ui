@@ -75,6 +75,7 @@ export function Edit() {
           onClearButtonClick={() => handleChange('client_id', '')}
           errorMessage={errors?.errors.client_id}
           queryAdditional
+          disabled
         />
       </Element>
 
