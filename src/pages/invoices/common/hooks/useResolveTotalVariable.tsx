@@ -87,6 +87,7 @@ export function useResolveTotalVariable(props: Props) {
         </Element>
       );
     }
+
     if (variable == '$line_taxes' && invoiceSum) {
       return (
         <Element leftSide={resolveTranslation(variable, '$')}>
@@ -99,6 +100,35 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element leftSide={resolveTranslation(variable, '$')}>
           {formatMoney(invoiceSum.total)}
+        </Element>
+      );
+    }
+
+    if (variable == '$paid_to_date' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.invoice.paid_to_date)}
+        </Element>
+      );
+    }
+
+    if (variable == '$balance' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.invoice.balance)}
+        </Element>
+      );
+    }
+
+    if (variable == '$taxes' && invoiceSum) {
+      return (
+        <Element leftSide={`${resolveTranslation(variable, '$')}:`}>
+          {invoiceSum?.getTaxMap().map((item, index) => (
+            <div key={index} className="flex space-x-6">
+              <span>{item.name}</span>
+              <span>{formatMoney(item.total)}</span>
+            </div>
+          ))}
         </Element>
       );
     }
