@@ -20,22 +20,30 @@ import { TabGroup } from 'components/TabGroup';
 import { useAtom } from 'jotai';
 import { Upload } from 'pages/settings/company/documents/components';
 import { TaskStatus } from 'pages/tasks/common/components/TaskStatus';
-import { calculateTime } from 'pages/tasks/common/helpers/calculate-time';
+import { isTaskRunning } from 'pages/tasks/common/helpers/calculate-entity-state';
+import {
+  calculateTime,
+  calculateDifferenceBetweenLogs,
+} from 'pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
+import { TaskClock } from './TaskClock';
 
 export function ViewSlider() {
   const [t] = useTranslation();
+
+  const company = useCurrentCompany();
+  const queryClient = useQueryClient();
+  const accentColor = useAccentColor();
+  const formatMoney = useFormatMoney();
+  const formatTimeLog = useFormatTimeLog();
+
   const [currentTask] = useAtom(currentTaskAtom);
 
-  const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
-  const formatTimeLog = useFormatTimeLog();
-  const accentColor = useAccentColor();
-
-  const queryClient = useQueryClient();
+  const currentTaskTimeLogs =
+    currentTask && formatTimeLog(currentTask.time_log);
 
   const onSuccess = () => {
     queryClient.invalidateQueries(
@@ -73,19 +81,31 @@ export function ViewSlider() {
               </div>
             </NonClickableElement>
 
-            {formatTimeLog(currentTask.time_log).map(
-              ([date, start, end], i) => (
-                <ClickableElement key={i}>
-                  <div>
+            {currentTaskTimeLogs?.map(([date, start, end], i) => (
+              <ClickableElement key={i}>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
                     <p>{date}</p>
 
                     <small>
                       {start} - {end}
                     </small>
                   </div>
-                </ClickableElement>
-              )
-            )}
+
+                  <div>
+                    {isTaskRunning(currentTask) &&
+                    i === currentTaskTimeLogs.length - 1 ? (
+                      <TaskClock
+                        task={currentTask}
+                        calculateLastTimeLog={true}
+                      />
+                    ) : (
+                      calculateDifferenceBetweenLogs(currentTask.time_log, i)
+                    )}
+                  </div>
+                </div>
+              </ClickableElement>
+            ))}
           </>
         )}
       </div>

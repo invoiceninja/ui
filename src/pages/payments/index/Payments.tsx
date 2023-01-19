@@ -9,64 +9,28 @@
  */
 
 import { useTitle } from 'common/hooks/useTitle';
-import { Payment } from 'common/interfaces/payment';
 import { Page } from 'components/Breadcrumbs';
 import { DataTable } from 'components/DataTable';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
-import { useEmailPayment } from '../common/hooks/useEmailPayment';
 import {
   defaultColumns,
   paymentColumns,
   usePaymentColumns,
 } from '../common/hooks/usePaymentColumns';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
-import { Icon } from 'components/icons/Icon';
-import { MdPayment, MdSend, MdSettingsBackupRestore } from 'react-icons/md';
+import { useActions } from '../common/hooks/useActions';
 
 export function Payments() {
   useTitle('payments');
 
   const [t] = useTranslation();
 
-  const emailPayment = useEmailPayment();
-
   const pages: Page[] = [{ name: t('payments'), href: '/payments' }];
 
   const columns = usePaymentColumns();
 
-  const actions = [
-    (resource: Payment) =>
-      resource.amount - resource.applied > 0 &&
-      !resource.is_deleted && (
-        <DropdownElement
-          to={route('/payments/:id/apply', { id: resource.id })}
-          icon={<Icon element={MdPayment} />}
-        >
-          {t('apply_payment')}
-        </DropdownElement>
-      ),
-    (resource: Payment) =>
-      resource.amount !== resource.refunded &&
-      !resource.is_deleted && (
-        <DropdownElement
-          to={route('/payments/:id/refund', { id: resource.id })}
-          icon={<Icon element={MdSettingsBackupRestore} />}
-        >
-          {t('refund_payment')}
-        </DropdownElement>
-      ),
-    (resource: Payment) => (
-      <DropdownElement
-        onClick={() => emailPayment(resource)}
-        icon={<Icon element={MdSend} />}
-      >
-        {t('email_payment')}
-      </DropdownElement>
-    ),
-  ];
+  const actions = useActions();
 
   return (
     <Default

@@ -8,42 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
-import { Task } from 'common/interfaces/task';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
 
-export function useStop() {
+export function useBulkAction() {
   const queryClient = useQueryClient();
 
-  return (task: Task) => {
+  return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
-    request(
-      'PUT',
-      endpoint('/api/v1/tasks/:id?stop=true', { id: task.id }),
-      task
-    )
+    request('POST', endpoint('/api/v1/bank_transactions/bulk'), {
+      action,
+      ids: [id],
+    })
       .then(() => {
-        toast.success('stopped_task');
+        toast.success(`${action}d_transaction`);
 
-        queryClient.invalidateQueries('/api/v1/tasks');
-
-        queryClient.invalidateQueries(
-          route('/api/v1/tasks/:id', { id: task.id })
-        );
-
-        queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
+        queryClient.invalidateQueries('/api/v1/bank_transactions');
 
         queryClient.invalidateQueries(
-          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
-            projectId: task.project_id,
-          })
+          route('/api/v1/bank_transactions/:id', { id })
         );
       })
-      .catch((error) => {
+      .catch((error: AxiosError) => {
         console.error(error);
 
         toast.error();

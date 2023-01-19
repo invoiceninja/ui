@@ -8,26 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
-import { FormEvent, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { endpoint, isProduction } from 'common/helpers';
+import { isProduction } from 'common/helpers';
 import { Card } from '@invoiceninja/cards';
 import { useTitle } from 'common/hooks/useTitle';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useAtom } from 'jotai';
 import { productAtom } from '../atoms';
 import { Product } from 'common/interfaces/product';
-import { toast } from 'common/helpers/toast/toast';
 import { useHandleChange } from '../hooks';
 import { ProductForm } from './ProductForm';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
 interface Props {
   product?: Product;
+  errors: ValidationBag | undefined;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
 }
 
 export function CreateProduct(props: Props) {
@@ -35,44 +31,12 @@ export function CreateProduct(props: Props) {
 
   useTitle(t('new_product'));
 
-  const navigate = useNavigate();
-
-  const [errors, setErrors] = useState<any>();
-
-  const [isFormBusy, setIsFormBusy] = useState(false);
-
   const [product, setProduct] = useAtom(productAtom);
 
-  const handleChange = useHandleChange({ setErrors, setProduct });
-
-  const handleSave = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    if (!isFormBusy) {
-      setIsFormBusy(true);
-
-      request('POST', endpoint('/api/v1/products'), product)
-        .then((response: GenericSingleResourceResponse<Product>) => {
-          toast.success('created_product');
-
-          navigate(
-            route('/products/:id/edit', {
-              id: response.data.data.id,
-            })
-          );
-        })
-        .catch((error: AxiosError<ValidationBag>) => {
-          if (error.response?.status === 422) {
-            setErrors(error.response.data);
-            toast.dismiss();
-          } else {
-            console.log(error);
-            toast.error();
-          }
-        })
-        .finally(() => setIsFormBusy(false));
-    }
-  };
+  const handleChange = useHandleChange({
+    setErrors: props.setErrors,
+    setProduct,
+  });
 
   useEffect(() => {
     if (!product) {
@@ -85,15 +49,10 @@ export function CreateProduct(props: Props) {
   }, [props.product]);
 
   return (
-    <Card
-      title={t('new_product')}
-      withSaveButton
-      disableSubmitButton={isFormBusy}
-      onFormSubmit={handleSave}
-    >
+    <Card title={t('new_product')}>
       {product && (
         <ProductForm
-          errors={errors}
+          errors={props.errors}
           handleChange={handleChange}
           product={product}
         />
