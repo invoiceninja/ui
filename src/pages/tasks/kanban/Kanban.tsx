@@ -341,121 +341,115 @@ export function Kanban() {
       </div>
 
       {board && (
-        <div className="flex">
-          <div
-            className="flex pb-6 space-x-4 overflow-x-auto mt-4"
-            style={{ paddingRight: isKanbanViewSliderVisible ? 512 : 0 }}
-          >
-            <DragDropContext onDragEnd={onDragEnd}>
-              {board.columns.map((board) => (
-                <Droppable key={board.id} droppableId={board.id}>
-                  {(provided) => (
-                    <div
-                      className="bg-white rounded shadow select-none h-max"
-                      style={{ minWidth: 360 }}
-                    >
-                      <div className="flex items-center justify-between border-b border-gray-200 px-4 py-5">
-                        <h3 className="leading-6 font-medium text-gray-900">
-                          {board.title}
-                        </h3>
+        <div
+          className="flex pb-6 space-x-4 overflow-x-auto mt-4"
+          style={{ paddingRight: isKanbanViewSliderVisible ? 512 : 0 }}
+        >
+          <DragDropContext onDragEnd={onDragEnd}>
+            {board.columns.map((board) => (
+              <Droppable key={board.id} droppableId={board.id}>
+                {(provided) => (
+                  <div
+                    className="bg-white rounded shadow select-none h-max"
+                    style={{ minWidth: 360 }}
+                  >
+                    <div className="flex items-center justify-between border-b border-gray-200 px-4 py-5">
+                      <h3 className="leading-6 font-medium text-gray-900">
+                        {board.title}
+                      </h3>
 
-                        <MdAddCircle
-                          className="cursor-pointer text-gray-500 hover:text-gray-800"
-                          fontSize={22}
-                          onClick={() => {
-                            setTaskDetails({
-                              taskStatusId: board.id,
-                              projectId,
-                            });
-                            setIsTaskModalOpened(true);
-                          }}
-                        />
-                      </div>
-
-                      <div
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="p-4 space-y-4"
-                      >
-                        {board.cards.map((card, i) => (
-                          <div
-                            key={i}
-                            className="w-full text-leftblock rounded bg-gray-50 text-gray-700 hover:text-gray-900 text-sm cursor-pointer group"
-                          >
-                            <Draggable
-                              draggableId={card.id}
-                              key={card.id}
-                              index={i}
-                            >
-                              {(provided) => (
-                                <div
-                                  ref={provided.innerRef}
-                                  {...provided.draggableProps}
-                                  {...provided.dragHandleProps}
-                                  className="px-4 sm:px-6 py-4 bg-gray-50 hover:bg-gray-100"
-                                >
-                                  <p>{card.title}</p>
-                                  <small>
-                                    {isTaskRunning(card.task) ? (
-                                      <TaskClock task={card.task} />
-                                    ) : (
-                                      card.description
-                                    )}
-                                  </small>
-                                </div>
-                              )}
-                            </Draggable>
-
-                            <div className="hidden group-hover:flex border-t border-gray-100 justify-center items-center">
-                              <button
-                                className="w-full hover:bg-gray-200 py-2 rounded-bl"
-                                onClick={() =>
-                                  handleCurrentTask(card.id, 'view')
-                                }
-                              >
-                                {t('view')}
-                              </button>
-
-                              <button
-                                className="w-full text-center hover:bg-gray-200 py-2"
-                                onClick={() =>
-                                  handleCurrentTask(card.id, 'edit')
-                                }
-                              >
-                                {t('edit')}
-                              </button>
-
-                              {isTaskRunning(card.task) && (
-                                <button
-                                  className="w-full hover:bg-gray-200 py-2 rounded-br"
-                                  onClick={() => stopTask(card.task)}
-                                >
-                                  {t('stop')}
-                                </button>
-                              )}
-
-                              {!isTaskRunning(card.task) && (
-                                <button
-                                  className="w-full hover:bg-gray-200 py-2 rounded-br"
-                                  onClick={() => startTask(card.task)}
-                                >
-                                  {t('start')}
-                                </button>
-                              )}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {provided.placeholder}
+                      <MdAddCircle
+                        className="cursor-pointer text-gray-500 hover:text-gray-800"
+                        fontSize={22}
+                        onClick={() => {
+                          setTaskDetails({
+                            taskStatusId: board.id,
+                            projectId,
+                          });
+                          setIsTaskModalOpened(true);
+                        }}
+                      />
                     </div>
-                  )}
-                </Droppable>
-              ))}
-            </DragDropContext>
-          </div>
 
-          <div className="sticky right-0 mt-3 ml-5">
+                    <div
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                      className="p-4 space-y-4"
+                    >
+                      {board.cards.map((card, i) => (
+                        <div
+                          key={i}
+                          className="w-full text-leftblock rounded bg-gray-50 text-gray-700 hover:text-gray-900 text-sm cursor-pointer group"
+                        >
+                          <Draggable
+                            draggableId={card.id}
+                            key={card.id}
+                            index={i}
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.draggableProps}
+                                {...provided.dragHandleProps}
+                                className="px-4 sm:px-6 py-4 bg-gray-50 hover:bg-gray-100"
+                              >
+                                <p>{card.title}</p>
+                                <small>
+                                  {isTaskRunning(card.task) ? (
+                                    <TaskClock task={card.task} />
+                                  ) : (
+                                    card.description
+                                  )}
+                                </small>
+                              </div>
+                            )}
+                          </Draggable>
+
+                          <div className="hidden group-hover:flex border-t border-gray-100 justify-center items-center">
+                            <button
+                              className="w-full hover:bg-gray-200 py-2 rounded-bl"
+                              onClick={() => handleCurrentTask(card.id, 'view')}
+                            >
+                              {t('view')}
+                            </button>
+
+                            <button
+                              className="w-full text-center hover:bg-gray-200 py-2"
+                              onClick={() => handleCurrentTask(card.id, 'edit')}
+                            >
+                              {t('edit')}
+                            </button>
+
+                            {isTaskRunning(card.task) && (
+                              <button
+                                className="w-full hover:bg-gray-200 py-2 rounded-br"
+                                onClick={() => stopTask(card.task)}
+                              >
+                                {t('stop')}
+                              </button>
+                            )}
+
+                            {!isTaskRunning(card.task) && (
+                              <button
+                                className="w-full hover:bg-gray-200 py-2 rounded-br"
+                                onClick={() => startTask(card.task)}
+                              >
+                                {t('start')}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            ))}
+          </DragDropContext>
+
+          <div>
             <CgAddR
               className="cursor-pointer"
               color={accentColor}
