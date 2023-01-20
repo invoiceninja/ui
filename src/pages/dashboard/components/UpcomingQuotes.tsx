@@ -18,6 +18,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Card } from '@invoiceninja/cards';
 import { Quote } from 'common/interfaces/quote';
 import { useTranslation } from 'react-i18next';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 export function UpcomingQuotes() {
   const [t] = useTranslation();
@@ -27,6 +28,8 @@ export function UpcomingQuotes() {
   const formatMoney = useFormatMoney();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const hasPermission = useHasPermission();
 
   const columns: DataTableColumns<Quote> = [
     {
@@ -81,6 +84,7 @@ export function UpcomingQuotes() {
         withoutActions
         withoutPagination
         withoutPadding
+        queryEnabled={hasPermission('view_quote')}
       />
     </Card>
   );
