@@ -21,6 +21,7 @@ import { InfoCard } from 'components/InfoCard';
 import { request } from 'common/helpers/request';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -60,6 +61,7 @@ export enum TotalColors {
 export function Totals() {
   const [t] = useTranslation();
 
+  const hasPermission = useHasPermission();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
@@ -97,6 +99,11 @@ export function Totals() {
   };
 
   const getTotals = () => {
+    if (!hasPermission('view_payment')) {
+      // @Todo: Correct permission for fetching totals.
+      return;
+    }
+
     request('POST', endpoint('/api/v1/charts/totals'), body).then(
       (response: AxiosResponse) => {
         setTotalsData(response.data);
@@ -114,6 +121,11 @@ export function Totals() {
   };
 
   const getChartData = () => {
+    if (!hasPermission('view_payment')) {
+      // @Todo: Correct permission for fetching totals.
+      return;
+    }
+
     request('POST', endpoint('/api/v1/charts/chart_summary'), body).then(
       (response: AxiosResponse) => setChartData(response.data)
     );
