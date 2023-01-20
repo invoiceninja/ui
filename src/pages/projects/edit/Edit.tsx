@@ -13,6 +13,7 @@ import { InputField } from '@invoiceninja/forms';
 import { Project } from 'common/interfaces/project';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useProjectQuery } from 'common/queries/projects';
+import { ClientSelector } from 'components/clients/ClientSelector';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -66,16 +67,12 @@ export function Edit() {
       </Element>
 
       <Element leftSide={t('client')}>
-        <DebouncedCombobox
-          defaultValue={project?.client_id}
-          endpoint="/api/v1/clients"
-          label="display_name"
-          onChange={(value) => handleChange('client_id', value.value)}
-          clearButton={Boolean(project?.client_id)}
+        <ClientSelector
+          value={project?.client_id}
+          onChange={(id) => handleChange('client_id', id)}
           onClearButtonClick={() => handleChange('client_id', '')}
+          readonly
           errorMessage={errors?.errors.client_id}
-          queryAdditional
-          disabled
         />
       </Element>
 
