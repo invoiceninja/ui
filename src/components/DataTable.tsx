@@ -70,6 +70,7 @@ interface Props<T> {
   staleTime?: number;
   onTableRowClick?: (resource: T) => unknown;
   beforeFilter?: ReactNode;
+  queryEnabled?: boolean;
 }
 
 export const datatablePerPageAtom = atomWithStorage('perPage', '10');
@@ -121,18 +122,11 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [perPage, currentPage, filter, sort, status, customFilter]);
 
   const { data, isLoading, isError } = useQuery(
-    [
-      props.endpoint,
-      perPage,
-      currentPage,
-      filter,
-      sort,
-      status,
-      customFilter,
-    ],
+    [props.endpoint, perPage, currentPage, filter, sort, status, customFilter],
     () => request('GET', apiEndpoint.href),
     {
       staleTime: props.staleTime || 5000,
+      enabled: props.queryEnabled || true,
     }
   );
 
