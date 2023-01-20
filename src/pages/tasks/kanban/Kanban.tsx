@@ -448,7 +448,7 @@ export function Kanban() {
           <div>
             <div className="bg-white shadow rounded p-1">
               <MdAdd
-                className="cursor-pointer"
+                className="cursor-pointer text-gray-500 hover:text-gray-800"
                 fontSize={28}
                 onClick={() => setIsTaskStatusModalOpened(true)}
               />
