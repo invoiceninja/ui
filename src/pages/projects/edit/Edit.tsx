@@ -70,9 +70,7 @@ export function Edit() {
         <ClientSelector
           value={project?.client_id}
           onChange={(id) => handleChange('client_id', id)}
-          onClearButtonClick={() => handleChange('client_id', '')}
           readonly
-          errorMessage={errors?.errors.client_id}
         />
       </Element>
 
