@@ -71,6 +71,7 @@ export function Details(props: Props) {
             clearButton={Boolean(expense.client_id)}
             onClearButtonClick={() => handleChange('client_id', '')}
             onChange={(client) => handleChange('client_id', client.id)}
+            staleTime={Infinity}
           />
         </Element>
       )}

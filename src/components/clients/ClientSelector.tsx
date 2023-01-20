@@ -18,6 +18,7 @@ import { useTranslation } from 'react-i18next';
 export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   initiallyVisible?: boolean;
   withoutAction?: boolean;
+  staleTime?: number;
 }
 
 export function ClientSelector(props: ClientSelectorProps) {
@@ -48,6 +49,7 @@ export function ClientSelector(props: ClientSelectorProps) {
         actionLabel={props.withoutAction ? '' : t('new_client')}
         onActionClick={() => setIsModalOpen(true)}
         sortBy="display_name|asc"
+        staleTime={props.staleTime || 500}
       />
     </>
   );
