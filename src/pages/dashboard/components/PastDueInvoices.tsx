@@ -18,11 +18,13 @@ import { Link } from 'components/forms/Link';
 import { Invoice } from 'common/interfaces/invoice';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Card } from '@invoiceninja/cards';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 export function PastDueInvoices() {
   const { dateFormat } = useCurrentCompanyDateFormats();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
+  const hasPermission = useHasPermission();
 
   const columns: DataTableColumns<Invoice> = [
     {
@@ -77,6 +79,7 @@ export function PastDueInvoices() {
         withoutActions
         withoutPagination
         withoutPadding
+        queryEnabled={hasPermission('view_invoice')}
       />
     </Card>
   );
