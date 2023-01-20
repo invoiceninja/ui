@@ -71,6 +71,7 @@ export function Edit() {
           value={project?.client_id}
           onChange={(id) => handleChange('client_id', id)}
           readonly
+          staleTime={Infinity}
         />
       </Element>
 
