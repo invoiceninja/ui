@@ -46,14 +46,12 @@ import { useStop } from '../common/hooks/useStop';
 import { Slider } from 'components/cards/Slider';
 import { EditSlider } from './components/EditSlider';
 import { Edit, Pause, Play } from 'react-feather';
-import { CgAddR } from 'react-icons/cg';
 import { Link as ReactRouterLink } from 'react-router-dom';
 import { Card, Element } from '@invoiceninja/cards';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { Inline } from 'components/Inline';
-import { useAccentColor } from 'common/hooks/useAccentColor';
 import { CreateTaskStatusModal } from 'pages/settings/task-statuses/components/CreateTaskStatusModal';
-import { MdAddCircle } from 'react-icons/md';
+import { MdAdd, MdAddCircle } from 'react-icons/md';
 import {
   CreateTaskModal,
   TaskDetails,
@@ -90,8 +88,6 @@ export function Kanban() {
   ];
 
   const queryClient = useQueryClient();
-
-  const accentColor = useAccentColor();
 
   const [isTaskStatusModalOpened, setIsTaskStatusModalOpened] =
     useState<boolean>(false);
@@ -450,12 +446,13 @@ export function Kanban() {
           </DragDropContext>
 
           <div>
-            <CgAddR
-              className="cursor-pointer"
-              color={accentColor}
-              fontSize={30}
-              onClick={() => setIsTaskStatusModalOpened(true)}
-            />
+            <div className="bg-white shadow rounded p-1">
+              <MdAdd
+                className="cursor-pointer"
+                fontSize={28}
+                onClick={() => setIsTaskStatusModalOpened(true)}
+              />
+            </div>
           </div>
         </div>
       )}
