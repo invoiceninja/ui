@@ -9,11 +9,13 @@
  */
 
 import { route } from 'common/helpers/route';
+import { useHandleSend } from 'common/hooks/emails/useHandleSend';
 import { useTitle } from 'common/hooks/useTitle';
 import { useInvoiceQuery } from 'common/queries/invoices';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Mailer } from 'pages/invoices/email/components/Mailer';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -24,6 +26,12 @@ export function Email() {
   const { id } = useParams();
 
   const { data: invoice } = useInvoiceQuery({ id });
+
+  const [templateId, setTemplateId] = useState<string>(
+    'email_template_invoice'
+  );
+  const [subject, setSubject] = useState<string>('');
+  const [body, setBody] = useState<string>('');
 
   const list = {
     email_template_invoice: 'initial_email',
@@ -40,15 +48,37 @@ export function Email() {
     },
   ];
 
+  const handleSend = useHandleSend();
+
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      disableSaveButton={!invoice}
+      saveButtonLabel={t('send_email')}
+      onSaveClick={() =>
+        invoice &&
+        handleSend(
+          body,
+          'invoice',
+          invoice.id,
+          subject,
+          templateId,
+          '/invoices'
+        )
+      }
+    >
       {invoice && (
         <Mailer
           resource={invoice}
           resourceType="invoice"
           list={list}
-          defaultEmail="email_template_invoice"
-          redirectUrl="/invoices"
+          body={body}
+          setBody={setBody}
+          subject={subject}
+          setSubject={setSubject}
+          templateId={templateId}
+          setTemplateId={setTemplateId}
         />
       )}
     </Default>
