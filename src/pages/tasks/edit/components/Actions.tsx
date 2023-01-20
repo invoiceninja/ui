@@ -75,13 +75,6 @@ export function Actions(props: Props) {
           </DropdownElement>
         )}
 
-        <DropdownElement
-          onClick={cloneToTask}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone')}
-        </DropdownElement>
-
         {!isTaskRunning(task) && !task.invoice_id && (
           <DropdownElement
             onClick={() => invoiceTask([task])}
@@ -90,6 +83,13 @@ export function Actions(props: Props) {
             {t('invoice_task')}
           </DropdownElement>
         )}
+
+        <DropdownElement
+          onClick={cloneToTask}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
       </div>
 
       <div>

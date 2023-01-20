@@ -335,6 +335,25 @@ export function useActions() {
         {t('client_portal')}
       </DropdownElement>
     ),
+    (quote) =>
+      quote.status_id === QuoteStatus.Draft && (
+        <DropdownElement
+          onClick={() => markSent(quote)}
+          icon={<Icon element={MdMarkEmailRead} />}
+        >
+          {t('mark_sent')}
+        </DropdownElement>
+      ),
+    (quote) =>
+      (quote.status_id === QuoteStatus.Draft ||
+        quote.status_id === QuoteStatus.Sent) && (
+        <DropdownElement
+          onClick={() => approve(quote)}
+          icon={<Icon element={MdDone} />}
+        >
+          {t('approve')}
+        </DropdownElement>
+      ),
     () => <Divider withoutPadding />,
     (quote) => (
       <DropdownElement
@@ -376,34 +395,6 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => <Divider withoutPadding />,
-    (quote) =>
-      quote.status_id === QuoteStatus.Draft && (
-        <DropdownElement
-          onClick={() => markSent(quote)}
-          icon={<Icon element={MdMarkEmailRead} />}
-        >
-          {t('mark_sent')}
-        </DropdownElement>
-      ),
-    (quote) =>
-      quote.status_id === QuoteStatus.Draft && (
-        <DropdownElement
-          onClick={() => approve(quote)}
-          icon={<Icon element={MdDone} />}
-        >
-          {t('approve')}
-        </DropdownElement>
-      ),
-    (quote) =>
-      quote.status_id === QuoteStatus.Sent && (
-        <DropdownElement
-          onClick={() => approve(quote)}
-          icon={<Icon element={MdDone} />}
-        >
-          {t('approve')}
-        </DropdownElement>
-      ),
     () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
     (quote) =>
       location.pathname.endsWith('/edit') &&
