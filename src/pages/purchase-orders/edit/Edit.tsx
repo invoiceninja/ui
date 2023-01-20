@@ -15,6 +15,7 @@ import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
+import { ResourceActions } from 'components/ResourceActions';
 import { Spinner } from 'components/Spinner';
 import { cloneDeep } from 'lodash';
 import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
@@ -25,8 +26,8 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
+import { useActions } from '../common/hooks';
 import { usePurchaseOrderQuery } from '../common/queries';
-import { Actions } from './components/Actions';
 import { Details } from './components/Details';
 import { Footer } from './components/Footer';
 import { VendorSelector } from './components/VendorSelector';
@@ -96,6 +97,8 @@ export function Edit() {
 
   const onSave = useSave(setErrors);
 
+  const actions = useActions();
+
   return (
     <Default
       title={documentTitle}
@@ -103,7 +106,13 @@ export function Edit() {
       onBackClick="/purchase_orders"
       onSaveClick={() => purchaseOrder && onSave(purchaseOrder)}
       navigationTopRight={
-        purchaseOrder && <Actions purchaseOrder={purchaseOrder} />
+        purchaseOrder && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={purchaseOrder}
+            actions={actions}
+          />
+        )
       }
     >
       <div className="grid grid-cols-12 gap-4">
