@@ -79,7 +79,7 @@ export function Edit() {
           id="number"
           value={payment?.number}
           onValueChange={(value) => handleChange('number', value)}
-          errorMessage={errors?.errors.payment_amount}
+          errorMessage={errors?.errors.number}
         />
       </Element>
 

@@ -60,6 +60,7 @@ export function Details(props: Props) {
             clearButton={Boolean(expense.vendor_id)}
             onClearButtonClick={() => handleChange('vendor_id', '')}
             onChange={(vendor) => handleChange('vendor_id', vendor.id)}
+            errorMessage={errors?.errors.vendor_id}
           />
         </Element>
       )}
@@ -71,6 +72,7 @@ export function Details(props: Props) {
             clearButton={Boolean(expense.client_id)}
             onClearButtonClick={() => handleChange('client_id', '')}
             onChange={(client) => handleChange('client_id', client.id)}
+            errorMessage={errors?.errors.client_id}
           />
         </Element>
       )}
@@ -82,6 +84,7 @@ export function Details(props: Props) {
             clearButton={Boolean(expense.project_id)}
             onClearButtonClick={() => handleChange('project_id', '')}
             onChange={(client) => handleChange('project_id', client.id)}
+            errorMessage={errors?.errors.project_id}
           />
         </Element>
       )}
@@ -93,6 +96,7 @@ export function Details(props: Props) {
             clearButton={Boolean(expense.category_id)}
             onClearButtonClick={() => handleChange('category_id', '')}
             onChange={(category) => handleChange('category_id', category.id)}
+            errorMessage={errors?.errors.category_id}
           />
         </Element>
       )}
@@ -104,6 +108,7 @@ export function Details(props: Props) {
             clearButton={Boolean(expense.assigned_user_id)}
             onClearButtonClick={() => handleChange('assigned_user_id', '')}
             onChange={(user) => handleChange('assigned_user_id', user.id)}
+            errorMessage={errors?.errors.assigned_user_id}
           />
         </Element>
       )}
@@ -139,12 +144,14 @@ export function Details(props: Props) {
               <InputField
                 label={t('tax_name')}
                 onValueChange={(value) => handleChange('tax_name1', value)}
+                errorMessage={errors?.errors.tax_name1}
               />
               <InputField
                 label={t('tax_amount')}
                 onValueChange={(value) =>
                   handleChange('tax_amount1', parseFloat(value))
                 }
+                errorMessage={errors?.errors.tax_amount1}
               />
             </div>
           </Element>
@@ -181,12 +188,14 @@ export function Details(props: Props) {
               <InputField
                 label={t('tax_name')}
                 onValueChange={(value) => handleChange('tax_name2', value)}
+                errorMessage={errors?.errors.tax_name2}
               />
               <InputField
                 label={t('tax_amount')}
                 onValueChange={(value) =>
                   handleChange('tax_amount2', parseFloat(value))
                 }
+                errorMessage={errors?.errors.tax_amount2}
               />
             </div>
           </Element>
@@ -223,12 +232,14 @@ export function Details(props: Props) {
               <InputField
                 label={t('tax_name')}
                 onValueChange={(value) => handleChange('tax_name3', value)}
+                errorMessage={errors?.errors.tax_name3}
               />
               <InputField
                 label={t('tax_amount')}
                 onValueChange={(value) =>
                   handleChange('tax_amount3', parseFloat(value))
                 }
+                errorMessage={errors?.errors.tax_amount3}
               />
             </div>
           </Element>

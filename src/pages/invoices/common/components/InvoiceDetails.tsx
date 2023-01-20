@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Invoice } from 'common/interfaces/invoice';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { CustomField } from 'components/CustomField';
 import { ChangeHandler } from 'pages/invoices/create/Create';
 import { useTranslation } from 'react-i18next';
@@ -19,6 +20,7 @@ import { useTranslation } from 'react-i18next';
 interface Props {
   invoice?: Invoice;
   handleChange: ChangeHandler;
+  errors: ValidationBag | undefined;
 }
 
 export function InvoiceDetails(props: Props) {
@@ -35,6 +37,7 @@ export function InvoiceDetails(props: Props) {
             type="date"
             onValueChange={(value) => handleChange('date', value)}
             value={invoice?.date || ''}
+            errorMessage={props.errors?.errors.date}
           />
         </Element>
 
@@ -43,6 +46,7 @@ export function InvoiceDetails(props: Props) {
             type="date"
             onValueChange={(value) => handleChange('due_date', value)}
             value={invoice?.due_date || ''}
+            errorMessage={props.errors?.errors.due_date}
           />
         </Element>
 
@@ -54,6 +58,7 @@ export function InvoiceDetails(props: Props) {
               handleChange('partial', parseFloat(value) || 0)
             }
             value={invoice?.partial || ''}
+            errorMessage={props.errors?.errors.partial}
           />
         </Element>
 
@@ -63,6 +68,7 @@ export function InvoiceDetails(props: Props) {
               type="date"
               onValueChange={(value) => handleChange('partial_due_date', value)}
               value={invoice?.partial_due_date || ''}
+              errorMessage={props.errors?.errors.partial_due_date}
             />
           </Element>
         )}
@@ -96,6 +102,7 @@ export function InvoiceDetails(props: Props) {
             id="number"
             onValueChange={(value) => handleChange('number', value)}
             value={invoice?.number || ''}
+            errorMessage={props.errors?.errors.number}
           />
         </Element>
 
@@ -104,6 +111,7 @@ export function InvoiceDetails(props: Props) {
             id="po_number"
             onValueChange={(value) => handleChange('po_number', value)}
             value={invoice?.po_number || ''}
+            errorMessage={props.errors?.errors.po_number}
           />
         </Element>
 
@@ -116,6 +124,7 @@ export function InvoiceDetails(props: Props) {
                   handleChange('discount', parseFloat(value) || 0)
                 }
                 value={invoice?.discount || ''}
+                errorMessage={props.errors?.errors.discount}
               />
             </div>
 
@@ -125,6 +134,7 @@ export function InvoiceDetails(props: Props) {
                   handleChange('is_amount_discount', JSON.parse(value))
                 }
                 value={invoice?.is_amount_discount.toString()}
+                errorMessage={props.errors?.errors.is_amount_discount}
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>

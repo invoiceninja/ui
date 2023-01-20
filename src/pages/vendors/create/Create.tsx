@@ -15,6 +15,7 @@ import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Vendor } from 'common/interfaces/vendor';
 import { useBlankVendorQuery } from 'common/queries/vendor';
 import { updateRecord } from 'common/stores/slices/company-users';
@@ -51,6 +52,8 @@ export function Create() {
   const company = useInjectCompanyChanges();
 
   const [vendor, setVendor] = useState<Vendor>();
+
+  const [errors, setErrors] = useState<ValidationBag>();
 
   useEffect(() => {
     if (data) {
@@ -111,9 +114,14 @@ export function Create() {
 
         navigate(route('/vendors/:id', { id: response[0].data.data.id }));
       })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       });
   };
 
@@ -124,7 +132,7 @@ export function Create() {
       onBackClick="/vendors"
       onSaveClick={vendor && handleSave}
     >
-      {vendor && <Form vendor={vendor} setVendor={setVendor} />}
+      {vendor && <Form vendor={vendor} setVendor={setVendor} errors={errors} />}
     </Default>
   );
 }

@@ -14,6 +14,7 @@ import { AxiosError } from 'axios';
 import { endpoint, isProduction } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
@@ -25,7 +26,6 @@ import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { Default } from 'components/layouts/Default';
 import { useAtom } from 'jotai';
 import React, { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectAtom } from '../common/atoms';
@@ -80,23 +80,23 @@ export function Create() {
 
   const onSave = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
     setErrors(undefined);
 
     request('POST', endpoint('/api/v1/projects'), project)
       .then((response) => {
-        toast.success(t('created_project'), { id: toastId });
+        toast.success('created_project');
 
         navigate(route('/projects/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        if (error.response?.status == 422) {
+        if (error.response?.status === 422) {
+          toast.dismiss();
           setErrors(error.response.data);
+        } else {
+          console.error(error);
+          toast.error();
         }
-
-        toast.error(t('error_title'), { id: toastId });
       });
   };
 
