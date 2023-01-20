@@ -23,7 +23,10 @@ export function RecurringExpenses() {
   return (
     <DataTable
       resource="recurring_expense"
-      endpoint={route('/api/v1/recurring_expenses?client_id=:id', { id })}
+      endpoint={route(
+        '/api/v1/recurring_expenses?include=client,vendor&client_id=:id',
+        { id }
+      )}
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/recurring_expenses/bulk"
