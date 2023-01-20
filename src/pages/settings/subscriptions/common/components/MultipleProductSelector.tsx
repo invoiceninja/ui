@@ -16,7 +16,6 @@ import { useEffect, useState } from 'react';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useAccentColor } from 'common/hooks/useAccentColor';
-import classNames from 'classnames';
 import { route } from 'common/helpers/route';
 import { BsBox } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
@@ -128,17 +127,8 @@ export function MultipleProductSelector(props: Props) {
         </SelectField>
       )}
 
-      <div
-        className={classNames('flex justify-center', {
-          'border-b border-gray-200': selectedProducts.length,
-        })}
-      >
-        <ul
-          role="list"
-          className={classNames('-mb-8 mt-3', {
-            'pb-3': selectedProducts.length,
-          })}
-        >
+      <div className="flex justify-center">
+        <ul role="list" className="-mb-8 mt-3">
           {selectedProducts.map((product, index) => (
             <li key={index}>
               <div className="relative pb-8">
