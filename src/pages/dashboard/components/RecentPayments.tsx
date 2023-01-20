@@ -19,11 +19,13 @@ import { Payment } from 'common/interfaces/payment';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Card } from '@invoiceninja/cards';
 import { generatePath } from 'react-router-dom';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 export function RecentPayments() {
   const { dateFormat } = useCurrentCompanyDateFormats();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
+  const hasPermission = useHasPermission();
 
   const columns: DataTableColumns<Payment> = [
     {
@@ -93,6 +95,7 @@ export function RecentPayments() {
         withoutActions
         withoutPagination
         withoutPadding
+        queryEnabled={hasPermission('view_payment')}
       />
     </Card>
   );
