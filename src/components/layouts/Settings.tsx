@@ -31,13 +31,6 @@ interface Props {
   disableSaveButton?: boolean;
 }
 
-interface AdvanceSetting {
-  name: string;
-  href: string;
-  current: boolean;
-  children?: AdvanceSetting[];
-}
-
 export function Settings(props: Props) {
   const [t] = useTranslation();
 
@@ -49,52 +42,7 @@ export function Settings(props: Props) {
 
   const settingPathNameKey = location.pathname.split('/')[2];
 
-  const { basic } = useSettingsRoutes();
-
-  const advanced: AdvanceSetting[] = [
-    {
-      name: t('invoice_design'),
-      href: '/settings/invoice_design',
-      current: location.pathname.startsWith('/settings/invoice_design'),
-    },
-    {
-      name: t('generated_numbers'),
-      href: '/settings/generated_numbers',
-      current: location.pathname.startsWith('/settings/generated_numbers'),
-    },
-    {
-      name: t('client_portal'),
-      href: '/settings/client_portal',
-      current: location.pathname.startsWith('/settings/client_portal'),
-    },
-    {
-      name: t('email_settings'),
-      href: '/settings/email_settings',
-      current: location.pathname.startsWith('/settings/email_settings'),
-    },
-    {
-      name: t('templates_and_reminders'),
-      href: '/settings/templates_and_reminders',
-      current: location.pathname.startsWith(
-        '/settings/templates_and_reminders'
-      ),
-    },
-    {
-      name: t('bank_accounts'),
-      href: '/settings/bank_accounts',
-      current: location.pathname.startsWith('/settings/bank_accounts'),
-    },
-    {
-      name: t('subscriptions'),
-      href: '/settings/subscriptions',
-      current: location.pathname.startsWith('/settings/subscriptions'),
-    },
-    {
-      name: t('user_management'),
-      href: '/settings/users',
-      current: location.pathname.startsWith('/settings/users'),
-    },
-  ];
+  const { basic, advanced } = useSettingsRoutes();
 
   useEffect(() => {
     setErrors(undefined);
@@ -132,26 +80,31 @@ export function Settings(props: Props) {
           </SelectField>
 
           <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
-            {basic.map((item) => (
-              item.enabled && <Link
-                key={item.name}
-                to={item.href}
-                className={classNames(
-                  item.current
-                    ? 'bg-gray-200 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                  'flex items-center px-3 py-2 text-sm font-medium rounded'
-                )}
-                aria-current={item.current ? 'page' : undefined}
-              >
-                <span className="truncate">{item.name}</span>
-              </Link>
-            ))}
+            {basic.map(
+              (item) =>
+                item.enabled && (
+                  <Link
+                    key={item.name}
+                    to={item.href}
+                    className={classNames(
+                      item.current
+                        ? 'bg-gray-200 text-gray-900'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                      'flex items-center px-3 py-2 text-sm font-medium rounded'
+                    )}
+                    aria-current={item.current ? 'page' : undefined}
+                  >
+                    <span className="truncate">{item.name}</span>
+                  </Link>
+                )
+            )}
           </nav>
 
-          <a className="flex items-center py-4 px-3 text-xs uppercase font-medium text-gray-600 mt-8">
-            <span className="truncate">{t('advanced_settings')}</span>
-          </a>
+          {advanced.filter((route) => route.enabled).length > 0 && (
+            <a className="flex items-center py-4 px-3 text-xs uppercase font-medium text-gray-600 mt-8">
+              <span className="truncate">{t('advanced_settings')}</span>
+            </a>
+          )}
 
           <SelectField
             className="lg:hidden"
@@ -159,50 +112,58 @@ export function Settings(props: Props) {
             onValueChange={(value) => navigate(value)}
             withBlank
           >
-            {advanced.map((item) => (
-              <option key={item.name} value={item.href}>
-                {item.name}
-              </option>
-            ))}
+            {advanced.map(
+              (item) =>
+                item.enabled && (
+                  <option key={item.name} value={item.href}>
+                    {item.name}
+                  </option>
+                )
+            )}
           </SelectField>
 
           <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
-            {advanced.map((item, index) => (
-              <div key={index}>
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={classNames(
-                    item.current
-                      ? 'bg-gray-200 text-gray-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                    item.children ? 'rounded-t' : 'rounded',
-                    'flex items-center px-3 py-2 text-sm font-medium'
-                  )}
-                  aria-current={item.current ? 'page' : undefined}
-                >
-                  <span className="truncate">{item.name}</span>
-                </Link>
+            {advanced.map(
+              (item, index) =>
+                item.enabled && (
+                  <div key={index}>
+                    <Link
+                      key={item.name}
+                      to={item.href}
+                      className={classNames(
+                        item.current
+                          ? 'bg-gray-200 text-gray-900'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                        item.children ? 'rounded-t' : 'rounded',
+                        'flex items-center px-3 py-2 text-sm font-medium'
+                      )}
+                      aria-current={item.current ? 'page' : undefined}
+                    >
+                      <span className="truncate">{item.name}</span>
+                    </Link>
 
-                {item.children && item.current && (
-                  <div className="bg-gray-100 space-y-4 py-3 rounded-b">
-                    {item.children &&
-                      item.children.map((item, index) => (
-                        <Link
-                          key={index}
-                          to={item.href}
-                          className={classNames(
-                            item.current ? 'text-gray-900 font-semibold' : '',
-                            'ml-4 px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
-                          )}
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
+                    {item.children && item.current && (
+                      <div className="bg-gray-100 space-y-4 py-3 rounded-b">
+                        {item.children &&
+                          item.children.map((item, index) => (
+                            <Link
+                              key={index}
+                              to={item.href}
+                              className={classNames(
+                                item.current
+                                  ? 'text-gray-900 font-semibold'
+                                  : '',
+                                'ml-4 px-3 text-sm block text-gray-700 hover:text-gray-900 transition duration-200 ease-in-out'
+                              )}
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            ))}
+                )
+            )}
           </nav>
         </div>
 
