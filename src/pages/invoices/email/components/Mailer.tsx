@@ -15,6 +15,7 @@ import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { freePlan } from 'common/guards/guards/free-plan';
 import { proPlan } from 'common/guards/guards/pro-plan';
 import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
+import { useHandleSend } from 'common/hooks/emails/useHandleSend';
 import { useResolveTemplate } from 'common/hooks/emails/useResolveTemplate';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Invoice } from 'common/interfaces/invoice';
@@ -24,7 +25,8 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { Contact } from 'components/emails/Contact';
 import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
-import { Dispatch, SetStateAction } from 'react';
+import { MailerComponent } from 'pages/purchase-orders/email/Email';
+import { forwardRef, RefObject, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type MailerResourceType =
@@ -38,22 +40,20 @@ export type MailerResource = Invoice | RecurringInvoice | Quote | PurchaseOrder;
 
 export type MailerContactProperty = 'client_id' | 'vendor_id';
 interface Props {
+  ref: RefObject<HTMLInputElement | undefined>;
   resource: MailerResource;
   resourceType: MailerResourceType;
   list: Record<string, string>;
-  body: string;
-  setBody: Dispatch<SetStateAction<string>>;
-  templateId: string;
-  setTemplateId: Dispatch<SetStateAction<string>>;
-  subject: string;
-  setSubject: Dispatch<SetStateAction<string>>;
+  defaultEmail: string;
+  redirectUrl: string;
 }
 
-export function Mailer(props: Props) {
+export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
   const [t] = useTranslation();
 
-  const { templateId, setTemplateId, subject, setSubject, body, setBody } =
-    props;
+  const [templateId, setTemplateId] = useState(props.defaultEmail);
+  const [subject, setSubject] = useState('');
+  const [body, setBody] = useState('');
 
   const company = useCurrentCompany();
 
@@ -74,6 +74,27 @@ export function Mailer(props: Props) {
   const pdfUrl = useGeneratePdfUrl({
     resourceType: props.resourceType,
   });
+
+  const handleSend = useHandleSend();
+
+  useImperativeHandle(
+    ref,
+    () => {
+      return {
+        sendEmail() {
+          handleSend(
+            body,
+            props.resourceType,
+            props.resource?.id || '',
+            subject,
+            templateId,
+            props.redirectUrl
+          );
+        },
+      };
+    },
+    [body, subject, templateId]
+  );
 
   return (
     <div className="grid grid-cols-12 lg:gap-4 my-4">
@@ -156,4 +177,4 @@ export function Mailer(props: Props) {
       </div>
     </div>
   );
-}
+});

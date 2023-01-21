@@ -9,12 +9,12 @@
  */
 
 import { route } from 'common/helpers/route';
-import { useHandleSend } from 'common/hooks/emails/useHandleSend';
 import { useTitle } from 'common/hooks/useTitle';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Mailer } from 'pages/invoices/email/components/Mailer';
-import { useState } from 'react';
+import { MailerComponent } from 'pages/purchase-orders/email/Email';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useQuoteQuery } from '../common/queries';
@@ -27,9 +27,7 @@ export function Email() {
 
   const { data: quote } = useQuoteQuery({ id: id! });
 
-  const [templateId, setTemplateId] = useState<string>('email_template_quote');
-  const [subject, setSubject] = useState<string>('');
-  const [body, setBody] = useState<string>('');
+  const mailerRef = useRef<MailerComponent>(null);
 
   const list = {
     email_template_quote: 'initial_email',
@@ -43,30 +41,21 @@ export function Email() {
     },
   ];
 
-  const handleSend = useHandleSend();
-
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      disableSaveButton={!quote}
       saveButtonLabel={t('send_email')}
-      onSaveClick={() =>
-        quote &&
-        handleSend(body, 'quote', quote.id, subject, templateId, '/quotes')
-      }
+      onSaveClick={() => mailerRef?.current?.sendEmail()}
     >
       {quote && (
         <Mailer
+          ref={mailerRef}
           resource={quote}
           resourceType="quote"
           list={list}
-          body={body}
-          setBody={setBody}
-          subject={subject}
-          setSubject={setSubject}
-          templateId={templateId}
-          setTemplateId={setTemplateId}
+          defaultEmail="email_template_quote"
+          redirectUrl="/quotes"
         />
       )}
     </Default>
