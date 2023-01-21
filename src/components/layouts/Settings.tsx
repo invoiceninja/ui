@@ -18,6 +18,7 @@ import { SelectField } from '../forms';
 import { Default } from './Default';
 import { companySettingsErrorsAtom } from '../../pages/settings/common/atoms';
 import { ValidationAlert } from 'components/ValidationAlert';
+import { useSettingsRoutes } from './common/hooks';
 
 interface Props {
   title: string;
@@ -48,63 +49,7 @@ export function Settings(props: Props) {
 
   const settingPathNameKey = location.pathname.split('/')[2];
 
-  const basic = [
-    {
-      name: t('company_details'),
-      href: '/settings/company_details',
-      current: location.pathname.startsWith('/settings/company_details'),
-    },
-    {
-      name: t('user_details'),
-      href: '/settings/user_details',
-      current: location.pathname.startsWith('/settings/user_details'),
-    },
-    {
-      name: t('localization'),
-      href: '/settings/localization',
-      current: location.pathname.startsWith('/settings/localization'),
-    },
-    {
-      name: t('payment_settings'),
-      href: '/settings/online_payments',
-      current: location.pathname.startsWith('/settings/online_payments'),
-    },
-    {
-      name: t('tax_settings'),
-      href: '/settings/tax_settings',
-      current: location.pathname.startsWith('/settings/tax_settings'),
-    },
-    {
-      name: t('product_settings'),
-      href: '/settings/product_settings',
-      current: location.pathname.startsWith('/settings/product_settings'),
-    },
-    {
-      name: t('task_settings'),
-      href: '/settings/task_settings',
-      current: location.pathname.startsWith('/settings/task_settings'),
-    },
-    {
-      name: t('expense_settings'),
-      href: '/settings/expense_settings',
-      current: location.pathname.startsWith('/settings/expense_settings'),
-    },
-    {
-      name: t('workflow_settings'),
-      href: '/settings/workflow_settings',
-      current: location.pathname.startsWith('/settings/workflow_settings'),
-    },
-    {
-      name: t('account_management'),
-      href: '/settings/account_management',
-      current: location.pathname.startsWith('/settings/account_management'),
-    },
-    {
-      name: t('backup_restore'),
-      href: '/settings/backup_restore',
-      current: location.pathname.startsWith('/settings/backup_restore'),
-    },
-  ];
+  const { basic } = useSettingsRoutes();
 
   const advanced: AdvanceSetting[] = [
     {
@@ -176,16 +121,19 @@ export function Settings(props: Props) {
             onValueChange={(value) => navigate(value)}
             withBlank
           >
-            {basic.map((item) => (
-              <option key={item.name} value={item.href}>
-                {item.name}
-              </option>
-            ))}
+            {basic.map(
+              (item) =>
+                item.enabled && (
+                  <option key={item.name} value={item.href}>
+                    {item.name}
+                  </option>
+                )
+            )}
           </SelectField>
 
           <nav className="space-y-1 hidden lg:block" aria-label="Sidebar">
             {basic.map((item) => (
-              <Link
+              item.enabled && <Link
                 key={item.name}
                 to={item.href}
                 className={classNames(
