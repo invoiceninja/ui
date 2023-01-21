@@ -10,6 +10,7 @@
 
 import { useCurrentCompanyUser } from '../useCurrentCompanyUser';
 
+type AdminPermissions = 'is_admin' | 'is_owner';
 type ClientPermissions = 'create_client' | 'view_client' | 'edit_client';
 type ProductPermissions = 'create_product' | 'view_product' | 'edit_product';
 type InvoicePermissions = 'create_invoice' | 'view_invoice' | 'edit_invoice';
@@ -38,6 +39,7 @@ type PurchaseOrderPermission =
   | 'edit_purchase_order';
 
 export type Permissions =
+  | AdminPermissions
   | ClientPermissions
   | ProductPermissions
   | InvoicePermissions
