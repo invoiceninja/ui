@@ -8,9 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CompanyUser } from 'common/interfaces/company-user';
-import { RootState } from 'common/stores/store';
-import { useSelector } from 'react-redux';
+import { useCurrentCompanyUser } from '../useCurrentCompanyUser';
 
 type ClientPermissions = 'create_client' | 'view_client' | 'edit_client';
 type ProductPermissions = 'create_product' | 'view_product' | 'edit_product';
@@ -30,10 +28,14 @@ type RecurringExpensePermissions =
   | 'create_recurring_expense'
   | 'view_recurring_expense'
   | 'edit_recurring_expense';
-type BankTransactionsPermissions =
+type BankTransactionPermissions =
   | 'create_transaction'
   | 'view_transaction'
   | 'edit_transaction';
+type PurchaseOrderPermission =
+  | 'create_purchase_order'
+  | 'view_purchase_order'
+  | 'edit_purchase_order';
 
 export type Permissions =
   | ClientPermissions
@@ -48,14 +50,11 @@ export type Permissions =
   | VendorPermissions
   | ExpensePermissions
   | RecurringExpensePermissions
-  | BankTransactionsPermissions;
+  | BankTransactionPermissions
+  | PurchaseOrderPermission;
 
 export function useHasPermission() {
-  const user = useSelector(
-    (state: RootState) =>
-      state.companyUsers.api[state.companyUsers.currentIndex]
-  ) as CompanyUser;
-
+  const user = useCurrentCompanyUser();
   const permissions = user?.permissions ?? '';
 
   return (permission: Permissions) =>
