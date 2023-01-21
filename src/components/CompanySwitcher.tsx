@@ -30,6 +30,7 @@ import { freePlan } from 'common/guards/guards/free-plan';
 import { Icon } from './icons/Icon';
 import { MdLogout, MdManageAccounts } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
+import { useCurrentCompanyUser } from 'common/hooks/useCurrentCompanyUser';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -38,16 +39,15 @@ export function CompanySwitcher() {
 
   const state = useSelector((state: RootState) => state.companyUsers);
 
-  const canUserAddCompany = isSelfHosted() || (isHosted() && !freePlan());
+  const companyUser = useCurrentCompanyUser();
+
+  const canUserAddCompany =
+    (isSelfHosted() || (isHosted() && !freePlan())) && companyUser?.is_admin; // @Todo: Needs confirmation.
 
   const dispatch = useDispatch();
-
   const queryClient = useQueryClient();
-
   const logo = useLogo();
-
   const companyName = useCompanyName();
-
   const currentCompany = useCurrentCompany();
 
   const [shouldShowAddCompany, setShouldShowAddCompany] =
@@ -102,15 +102,19 @@ export function CompanySwitcher() {
 
   return (
     <>
-      <CompanyCreate
-        isModalOpen={isCompanyCreateModalOpened}
-        setIsModalOpen={setIsCompanyCreateModalOpened}
-      />
+      {companyUser?.is_owner && (
+        <CompanyCreate
+          isModalOpen={isCompanyCreateModalOpened}
+          setIsModalOpen={setIsCompanyCreateModalOpened}
+        />
+      )}
 
-      <CompanyEdit
-        isModalOpen={isCompanyEditModalOpened}
-        setIsModalOpen={setIsCompanyEditModalOpened}
-      />
+      {companyUser?.is_owner && (
+        <CompanyEdit
+          isModalOpen={isCompanyEditModalOpened}
+          setIsModalOpen={setIsCompanyEditModalOpened}
+        />
+      )}
 
       <Menu as="div" className="relative inline-block text-left">
         <div>
@@ -172,14 +176,17 @@ export function CompanySwitcher() {
                 </Menu.Item>
               )}
 
-              <Menu.Item>
-                <DropdownElement
-                  to="/settings/account_management"
-                  icon={<Icon element={MdManageAccounts} size={22} />}
-                >
-                  {t('account_management')}
-                </DropdownElement>
-              </Menu.Item>
+              {companyUser?.is_admin ||
+                (companyUser?.is_owner && (
+                  <Menu.Item>
+                    <DropdownElement
+                      to="/settings/account_management"
+                      icon={<Icon element={MdManageAccounts} size={22} />}
+                    >
+                      {t('account_management')}
+                    </DropdownElement>
+                  </Menu.Item>
+                ))}
 
               <Menu.Item>
                 <DropdownElement
