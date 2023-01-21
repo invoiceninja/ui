@@ -13,6 +13,7 @@ import { InputField } from '@invoiceninja/forms';
 import { Project } from 'common/interfaces/project';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useProjectQuery } from 'common/queries/projects';
+import { ClientSelector } from 'components/clients/ClientSelector';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -62,6 +63,15 @@ export function Edit() {
           value={project?.number}
           onValueChange={(value) => handleChange('number', value)}
           errorMessage={errors?.errors.number}
+        />
+      </Element>
+
+      <Element leftSide={t('client')}>
+        <ClientSelector
+          value={project?.client_id}
+          onChange={(id) => handleChange('client_id', id)}
+          readonly
+          staleTime={Infinity}
         />
       </Element>
 
