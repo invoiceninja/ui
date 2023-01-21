@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Guard } from 'common/guards/Guard';
+import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
@@ -17,12 +19,52 @@ import { Pdf } from './pdf/Pdf';
 
 export const purchaseOrderRoutes = (
   <Route path="/purchase_orders">
-    <Route path="" element={<PurchaseOrders />} />
+    <Route
+      path=""
+      element={
+        <Guard
+          guards={[() => permission('view_purchase_order')]} // @Todo: Missing bitmask guard
+          component={<PurchaseOrders />}
+        />
+      }
+    />
     <Route path=":id">
-      <Route path="edit" element={<Edit />} />
-      <Route path="email" element={<Email />} />
-      <Route path="pdf" element={<Pdf />} />
+      <Route
+        path="edit"
+        element={
+          <Guard
+            guards={[() => permission('edit_purchase_order')]}
+            component={<Edit />}
+          />
+        }
+      />
+      <Route
+        path="email"
+        element={
+          <Guard
+            guards={[() => permission('view_purchase_order')]}
+            component={<Email />}
+          />
+        }
+      />
+      <Route
+        path="pdf"
+        element={
+          <Guard
+            guards={[() => permission('view_purchase_order')]}
+            component={<Pdf />}
+          />
+        }
+      />
     </Route>
-    <Route path="create" element={<Create />} />
+    <Route
+      path="create"
+      element={
+        <Guard
+          guards={[() => permission('create_purchase_order')]}
+          component={<Create />}
+        />
+      }
+    />
   </Route>
 );
