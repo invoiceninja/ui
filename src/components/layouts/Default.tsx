@@ -274,7 +274,10 @@ export function Default(props: Props) {
     },
     {
       name: t('settings'),
-      href: '/settings/company_details',
+      href:
+        companyUser?.is_admin || companyUser?.is_owner
+          ? '/settings/company_details'
+          : '/settings/user_details',
       icon: Settings,
       current: location.pathname.startsWith('/settings'),
       visible: true,
