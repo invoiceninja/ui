@@ -16,12 +16,9 @@ export function permission(permission: Permissions) {
   const user = state.companyUsers.api[state.companyUsers.currentIndex];
 
   const permissions = user?.permissions ?? '';
-  const [action] = permission.split('_');
 
-  return (
-    user?.is_admin ||
-    user?.is_owner ||
-    permissions.includes(permission) ||
-    permission.includes(action)
-  );
+  return user?.is_admin || user?.is_owner || permissions.includes(permission);
+
+  // const [action] = permission.split('_');
+  // permission.includes(action)
 }
