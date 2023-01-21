@@ -94,5 +94,58 @@ export function useSettingsRoutes() {
     },
   ];
 
-  return { basic };
+  const advanced: SettingsRoute[] = [
+    {
+      name: t('invoice_design'),
+      href: '/settings/invoice_design',
+      current: location.pathname.startsWith('/settings/invoice_design'),
+      enabled: companyUser?.is_admin || companyUser?.is_owner || false,
+    },
+    {
+      name: t('generated_numbers'),
+      href: '/settings/generated_numbers',
+      current: location.pathname.startsWith('/settings/generated_numbers'),
+      enabled: companyUser?.is_admin || companyUser?.is_owner || false,
+    },
+    {
+      name: t('client_portal'),
+      href: '/settings/client_portal',
+      current: location.pathname.startsWith('/settings/client_portal'),
+      enabled: companyUser?.is_admin || companyUser?.is_owner || false,
+    },
+    {
+      name: t('email_settings'),
+      href: '/settings/email_settings',
+      current: location.pathname.startsWith('/settings/email_settings'),
+      enabled: companyUser?.is_admin || companyUser?.is_owner || false,
+    },
+    {
+      name: t('templates_and_reminders'),
+      href: '/settings/templates_and_reminders',
+      current: location.pathname.startsWith(
+        '/settings/templates_and_reminders'
+      ),
+      enabled: companyUser?.is_admin || companyUser?.is_owner || false,
+    },
+    {
+      name: t('bank_accounts'),
+      href: '/settings/bank_accounts',
+      current: location.pathname.startsWith('/settings/bank_accounts'),
+      enabled: companyUser?.is_admin || companyUser?.is_owner || false,
+    },
+    {
+      name: t('subscriptions'),
+      href: '/settings/subscriptions',
+      current: location.pathname.startsWith('/settings/subscriptions'),
+      enabled: companyUser?.is_admin || companyUser?.is_owner || false,
+    },
+    {
+      name: t('user_management'),
+      href: '/settings/users',
+      current: location.pathname.startsWith('/settings/users'),
+      enabled: companyUser?.is_admin || companyUser?.is_owner || false,
+    },
+  ];
+
+  return { basic, advanced };
 }
