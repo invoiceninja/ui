@@ -36,6 +36,7 @@ export function Permissions(props: Props) {
     'task',
     'vendor',
     'expense',
+    'purchase_order',
   ];
 
   const handleAdministratorToggle = (value: boolean) => {
