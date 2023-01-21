@@ -10,14 +10,15 @@
 
 import { Product } from 'common/interfaces/product';
 import { Subscription } from 'common/interfaces/subscription';
-import { SelectField } from '@invoiceninja/forms';
+import { Link, SelectField } from '@invoiceninja/forms';
 import { MdClose } from 'react-icons/md';
 import { useEffect, useState } from 'react';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useAccentColor } from 'common/hooks/useAccentColor';
-import { BiChevronRight } from 'react-icons/bi';
-import classNames from 'classnames';
+import { route } from 'common/helpers/route';
+import { BsBox } from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   type:
@@ -37,6 +38,8 @@ export function MultipleProductSelector(props: Props) {
   const accentColor = useAccentColor();
 
   const company = useCurrentCompany();
+
+  const navigate = useNavigate();
 
   const formatMoney = useFormatMoney();
 
@@ -124,42 +127,60 @@ export function MultipleProductSelector(props: Props) {
         </SelectField>
       )}
 
-      <div
-        className={classNames('flex justify-center', {
-          'border-b border-gray-200': selectedProducts.length,
-        })}
-      >
-        <ul
-          className={classNames('flex flex-col justify-start', {
-            'pb-3': selectedProducts.length,
-          })}
-        >
-          {selectedProducts?.map((product, index) => (
-            <li
-              key={index}
-              className="flex flex-1 justify-between items-center mt-3"
-            >
-              <BiChevronRight fontSize={18} />
-
-              <div className="flex flex-1 justify-between items-center">
-                <div className="flex space-x-2 font-medium">
-                  <span>{product.product_key}</span>
-
-                  <span>
-                    {formatMoney(
-                      product.price,
-                      company?.settings.country_id,
-                      company?.settings.currency_id
-                    )}
+      <div className="flex justify-center">
+        <ul role="list" className="-mb-8 mt-3">
+          {selectedProducts.map((product, index) => (
+            <li key={index}>
+              <div className="relative pb-8">
+                {index !== selectedProducts.length - 1 && (
+                  <span
+                    className="absolute top-4 left-4 -ml-px h-full w-0.5 bg-gray-200"
+                    aria-hidden="true"
+                  />
+                )}
+                <div className="relative flex space-x-3">
+                  <span
+                    className="h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white"
+                    style={{ backgroundColor: accentColor }}
+                  >
+                    <BsBox
+                      className="h-4 w-4 text-white cursor-pointer"
+                      aria-hidden="true"
+                      onClick={() =>
+                        navigate(
+                          route(`/products/:id/edit`, { id: product.id })
+                        )
+                      }
+                    />
                   </span>
-                </div>
 
-                <MdClose
-                  className="cursor-pointer ml-20"
-                  color={accentColor}
-                  fontSize={19}
-                  onClick={() => handleRemoveProduct(product.id)}
-                />
+                  <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                    <div className="flex flex-1 justify-between space-x-5">
+                      <Link
+                        to={route(`/products/:id/edit`, { id: product.id })}
+                      >
+                        {product.product_key}
+                      </Link>
+
+                      <span>
+                        {formatMoney(
+                          product.price,
+                          company?.settings.country_id,
+                          company?.settings.currency_id
+                        )}
+                      </span>
+                    </div>
+
+                    <div className="whitespace-nowrap text-right text-sm text-gray-500">
+                      <MdClose
+                        className="cursor-pointer ml-10 xl:ml-20"
+                        color={accentColor}
+                        fontSize={19}
+                        onClick={() => handleRemoveProduct(product.id)}
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </li>
           ))}
