@@ -40,6 +40,7 @@ import { AiOutlineBank } from 'react-icons/ai';
 import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 import { QuickCreatePopover } from 'components/QuickCreatePopover';
+import { useCurrentCompanyUser } from 'common/hooks/useCurrentCompanyUser';
 
 interface Props extends CommonProps {
   title?: string | null;
@@ -67,6 +68,8 @@ export function Default(props: Props) {
   const hasPermission = useHasPermission();
   const location = useLocation();
   const navigate = useNavigate();
+
+  const companyUser = useCurrentCompanyUser();
 
   const navigation: NavigationItem[] = [
     {
@@ -213,12 +216,12 @@ export function Default(props: Props) {
       href: '/purchase_orders',
       icon: BiFile,
       current: location.pathname.startsWith('/purchase_orders'),
-      visible: true,
+      visible: hasPermission('view_purchase_order'),
       rightButton: {
         icon: PlusCircle,
         to: '/purchase_orders/create',
         label: t('new_purchase_order'),
-        visible: true,
+        visible: hasPermission('create_purchase_order'),
       },
     },
     {
@@ -254,7 +257,7 @@ export function Default(props: Props) {
       href: '/reports',
       icon: PieChart,
       current: location.pathname.startsWith('/reports'),
-      visible: true,
+      visible: companyUser?.is_admin || companyUser?.is_owner || false,
     },
     {
       name: t('transactions'),
@@ -281,7 +284,7 @@ export function Default(props: Props) {
       href: '/system_logs',
       icon: ShieldOff,
       current: location.pathname.startsWith('/system_logs'),
-      visible: true,
+      visible: companyUser?.is_admin || companyUser?.is_owner || false,
     },
   ];
 
