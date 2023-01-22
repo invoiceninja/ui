@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
@@ -132,16 +131,16 @@ export function CreateProjectModal(props: Props) {
     >
       {project ? (
         <>
-          <Element leftSide={t('project_name')}>
+          <div className="grid grid-cols-2 gap-x-5 gap-y-3">
             <InputField
+              label={t('project_name')}
               value={project.name}
               onValueChange={(value) => handleChange('name', value)}
               errorMessage={errors?.errors.name}
             />
-          </Element>
 
-          <Element leftSide={t('client')}>
             <ClientSelector
+              inputLabel={t('client')}
               value={project.client_id}
               onChange={(client) => handleChange('client_id', client.id)}
               clearButton
@@ -149,10 +148,9 @@ export function CreateProjectModal(props: Props) {
               errorMessage={errors?.errors.client_id}
               staleTime={Infinity}
             />
-          </Element>
 
-          <Element leftSide={t('user')}>
             <DebouncedCombobox
+              inputLabel={t('user')}
               defaultValue={project.assigned_user_id}
               endpoint="/api/v1/users"
               label="first_name"
@@ -167,50 +165,45 @@ export function CreateProjectModal(props: Props) {
               errorMessage={errors?.errors.assigned_user_id}
               queryAdditional
             />
-          </Element>
 
-          <Element leftSide={t('due_date')}>
             <InputField
+              label={t('due_date')}
               type="date"
               value={project.due_date}
               onValueChange={(value) => handleChange('due_date', value)}
               errorMessage={errors?.errors.due_date}
             />
-          </Element>
 
-          <Element leftSide={t('budgeted_hours')}>
             <InputField
+              label={t('budgeted_hours')}
               value={project.budgeted_hours}
               onValueChange={(value) => handleChange('budgeted_hours', value)}
               errorMessage={errors?.errors.budgeted_hours}
             />
-          </Element>
 
-          <Element leftSide={t('task_rate')}>
             <InputField
+              label={t('task_rate')}
               value={project.task_rate}
               onValueChange={(value) => handleChange('task_rate', value)}
               errorMessage={errors?.errors.task_rate}
             />
-          </Element>
 
-          <Element leftSide={t('public_notes')}>
             <InputField
+              label={t('public_notes')}
               element="textarea"
               value={project.public_notes}
               onValueChange={(value) => handleChange('public_notes', value)}
               errorMessage={errors?.errors.public_notes}
             />
-          </Element>
 
-          <Element leftSide={t('private_notes')}>
             <InputField
+              label={t('private_notes')}
               element="textarea"
               value={project.private_notes}
               onValueChange={(value) => handleChange('private_notes', value)}
               errorMessage={errors?.errors.private_notes}
             />
-          </Element>
+          </div>
 
           <Button
             className="flex self-end"
