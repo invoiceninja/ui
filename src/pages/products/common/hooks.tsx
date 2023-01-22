@@ -38,6 +38,7 @@ import { productAtom } from './atoms';
 import { bulk } from 'common/queries/products';
 import { useQueryClient } from 'react-query';
 import { Divider } from 'components/cards/Divider';
+import { Tooltip } from 'components/Tooltip';
 
 export const productColumns = [
   'product_key',
@@ -103,6 +104,13 @@ export function useProductColumns() {
       column: 'description',
       id: 'notes',
       label: t('notes'),
+      format: (value) => {
+        return (
+          <Tooltip size="regular" truncate message={value as string}>
+            <span>{value}</span>
+          </Tooltip>
+        );
+      },
     },
     {
       column: 'price',

@@ -129,7 +129,7 @@ export function useActions() {
         to={route('/invoices/:id/pdf?delivery_note=true', { id: invoice.id })}
         icon={<Icon element={MdPictureAsPdf} />}
       >
-        {t('view_delivery_note')} ({t('pdf')})
+        {t('delivery_note')} ({t('pdf')})
       </DropdownElement>
     ),
     (invoice: Invoice) => (
