@@ -20,6 +20,7 @@ import { useTitle } from 'common/hooks/useTitle';
 import { Project } from 'common/interfaces/project';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankProjectQuery } from 'common/queries/projects';
+import { ClientSelector } from 'components/clients/ClientSelector';
 import { Container } from 'components/Container';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { Default } from 'components/layouts/Default';
@@ -118,15 +119,13 @@ export function Create() {
           </Element>
 
           <Element leftSide={t('client')}>
-            <DebouncedCombobox
-              defaultValue={project?.client_id}
-              endpoint="/api/v1/clients"
-              label="display_name"
-              onChange={(value) => handleChange('client_id', value.value)}
+            <ClientSelector
+              value={project?.client_id}
+              onChange={(client) => handleChange('client_id', client.id)}
               clearButton={Boolean(project?.client_id)}
               onClearButtonClick={() => handleChange('client_id', '')}
               errorMessage={errors?.errors.client_id}
-              queryAdditional
+              staleTime={Infinity}
             />
           </Element>
 
