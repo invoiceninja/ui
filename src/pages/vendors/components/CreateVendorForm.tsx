@@ -25,7 +25,8 @@ import { useDispatch } from 'react-redux';
 
 interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;
-  setSelectedIds: Dispatch<SetStateAction<string[]>>;
+  setSelectedIds?: Dispatch<SetStateAction<string[]>>;
+  onVendorCreated?: (vendor: Vendor) => unknown;
 }
 
 export function CreateVendorForm(props: Props) {
@@ -98,8 +99,15 @@ export function CreateVendorForm(props: Props) {
           })
         );
 
-        props.setSelectedIds([response[0].data.data.id]);
+        if (props.setSelectedIds) {
+          props.setSelectedIds([response[0].data.data.id]);
+        }
 
+        if (props.onVendorCreated) {
+          props.onVendorCreated(response[0].data.data);
+        }
+
+        setVendor(data);
         props.setVisible(false);
       })
       .catch((error: AxiosError) => {
