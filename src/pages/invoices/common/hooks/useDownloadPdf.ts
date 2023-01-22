@@ -37,9 +37,12 @@ export function useDownloadPdf(props: Props) {
             const blob = new Blob([response.data], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
 
+            const [, filename] =
+              response.headers['content-disposition'].split('filename=');
+
             const link = document.createElement('a');
 
-            link.download = `${props.resource}.pdf`;
+            link.download = filename;
             link.href = url;
             link.target = '_blank';
 
