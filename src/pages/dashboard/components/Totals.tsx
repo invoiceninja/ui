@@ -21,7 +21,6 @@ import { InfoCard } from 'components/InfoCard';
 import { request } from 'common/helpers/request';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { useCurrentCompanyUser } from 'common/hooks/useCurrentCompanyUser';
 
 interface TotalsRecord {
@@ -62,7 +61,6 @@ export enum TotalColors {
 export function Totals() {
   const [t] = useTranslation();
 
-  const hasPermission = useHasPermission();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
   const companyUser = useCurrentCompanyUser();
