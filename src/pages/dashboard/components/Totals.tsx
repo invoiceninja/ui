@@ -22,6 +22,7 @@ import { request } from 'common/helpers/request';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
+import { useCurrentCompanyUser } from 'common/hooks/useCurrentCompanyUser';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -64,6 +65,7 @@ export function Totals() {
   const hasPermission = useHasPermission();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
+  const companyUser = useCurrentCompanyUser();
 
   const [isLoadingTotals, setIsLoadingTotals] = useState(true);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
@@ -99,8 +101,7 @@ export function Totals() {
   };
 
   const getTotals = () => {
-    if (!hasPermission('view_payment')) {
-      // @Todo: Correct permission for fetching totals.
+    if (!companyUser?.is_owner || !companyUser.is_admin) {
       return;
     }
 
@@ -121,8 +122,7 @@ export function Totals() {
   };
 
   const getChartData = () => {
-    if (!hasPermission('view_payment')) {
-      // @Todo: Correct permission for fetching totals.
+    if (!companyUser?.is_owner || !companyUser.is_admin) {
       return;
     }
 

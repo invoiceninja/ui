@@ -42,7 +42,7 @@ export function CompanySwitcher() {
   const companyUser = useCurrentCompanyUser();
 
   const canUserAddCompany =
-    (isSelfHosted() || (isHosted() && !freePlan())) && companyUser?.is_admin; // @Todo: Needs confirmation.
+    (isSelfHosted() || (isHosted() && !freePlan())) && companyUser?.is_owner;
 
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
