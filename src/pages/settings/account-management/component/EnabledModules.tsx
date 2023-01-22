@@ -30,6 +30,7 @@ export enum ModuleBitmask {
   Vendors = 64,
   Expenses = 16,
   RecurringExpenses = 512,
+  PurchaseOrders = 16384,
 }
 
 export function EnabledModules() {
@@ -59,7 +60,7 @@ export function EnabledModules() {
     // { label: t('recurring_tasks'), bitmask: 1024 },
     // { label: t('recurring_quotes'), bitmask: 2048 },
     // { label: t('proformal_invoices'), bitmask: 8192 },
-    // { label: t('purchase_orders'), bitmask: 16384 },
+    { label: t('purchase_orders'), bitmask: ModuleBitmask.PurchaseOrders },
   ];
 
   const handleToggleChange = (value: boolean, bitmask: number) =>
