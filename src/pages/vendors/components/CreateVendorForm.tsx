@@ -22,6 +22,7 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;
@@ -40,6 +41,8 @@ export function CreateVendorForm(props: Props) {
   const company = useInjectCompanyChanges();
 
   const [vendor, setVendor] = useState<Vendor>();
+
+  const [errors, setErrors] = useState<ValidationBag>();
 
   useEffect(() => {
     if (data) {
@@ -102,15 +105,20 @@ export function CreateVendorForm(props: Props) {
 
         props.setVisible(false);
       })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       });
   };
 
   return (
     <>
-      {vendor && <Form vendor={vendor} setVendor={setVendor} />}
+      {vendor && <Form vendor={vendor} setVendor={setVendor} errors={errors} />}
 
       <div className="flex justify-end space-x-4 mt-5">
         <Button onClick={handleSave}>{t('save')}</Button>
