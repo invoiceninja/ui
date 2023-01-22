@@ -9,7 +9,9 @@
  */
 
 import { Guard } from 'common/guards/Guard';
+import { enabled } from 'common/guards/guards/enabled';
 import { permission } from 'common/guards/guards/permission';
+import { ModuleBitmask } from 'pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
@@ -23,7 +25,10 @@ export const purchaseOrderRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_purchase_order')]} // @Todo: Missing bitmask guard
+          guards={[
+            () => enabled(ModuleBitmask.PurchaseOrders),
+            () => permission('view_purchase_order'),
+          ]}
           component={<PurchaseOrders />}
         />
       }
@@ -33,7 +38,10 @@ export const purchaseOrderRoutes = (
         path="edit"
         element={
           <Guard
-            guards={[() => permission('edit_purchase_order')]}
+            guards={[
+              () => enabled(ModuleBitmask.PurchaseOrders),
+              () => permission('edit_purchase_order'),
+            ]}
             component={<Edit />}
           />
         }
@@ -42,7 +50,10 @@ export const purchaseOrderRoutes = (
         path="email"
         element={
           <Guard
-            guards={[() => permission('view_purchase_order')]}
+            guards={[
+              () => enabled(ModuleBitmask.PurchaseOrders),
+              () => permission('view_purchase_order'),
+            ]}
             component={<Email />}
           />
         }
@@ -51,7 +62,10 @@ export const purchaseOrderRoutes = (
         path="pdf"
         element={
           <Guard
-            guards={[() => permission('view_purchase_order')]}
+            guards={[
+              () => enabled(ModuleBitmask.PurchaseOrders),
+              () => permission('view_purchase_order'),
+            ]}
             component={<Pdf />}
           />
         }
@@ -61,7 +75,10 @@ export const purchaseOrderRoutes = (
       path="create"
       element={
         <Guard
-          guards={[() => permission('create_purchase_order')]}
+          guards={[
+            () => enabled(ModuleBitmask.PurchaseOrders),
+            () => permission('create_purchase_order'),
+          ]}
           component={<Create />}
         />
       }

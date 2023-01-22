@@ -216,7 +216,9 @@ export function Default(props: Props) {
       href: '/purchase_orders',
       icon: BiFile,
       current: location.pathname.startsWith('/purchase_orders'),
-      visible: hasPermission('view_purchase_order'),
+      visible:
+        enabled(ModuleBitmask.PurchaseOrders) &&
+        hasPermission('view_purchase_order'),
       rightButton: {
         icon: PlusCircle,
         to: '/purchase_orders/create',
