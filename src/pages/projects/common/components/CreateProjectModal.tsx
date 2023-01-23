@@ -8,65 +8,65 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
+import { Button, InputField } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
-import { endpoint, isProduction } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useTitle } from 'common/hooks/useTitle';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Project } from 'common/interfaces/project';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankProjectQuery } from 'common/queries/projects';
 import { ClientSelector } from 'components/clients/ClientSelector';
-import { Container } from 'components/Container';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
-import { Default } from 'components/layouts/Default';
-import { useAtom } from 'jotai';
-import React, { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
+import { Modal } from 'components/Modal';
+import { Spinner } from 'components/Spinner';
+import {
+  Dispatch,
+  FormEvent,
+  SetStateAction,
+  useEffect,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { projectAtom } from '../common/atoms';
+import { useQueryClient } from 'react-query';
 
-export function Create() {
-  const { documentTitle } = useTitle('new_project');
+interface Props {
+  visible: boolean;
+  setVisible: Dispatch<SetStateAction<boolean>>;
+  onProjectCreated: (project: Project) => unknown;
+}
 
+export function CreateProjectModal(props: Props) {
   const [t] = useTranslation();
-
-  const pages = [
-    { name: t('projects'), href: '/projects' },
-    { name: t('new_project'), href: '/projects/create' },
-  ];
+  const queryClient = useQueryClient();
 
   const { data: blankProject } = useBlankProjectQuery();
 
-  const [searchParams] = useSearchParams();
-  const [project, setProject] = useAtom(projectAtom);
+  const [project, setProject] = useState<Project>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const company = useCurrentCompany();
   const clientResolver = useClientResolver();
-  const navigate = useNavigate();
 
-  const handleChange = (property: keyof Project, value: unknown) => {
+  const handleChange = (
+    property: keyof Project,
+    value: Project[typeof property]
+  ) => {
+    setErrors(undefined);
     setProject((project) => project && { ...project, [property]: value });
   };
 
   useEffect(() => {
-    if (blankProject && !project) {
+    if (blankProject) {
       setProject({
         ...blankProject,
         task_rate: company?.settings.default_task_rate || 0,
-        client_id: searchParams.get('client') || '',
       });
     }
-
-    return () => {
-      isProduction() && setProject(undefined);
-    };
   }, [blankProject]);
 
   useEffect(() => {
@@ -79,59 +79,79 @@ export function Create() {
     }
   }, [project?.client_id]);
 
-  const onSave = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSave = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const toastId = toast.loading(t('processing'));
-    setErrors(undefined);
 
-    request('POST', endpoint('/api/v1/projects'), project)
-      .then((response) => {
-        toast.success(t('created_project'), { id: toastId });
+    if (!isFormBusy) {
+      toast.processing();
+      setErrors(undefined);
+      setIsFormBusy(true);
 
-        navigate(route('/projects/:id/edit', { id: response.data.data.id }));
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
+      request('POST', endpoint('/api/v1/projects'), project)
+        .then((response: GenericSingleResourceResponse<Project>) => {
+          toast.success('created_project');
 
-        if (error.response?.status == 422) {
-          setErrors(error.response.data);
-        }
+          queryClient.invalidateQueries('/api/v1/projects');
 
-        toast.error(t('error_title'), { id: toastId });
-      });
+          window.dispatchEvent(
+            new CustomEvent('invalidate.combobox.queries', {
+              detail: {
+                url: endpoint('/api/v1/projects'),
+              },
+            })
+          );
+
+          props.onProjectCreated(response.data.data);
+
+          setProject(blankProject);
+          props.setVisible(false);
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          } else {
+            console.error(error);
+            toast.error();
+          }
+        })
+        .finally(() => setIsFormBusy(false));
+    }
   };
 
   return (
-    <Default
-      title={documentTitle}
-      breadcrumbs={pages}
-      disableSaveButton={!project}
-      onSaveClick={onSave}
+    <Modal
+      title={t('new_project')}
+      size="regular"
+      visible={props.visible}
+      onClose={() => {
+        setProject(blankProject);
+        props.setVisible(false);
+      }}
     >
-      <Container>
-        <Card title={documentTitle}>
-          <Element leftSide={t('project_name')}>
+      {project ? (
+        <>
+          <div className="grid grid-cols-2 gap-x-5 gap-y-3">
             <InputField
-              value={project?.name}
+              label={t('project_name')}
+              value={project.name}
               onValueChange={(value) => handleChange('name', value)}
               errorMessage={errors?.errors.name}
             />
-          </Element>
 
-          <Element leftSide={t('client')}>
             <ClientSelector
-              value={project?.client_id}
+              inputLabel={t('client')}
+              value={project.client_id}
               onChange={(client) => handleChange('client_id', client.id)}
-              clearButton={Boolean(project?.client_id)}
+              clearButton
               onClearButtonClick={() => handleChange('client_id', '')}
               errorMessage={errors?.errors.client_id}
               staleTime={Infinity}
             />
-          </Element>
 
-          <Element leftSide={t('user')}>
             <DebouncedCombobox
-              defaultValue={project?.assigned_user_id}
+              inputLabel={t('user')}
+              defaultValue={project.assigned_user_id}
               endpoint="/api/v1/users"
               label="first_name"
               formatLabel={(resource) =>
@@ -140,57 +160,63 @@ export function Create() {
               onChange={(value) =>
                 handleChange('assigned_user_id', value.value)
               }
-              clearButton={Boolean(project?.assigned_user_id)}
+              clearButton={Boolean(project.assigned_user_id)}
               onClearButtonClick={() => handleChange('assigned_user_id', '')}
               errorMessage={errors?.errors.assigned_user_id}
               queryAdditional
             />
-          </Element>
 
-          <Element leftSide={t('due_date')}>
             <InputField
+              label={t('due_date')}
               type="date"
-              value={project?.due_date}
+              value={project.due_date}
               onValueChange={(value) => handleChange('due_date', value)}
               errorMessage={errors?.errors.due_date}
             />
-          </Element>
 
-          <Element leftSide={t('budgeted_hours')}>
             <InputField
-              value={project?.budgeted_hours}
+              label={t('budgeted_hours')}
+              value={project.budgeted_hours}
               onValueChange={(value) => handleChange('budgeted_hours', value)}
               errorMessage={errors?.errors.budgeted_hours}
             />
-          </Element>
 
-          <Element leftSide={t('task_rate')}>
             <InputField
-              value={project?.task_rate}
+              label={t('task_rate')}
+              value={project.task_rate}
               onValueChange={(value) => handleChange('task_rate', value)}
               errorMessage={errors?.errors.task_rate}
             />
-          </Element>
 
-          <Element leftSide={t('public_notes')}>
             <InputField
+              label={t('public_notes')}
               element="textarea"
-              value={project?.public_notes}
+              value={project.public_notes}
               onValueChange={(value) => handleChange('public_notes', value)}
               errorMessage={errors?.errors.public_notes}
             />
-          </Element>
 
-          <Element leftSide={t('private_notes')}>
             <InputField
+              label={t('private_notes')}
               element="textarea"
-              value={project?.private_notes}
+              value={project.private_notes}
               onValueChange={(value) => handleChange('private_notes', value)}
               errorMessage={errors?.errors.private_notes}
             />
-          </Element>
-        </Card>
-      </Container>
-    </Default>
+          </div>
+
+          <Button
+            className="flex self-end"
+            disableWithoutIcon
+            disabled={!project || isFormBusy}
+            onClick={handleSave}
+          >
+            {t('save')}
+          </Button>
+        </>
+      ) : (
+        <Spinner />
+      )}
+    </Modal>
   );
 }

@@ -11,28 +11,37 @@
 import { GenericSelectorProps } from 'common/interfaces/generic-selector-props';
 import { Project } from 'common/interfaces/project';
 import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
+import { CreateProjectModal } from 'pages/projects/common/components/CreateProjectModal';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export function ProjectSelector(props: GenericSelectorProps<Project>) {
   const [t] = useTranslation();
-  const [, setIsModalOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <DebouncedCombobox
-      inputLabel={props.inputLabel}
-      endpoint="/api/v1/projects"
-      label="name"
-      onChange={(value: Record<Project>) =>
-        value.resource && props.onChange(value.resource)
-      }
-      defaultValue={props.value}
-      disabled={props.readonly}
-      clearButton={props.clearButton}
-      onClearButtonClick={props.onClearButtonClick}
-      queryAdditional
-      actionLabel={t('new_project')}
-      onActionClick={() => setIsModalOpen(true)}
-    />
+    <>
+      <CreateProjectModal
+        visible={isModalOpen}
+        setVisible={setIsModalOpen}
+        onProjectCreated={(project) => props.onChange(project)}
+      />
+
+      <DebouncedCombobox
+        inputLabel={props.inputLabel}
+        endpoint="/api/v1/projects"
+        label="name"
+        onChange={(value: Record<Project>) =>
+          value.resource && props.onChange(value.resource)
+        }
+        defaultValue={props.value}
+        disabled={props.readonly}
+        clearButton={props.clearButton}
+        onClearButtonClick={props.onClearButtonClick}
+        queryAdditional
+        actionLabel={t('new_project')}
+        onActionClick={() => setIsModalOpen(true)}
+      />
+    </>
   );
 }
