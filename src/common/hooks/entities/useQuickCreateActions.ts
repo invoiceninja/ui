@@ -66,14 +66,13 @@ export function useQuickCreateActions() {
       key: 'client',
       url: '/clients/create',
       section: 'income',
-      visible: hasPermission('create_client') && enabled(ModuleBitmask.Clients),
+      visible: hasPermission('create_client'),
     },
     {
       key: 'product',
       url: '/products/create',
       section: 'income',
-      visible:
-        hasPermission('create_product') && enabled(ModuleBitmask.Products),
+      visible: hasPermission('create_product'),
     },
     {
       key: 'invoice',
@@ -106,8 +105,7 @@ export function useQuickCreateActions() {
       key: 'payment',
       url: '/payments/create',
       section: 'income',
-      visible:
-        hasPermission('create_payment') && enabled(ModuleBitmask.Payments),
+      visible: hasPermission('create_payment'),
     },
     {
       key: 'subscription',
@@ -140,9 +138,7 @@ export function useQuickCreateActions() {
       key: 'transaction',
       url: '/transactions/create',
       section: 'expense',
-      visible:
-        hasPermission('create_bank_transaction') &&
-        enabled(ModuleBitmask.BankTransactions),
+      visible: hasPermission('create_bank_transaction'),
     },
     {
       key: 'add_stripe',
