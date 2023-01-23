@@ -37,8 +37,6 @@ export function useHandleCreate(
       setErrors(undefined);
       setIsFormBusy(true);
 
-      delete bankAccount['nickname'];
-
       request('POST', endpoint('/api/v1/bank_integrations'), bankAccount)
         .then((response: GenericSingleResourceResponse<BankAccount>) => {
           toast.success('created_bank_account');
