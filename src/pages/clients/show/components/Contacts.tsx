@@ -15,6 +15,7 @@ import { InfoCard } from 'components/InfoCard';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import React from 'react';
+import { CopyToClipboard } from 'components/CopyToClipboard';
 
 export function Contacts() {
   const [t] = useTranslation();
@@ -40,7 +41,7 @@ export function Contacts() {
                         {contact.first_name} {contact.last_name}
                       </p>
 
-                      <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                      <CopyToClipboard text={contact.email} />
                     </div>
                   )
                 )}
