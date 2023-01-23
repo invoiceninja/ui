@@ -25,21 +25,26 @@ export const template = `
   <p>Primary text</p>
 `;
 
-interface Context {
-  logo: {
-    size: {
-      value: string | null;
-      selector: string;
-      property: string;
-    };
-  };
+enum CommonSelectors {
+  CompanyLogo = '.company-logo',
+}
+
+interface Element {
+  selector: string | CommonSelectors;
+  value: string | null;
+  property: string;
+}
+
+interface Compilation {
+  html: string;
+  elements: Element[];
 }
 
 class Builder {
   #document!: Document;
   #css = new CSSStyleSheet();
 
-  constructor(html: string) {
+  constructor(html: string, public elements: Element[]) {
     this.#document = new DOMParser().parseFromString(html, 'text/html');
 
     const style = this.#document.querySelector('style');
@@ -83,43 +88,73 @@ class Builder {
     return this.#document.documentElement.innerHTML;
   }
 
+  #elements() {
+    this.elements.map((element, index) => {
+      this.elements[index].value = this.getSelectorValue(
+        element.selector,
+        element.property
+      );
+    });
+
+    console.log(this.elements);
+
+    return this.elements;
+  }
+
   getSelectorValue(selector: string, property: string) {
     return (
       this.#querySelector(selector)?.style.getPropertyValue(property) || null
     );
   }
 
-  setSelectorValue(selector: string, property: string, value: string | null) {
+  setSelectorValue(
+    selector: string,
+    property: string,
+    value: string | null
+  ): Builder {
     this.#querySelector(selector)?.style.setProperty(property, value);
 
-    return new Promise((resolve) => {
-      resolve(this.#html());
-    });
+    return this;
+  }
+
+  compile() {
+    return {
+      html: this.#html(),
+      elements: this.#elements(),
+    } satisfies Compilation;
   }
 }
 
 export function Designer() {
   const logo = useLogo();
   const [html, setHtml] = useState(template);
-  const [context, setContext] = useState<Context>();
+  const [elements, setElements] = useState<Element[]>([]);
 
-  const builder = new Builder(html);
+  const builder = new Builder(html, elements);
 
   useEffect(() => {
     // Initial load, fill the context with data.
 
-    setContext({
-      logo: {
-        size: {
-          value: builder.getSelectorValue('.company-logo', 'max-width'),
-          selector: '.company-logo',
-          property: 'max-width',
-        },
+    setElements((current) => [
+      {
+        selector: CommonSelectors.CompanyLogo,
+        property: 'max-width',
+        value: '65%',
       },
-    });
+    ]);
   }, []);
 
-  console.log(context);
+  const handleSelectorChange = (
+    selector: string,
+    property: string,
+    value: string
+  ) => {
+    const { html } = builder
+      .setSelectorValue(selector, property, value)
+      .compile();
+
+    setHtml(html);
+  };
 
   return (
     <div className="flex">
@@ -152,20 +187,23 @@ export function Designer() {
                 <input
                   type="range"
                   min="1"
-                  max="100"
-                  // value={context?.logo.size.value || 0}
+                  max="65"
+                  // value={elements.logo?.size.value || 0}
                   id="slider"
                   onChange={(event) =>
-                    builder
-                      .setSelectorValue(
-                        '.company-logo',
-                        'max-width',
-                        event.target.value + '%'
-                      )
-                      .then((html) => setHtml(html as string))
+                    handleSelectorChange(
+                      '.company-logo',
+                      'max-width',
+                      `${event.target.value}%`
+                    )
                   }
                 />
-                {/* <span className="text-sm">{context?.logo.size.value || 0}</span> */}
+                <span className="text-sm">
+                  {elements.find(
+                    (element) =>
+                      element.selector === CommonSelectors.CompanyLogo
+                  )?.value || 0}
+                </span>
               </label>
             </div>
           </div>
