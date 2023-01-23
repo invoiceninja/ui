@@ -266,7 +266,7 @@ export function Default(props: Props) {
         icon: PlusCircle,
         to: '/transactions/create',
         label: t('new_transaction'),
-        visible: hasPermission('create_transaction'),
+        visible: hasPermission('create_bank_transaction'),
       },
     },
     {

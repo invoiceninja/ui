@@ -30,6 +30,11 @@ export enum ModuleBitmask {
   Vendors = 64,
   Expenses = 16,
   RecurringExpenses = 512,
+  Clients = -1,
+  Products = -1,
+  Payments = -1,
+  PurchaseOrders = -1,
+  BankTransactions = -1,
 }
 
 export function EnabledModules() {

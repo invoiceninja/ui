@@ -31,9 +31,13 @@ type RecurringExpensePermissions =
   | 'view_recurring_expense'
   | 'edit_recurring_expense';
 type BankTransactionsPermissions =
-  | 'create_transaction'
-  | 'view_transaction'
-  | 'edit_transaction';
+  | 'create_bank_transaction'
+  | 'view_bank_transaction'
+  | 'edit_bank_transaction';
+type PurchaseOrderPermissions =
+  | 'create_purchase_order'
+  | 'view_purchase_order'
+  | 'edit_purchase_order';
 
 export type Permissions =
   | ClientPermissions
@@ -48,7 +52,8 @@ export type Permissions =
   | VendorPermissions
   | ExpensePermissions
   | RecurringExpensePermissions
-  | BankTransactionsPermissions;
+  | BankTransactionsPermissions
+  | PurchaseOrderPermissions;
 
 export function useHasPermission() {
   const user = useSelector(
