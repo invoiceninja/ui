@@ -11,26 +11,37 @@
 import { Link } from '@invoiceninja/forms';
 import { useLogo } from 'common/hooks/useLogo';
 import { ColorPicker } from 'components/forms/ColorPicker';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { ArrowLeft } from 'react-feather';
 
 export const template = `
   <style>
+    :root {
+      --primary-color: $primary_color;
+      --secondary-color: $secondary_color;
+      --line-height: 1.6;
+    }
+  
     .company-logo {
       max-width: 65%;
+    }
+
+    .text-primary {
+      color: var(--primary-color);
+    }
+
+    .text-secondary {
+      color: var(--secondary-color);
     }
   </style>
   
   <img src="https://forum.invoiceninja.com/uploads/default/original/2X/6/672414e38c31024298b506d24ffc4d5e3c3b488e.png" class="company-logo" />
-  <p>Primary text</p>
+  <p class="text-primary">Primary text</p>
+  <p class="text-secondary">Secondary text</p>
 `;
 
-enum CommonSelectors {
-  CompanyLogo = '.company-logo',
-}
-
 interface Element {
-  selector: string | CommonSelectors;
+  selector: string;
   value: string | null;
   property: string;
 }
@@ -39,6 +50,12 @@ interface Compilation {
   html: string;
   elements: Element[];
 }
+
+const defaultSet: Element[] = [
+  { selector: ':root', property: '--primary-color', value: 'red' },
+  { selector: ':root', property: '--secondary-color', value: 'blue' },
+  { selector: '.company-logo', property: 'max-width', value: '15%' },
+];
 
 class Builder {
   #document!: Document;
@@ -51,14 +68,23 @@ class Builder {
 
     if (style) {
       this.#css.replaceSync(style.innerHTML);
+      this.#sync();
     }
+  }
+
+  #sync() {
+    // This injects elements from the context object (settings)
+
+    this.elements.map((element) => {
+      this.setSelectorValue(element.selector, element.property, element.value);
+    });
   }
 
   #querySelector(selector: string) {
     const numbers = [...Array(this.#css.cssRules.length).keys()];
     let cssRule: CSSStyleRule | undefined;
 
-    numbers.every((i) => {
+    numbers.map((i) => {
       const rule = this.#css.cssRules.item(i) as CSSStyleRule | null;
 
       if (rule && rule.selectorText === selector) {
@@ -72,8 +98,6 @@ class Builder {
   }
 
   #html(): string {
-    console.log('Compiling..');
-
     const cssTexts: string[] = [];
     const numbers = [...Array(this.#css.cssRules.length).keys()];
 
@@ -95,8 +119,6 @@ class Builder {
         element.property
       );
     });
-
-    console.log(this.elements);
 
     return this.elements;
   }
@@ -128,21 +150,8 @@ class Builder {
 export function Designer() {
   const logo = useLogo();
   const [html, setHtml] = useState(template);
-  const [elements, setElements] = useState<Element[]>([]);
-
+  const [elements] = useState<Element[]>(defaultSet);
   const builder = new Builder(html, elements);
-
-  useEffect(() => {
-    // Initial load, fill the context with data.
-
-    setElements((current) => [
-      {
-        selector: CommonSelectors.CompanyLogo,
-        property: 'max-width',
-        value: '65%',
-      },
-    ]);
-  }, []);
 
   const handleSelectorChange = (
     selector: string,
@@ -155,6 +164,10 @@ export function Designer() {
 
     setHtml(html);
   };
+
+  // Two ways of updating stuff.
+  // 1. Direct selector (.company-size) example
+  // 2. Updating settings which will trigger update of the elements array (primary color example).
 
   return (
     <div className="flex">
@@ -200,8 +213,7 @@ export function Designer() {
                 />
                 <span className="text-sm">
                   {elements.find(
-                    (element) =>
-                      element.selector === CommonSelectors.CompanyLogo
+                    (element) => element.selector === '.company-logo'
                   )?.value || 0}
                 </span>
               </label>
@@ -217,13 +229,35 @@ export function Designer() {
             <div className="flex flex-col space-y-2 my-4">
               <small className="font-medium">Primary color</small>
 
-              <ColorPicker />
+              <ColorPicker
+                value={
+                  elements.find(
+                    (element) =>
+                      element.selector === ':root' &&
+                      element.property === '--primary-color'
+                  )?.value || '#fff'
+                }
+                onValueChange={(value) =>
+                  handleSelectorChange(':root', '--primary-color', value)
+                }
+              />
             </div>
 
             <div className="flex flex-col space-y-2 my-4">
               <small className="font-medium">Secondary color</small>
 
-              <ColorPicker />
+              <ColorPicker
+                value={
+                  elements.find(
+                    (element) =>
+                      element.selector === ':root' &&
+                      element.property === '--secondary-color'
+                  )?.value || '#fff'
+                }
+                onValueChange={(value) =>
+                  handleSelectorChange(':root', '--secondary-color', value)
+                }
+              />
             </div>
           </div>
         </div>
