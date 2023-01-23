@@ -23,7 +23,7 @@ export interface BankAccount {
   disabled_upstream: boolean;
   from_date: string;
   is_deleted: boolean;
-  nickname?: string;
+  nickname: string;
   provider_id: number;
   provider_name: string;
   updated_at: number;
