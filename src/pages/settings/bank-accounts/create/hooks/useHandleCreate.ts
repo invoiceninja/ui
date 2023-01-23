@@ -12,31 +12,35 @@ import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
-import { BankAccountInput } from 'common/interfaces/bank-accounts';
+import { BankAccount } from 'common/interfaces/bank-accounts';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Dispatch, FormEvent, SetStateAction } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
 export function useHandleCreate(
-  bankAccount: BankAccountInput | undefined,
+  bankAccount: BankAccount | undefined,
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>,
   setIsFormBusy: Dispatch<SetStateAction<boolean>>,
   isFormBusy: boolean,
-  setIsModalOpened?: Dispatch<SetStateAction<boolean>>
+  setIsModalOpened?: Dispatch<SetStateAction<boolean>>,
+  onCreatedBankAccount?: (bankAccount: BankAccount) => unknown
 ) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   return (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!isFormBusy) {
+    if (!isFormBusy && bankAccount) {
       toast.processing();
       setErrors(undefined);
       setIsFormBusy(true);
 
+      delete bankAccount['nickname'];
+
       request('POST', endpoint('/api/v1/bank_integrations'), bankAccount)
-        .then(() => {
+        .then((response: GenericSingleResourceResponse<BankAccount>) => {
           toast.success('created_bank_account');
 
           queryClient.invalidateQueries('/api/v1/bank_integrations');
@@ -51,6 +55,11 @@ export function useHandleCreate(
                 },
               })
             );
+
+            if (onCreatedBankAccount) {
+              onCreatedBankAccount(response.data.data);
+            }
+
             setIsModalOpened(false);
           }
         })
