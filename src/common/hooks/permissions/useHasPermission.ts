@@ -30,9 +30,9 @@ type RecurringExpensePermissions =
   | 'view_recurring_expense'
   | 'edit_recurring_expense';
 type BankTransactionPermissions =
-  | 'create_transaction'
-  | 'view_transaction'
-  | 'edit_transaction';
+  | 'create_bank_transaction'
+  | 'view_bank_transaction'
+  | 'edit_bank_transaction';
 type PurchaseOrderPermission =
   | 'create_purchase_order'
   | 'view_purchase_order'
