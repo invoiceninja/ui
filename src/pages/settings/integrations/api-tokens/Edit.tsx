@@ -12,29 +12,34 @@ import { Card, Element } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { Settings } from 'components/layouts/Settings';
 import { InputField } from '@invoiceninja/forms';
-import { useState } from 'react';
-import { useFormik } from 'formik';
-import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
 import { date, endpoint } from 'common/helpers';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { useApiTokenQuery } from 'common/queries/api-tokens';
 import { useQueryClient } from 'react-query';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { Archive } from './components/Archive';
 import { Badge } from 'components/Badge';
-import { Restore } from './components/Restore';
-import { Delete } from './components/Delete';
 import { useTitle } from 'common/hooks/useTitle';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { ApiToken } from 'common/interfaces/api-token';
+import { toast } from 'common/helpers/toast/toast';
+import { useHandleChange } from './common/hooks/hooks';
+import { ResourceActions } from 'components/ResourceActions';
+import { useActions } from './common/hooks/useActions';
+import { CopyToClipboard } from 'components/CopyToClipboard';
 
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
-  const { data } = useApiTokenQuery({ id });
+  const { data: fetchedApiToken } = useApiTokenQuery({ id });
+
+  const navigate = useNavigate();
+
+  const { documentTitle } = useTitle('edit_token');
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -46,102 +51,119 @@ export function Edit() {
     },
   ];
 
-  useTitle('new_token');
-
-  const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
-    useState(false);
-  const [errors, setErrors] = useState<Record<string, any>>({});
   const queryClient = useQueryClient();
+
+  const actions = useActions();
+
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      name: data?.data?.data.name || '',
-    },
-    onSubmit: (values) => {
-      setErrors({});
-      const toastId = toast.loading(t('processing'));
+  const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
+    useState<boolean>(false);
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-      request('PUT', endpoint('/api/v1/tokens/:id', { id }), values)
+  const [apiToken, setApiToken] = useState<ApiToken>();
+  const [errors, setErrors] = useState<ValidationBag>();
+
+  const handleChange = useHandleChange({ setApiToken, setErrors });
+
+  const handleSave = (password: string) => {
+    if (!isFormBusy) {
+      setErrors(undefined);
+      toast.processing();
+      setIsFormBusy(true);
+
+      request('PUT', endpoint('/api/v1/tokens/:id', { id }), apiToken, {
+        headers: { 'X-Api-Password': password },
+      })
         .then(() => {
-          toast.success(t('updated_token'), { id: toastId });
+          toast.success('updated_token');
+
+          queryClient.invalidateQueries('/api/v1/tokens');
+
+          queryClient.invalidateQueries(route('/api/v1/tokens/:id', { id }));
+
+          navigate(route('/settings/integrations/api_tokens'));
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
             toast.dismiss();
-
-            return setErrors(error.response.data);
+            setErrors(error.response.data);
+            return;
           }
 
-          error.response?.status === 412
-            ? toast.error(t('password_error_incorrect'), { id: toastId })
-            : toast.error(t('error_title'), { id: toastId });
+          if (error.response?.status === 412) {
+            toast.error('password_error_incorrect');
+          } else {
+            console.error(error);
+            toast.error();
+          }
         })
-        .finally(() => {
-          formik.setSubmitting(false);
+        .finally(() => setIsFormBusy(false));
+    }
+  };
 
-          queryClient.invalidateQueries(route('/api/v1/tokens/:id', { id }));
-        });
-    },
-  });
+  useEffect(() => {
+    if (fetchedApiToken) {
+      setApiToken(fetchedApiToken);
+    }
+  }, [fetchedApiToken]);
 
   return (
     <>
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setIsPasswordConfirmModalOpen}
-        onSave={() => formik.submitForm()}
+        onSave={handleSave}
       />
 
-      <Settings title={t('new_token')} breadcrumbs={pages}>
-        {data && (
-          <Card
-            disableSubmitButton={formik.isSubmitting}
-            onFormSubmit={(event) => {
-              event.preventDefault();
-              setIsPasswordConfirmModalOpen(true);
-            }}
-            withSaveButton
-            title={data?.data?.data.name}
-          >
+      <Settings
+        title={documentTitle}
+        breadcrumbs={pages}
+        disableSaveButton={!apiToken}
+        onSaveClick={() => setIsPasswordConfirmModalOpen(true)}
+        navigationTopRight={
+          apiToken && (
+            <ResourceActions
+              resource={apiToken}
+              label={t('more_actions')}
+              actions={actions}
+            />
+          )
+        }
+      >
+        {fetchedApiToken && apiToken && (
+          <Card title={fetchedApiToken.name}>
             <Element leftSide="Status">
-              {!data.data.data.is_deleted && !data.data.data.archived_at && (
+              {!apiToken.is_deleted && !apiToken.archived_at && (
                 <Badge variant="primary">{t('active')}</Badge>
               )}
 
-              {data.data.data.archived_at && !data.data.data.is_deleted ? (
+              {apiToken.archived_at && !apiToken.is_deleted ? (
                 <Badge variant="yellow">{t('archived')}</Badge>
               ) : null}
 
-              {data.data.data.is_deleted && (
+              {apiToken.is_deleted && (
                 <Badge variant="red">{t('deleted')}</Badge>
               )}
             </Element>
 
-            <Element leftSide={t('name')}>
+            <Element leftSide={t('name')} required>
               <InputField
-                required
-                id="name"
-                onChange={formik.handleChange}
-                errorMessage={errors?.errors?.name}
-                value={formik.values.name}
+                value={apiToken.name}
+                onValueChange={(value) => handleChange('name', value)}
+                errorMessage={errors?.errors.name}
               />
             </Element>
 
             <Element leftSide={t('token')}>
-              <p className="break-words">{data?.data?.data.token}</p>
+              <CopyToClipboard className="break-all" text={apiToken.token} />
             </Element>
 
             <Element leftSide={t('created_on')}>
-              {date(data?.data?.data.created_at, dateFormat)}
+              {date(apiToken.created_at, dateFormat)}
             </Element>
           </Card>
         )}
-
-        <Archive />
-        <Restore />
-        <Delete />
       </Settings>
     </>
   );
