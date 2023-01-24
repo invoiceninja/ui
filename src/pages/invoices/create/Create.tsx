@@ -118,7 +118,7 @@ export function Create() {
     }
 
     return () => {
-      isProduction() && setInvoice(undefined)
+      isProduction() && setInvoice(undefined);
     };
   }, [data]);
 
@@ -167,7 +167,11 @@ export function Create() {
           errorMessage={errors?.errors.client_id}
         />
 
-        <InvoiceDetails invoice={invoice} handleChange={handleChange} />
+        <InvoiceDetails
+          invoice={invoice}
+          handleChange={handleChange}
+          errors={errors}
+        />
 
         <div className="col-span-12">
           <TabGroup

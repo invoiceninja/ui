@@ -135,7 +135,7 @@ export function Create() {
           errorMessage={errors?.errors.client_id}
         />
 
-        <QuoteDetails handleChange={handleChange} />
+        <QuoteDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
           {quote && client ? (

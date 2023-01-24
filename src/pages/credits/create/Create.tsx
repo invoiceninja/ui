@@ -137,7 +137,7 @@ export function Create() {
           errorMessage={errors?.errors.client_id}
         />
 
-        <CreditDetails handleChange={handleChange} />
+        <CreditDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
           {credit && client ? (
