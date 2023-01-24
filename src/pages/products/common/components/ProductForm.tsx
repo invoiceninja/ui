@@ -81,7 +81,7 @@ export function ProductForm(props: Props) {
       )}
 
       {company?.enable_product_quantity && (
-        <Element leftSide={t('quantity')}>
+        <Element leftSide={t('default_quantity')}>
           <InputField
             value={product.quantity}
             onValueChange={(value) => handleChange('quantity', value)}

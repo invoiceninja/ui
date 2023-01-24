@@ -10,12 +10,12 @@
 
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { BankAccountDetails } from 'common/interfaces/bank-accounts';
+import { BankAccount } from 'common/interfaces/bank-accounts';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 
 interface Props {
-  accountDetails?: BankAccountDetails;
+  accountDetails?: BankAccount;
 }
 
 export function Details(props: Props) {

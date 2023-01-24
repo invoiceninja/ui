@@ -118,7 +118,7 @@ export function Edit() {
           readonly
         />
 
-        <QuoteDetails handleChange={handleChange} />
+        <QuoteDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
           {quote && client ? (

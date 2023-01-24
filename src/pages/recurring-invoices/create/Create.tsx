@@ -157,7 +157,7 @@ export function Create() {
           errorMessage={errors?.errors.client_id}
         />
 
-        <InvoiceDetails handleChange={handleChange} />
+        <InvoiceDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
           {recurringInvoice && client ? (

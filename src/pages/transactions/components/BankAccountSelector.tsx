@@ -15,7 +15,12 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CreateBankAccountModal } from './CreateBankAccountModal';
 
-export function BankAccountSelector(props: GenericSelectorProps<BankAccount>) {
+export interface BankAccountSelectorProps
+  extends GenericSelectorProps<BankAccount> {
+  staleTime?: number;
+}
+
+export function BankAccountSelector(props: BankAccountSelectorProps) {
   const [t] = useTranslation();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -24,18 +29,25 @@ export function BankAccountSelector(props: GenericSelectorProps<BankAccount>) {
       <CreateBankAccountModal
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
+        onCreatedBankAccount={(bankAccount) => props.onChange(bankAccount)}
       />
 
       <DebouncedCombobox
-        {...props}
+        inputLabel={props.inputLabel}
         endpoint="/api/v1/bank_integrations"
         label="bank_account_name"
+        defaultValue={props.value}
         onChange={(value: Record<BankAccount>) =>
           value.resource && props.onChange(value.resource)
         }
+        disabled={props.readonly}
+        clearButton={props.clearButton}
+        onClearButtonClick={props.onClearButtonClick}
+        queryAdditional
         actionLabel={t('new_bank_account')}
         onActionClick={() => setIsModalOpen(true)}
-        clearButton
+        sortBy="bank_account_name|desc"
+        staleTime={props.staleTime}
       />
     </>
   );

@@ -12,6 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Vendor } from 'common/interfaces/vendor';
 import { VendorContact } from 'common/interfaces/vendor-contact';
 import { Divider } from 'components/cards/Divider';
@@ -27,11 +28,12 @@ import { useTranslation } from 'react-i18next';
 interface Props {
   vendor: Vendor;
   setVendor: React.Dispatch<React.SetStateAction<Vendor | undefined>>;
+  errors: ValidationBag | undefined;
 }
 
 export function Form(props: Props) {
   const [t] = useTranslation();
-  const { vendor, setVendor } = props;
+  const { vendor, setVendor, errors } = props;
 
   const company = useCurrentCompany();
   const handleCustomFieldChange = useHandleCustomFieldChange();
@@ -92,6 +94,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.name}
               onValueChange={(value) => handleChange('name', value)}
+              errorMessage={errors?.errors.name}
             />
           </Element>
 
@@ -99,6 +102,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.number}
               onValueChange={(value) => handleChange('number', value)}
+              errorMessage={errors?.errors.number}
             />
           </Element>
 
@@ -108,6 +112,7 @@ export function Form(props: Props) {
               onChange={(user) => handleChange('assigned_user_id', user.id)}
               onClearButtonClick={() => handleChange('assigned_user_id', '')}
               clearButton
+              errorMessage={errors?.errors.assigned_user_id}
             />
           </Element>
 
@@ -115,6 +120,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.id_number}
               onValueChange={(value) => handleChange('id_number', value)}
+              errorMessage={errors?.errors.id_number}
             />
           </Element>
 
@@ -122,6 +128,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.vat_number}
               onValueChange={(value) => handleChange('vat_number', value)}
+              errorMessage={errors?.errors.vat_number}
             />
           </Element>
 
@@ -129,6 +136,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.website}
               onValueChange={(value) => handleChange('website', value)}
+              errorMessage={errors?.errors.website}
             />
           </Element>
 
@@ -136,6 +144,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.phone}
               onValueChange={(value) => handleChange('phone', value)}
+              errorMessage={errors?.errors.phone}
             />
           </Element>
 
@@ -181,6 +190,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.address1}
               onValueChange={(value) => handleChange('address1', value)}
+              errorMessage={errors?.errors.address1}
             />
           </Element>
 
@@ -188,6 +198,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.address2}
               onValueChange={(value) => handleChange('address2', value)}
+              errorMessage={errors?.errors.address2}
             />
           </Element>
 
@@ -195,6 +206,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.city}
               onValueChange={(value) => handleChange('city', value)}
+              errorMessage={errors?.errors.city}
             />
           </Element>
 
@@ -202,6 +214,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.state}
               onValueChange={(value) => handleChange('state', value)}
+              errorMessage={errors?.errors.state}
             />
           </Element>
 
@@ -209,6 +222,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.postal_code}
               onValueChange={(value) => handleChange('postal_code', value)}
+              errorMessage={errors?.errors.postal_code}
             />
           </Element>
 

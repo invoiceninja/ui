@@ -10,24 +10,14 @@
 
 export interface BankAccount {
   id: string;
-  bank_account_name: string;
-  bank_account_type: string;
-  balance: number;
-}
-
-export interface BankAccountInput {
-  bank_account_name: string;
-}
-
-export interface BankAccountDetails {
-  id: string;
   archived_at: number;
   auto_sync: boolean;
-  bank_account_name: string;
-  bank_account_type: string;
   balance: number;
   bank_account_id: number;
+  bank_account_name: string;
+  bank_account_number: string;
   bank_account_status: string;
+  bank_account_type: string;
   created_at: number;
   currency: string;
   disabled_upstream: boolean;
