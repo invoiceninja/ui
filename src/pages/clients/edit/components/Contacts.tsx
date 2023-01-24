@@ -73,7 +73,7 @@ export function Contacts(props: Props) {
         <div key={index} className="pb-4 mb-4 border-b">
           <Element leftSide={t('first_name')}>
             <InputField
-              id="first_name"
+              id={`first_nam_${index}`}
               value={contact.first_name}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleChange(
@@ -88,7 +88,7 @@ export function Contacts(props: Props) {
 
           <Element leftSide={t('last_name')}>
             <InputField
-              id="last_name"
+              id={`last_name_${index}`}
               value={contact.last_name}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleChange(
@@ -103,7 +103,7 @@ export function Contacts(props: Props) {
 
           <Element leftSide={t('email')}>
             <InputField
-              id="email"
+              id={`email_${index}`}
               value={contact.email}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleChange(event.target.value, 'email', contact.id as string)
@@ -113,7 +113,7 @@ export function Contacts(props: Props) {
 
           <Element leftSide={t('phone')}>
             <InputField
-              id="phone"
+              id={`phone_${index}`}
               value={contact.phone}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleChange(event.target.value, 'phone', contact.id as string)

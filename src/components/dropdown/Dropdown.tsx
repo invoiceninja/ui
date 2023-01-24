@@ -59,8 +59,17 @@ export function Dropdown(props: Props) {
             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
             {/* @ts-ignore */}
             {children?.map((child, index: number) =>
-              child && child['type'] == DropdownElement
-                ? cloneElement(child, { setVisible, key: index })
+              child &&
+              (child['type'] == DropdownElement || child['type'] == 'div')
+                ? cloneElement(child, {
+                    ...(child['type'] == DropdownElement && {
+                      setVisible,
+                    }),
+                    ...(child['type'] == 'div' && {
+                      onClick: () => setVisible(false),
+                    }),
+                    key: index,
+                  })
                 : child
             )}
           </div>

@@ -121,15 +121,7 @@ export function DataTable<T extends object>(props: Props<T>) {
   }, [perPage, currentPage, filter, sort, status, customFilter]);
 
   const { data, isLoading, isError } = useQuery(
-    [
-      props.endpoint,
-      perPage,
-      currentPage,
-      filter,
-      sort,
-      status,
-      customFilter,
-    ],
+    [props.endpoint, perPage, currentPage, filter, sort, status, customFilter],
     () => request('GET', apiEndpoint.href),
     {
       staleTime: props.staleTime || 5000,
@@ -354,9 +346,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                       {props.customActions &&
                         props.customActions?.map(
                           (action: any, index: number) => (
-                            <React.Fragment key={index}>
-                              {action(resource)}
-                            </React.Fragment>
+                            <div key={index}>{action(resource)}</div>
                           )
                         )}
 
