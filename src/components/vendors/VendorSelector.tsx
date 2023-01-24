@@ -19,6 +19,7 @@ export interface VendorSelectorProps extends GenericSelectorProps<Vendor> {
   initiallyVisible?: boolean;
   setVisible?: Dispatch<SetStateAction<boolean>>;
   setSelectedIds?: Dispatch<SetStateAction<string[]>>;
+  staleTime?: number;
 }
 
 export function VendorSelector(props: VendorSelectorProps) {
@@ -32,21 +33,28 @@ export function VendorSelector(props: VendorSelectorProps) {
         visible={props.initiallyVisible || isModalOpen}
         setVisible={props.setVisible || setIsModalOpen}
         setSelectedIds={props.setSelectedIds}
+        onVendorCreated={(vendor) => props.onChange(vendor)}
       />
 
       {!props.setSelectedIds && (
         <DebouncedCombobox
-          {...props}
+          inputLabel={props.inputLabel}
           value="id"
           endpoint="/api/v1/vendors"
           label="name"
-          defaultValue={props.value}
           onChange={(value: Record<Vendor>) =>
             value.resource && props.onChange(value.resource)
           }
+          defaultValue={props.value}
+          disabled={props.readonly}
+          clearButton={props.clearButton}
+          onClearButtonClick={props.onClearButtonClick}
+          queryAdditional
+          initiallyVisible={props.initiallyVisible}
           actionLabel={t('new_vendor')}
           onActionClick={() => setIsModalOpen(true)}
-          disabled={props.readonly}
+          sortBy="name|asc"
+          staleTime={props.staleTime}
         />
       )}
     </>
