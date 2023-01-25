@@ -12,12 +12,12 @@ import { ApiWebhook } from 'common/interfaces/api-webhook';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
 
-interface HandleChangeExpenseParams {
+interface HandleChangeWebHookParams {
   setApiWebHook: Dispatch<SetStateAction<ApiWebhook | undefined>>;
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
 }
 
-export function useHandleChange(params: HandleChangeExpenseParams) {
+export function useHandleChange(params: HandleChangeWebHookParams) {
   const { setApiWebHook, setErrors } = params;
 
   return <T extends keyof ApiWebhook>(
