@@ -109,21 +109,21 @@ export function TaxSettings() {
           </SelectField>
         </Element>
 
-        <Element
-          leftSide={t('inclusive_taxes')}
-          leftSideHelp={
-            <span className="flex flex-col">
-              <span>{t('exclusive')}: 100 + 10% = 100 + 10</span>
+        <Element leftSide={t('inclusive_taxes')}>
+          <div className="flex items-center space-x-7">
+            <Toggle
+              onChange={(value: boolean) =>
+                handleToggleChange('settings.inclusive_taxes', value)
+              }
+              checked={companyChanges?.settings?.inclusive_taxes || false}
+            />
+
+            {companyChanges?.settings?.inclusive_taxes ? (
               <span>{t('inclusive')}: 100 + 10% = 90.91 + 9.09</span>
-            </span>
-          }
-        >
-          <Toggle
-            onChange={(value: boolean) =>
-              handleToggleChange('settings.inclusive_taxes', value)
-            }
-            checked={companyChanges?.settings?.inclusive_taxes || false}
-          />
+            ) : (
+              <span>{t('exclusive')}: 100 + 10% = 100 + 10</span>
+            )}
+          </div>
         </Element>
       </Card>
 
