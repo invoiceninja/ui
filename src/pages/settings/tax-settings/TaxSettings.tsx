@@ -115,10 +115,10 @@ export function TaxSettings() {
               onChange={(value: boolean) =>
                 handleToggleChange('settings.inclusive_taxes', value)
               }
-              checked={companyChanges?.settings?.inclusive_taxes || false}
+              checked={companyChanges?.settings.inclusive_taxes || false}
             />
 
-            {companyChanges?.settings?.inclusive_taxes ? (
+            {companyChanges?.settings.inclusive_taxes ? (
               <span>{t('inclusive')}: 100 + 10% = 90.91 + 9.09</span>
             ) : (
               <span>{t('exclusive')}: 100 + 10% = 100 + 10</span>
