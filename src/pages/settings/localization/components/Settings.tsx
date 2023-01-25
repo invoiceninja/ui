@@ -60,7 +60,7 @@ export function Settings() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('decimal_comma')}>
+        {/* <Element leftSide={t('decimal_comma')}>
           <Toggle
             checked={company?.settings.use_comma_as_decimal_place}
             onChange={(value: boolean) =>
@@ -73,7 +73,7 @@ export function Settings() {
               )
             }
           />
-        </Element>
+        </Element> */}
 
         <Element leftSide={t('currency_format')}>
           <Radio
