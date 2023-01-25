@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ApiToken } from 'common/interfaces/api-token';
+import { ApiWebhook } from 'common/interfaces/api-webhook';
 import { useBulkAction } from 'common/queries/api-webhooks';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Icon } from 'components/icons/Icon';
@@ -21,7 +21,7 @@ export function useActions() {
 
   const bulk = useBulkAction();
 
-  const actions: Action<ApiToken>[] = [
+  const actions: Action<ApiWebhook>[] = [
     (apiToken) =>
       apiToken.archived_at === 0 && (
         <DropdownElement
