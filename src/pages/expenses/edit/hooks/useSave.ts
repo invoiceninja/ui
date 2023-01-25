@@ -17,6 +17,7 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
 import { useNavigate } from 'react-router-dom';
+import { useHandleCompanySave } from 'pages/settings/common/hooks/useHandleCompanySave';
 
 interface Props {
   setErrors: (errors: ValidationBag | undefined) => unknown;
@@ -24,6 +25,8 @@ interface Props {
 
 export function useSave(params: Props) {
   const queryClient = useQueryClient();
+
+  const handleSaveCompanyChanges = useHandleCompanySave();
 
   const navigate = useNavigate();
 
@@ -40,6 +43,8 @@ export function useSave(params: Props) {
       expense
     )
       .then(() => {
+        handleSaveCompanyChanges();
+
         toast.success('updated_expense');
 
         queryClient.invalidateQueries(

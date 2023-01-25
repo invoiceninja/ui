@@ -19,9 +19,12 @@ import { useQueryClient } from 'react-query';
 import { toast } from 'common/helpers/toast/toast';
 import { useAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../atoms';
+import { useLocation } from 'react-router-dom';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
+
+  const location = useLocation();
 
   const queryClient = useQueryClient();
 
@@ -44,7 +47,8 @@ export function useHandleCompanySave() {
 
         queryClient.invalidateQueries('/api/v1/statics');
 
-        toast.success('updated_settings');
+        !location.pathname.startsWith('/expenses') &&
+          toast.success('updated_settings');
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 422) {

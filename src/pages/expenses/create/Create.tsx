@@ -29,6 +29,7 @@ import { route } from 'common/helpers/route';
 import { useAtom } from 'jotai';
 import { expenseAtom } from '../common/atoms';
 import { useHandleChange } from '../common/hooks';
+import { useHandleCompanySave } from 'pages/settings/common/hooks/useHandleCompanySave';
 
 export function Create() {
   const [t] = useTranslation();
@@ -38,6 +39,8 @@ export function Create() {
   const { documentTitle } = useTitle('new_expense');
 
   const [searchParams] = useSearchParams();
+
+  const handleSaveCompanyChanges = useHandleCompanySave();
 
   const pages = [
     { name: t('expenses'), href: '/expenses' },
@@ -93,6 +96,8 @@ export function Create() {
 
     request('POST', endpoint('/api/v1/expenses'), expense)
       .then((response: GenericSingleResourceResponse<Expense>) => {
+        handleSaveCompanyChanges();
+
         toast.success('created_expense');
 
         navigate(route('/expenses/:id/edit', { id: response.data.data.id }));
