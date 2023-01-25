@@ -12,12 +12,12 @@ import { ApiToken } from 'common/interfaces/api-token';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
 
-interface HandleChangeRecurringExpenseParams {
+interface HandleChangeApiTokenParams {
   setApiToken: Dispatch<SetStateAction<ApiToken | undefined>>;
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
 }
 
-export function useHandleChange(params: HandleChangeRecurringExpenseParams) {
+export function useHandleChange(params: HandleChangeApiTokenParams) {
   const { setApiToken, setErrors } = params;
 
   return <T extends keyof ApiToken>(
