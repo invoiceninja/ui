@@ -14,24 +14,31 @@ import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
+import { ApiWebhook, ApiWebHookHeader } from 'common/interfaces/api-webhook';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useApiWebhookQuery } from 'common/queries/api-webhooks';
 import { Divider } from 'components/cards/Divider';
 import { Settings } from 'components/layouts/Settings';
-import { useFormik } from 'formik';
+import { ResourceActions } from 'components/ResourceActions';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { PlusCircle, X } from 'react-feather';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useHandleChange } from './common/hooks';
+import { useActions } from './common/useActions';
 
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
 
   useTitle('edit_webhook');
+
+  const navigate = useNavigate();
+
+  const actions = useActions();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -103,75 +110,93 @@ export function Edit() {
     { event: EVENT_DELETE_TASK, label: t('delete_task') },
   ];
 
-  const [headers, setHeaders] = useState<Record<string, string>[]>([]);
-  const [header, setHeader] = useState<Record<string, string>>({});
-  const [errors, setErrors] = useState<Record<string, any>>({});
+  const [headers, setHeaders] = useState<ApiWebHookHeader[]>([]);
+  const [header, setHeader] = useState<ApiWebHookHeader>({});
+  const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [apiWebHook, setApiWebHook] = useState<ApiWebhook>();
+
+  const handleChange = useHandleChange({ setApiWebHook, setErrors });
 
   const queryClient = useQueryClient();
-  const { data } = useApiWebhookQuery({ id });
+  const { data: apiWebHookResponse } = useApiWebhookQuery({ id });
+
+  const handleSave = () => {
+    if (apiWebHook && !isFormBusy) {
+      toast.processing();
+      setIsFormBusy(true);
+      setErrors(undefined);
+
+      apiWebHook.headers = headers;
+
+      request('PUT', endpoint('/api/v1/webhooks/:id', { id }), apiWebHook)
+        .then(() => {
+          toast.success('created_webhook');
+
+          queryClient.invalidateQueries('/api/v1/webhooks');
+          queryClient.invalidateQueries(route('/api/v1/webhooks/:id', { id }));
+
+          navigate('/settings/integrations/api_webhooks');
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          } else {
+            toast.error();
+            console.error(error);
+          }
+        })
+        .finally(() => setIsFormBusy(false));
+    }
+  };
 
   useEffect(() => {
-    if (data?.data?.data?.headers) {
-      if (data.data.data.headers instanceof Array) {
-        setHeaders(data.data.data.headers);
+    if (apiWebHookResponse?.headers) {
+      if (apiWebHookResponse.headers instanceof Array) {
+        setHeaders(apiWebHookResponse.headers);
       } else {
-        setHeaders([data.data.data.headers]);
+        setHeaders([apiWebHookResponse.headers]);
       }
     }
-  }, [data]);
+  }, [apiWebHookResponse]);
 
-  const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      target_url: data?.data?.data?.target_url || '',
-      event_id: data?.data?.data.event_id || EVENT_CREATE_CLIENT,
-      rest_method: data?.data?.data?.rest_method || 'post',
-      headers: {},
-    },
-    onSubmit: (values) => {
-      const toastId = toast.loading(t('processing'));
-
-      values.headers = headers;
-
-      request('PUT', endpoint('/api/v1/webhooks/:id', { id }), values)
-        .then(() => toast.success(t('updated_webhook'), { id: toastId }))
-        .catch((error: AxiosError<ValidationBag>) => {
-          toast.dismiss();
-
-          error.response?.status === 422
-            ? setErrors(error.response.data)
-            : toast.error(t('error_title'));
-        })
-        .finally(() => {
-          formik.setSubmitting(false);
-
-          queryClient.invalidateQueries(route('/api/v1/webhooks/:id', { id }));
-        });
-    },
-  });
+  useEffect(() => {
+    if (apiWebHookResponse) {
+      setApiWebHook(apiWebHookResponse);
+    }
+  }, [apiWebHookResponse]);
 
   return (
-    <Settings title={t('api_webhooks')} breadcrumbs={pages}>
-      <Card
-        title={data?.data?.data?.target_url}
-        withSaveButton
-        onFormSubmit={formik.handleSubmit}
-        disableSubmitButton={formik.isSubmitting}
-      >
+    <Settings
+      title={t('api_webhooks')}
+      breadcrumbs={pages}
+      disableSaveButton={!apiWebHook}
+      onSaveClick={handleSave}
+      navigationTopRight={
+        apiWebHook && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={apiWebHook}
+            actions={actions}
+          />
+        )
+      }
+    >
+      <Card title={apiWebHookResponse?.target_url}>
         <Element leftSide={t('target_url')}>
           <InputField
-            id="target_url"
-            onChange={formik.handleChange}
-            errorMessage={errors?.errors?.target_url}
-            value={formik.values.target_url}
+            value={apiWebHook?.target_url}
+            onValueChange={(value) => handleChange('target_url', value)}
+            errorMessage={errors?.errors.target_url}
           />
         </Element>
 
         <Element leftSide={t('event_type')}>
           <SelectField
-            id="event_id"
-            onChange={formik.handleChange}
-            value={formik.values.event_id}
+            value={apiWebHook?.event_id}
+            onValueChange={(value) => handleChange('event_id', value)}
+            errorMessage={errors?.errors.event_id}
           >
             {events.map((event) => (
               <option key={event.event} value={event.event}>
@@ -183,9 +208,9 @@ export function Edit() {
 
         <Element leftSide={t('method')}>
           <SelectField
-            id="rest_method"
-            onChange={formik.handleChange}
-            value={formik.values.rest_method}
+            value={apiWebHook?.rest_method}
+            onValueChange={(value) => handleChange('rest_method', value)}
+            errorMessage={errors?.errors.rest_method}
           >
             <option value="post">POST</option>
             <option value="put">PUT</option>
