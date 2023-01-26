@@ -196,26 +196,31 @@ export function Create() {
 
         <Element leftSide={t('headers')}>
           <div className="flex flex-col">
-            <div className="flex flex-1 justify-between items-center">
-              <InputField
-                debounceTimeout={0}
-                id="header_key"
-                placeholder={t('header_key')}
-                value={header.key || ''}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  setHeader({ ...header, key: event.target.value })
-                }
-              />
+            <div className="flex flex-1 justify-between items-center space-x-6">
+              <div className="flex-1">
+                <InputField
+                  debounceTimeout={0}
+                  id="header_key"
+                  placeholder={t('header_key')}
+                  value={header.key || ''}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    setHeader({ ...header, key: event.target.value })
+                  }
+                />
+              </div>
 
-              <InputField
-                debounceTimeout={0}
-                id="header_value"
-                value={header.value || ''}
-                placeholder={t('header_value')}
-                onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                  setHeader({ ...header, value: event.target.value })
-                }
-              />
+              <div className="flex-1">
+                <InputField
+                  className="flex-1"
+                  debounceTimeout={0}
+                  id="header_value"
+                  value={header.value || ''}
+                  placeholder={t('header_value')}
+                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                    setHeader({ ...header, value: event.target.value })
+                  }
+                />
+              </div>
 
               <Button
                 behavior="button"
