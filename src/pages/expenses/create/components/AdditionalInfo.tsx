@@ -165,7 +165,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
         </Element>
       )}
 
-      {expense && company && (
+      {expense && (
         <Element
           leftSide={t('convert_currency')}
           leftSideHelp={t('convert_expense_currency_help')}
