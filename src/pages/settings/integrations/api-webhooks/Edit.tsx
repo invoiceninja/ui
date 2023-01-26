@@ -19,7 +19,6 @@ import { useTitle } from 'common/hooks/useTitle';
 import { ApiWebhook, ApiWebHookHeader } from 'common/interfaces/api-webhook';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useApiWebhookQuery } from 'common/queries/api-webhooks';
-import { Divider } from 'components/cards/Divider';
 import { Settings } from 'components/layouts/Settings';
 import { ResourceActions } from 'components/ResourceActions';
 import { ChangeEvent, useEffect, useState } from 'react';
@@ -217,36 +216,34 @@ export function Edit() {
           </SelectField>
         </Element>
 
-        <Divider />
+        <Element leftSide={t('headers')}>
+          <div className="flex flex-col">
+            <div className="flex flex-1 justify-between items-center">
+              <InputField
+                debounceTimeout={0}
+                id="header_key"
+                placeholder={t('header_key')}
+                value={header.key || ''}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setHeader({ ...header, key: event.target.value })
+                }
+              />
 
-        <Element
-          leftSide={
-            <InputField
-              debounceTimeout={0}
-              id="header_key"
-              placeholder={t('header_key')}
-              value={header.key || ''}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setHeader({ ...header, key: event.target.value })
-              }
-            />
-          }
-        >
-          <div className="inline-flex items-center space-x-4">
-            <InputField
-              debounceTimeout={0}
-              id="header_value"
-              value={header.value || ''}
-              placeholder={t('header_value')}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setHeader({ ...header, value: event.target.value })
-              }
-            />
+              <InputField
+                debounceTimeout={0}
+                id="header_value"
+                value={header.value || ''}
+                placeholder={t('header_value')}
+                onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                  setHeader({ ...header, value: event.target.value })
+                }
+              />
 
-            {header.key && header.value && (
               <Button
                 behavior="button"
                 type="minimal"
+                disableWithoutIcon
+                disabled={Boolean(!header.key) || Boolean(!header.value)}
                 onClick={() => {
                   setHeaders((headers) => [
                     ...headers,
@@ -258,39 +255,47 @@ export function Edit() {
               >
                 <PlusCircle />
               </Button>
+            </div>
+
+            <div className="flex flex-col space-y-5 pt-5">
+              {headers.map((header, index) => (
+                <div
+                  key={index}
+                  className="flex justify-between items-center space-x-4"
+                >
+                  <span className="flex-1 text-start">
+                    {Object.keys(header)[0]}
+                  </span>
+
+                  <span className="flex-1 text-start">
+                    {header[Object.keys(header)[0]]}
+                  </span>
+
+                  <Button
+                    behavior="button"
+                    type="minimal"
+                    onClick={() => {
+                      setHeaders((headers) =>
+                        headers.filter(
+                          (entry) =>
+                            Object.keys(entry)[0] !== Object.keys(header)[0]
+                        )
+                      );
+                    }}
+                  >
+                    <X size={18} />
+                  </Button>
+                </div>
+              ))}
+            </div>
+
+            {!headers.length && (
+              <span className="text-gray-500 self-center text-xl">
+                {t('no_headers')}
+              </span>
             )}
           </div>
         </Element>
-
-        <Divider />
-
-        {headers.length === 0 && (
-          <Element>
-            <span className="text-gray-600">{t('no_headers')}</span>
-          </Element>
-        )}
-
-        {headers.map((header, index) => (
-          <Element key={index} leftSide={Object.keys(header)[0]}>
-            <div className="flex items-center space-x-4">
-              <span>{header[Object.keys(header)[0]]}</span>
-              <Button
-                behavior="button"
-                type="minimal"
-                onClick={() => {
-                  setHeaders((headers) =>
-                    headers.filter(
-                      (entry) =>
-                        Object.keys(entry)[0] !== Object.keys(header)[0]
-                    )
-                  );
-                }}
-              >
-                <X size={18} />
-              </Button>
-            </div>
-          </Element>
-        ))}
       </Card>
     </Settings>
   );
