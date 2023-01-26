@@ -156,7 +156,11 @@ export function Edit() {
             </Element>
 
             <Element leftSide={t('token')}>
-              <CopyToClipboard className="break-all" text={apiToken.token} />
+              <CopyToClipboard
+                secure
+                className="break-all"
+                text={apiToken.token}
+              />
             </Element>
 
             <Element leftSide={t('created_on')}>
