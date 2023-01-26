@@ -10,10 +10,9 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
-import { updateChanges } from 'common/stores/slices/company-users';
 import { CurrencySelector } from 'components/CurrencySelector';
 import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
 import Toggle from 'components/forms/Toggle';
@@ -22,21 +21,26 @@ import dayjs from 'dayjs';
 import { useResolveCurrencySeparator } from 'pages/transactions/common/hooks/useResolveCurrencySeparator';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
 import { ExpenseCardProps } from './Details';
 
 export function AdditionalInfo(props: ExpenseCardProps) {
   const [t] = useTranslation();
   const { expense, handleChange } = props;
-  const dispatch = useDispatch();
 
-  const company = useCompanyChanges();
+  const company = useCurrentCompany();
   const resolveCurrency = useResolveCurrency();
-
   const resolveCurrencySeparator = useResolveCurrencySeparator();
 
   const [currencySeparators, setCurrencySeparators] =
-    useState<DecimalInputSeparators>();
+    useState<DecimalInputSeparators>({
+      decimalSeparator: ',',
+      precision: 2,
+      thousandSeparator: '.',
+    });
+
+  const [convertCurrency, setConvertCurrency] = useState<boolean>(
+    Boolean(company?.convert_expense_currency)
+  );
 
   const isMarkPaid = () => {
     return (
@@ -59,7 +63,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
   };
 
   const onAmountChange = () => {
-    if (!company?.convert_expense_currency) {
+    if (!currencySeparators) {
       handleChange('invoice_currency_id', '');
       handleChange('exchange_rate', 0);
       handleChange('foreign_amount', 0);
@@ -70,15 +74,6 @@ export function AdditionalInfo(props: ExpenseCardProps) {
     handleChange('exchange_rate', 1);
     handleChange('foreign_amount', expense!.amount);
   };
-
-  const handleToggleChange = (id: string, value: boolean) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: id,
-        value,
-      })
-    );
 
   const onExchangeRateChange = (rate: string) => {
     handleChange('exchange_rate', parseFloat(rate) || 1);
@@ -106,8 +101,6 @@ export function AdditionalInfo(props: ExpenseCardProps) {
         const resolvedCurrencySeparator = resolveCurrencySeparator(
           resolvedCurrency.id
         );
-
-        console.log(resolvedCurrencySeparator);
 
         if (resolvedCurrencySeparator) {
           setCurrencySeparators(resolvedCurrencySeparator);
@@ -178,15 +171,13 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           leftSideHelp={t('convert_expense_currency_help')}
         >
           <Toggle
-            checked={company.convert_expense_currency}
-            onChange={(value: boolean) =>
-              handleToggleChange('convert_expense_currency', value)
-            }
+            checked={convertCurrency}
+            onChange={(value: boolean) => setConvertCurrency(value)}
           />
         </Element>
       )}
 
-      {expense && company?.convert_expense_currency && (
+      {expense && convertCurrency && (
         <>
           <Element leftSide={t('currency')}>
             <CurrencySelector
@@ -197,23 +188,21 @@ export function AdditionalInfo(props: ExpenseCardProps) {
 
           <Element leftSide={t('exchange_rate')}>
             <InputField
-              value={expense.exchange_rate}
+              value={expense.exchange_rate.toFixed(2)}
               onValueChange={(value) => onExchangeRateChange(value)}
             />
           </Element>
 
-          {currencySeparators && (
-            <Element leftSide={t('converted_amount')}>
-              <DecimalNumberInput
-                border
-                precision={currencySeparators.precision}
-                currency={currencySeparators}
-                className="auto"
-                value={expense.foreign_amount.toString()}
-                onChange={onConvertedAmountChange}
-              />
-            </Element>
-          )}
+          <Element leftSide={t('converted_amount')}>
+            <DecimalNumberInput
+              border
+              precision={currencySeparators?.precision || 2}
+              currency={currencySeparators}
+              className="auto"
+              initialValue={(expense.foreign_amount || 0).toString()}
+              onChange={onConvertedAmountChange}
+            />
+          </Element>
         </>
       )}
 
