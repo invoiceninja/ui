@@ -43,6 +43,7 @@ import { QuickCreatePopover } from 'components/QuickCreatePopover';
 import { isHosted, isSelfHosted } from 'common/helpers';
 import { freePlan } from 'common/guards/guards/free-plan';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
 
 interface Props extends CommonProps {
   title?: string | null;
@@ -63,6 +64,14 @@ export function Default(props: Props) {
 
   const whiteLabelLink = import.meta.env
     .VITE_WHITELABEL_INVOICE_URL as unknown as string;
+
+  const account = useCurrentAccount();
+
+  const shouldShowUnlockButton =
+    (isHosted() && freePlan()) ||
+    (isSelfHosted() &&
+      ((account?.plan && new Date(account?.plan_expires) < new Date()) ||
+        !account?.plan));
 
   const isMiniSidebar = useSelector(
     (state: RootState) => state.settings.isMiniSidebar
@@ -327,7 +336,7 @@ export function Default(props: Props) {
               </div>
 
               <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
-                {((isHosted() && freePlan()) || isSelfHosted()) && (
+                {shouldShowUnlockButton && (
                   <button
                     className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
                     onClick={() =>
