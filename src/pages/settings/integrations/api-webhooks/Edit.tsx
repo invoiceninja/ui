@@ -21,7 +21,7 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useApiWebhookQuery } from 'common/queries/api-webhooks';
 import { Settings } from 'components/layouts/Settings';
 import { ResourceActions } from 'components/ResourceActions';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PlusCircle, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -121,7 +121,7 @@ export function Edit() {
   const { data: apiWebHookResponse } = useApiWebhookQuery({ id });
 
   const handleRemoveHeader = (key: string) => {
-    if (apiWebHook && Object.hasOwn(headers, key)) {
+    if (Object.hasOwn(headers, key)) {
       const updatedHeaders = { ...headers };
 
       delete updatedHeaders[key];
@@ -184,8 +184,9 @@ export function Edit() {
       }
     >
       <Card title={apiWebHookResponse?.target_url}>
-        <Element leftSide={t('target_url')}>
+        <Element leftSide={t('target_url')} required>
           <InputField
+            required
             value={apiWebHook?.target_url}
             onValueChange={(value) => handleChange('target_url', value)}
             errorMessage={errors?.errors.target_url}
@@ -226,8 +227,8 @@ export function Edit() {
                   id="header_key"
                   placeholder={t('header_key')}
                   value={header.key || ''}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                    setHeader({ ...header, key: event.target.value })
+                  onValueChange={(value) =>
+                    setHeader({ ...header, key: value })
                   }
                 />
               </div>
@@ -238,9 +239,7 @@ export function Edit() {
                   id="header_value"
                   value={header.value || ''}
                   placeholder={t('header_value')}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                    setHeader({ ...header, value: event.target.value })
-                  }
+                  onValueChange={(value) => setHeader({ ...header, value })}
                 />
               </div>
 

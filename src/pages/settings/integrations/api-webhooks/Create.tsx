@@ -21,7 +21,7 @@ import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-res
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankApiWebhookQuery } from 'common/queries/api-webhooks';
 import { Settings } from 'components/layouts/Settings';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PlusCircle, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -111,7 +111,7 @@ export function Create() {
   const handleChange = useHandleChange({ setApiWebHook, setErrors });
 
   const handleRemoveHeader = (key: string) => {
-    if (apiWebHook && Object.hasOwn(headers, key)) {
+    if (Object.hasOwn(headers, key)) {
       const updatedHeaders = { ...headers };
 
       delete updatedHeaders[key];
@@ -213,8 +213,8 @@ export function Create() {
                   id="header_key"
                   placeholder={t('header_key')}
                   value={header.key || ''}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                    setHeader({ ...header, key: event.target.value })
+                  onValueChange={(value) =>
+                    setHeader({ ...header, key: value })
                   }
                 />
               </div>
@@ -226,9 +226,7 @@ export function Create() {
                   id="header_value"
                   value={header.value || ''}
                   placeholder={t('header_value')}
-                  onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                    setHeader({ ...header, value: event.target.value })
-                  }
+                  onValueChange={(value) => setHeader({ ...header, value })}
                 />
               </div>
 
