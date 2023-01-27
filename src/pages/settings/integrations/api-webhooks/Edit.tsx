@@ -216,7 +216,7 @@ export function Edit() {
           </SelectField>
         </Element>
 
-        <Element leftSide={t('headers')}>
+        <Element leftSide={t('add_header')}>
           <div className="flex flex-col">
             <div className="flex flex-1 justify-between items-center space-x-6">
               <div className="flex-1">
