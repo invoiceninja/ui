@@ -28,7 +28,7 @@ import { blankLineItem } from 'common/constants/blank-line-item';
 import { Divider } from 'components/cards/Divider';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Action } from 'components/ResourceActions';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { invoiceAtom } from 'pages/invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -57,6 +57,7 @@ import {
   MdPictureAsPdf,
   MdStopCircle,
 } from 'react-icons/md';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -217,6 +218,7 @@ export function useSave(props: RecurringInvoiceSaveProps) {
 
 export function useToggleStartStop() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (recurringInvoice: RecurringInvoice, action: 'start' | 'stop') => {
     toast.processing();
@@ -235,6 +237,9 @@ export function useToggleStartStop() {
             id: recurringInvoice.id,
           })
         );
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
 
         toast.success(
           action === 'start'

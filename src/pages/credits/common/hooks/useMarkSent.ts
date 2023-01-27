@@ -8,12 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { Credit } from 'common/interfaces/credit';
+import { useAtomValue } from 'jotai';
+import { useQueryClient } from 'react-query';
 
 export function useMarkSent() {
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
   return (credit: Credit) => {
     toast.processing();
 
@@ -23,6 +29,9 @@ export function useMarkSent() {
       credit
     )
       .then(() => {
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
+
         toast.success('updated_credit');
       })
       .catch((error) => {
