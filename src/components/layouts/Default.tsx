@@ -40,6 +40,9 @@ import { AiOutlineBank } from 'react-icons/ai';
 import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 import { QuickCreatePopover } from 'components/QuickCreatePopover';
+import { isHosted, isSelfHosted } from 'common/helpers';
+import { freePlan } from 'common/guards/guards/free-plan';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 
 interface Props extends CommonProps {
   title?: string | null;
@@ -58,11 +61,15 @@ interface Props extends CommonProps {
 export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const whiteLabelLink = import.meta.env
+    .VITE_WHITELABEL_INVOICE_URL as unknown as string;
+
   const isMiniSidebar = useSelector(
     (state: RootState) => state.settings.isMiniSidebar
   );
 
   const [t] = useTranslation();
+  const user = useCurrentUser();
 
   const hasPermission = useHasPermission();
   const location = useLocation();
@@ -320,6 +327,24 @@ export function Default(props: Props) {
               </div>
 
               <div className="ml-4 flex items-center md:ml-6 space-x-2 lg:space-x-3">
+                {((isHosted() && freePlan()) || isSelfHosted()) && (
+                  <button
+                    className="inline-flex items-center justify-center py-2 px-4 rounded text-sm text-white bg-green-500 hover:bg-green-600"
+                    onClick={() =>
+                      window.open(
+                        isSelfHosted()
+                          ? whiteLabelLink
+                          : user?.company_user?.ninja_portal_url,
+                        '_blank'
+                      )
+                    }
+                  >
+                    <span>
+                      {isSelfHosted() ? t('upgrade') : t('unlock_pro')}
+                    </span>
+                  </button>
+                )}
+
                 {props.onCancelClick && (
                   <Button onClick={props.onCancelClick} type="secondary">
                     {t('cancel')}
