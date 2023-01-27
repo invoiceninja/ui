@@ -17,7 +17,7 @@ export interface ApiWebhook {
   company_id: string;
   event_id: string;
   format: string;
-  headers: ApiWebHookHeader[];
+  headers: ApiWebHookHeader;
   rest_method: string;
   target_url: string;
   user_id: string;

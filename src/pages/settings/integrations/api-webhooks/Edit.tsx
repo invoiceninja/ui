@@ -109,7 +109,7 @@ export function Edit() {
     { event: EVENT_DELETE_TASK, label: t('delete_task') },
   ];
 
-  const [headers, setHeaders] = useState<ApiWebHookHeader[]>([]);
+  const [headers, setHeaders] = useState<ApiWebHookHeader>({});
   const [header, setHeader] = useState<ApiWebHookHeader>({});
   const [errors, setErrors] = useState<ValidationBag>();
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
@@ -119,6 +119,16 @@ export function Edit() {
 
   const queryClient = useQueryClient();
   const { data: apiWebHookResponse } = useApiWebhookQuery({ id });
+
+  const handleRemoveHeader = (key: string) => {
+    if (apiWebHook && Object.hasOwn(headers, key)) {
+      const updatedHeaders = { ...headers };
+
+      delete updatedHeaders[key];
+
+      setHeaders(updatedHeaders);
+    }
+  };
 
   const handleSave = () => {
     if (apiWebHook && !isFormBusy) {
@@ -151,18 +161,9 @@ export function Edit() {
   };
 
   useEffect(() => {
-    if (apiWebHookResponse?.headers) {
-      if (apiWebHookResponse.headers instanceof Array) {
-        setHeaders(apiWebHookResponse.headers);
-      } else {
-        setHeaders([apiWebHookResponse.headers]);
-      }
-    }
-  }, [apiWebHookResponse]);
-
-  useEffect(() => {
     if (apiWebHookResponse) {
       setApiWebHook(apiWebHookResponse);
+      setHeaders(apiWebHookResponse.headers);
     }
   }, [apiWebHookResponse]);
 
@@ -249,10 +250,10 @@ export function Edit() {
                 disableWithoutIcon
                 disabled={Boolean(!header.key) || Boolean(!header.value)}
                 onClick={() => {
-                  setHeaders((headers) => [
+                  setHeaders((headers) => ({
                     ...headers,
-                    { [header.key]: header.value },
-                  ]);
+                    [header.key]: header.value,
+                  }));
 
                   setHeader({});
                 }}
@@ -262,42 +263,31 @@ export function Edit() {
             </div>
 
             <div className="flex flex-col space-y-5 pt-5">
-              {headers.map((header, index) => (
+              {Object.entries(headers).map(([key, value], index) => (
                 <div
                   key={index}
                   className="flex justify-between items-center space-x-4"
                 >
-                  <span className="flex-1 text-start">
-                    {Object.keys(header)[0]}
-                  </span>
+                  <span className="flex-1 text-start">{key}</span>
 
-                  <span className="flex-1 text-start">
-                    {header[Object.keys(header)[0]]}
-                  </span>
+                  <span className="flex-1 text-start">{value}</span>
 
                   <Button
                     behavior="button"
                     type="minimal"
-                    onClick={() => {
-                      setHeaders((headers) =>
-                        headers.filter(
-                          (entry) =>
-                            Object.keys(entry)[0] !== Object.keys(header)[0]
-                        )
-                      );
-                    }}
+                    onClick={() => handleRemoveHeader(key)}
                   >
                     <X size={18} />
                   </Button>
                 </div>
               ))}
-            </div>
 
-            {!headers.length && (
-              <span className="text-gray-500 self-center text-xl">
-                {t('no_headers')}
-              </span>
-            )}
+              {!Object.entries(headers).length && (
+                <span className="text-gray-500 self-center text-xl">
+                  {t('no_headers')}
+                </span>
+              )}
+            </div>
           </div>
         </Element>
       </Card>
