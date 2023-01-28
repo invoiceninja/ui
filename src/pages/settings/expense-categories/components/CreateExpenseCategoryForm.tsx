@@ -32,6 +32,7 @@ interface ExpenseCategoryInput {
 interface Props {
   setVisible?: Dispatch<SetStateAction<boolean>>;
   setSelectedIds?: Dispatch<SetStateAction<string[]>>;
+  onCreatedCategory?: (category: ExpenseCategory) => unknown;
 }
 
 export function CreateExpenseCategoryForm(props: Props) {
@@ -84,6 +85,10 @@ export function CreateExpenseCategoryForm(props: Props) {
 
           if (props.setSelectedIds) {
             props.setSelectedIds([response.data.data.id]);
+          }
+
+          if (props.onCreatedCategory) {
+            props.onCreatedCategory(response.data.data);
           }
 
           if (props.setVisible) {

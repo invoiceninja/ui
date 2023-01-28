@@ -40,10 +40,6 @@ export function CompanySwitcher() {
 
   const canUserAddCompany = isSelfHosted() || (isHosted() && !freePlan());
 
-  const isCompanyEditAlreadyOpened = localStorage.getItem(
-    'COMPANY-EDIT-OPENED'
-  );
-
   const dispatch = useDispatch();
 
   const queryClient = useQueryClient();
@@ -76,6 +72,8 @@ export function CompanySwitcher() {
 
     localStorage.setItem('COMPANY-EDIT-OPENED', 'false');
 
+    sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'false');
+
     queryClient.invalidateQueries();
 
     window.location.href = route('/');
@@ -89,16 +87,18 @@ export function CompanySwitcher() {
     if (isDemo()) {
       setShouldShowAddCompany(false);
     }
+  }, [currentCompany]);
 
+  useEffect(() => {
     if (
       currentCompany &&
       currentCompany?.settings?.name.includes(t('untitled')) &&
-      isCompanyEditAlreadyOpened !== 'true'
+      localStorage.getItem('COMPANY-EDIT-OPENED') !== 'true'
     ) {
       localStorage.setItem('COMPANY-EDIT-OPENED', 'true');
       setIsCompanyEditModalOpened(true);
     }
-  }, [currentCompany]);
+  }, []);
 
   return (
     <>
@@ -149,7 +149,8 @@ export function CompanySwitcher() {
                     <DropdownElement onClick={() => switchCompany(index)}>
                       <div className="flex items-center space-x-3">
                         <span>
-                          {record.company.settings.name || t('new_company')}
+                          {record.company.settings.name ||
+                            t('untitled_company')}
                         </span>
 
                         {state.currentIndex === index && <Check size={18} />}

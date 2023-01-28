@@ -371,7 +371,7 @@ export function useActions() {
         onClick={() => cloneToCredit(credit)}
         icon={<Icon element={MdControlPointDuplicate} />}
       >
-        {t('clone_to_credit')}
+        {t('clone')}
       </DropdownElement>
     ),
     (credit) => (

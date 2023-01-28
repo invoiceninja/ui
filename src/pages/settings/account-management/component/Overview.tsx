@@ -36,9 +36,9 @@ export function Overview() {
         leftSideHelp={t('activate_company_help')}
       >
         <Toggle
-          checked={company?.is_disabled}
+          checked={!company?.is_disabled}
           onChange={(value: boolean) =>
-            handleToggleChange('is_disabled', value)
+            handleToggleChange('is_disabled', !value)
           }
         />
       </Element>

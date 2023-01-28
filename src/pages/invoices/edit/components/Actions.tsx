@@ -126,6 +126,14 @@ export function useActions() {
     ),
     (invoice: Invoice) => (
       <DropdownElement
+        to={route('/invoices/:id/pdf?delivery_note=true', { id: invoice.id })}
+        icon={<Icon element={MdPictureAsPdf} />}
+      >
+        {t('delivery_note')} ({t('pdf')})
+      </DropdownElement>
+    ),
+    (invoice: Invoice) => (
+      <DropdownElement
         onClick={() => downloadPdf(invoice)}
         icon={<Icon element={MdDownload} />}
       >
@@ -187,7 +195,7 @@ export function useActions() {
         onClick={() => cloneToInvoice(invoice)}
         icon={<Icon element={MdControlPointDuplicate} />}
       >
-        {t('clone_to_invoice')}
+        {t('clone')}
       </DropdownElement>
     ),
     (invoice: Invoice) => (

@@ -9,6 +9,7 @@
  */
 
 import { blankInvitation } from 'common/constants/blank-invitation';
+import { isProduction } from 'common/helpers';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
@@ -108,7 +109,7 @@ export function Create() {
     }
 
     return () => {
-      setRecurringInvoice(undefined);
+      isProduction() && setRecurringInvoice(undefined);
     };
   }, [data]);
 
@@ -156,7 +157,7 @@ export function Create() {
           errorMessage={errors?.errors.client_id}
         />
 
-        <InvoiceDetails handleChange={handleChange} />
+        <InvoiceDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
           {recurringInvoice && client ? (

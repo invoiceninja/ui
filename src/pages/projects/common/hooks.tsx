@@ -9,17 +9,31 @@
  */
 
 import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
+import { EntityState } from 'common/enums/entity-state';
+import { date, getEntityState } from 'common/helpers';
 import { route } from 'common/helpers/route';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Project } from 'common/interfaces/project';
+import { Divider } from 'components/cards/Divider';
 import { customField } from 'components/CustomField';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
+import { Icon } from 'components/icons/Icon';
+import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
+import {
+  MdArchive,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdRestore,
+} from 'react-icons/md';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { projectAtom } from './atoms';
+import { useBulkAction } from './hooks/useBulkAction';
 
 export const projectColumns = [
   'name',
@@ -199,4 +213,70 @@ export function useProjectColumns() {
   return columns
     .filter((column) => list.includes(column.column))
     .sort((a, b) => list.indexOf(a.column) - list.indexOf(b.column));
+}
+
+export function useActions() {
+  const [t] = useTranslation();
+
+  const location = useLocation();
+
+  const navigate = useNavigate();
+
+  const bulk = useBulkAction();
+
+  const isEditPage = location.pathname.endsWith('/edit');
+
+  const setProject = useUpdateAtom(projectAtom);
+
+  const cloneToProject = (project: Project) => {
+    setProject({ ...project, id: '', documents: [], number: '' });
+
+    navigate('/projects/create');
+  };
+
+  const actions = [
+    (project: Project) => (
+      <DropdownElement
+        onClick={() => cloneToProject(project)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
+        {t('clone')}
+      </DropdownElement>
+    ),
+    () => isEditPage && <Divider withoutPadding />,
+    (project: Project) =>
+      getEntityState(project) === EntityState.Active &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => bulk(project.id, 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (project: Project) =>
+      (getEntityState(project) === EntityState.Archived ||
+        getEntityState(project) === EntityState.Deleted) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => bulk(project.id, 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (project: Project) =>
+      (getEntityState(project) === EntityState.Active ||
+        getEntityState(project) === EntityState.Archived) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => bulk(project.id, 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
+  ];
+
+  return actions;
 }

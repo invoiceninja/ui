@@ -17,7 +17,6 @@ import { useInvoiceTask } from 'pages/tasks/common/hooks/useInvoiceTask';
 import { useStart } from 'pages/tasks/common/hooks/useStart';
 import { useStop } from 'pages/tasks/common/hooks/useStop';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
 import { Icon } from 'components/icons/Icon';
 import {
   MdArchive,
@@ -28,6 +27,9 @@ import {
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
+import { useUpdateAtom } from 'jotai/utils';
+import { taskAtom } from 'pages/tasks/common/atoms';
+import { useNavigate } from 'react-router-dom';
 
 interface Props {
   task: Task;
@@ -37,10 +39,20 @@ export function Actions(props: Props) {
   const { task } = props;
   const [t] = useTranslation();
 
+  const navigate = useNavigate();
+
   const start = useStart();
   const stop = useStop();
   const bulk = useBulkAction();
   const invoiceTask = useInvoiceTask();
+
+  const setTask = useUpdateAtom(taskAtom);
+
+  const cloneToTask = () => {
+    setTask({ ...task, id: '', documents: [], number: '' });
+
+    navigate('/tasks/create');
+  };
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
@@ -63,13 +75,6 @@ export function Actions(props: Props) {
           </DropdownElement>
         )}
 
-        <DropdownElement
-          to={route('/tasks/:id/clone', { id: task.id })}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone')}
-        </DropdownElement>
-
         {!isTaskRunning(task) && !task.invoice_id && (
           <DropdownElement
             onClick={() => invoiceTask([task])}
@@ -78,6 +83,13 @@ export function Actions(props: Props) {
             {t('invoice_task')}
           </DropdownElement>
         )}
+
+        <DropdownElement
+          onClick={cloneToTask}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
       </div>
 
       <div>

@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ExpenseCategory } from 'common/interfaces/expense-category';
 import { Modal } from 'components/Modal';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,6 +18,7 @@ interface Props {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
   setSelectedIds?: Dispatch<SetStateAction<string[]>>;
+  onCreatedCategory: (category: ExpenseCategory) => unknown;
 }
 
 export function CreateExpenseCategoryModal(props: Props) {
@@ -31,6 +33,7 @@ export function CreateExpenseCategoryModal(props: Props) {
       <CreateExpenseCategoryForm
         setSelectedIds={props.setSelectedIds}
         setVisible={props.setVisible}
+        onCreatedCategory={props.onCreatedCategory}
       />
     </Modal>
   );

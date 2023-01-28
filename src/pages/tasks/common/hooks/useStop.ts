@@ -26,18 +26,27 @@ export function useStop() {
       endpoint('/api/v1/tasks/:id?stop=true', { id: task.id }),
       task
     )
-      .then(() => toast.success('stopped_task'))
-      .catch((error) => {
-        console.error(error);
+      .then(() => {
+        toast.success('stopped_task');
 
-        toast.error();
-      })
-      .finally(() => {
         queryClient.invalidateQueries('/api/v1/tasks');
 
         queryClient.invalidateQueries(
           route('/api/v1/tasks/:id', { id: task.id })
         );
+
+        queryClient.invalidateQueries('/api/v1/tasks?per_page=1000');
+
+        queryClient.invalidateQueries(
+          route('/api/v1/tasks?project_tasks=:projectId&per_page=1000', {
+            projectId: task.project_id,
+          })
+        );
+      })
+      .catch((error) => {
+        console.error(error);
+
+        toast.error();
       });
   };
 }

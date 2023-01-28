@@ -14,6 +14,24 @@ import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 
+interface BlankQueryParams {
+  refetchOnWindowFocus?: boolean;
+}
+
+export function useBlankClientQuery(params: BlankQueryParams) {
+  return useQuery(
+    '/api/v1/clients/create',
+    () =>
+      request('GET', endpoint('/api/v1/clients/create')).then(
+        (response) => response.data.data
+      ),
+    {
+      refetchOnWindowFocus: Boolean(params.refetchOnWindowFocus),
+      staleTime: Infinity,
+    }
+  );
+}
+
 interface Props {
   enabled?: boolean;
 }

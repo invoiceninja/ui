@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isProduction } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
@@ -23,6 +24,7 @@ import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
 import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { purchaseOrderAtom } from '../common/atoms';
 import { useCreate } from '../common/hooks';
@@ -39,6 +41,8 @@ import { useHandleProductChange } from '../edit/hooks/useHandleProductChange';
 export function Create() {
   const { documentTitle } = useTitle('new_purchase_order');
   const { t } = useTranslation();
+
+  const [searchParams] = useSearchParams();
 
   const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
@@ -72,7 +76,19 @@ export function Create() {
       setPurchaseOrder(po);
     }
 
-    return () => setPurchaseOrder(undefined);
+    if (searchParams.has('vendor')) {
+      setPurchaseOrder(
+        (current) =>
+          current && {
+            ...current,
+            vendor_id: searchParams.get('vendor') as string,
+          }
+      );
+    }
+
+    return () => {
+      isProduction() && setPurchaseOrder(undefined);
+    };
   }, [data]);
 
   const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();

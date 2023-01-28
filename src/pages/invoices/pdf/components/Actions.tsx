@@ -16,36 +16,57 @@ import { DropdownElement } from 'components/dropdown/DropdownElement';
 import Toggle from 'components/forms/Toggle';
 import { Icon } from 'components/icons/Icon';
 import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDownload, MdSend } from 'react-icons/md';
 import { useParams } from 'react-router-dom';
 
 interface Props {
   blobUrl: string;
+  deliveryNote: boolean;
+  setDeliveryNote: Dispatch<SetStateAction<boolean>>;
   onHandleDeliveryNote: (url: string, isDeliveryNote: boolean) => unknown;
   invoice: Invoice;
 }
 
 export function Actions(props: Props) {
   const [t] = useTranslation();
+
   const { id } = useParams();
+
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
 
-  const handleDeliveryNoteChange = (value: boolean) =>
+  const {
+    deliveryNote,
+    setDeliveryNote,
+    blobUrl,
+    invoice,
+    onHandleDeliveryNote,
+  } = props;
+
+  const handleDeliveryNoteChange = (value: boolean) => {
+    setDeliveryNote(value);
+
     value
-      ? props.onHandleDeliveryNote(
+      ? onHandleDeliveryNote(
           endpoint('/api/v1/invoices/:id/delivery_note?per_page=999999', {
             id,
           }),
           true
         )
-      : props.onHandleDeliveryNote(props.blobUrl, false);
+      : onHandleDeliveryNote(blobUrl, false);
+  };
+
+  useEffect(() => {
+    handleDeliveryNoteChange(deliveryNote);
+  }, []);
 
   return (
     <>
       <span className="inline-flex items-center">
         <Toggle
           label={t('delivery_note')}
+          checked={deliveryNote}
           onChange={handleDeliveryNoteChange}
         />
       </span>
@@ -59,7 +80,7 @@ export function Actions(props: Props) {
         </DropdownElement>
 
         <DropdownElement
-          onClick={() => downloadPdf(props.invoice)}
+          onClick={() => downloadPdf(invoice)}
           icon={<Icon element={MdDownload} />}
         >
           {t('download')}

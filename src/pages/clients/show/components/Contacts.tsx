@@ -13,6 +13,7 @@ import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
 import { InfoCard } from 'components/InfoCard';
 import { useTranslation } from 'react-i18next';
+import { CopyToClipboard } from 'components/CopyToClipboard';
 
 interface Props {
   client: Client;
@@ -43,7 +44,7 @@ export function Contacts(props: Props) {
                         {contact.first_name} {contact.last_name}
                       </p>
 
-                      <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                      <CopyToClipboard text={contact.email} />
                     </div>
                   )
                 )}

@@ -366,7 +366,7 @@ export function Default(props: Props) {
               </div>
             )}
 
-            <div className="p-4 md:p-8 dark:text-gray-100">
+            <div className="p-4 md:py-8 xl:p-8 dark:text-gray-100">
               {props.children}
             </div>
           </main>

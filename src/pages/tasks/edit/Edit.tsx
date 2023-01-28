@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
@@ -16,6 +16,7 @@ import { toast } from 'common/helpers/toast/toast';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useTaskQuery } from 'common/queries/tasks';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { Default } from 'components/layouts/Default';
@@ -34,6 +35,8 @@ export function Edit() {
   const { data } = useTaskQuery({ id });
 
   const [task, setTask] = useState<Task>();
+
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const queryClient = useQueryClient();
   const company = useInjectCompanyChanges();
@@ -72,10 +75,14 @@ export function Edit() {
           updateRecord({ object: 'company', data: response[1].data.data })
         );
       })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       })
       .finally(() =>
         queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id }))
@@ -89,7 +96,9 @@ export function Edit() {
       navigationTopRight={task && <Actions task={task} />}
       onSaveClick={() => task && handleSave(task)}
     >
-      {task && <TaskDetails task={task} handleChange={handleChange} />}
+      {task && (
+        <TaskDetails task={task} handleChange={handleChange} errors={errors} />
+      )}
       {task && <TaskTable task={task} handleChange={handleChange} />}
     </Default>
   );

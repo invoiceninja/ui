@@ -118,7 +118,7 @@ export function Edit() {
           readonly
         />
 
-        <CreditDetails handleChange={handleChange} />
+        <CreditDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
           {credit ? (

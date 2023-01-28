@@ -32,7 +32,7 @@ import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
 import Toggle from 'components/forms/Toggle';
 import { Default } from 'components/layouts/Default';
 import { ValidationAlert } from 'components/ValidationAlert';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -188,19 +188,19 @@ export function Create() {
   const onSubmit = useSave(setErrors);
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onSaveClick={(event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        onSubmit(payment as unknown as Payment, sendEmail);
+      }}
+      disableSaveButton={!payment}
+    >
       <Container>
         {errors && <ValidationAlert errors={errors} />}
 
-        <Card
-          title={t('enter_payment')}
-          onFormSubmit={(event) => {
-            event.preventDefault();
-
-            payment && onSubmit(payment as unknown as Payment, sendEmail);
-          }}
-          withSaveButton
-        >
+        <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
             <DebouncedCombobox
               endpoint="/api/v1/clients"
@@ -225,7 +225,7 @@ export function Create() {
               onValueChange={(value) =>
                 handleChange('amount', parseFloat(value))
               }
-              errorMessage={errors?.errors.payment_amount}
+              errorMessage={errors?.errors.amount}
             />
           </Element>
 

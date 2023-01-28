@@ -17,6 +17,8 @@ import { useTranslation } from 'react-i18next';
 
 export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   initiallyVisible?: boolean;
+  withoutAction?: boolean;
+  staleTime?: number;
 }
 
 export function ClientSelector(props: ClientSelectorProps) {
@@ -44,10 +46,10 @@ export function ClientSelector(props: ClientSelectorProps) {
         onClearButtonClick={props.onClearButtonClick}
         queryAdditional
         initiallyVisible={props.initiallyVisible}
-        actionLabel={t('new_client')}
+        actionLabel={props.withoutAction ? '' : t('new_client')}
         onActionClick={() => setIsModalOpen(true)}
         sortBy="display_name|asc"
-        staleTime={500}
+        staleTime={props.staleTime || 500}
       />
     </>
   );

@@ -28,6 +28,8 @@ import { TransactionForm } from '../components/TransactionForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { route } from 'common/helpers/route';
 import { useQueryClient } from 'react-query';
+import { ResourceActions } from 'components/ResourceActions';
+import { useActions } from '../common/hooks/useActions';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -39,6 +41,8 @@ export function Edit() {
   const { data } = useTransactionQuery({ id });
 
   const queryClient = useQueryClient();
+
+  const actions = useActions();
 
   const resolveCurrencySeparator = useResolveCurrencySeparator();
 
@@ -105,9 +109,13 @@ export function Edit() {
   };
 
   useEffect(() => {
-    if (!transaction) {
+    if (data) {
       setTransaction(data);
-    } else {
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (transaction) {
       const resolvedCurrencySeparator = resolveCurrencySeparator(
         transaction.currency_id
       );
@@ -116,21 +124,27 @@ export function Edit() {
         setCurrencySeparators(resolvedCurrencySeparator);
       }
     }
-  }, [data, transaction]);
+  }, [transaction]);
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
       onBackClick="/transactions"
+      disableSaveButton={!transaction || isFormBusy}
+      onSaveClick={onSave}
+      navigationTopRight={
+        transaction && (
+          <ResourceActions
+            resource={transaction}
+            label={t('more_actions')}
+            actions={actions}
+          />
+        )
+      }
     >
       <Container>
-        <Card
-          title={documentTitle}
-          withSaveButton
-          onSaveClick={onSave}
-          disableSubmitButton={isFormBusy}
-        >
+        <Card title={documentTitle}>
           {transaction && currencySeparators && (
             <TransactionForm
               errors={errors}

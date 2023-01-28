@@ -25,7 +25,7 @@ export function Notifications(props: Props) {
 
   const notifications = [
     { id: 'invoice_created', label: 'invoice_created' },
-    { id: 'invoice_sent', label: 'notification_invoice_sent' },
+    { id: 'invoice_sent', label: 'invoice_sent_notification_label' },
     { id: 'invoice_viewed', label: 'invoice_viewed' },
     { id: 'invoice_late', label: 'invoice_late' },
     { id: 'payment_success', label: 'payment_success' },
