@@ -8,46 +8,62 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AiFillAlipaySquare, AiOutlineCreditCard } from 'react-icons/ai';
-import { BsCashStack } from 'react-icons/bs';
-import { FaCcMastercard, FaCcPaypal, FaCcVisa } from 'react-icons/fa';
-import { SiAmericanexpress, SiZelle } from 'react-icons/si';
-import { CiBitcoin, CiMoneyCheck1 } from 'react-icons/ci';
+import { CSSProperties } from 'react';
 
 interface Props {
   name: string;
 }
 
+const imageStyle: CSSProperties = { width: 30, height: 30 };
+
 export function GatewayTypeIcon(props: Props) {
   switch (props.name) {
     case 'visa':
-      return <FaCcVisa fontSize={19} />;
+      return (
+        <img
+          src="/gateway-card-images/visa.png"
+          alt="Visa"
+          style={imageStyle}
+        />
+      );
 
     case 'american_express':
-      return <SiAmericanexpress fontSize={19} />;
-
-    case 'ali_pay':
-      return <AiFillAlipaySquare fontSize={19} />;
-
-    case 'cash':
-      return <BsCashStack fontSize={19} />;
-
-    case 'check':
-      return <CiMoneyCheck1 fontSize={19} />;
-
-    case 'crypto_currency':
-      return <CiBitcoin fontSize={19} />;
+      return (
+        <img
+          src="/gateway-card-images/american-express.png"
+          alt="American Express"
+          style={imageStyle}
+        />
+      );
 
     case 'mastercard':
-      return <FaCcMastercard fontSize={19} />;
+      return (
+        <img
+          src="/gateway-card-images/mastercard.png"
+          alt="Mastercard"
+          style={imageStyle}
+        />
+      );
 
     case 'paypal':
-      return <FaCcPaypal fontSize={19} />;
+      return (
+        <img
+          src="/gateway-card-images/paypal.png"
+          alt="Paypal"
+          style={{ width: 40, height: 40 }}
+        />
+      );
 
-    case 'zelle':
-      return <SiZelle fontSize={19} />;
+    case 'wepay':
+      return (
+        <img
+          src="/gateway-card-images/wepay.svg"
+          alt="Wepay"
+          style={imageStyle}
+        />
+      );
 
     default:
-      return <AiOutlineCreditCard fontSize={19} />;
+      return <></>;
   }
 }
