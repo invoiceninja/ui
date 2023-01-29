@@ -68,7 +68,9 @@ export function Default(props: Props) {
   const account = useCurrentAccount();
 
   const shouldShowUnlockButton =
-    (isHosted() && freePlan()) ||
+    (isHosted() &&
+      (freePlan() ||
+        (account?.plan && new Date(account?.plan_expires) < new Date()))) ||
     (isSelfHosted() &&
       ((account?.plan && new Date(account?.plan_expires) < new Date()) ||
         !account?.plan));
