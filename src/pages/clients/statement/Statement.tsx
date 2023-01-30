@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { Button, InputField, SelectField } from '@invoiceninja/forms';
+import { InputField, SelectField } from '@invoiceninja/forms';
 import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Page } from 'components/Breadcrumbs';
@@ -25,6 +25,10 @@ import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { AxiosError } from 'axios';
+import { Dropdown } from 'components/dropdown/Dropdown';
+import { Icon } from 'components/icons/Icon';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { MdDownload, MdSend } from 'react-icons/md';
 
 dayjs.extend(quarter);
 
@@ -194,12 +198,22 @@ export function Statement() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={
-        <div className="flex space-x-3">
+        <Dropdown label={t('more_actions')}>
           {user?.company_user?.is_admin && (
-            <Button onClick={handleSendEmail}>{t('email')}</Button>
+            <DropdownElement
+              onClick={handleSendEmail}
+              icon={<Icon element={MdSend} />}
+            >
+              {t('email_statement')}
+            </DropdownElement>
           )}
-          <Button onClick={downloadPdf}>{t('download')}</Button>
-        </div>
+          <DropdownElement
+            onClick={downloadPdf}
+            icon={<Icon element={MdDownload} />}
+          >
+            {t('download')}
+          </DropdownElement>
+        </Dropdown>
       }
       onBackClick={route('/clients/:id', { id })}
     >
