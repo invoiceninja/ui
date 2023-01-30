@@ -38,8 +38,8 @@ export function Integrations() {
         Zapier
       </ClickableElement>
 
-      <ClickableElement to="/settings/integrations/google_analytics">
-        {t('google_analytics')}
+      <ClickableElement to="/settings/integrations/analytics">
+        {t('analytics')}
       </ClickableElement>
     </Card>
   );

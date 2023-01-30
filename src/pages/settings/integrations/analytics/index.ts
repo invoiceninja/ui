@@ -7,4 +7,4 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-export * from './GoogleAnalytics';
+export * from './Analytics';
