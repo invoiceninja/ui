@@ -23,6 +23,8 @@ import quarter from 'dayjs/plugin/quarterOfYear';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { AxiosError } from 'axios';
 
 dayjs.extend(quarter);
 
@@ -41,6 +43,8 @@ export function Statement() {
   const { documentTitle } = useTitle('statement');
   const { t } = useTranslation();
   const { id } = useParams();
+
+  const user = useCurrentUser();
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
@@ -146,6 +150,23 @@ export function Statement() {
     toast.dismiss();
   };
 
+  const handleSendEmail = () => {
+    toast.processing();
+
+    request(
+      'POST',
+      endpoint('/api/v1/client_statement?send_email=true'),
+      statement
+    )
+      .then((response) => {
+        toast.success(response.data.message);
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+        toast.error();
+      });
+  };
+
   useEffect(() => {
     toast.processing();
 
@@ -173,7 +194,12 @@ export function Statement() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={
-        <Button onClick={downloadPdf}>{t('download')}</Button>
+        <div className="flex space-x-3">
+          {user?.company_user?.is_admin && (
+            <Button onClick={handleSendEmail}>{t('email')}</Button>
+          )}
+          <Button onClick={downloadPdf}>{t('download')}</Button>
+        </div>
       }
       onBackClick={route('/clients/:id', { id })}
     >
