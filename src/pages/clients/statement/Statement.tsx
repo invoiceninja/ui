@@ -29,6 +29,8 @@ import { Dropdown } from 'components/dropdown/Dropdown';
 import { Icon } from 'components/icons/Icon';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { MdDownload, MdSend } from 'react-icons/md';
+import { useClientQuery } from 'common/queries/clients';
+import { Client } from 'common/interfaces/client';
 
 dayjs.extend(quarter);
 
@@ -49,6 +51,8 @@ export function Statement() {
   const { id } = useParams();
 
   const user = useCurrentUser();
+
+  const { data: clientResponse } = useClientQuery({ id });
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
@@ -109,6 +113,11 @@ export function Statement() {
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [selectRange, setSelectRange] = useState<string>('last_7_days');
+
+  const [client, setClient] = useState<Client>();
+
+  const [shouldEmailStatement, setShouldEmailStatement] =
+    useState<boolean>(false);
 
   const [statement, setStatement] = useState<Statement>({
     client_id: id!,
@@ -171,6 +180,18 @@ export function Statement() {
       });
   };
 
+  const hasClientContactEmail = () => {
+    const clientContacts = client?.contacts;
+
+    return clientContacts?.some((contact) => contact.email) || false;
+  };
+
+  useEffect(() => {
+    if (clientResponse) {
+      setClient(clientResponse.data.data);
+    }
+  }, [clientResponse]);
+
   useEffect(() => {
     toast.processing();
 
@@ -193,6 +214,12 @@ export function Statement() {
       });
   }, [statement]);
 
+  useEffect(() => {
+    if (client) {
+      setShouldEmailStatement(hasClientContactEmail());
+    }
+  }, [client]);
+
   return (
     <Default
       title={documentTitle}
@@ -201,7 +228,11 @@ export function Statement() {
         <Dropdown label={t('more_actions')}>
           {user?.company_user?.is_admin && (
             <DropdownElement
-              onClick={handleSendEmail}
+              onClick={() =>
+                shouldEmailStatement
+                  ? handleSendEmail()
+                  : toast.error('client_email_not_set')
+              }
               icon={<Icon element={MdSend} />}
             >
               {t('email_statement')}
