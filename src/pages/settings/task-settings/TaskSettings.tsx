@@ -47,7 +47,7 @@ export function TaskSettings() {
       })
     );
 
-  const handleToggleChange = (id: string, value: boolean | string) =>
+  const handleToggleChange = (id: string, value: boolean) =>
     dispatch(
       updateChanges({
         object: 'company',
@@ -143,14 +143,9 @@ export function TaskSettings() {
           leftSideHelp={t('lock_invoiced_tasks_help')}
         >
           <Toggle
-            checked={
-              companyChanges?.settings?.lock_invoices === 'off' ? false : true
-            }
+            checked={companyChanges?.invoice_task_lock || false}
             onChange={(value: boolean) =>
-              handleToggleChange(
-                'settings.lock_invoices',
-                value === false ? 'off' : 'on'
-              )
+              handleToggleChange('invoice_task_lock', value)
             }
           />
         </Element>

@@ -30,6 +30,8 @@ export interface Company {
   enable_applying_payments: boolean;
   enabled_expense_tax_rates: number;
   stock_notification: boolean;
+  invoice_task_lock: boolean;
+
   track_inventory: boolean;
   stop_on_unpaid_recurring: boolean;
 }

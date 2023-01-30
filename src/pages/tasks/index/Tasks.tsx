@@ -45,7 +45,6 @@ export function Tasks() {
         customActions={actions}
         endpoint="/api/v1/tasks?include=status,client"
         bulkRoute="/api/v1/tasks/bulk"
-        linkToEdit="/tasks/:id/edit"
         linkToCreate="/tasks/create"
         customFilters={filters}
         customFilterQueryKey="client_status"
