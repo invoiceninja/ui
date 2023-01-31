@@ -23,6 +23,6 @@ export function permission(permission: Permissions) {
     user?.is_admin ||
     user?.is_owner ||
     permissions.includes(permission) ||
-    permissions.includes(action)
+    permissions.includes(`${action}_all`)
   );
 }
