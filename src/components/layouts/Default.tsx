@@ -253,7 +253,9 @@ export function Default(props: Props) {
       current: location.pathname.startsWith('/purchase_orders'),
       visible:
         enabled(ModuleBitmask.PurchaseOrders) &&
-        hasPermission('view_purchase_order'),
+        (hasPermission('view_purchase_order') ||
+          hasPermission('create_purchase_order') ||
+          hasPermission('edit_purchase_order')),
       rightButton: {
         icon: PlusCircle,
         to: '/purchase_orders/create',

@@ -27,7 +27,10 @@ export const purchaseOrderRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.PurchaseOrders),
-            () => permission('view_purchase_order'),
+            () =>
+              permission('view_purchase_order') ||
+              permission('view_purchase_order') ||
+              permission('edit_purchase_order'),
           ]}
           component={<PurchaseOrders />}
         />
@@ -40,7 +43,7 @@ export const purchaseOrderRoutes = (
           <Guard
             guards={[
               () => enabled(ModuleBitmask.PurchaseOrders),
-              () => permission('edit_purchase_order'),
+              () => permission('view_purchase_order') || permission('edit_purchase_order'),
             ]}
             component={<Edit />}
           />

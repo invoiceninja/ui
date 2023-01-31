@@ -10,6 +10,7 @@
 
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { route } from 'common/helpers/route';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -96,8 +97,8 @@ export function Edit() {
   );
 
   const onSave = useSave(setErrors);
-
   const actions = useActions();
+  const hasPermission = useHasPermission();
 
   return (
     <Default
@@ -114,6 +115,7 @@ export function Edit() {
           />
         )
       }
+      disableSaveButton={!hasPermission('edit_purchase_order')}
     >
       <div className="grid grid-cols-12 gap-4">
         <VendorSelector
