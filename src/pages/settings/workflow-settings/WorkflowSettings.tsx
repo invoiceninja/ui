@@ -10,6 +10,7 @@
 
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
+import { TabGroup } from 'components/TabGroup';
 
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
@@ -31,6 +32,8 @@ export function WorkflowSettings() {
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
 
+  const tabs = [t('invoices'), t('quotes')];
+
   return (
     <Settings
       onSaveClick={onSave}
@@ -39,8 +42,15 @@ export function WorkflowSettings() {
       breadcrumbs={pages}
       docsLink="docs/advanced-settings/#workflow_settings"
     >
-      <Invoices />
-      <Quotes />
+      <TabGroup tabs={tabs}>
+        <div>
+          <Invoices />
+        </div>
+
+        <div>
+          <Quotes />
+        </div>
+      </TabGroup>
     </Settings>
   );
 }

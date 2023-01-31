@@ -14,24 +14,30 @@ import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
+import { ApiWebhook, ApiWebHookHeader } from 'common/interfaces/api-webhook';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useApiWebhookQuery } from 'common/queries/api-webhooks';
-import { Divider } from 'components/cards/Divider';
 import { Settings } from 'components/layouts/Settings';
-import { useFormik } from 'formik';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ResourceActions } from 'components/ResourceActions';
+import { useEffect, useState } from 'react';
 import { PlusCircle, X } from 'react-feather';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { useHandleChange } from './common/hooks';
+import { useActions } from './common/useActions';
 
 export function Edit() {
   const [t] = useTranslation();
   const { id } = useParams();
 
   useTitle('edit_webhook');
+
+  const navigate = useNavigate();
+
+  const actions = useActions();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -103,75 +109,95 @@ export function Edit() {
     { event: EVENT_DELETE_TASK, label: t('delete_task') },
   ];
 
-  const [headers, setHeaders] = useState<Record<string, string>[]>([]);
-  const [header, setHeader] = useState<Record<string, string>>({});
-  const [errors, setErrors] = useState<Record<string, any>>({});
+  const [headers, setHeaders] = useState<ApiWebHookHeader>({});
+  const [header, setHeader] = useState<ApiWebHookHeader>({});
+  const [errors, setErrors] = useState<ValidationBag>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+  const [apiWebHook, setApiWebHook] = useState<ApiWebhook>();
+
+  const handleChange = useHandleChange({ setApiWebHook, setErrors });
 
   const queryClient = useQueryClient();
-  const { data } = useApiWebhookQuery({ id });
+  const { data: apiWebHookResponse } = useApiWebhookQuery({ id });
+
+  const handleRemoveHeader = (key: string) => {
+    if (Object.hasOwn(headers, key)) {
+      const updatedHeaders = { ...headers };
+
+      delete updatedHeaders[key];
+
+      setHeaders(updatedHeaders);
+    }
+  };
+
+  const handleSave = () => {
+    if (apiWebHook && !isFormBusy) {
+      toast.processing();
+      setIsFormBusy(true);
+      setErrors(undefined);
+
+      apiWebHook.headers = headers;
+
+      request('PUT', endpoint('/api/v1/webhooks/:id', { id }), apiWebHook)
+        .then(() => {
+          toast.success('created_webhook');
+
+          queryClient.invalidateQueries('/api/v1/webhooks');
+          queryClient.invalidateQueries(route('/api/v1/webhooks/:id', { id }));
+
+          navigate('/settings/integrations/api_webhooks');
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          } else {
+            toast.error();
+            console.error(error);
+          }
+        })
+        .finally(() => setIsFormBusy(false));
+    }
+  };
 
   useEffect(() => {
-    if (data?.data?.data?.headers) {
-      if (data.data.data.headers instanceof Array) {
-        setHeaders(data.data.data.headers);
-      } else {
-        setHeaders([data.data.data.headers]);
-      }
+    if (apiWebHookResponse) {
+      setApiWebHook(apiWebHookResponse);
+      setHeaders(apiWebHookResponse.headers);
     }
-  }, [data]);
-
-  const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      target_url: data?.data?.data?.target_url || '',
-      event_id: data?.data?.data.event_id || EVENT_CREATE_CLIENT,
-      rest_method: data?.data?.data?.rest_method || 'post',
-      headers: {},
-    },
-    onSubmit: (values) => {
-      const toastId = toast.loading(t('processing'));
-
-      values.headers = headers;
-
-      request('PUT', endpoint('/api/v1/webhooks/:id', { id }), values)
-        .then(() => toast.success(t('updated_webhook'), { id: toastId }))
-        .catch((error: AxiosError<ValidationBag>) => {
-          toast.dismiss();
-
-          error.response?.status === 422
-            ? setErrors(error.response.data)
-            : toast.error(t('error_title'));
-        })
-        .finally(() => {
-          formik.setSubmitting(false);
-
-          queryClient.invalidateQueries(route('/api/v1/webhooks/:id', { id }));
-        });
-    },
-  });
+  }, [apiWebHookResponse]);
 
   return (
-    <Settings title={t('api_webhooks')} breadcrumbs={pages}>
-      <Card
-        title={data?.data?.data?.target_url}
-        withSaveButton
-        onFormSubmit={formik.handleSubmit}
-        disableSubmitButton={formik.isSubmitting}
-      >
-        <Element leftSide={t('target_url')}>
+    <Settings
+      title={t('api_webhooks')}
+      breadcrumbs={pages}
+      disableSaveButton={!apiWebHook}
+      onSaveClick={handleSave}
+      navigationTopRight={
+        apiWebHook && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={apiWebHook}
+            actions={actions}
+          />
+        )
+      }
+    >
+      <Card title={apiWebHookResponse?.target_url}>
+        <Element leftSide={t('target_url')} required>
           <InputField
-            id="target_url"
-            onChange={formik.handleChange}
-            errorMessage={errors?.errors?.target_url}
-            value={formik.values.target_url}
+            required
+            value={apiWebHook?.target_url}
+            onValueChange={(value) => handleChange('target_url', value)}
+            errorMessage={errors?.errors.target_url}
           />
         </Element>
 
         <Element leftSide={t('event_type')}>
           <SelectField
-            id="event_id"
-            onChange={formik.handleChange}
-            value={formik.values.event_id}
+            value={apiWebHook?.event_id}
+            onValueChange={(value) => handleChange('event_id', value)}
+            errorMessage={errors?.errors.event_id}
           >
             {events.map((event) => (
               <option key={event.event} value={event.event}>
@@ -183,89 +209,86 @@ export function Edit() {
 
         <Element leftSide={t('method')}>
           <SelectField
-            id="rest_method"
-            onChange={formik.handleChange}
-            value={formik.values.rest_method}
+            value={apiWebHook?.rest_method}
+            onValueChange={(value) => handleChange('rest_method', value)}
+            errorMessage={errors?.errors.rest_method}
           >
             <option value="post">POST</option>
             <option value="put">PUT</option>
           </SelectField>
         </Element>
 
-        <Divider />
+        <Element leftSide={t('add_header')}>
+          <div className="flex flex-col">
+            <div className="flex flex-1 justify-between items-center space-x-6">
+              <div className="flex-1">
+                <InputField
+                  debounceTimeout={0}
+                  id="header_key"
+                  placeholder={t('header_key')}
+                  value={header.key || ''}
+                  onValueChange={(value) =>
+                    setHeader({ ...header, key: value })
+                  }
+                />
+              </div>
 
-        <Element
-          leftSide={
-            <InputField
-              debounceTimeout={0}
-              id="header_key"
-              placeholder={t('header_key')}
-              value={header.key || ''}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setHeader({ ...header, key: event.target.value })
-              }
-            />
-          }
-        >
-          <div className="inline-flex items-center space-x-4">
-            <InputField
-              debounceTimeout={0}
-              id="header_value"
-              value={header.value || ''}
-              placeholder={t('header_value')}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setHeader({ ...header, value: event.target.value })
-              }
-            />
+              <div className="flex-1">
+                <InputField
+                  debounceTimeout={0}
+                  id="header_value"
+                  value={header.value || ''}
+                  placeholder={t('header_value')}
+                  onValueChange={(value) => setHeader({ ...header, value })}
+                />
+              </div>
 
-            {header.key && header.value && (
               <Button
                 behavior="button"
                 type="minimal"
+                disableWithoutIcon
+                disabled={Boolean(!header.key) || Boolean(!header.value)}
                 onClick={() => {
-                  setHeaders((headers) => [
+                  setHeaders((headers) => ({
                     ...headers,
-                    { [header.key]: header.value },
-                  ]);
+                    [header.key]: header.value,
+                  }));
 
                   setHeader({});
                 }}
               >
                 <PlusCircle />
               </Button>
-            )}
+            </div>
+
+            <div className="flex flex-col space-y-5 pt-5">
+              {Object.entries(headers).map(([key, value], index) => (
+                <div
+                  key={index}
+                  className="flex justify-between items-center space-x-4"
+                >
+                  <span className="flex-1 text-start">{key}</span>
+
+                  <span className="flex-1 text-start">{value}</span>
+
+                  <Button
+                    behavior="button"
+                    type="minimal"
+                    onClick={() => handleRemoveHeader(key)}
+                  >
+                    <X size={18} />
+                  </Button>
+                </div>
+              ))}
+
+              {!Object.entries(headers).length && (
+                <span className="text-gray-500 self-center text-xl">
+                  {t('no_headers')}
+                </span>
+              )}
+            </div>
           </div>
         </Element>
-
-        <Divider />
-
-        {headers.length === 0 && (
-          <Element>
-            <span className="text-gray-600">{t('no_headers')}</span>
-          </Element>
-        )}
-
-        {headers.map((header, index) => (
-          <Element key={index} leftSide={Object.keys(header)[0]}>
-            <div className="flex items-center space-x-4">
-              <span>{header[Object.keys(header)[0]]}</span>
-              <Button
-                behavior="button"
-                type="minimal"
-                onClick={() => {
-                  setHeaders((headers) =>
-                    headers.filter(
-                      (entry) =>
-                        Object.keys(entry)[0] !== Object.keys(header)[0]
-                    )
-                  );
-                }}
-              >
-                <X size={18} />
-              </Button>
-            </div>
-          </Element>
-        ))}
       </Card>
     </Settings>
   );

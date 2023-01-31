@@ -130,7 +130,11 @@ export function Edit() {
           readonly
         />
 
-        <InvoiceDetails invoice={invoice} handleChange={handleChange} />
+        <InvoiceDetails
+          invoice={invoice}
+          handleChange={handleChange}
+          errors={errors}
+        />
 
         <div className="col-span-12">
           <TabGroup
