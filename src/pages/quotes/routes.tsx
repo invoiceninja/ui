@@ -28,7 +28,10 @@ export const quoteRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.Quotes),
-            () => permission('view_quote'),
+            () =>
+              permission('view_quote') ||
+              permission('view_quote') ||
+              permission('create_quote'),
           ]}
           component={<Quotes />}
         />
@@ -52,7 +55,7 @@ export const quoteRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.Quotes),
-            () => permission('edit_quote'),
+            () => permission('view_quote') || permission('edit_quote'),
           ]}
           component={<Edit />}
         />
@@ -82,6 +85,14 @@ export const quoteRoutes = (
         />
       }
     />
-    <Route path=":id/email" element={<Email />} />
+    <Route
+      path=":id/email"
+      element={
+        <Guard
+          guards={[() => permission('view_quote')]}
+          component={<Email />}
+        />
+      }
+    />
   </Route>
 );

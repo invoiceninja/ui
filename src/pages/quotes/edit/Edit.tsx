@@ -10,6 +10,7 @@
 
 import { route } from 'common/helpers/route';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -91,6 +92,7 @@ export function Edit() {
 
   const actions = useActions();
   const save = useSave({ setErrors });
+  const hasPermission = useHasPermission();
 
   return (
     <Default
@@ -107,6 +109,7 @@ export function Edit() {
           />
         )
       }
+      disableSaveButton={!hasPermission('edit_quote')}
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector

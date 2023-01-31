@@ -166,7 +166,11 @@ export function Default(props: Props) {
       href: '/quotes',
       icon: File,
       current: location.pathname.startsWith('/quotes'),
-      visible: enabled(ModuleBitmask.Quotes) && hasPermission('view_quote'),
+      visible:
+        enabled(ModuleBitmask.Quotes) &&
+        (hasPermission('view_quote') ||
+          hasPermission('create_quote') ||
+          hasPermission('edit_quote')),
       rightButton: {
         icon: PlusCircle,
         to: '/quotes/create',
