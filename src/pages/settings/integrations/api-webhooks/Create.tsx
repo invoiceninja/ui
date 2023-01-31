@@ -14,21 +14,25 @@ import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
+import { ApiWebhook, ApiWebHookHeader } from 'common/interfaces/api-webhook';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Divider } from 'components/cards/Divider';
+import { useBlankApiWebhookQuery } from 'common/queries/api-webhooks';
 import { Settings } from 'components/layouts/Settings';
-import { useFormik } from 'formik';
-import { ChangeEvent, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PlusCircle, X } from 'react-feather';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
+import { useHandleChange } from './common/hooks';
 
 export function Create() {
   const [t] = useTranslation();
 
-  useTitle('new_webhook');
+  const { documentTitle } = useTitle('new_webhook');
+
+  const { data: blankApiWebHook } = useBlankApiWebhookQuery();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -98,28 +102,37 @@ export function Create() {
     { event: EVENT_DELETE_TASK, label: t('delete_task') },
   ];
 
-  const [headers, setHeaders] = useState<Record<string, string>[]>([]);
-  const [header, setHeader] = useState<Record<string, string>>({});
-  const [errors, setErrors] = useState<Record<string, any>>({});
+  const [headers, setHeaders] = useState<ApiWebHookHeader>({});
+  const [header, setHeader] = useState<ApiWebHookHeader>({});
+  const [errors, setErrors] = useState<ValidationBag>();
+  const [apiWebHook, setApiWebHook] = useState<ApiWebhook>();
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
+
+  const handleChange = useHandleChange({ setApiWebHook, setErrors });
+
+  const handleRemoveHeader = (key: string) => {
+    if (Object.hasOwn(headers, key)) {
+      const updatedHeaders = { ...headers };
+
+      delete updatedHeaders[key];
+
+      setHeaders(updatedHeaders);
+    }
+  };
 
   const navigate = useNavigate();
 
-  const formik = useFormik({
-    enableReinitialize: true,
-    initialValues: {
-      target_url: '',
-      event_id: EVENT_CREATE_CLIENT,
-      rest_method: 'post',
-      headers: {},
-    },
-    onSubmit: (values) => {
-      const toastId = toast.loading(t('processing'));
+  const handleSave = () => {
+    if (apiWebHook && !isFormBusy) {
+      toast.processing();
+      setIsFormBusy(true);
+      setErrors(undefined);
 
-      values.headers = headers;
+      apiWebHook.headers = headers;
 
-      request('POST', endpoint('/api/v1/webhooks'), values)
-        .then((response) => {
-          toast.success(t('created_webhook'), { id: toastId });
+      request('POST', endpoint('/api/v1/webhooks'), apiWebHook)
+        .then((response: GenericSingleResourceResponse<ApiWebhook>) => {
+          toast.success('created_webhook');
 
           navigate(
             route('/settings/integrations/api_webhooks/:id/edit', {
@@ -128,35 +141,49 @@ export function Create() {
           );
         })
         .catch((error: AxiosError<ValidationBag>) => {
-          toast.dismiss();
+          if (error.response?.status === 422) {
+            toast.dismiss();
+            setErrors(error.response.data);
+          } else {
+            toast.error();
+            console.error(error);
+          }
+        })
+        .finally(() => setIsFormBusy(false));
+    }
+  };
 
-          error.response?.status === 422
-            ? setErrors(error.response.data)
-            : toast.error(t('error_title'));
-        });
-    },
-  });
+  useEffect(() => {
+    if (blankApiWebHook) {
+      setApiWebHook({
+        ...blankApiWebHook,
+        headers: {},
+      });
+    }
+  }, [blankApiWebHook]);
 
   return (
-    <Settings title={t('api_webhooks')} breadcrumbs={pages}>
-      <Card
-        title={t('new_webhook')}
-        withSaveButton
-        onFormSubmit={formik.handleSubmit}
-      >
-        <Element leftSide={t('target_url')}>
+    <Settings
+      title={t('api_webhooks')}
+      breadcrumbs={pages}
+      disableSaveButton={!apiWebHook}
+      onSaveClick={handleSave}
+    >
+      <Card title={documentTitle}>
+        <Element leftSide={t('target_url')} required>
           <InputField
-            id="target_url"
-            onChange={formik.handleChange}
-            errorMessage={errors?.errors?.target_url}
+            required
+            value={apiWebHook?.target_url}
+            onValueChange={(value) => handleChange('target_url', value)}
+            errorMessage={errors?.errors.target_url}
           />
         </Element>
 
         <Element leftSide={t('event_type')}>
           <SelectField
-            id="event_id"
-            onChange={formik.handleChange}
-            value={formik.values.event_id}
+            value={apiWebHook?.event_id}
+            onValueChange={(value) => handleChange('event_id', value)}
+            errorMessage={errors?.errors.event_id}
           >
             {events.map((event) => (
               <option key={event.event} value={event.event}>
@@ -167,86 +194,88 @@ export function Create() {
         </Element>
 
         <Element leftSide={t('method')}>
-          <SelectField id="rest_method" onChange={formik.handleChange}>
+          <SelectField
+            value={apiWebHook?.rest_method}
+            onValueChange={(value) => handleChange('rest_method', value)}
+            errorMessage={errors?.errors.method}
+          >
             <option value="post">POST</option>
             <option value="put">PUT</option>
           </SelectField>
         </Element>
 
-        <Divider />
+        <Element leftSide={t('add_header')}>
+          <div className="flex flex-col">
+            <div className="flex flex-1 justify-between items-center space-x-6">
+              <div className="flex-1">
+                <InputField
+                  debounceTimeout={0}
+                  id="header_key"
+                  placeholder={t('header_key')}
+                  value={header.key || ''}
+                  onValueChange={(value) =>
+                    setHeader({ ...header, key: value })
+                  }
+                />
+              </div>
 
-        <Element
-          leftSide={
-            <InputField
-              debounceTimeout={0}
-              id="header_key"
-              placeholder={t('header_key')}
-              value={header.key || ''}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setHeader({ ...header, key: event.target.value })
-              }
-            />
-          }
-        >
-          <div className="inline-flex items-center space-x-4">
-            <InputField
-              debounceTimeout={0}
-              id="header_value"
-              value={header.value || ''}
-              placeholder={t('header_value')}
-              onChange={(event: ChangeEvent<HTMLInputElement>) =>
-                setHeader({ ...header, value: event.target.value })
-              }
-            />
+              <div className="flex-1">
+                <InputField
+                  className="flex-1"
+                  debounceTimeout={0}
+                  id="header_value"
+                  value={header.value || ''}
+                  placeholder={t('header_value')}
+                  onValueChange={(value) => setHeader({ ...header, value })}
+                />
+              </div>
 
-            {header.key && header.value && (
               <Button
                 behavior="button"
                 type="minimal"
+                disableWithoutIcon
+                disabled={Boolean(!header.key) || Boolean(!header.value)}
                 onClick={() => {
-                  setHeaders((headers) => [
+                  setHeaders((headers) => ({
                     ...headers,
-                    { [header.key]: header.value },
-                  ]);
+                    [header.key]: header.value,
+                  }));
 
                   setHeader({});
                 }}
               >
                 <PlusCircle />
               </Button>
-            )}
+            </div>
+
+            <div className="flex flex-col space-y-5 pt-5">
+              {Object.entries(headers).map(([key, value], index) => (
+                <div
+                  key={index}
+                  className="flex justify-between items-center space-x-4"
+                >
+                  <span className="flex-1 text-start">{key}</span>
+
+                  <span className="flex-1 text-start">{value}</span>
+
+                  <Button
+                    behavior="button"
+                    type="minimal"
+                    onClick={() => handleRemoveHeader(key)}
+                  >
+                    <X size={18} />
+                  </Button>
+                </div>
+              ))}
+
+              {!Object.entries(headers).length && (
+                <span className="text-gray-500 self-center text-xl">
+                  {t('no_headers')}
+                </span>
+              )}
+            </div>
           </div>
         </Element>
-
-        <Divider />
-
-        {headers.length === 0 && (
-          <Element>
-            <span className="text-gray-600">{t('no_headers')}</span>
-          </Element>
-        )}
-
-        {headers.map((header, index) => (
-          <Element key={index} leftSide={Object.keys(header)[0]}>
-            <div className="flex items-center space-x-4">
-              <span>{header[Object.keys(header)[0]]}</span>
-              <Button
-                behavior="button"
-                type="minimal"
-                onClick={() => {
-                  setHeaders((headers) =>
-                    headers.filter(
-                      (entry) =>
-                        Object.keys(entry)[0] !== Object.keys(header)[0]
-                    )
-                  );
-                }}
-              >
-                <X size={18} />
-              </Button>
-            </div>
-          </Element>
-        ))}
       </Card>
     </Settings>
   );
