@@ -112,7 +112,7 @@ export function Edit() {
         (invoice &&
           (invoice.status_id === InvoiceStatus.Cancelled ||
             invoice.is_deleted)) ||
-        !hasPermission('create_invoice')
+        !hasPermission('edit_invoice')
       }
       navigationTopRight={
         invoice && (
