@@ -200,7 +200,11 @@ export function Default(props: Props) {
       href: '/projects',
       icon: Briefcase,
       current: location.pathname.startsWith('/projects'),
-      visible: enabled(ModuleBitmask.Projects) && hasPermission('view_project'),
+      visible:
+        enabled(ModuleBitmask.Projects) &&
+        (hasPermission('view_project') ||
+          hasPermission('create_project') ||
+          hasPermission('edit_project')),
       rightButton: {
         icon: PlusCircle,
         to: '/projects/create',

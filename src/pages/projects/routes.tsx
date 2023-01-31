@@ -27,7 +27,10 @@ export const projectRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.Projects),
-            () => permission('view_project'),
+            () =>
+              permission('view_project') ||
+              permission('create_project') ||
+              permission('edit_project'),
           ]}
           component={<Projects />}
         />
@@ -51,7 +54,7 @@ export const projectRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.Projects),
-            () => permission('edit_project'),
+            () => permission('view_project') || permission('edit_project'),
           ]}
           component={<Project />}
         />

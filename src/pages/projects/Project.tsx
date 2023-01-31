@@ -13,6 +13,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { useTitle } from 'common/hooks/useTitle';
 import { Project as ProjectEntity } from 'common/interfaces/project';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -34,8 +35,8 @@ export function Project() {
   const { data } = useProjectQuery({ id });
 
   const queryClient = useQueryClient();
-
   const actions = useActions();
+  const hasPermission = useHasPermission();
 
   const [projectValue, setProjectValue] = useState<ProjectEntity>();
 
@@ -92,7 +93,7 @@ export function Project() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      disableSaveButton={!projectValue}
+      disableSaveButton={!hasPermission('edit_project') || !projectValue}
       onSaveClick={onSave}
       navigationTopRight={
         projectValue && (
