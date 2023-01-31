@@ -100,7 +100,10 @@ export function Default(props: Props) {
       href: '/products',
       icon: Box,
       current: location.pathname.startsWith('/products'),
-      visible: hasPermission('view_product'),
+      visible:
+        hasPermission('view_product') ||
+        hasPermission('create_product') ||
+        hasPermission('edit_product'),
       rightButton: {
         icon: PlusCircle,
         to: '/products/create',

@@ -26,7 +26,12 @@ export const productRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_product')]}
+          guards={[
+            () =>
+              permission('view_product') ||
+              permission('create_product') ||
+              permission('edit_product'),
+          ]}
           component={<Products />}
         />
       }
@@ -55,7 +60,9 @@ export const productRoutes = (
       path=":id"
       element={
         <Guard
-          guards={[() => permission('view_product')]}
+          guards={[
+            () => permission('view_product') || permission('edit_product'),
+          ]}
           component={<Product />}
         />
       }
@@ -68,7 +75,9 @@ export const productRoutes = (
       path=":id/edit"
       element={
         <Guard
-          guards={[() => permission('edit_product')]}
+          guards={[
+            () => permission('view_product') || permission('edit_product'),
+          ]}
           component={<Product />}
         />
       }

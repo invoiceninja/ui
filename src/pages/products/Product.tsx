@@ -13,6 +13,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { Product as ProductInterface } from 'common/interfaces/product';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useProductQuery } from 'common/queries/products';
@@ -28,20 +29,16 @@ import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 
 export function Product() {
-  const [t] = useTranslation();
-
+  const { t } = useTranslation();
   const { id } = useParams();
-
-  const queryClient = useQueryClient();
-
   const { data: productData } = useProductQuery({ id });
 
+  const queryClient = useQueryClient();
   const actions = useActions();
+  const hasPermission = useHasPermission();
 
   const [productValue, setProductValue] = useState<ProductInterface>();
-
   const [errors, setErrors] = useState<ValidationBag>();
-
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const pages: Page[] = [
@@ -98,7 +95,9 @@ export function Product() {
     <Default
       title={t('edit_product')}
       breadcrumbs={pages}
-      disableSaveButton={!productData || isFormBusy}
+      disableSaveButton={
+        !hasPermission('edit_product') || !productData || isFormBusy
+      }
       onSaveClick={handleSave}
       navigationTopRight={
         productData && (
