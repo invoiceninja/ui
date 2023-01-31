@@ -33,7 +33,12 @@ export const clientRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_client')]}
+          guards={[
+            () =>
+              permission('view_client') ||
+              permission('create_client') ||
+              permission('edit_client'),
+          ]}
           component={<Clients />}
         />
       }
@@ -62,7 +67,9 @@ export const clientRoutes = (
       path=":id/edit"
       element={
         <Guard
-          guards={[() => permission('edit_client')]}
+          guards={[
+            () => permission('view_client') || permission('edit_client'),
+          ]}
           component={<Edit />}
         />
       }
@@ -71,7 +78,9 @@ export const clientRoutes = (
       path=":id"
       element={
         <Guard
-          guards={[() => permission('view_client')]}
+          guards={[
+            () => permission('view_client') || permission('edit_client'),
+          ]}
           component={<Client />}
         />
       }
@@ -86,6 +95,14 @@ export const clientRoutes = (
       <Route path="expenses" element={<Expenses />} />
       <Route path="recurring_expenses" element={<RecurringExpenses />} />
     </Route>
-    <Route path=":id/statement" element={<Statement />} />
+    <Route
+      path=":id/statement"
+      element={
+        <Guard
+          guards={[() => permission('view_client')]}
+          component={<Statement />}
+        />
+      }
+    />
   </Route>
 );

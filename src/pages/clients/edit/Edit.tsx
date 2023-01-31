@@ -12,6 +12,7 @@ import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
@@ -47,6 +48,7 @@ export function Edit() {
   const navigate = useNavigate();
   const company = useInjectCompanyChanges();
   const dispatch = useDispatch();
+  const hasPermission = useHasPermission();
 
   const { data, isLoading } = useClientQuery(
     { id },
@@ -144,6 +146,7 @@ export function Edit() {
       }
       onBackClick={route('/clients/:id', { id })}
       onSaveClick={onSave}
+      disableSaveButton={!hasPermission('edit_client')}
     >
       {isLoading && <Spinner />}
 

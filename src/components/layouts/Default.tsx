@@ -84,7 +84,10 @@ export function Default(props: Props) {
       href: '/clients',
       icon: Users,
       current: location.pathname.startsWith('/clients'),
-      visible: hasPermission('view_client'),
+      visible:
+        hasPermission('view_client') ||
+        hasPermission('create_client') ||
+        hasPermission('edit_client'),
       rightButton: {
         icon: PlusCircle,
         to: '/clients/create',
