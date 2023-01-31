@@ -8,12 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
 import { Params } from './common/params.interface';
+import { ApiToken } from 'common/interfaces/api-token';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { toast } from 'common/helpers/toast/toast';
 
 export function useApiTokensQuery(params: Params) {
   return useQuery(['/api/v1/tokens', params], () =>
@@ -28,19 +31,50 @@ export function useApiTokensQuery(params: Params) {
 }
 
 export function useApiTokenQuery(params: { id: string | undefined }) {
-  return useQuery(
+  return useQuery<ApiToken>(
     route('/api/v1/tokens/:id', { id: params.id }),
-    () => request('GET', endpoint('/api/v1/tokens/:id', { id: params.id })),
+    () =>
+      request('GET', endpoint('/api/v1/tokens/:id', { id: params.id })).then(
+        (response: GenericSingleResourceResponse<ApiToken>) =>
+          response.data.data
+      ),
     { staleTime: Infinity }
   );
 }
 
-export function bulk(
-  id: string[],
-  action: 'archive' | 'restore' | 'delete'
-): Promise<AxiosResponse> {
-  return request('POST', endpoint('/api/v1/tokens/bulk'), {
-    action,
-    ids: id,
-  });
+export function useBulkAction() {
+  const queryClient = useQueryClient();
+
+  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/tokens/bulk'), {
+      action,
+      ids: [id],
+    })
+      .then(() => {
+        toast.success(`${action}d_token`);
+
+        queryClient.invalidateQueries('/api/v1/tokens');
+
+        queryClient.invalidateQueries(route('/api/v1/tokens/:id', { id }));
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+
+        toast.error();
+      });
+  };
+}
+
+export function useBlankApiTokenQuery() {
+  return useQuery<ApiToken>(
+    '/api/v1/tokens/create',
+    () =>
+      request('GET', endpoint('/api/v1/tokens/create')).then(
+        (response: GenericSingleResourceResponse<ApiToken>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
+  );
 }
