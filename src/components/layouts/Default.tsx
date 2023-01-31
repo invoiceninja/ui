@@ -134,8 +134,10 @@ export function Default(props: Props) {
       icon: Repeat,
       current: location.pathname.startsWith('/recurring_invoices'),
       visible:
-        enabled(ModuleBitmask.RecurringInvoices) &&
-        hasPermission('view_recurring_invoice'),
+        (enabled(ModuleBitmask.RecurringInvoices) &&
+          hasPermission('view_recurring_invoice')) ||
+        hasPermission('create_recurring_invoice') ||
+        hasPermission('edit_recurring_invoice'),
       rightButton: {
         icon: PlusCircle,
         to: '/recurring_invoices/create',

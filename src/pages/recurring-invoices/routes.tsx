@@ -26,7 +26,10 @@ export const recurringInvoiceRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.RecurringInvoices),
-            () => permission('view_recurring_invoice'),
+            () =>
+              permission('view_recurring_invoice') ||
+              permission('create_recurring_expense') ||
+              permission('edit_recurring_invoice'),
           ]}
           component={<RecurringInvoices />}
         />
@@ -51,7 +54,9 @@ export const recurringInvoiceRoutes = (
           <Guard
             guards={[
               () => enabled(ModuleBitmask.RecurringInvoices),
-              () => permission('edit_recurring_invoice'),
+              () =>
+                permission('view_recurring_invoice') ||
+                permission('edit_recurring_invoice'),
             ]}
             component={<Edit />}
           />
