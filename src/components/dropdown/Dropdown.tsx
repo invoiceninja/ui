@@ -37,6 +37,20 @@ export function Dropdown(props: Props) {
 
   const [children, setChildren] = useState<ReactNode>();
 
+  const getPropsWithChildType = (
+    childType: string | typeof DropdownElement,
+    index: number
+  ) => {
+    if (childType === 'div') {
+      return {
+        onClick: () => setVisible(false),
+        key: index,
+      };
+    } else {
+      return { setVisible, key: index };
+    }
+  };
+
   useClickAway(ref, () => {
     visible && setVisible(false);
   });
@@ -61,15 +75,10 @@ export function Dropdown(props: Props) {
             {children?.map((child, index: number) =>
               child &&
               (child['type'] == DropdownElement || child['type'] == 'div')
-                ? cloneElement(child, {
-                    ...(child['type'] == DropdownElement && {
-                      setVisible,
-                    }),
-                    ...(child['type'] == 'div' && {
-                      onClick: () => setVisible(false),
-                    }),
-                    key: index,
-                  })
+                ? cloneElement(
+                    child,
+                    getPropsWithChildType(child['type'], index)
+                  )
                 : child
             )}
           </div>
