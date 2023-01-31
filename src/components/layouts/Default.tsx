@@ -40,10 +40,10 @@ import { AiOutlineBank } from 'react-icons/ai';
 import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 import { QuickCreatePopover } from 'components/QuickCreatePopover';
-import { isHosted, isSelfHosted } from 'common/helpers';
-import { freePlan } from 'common/guards/guards/free-plan';
+import { isSelfHosted } from 'common/helpers';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
+import { useUnlockButtonForHosted } from 'common/hooks/useUnlockButtonForHosted';
+import { useUnlockButtonForSelfHosted } from 'common/hooks/useUnlockButtonForSelfHosted';
 
 interface Props extends CommonProps {
   title?: string | null;
@@ -65,15 +65,8 @@ export function Default(props: Props) {
   const whiteLabelLink = import.meta.env
     .VITE_WHITELABEL_INVOICE_URL as unknown as string;
 
-  const account = useCurrentAccount();
-
   const shouldShowUnlockButton =
-    (isHosted() &&
-      (freePlan() ||
-        (account?.plan && new Date(account?.plan_expires) < new Date()))) ||
-    (isSelfHosted() &&
-      ((account?.plan && new Date(account?.plan_expires) < new Date()) ||
-        !account?.plan));
+    useUnlockButtonForHosted() || useUnlockButtonForSelfHosted();
 
   const isMiniSidebar = useSelector(
     (state: RootState) => state.settings.isMiniSidebar
