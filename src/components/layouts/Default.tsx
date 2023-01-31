@@ -150,7 +150,10 @@ export function Default(props: Props) {
       href: '/payments',
       icon: CreditCard,
       current: location.pathname.startsWith('/payments'),
-      visible: hasPermission('view_payment'),
+      visible:
+        hasPermission('view_payment') ||
+        hasPermission('create_payment') ||
+        hasPermission('edit_payment'),
       rightButton: {
         icon: PlusCircle,
         to: '/payments/create',

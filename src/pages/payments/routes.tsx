@@ -26,7 +26,12 @@ export const paymentRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_payment')]}
+          guards={[
+            () =>
+              permission('view_payment') ||
+              permission('create_payment') ||
+              permission('edit_payment'),
+          ]}
           component={<Payments />}
         />
       }
@@ -59,7 +64,9 @@ export const paymentRoutes = (
         path=""
         element={
           <Guard
-            guards={[() => permission('edit_payment')]}
+            guards={[
+              () => permission('view_payment') || permission('edit_payment'),
+            ]}
             component={<Edit />}
           />
         }

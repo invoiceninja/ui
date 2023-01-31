@@ -9,6 +9,7 @@
  */
 
 import { route } from 'common/helpers/route';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { Payment as PaymentEntity } from 'common/interfaces/payment';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
@@ -55,8 +56,8 @@ export function Payment() {
   ];
 
   const onSave = useSave(setErrors);
-
   const actions = useActions();
+  const hasPermission = useHasPermission();
 
   return (
     <Default
@@ -66,7 +67,7 @@ export function Payment() {
         event.preventDefault();
         onSave(paymentValue as unknown as PaymentEntity);
       }}
-      disableSaveButton={!paymentValue}
+      disableSaveButton={!hasPermission('edit_payment') || !paymentValue}
       navigationTopRight={
         paymentValue && (
           <ResourceActions
