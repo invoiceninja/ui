@@ -287,7 +287,9 @@ export function Default(props: Props) {
       current: location.pathname.startsWith('/recurring_expenses'),
       visible:
         enabled(ModuleBitmask.RecurringExpenses) &&
-        hasPermission('view_recurring_expense'),
+        (hasPermission('view_recurring_expense') ||
+          hasPermission('create_recurring_expense') ||
+          hasPermission('edit_recurring_expense')),
       rightButton: {
         icon: PlusCircle,
         to: '/recurring_expenses/create',

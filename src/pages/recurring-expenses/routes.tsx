@@ -26,7 +26,10 @@ export const recurringExpenseRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.RecurringExpenses),
-            () => permission('view_recurring_expense'),
+            () =>
+              permission('view_recurring_expense') ||
+              permission('edit_recurring_expense') ||
+              permission('edit_recurring_expense'),
           ]}
           component={<RecurringExpenses />}
         />
@@ -51,7 +54,7 @@ export const recurringExpenseRoutes = (
           <Guard
             guards={[
               () => enabled(ModuleBitmask.RecurringExpenses),
-              () => permission('edit_recurring_expense'),
+              () => permission('view_recurring_expense') || permission('edit_recurring_expense'),
             ]}
             component={<Edit />}
           />

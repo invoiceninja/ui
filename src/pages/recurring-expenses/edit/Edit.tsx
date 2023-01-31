@@ -13,6 +13,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { useTitle } from 'common/hooks/useTitle';
 import { RecurringExpense } from 'common/interfaces/recurring-expense';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -114,6 +115,8 @@ export function Edit() {
       });
   };
 
+  const hasPermission = useHasPermission();
+
   return (
     <Default
       title={documentTitle}
@@ -129,6 +132,7 @@ export function Edit() {
           />
         )
       }
+      disableSaveButton={!hasPermission('edit_recurring_expense')}
     >
       <div className="space-y-4">
         <Tabs tabs={tabs} />
