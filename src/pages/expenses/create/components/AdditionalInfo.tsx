@@ -138,6 +138,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
         handleChange('foreign_amount', expense.amount * expense.exchange_rate);
       }
     } else {
+      handleChange('exchange_rate', 1);
       handleChange('foreign_amount', 0);
     }
   }, [expense?.exchange_rate]);
