@@ -30,6 +30,7 @@ import { route } from 'common/helpers/route';
 import { useQueryClient } from 'react-query';
 import { ResourceActions } from 'components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -126,6 +127,8 @@ export function Edit() {
     }
   }, [transaction]);
 
+  const hasPermission = useHasPermission();
+
   return (
     <Default
       title={documentTitle}
@@ -142,6 +145,7 @@ export function Edit() {
           />
         )
       }
+      disabled={!hasPermission('edit_bank_transaction')}
     >
       <Container>
         <Card title={documentTitle}>

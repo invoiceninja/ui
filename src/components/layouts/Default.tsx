@@ -309,7 +309,10 @@ export function Default(props: Props) {
       href: '/transactions',
       icon: AiOutlineBank,
       current: location.pathname.startsWith('/transactions'),
-      visible: hasPermission('view_bank_transaction'),
+      visible:
+        hasPermission('view_bank_transaction') ||
+        hasPermission('create_bank_transaction') ||
+        hasPermission('edit_bank_transaction'),
       rightButton: {
         icon: PlusCircle,
         to: '/transactions/create',
