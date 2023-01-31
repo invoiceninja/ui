@@ -14,6 +14,7 @@ import { MdOutlineContentCopy } from 'react-icons/md';
 interface Props {
   text: string;
   className?: string;
+  secure?: boolean;
 }
 
 export function CopyToClipboard(props: Props) {
@@ -27,7 +28,7 @@ export function CopyToClipboard(props: Props) {
 
   return (
     <div className={`inline-flex space-x-2 ${props.className}`}>
-      <span>{value}</span>
+      <span>{props.secure ? props.text.split('').map(() => '*') : value}</span>
 
       {value.length > 0 && (
         <button type="button" onClick={handleClick}>
