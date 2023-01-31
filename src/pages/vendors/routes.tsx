@@ -31,7 +31,10 @@ export const vendorRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.Vendors),
-            () => permission('view_vendor'),
+            () =>
+              permission('view_vendor') ||
+              permission('create_vendor') ||
+              permission('edit_vendor'),
           ]}
           component={<Vendors />}
         />
@@ -55,7 +58,7 @@ export const vendorRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.Vendors),
-            () => permission('view_vendor'),
+            () => permission('view_vendor') || permission('edit_vendor'),
           ]}
           component={<Vendor />}
         />
@@ -73,7 +76,7 @@ export const vendorRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.Vendors),
-            () => permission('edit_vendor'),
+            () => permission('view_vendor') || permission('edit_vendor'),
           ]}
           component={<Edit />}
         />

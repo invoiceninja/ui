@@ -234,7 +234,11 @@ export function Default(props: Props) {
       href: '/vendors',
       icon: BiBuildings,
       current: location.pathname.startsWith('/vendors'),
-      visible: enabled(ModuleBitmask.Vendors) && hasPermission('view_vendor'),
+      visible:
+        enabled(ModuleBitmask.Vendors) &&
+        (hasPermission('view_vendor') ||
+          hasPermission('create_vendor') ||
+          hasPermission('edit_vendor')),
       rightButton: {
         icon: PlusCircle,
         to: '/vendors/create',
