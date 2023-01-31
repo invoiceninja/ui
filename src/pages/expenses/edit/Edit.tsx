@@ -9,6 +9,7 @@
  */
 
 import { route } from 'common/helpers/route';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { useTitle } from 'common/hooks/useTitle';
 import { Expense } from 'common/interfaces/expense';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -72,6 +73,8 @@ export function Edit() {
     }
   }, [data]);
 
+  const hasPermission = useHasPermission();
+
   return (
     <Default
       title={documentTitle}
@@ -87,6 +90,7 @@ export function Edit() {
           />
         )
       }
+      disableSaveButton={!hasPermission('edit_expense')}
     >
       <div className="space-y-4">
         <Tabs tabs={tabs} />

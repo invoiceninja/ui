@@ -268,7 +268,11 @@ export function Default(props: Props) {
       href: '/expenses',
       icon: BiWallet,
       current: location.pathname.startsWith('/expenses'),
-      visible: enabled(ModuleBitmask.Expenses) && hasPermission('view_expense'),
+      visible:
+        enabled(ModuleBitmask.Expenses) &&
+        (hasPermission('view_expense') ||
+          hasPermission('create_expense') ||
+          hasPermission('edit_expense')),
       rightButton: {
         icon: PlusCircle,
         to: '/expenses/create',

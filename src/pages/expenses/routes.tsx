@@ -27,7 +27,10 @@ export const expenseRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.Expenses),
-            () => permission('view_expense'),
+            () =>
+              permission('view_expense') ||
+              permission('create_expense') ||
+              permission('edit_expense'),
           ]}
           component={<Expenses />}
         />
@@ -64,7 +67,7 @@ export const expenseRoutes = (
           <Guard
             guards={[
               () => enabled(ModuleBitmask.Expenses),
-              () => permission('edit_expense'),
+              () => permission('view_expense') || permission('edit_expense'),
             ]}
             component={<Edit />}
           />
