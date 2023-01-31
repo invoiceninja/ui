@@ -59,6 +59,14 @@ export function useHasPermission() {
   const user = useCurrentCompanyUser();
   const permissions = user?.permissions ?? '';
 
-  return (permission: Permissions) =>
-    user?.is_admin || user?.is_owner || permissions.includes(permission);
+  return (permission: Permissions) => {
+    const [action] = permission.split('_');
+
+    return (
+      user?.is_admin ||
+      user?.is_owner ||
+      permissions.includes(permission) ||
+      permissions.includes(`${action}_all`)
+    );
+  };
 }

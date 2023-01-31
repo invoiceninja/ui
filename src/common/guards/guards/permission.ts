@@ -17,8 +17,12 @@ export function permission(permission: Permissions) {
 
   const permissions = user?.permissions ?? '';
 
-  return user?.is_admin || user?.is_owner || permissions.includes(permission);
+  const [action] = permission.split('_');
 
-  // const [action] = permission.split('_');
-  // permission.includes(action)
+  return (
+    user?.is_admin ||
+    user?.is_owner ||
+    permissions.includes(permission) ||
+    permissions.includes(action)
+  );
 }
