@@ -102,7 +102,7 @@ export function TransactionForm(props: Props) {
 
       <Element required leftSide={t('bank_account')}>
         <BankAccountSelector
-          defaultValue={props.transaction.bank_integration_id}
+          value={props.transaction.bank_integration_id}
           onChange={(account) =>
             props.handleChange('bank_integration_id', account.id)
           }
@@ -110,7 +110,7 @@ export function TransactionForm(props: Props) {
             props.handleChange('bank_integration_id', '')
           }
           errorMessage={props.errors?.errors.bank_integration_id}
-          clearButton
+          clearButton={Boolean(props.transaction.bank_integration_id)}
         />
       </Element>
 
