@@ -73,7 +73,7 @@ export function Contacts(props: Props) {
         <div key={index} className="pb-4 mb-4 border-b">
           <Element leftSide={t('first_name')}>
             <InputField
-              id={`first_nam_${index}`}
+              id={`first_name_${index}`}
               value={contact.first_name}
               onChange={(event: ChangeEvent<HTMLInputElement>) =>
                 handleChange(
