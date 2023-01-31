@@ -217,7 +217,11 @@ export function Default(props: Props) {
       href: '/tasks',
       icon: Clock,
       current: location.pathname.startsWith('/tasks'),
-      visible: enabled(ModuleBitmask.Tasks) && hasPermission('view_task'),
+      visible:
+        enabled(ModuleBitmask.Tasks) &&
+        (hasPermission('view_task') ||
+          hasPermission('edit_task') ||
+          hasPermission('create_task')),
       rightButton: {
         icon: PlusCircle,
         to: '/tasks/create',

@@ -13,6 +13,7 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
@@ -41,6 +42,7 @@ export function Edit() {
   const queryClient = useQueryClient();
   const company = useInjectCompanyChanges();
   const dispatch = useDispatch();
+  const hasPermission = useHasPermission();
 
   useEffect(() => {
     if (data) {
@@ -95,6 +97,7 @@ export function Edit() {
       onBackClick={route('/tasks')}
       navigationTopRight={task && <Actions task={task} />}
       onSaveClick={() => task && handleSave(task)}
+      disableSaveButton={!hasPermission('edit_task')}
     >
       {task && (
         <TaskDetails task={task} handleChange={handleChange} errors={errors} />
