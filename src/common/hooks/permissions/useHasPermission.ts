@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompanyUser } from '../useCurrentCompanyUser';
+import { permission } from 'common/guards/guards/permission';
 
 type AdminPermissions = 'is_admin' | 'is_owner';
 type ClientPermissions = 'create_client' | 'view_client' | 'edit_client';
@@ -56,17 +56,5 @@ export type Permissions =
   | PurchaseOrderPermission;
 
 export function useHasPermission() {
-  const user = useCurrentCompanyUser();
-  const permissions = user?.permissions ?? '';
-
-  return (permission: Permissions) => {
-    const [action] = permission.split('_');
-
-    return (
-      user?.is_admin ||
-      user?.is_owner ||
-      permissions.includes(permission) ||
-      permissions.includes(`${action}_all`)
-    );
-  };
+  return (p: Permissions) => permission(p);
 }

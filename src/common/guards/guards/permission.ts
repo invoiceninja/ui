@@ -14,7 +14,6 @@ import { store } from 'common/stores/store';
 export function permission(permission: Permissions) {
   const state = store.getState();
   const user = state.companyUsers.api[state.companyUsers.currentIndex];
-
   const permissions = user?.permissions ?? '';
 
   const [action] = permission.split('_');
