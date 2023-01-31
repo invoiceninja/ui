@@ -343,7 +343,8 @@ export function useActions() {
         <Divider withoutPadding />
       ),
     (task: Task) =>
-      !isTaskRunning(task) && (
+      !isTaskRunning(task) &&
+      !task.invoice_id && (
         <DropdownElement
           onClick={() => start(task)}
           icon={<Icon element={MdNotStarted} />}
@@ -352,7 +353,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) =>
-      isTaskRunning(task) && (
+      isTaskRunning(task) &&
+      !task.invoice_id && (
         <DropdownElement
           onClick={() => stop(task)}
           icon={<Icon element={MdStopCircle} />}
