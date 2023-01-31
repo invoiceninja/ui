@@ -116,7 +116,11 @@ export function Default(props: Props) {
       href: '/invoices',
       icon: FileText,
       current: location.pathname.startsWith('/invoices'),
-      visible: enabled(ModuleBitmask.Invoices) && hasPermission('view_invoice'),
+      visible:
+        enabled(ModuleBitmask.Invoices) &&
+        (hasPermission('view_invoice') ||
+          hasPermission('create_invoice') ||
+          hasPermission('edit_invoice')),
       rightButton: {
         icon: PlusCircle,
         to: '/invoices/create',

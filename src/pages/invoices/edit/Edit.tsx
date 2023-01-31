@@ -11,6 +11,7 @@
 import { InvoiceStatus } from 'common/enums/invoice-status';
 import { route } from 'common/helpers/route';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -99,6 +100,7 @@ export function Edit() {
 
   const actions = useActions();
   const save = useHandleSave(setErrors);
+  const hasPermission = useHasPermission();
 
   return (
     <Default
@@ -107,8 +109,10 @@ export function Edit() {
       onBackClick="/invoices"
       onSaveClick={() => invoice && save(invoice)}
       disableSaveButton={
-        invoice &&
-        (invoice.status_id === InvoiceStatus.Cancelled || invoice.is_deleted)
+        (invoice &&
+          (invoice.status_id === InvoiceStatus.Cancelled ||
+            invoice.is_deleted)) ||
+        !hasPermission('create_invoice')
       }
       navigationTopRight={
         invoice && (
