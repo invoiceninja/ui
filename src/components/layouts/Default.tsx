@@ -183,7 +183,11 @@ export function Default(props: Props) {
       href: '/credits',
       icon: FileText,
       current: location.pathname.startsWith('/credits'),
-      visible: enabled(ModuleBitmask.Credits) && hasPermission('view_credit'),
+      visible:
+        enabled(ModuleBitmask.Credits) &&
+        (hasPermission('view_credit') ||
+          hasPermission('create_credit') ||
+          hasPermission('edit_credit')),
       rightButton: {
         icon: PlusCircle,
         to: '/credits/create',

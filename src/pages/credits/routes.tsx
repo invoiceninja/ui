@@ -27,7 +27,10 @@ export const creditRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.Credits),
-            () => permission('view_credit'),
+            () =>
+              permission('view_credit') ||
+              permission('create_credit') ||
+              permission('edit_credit'),
           ]}
           component={<Credits />}
         />
@@ -51,7 +54,7 @@ export const creditRoutes = (
         <Guard
           guards={[
             () => enabled(ModuleBitmask.Credits),
-            () => permission('edit_credit'),
+            () => permission('view_credit') || permission('edit_credit'),
           ]}
           component={<Edit />}
         />
@@ -69,6 +72,14 @@ export const creditRoutes = (
         />
       }
     />
-    <Route path=":id/email" element={<Email />} />
+    <Route
+      path=":id/email"
+      element={
+        <Guard
+          guards={[() => permission('view_credit')]}
+          component={<Email />}
+        />
+      }
+    />
   </Route>
 );
