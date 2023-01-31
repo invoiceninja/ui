@@ -20,6 +20,7 @@ export interface InvoiceItem {
   product_key: string;
   notes: string;
   discount: number;
+  hours: number;
   is_amount_discount: boolean;
   tax_name1: string;
   tax_rate1: number;

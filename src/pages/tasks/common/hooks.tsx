@@ -26,11 +26,11 @@ import dayjs from 'dayjs';
 import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
+import { BiPlusCircle } from 'react-icons/bi';
 import {
   MdControlPointDuplicate,
   MdNotStarted,
   MdStopCircle,
-  MdTextSnippet,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
@@ -344,7 +344,7 @@ export function useActions() {
       !task.invoice_id && (
         <DropdownElement
           onClick={() => invoiceTask([task])}
-          icon={<Icon element={MdTextSnippet} />}
+          icon={<Icon element={BiPlusCircle} />}
         >
           {t('invoice_task')}
         </DropdownElement>

@@ -76,6 +76,8 @@ export function useInvoiceTask() {
           type_id: InvoiceItemType.Task,
         };
 
+        item.hours = 8;
+
         item.notes = [
           task.description,
           '<div class="task-time-details">',
@@ -85,12 +87,14 @@ export function useInvoiceTask() {
           .join('\n')
           .trim();
 
+        console.log(item);
+
         invoice.line_items = [item];
       });
 
       setInvoice(invoice);
 
-      navigate('/invoices/create&table=tasks');
+      navigate('/invoices/create?table=tasks');
     }
   };
 }
