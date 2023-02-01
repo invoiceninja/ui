@@ -139,6 +139,18 @@ export function TaskSettings() {
         </Element>
 
         <Element
+          leftSide={t('lock_invoiced_tasks')}
+          leftSideHelp={t('lock_invoiced_tasks_help')}
+        >
+          <Toggle
+            checked={companyChanges?.invoice_task_lock || false}
+            onChange={(value: boolean) =>
+              handleToggleChange('invoice_task_lock', value)
+            }
+          />
+        </Element>
+
+        <Element
           leftSide={t('add_documents_to_invoice')}
           leftSideHelp={t('add_documents_to_invoice_help')}
         >
@@ -160,6 +172,7 @@ export function TaskSettings() {
             }
           />
         </Element>
+
         <Element leftSide={t('tasks_shown_in_portal')}>
           <SelectField
             id="settings.show_all_tasks_client_portal"
