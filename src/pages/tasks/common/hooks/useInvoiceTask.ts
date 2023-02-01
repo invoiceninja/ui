@@ -32,6 +32,21 @@ export function useInvoiceTask() {
 
   const [, setInvoice] = useAtom(invoiceAtom);
 
+  const calculateTaskHours = (timeLog: string) => {
+    const parsedTimeLogs = parseTimeLog(timeLog);
+
+    if (parsedTimeLogs.length) {
+      const lastIndex = parsedTimeLogs.length - 1;
+
+      const startTime = dayjs.unix(parsedTimeLogs[0][0]);
+      const endTime = dayjs.unix(parsedTimeLogs[lastIndex][1]);
+
+      return Number((endTime.diff(startTime, 'seconds') / 3600).toFixed(4));
+    }
+
+    return 0;
+  };
+
   return (tasks: Task[]) => {
     if (data) {
       const invoice: Invoice = { ...data };
@@ -71,12 +86,15 @@ export function useInvoiceTask() {
           );
         });
 
+        const taskQuantity = calculateTaskHours(task.time_log);
+
         const item: InvoiceItem = {
           ...blankLineItem(),
           type_id: InvoiceItemType.Task,
+          cost: task.rate,
+          quantity: taskQuantity,
+          line_total: Number((task.rate * taskQuantity).toFixed(2)),
         };
-
-        item.hours = 8;
 
         item.notes = [
           task.description,
@@ -86,8 +104,6 @@ export function useInvoiceTask() {
         ]
           .join('\n')
           .trim();
-
-        console.log(item);
 
         invoice.line_items = [item];
       });

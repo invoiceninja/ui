@@ -25,11 +25,11 @@ import {
   MdNotStarted,
   MdRestore,
   MdStopCircle,
-  MdTextSnippet,
 } from 'react-icons/md';
 import { useUpdateAtom } from 'jotai/utils';
 import { taskAtom } from 'pages/tasks/common/atoms';
 import { useNavigate } from 'react-router-dom';
+import { BiPlusCircle } from 'react-icons/bi';
 
 interface Props {
   task: Task;
@@ -78,7 +78,7 @@ export function Actions(props: Props) {
         {!isTaskRunning(task) && !task.invoice_id && (
           <DropdownElement
             onClick={() => invoiceTask([task])}
-            icon={<Icon element={MdTextSnippet} />}
+            icon={<Icon element={BiPlusCircle} />}
           >
             {t('invoice_task')}
           </DropdownElement>
