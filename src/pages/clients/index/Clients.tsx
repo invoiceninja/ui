@@ -21,6 +21,8 @@ import {
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { ImportButton } from 'components/import/ImportButton';
 import { useActions } from '../common/hooks/useActions';
+import { MergeClientModal } from '../common/components/MergeClientModal';
+import { useState } from 'react';
 
 export function Clients() {
   useTitle('clients');
@@ -29,7 +31,14 @@ export function Clients() {
 
   const pages: Page[] = [{ name: t('clients'), href: '/clients' }];
 
-  const actions = useActions();
+  const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
+
+  const [mergeFromClientId, setMergeFromClientId] = useState<string>('');
+
+  const actions = useActions({
+    setIsMergeModalOpen,
+    setMergeFromClientId,
+  });
 
   const columns = useClientColumns();
 
@@ -51,6 +60,12 @@ export function Clients() {
             defaultColumns={defaultColumns}
           />
         }
+      />
+
+      <MergeClientModal
+        visible={isMergeModalOpen}
+        setVisible={setIsMergeModalOpen}
+        mergeFromClientId={mergeFromClientId}
       />
     </Default>
   );

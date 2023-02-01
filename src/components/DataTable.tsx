@@ -354,9 +354,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                       {props.customActions &&
                         props.customActions?.map(
                           (action: any, index: number) => (
-                            <React.Fragment key={index}>
-                              {action(resource)}
-                            </React.Fragment>
+                            <div key={index}>{action(resource)}</div>
                           )
                         )}
 
