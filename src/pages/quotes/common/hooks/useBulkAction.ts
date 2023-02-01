@@ -21,14 +21,21 @@ export function useBulkAction() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+  return (
+    id: string,
+    action: 'archive' | 'restore' | 'delete' | 'convert_to_invoice'
+  ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/quotes/bulk'), {
       action,
       ids: [id],
     })
-      .then(() => toast.success(`${action}d_quote`))
+      .then(() => {
+        action === 'convert_to_invoice'
+          ? toast.success('converted_quote')
+          : toast.success(`${action}d_quote`);
+      })
       .catch((error: AxiosError) => {
         console.error(error);
 
