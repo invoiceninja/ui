@@ -68,6 +68,7 @@ import {
   MdPictureAsPdf,
   MdRestore,
   MdSend,
+  MdSwitchRight,
 } from 'react-icons/md';
 import { SelectOption } from 'components/datatables/Actions';
 
@@ -352,6 +353,15 @@ export function useActions() {
           icon={<Icon element={MdDone} />}
         >
           {t('approve')}
+        </DropdownElement>
+      ),
+    (quote) =>
+      quote.status_id !== QuoteStatus.Converted && (
+        <DropdownElement
+          onClick={() => bulk(quote.id, 'convert_to_invoice')}
+          icon={<Icon element={MdSwitchRight} />}
+        >
+          {t('convert_to_invoice')}
         </DropdownElement>
       ),
     () => <Divider withoutPadding />,
