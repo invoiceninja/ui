@@ -17,6 +17,8 @@ import { Payment } from 'common/interfaces/payment';
 import { Params } from './common/params.interface';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { toast } from 'common/helpers/toast/toast';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 
 interface PaymentParams {
   id: string | undefined;
@@ -76,6 +78,7 @@ export function useBlankPaymentQuery() {
 
 export function useBulk() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (id: string, action: 'archive' | 'restore' | 'delete' | 'email') => {
     toast.processing();
@@ -88,6 +91,9 @@ export function useBulk() {
         const translationKeyword = action === 'email' ? 'emaile' : action;
 
         toast.success(`${translationKeyword}d_payment`);
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
 
         queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
       })

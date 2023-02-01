@@ -17,6 +17,8 @@ import { useQuery, useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { AxiosError } from 'axios';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 
 export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
   return useQuery<PurchaseOrder>(
@@ -47,6 +49,7 @@ export function usePurchaseOrderQuery(params: { id: string | undefined }) {
 
 export function useBulk() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (id: string, action: 'archive' | 'restore' | 'delete' | 'expense') => {
     toast.processing();
@@ -65,6 +68,9 @@ export function useBulk() {
         queryClient.invalidateQueries(
           route('/api/v1/purchase_orders/:id', { id })
         );
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
       })
       .catch((error: AxiosError) => {
         console.error(error);
@@ -75,6 +81,7 @@ export function useBulk() {
 
 export function useMarkSent() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (purchaseOrder: PurchaseOrder) => {
     toast.processing();
@@ -92,6 +99,9 @@ export function useMarkSent() {
         queryClient.invalidateQueries(
           route('/api/v1/purchase_orders/:id', { id: purchaseOrder.id })
         );
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
       })
       .catch((error: AxiosError) => {
         console.error(error);

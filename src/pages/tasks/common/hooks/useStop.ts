@@ -14,9 +14,12 @@ import { toast } from 'common/helpers/toast/toast';
 import { Task } from 'common/interfaces/task';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 
 export function useStop() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (task: Task) => {
     toast.processing();
@@ -42,6 +45,9 @@ export function useStop() {
             projectId: task.project_id,
           })
         );
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
       })
       .catch((error) => {
         console.error(error);
