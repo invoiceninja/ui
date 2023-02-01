@@ -20,7 +20,6 @@ export const blankLineItem = (): InvoiceItem => {
     product_cost: 0,
     notes: '',
     discount: 0,
-    hours: 0,
     is_amount_discount: false,
     tax_name1: '',
     tax_rate1: 0,
