@@ -24,7 +24,7 @@ export const transactionRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_transaction')]}
+          guards={[() => permission('view_bank_transaction')]}
           component={<Transactions />}
         />
       }
@@ -33,7 +33,7 @@ export const transactionRoutes = (
       path="create"
       element={
         <Guard
-          guards={[() => permission('create_transaction')]}
+          guards={[() => permission('create_bank_transaction')]}
           component={<CreateTransaction />}
         />
       }
@@ -44,8 +44,8 @@ export const transactionRoutes = (
         <Guard
           guards={[
             () =>
-              permission('create_transaction') ||
-              permission('edit_transaction'),
+              permission('create_bank_transaction') ||
+              permission('edit_bank_transaction'),
           ]}
           component={<Import />}
         />
@@ -55,7 +55,7 @@ export const transactionRoutes = (
       path=":id/edit"
       element={
         <Guard
-          guards={[() => permission('edit_transaction')]}
+          guards={[() => permission('edit_bank_transaction')]}
           component={<EditTransaction />}
         />
       }
