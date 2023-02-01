@@ -69,8 +69,10 @@ import {
   MdRestore,
   MdSend,
   MdSwitchRight,
+  MdTextSnippet,
 } from 'react-icons/md';
 import { SelectOption } from 'components/datatables/Actions';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -495,6 +497,9 @@ export function useQuoteColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const accentColor = useAccentColor();
+  const navigate = useNavigate();
+
   const currentUser = useCurrentUser();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
@@ -517,7 +522,22 @@ export function useQuoteColumns() {
       column: 'status',
       id: 'status_id',
       label: t('status'),
-      format: (value, quote) => <QuoteStatusBadge entity={quote} />,
+      format: (value, quote) => (
+        <div className="flex items-center space-x-2">
+          <QuoteStatusBadge entity={quote} />
+
+          {quote.status_id === QuoteStatus.Converted && (
+            <MdTextSnippet
+              className="cursor-pointer"
+              fontSize={19}
+              color={accentColor}
+              onClick={() =>
+                navigate(route('/invoices/:id/edit', { id: quote.invoice_id }))
+              }
+            />
+          )}
+        </div>
+      ),
     },
     {
       column: 'number',
