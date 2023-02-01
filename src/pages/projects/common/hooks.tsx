@@ -25,6 +25,7 @@ import { Icon } from 'components/icons/Icon';
 import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
+import { BiPlusCircle } from 'react-icons/bi';
 import {
   MdArchive,
   MdControlPointDuplicate,
@@ -235,6 +236,14 @@ export function useActions() {
   };
 
   const actions = [
+    (project: Project) => (
+      <DropdownElement
+        onClick={() => cloneToProject(project)}
+        icon={<Icon element={BiPlusCircle} />}
+      >
+        {t('invoice_project')}
+      </DropdownElement>
+    ),
     (project: Project) => (
       <DropdownElement
         onClick={() => cloneToProject(project)}
