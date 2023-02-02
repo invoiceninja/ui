@@ -32,6 +32,7 @@ export interface Company {
   stock_notification: boolean;
   track_inventory: boolean;
   stop_on_unpaid_recurring: boolean;
+  enabled_modules: number;
 }
 
 export interface CompanyInput {
