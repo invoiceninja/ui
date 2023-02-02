@@ -24,17 +24,116 @@ export function parseTime(timestamp: number) {
     return;
   }
 
-  return dayjs.unix(timestamp).format('hh:mm:ss');
-}
+  const formattedTimestamp = dayjs.unix(timestamp).format('hh:mm:ss A');
 
-export function duration(start: number, stop: number) {
-  const diff = dayjs.unix(stop).diff(dayjs.unix(start), 'seconds');
+  const [timeValues] = formattedTimestamp.split(' ');
 
-  if (diff < 0) {
-    return;
+  const [hours, minutes, seconds] = timeValues.split(':');
+
+  if (formattedTimestamp.includes('PM')) {
+    const updatedHours = Number(hours) + 12;
+
+    return (
+      updatedHours.toString() +
+      ':' +
+      minutes.toString() +
+      ':' +
+      seconds.toString()
+    );
   }
 
-  return new Date(diff * 1000).toISOString().slice(11, 19);
+  const updatedHours = Number(hours) === 12 ? '00' : hours;
+
+  return (
+    updatedHours.toString() +
+    ':' +
+    minutes.toString() +
+    ':' +
+    seconds.toString()
+  );
+}
+
+export const combineDateAndTime = (
+  date: string | undefined,
+  time: string | undefined
+) => {
+  if (date && time) {
+    const dateValue = new Date(date);
+    const [hours, minutes, seconds] = time.split(':');
+
+    dateValue.setHours(Number(hours));
+    dateValue.setMinutes(Number(minutes));
+    dateValue.setSeconds(Number(seconds));
+
+    return dateValue;
+  }
+};
+
+export function duration(
+  start: number,
+  stop: number,
+  includedEndDate: boolean
+) {
+  const startDateValue = parseTimeToDate(start);
+  const startTimeValue = parseTime(start);
+
+  const endDateValue = parseTimeToDate(stop);
+  const endTimeValue = parseTime(stop);
+
+  const unixTimestampStart = dayjs(
+    `${startDateValue} ${startTimeValue}`,
+    'YYYY-MM-DD hh:mm:ss'
+  ).unix();
+
+  let unixTimestampEnd = dayjs(
+    `${endDateValue} ${endTimeValue}`,
+    'YYYY-MM-DD hh:mm:ss'
+  ).unix();
+
+  let diff = dayjs
+    .unix(unixTimestampEnd)
+    .diff(dayjs.unix(unixTimestampStart), 'seconds');
+
+  if (!includedEndDate && diff < 0) {
+    unixTimestampEnd = dayjs(
+      `${startDateValue} ${endTimeValue}`,
+      'YYYY-MM-DD hh:mm:ss'
+    ).unix();
+  }
+
+  diff = dayjs
+    .unix(unixTimestampEnd)
+    .diff(dayjs.unix(unixTimestampStart), 'seconds');
+
+  if (diff < 0) {
+    return '00:00:00';
+  }
+
+  let hours = Math.floor(diff / 3600).toString();
+  diff -= Number(hours) * 3600;
+
+  let minutes = Math.floor(diff / 60).toString();
+  diff -= Number(minutes) * 60;
+
+  let seconds = diff.toString();
+
+  if (Number(hours) < 10) {
+    hours = '0' + hours.toString();
+  }
+
+  if (Number(minutes) < 10) {
+    minutes = '0' + minutes.toString();
+  }
+
+  if (Number(seconds) < 10) {
+    seconds = '0' + seconds.toString();
+  }
+
+  if (stop && startDateValue !== '1970-01-01') {
+    return hours + ':' + minutes + ':' + seconds;
+  } else {
+    return '00:00:00';
+  }
 }
 
 export function handleTaskTimeChange(

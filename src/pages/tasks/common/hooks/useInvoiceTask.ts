@@ -22,6 +22,7 @@ import collect from 'collect.js';
 import toast from 'react-hot-toast';
 import { useAtom } from 'jotai';
 import { invoiceAtom } from 'pages/invoices/common/atoms';
+import { route } from 'common/helpers/route';
 
 export function useInvoiceTask() {
   const navigate = useNavigate();
@@ -35,16 +36,20 @@ export function useInvoiceTask() {
   const calculateTaskHours = (timeLog: string) => {
     const parsedTimeLogs = parseTimeLog(timeLog);
 
+    let hoursSum = 0;
+
     if (parsedTimeLogs.length) {
-      const lastIndex = parsedTimeLogs.length - 1;
+      parsedTimeLogs.forEach(([start, stop]) => {
+        const unixStart = dayjs.unix(start);
+        const unixStop = dayjs.unix(stop);
 
-      const startTime = dayjs.unix(parsedTimeLogs[0][0]);
-      const endTime = dayjs.unix(parsedTimeLogs[lastIndex][1]);
-
-      return Number((endTime.diff(startTime, 'seconds') / 3600).toFixed(4));
+        hoursSum += Number(
+          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
+        );
+      });
     }
 
-    return 0;
+    return hoursSum;
   };
 
   return (tasks: Task[]) => {
@@ -110,7 +115,11 @@ export function useInvoiceTask() {
 
       setInvoice(invoice);
 
-      navigate('/invoices/create?table=tasks');
+      navigate(
+        route('/invoices/create?table=tasks&project=:projectAssigned', {
+          projectAssigned: Boolean(tasks[0].project_id),
+        })
+      );
     }
   };
 }

@@ -171,7 +171,8 @@ export function EditSlider() {
               debounceTimeout={1000}
               value={duration(
                 timeLog[timeLogIndex!][LogPosition.Start],
-                timeLog[timeLogIndex!][LogPosition.End]
+                timeLog[timeLogIndex!][LogPosition.End],
+                company?.show_task_end_date
               )}
               onValueChange={(value) =>
                 handleDurationChange(
