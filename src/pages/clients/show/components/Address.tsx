@@ -9,16 +9,20 @@
  */
 
 import { useResolveCountry } from 'common/hooks/useResolveCountry';
-import { useClientQuery } from 'common/queries/clients';
+import { Client } from 'common/interfaces/client';
 import { InfoCard } from 'components/InfoCard';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 
-export function Address() {
+interface Props {
+  client: Client;
+}
+
+export function Address(props: Props) {
   const { t } = useTranslation();
-  const { id } = useParams();
-  const { data: client } = useClientQuery({ id });
+
   const resolveCountry = useResolveCountry();
+
+  const { client } = props;
 
   return (
     <>
@@ -29,18 +33,16 @@ export function Address() {
             value={
               <>
                 <p>
-                  {client.data.data.address1.length > 0 &&
-                    `${client.data.data.address1}, `}
-                  {client.data.data.address2}
+                  {client.address1.length > 0 && `${client.address1}, `}
+                  {client.address2}
                 </p>
 
                 <p>
-                  {client.data.data.city.length > 0 &&
-                    `${client.data.data.city}, `}
-                  {client.data.data.state}
+                  {client.city.length > 0 && `${client.city}, `}
+                  {client.state}
                 </p>
 
-                <p>{resolveCountry(client.data.data.country_id)?.name}</p>
+                <p>{resolveCountry(client.country_id)?.name}</p>
               </>
             }
             className="h-full"

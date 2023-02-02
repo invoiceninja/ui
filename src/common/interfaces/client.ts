@@ -11,6 +11,28 @@
 import { ClientContact } from './client-contact';
 import { Timestamps } from './timestamps';
 
+interface Meta {
+  brand: string;
+  exp_month: string;
+  exp_year: string;
+  last4: string;
+  type: number;
+}
+
+interface GatewayToken {
+  id: string;
+  archived_at: number;
+  company_gateway_id: string;
+  created_at: number;
+  gateway_customer_reference: string;
+  gateway_type_id: string;
+  meta: Meta;
+  is_default: boolean;
+  is_deleted: boolean;
+  token: string;
+  updated_at: number;
+}
+
 export interface Client extends Timestamps {
   id: string;
   user_id: string;
@@ -52,5 +74,5 @@ export interface Client extends Timestamps {
   number: string;
   contacts: ClientContact[];
   documents: any[];
-  gateway_tokens: any[];
+  gateway_tokens: GatewayToken[];
 }
