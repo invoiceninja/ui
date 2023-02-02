@@ -15,13 +15,13 @@ import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { request } from 'common/helpers/request';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { isHosted } from 'common/helpers';
 import { Alert } from 'components/Alert';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Link } from '@invoiceninja/forms';
 import { toast } from 'common/helpers/toast/toast';
 import { MdInfoOutline } from 'react-icons/md';
+import { usePlan } from 'common/guards/guards/free-plan';
 
 interface Props {
   endpoint: string;
@@ -33,6 +33,8 @@ export function Upload(props: Props) {
   const [t] = useTranslation();
 
   const user = useCurrentUser();
+
+  const { enterprisePlan } = usePlan();
 
   const [formData, setFormData] = useState(new FormData());
 
@@ -60,7 +62,7 @@ export function Upload(props: Props) {
   });
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    disabled: !enterprisePlan() && isHosted(),
+    disabled: !enterprisePlan && isHosted(),
     onDrop: (acceptedFiles) => {
       formData.append('_method', 'PUT');
 
@@ -75,7 +77,7 @@ export function Upload(props: Props) {
   if (props.widgetOnly) {
     return (
       <>
-        {!enterprisePlan() && isHosted() && (
+        {!enterprisePlan && isHosted() && (
           <Alert className="mb-4" type="warning" disableClosing>
             <div className="flex items-center">
               <MdInfoOutline className="mr-2" fontSize={20} />
@@ -115,7 +117,7 @@ export function Upload(props: Props) {
 
   return (
     <>
-      {!enterprisePlan() && isHosted() && (
+      {!enterprisePlan && isHosted() && (
         <Alert className="mb-4" type="warning" disableClosing>
           <div className="flex items-center">
             <MdInfoOutline className="mr-2" fontSize={20} />

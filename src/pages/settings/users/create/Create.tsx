@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
+import { usePlan } from 'common/guards/guards/free-plan';
 import { endpoint, isHosted } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
@@ -96,14 +96,16 @@ export function Create() {
       });
   };
 
+  const { enterprisePlan } = usePlan();
+
   return (
     <Settings
       title={t('new_user')}
       breadcrumbs={pages}
       onSaveClick={() => setIsPasswordConfirmModalOpen(true)}
-      disableSaveButton={!enterprisePlan() && isHosted()}
+      disableSaveButton={!enterprisePlan && isHosted()}
     >
-      {!enterprisePlan() && isHosted() && (
+      {!enterprisePlan && isHosted() && (
         <AdvancedSettingsPlanAlert
           message={t('add_users_not_supported') as string}
         />

@@ -18,8 +18,8 @@ import { MdLink } from 'react-icons/md';
 import { endpoint, isHosted } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
+import { usePlan } from 'common/guards/guards/free-plan';
 
 export function BankAccounts() {
   useTitle('bank_accounts');
@@ -46,13 +46,15 @@ export function BankAccounts() {
     );
   };
 
+  const { enterprisePlan } = usePlan();
+
   return (
     <Settings
       title={t('bank_accounts')}
       breadcrumbs={pages}
       docsLink="/docs/advanced-settings/#bank_accounts"
     >
-      {!enterprisePlan() && isHosted() && (
+      {!enterprisePlan && isHosted() && (
         <AdvancedSettingsPlanAlert
           message={t('upgrade_to_connect_bank_account') as string}
         />
@@ -67,7 +69,7 @@ export function BankAccounts() {
         withResourcefulActions
         rightSide={
           isHosted() &&
-          enterprisePlan() && (
+          enterprisePlan && (
             <Button onClick={handleConnectAccounts}>
               <span className="mr-2">{<MdLink />}</span>
               {t('connect_accounts')}

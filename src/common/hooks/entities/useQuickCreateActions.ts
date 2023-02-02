@@ -13,10 +13,10 @@ import { useEffect, useState } from 'react';
 import { CompanyGateway } from 'common/interfaces/company-gateway';
 import { BankAccount } from 'common/interfaces/bank-accounts';
 import { useBankAccountsQuery } from 'pages/settings/bank-accounts/common/queries';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { useTaxRatesQuery } from 'common/queries/tax-rates';
 import { TaxRate } from 'common/interfaces/tax-rate';
 import { useCurrentCompany } from '../useCurrentCompany';
+import { usePlan } from 'common/guards/guards/free-plan';
 
 interface EntityAction {
   key: string;
@@ -30,15 +30,12 @@ export function useQuickCreateActions() {
   const currentCompany = useCurrentCompany();
 
   const { data: gatewaysData } = useCompanyGatewaysQuery();
-
   const { data: bankAccountsData } = useBankAccountsQuery();
-
   const { data: taxRatesData } = useTaxRatesQuery({});
+  const { enterprisePlan } = usePlan();
 
   const [gateways, setGateways] = useState<CompanyGateway[]>();
-
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>();
-
   const [taxRates, setTaxRates] = useState<TaxRate[]>();
 
   useEffect(() => {
@@ -138,7 +135,7 @@ export function useQuickCreateActions() {
       key: 'connect_bank',
       url: '/settings/bank_accounts/create',
       section: 'settings',
-      visible: enterprisePlan() && Boolean(!bankAccounts?.length),
+      visible: enterprisePlan && Boolean(!bankAccounts?.length),
     },
     {
       key: 'tax_settings',
