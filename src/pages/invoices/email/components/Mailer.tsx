@@ -12,7 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import MDEditor from '@uiw/react-md-editor';
 import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
-import { freePlan } from 'common/guards/guards/free-plan';
+import { usePlan } from 'common/guards/guards/free-plan';
 import { proPlan } from 'common/guards/guards/pro-plan';
 import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
 import { useHandleSend } from 'common/hooks/emails/useHandleSend';
@@ -55,6 +55,7 @@ export function Mailer(props: Props) {
   const [body, setBody] = useState('');
 
   const company = useCurrentCompany();
+  const { freePlan } = usePlan();
 
   const handleTemplateChange = (id: string) => {
     setSubject('');
@@ -169,7 +170,7 @@ export function Mailer(props: Props) {
               label={t('subject')}
               value={subject || template?.raw_subject}
               onValueChange={(value) => setSubject(value)}
-              disabled={freePlan()}
+              disabled={freePlan}
             />
 
             {(proPlan() || enterprisePlan()) && (
