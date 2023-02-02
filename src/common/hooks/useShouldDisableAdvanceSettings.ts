@@ -8,10 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
-import { proPlan } from 'common/guards/guards/pro-plan';
+import { usePlan } from 'common/guards/guards/free-plan';
 import { isHosted } from 'common/helpers';
 
 export function useShouldDisableAdvanceSettings() {
-  return !proPlan() && !enterprisePlan() && isHosted();
+  const { enterprisePlan, proPlan } = usePlan();
+
+  return !proPlan && !enterprisePlan && isHosted();
 }

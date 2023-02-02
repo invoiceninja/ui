@@ -11,9 +11,7 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, SelectField } from '@invoiceninja/forms';
 import MDEditor from '@uiw/react-md-editor';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { usePlan } from 'common/guards/guards/free-plan';
-import { proPlan } from 'common/guards/guards/pro-plan';
 import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
 import { useHandleSend } from 'common/hooks/emails/useHandleSend';
 import { useResolveTemplate } from 'common/hooks/emails/useResolveTemplate';
@@ -95,6 +93,8 @@ export function Mailer(props: Props) {
 
   const handleSend = useHandleSend();
 
+  const { proPlan, enterprisePlan } = usePlan();
+
   return (
     <>
       <div className="flex justify-end">
@@ -173,7 +173,7 @@ export function Mailer(props: Props) {
               disabled={freePlan}
             />
 
-            {(proPlan() || enterprisePlan()) && (
+            {(proPlan || enterprisePlan) && (
               <MDEditor
                 value={body || template?.raw_body}
                 onChange={(value) => setBody(String(value))}
