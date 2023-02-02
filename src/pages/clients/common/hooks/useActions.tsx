@@ -13,11 +13,17 @@ import { Client } from 'common/interfaces/client';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Icon } from 'components/icons/Icon';
 import { Action } from 'components/ResourceActions';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BiPlusCircle } from 'react-icons/bi';
+import { BiGitMerge, BiPlusCircle } from 'react-icons/bi';
 import { MdCloudCircle, MdPictureAsPdf } from 'react-icons/md';
 
-export function useActions() {
+interface Params {
+  setIsMergeModalOpen: Dispatch<SetStateAction<boolean>>;
+  setMergeFromClientId: Dispatch<SetStateAction<string>>;
+}
+
+export function useActions(params: Params) {
   const [t] = useTranslation();
 
   const actions: Action<Client>[] = [
@@ -67,6 +73,17 @@ export function useActions() {
         icon={<Icon element={BiPlusCircle} />}
       >
         {t('new_credit')}
+      </DropdownElement>
+    ),
+    (client) => (
+      <DropdownElement
+        onClick={() => {
+          params.setMergeFromClientId(client.id);
+          params.setIsMergeModalOpen(true);
+        }}
+        icon={<Icon element={BiGitMerge} />}
+      >
+        {t('merge')}
       </DropdownElement>
     ),
   ];
