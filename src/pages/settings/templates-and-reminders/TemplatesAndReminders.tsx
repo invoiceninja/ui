@@ -10,7 +10,7 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { Button, InputField, Link, SelectField } from '@invoiceninja/forms';
-import { freePlan } from 'common/guards/guards/free-plan';
+import { freePlan, usePlan } from 'common/guards/guards/free-plan';
 import { endpoint, isHosted, isSelfHosted } from 'common/helpers';
 import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
 import { request } from 'common/helpers/request';
@@ -55,7 +55,10 @@ export function TemplatesAndReminders() {
   const [templateId, setTemplateId] = useState('invoice');
   const [templateBody, setTemplateBody] = useState<TemplateBody>();
   const [preview, setPreview] = useState<EmailTemplate>();
-  const canChangeEmailTemplate = (isHosted() && !freePlan()) || isSelfHosted();
+
+  const { freePlan } = usePlan();
+
+  const canChangeEmailTemplate = (isHosted() && !freePlan) || isSelfHosted();
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 

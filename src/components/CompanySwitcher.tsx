@@ -26,7 +26,7 @@ import { CompanyCreate } from 'pages/settings/company/create/CompanyCreate';
 import { CompanyEdit } from 'pages/settings/company/edit/CompanyEdit';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { isDemo, isHosted, isSelfHosted } from 'common/helpers';
-import { freePlan } from 'common/guards/guards/free-plan';
+import { usePlan } from 'common/guards/guards/free-plan';
 import { Icon } from './icons/Icon';
 import { MdLogout, MdManageAccounts } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
@@ -40,9 +40,10 @@ export function CompanySwitcher() {
   const state = useSelector((state: RootState) => state.companyUsers);
 
   const companyUser = useCurrentCompanyUser();
+  const { freePlan } = usePlan();
 
   const canUserAddCompany =
-    (isSelfHosted() || (isHosted() && !freePlan())) && companyUser?.is_owner;
+    (isSelfHosted() || (isHosted() && !freePlan)) && companyUser?.is_owner;
 
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
