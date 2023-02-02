@@ -20,9 +20,11 @@ import {
   MdDeleteForever,
   MdPictureAsPdf,
 } from 'react-icons/md';
-import { BiPlusCircle } from 'react-icons/bi';
+import { BiGitMerge, BiPlusCircle } from 'react-icons/bi';
 import { Icon } from 'components/icons/Icon';
 import { toast } from 'common/helpers/toast/toast';
+import { MergeClientModal } from './MergeClientModal';
+import { useState } from 'react';
 
 interface Props {
   clientId: string | undefined;
@@ -30,6 +32,10 @@ interface Props {
 }
 export function CustomResourcefulActions(props: Props) {
   const [t] = useTranslation();
+
+  const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
+
+  const [mergeFromClientId, setMergeFromClientId] = useState<string>('');
 
   const handleResourcefulAction = (action: 'delete' | 'archive') => {
     toast.processing();
@@ -46,83 +52,102 @@ export function CustomResourcefulActions(props: Props) {
   };
 
   return (
-    <Dropdown label={t('more_actions')} className="divide-y">
-      <div>
-        <DropdownElement
-          to={route('/clients/:id/statement', {
-            id: props.clientId,
-          })}
-          icon={<Icon element={MdPictureAsPdf} />}
-        >
-          {t('view_statement')}
-        </DropdownElement>
+    <>
+      <Dropdown label={t('more_actions')} className="divide-y">
+        <div>
+          <DropdownElement
+            to={route('/clients/:id/statement', {
+              id: props.clientId,
+            })}
+            icon={<Icon element={MdPictureAsPdf} />}
+          >
+            {t('view_statement')}
+          </DropdownElement>
 
-        <DropdownElement
-          to={route('/invoices/create?client=:id', {
-            id: props.clientId,
-          })}
-          icon={<Icon element={BiPlusCircle} />}
-        >
-          {t('new_invoice')}
-        </DropdownElement>
+          <DropdownElement
+            to={route('/invoices/create?client=:id', {
+              id: props.clientId,
+            })}
+            icon={<Icon element={BiPlusCircle} />}
+          >
+            {t('new_invoice')}
+          </DropdownElement>
 
-        <DropdownElement
-          to={route('/payments/create?client=:id', {
-            id: props.clientId,
-          })}
-          icon={<Icon element={BiPlusCircle} />}
-        >
-          {t('new_payment')}
-        </DropdownElement>
+          <DropdownElement
+            to={route('/payments/create?client=:id', {
+              id: props.clientId,
+            })}
+            icon={<Icon element={BiPlusCircle} />}
+          >
+            {t('new_payment')}
+          </DropdownElement>
 
-        <DropdownElement
-          to={route('/quotes/create?client=:id', {
-            id: props.clientId,
-          })}
-          icon={<Icon element={BiPlusCircle} />}
-        >
-          {t('new_quote')}
-        </DropdownElement>
+          <DropdownElement
+            to={route('/quotes/create?client=:id', {
+              id: props.clientId,
+            })}
+            icon={<Icon element={BiPlusCircle} />}
+          >
+            {t('new_quote')}
+          </DropdownElement>
 
-        <DropdownElement
-          to={route('/credits/create?client=:id', {
-            id: props.clientId,
-          })}
-          icon={<Icon element={BiPlusCircle} />}
-        >
-          {t('new_credit')}
-        </DropdownElement>
-      </div>
+          <DropdownElement
+            to={route('/credits/create?client=:id', {
+              id: props.clientId,
+            })}
+            icon={<Icon element={BiPlusCircle} />}
+          >
+            {t('new_credit')}
+          </DropdownElement>
 
-      <div>
-        <DropdownElement
-          key={'archive'}
-          onClick={() => {
-            handleResourcefulAction('archive');
-          }}
-          icon={<Icon element={MdArchive} />}
-        >
-          {t('archive')}
-        </DropdownElement>
-        <DropdownElement
-          key={'delete'}
-          onClick={() => {
-            handleResourcefulAction('delete');
-          }}
-          icon={<Icon element={MdDelete} />}
-        >
-          {t('delete')}
-        </DropdownElement>
-        <DropdownElement
-          key={'purge'}
-          onClick={() => {
-            props.openPurgeModal(true);
-          }}
-          icon={<Icon element={MdDeleteForever} />}
-        >
-          {t('purge')}
-        </DropdownElement>
-      </div>
-    </Dropdown>
+          <DropdownElement
+            onClick={() => {
+              props.clientId && setMergeFromClientId(props.clientId);
+              props.clientId && setIsMergeModalOpen(true);
+            }}
+            icon={<Icon element={BiGitMerge} />}
+          >
+            {t('merge')}
+          </DropdownElement>
+        </div>
+
+        <div>
+          <DropdownElement
+            key={'archive'}
+            onClick={() => {
+              handleResourcefulAction('archive');
+            }}
+            icon={<Icon element={MdArchive} />}
+          >
+            {t('archive')}
+          </DropdownElement>
+          <DropdownElement
+            key={'delete'}
+            onClick={() => {
+              handleResourcefulAction('delete');
+            }}
+            icon={<Icon element={MdDelete} />}
+          >
+            {t('delete')}
+          </DropdownElement>
+          <DropdownElement
+            key={'purge'}
+            onClick={() => {
+              props.openPurgeModal(true);
+            }}
+            icon={<Icon element={MdDeleteForever} />}
+          >
+            {t('purge')}
+          </DropdownElement>
+        </div>
+      </Dropdown>
+
+      <MergeClientModal
+        visible={isMergeModalOpen}
+        setVisible={setIsMergeModalOpen}
+        mergeFromClientId={mergeFromClientId}
+        editPage
+      />
+    </>
   );
 }
