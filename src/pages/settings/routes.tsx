@@ -153,7 +153,7 @@ export const settingsRoutes = (
         <Route path="create" element={<Settings.CreateApiWebhook />} />
         <Route path=":id/edit" element={<Settings.EditApiWebhook />} />
       </Route>
-      <Route path="google_analytics" element={<Settings.GoogleAnalytics />} />
+      <Route path="analytics" element={<Settings.Analytics />} />
     </Route>
     <Route path="gateways">
       <Route path="create" element={<Settings.CreateGateway />} />

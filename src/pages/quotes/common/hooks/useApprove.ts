@@ -14,9 +14,12 @@ import { toast } from 'common/helpers/toast/toast';
 import { Quote } from 'common/interfaces/quote';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 
 export function useApprove() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (quote: Quote) => {
     toast.processing();
@@ -34,6 +37,9 @@ export function useApprove() {
         );
 
         queryClient.invalidateQueries('/api/v1/quotes');
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
       })
       .catch((error) => {
         toast.error();

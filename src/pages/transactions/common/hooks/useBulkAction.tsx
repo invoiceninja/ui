@@ -14,9 +14,12 @@ import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 
 export function useBulkAction() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
@@ -33,6 +36,9 @@ export function useBulkAction() {
         queryClient.invalidateQueries(
           route('/api/v1/bank_transactions/:id', { id })
         );
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
       })
       .catch((error: AxiosError) => {
         console.error(error);

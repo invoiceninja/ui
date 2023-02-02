@@ -12,9 +12,7 @@ import { Card, Element } from '@invoiceninja/cards';
 import { useTranslation } from 'react-i18next';
 import { Settings } from 'components/layouts/Settings';
 import { InputField } from '@invoiceninja/forms';
-import { useState } from 'react';
-import { useFormik } from 'formik';
-import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { useNavigate } from 'react-router-dom';
@@ -23,9 +21,16 @@ import { useTitle } from 'common/hooks/useTitle';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { ApiToken } from 'common/interfaces/api-token';
+import { useBlankApiTokenQuery } from 'common/queries/api-tokens';
+import { useHandleChange } from './common/hooks/hooks';
+import { toast } from 'common/helpers/toast/toast';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
 export function Create() {
   const [t] = useTranslation();
+  const { documentTitle } = useTitle('new_token');
+  const navigate = useNavigate();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -37,27 +42,28 @@ export function Create() {
     },
   ];
 
-  useTitle('new_token');
+  const { data: blankApiToken } = useBlankApiTokenQuery();
 
-  const navigate = useNavigate();
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
-    useState(false);
-  const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<Record<string, any>>({});
+    useState<boolean>(false);
+  const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const formik = useFormik({
-    initialValues: {
-      name: '',
-    },
-    onSubmit: (values) => {
-      setErrors({});
-      const toastId = toast.loading(t('processing'));
+  const [apiToken, setApiToken] = useState<ApiToken>();
+  const [errors, setErrors] = useState<ValidationBag>();
 
-      request('POST', endpoint('/api/v1/tokens'), values, {
+  const handleChange = useHandleChange({ setApiToken, setErrors });
+
+  const handleSave = (password: string) => {
+    if (!isFormBusy) {
+      setErrors(undefined);
+      toast.processing();
+      setIsFormBusy(true);
+
+      request('POST', endpoint('/api/v1/tokens'), apiToken, {
         headers: { 'X-Api-Password': password },
       })
-        .then((response) => {
-          toast.success(t('created_token'), { id: toastId });
+        .then((response: GenericSingleResourceResponse<ApiToken>) => {
+          toast.success('created_token');
 
           navigate(
             route('/settings/integrations/api_tokens/:id/edit', {
@@ -66,48 +72,49 @@ export function Create() {
           );
         })
         .catch((error: AxiosError<ValidationBag>) => {
-          formik.setSubmitting(false);
-
           if (error.response?.status === 422) {
             toast.dismiss();
-
-            return setErrors(error.response.data);
+            setErrors(error.response.data);
+            return;
           }
 
-          error.response?.status === 412
-            ? toast.error(t('password_error_incorrect'), { id: toastId })
-            : toast.error(t('error_title'), { id: toastId });
-        });
-    },
-  });
+          if (error.response?.status === 412) {
+            toast.error('password_error_incorrect');
+          } else {
+            console.error(error);
+            toast.error();
+          }
+        })
+        .finally(() => setIsFormBusy(false));
+    }
+  };
+
+  useEffect(() => {
+    if (blankApiToken) {
+      setApiToken(blankApiToken);
+    }
+  }, [blankApiToken]);
 
   return (
     <>
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setIsPasswordConfirmModalOpen}
-        onSave={(password) => {
-          setPassword(password);
-          formik.submitForm();
-        }}
+        onSave={handleSave}
       />
 
-      <Settings title={t('new_token')} breadcrumbs={pages}>
-        <Card
-          disableSubmitButton={formik.isSubmitting}
-          onFormSubmit={(event) => {
-            event.preventDefault();
-            setIsPasswordConfirmModalOpen(true);
-          }}
-          withSaveButton
-          title={t('new_token')}
-        >
-          <Element leftSide={t('name')}>
+      <Settings
+        title={documentTitle}
+        breadcrumbs={pages}
+        onSaveClick={() => setIsPasswordConfirmModalOpen(true)}
+        disableSaveButton={!apiToken}
+      >
+        <Card title={t('new_token')}>
+          <Element leftSide={t('name')} required>
             <InputField
               required
-              id="name"
-              onChange={formik.handleChange}
-              errorMessage={errors?.errors?.name}
+              onValueChange={(value) => handleChange('name', value)}
+              errorMessage={errors?.errors.name}
             />
           </Element>
         </Card>
