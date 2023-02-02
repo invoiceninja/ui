@@ -9,18 +9,16 @@
  */
 
 import { isSelfHosted } from 'common/helpers';
-import { store } from 'common/stores/store';
+import { GuardContext } from '../Guard';
 
 export function freePlan() {
-  if (isSelfHosted()) {
-    return true;
-  }
-
   const plans = ['pro', 'enterprise', 'white_label'];
 
-  return !plans.includes(
-    store.getState().companyUsers.api?.[
-      store.getState().companyUsers.currentIndex
-    ]?.account.plan
-  );
+  return ({ companyUser }: GuardContext) => {
+    if (isSelfHosted()) {
+      return true;
+    }
+
+    return !plans.includes(companyUser?.account.plan || '');
+  };
 }

@@ -9,16 +9,14 @@
  */
 
 import { isSelfHosted } from 'common/helpers';
-import { store } from 'common/stores/store';
+import { GuardContext } from '../Guard';
 
 export function proPlan() {
-  if (isSelfHosted()) {
-    return true;
-  }
+  return ({ companyUser }: GuardContext) => {
+    if (isSelfHosted()) {
+      return true;
+    }
 
-  return Boolean(
-    store.getState().companyUsers.api?.[
-      store.getState().companyUsers.currentIndex
-    ]?.account.plan === 'pro'
-  );
+    return companyUser?.account.plan === 'pro';
+  };
 }
