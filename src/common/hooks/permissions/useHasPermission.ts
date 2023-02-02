@@ -8,7 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { GuardContext } from 'common/guards/Guard';
 import { permission } from 'common/guards/guards/permission';
+import { useQueryClient } from 'react-query';
+import { useParams } from 'react-router-dom';
+import { useCurrentCompanyUser } from '../useCurrentCompanyUser';
 
 type AdminPermissions = 'is_admin' | 'is_owner';
 type ClientPermissions = 'create_client' | 'view_client' | 'edit_client';
@@ -56,5 +60,11 @@ export type Permissions =
   | PurchaseOrderPermission;
 
 export function useHasPermission() {
-  return (p: Permissions) => permission(p);
+  const params = useParams();
+  const queryClient = useQueryClient();
+  const companyUser = useCurrentCompanyUser();
+
+  const payload: GuardContext = { params, queryClient, companyUser };
+
+  return (p: Permissions) => permission(p)(payload);
 }
