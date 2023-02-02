@@ -163,7 +163,7 @@ export function Create() {
           onChange={(id) => handleChange('client_id', id)}
           onClearButtonClick={() => handleChange('client_id', '')}
           onContactCheckboxChange={handleInvitationChange}
-          readonly={searchParams.get('table') === 'tasks'}
+          readonly={searchParams.get('project') === 'true'}
           errorMessage={errors?.errors.client_id}
         />
 
