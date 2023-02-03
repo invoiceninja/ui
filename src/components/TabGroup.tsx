@@ -27,7 +27,7 @@ export function TabGroup(props: Props) {
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
 
   return (
-    <div className={`relative ${props.className}`}>
+    <div className={props.className}>
       <div className="-mb-px flex space-x-8 overflow-x-auto border-b border-gray-200">
         {props.tabs.map((tab, index) => (
           <div
