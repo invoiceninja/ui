@@ -55,7 +55,26 @@ export const settingsRoutes = (
       <Route path="" element={<Settings.CompanyBackup />} />
       <Route path="restore" element={<Settings.CompanyRestore />} />
     </Route>
-    <Route path="invoice_design" element={<Settings.InvoiceDesign />} />
+    <Route path="invoice_design" element={<Settings.InvoiceDesign />}>
+      <Route path="" element={<Settings.GeneralSettings />} />
+      <Route path="client_details" element={<Settings.ClientDetails />} />
+      <Route
+        path="company_details"
+        element={<Settings.InvoiceCompanyDetails />}
+      />
+      <Route path="company_address" element={<Settings.CompanyAddress />} />
+      <Route path="invoice_details" element={<Settings.InvoiceDetails />} />
+      <Route path="quote_details" element={<Settings.QuoteDetails />} />
+      <Route path="credit_details" element={<Settings.CreditDetails />} />
+      <Route path="vendor_details" element={<Settings.VendorDetails />} />
+      <Route
+        path="purchase_order_details"
+        element={<Settings.PurchaseOrderDetails />}
+      />
+      <Route path="product_columns" element={<Settings.ProductColumns />} />
+      <Route path="task_columns" element={<Settings.TaskColumns />} />
+      <Route path="total_fields" element={<Settings.TotalFields />} />
+    </Route>
     <Route path="invoice_design/customize" element={<Settings.Customize />} />
     <Route path="custom_fields">
       <Route path="" element={<Settings.CustomFields />} />
