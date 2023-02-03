@@ -116,9 +116,6 @@ export function Statement() {
 
   const [client, setClient] = useState<Client>();
 
-  const [shouldEmailStatement, setShouldEmailStatement] =
-    useState<boolean>(false);
-
   const [statement, setStatement] = useState<Statement>({
     client_id: id!,
     start_date: dayjs().subtract(7, 'days').format('YYYY-MM-DD'),
@@ -164,6 +161,12 @@ export function Statement() {
   };
 
   const handleSendEmail = () => {
+    const send = client?.contacts?.some((contact) => contact.email);
+
+    if (!send) {
+      return toast.error('client_email_not_set');
+    }
+
     toast.processing();
 
     request(
@@ -178,12 +181,6 @@ export function Statement() {
         console.error(error);
         toast.error();
       });
-  };
-
-  const hasClientContactEmail = () => {
-    const clientContacts = client?.contacts;
-
-    return clientContacts?.some((contact) => contact.email) || false;
   };
 
   useEffect(() => {
@@ -214,12 +211,6 @@ export function Statement() {
       });
   }, [statement]);
 
-  useEffect(() => {
-    if (client) {
-      setShouldEmailStatement(hasClientContactEmail());
-    }
-  }, [client]);
-
   return (
     <Default
       title={documentTitle}
@@ -228,11 +219,7 @@ export function Statement() {
         <Dropdown label={t('more_actions')}>
           {user?.company_user?.is_admin && (
             <DropdownElement
-              onClick={() =>
-                shouldEmailStatement
-                  ? handleSendEmail()
-                  : toast.error('client_email_not_set')
-              }
+              onClick={handleSendEmail}
               icon={<Icon element={MdSend} />}
             >
               {t('email')}
