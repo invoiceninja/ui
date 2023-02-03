@@ -38,9 +38,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
       thousandSeparator: '.',
     });
 
-  const [convertCurrency, setConvertCurrency] = useState<boolean>(
-    Boolean(company?.convert_expense_currency)
-  );
+  const [convertCurrency, setConvertCurrency] = useState<boolean>();
 
   const isMarkPaid = () => {
     return (
@@ -143,6 +141,15 @@ export function AdditionalInfo(props: ExpenseCardProps) {
     }
   }, [expense?.exchange_rate]);
 
+  useEffect(() => {
+    if (expense && typeof convertCurrency === 'undefined') {
+      setConvertCurrency(
+        Boolean(company?.convert_expense_currency) ||
+          Boolean(expense?.foreign_amount)
+      );
+    }
+  }, [expense]);
+
   return (
     <Card title={t('additional_info')} isLoading={!expense}>
       {expense && (
@@ -199,7 +206,7 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           leftSideHelp={t('convert_expense_currency_help')}
         >
           <Toggle
-            checked={convertCurrency}
+            checked={convertCurrency || false}
             onChange={(value: boolean) => setConvertCurrency(value)}
           />
         </Element>
