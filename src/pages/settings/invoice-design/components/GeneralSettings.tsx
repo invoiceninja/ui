@@ -862,7 +862,7 @@ export function GeneralSettings() {
           value={company?.settings?.page_layout || 'portrait'}
           onChange={handleChange}
         >
-          <option value="portait">{t('portait')}</option>
+          <option value="portrait">{t('portrait')}</option>
           <option value="landscape">{t('landscape')}</option>
         </SelectField>
       </Element>
