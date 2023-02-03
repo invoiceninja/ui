@@ -235,7 +235,7 @@ export function Statement() {
               }
               icon={<Icon element={MdSend} />}
             >
-              {t('email_statement')}
+              {t('email')}
             </DropdownElement>
           )}
           <DropdownElement
