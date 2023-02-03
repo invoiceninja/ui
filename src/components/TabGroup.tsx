@@ -10,7 +10,7 @@
 
 import classNames from 'classnames';
 import { useAccentColor } from 'common/hooks/useAccentColor';
-import React, { ReactElement, useState } from 'react';
+import React, { MouseEvent, ReactElement, useRef, useState } from 'react';
 
 interface Props {
   children: ReactElement[];
@@ -26,13 +26,34 @@ export function TabGroup(props: Props) {
 
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
 
+  const tabBar = useRef<HTMLDivElement>(null);
+
+  const handleScroll = (event: MouseEvent<HTMLDivElement>) => {
+    const clickedTab = event.currentTarget;
+
+    const tabBarElement = tabBar.current;
+
+    const scrollWidth = tabBarElement!.scrollWidth / 6;
+
+    const scrollBy = clickedTab.getBoundingClientRect().width / 2;
+
+    tabBarElement!.scrollTo({
+      left: clickedTab!.offsetLeft - scrollWidth - scrollBy,
+      behavior: 'smooth',
+    });
+  };
+
   return (
-    <div className={props.className}>
-      <div className="-mb-px flex space-x-8 overflow-x-auto border-b border-gray-200">
+    <div className={`relative ${props.className}`}>
+      <div
+        ref={tabBar}
+        className="-mb-px flex space-x-8 overflow-x-auto border-b border-gray-200"
+      >
         {props.tabs.map((tab, index) => (
           <div
             key={index}
             className={classNames({ 'w-full': props.width === 'full' })}
+            onClick={(event) => handleScroll(event)}
           >
             <button
               type="button"

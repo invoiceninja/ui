@@ -11,6 +11,7 @@
 import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
+import { TabGroup } from 'components/TabGroup';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
@@ -46,6 +47,21 @@ export function InvoiceDesign() {
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
+  const tabs = [
+    t('general_settings'),
+    t('client_details'),
+    t('company_details'),
+    t('company_address'),
+    t('invoice_details'),
+    t('quote_details'),
+    t('credit_details'),
+    t('vendor_details'),
+    t('purchase_order_details'),
+    t('product_columns'),
+    t('task_columns'),
+    t('total_fields'),
+  ];
+
   return (
     <Settings
       title={t('invoice_design')}
@@ -57,18 +73,55 @@ export function InvoiceDesign() {
     >
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
-      <GeneralSettings />
-      <ClientDetails />
-      <CompanyDetails />
-      <CompanyAddress />
-      <InvoiceDetails />
-      <QuoteDetails />
-      <CreditDetails />
-      <VendorDetails />
-      <PurchaseOrderDetails />
-      <ProductColumns />
-      <TaskColumns />
-      <TotalFields />
+      <TabGroup tabs={tabs}>
+        <div>
+          <GeneralSettings />
+        </div>
+
+        <div>
+          <ClientDetails />
+        </div>
+
+        <div>
+          <CompanyDetails />
+        </div>
+
+        <div>
+          <CompanyAddress />
+        </div>
+
+        <div>
+          <InvoiceDetails />
+        </div>
+
+        <div>
+          <QuoteDetails />
+        </div>
+
+        <div>
+          <CreditDetails />
+        </div>
+
+        <div>
+          <VendorDetails />
+        </div>
+
+        <div>
+          <PurchaseOrderDetails />
+        </div>
+
+        <div>
+          <ProductColumns />
+        </div>
+
+        <div>
+          <TaskColumns />
+        </div>
+
+        <div>
+          <TotalFields />
+        </div>
+      </TabGroup>
     </Settings>
   );
 }
