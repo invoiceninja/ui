@@ -14,12 +14,13 @@ import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 import { useBankAccountColumns } from '../common/hooks/useBankAccountColumns';
 import { Button } from '@invoiceninja/forms';
-import { MdLink } from 'react-icons/md';
+import { MdLink, MdRuleFolder } from 'react-icons/md';
 import { endpoint, isHosted } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
+import { useNavigate } from 'react-router-dom';
 
 export function BankAccounts() {
   useTitle('bank_accounts');
@@ -27,6 +28,8 @@ export function BankAccounts() {
   const [t] = useTranslation();
 
   const columns = useBankAccountColumns();
+
+  const navigate = useNavigate();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -66,13 +69,23 @@ export function BankAccounts() {
         linkToEdit="/settings/bank_accounts/:id/edit"
         withResourcefulActions
         rightSide={
-          isHosted() &&
-          enterprisePlan() && (
-            <Button onClick={handleConnectAccounts}>
-              <span className="mr-2">{<MdLink />}</span>
-              {t('connect_accounts')}
+          <div className="flex space-x-2">
+            {isHosted() && enterprisePlan() && (
+              <Button onClick={handleConnectAccounts}>
+                <span className="mr-2">{<MdLink fontSize={20} />}</span>
+                {t('connect_accounts')}
+              </Button>
+            )}
+
+            <Button
+              onClick={() =>
+                navigate('/settings/bank_accounts/transaction_rules')
+              }
+            >
+              <span className="mr-2">{<MdRuleFolder fontSize={20} />}</span>
+              {t('rules')}
             </Button>
-          )
+          </div>
         }
       />
     </Settings>

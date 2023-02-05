@@ -9,9 +9,8 @@
  */
 
 export { BankAccounts } from './index/BankAccounts';
-
 export { Edit as EditBankAccount } from './edit/Edit';
-
 export { Create as CreateBankAccount } from './create/Create';
-
 export { BankAccount } from './show/BankAccount';
+export { TransactionRules } from './components/transaction-rules/TransactionRules';
+export { Create as CreateTransactionRule } from './components/transaction-rules/create/Create';
