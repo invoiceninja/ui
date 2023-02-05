@@ -73,7 +73,12 @@ export function AdditionalInfo(props: ExpenseCardProps) {
   };
 
   useEffect(() => {
-    if (expense && expense.amount && expense.exchange_rate) {
+    if (
+      expense &&
+      expense.exchange_rate &&
+      expense.invoice_currency_id &&
+      expense.currency_id
+    ) {
       handleChange('foreign_amount', expense.amount * expense.exchange_rate);
     } else {
       handleChange('foreign_amount', 0);
