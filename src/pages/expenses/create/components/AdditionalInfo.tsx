@@ -114,9 +114,11 @@ export function AdditionalInfo(props: ExpenseCardProps) {
           }
         }
       } else {
+        handleChange('foreign_amount', 0);
         handleChange('exchange_rate', 1);
       }
     } else {
+      handleChange('foreign_amount', 0);
       handleChange('exchange_rate', 1);
     }
   }, [expense?.currency_id, expense?.invoice_currency_id]);
@@ -137,7 +139,11 @@ export function AdditionalInfo(props: ExpenseCardProps) {
     if (expense && expense.exchange_rate) {
       handleChange('exchange_rate', expense.exchange_rate);
 
-      if (expense.amount) {
+      if (
+        expense.amount &&
+        expense.invoice_currency_id &&
+        expense.currency_id
+      ) {
         handleChange('foreign_amount', expense.amount * expense.exchange_rate);
       }
     } else {
