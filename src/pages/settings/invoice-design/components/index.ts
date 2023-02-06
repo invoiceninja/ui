@@ -17,3 +17,6 @@ export * from './ProductColumns';
 export * from './QuoteDetails';
 export * from './TaskColumns';
 export * from './TotalFields';
+export * from './VendorDetails';
+export * from './PurchaseOrderDetails';
+export * from './TaskColumns';
