@@ -34,7 +34,7 @@ export function TransactionRules() {
     <Settings
       title={t('transaction_rules')}
       breadcrumbs={pages}
-      docsLink="/docs/advanced-settings/#transaction_rules"
+      docsLink="/docs/advanced-settings/#bank_transaction_rules"
     >
       <DataTable
         resource="transaction_rule"
