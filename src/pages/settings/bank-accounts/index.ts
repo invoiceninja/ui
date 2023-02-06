@@ -14,3 +14,4 @@ export { Create as CreateBankAccount } from './create/Create';
 export { BankAccount } from './show/BankAccount';
 export { TransactionRules } from './components/transaction-rules/TransactionRules';
 export { Create as CreateTransactionRule } from './components/transaction-rules/create/Create';
+export { Edit as EditTransactionRule } from './components/transaction-rules/edit/Edit';

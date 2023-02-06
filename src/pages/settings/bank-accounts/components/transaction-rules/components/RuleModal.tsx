@@ -38,15 +38,18 @@ export function RuleModal(props: Props) {
     setErrors,
   } = props;
 
-  const [rule, setRule] = useState<Rule>(defaultRule);
+  const [rule, setRule] = useState<Rule>();
 
   const handleChange = useHandleChange({ setTransactionRule, setErrors });
 
   const handleChangeRule = (property: keyof Rule, value: Rule[keyof Rule]) => {
-    setRule((currentRule) => ({
-      ...currentRule,
-      [property]: value,
-    }));
+    setRule(
+      (currentRule) =>
+        currentRule && {
+          ...currentRule,
+          [property]: value,
+        }
+    );
   };
 
   const handleAddRule = () => {
@@ -70,21 +73,26 @@ export function RuleModal(props: Props) {
     if (transactionRule) {
       if (ruleIndex > -1) {
         setRule(transactionRule.rules[ruleIndex]);
+      } else {
+        setRule(defaultRule);
       }
     }
-  }, [transactionRule]);
+  }, [transactionRule, ruleIndex]);
 
   return (
     <Modal
-      title={t('add_rule')}
+      title={ruleIndex > -1 ? t('edit_rule') : t('add_rule')}
       visible={visible}
-      onClose={() => setVisible(false)}
+      onClose={() => {
+        setRule(defaultRule);
+        setVisible(false);
+      }}
     >
       <SelectField
         required
         label={t('field')}
-        value={rule.field}
-        onValueChange={(value) => handleChangeRule('field', value)}
+        value={rule?.search_key}
+        onValueChange={(value) => handleChangeRule('search_key', value)}
       >
         <option defaultChecked value="description">
           {t('description')}
@@ -95,7 +103,7 @@ export function RuleModal(props: Props) {
       <SelectField
         required
         label={t('operator')}
-        value={rule.operator}
+        value={rule?.operator}
         onValueChange={(value) => handleChangeRule('operator', value)}
       >
         <option defaultChecked value="contains">
@@ -109,7 +117,7 @@ export function RuleModal(props: Props) {
       <InputField
         required
         label={t('value')}
-        value={rule.value}
+        value={rule?.value}
         onValueChange={(value) => handleChangeRule('value', value)}
       />
 
@@ -117,7 +125,7 @@ export function RuleModal(props: Props) {
         className="self-end"
         onClick={handleAddRule}
         disableWithoutIcon
-        disabled={!rule.value}
+        disabled={!rule?.value}
       >
         {t('save')}
       </Button>

@@ -9,7 +9,7 @@
  */
 
 export interface Rule {
-  field: string;
+  search_key: string;
   operator: string;
   value: string;
 }

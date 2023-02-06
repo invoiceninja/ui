@@ -11,7 +11,7 @@
 import { Rule } from 'common/interfaces/transaction-rules';
 
 export const defaultRule: Rule = {
-  field: 'description',
+  search_key: 'description',
   operator: 'contains',
   value: '',
 };

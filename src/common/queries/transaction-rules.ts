@@ -16,21 +16,23 @@ import { TransactionRule } from 'common/interfaces/transaction-rules';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
 export function useBlankTransactionRuleQuery() {
-  return useQuery<TransactionRule>(route('/api/v1/tasks/create'), () =>
-    request('GET', endpoint('/api/v1/tasks/create')).then(
-      (response: GenericSingleResourceResponse<TransactionRule>) =>
-        response.data.data
-    )
+  return useQuery<TransactionRule>(
+    route('/api/v1/bank_transaction_rules/create'),
+    () =>
+      request('GET', endpoint('/api/v1/bank_transaction_rules/create')).then(
+        (response: GenericSingleResourceResponse<TransactionRule>) =>
+          response.data.data
+      )
   );
 }
 
 export function useTransactionRuleQuery(params: { id: string | undefined }) {
   return useQuery<TransactionRule>(
-    route('/api/v1/transaction_rules/:id', { id: params.id }),
+    route('/api/v1/bank_transaction_rules/:id', { id: params.id }),
     () =>
       request(
         'GET',
-        endpoint('/api/v1/transaction_rules/:id', { id: params.id })
+        endpoint('/api/v1/bank_transaction_rules/:id', { id: params.id })
       ).then(
         (response: GenericSingleResourceResponse<TransactionRule>) =>
           response.data.data
