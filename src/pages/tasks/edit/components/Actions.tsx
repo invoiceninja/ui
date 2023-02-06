@@ -57,7 +57,7 @@ export function Actions(props: Props) {
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
       <div>
-        {!isTaskRunning(task) && (
+        {!isTaskRunning(task) && !task.invoice_id && (
           <DropdownElement
             onClick={() => start(task)}
             icon={<Icon element={MdNotStarted} />}
@@ -66,7 +66,7 @@ export function Actions(props: Props) {
           </DropdownElement>
         )}
 
-        {isTaskRunning(task) && (
+        {isTaskRunning(task) && !task.invoice_id && (
           <DropdownElement
             onClick={() => stop(task)}
             icon={<Icon element={MdStopCircle} />}
@@ -74,13 +74,6 @@ export function Actions(props: Props) {
             {t('stop')}
           </DropdownElement>
         )}
-
-        <DropdownElement
-          onClick={cloneToTask}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone')}
-        </DropdownElement>
 
         {!isTaskRunning(task) && !task.invoice_id && (
           <DropdownElement
@@ -90,6 +83,13 @@ export function Actions(props: Props) {
             {t('invoice_task')}
           </DropdownElement>
         )}
+
+        <DropdownElement
+          onClick={cloneToTask}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
       </div>
 
       <div>

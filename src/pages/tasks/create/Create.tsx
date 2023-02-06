@@ -13,6 +13,7 @@ import { endpoint, isProduction } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
+import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
 import { Task } from 'common/interfaces/task';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -27,6 +28,7 @@ import { taskAtom } from '../common/atoms';
 import { TaskDetails } from '../common/components/TaskDetails';
 import { TaskTable } from '../common/components/TaskTable';
 import { isOverlapping } from '../common/helpers/is-overlapping';
+import { useStart } from '../common/hooks/useStart';
 
 export function Create() {
   const [t] = useTranslation();
@@ -36,6 +38,9 @@ export function Create() {
   const [searchParams] = useSearchParams();
 
   const { data } = useBlankTaskQuery();
+  const company = useCurrentCompany();
+
+  const start = useStart();
 
   const { data: taskStatuses } = useTaskStatusesQuery();
 
@@ -97,6 +102,8 @@ export function Create() {
 
     request('POST', endpoint('/api/v1/tasks'), task)
       .then((response) => {
+        company?.auto_start_tasks && start(response.data.data);
+
         toast.success('created_task');
 
         navigate(route('/tasks/:id/edit', { id: response.data.data.id }));

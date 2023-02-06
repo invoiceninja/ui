@@ -9,18 +9,22 @@
  */
 
 import { useAccentColor } from 'common/hooks/useAccentColor';
+import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
-import { useClientQuery } from 'common/queries/clients';
 import { InfoCard } from 'components/InfoCard';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import React from 'react';
+import { CopyToClipboard } from 'components/CopyToClipboard';
 
-export function Contacts() {
+interface Props {
+  client: Client;
+}
+
+export function Contacts(props: Props) {
   const [t] = useTranslation();
-  const { id } = useParams();
-  const { data: client } = useClientQuery({ id });
+
   const accentColor = useAccentColor();
+
+  const { client } = props;
 
   return (
     <>
@@ -30,7 +34,7 @@ export function Contacts() {
             title={t('contacts')}
             value={
               <div className="space-y-2">
-                {client.data.data.contacts.map(
+                {client.contacts.map(
                   (contact: ClientContact, index: number) => (
                     <div key={index}>
                       <p
@@ -40,7 +44,7 @@ export function Contacts() {
                         {contact.first_name} {contact.last_name}
                       </p>
 
-                      <a href={`mailto:${contact.email}`}>{contact.email}</a>
+                      <CopyToClipboard text={contact.email} />
                     </div>
                   )
                 )}

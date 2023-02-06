@@ -14,6 +14,8 @@ import { useInvoiceQuery } from 'common/queries/invoices';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { Mailer } from 'pages/invoices/email/components/Mailer';
+import { MailerComponent } from 'pages/purchase-orders/email/Email';
+import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
@@ -24,6 +26,8 @@ export function Email() {
   const { id } = useParams();
 
   const { data: invoice } = useInvoiceQuery({ id });
+
+  const mailerRef = useRef<MailerComponent>(null);
 
   const list = {
     email_template_invoice: 'initial_email',
@@ -41,9 +45,15 @@ export function Email() {
   ];
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      saveButtonLabel={t('send_email')}
+      onSaveClick={() => mailerRef?.current?.sendEmail()}
+    >
       {invoice && (
         <Mailer
+          ref={mailerRef}
           resource={invoice}
           resourceType="invoice"
           list={list}

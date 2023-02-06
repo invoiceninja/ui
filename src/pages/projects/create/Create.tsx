@@ -14,18 +14,19 @@ import { AxiosError } from 'axios';
 import { endpoint, isProduction } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
 import { Project } from 'common/interfaces/project';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useBlankProjectQuery } from 'common/queries/projects';
+import { ClientSelector } from 'components/clients/ClientSelector';
 import { Container } from 'components/Container';
 import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
 import { Default } from 'components/layouts/Default';
 import { useAtom } from 'jotai';
 import React, { useEffect, useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectAtom } from '../common/atoms';
@@ -80,30 +81,35 @@ export function Create() {
 
   const onSave = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
     setErrors(undefined);
 
     request('POST', endpoint('/api/v1/projects'), project)
       .then((response) => {
-        toast.success(t('created_project'), { id: toastId });
+        toast.success('created_project');
 
         navigate(route('/projects/:id/edit', { id: response.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        if (error.response?.status == 422) {
+        if (error.response?.status === 422) {
+          toast.dismiss();
           setErrors(error.response.data);
+        } else {
+          console.error(error);
+          toast.error();
         }
-
-        toast.error(t('error_title'), { id: toastId });
       });
   };
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      disableSaveButton={!project}
+      onSaveClick={onSave}
+    >
       <Container>
-        <Card title={documentTitle} withSaveButton onSaveClick={onSave}>
+        <Card title={documentTitle}>
           <Element leftSide={t('project_name')}>
             <InputField
               value={project?.name}
@@ -113,15 +119,13 @@ export function Create() {
           </Element>
 
           <Element leftSide={t('client')}>
-            <DebouncedCombobox
-              defaultValue={project?.client_id}
-              endpoint="/api/v1/clients"
-              label="display_name"
-              onChange={(value) => handleChange('client_id', value.value)}
+            <ClientSelector
+              value={project?.client_id}
+              onChange={(client) => handleChange('client_id', client.id)}
               clearButton={Boolean(project?.client_id)}
               onClearButtonClick={() => handleChange('client_id', '')}
               errorMessage={errors?.errors.client_id}
-              queryAdditional
+              staleTime={Infinity}
             />
           </Element>
 

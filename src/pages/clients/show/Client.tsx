@@ -24,10 +24,10 @@ import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
 import { Standing } from './components/Standing';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
-
 import { CustomResourcefulActions } from '../common/components/CustomResourcefulActions';
 import { usePurgeClient } from '../common/hooks/usePurgeClient';
 import { route } from 'common/helpers/route';
+import { Gateways } from './components/Gateways';
 
 export function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -35,6 +35,7 @@ export function Client() {
   const { data: client, isLoading } = useClientQuery({ id });
 
   const [t] = useTranslation();
+
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState(false);
 
@@ -106,10 +107,13 @@ export function Client() {
       {client && (
         <>
           <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
-            <Details />
-            <Address />
-            <Contacts />
-            <Standing />
+            <Details client={client.data.data} />
+            <Address client={client.data.data} />
+            <Contacts client={client.data.data} />
+            <Standing client={client.data.data} />
+            {client.data.data.gateway_tokens.length > 0 && (
+              <Gateways client={client.data.data} />
+            )}
           </div>
 
           <Tabs tabs={tabs} className="mt-6" />

@@ -16,10 +16,7 @@ import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
-import {
-  BankAccountDetails,
-  BankAccountInput,
-} from 'common/interfaces/bank-accounts';
+import { BankAccount } from 'common/interfaces/bank-accounts';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,10 +24,6 @@ import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Settings } from '../../../../components/layouts/Settings';
 import { useBankAccountQuery } from '../common/queries';
-
-interface BankAccountValidation {
-  bank_account_name?: string[];
-}
 
 export function Edit() {
   useTitle('edit_bank_account');
@@ -47,9 +40,9 @@ export function Edit() {
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
-  const [errors, setErrors] = useState<BankAccountValidation>();
+  const [errors, setErrors] = useState<ValidationBag>();
 
-  const [accountDetails, setAccountDetails] = useState<BankAccountInput>();
+  const [accountDetails, setAccountDetails] = useState<BankAccount>();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -61,22 +54,12 @@ export function Edit() {
   ];
 
   const handleChange = (
-    property: keyof BankAccountInput,
-    value: BankAccountInput[keyof BankAccountInput]
+    property: keyof BankAccount,
+    value: BankAccount[keyof BankAccount]
   ) => {
-    setAccountDetails((prevState) => ({ ...prevState, [property]: value }));
-  };
-
-  const getBankAccount = (bankAccount: BankAccountDetails | undefined) => {
-    return {
-      bank_account_name: bankAccount?.bank_account_name || '',
-    };
-  };
-
-  const handleCancel = () => {
-    if (!isFormBusy) {
-      navigate('/settings/bank_accounts');
-    }
+    setAccountDetails(
+      (prevState) => prevState && { ...prevState, [property]: value }
+    );
   };
 
   const handleSave = async (event: FormEvent<HTMLFormElement>) => {
@@ -105,7 +88,7 @@ export function Edit() {
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
-            setErrors(error.response.data.errors);
+            setErrors(error.response.data);
             toast.dismiss();
           } else {
             console.error(error);
@@ -117,7 +100,9 @@ export function Edit() {
   };
 
   useEffect(() => {
-    setAccountDetails(getBankAccount(response));
+    if (response) {
+      setAccountDetails(response);
+    }
   }, [response]);
 
   return (
@@ -125,7 +110,6 @@ export function Edit() {
       title={t('edit_bank_account')}
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#edit_bank_account"
-      onCancelClick={handleCancel}
       onSaveClick={handleSave}
     >
       <Card onFormSubmit={handleSave} title={t('edit_bank_account')}>
@@ -133,7 +117,7 @@ export function Edit() {
           <InputField
             value={accountDetails?.bank_account_name}
             onValueChange={(value) => handleChange('bank_account_name', value)}
-            errorMessage={errors?.bank_account_name}
+            errorMessage={errors?.errors.bank_account_name}
           />
         </Element>
       </Card>

@@ -11,17 +11,19 @@
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { Invoice } from 'common/interfaces/invoice';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 
 export function useMarkSent() {
-  const [t] = useTranslation();
   const queryClient = useQueryClient();
 
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
   return (invoice: Invoice) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request(
       'PUT',
@@ -29,16 +31,19 @@ export function useMarkSent() {
       invoice
     )
       .then(() => {
-        toast.success(t('notification_invoice_sent'), { id: toastId });
+        toast.success('marked_invoice_as_sent');
 
         queryClient.invalidateQueries('/api/v1/invoices');
 
         queryClient.invalidateQueries(
           route('/api/v1/invoices/:id', { id: invoice.id })
         );
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
       })
       .catch((error) => {
-        toast.error(t('error_title'), { id: toastId });
+        toast.error();
 
         console.error(error);
       });

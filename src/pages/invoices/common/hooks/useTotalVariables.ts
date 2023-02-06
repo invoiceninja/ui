@@ -56,6 +56,9 @@ export function useTotalVariables() {
     }
 
     variables.push('$total');
+    variables.push('$paid_to_date');
+    variables.push('$balance');
+    variables.push('$taxes');
 
     setColumns(variables);
   }, [company]);

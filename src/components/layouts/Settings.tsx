@@ -12,7 +12,7 @@ import { Breadcrumbs, Page } from 'components/Breadcrumbs';
 import { useAtom } from 'jotai';
 import { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { classNames } from '../../common/helpers';
 import { SelectField } from '../forms';
 import { Default } from './Default';
@@ -41,6 +41,8 @@ export function Settings(props: Props) {
   const [t] = useTranslation();
 
   const location = useLocation();
+
+  const navigate = useNavigate();
 
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
 
@@ -163,24 +165,19 @@ export function Settings(props: Props) {
       disableSaveButton={props.disableSaveButton}
     >
       <div className="grid grid-cols-12 lg:gap-10">
-        <div className="col-span-12 md:col-span-4 lg:col-span-3">
+        <div className="col-span-12 lg:col-span-3">
           <a className="flex items-center py-4 px-3 text-xs uppercase font-medium text-gray-600">
             <span className="truncate">{t('basic_settings')}</span>
           </a>
 
-          <SelectField className="lg:hidden">
+          <SelectField
+            className="lg:hidden"
+            value={location.pathname}
+            onValueChange={(value) => navigate(value)}
+            withBlank
+          >
             {basic.map((item) => (
-              <option
-                key={item.name}
-                value={item.href}
-                className={classNames(
-                  item.current
-                    ? 'bg-gray-200 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                  'flex items-center px-3 py-2 text-sm font-medium rounded'
-                )}
-                aria-current={item.current ? 'page' : undefined}
-              >
+              <option key={item.name} value={item.href}>
                 {item.name}
               </option>
             ))}
@@ -208,19 +205,14 @@ export function Settings(props: Props) {
             <span className="truncate">{t('advanced_settings')}</span>
           </a>
 
-          <SelectField className="lg:hidden">
+          <SelectField
+            className="lg:hidden"
+            value={location.pathname}
+            onValueChange={(value) => navigate(value)}
+            withBlank
+          >
             {advanced.map((item) => (
-              <option
-                key={item.name}
-                value={item.href}
-                className={classNames(
-                  item.current
-                    ? 'bg-gray-200 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                  'flex items-center px-3 py-2 text-sm font-medium rounded'
-                )}
-                aria-current={item.current ? 'page' : undefined}
-              >
+              <option key={item.name} value={item.href}>
                 {item.name}
               </option>
             ))}
@@ -266,7 +258,7 @@ export function Settings(props: Props) {
           </nav>
         </div>
 
-        <div className="col-span-12 md:col-span-8 lg:col-start-4 space-y-6 mt-5">
+        <div className="col-span-12 lg:col-start-4 space-y-6 mt-5">
           {props.breadcrumbs && <Breadcrumbs pages={props.breadcrumbs} />}
 
           {errors && <ValidationAlert errors={errors} />}

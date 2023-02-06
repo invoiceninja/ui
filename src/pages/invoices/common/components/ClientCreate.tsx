@@ -12,10 +12,10 @@ import { Button } from '@invoiceninja/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
-import { useQuery } from 'common/hooks/useQuery';
 import { Client } from 'common/interfaces/client';
 import { ClientContact } from 'common/interfaces/client-contact';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useBlankClientQuery } from 'common/queries/clients';
 import { Modal } from 'components/Modal';
 import { set } from 'lodash';
 import { AdditionalInfo } from 'pages/clients/edit/components/AdditionalInfo';
@@ -49,21 +49,15 @@ export function ClientCreate(props: Props) {
 
   const queryClient = useQueryClient();
 
-  const { data: blankClient } = useQuery('/api/v1/clients/create', {
+  const { data: blankClient } = useBlankClientQuery({
     refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
-    if (blankClient?.data.data) {
-      setClient(blankClient.data.data);
+    if (blankClient) {
+      setClient(blankClient);
     }
   }, [blankClient]);
-
-  useEffect(() => {
-    if (!props.isModalOpen) {
-      queryClient.invalidateQueries('/api/v1/clients/create');
-    }
-  }, [props.isModalOpen]);
 
   const onSave = () => {
     set(client as Client, 'contacts', contacts);
@@ -92,6 +86,8 @@ export function ClientCreate(props: Props) {
         props.setIsModalOpen(false);
 
         props.onClientCreated && props.onClientCreated(response.data.data);
+
+        queryClient.invalidateQueries('/api/v1/clients');
 
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {

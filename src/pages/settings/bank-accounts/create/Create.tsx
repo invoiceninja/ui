@@ -11,12 +11,12 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
-import { BankAccountInput } from 'common/interfaces/bank-accounts';
+import { BankAccount } from 'common/interfaces/bank-accounts';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { Settings } from '../../../../components/layouts/Settings';
+import { useBlankBankAccountQuery } from '../common/queries';
 import { useHandleCreate } from './hooks/useHandleCreate';
 
 export function Create() {
@@ -24,7 +24,7 @@ export function Create() {
 
   useTitle('new_bank_account');
 
-  const navigate = useNavigate();
+  const { data } = useBlankBankAccountQuery();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -36,7 +36,7 @@ export function Create() {
 
   const [errors, setErrors] = useState<ValidationBag>();
 
-  const [bankAccount, setBankAccount] = useState<BankAccountInput>();
+  const [bankAccount, setBankAccount] = useState<BankAccount>();
 
   const handleSave = useHandleCreate(
     bankAccount,
@@ -46,24 +46,25 @@ export function Create() {
   );
 
   const handleChange = (
-    property: keyof BankAccountInput,
-    value: BankAccountInput[keyof BankAccountInput]
+    property: keyof BankAccount,
+    value: BankAccount[keyof BankAccount]
   ) => {
-    setBankAccount((prevState) => ({ ...prevState, [property]: value }));
+    setBankAccount(
+      (prevState) => prevState && { ...prevState, [property]: value }
+    );
   };
 
-  const handleCancel = () => {
-    if (!isFormBusy) {
-      navigate('/settings/bank_accounts');
+  useEffect(() => {
+    if (data) {
+      setBankAccount(data);
     }
-  };
+  }, [data]);
 
   return (
     <Settings
-      title={t('create_bank_account')}
+      title={t('new_bank_account')}
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#create_bank_account"
-      onCancelClick={handleCancel}
       onSaveClick={handleSave}
     >
       <Card onFormSubmit={handleSave} title={t('new_bank_account')}>

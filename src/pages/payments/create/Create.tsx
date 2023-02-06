@@ -225,7 +225,7 @@ export function Create() {
               onValueChange={(value) =>
                 handleChange('amount', parseFloat(value))
               }
-              errorMessage={errors?.errors.payment_amount}
+              errorMessage={errors?.errors.amount}
             />
           </Element>
 

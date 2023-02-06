@@ -68,8 +68,11 @@ import {
   MdPictureAsPdf,
   MdRestore,
   MdSend,
+  MdSwitchRight,
+  MdTextSnippet,
 } from 'react-icons/md';
 import { SelectOption } from 'components/datatables/Actions';
+import { useAccentColor } from 'common/hooks/useAccentColor';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -335,6 +338,34 @@ export function useActions() {
         {t('client_portal')}
       </DropdownElement>
     ),
+    (quote) =>
+      quote.status_id === QuoteStatus.Draft && (
+        <DropdownElement
+          onClick={() => markSent(quote)}
+          icon={<Icon element={MdMarkEmailRead} />}
+        >
+          {t('mark_sent')}
+        </DropdownElement>
+      ),
+    (quote) =>
+      (quote.status_id === QuoteStatus.Draft ||
+        quote.status_id === QuoteStatus.Sent) && (
+        <DropdownElement
+          onClick={() => approve(quote)}
+          icon={<Icon element={MdDone} />}
+        >
+          {t('approve')}
+        </DropdownElement>
+      ),
+    (quote) =>
+      quote.status_id !== QuoteStatus.Converted && (
+        <DropdownElement
+          onClick={() => bulk(quote.id, 'convert_to_invoice')}
+          icon={<Icon element={MdSwitchRight} />}
+        >
+          {t('convert_to_invoice')}
+        </DropdownElement>
+      ),
     () => <Divider withoutPadding />,
     (quote) => (
       <DropdownElement
@@ -376,34 +407,6 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
-    () => <Divider withoutPadding />,
-    (quote) =>
-      quote.status_id === QuoteStatus.Draft && (
-        <DropdownElement
-          onClick={() => markSent(quote)}
-          icon={<Icon element={MdMarkEmailRead} />}
-        >
-          {t('mark_sent')}
-        </DropdownElement>
-      ),
-    (quote) =>
-      quote.status_id === QuoteStatus.Draft && (
-        <DropdownElement
-          onClick={() => approve(quote)}
-          icon={<Icon element={MdDone} />}
-        >
-          {t('approve')}
-        </DropdownElement>
-      ),
-    (quote) =>
-      quote.status_id === QuoteStatus.Sent && (
-        <DropdownElement
-          onClick={() => approve(quote)}
-          icon={<Icon element={MdDone} />}
-        >
-          {t('approve')}
-        </DropdownElement>
-      ),
     () => location.pathname.endsWith('/edit') && <Divider withoutPadding />,
     (quote) =>
       location.pathname.endsWith('/edit') &&
@@ -494,6 +497,9 @@ export function useQuoteColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const accentColor = useAccentColor();
+  const navigate = useNavigate();
+
   const currentUser = useCurrentUser();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
@@ -516,7 +522,22 @@ export function useQuoteColumns() {
       column: 'status',
       id: 'status_id',
       label: t('status'),
-      format: (value, quote) => <QuoteStatusBadge entity={quote} />,
+      format: (value, quote) => (
+        <div className="flex items-center space-x-2">
+          <QuoteStatusBadge entity={quote} />
+
+          {quote.status_id === QuoteStatus.Converted && (
+            <MdTextSnippet
+              className="cursor-pointer"
+              fontSize={19}
+              color={accentColor}
+              onClick={() =>
+                navigate(route('/invoices/:id/edit', { id: quote.invoice_id }))
+              }
+            />
+          )}
+        </div>
+      ),
     },
     {
       column: 'number',

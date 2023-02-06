@@ -14,8 +14,10 @@ import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 
 export function useCompanyGatewaysQuery() {
-  return useQuery(route('/api/v1/company_gateways'), () =>
-    request('GET', endpoint('/api/v1/company_gateways'))
+  return useQuery(
+    route('/api/v1/company_gateways'),
+    () => request('GET', endpoint('/api/v1/company_gateways')),
+    { staleTime: Infinity }
   );
 }
 

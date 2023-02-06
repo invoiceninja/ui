@@ -29,12 +29,13 @@ import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoice
 import { useTranslation } from 'react-i18next';
 import {
   MdControlPointDuplicate,
+  MdEdit,
   MdNotStarted,
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { taskAtom } from './atoms';
 import { TaskStatus } from './components/TaskStatus';
 import {
@@ -307,6 +308,10 @@ export function useActions() {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+  const company = useCurrentCompany();
+
   const start = useStart();
 
   const stop = useStop();
@@ -323,7 +328,23 @@ export function useActions() {
 
   const actions = [
     (task: Task) =>
-      !isTaskRunning(task) && (
+      !location.pathname.endsWith('/edit') &&
+      (!task.invoice_id || !company?.invoice_task_lock) && (
+        <DropdownElement
+          onClick={() => navigate(route('/tasks/:id/edit', { id: task.id }))}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    (task: Task) =>
+      !location.pathname.endsWith('/edit') &&
+      (!task.invoice_id || !company?.invoice_task_lock) && (
+        <Divider withoutPadding />
+      ),
+    (task: Task) =>
+      !isTaskRunning(task) &&
+      !task.invoice_id && (
         <DropdownElement
           onClick={() => start(task)}
           icon={<Icon element={MdNotStarted} />}
@@ -332,7 +353,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) =>
-      isTaskRunning(task) && (
+      isTaskRunning(task) &&
+      !task.invoice_id && (
         <DropdownElement
           onClick={() => stop(task)}
           icon={<Icon element={MdStopCircle} />}
@@ -340,15 +362,6 @@ export function useActions() {
           {t('stop')}
         </DropdownElement>
       ),
-    () => <Divider withoutPadding />,
-    (task: Task) => (
-      <DropdownElement
-        onClick={() => cloneToTask(task)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
     (task: Task) =>
       !isTaskRunning(task) &&
       !task.invoice_id && (
@@ -359,6 +372,14 @@ export function useActions() {
           {t('invoice_task')}
         </DropdownElement>
       ),
+    (task: Task) => (
+      <DropdownElement
+        onClick={() => cloneToTask(task)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
+        {t('clone')}
+      </DropdownElement>
+    ),
   ];
 
   return actions;

@@ -78,6 +78,7 @@ export function Details(props: Props) {
             onClearButtonClick={() => handleChange('client_id', '')}
             onChange={(client) => handleChange('client_id', client.id)}
             errorMessage={errors?.errors.client_id}
+            staleTime={Infinity}
           />
         </Element>
       )}
@@ -149,12 +150,14 @@ export function Details(props: Props) {
               <InputField
                 label={t('tax_name')}
                 onValueChange={(value) => handleChange('tax_name1', value)}
+                errorMessage={errors?.errors.tax_name1}
               />
               <InputField
                 label={t('tax_amount')}
                 onValueChange={(value) =>
                   handleChange('tax_amount1', parseFloat(value))
                 }
+                errorMessage={errors?.errors.tax_amount1}
               />
             </div>
           </Element>
@@ -191,12 +194,14 @@ export function Details(props: Props) {
               <InputField
                 label={t('tax_name')}
                 onValueChange={(value) => handleChange('tax_name2', value)}
+                errorMessage={errors?.errors.tax_name2}
               />
               <InputField
                 label={t('tax_amount')}
                 onValueChange={(value) =>
                   handleChange('tax_amount2', parseFloat(value))
                 }
+                errorMessage={errors?.errors.tax_amount2}
               />
             </div>
           </Element>
@@ -233,12 +238,14 @@ export function Details(props: Props) {
               <InputField
                 label={t('tax_name')}
                 onValueChange={(value) => handleChange('tax_name3', value)}
+                errorMessage={errors?.errors.tax_name3}
               />
               <InputField
                 label={t('tax_amount')}
                 onValueChange={(value) =>
                   handleChange('tax_amount3', parseFloat(value))
                 }
+                errorMessage={errors?.errors.tax_amount3}
               />
             </div>
           </Element>
