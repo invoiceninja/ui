@@ -122,10 +122,7 @@ export function EmailSettings() {
           />
         </Element>
 
-        <Element
-          leftSide={t('send_time')}
-          leftSideHelp={t('comma_sparated_list')}
-        >
+        <Element leftSide={t('send_time')}>
           <SelectField
             value={company?.settings.entity_send_time}
             onValueChange={(value) =>
