@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '@invoiceninja/cards';
-import { Button, InputField, SelectField } from '@invoiceninja/forms';
+import { InputField, SelectField } from '@invoiceninja/forms';
 import { route } from 'common/helpers/route';
 import { useTitle } from 'common/hooks/useTitle';
 import { Page } from 'components/Breadcrumbs';
@@ -23,6 +23,14 @@ import quarter from 'dayjs/plugin/quarterOfYear';
 import { request } from 'common/helpers/request';
 import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { AxiosError } from 'axios';
+import { Dropdown } from 'components/dropdown/Dropdown';
+import { Icon } from 'components/icons/Icon';
+import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { MdDownload, MdSend } from 'react-icons/md';
+import { useClientQuery } from 'common/queries/clients';
+import { Client } from 'common/interfaces/client';
 
 dayjs.extend(quarter);
 
@@ -41,6 +49,10 @@ export function Statement() {
   const { documentTitle } = useTitle('statement');
   const { t } = useTranslation();
   const { id } = useParams();
+
+  const user = useCurrentUser();
+
+  const { data: clientResponse } = useClientQuery({ id });
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
@@ -102,6 +114,8 @@ export function Statement() {
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const [selectRange, setSelectRange] = useState<string>('last_7_days');
 
+  const [client, setClient] = useState<Client>();
+
   const [statement, setStatement] = useState<Statement>({
     client_id: id!,
     start_date: dayjs().subtract(7, 'days').format('YYYY-MM-DD'),
@@ -146,6 +160,35 @@ export function Statement() {
     toast.dismiss();
   };
 
+  const handleSendEmail = () => {
+    const send = client?.contacts?.some((contact) => contact.email);
+
+    if (!send) {
+      return toast.error('client_email_not_set');
+    }
+
+    toast.processing();
+
+    request(
+      'POST',
+      endpoint('/api/v1/client_statement?send_email=true'),
+      statement
+    )
+      .then((response) => {
+        toast.success(response.data.message);
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+        toast.error();
+      });
+  };
+
+  useEffect(() => {
+    if (clientResponse) {
+      setClient(clientResponse.data.data);
+    }
+  }, [clientResponse]);
+
   useEffect(() => {
     toast.processing();
 
@@ -173,7 +216,22 @@ export function Statement() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={
-        <Button onClick={downloadPdf}>{t('download')}</Button>
+        <Dropdown label={t('more_actions')}>
+          {user?.company_user?.is_admin && (
+            <DropdownElement
+              onClick={handleSendEmail}
+              icon={<Icon element={MdSend} />}
+            >
+              {t('email')}
+            </DropdownElement>
+          )}
+          <DropdownElement
+            onClick={downloadPdf}
+            icon={<Icon element={MdDownload} />}
+          >
+            {t('download')}
+          </DropdownElement>
+        </Dropdown>
       }
       onBackClick={route('/clients/:id', { id })}
     >
