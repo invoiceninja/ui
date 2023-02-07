@@ -53,7 +53,7 @@ export function useTransactionRuleColumns() {
             id: transactionRule.category_id,
           })}
         >
-          {transactionRule.category?.name}
+          {transactionRule.expense_category?.name}
         </Link>
       ),
     },

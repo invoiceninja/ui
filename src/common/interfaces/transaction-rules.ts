@@ -32,5 +32,5 @@ export interface TransactionRule {
   updated_at: number;
   vendor_id: string;
   vendor: Vendor;
-  category: ExpenseCategory;
+  expense_category: ExpenseCategory;
 }
