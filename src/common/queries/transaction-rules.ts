@@ -22,7 +22,8 @@ export function useBlankTransactionRuleQuery() {
       request('GET', endpoint('/api/v1/bank_transaction_rules/create')).then(
         (response: GenericSingleResourceResponse<TransactionRule>) =>
           response.data.data
-      )
+      ),
+    { staleTime: Infinity }
   );
 }
 
