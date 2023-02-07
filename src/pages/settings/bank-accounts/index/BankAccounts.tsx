@@ -78,7 +78,7 @@ export function BankAccounts() {
               </Button>
             )}
 
-            {!isHosted() && (proPlan() || enterprisePlan()) && (
+            {isHosted() && (proPlan() || enterprisePlan()) && (
               <Button
                 onClick={() =>
                   navigate('/settings/bank_accounts/transaction_rules')
