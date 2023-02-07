@@ -21,6 +21,7 @@ import { route } from 'common/helpers/route';
 import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
 import { useNavigate } from 'react-router-dom';
+import { proPlan } from 'common/guards/guards/pro-plan';
 
 export function BankAccounts() {
   useTitle('bank_accounts');
@@ -77,14 +78,16 @@ export function BankAccounts() {
               </Button>
             )}
 
-            <Button
-              onClick={() =>
-                navigate('/settings/bank_accounts/transaction_rules')
-              }
-            >
-              <span className="mr-2">{<MdRuleFolder fontSize={20} />}</span>
-              {t('rules')}
-            </Button>
+            {!isHosted() && (proPlan() || enterprisePlan()) && (
+              <Button
+                onClick={() =>
+                  navigate('/settings/bank_accounts/transaction_rules')
+                }
+              >
+                <span className="mr-2">{<MdRuleFolder fontSize={20} />}</span>
+                {t('rules')}
+              </Button>
+            )}
           </div>
         }
       />
