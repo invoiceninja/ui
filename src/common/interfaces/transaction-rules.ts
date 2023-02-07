@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { ExpenseCategory } from './expense-category';
+import { Vendor } from './vendor';
+
 export interface Rule {
   search_key: string;
   operator: string;
@@ -28,4 +31,6 @@ export interface TransactionRule {
   rules: Rule[];
   updated_at: number;
   vendor_id: string;
+  vendor: Vendor;
+  category: ExpenseCategory;
 }
