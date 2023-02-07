@@ -12,6 +12,7 @@ import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
+import { TabGroup } from 'components/TabGroup';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
@@ -42,6 +43,14 @@ export function ClientPortal() {
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
+  const tabs = [
+    t('settings'),
+    t('authorization'),
+    t('registration'),
+    t('messages'),
+    t('customize'),
+  ];
+
   return (
     <Settings
       title={t('client_portal')}
@@ -53,11 +62,27 @@ export function ClientPortal() {
     >
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
-      <SettingsComponent />
-      <Authorization />
-      <Registration />
-      <Messages />
-      <Customize />
+      <TabGroup tabs={tabs}>
+        <div>
+          <SettingsComponent />
+        </div>
+
+        <div>
+          <Authorization />
+        </div>
+
+        <div>
+          <Registration />
+        </div>
+
+        <div>
+          <Messages />
+        </div>
+
+        <div>
+          <Customize />
+        </div>
+      </TabGroup>
     </Settings>
   );
 }

@@ -39,7 +39,7 @@ export function Backup() {
 
   return (
     <Card>
-      <Element leftSide={t('export_company')}>
+      <Element leftSide={t('export_company')} leftSideHelp={t('exported_data')}>
         <Button onClick={handleExportCompany}>{t('export')}</Button>
       </Element>
     </Card>
