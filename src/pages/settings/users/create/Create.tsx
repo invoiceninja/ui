@@ -20,6 +20,7 @@ import { useBlankUserQuery } from 'common/queries/users';
 import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
 import { Settings } from 'components/layouts/Settings';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
+import { TabGroup } from 'components/TabGroup';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -37,6 +38,8 @@ export function Create() {
     { name: t('user_management'), href: '/settings/users' },
     { name: t('new_user'), href: '/settings/users/create' },
   ];
+
+  const tabs: string[] = [t('details'), t('notifications'), t('permissions')];
 
   const { data: response } = useBlankUserQuery();
   const [user, setUser] = useState<User>();
@@ -115,9 +118,11 @@ export function Create() {
         onClose={setIsPasswordConfirmModalOpen}
       />
 
-      {user && <Details user={user} setUser={setUser} />}
-      {user && <Notifications user={user} setUser={setUser} />}
-      {user && <Permissions user={user} setUser={setUser} />}
+      <TabGroup tabs={tabs}>
+        <div>{user && <Details user={user} setUser={setUser} />}</div>
+        <div>{user && <Notifications user={user} setUser={setUser} />}</div>
+        <div>{user && <Permissions user={user} setUser={setUser} />}</div>
+      </TabGroup>
     </Settings>
   );
 }
