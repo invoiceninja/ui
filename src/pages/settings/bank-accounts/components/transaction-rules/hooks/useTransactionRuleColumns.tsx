@@ -24,23 +24,10 @@ export function useTransactionRuleColumns() {
       format: (field, transactionRule) => (
         <Link
           to={route('/settings/bank_accounts/transaction_rules/:id/edit', {
-            id: transactionRule?.id,
+            id: transactionRule.id,
           })}
         >
-          {transactionRule?.name}
-        </Link>
-      ),
-    },
-    {
-      id: 'client_id',
-      label: t('client'),
-      format: (field, transactionRule) => (
-        <Link
-          to={route('/clients/:id/edit', {
-            id: transactionRule?.client_id,
-          })}
-        >
-          {transactionRule?.name}
+          {transactionRule.name}
         </Link>
       ),
     },
@@ -50,10 +37,23 @@ export function useTransactionRuleColumns() {
       format: (field, transactionRule) => (
         <Link
           to={route('/vendors/:id/edit', {
-            id: transactionRule?.vendor_id,
+            id: transactionRule.vendor_id,
           })}
         >
-          {transactionRule?.name}
+          {transactionRule.vendor?.name}
+        </Link>
+      ),
+    },
+    {
+      id: 'category_id',
+      label: t('category'),
+      format: (field, transactionRule) => (
+        <Link
+          to={route('/settings/expense_categories/:id/edit', {
+            id: transactionRule.category_id,
+          })}
+        >
+          {transactionRule.category?.name}
         </Link>
       ),
     },
