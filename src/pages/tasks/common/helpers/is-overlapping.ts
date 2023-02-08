@@ -17,7 +17,9 @@ export function isOverlapping(task: Task) {
   const logs = parseTimeLog(task.time_log);
   const sorted = logs.sort((a, b) => a[0] - b[0]);
 
-  sorted.forEach(([, stop], index) => {
+  let numberOfStartedLogs = 0;
+
+  sorted.forEach(([start, stop], index) => {
     const next = sorted[index + 1];
 
     if (stop == 0 && next) {
@@ -25,6 +27,18 @@ export function isOverlapping(task: Task) {
     }
 
     if (next && stop > next[0]) {
+      overlaps = true;
+    }
+
+    if (stop !== 0 && start > stop) {
+      overlaps = true;
+    }
+
+    if (stop === 0) {
+      numberOfStartedLogs++;
+    }
+
+    if (numberOfStartedLogs > 1) {
       overlaps = true;
     }
   });

@@ -16,6 +16,9 @@ import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from 'common/atoms/data-table';
+import { parseTimeLog } from '../helpers/calculate-time';
+import dayjs from 'dayjs';
+import { isOverlapping } from '../helpers/is-overlapping';
 
 export function useStop() {
   const queryClient = useQueryClient();
@@ -23,6 +26,16 @@ export function useStop() {
 
   return (task: Task) => {
     toast.processing();
+
+    const logs = parseTimeLog(task.time_log);
+
+    logs[logs.length - 1][1] = dayjs().unix();
+
+    task.time_log = JSON.stringify(logs);
+
+    if (isOverlapping(task)) {
+      return toast.error('task_errors');
+    }
 
     request(
       'PUT',
