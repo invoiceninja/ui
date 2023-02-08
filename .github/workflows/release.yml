@@ -26,13 +26,11 @@ jobs:
 
       - name: Cleanup 
         run: |
-          sudo rm -rf bootstrap/cache/*
-          sudo rm -rf node_modules
-          sudo rm -rf .git
+          sudo rm -rf .env
 
       - name: Build project
         run: |
-          zip -r ./invoiceninja-react.zip .* -x "../*"
+          zip -r ./invoiceninja-react.zip dist/
       
       - name: Release
         uses: softprops/action-gh-release@v1
