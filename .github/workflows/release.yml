@@ -22,7 +22,7 @@ jobs:
       - name: Prepare React Application
         run: |
           npm i
-          npm run production
+          npm run build
 
       - name: Cleanup 
         run: |
@@ -32,7 +32,7 @@ jobs:
 
       - name: Build project
         run: |
-          zip -r ./react.zip .* -x "../*"
+          zip -r ./invoiceninja-react.zip .* -x "../*"
       
       - name: Release
         uses: softprops/action-gh-release@v1
@@ -41,4 +41,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           files: |
-            react.zip
+            invoiceninja-react.zip
