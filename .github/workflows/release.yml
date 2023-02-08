@@ -1,0 +1,44 @@
+on:
+  release:
+    types: [released]
+
+name: Upload Release Asset
+
+jobs:
+  build:
+    name: Upload Release Asset
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v1
+        with:
+          ref: main
+          
+      - name: Copy .env file
+        run: |
+          cp .env.example .env
+             
+      - name: Prepare React Application
+        run: |
+          npm i
+          npm run production
+
+      - name: Cleanup 
+        run: |
+          sudo rm -rf bootstrap/cache/*
+          sudo rm -rf node_modules
+          sudo rm -rf .git
+
+      - name: Build project
+        run: |
+          zip -r ./react.zip .* -x "../*"
+      
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          files: |
+            react.zip
