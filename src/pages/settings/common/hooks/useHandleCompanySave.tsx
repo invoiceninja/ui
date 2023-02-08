@@ -10,7 +10,6 @@
 
 import { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { updateRecord } from 'common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 import { request } from 'common/helpers/request';
@@ -19,15 +18,17 @@ import { useQueryClient } from 'react-query';
 import { toast } from 'common/helpers/toast/toast';
 import { useAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../atoms';
+import { updatingRecords as updatingRecordsAtom } from 'pages/settings/invoice-design/common/atoms';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
-
   const queryClient = useQueryClient();
-
-  const companyChanges = useCompanyChanges();
+  const companyChanges = useInjectCompanyChanges();
 
   const [, setErrors] = useAtom(companySettingsErrorsAtom);
+
+  const [updatingRecords, setUpdatingRecords] = useAtom(updatingRecordsAtom);
 
   return () => {
     toast.processing();
@@ -44,6 +45,22 @@ export function useHandleCompanySave() {
 
         queryClient.invalidateQueries('/api/v1/statics');
 
+        toast.dismiss();
+
+        updatingRecords?.forEach((record) => {
+          toast.processing();
+
+          if (record.checked) {
+            request('POST', endpoint('/api/v1/designs/set/default'), {
+              design_id: record.design_id,
+              entity: record.entity,
+            }).catch((error) => {
+              console.log(error);
+              toast.error();
+            });
+          }
+        });
+
         toast.success('updated_settings');
       })
       .catch((error: AxiosError<ValidationBag>) => {
@@ -54,6 +71,7 @@ export function useHandleCompanySave() {
           console.error(error);
           toast.error();
         }
-      });
+      })
+      .finally(() => setUpdatingRecords(undefined));
   };
 }

@@ -9,24 +9,28 @@
  */
 
 import colors from 'common/constants/colors';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { Design } from 'common/interfaces/design';
 import { useDesignsQuery } from 'common/queries/designs';
 import { updateChanges } from 'common/stores/slices/company-users';
 import { Divider } from 'components/cards/Divider';
 import { ColorPicker } from 'components/forms/ColorPicker';
+import { useAtom } from 'jotai';
 import { range } from 'lodash';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
 import { SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
+import { updatingRecords as updatingRecordsAtom } from '../common/atoms';
 
 export function GeneralSettings() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
-  const company = useCompanyChanges();
+  const company = useInjectCompanyChanges();
+
+  const [updatingRecords, setUpdatingRecords] = useAtom(updatingRecordsAtom);
 
   const { data: designs } = useDesignsQuery({
     currentPage: 1,
@@ -770,7 +774,62 @@ export function GeneralSettings() {
     { value: 'Zeyada', label: 'Zeyada' },
   ];
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
+  const isChangedDesign = (entity: string) => {
+    const foundRecord = updatingRecords?.find(
+      (record) => record.entity === entity
+    );
+
+    return Boolean(foundRecord);
+  };
+
+  const isUpdateAllRecordsChecked = (entity: string) => {
+    const foundRecord = updatingRecords?.find(
+      (record) => record.entity === entity
+    );
+
+    return Boolean(foundRecord?.checked);
+  };
+
+  const handleChangeUpdateAllRecords = (entity: string, value: boolean) => {
+    const updatedRecords = updatingRecords?.map((record) => ({
+      ...record,
+      checked: record.entity === entity ? value : record.checked,
+    }));
+
+    setUpdatingRecords(updatedRecords);
+  };
+
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (event.target.id.includes('settings')) {
+      const targetId = event.target.id.split('.')[1];
+
+      const entity = targetId.split('_design_id')[0];
+
+      if (
+        entity === 'invoice' ||
+        entity === 'quote' ||
+        entity === 'credit' ||
+        entity === 'purchase_order'
+      ) {
+        if (isChangedDesign(entity)) {
+          const updatedRecords = updatingRecords?.map((record) => ({
+            ...record,
+            design_id:
+              record.entity === entity ? event.target.value : record.design_id,
+            checked: record.entity === entity ? false : record.checked,
+          }));
+
+          setUpdatingRecords(updatedRecords);
+        } else {
+          const updatedRecordsList = updatingRecords || [];
+
+          setUpdatingRecords([
+            ...updatedRecordsList,
+            { design_id: event.target.value, entity, checked: false },
+          ]);
+        }
+      }
+    }
     dispatch(
       updateChanges({
         object: 'company',
@@ -778,6 +837,7 @@ export function GeneralSettings() {
         value: event.target.value,
       })
     );
+  };
 
   const handleToggleChange = (id: string, value: boolean) =>
     dispatch(
@@ -788,6 +848,10 @@ export function GeneralSettings() {
       })
     );
 
+  useEffect(() => {
+    setUpdatingRecords(undefined);
+  }, []);
+
   return (
     <Card title={t('general_settings')}>
       <ClickableElement to="/settings/invoice_design/customize">
@@ -797,63 +861,119 @@ export function GeneralSettings() {
       <Divider />
 
       <Element leftSide={t('invoice_design')}>
-        <SelectField
-          id="settings.invoice_design_id"
-          value={company?.settings?.invoice_design_id || 'VolejRejNm'}
-          onChange={handleChange}
-        >
-          {designs &&
-            designs.data.data.map((design: Design) => (
-              <option key={design.id} value={design.id}>
-                {design.name}
-              </option>
-            ))}
-        </SelectField>
+        <div className="flex flex-col space-y-3">
+          <SelectField
+            id="settings.invoice_design_id"
+            value={company?.settings?.invoice_design_id || 'VolejRejNm'}
+            onChange={handleChange}
+          >
+            {designs &&
+              designs.data.data.map((design: Design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
+
+          {isChangedDesign('invoice') && (
+            <div className="flex space-x-10 pl-5">
+              <span>{t('update_all_records')}</span>
+              <Toggle
+                checked={isUpdateAllRecordsChecked('invoice')}
+                onValueChange={(value) =>
+                  handleChangeUpdateAllRecords('invoice', value)
+                }
+              />
+            </div>
+          )}
+        </div>
       </Element>
 
       <Element leftSide={t('quote_design')}>
-        <SelectField
-          id="settings.quote_design_id"
-          value={company?.settings?.quote_design_id || 'VolejRejNm'}
-          onChange={handleChange}
-        >
-          {designs &&
-            designs.data.data.map((design: Design) => (
-              <option key={design.id} value={design.id}>
-                {design.name}
-              </option>
-            ))}
-        </SelectField>
+        <div className="flex flex-col space-y-3">
+          <SelectField
+            id="settings.quote_design_id"
+            value={company?.settings?.quote_design_id || 'VolejRejNm'}
+            onChange={handleChange}
+          >
+            {designs &&
+              designs.data.data.map((design: Design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
+
+          {isChangedDesign('quote') && (
+            <div className="flex space-x-10 pl-5">
+              <span>{t('update_all_records')}</span>
+              <Toggle
+                checked={isUpdateAllRecordsChecked('quote')}
+                onValueChange={(value) =>
+                  handleChangeUpdateAllRecords('quote', value)
+                }
+              />
+            </div>
+          )}
+        </div>
       </Element>
 
       <Element leftSide={t('credit_design')}>
-        <SelectField
-          id="settings.credit_design_id"
-          value={company?.settings?.credit_design_id || 'VolejRejNm'}
-          onChange={handleChange}
-        >
-          {designs &&
-            designs.data.data.map((design: Design) => (
-              <option key={design.id} value={design.id}>
-                {design.name}
-              </option>
-            ))}
-        </SelectField>
+        <div className="flex flex-col space-y-3">
+          <SelectField
+            id="settings.credit_design_id"
+            value={company?.settings?.credit_design_id || 'VolejRejNm'}
+            onChange={handleChange}
+          >
+            {designs &&
+              designs.data.data.map((design: Design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
+
+          {isChangedDesign('credit') && (
+            <div className="flex space-x-10 pl-5">
+              <span>{t('update_all_records')}</span>
+              <Toggle
+                checked={isUpdateAllRecordsChecked('credit')}
+                onValueChange={(value) =>
+                  handleChangeUpdateAllRecords('credit', value)
+                }
+              />
+            </div>
+          )}
+        </div>
       </Element>
 
       <Element leftSide={t('purchase_order_design')}>
-        <SelectField
-          id="settings.purchase_order_design_id"
-          value={company?.settings?.purchase_order_design_id || 'VolejRejNm'}
-          onChange={handleChange}
-        >
-          {designs &&
-            designs.data.data.map((design: Design) => (
-              <option key={design.id} value={design.id}>
-                {design.name}
-              </option>
-            ))}
-        </SelectField>
+        <div className="flex flex-col space-y-3">
+          <SelectField
+            id="settings.purchase_order_design_id"
+            value={company?.settings?.purchase_order_design_id || 'VolejRejNm'}
+            onChange={handleChange}
+          >
+            {designs &&
+              designs.data.data.map((design: Design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
+
+          {isChangedDesign('purchase_order') && (
+            <div className="flex space-x-10 pl-5">
+              <span>{t('update_all_records')}</span>
+              <Toggle
+                checked={isUpdateAllRecordsChecked('purchase_order')}
+                onValueChange={(value) =>
+                  handleChangeUpdateAllRecords('purchase_order', value)
+                }
+              />
+            </div>
+          )}
+        </div>
       </Element>
 
       <Element leftSide={t('page_layout')}>
