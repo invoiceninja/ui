@@ -34,20 +34,20 @@ export function ProductForm(props: Props) {
 
   const company = useCurrentCompany();
 
-  const { product, errors, handleChange, type } = props;
+  const { errors, handleChange, type } = props;
 
   return (
     <>
       {type === 'edit' && (
         <Element leftSide={t('status')}>
-          <EntityStatus entity={product} />
+          <EntityStatus entity={props.product} />
         </Element>
       )}
 
       <Element leftSide={t('product')} required>
         <InputField
           required
-          value={product.product_key}
+          value={props.product.product_key}
           onValueChange={(value) => handleChange('product_key', value)}
           errorMessage={errors?.errors.product_key}
         />
@@ -56,7 +56,7 @@ export function ProductForm(props: Props) {
       <Element leftSide={t('notes')}>
         <InputField
           element="textarea"
-          value={product.notes}
+          value={props.product.notes}
           onValueChange={(value) => handleChange('notes', value)}
           errorMessage={errors?.errors.notes}
         />
@@ -64,7 +64,7 @@ export function ProductForm(props: Props) {
 
       <Element leftSide={t('price')}>
         <InputField
-          value={product.price}
+          value={props.product.price}
           onValueChange={(value) => handleChange('price', value)}
           errorMessage={errors?.errors.price}
         />
@@ -73,7 +73,7 @@ export function ProductForm(props: Props) {
       {company?.enable_product_cost && (
         <Element leftSide={t('cost')}>
           <InputField
-            value={product.cost}
+            value={props.product.cost}
             onValueChange={(value) => handleChange('cost', value)}
             errorMessage={errors?.errors.cost}
           />
@@ -83,7 +83,7 @@ export function ProductForm(props: Props) {
       {company?.enable_product_quantity && (
         <Element leftSide={t('default_quantity')}>
           <InputField
-            value={product.quantity}
+            value={props.product.quantity}
             onValueChange={(value) => handleChange('quantity', value)}
             errorMessage={errors?.errors.quantity}
           />
@@ -94,7 +94,7 @@ export function ProductForm(props: Props) {
         <>
           <Element leftSide={t('stock_quantity')}>
             <InputField
-              value={product.in_stock_quantity}
+              value={props.product.in_stock_quantity}
               onValueChange={(value) =>
                 handleChange('in_stock_quantity', Number(value))
               }
@@ -104,7 +104,7 @@ export function ProductForm(props: Props) {
 
           <Element leftSide={t('stock_notifications')}>
             <Toggle
-              checked={product.stock_notification}
+              checked={props.product.stock_notification}
               onValueChange={(value) =>
                 handleChange('stock_notification', value)
               }
@@ -113,7 +113,7 @@ export function ProductForm(props: Props) {
 
           <Element leftSide={t('notification_threshold')}>
             <InputField
-              value={product.stock_notification_threshold}
+              value={props.product.stock_notification_threshold}
               onValueChange={(value) =>
                 handleChange('stock_notification_threshold', value)
               }
@@ -130,8 +130,8 @@ export function ProductForm(props: Props) {
               handleChange('tax_rate1', value.resource?.rate);
               handleChange('tax_name1', value.resource?.name);
             }}
-            defaultValue={product.tax_rate1}
-            clearButton={Boolean(product.tax_rate1)}
+            defaultValue={props.product.tax_rate1}
+            clearButton={Boolean(props.product.tax_rate1)}
             onClearButtonClick={() => {
               handleChange('tax_rate1', 0);
               handleChange('tax_name1', '');
@@ -151,8 +151,8 @@ export function ProductForm(props: Props) {
               handleChange('tax_rate2', value.resource?.rate);
               handleChange('tax_name2', value.resource?.name);
             }}
-            defaultValue={product.tax_rate2}
-            clearButton={Boolean(product.tax_rate2)}
+            defaultValue={props.product.tax_rate2}
+            clearButton={Boolean(props.product.tax_rate2)}
             onClearButtonClick={() => {
               handleChange('tax_rate2', 0);
               handleChange('tax_name2', '');
@@ -172,8 +172,8 @@ export function ProductForm(props: Props) {
               handleChange('tax_rate3', value.resource?.rate);
               handleChange('tax_name3', value.resource?.name);
             }}
-            defaultValue={product.tax_rate3}
-            clearButton={Boolean(product.tax_rate3)}
+            defaultValue={props.product.tax_rate3}
+            clearButton={Boolean(props.product.tax_rate3)}
             onClearButtonClick={() => {
               handleChange('tax_rate3', 0);
               handleChange('tax_name3', '');
@@ -189,7 +189,7 @@ export function ProductForm(props: Props) {
       {company?.custom_fields?.product1 && (
         <CustomField
           field="custom_value1"
-          defaultValue={product.custom_value1}
+          defaultValue={props.product.custom_value1}
           value={company.custom_fields.product1}
           onValueChange={(value) => handleChange('custom_value1', value)}
         />
@@ -198,7 +198,7 @@ export function ProductForm(props: Props) {
       {company?.custom_fields?.product2 && (
         <CustomField
           field="custom_value2"
-          defaultValue={product.custom_value2}
+          defaultValue={props.product.custom_value2}
           value={company.custom_fields.product2}
           onValueChange={(value) => handleChange('custom_value2', value)}
         />
@@ -207,7 +207,7 @@ export function ProductForm(props: Props) {
       {company?.custom_fields?.product3 && (
         <CustomField
           field="custom_value3"
-          defaultValue={product.custom_value3}
+          defaultValue={props.product.custom_value3}
           value={company.custom_fields.product3}
           onValueChange={(value) => handleChange('custom_value3', value)}
         />
@@ -216,7 +216,7 @@ export function ProductForm(props: Props) {
       {company?.custom_fields?.product4 && (
         <CustomField
           field="custom_value4"
-          defaultValue={product.custom_value4}
+          defaultValue={props.product.custom_value4}
           value={company.custom_fields.product4}
           onValueChange={(value) => handleChange('custom_value4', value)}
         />
