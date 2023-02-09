@@ -155,6 +155,7 @@ export function Create() {
           onClearButtonClick={() => handleChange('client_id', '')}
           onContactCheckboxChange={handleInvitationChange}
           errorMessage={errors?.errors.client_id}
+          disableWithSpinner={searchParams.get('action') === 'create'}
         />
 
         <InvoiceDetails handleChange={handleChange} errors={errors} />
