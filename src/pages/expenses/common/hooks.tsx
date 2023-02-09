@@ -99,7 +99,7 @@ export function useActions() {
       number: '',
     });
 
-    navigate('/recurring_expenses/create');
+    navigate('/recurring_expenses/create?action=clone');
   };
 
   const actions: Action<Expense>[] = [
