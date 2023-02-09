@@ -76,41 +76,48 @@ export function Create() {
   });
 
   useEffect(() => {
-    if (
-      typeof data !== 'undefined' &&
-      typeof recurringInvoice === 'undefined'
-    ) {
-      const _recurringInvoice = cloneDeep(data);
+    setRecurringInvoice((current) => {
+      let value = current;
 
-      if (company && company.enabled_tax_rates > 0) {
-        _recurringInvoice.tax_name1 = company.settings.tax_name1;
-        _recurringInvoice.tax_rate1 = company.settings.tax_rate1;
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
       }
 
-      if (company && company.enabled_tax_rates > 1) {
-        _recurringInvoice.tax_name2 = company.settings.tax_name2;
-        _recurringInvoice.tax_rate2 = company.settings.tax_rate2;
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const _recurringInvoice = cloneDeep(data);
+
+        if (company && company.enabled_tax_rates > 0) {
+          _recurringInvoice.tax_name1 = company.settings.tax_name1;
+          _recurringInvoice.tax_rate1 = company.settings.tax_rate1;
+        }
+
+        if (company && company.enabled_tax_rates > 1) {
+          _recurringInvoice.tax_name2 = company.settings.tax_name2;
+          _recurringInvoice.tax_rate2 = company.settings.tax_rate2;
+        }
+
+        if (company && company.enabled_tax_rates > 2) {
+          _recurringInvoice.tax_name3 = company.settings.tax_name3;
+          _recurringInvoice.tax_rate3 = company.settings.tax_rate3;
+        }
+
+        if (typeof _recurringInvoice.line_items === 'string') {
+          _recurringInvoice.line_items = [];
+        }
+
+        if (searchParams.get('client')) {
+          _recurringInvoice.client_id = searchParams.get('client')!;
+        }
+
+        value = _recurringInvoice;
       }
 
-      if (company && company.enabled_tax_rates > 2) {
-        _recurringInvoice.tax_name3 = company.settings.tax_name3;
-        _recurringInvoice.tax_rate3 = company.settings.tax_rate3;
-      }
-
-      if (typeof _recurringInvoice.line_items === 'string') {
-        _recurringInvoice.line_items = [];
-      }
-
-      if (searchParams.get('client')) {
-        _recurringInvoice.client_id = searchParams.get('client')!;
-      }
-
-      setRecurringInvoice(_recurringInvoice);
-    }
-
-    return () => {
-      isProduction() && setRecurringInvoice(undefined);
-    };
+      return value;
+    });
   }, [data]);
 
   useEffect(() => {
