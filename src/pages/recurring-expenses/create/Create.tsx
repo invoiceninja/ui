@@ -16,7 +16,7 @@ import { Details } from '../components/Details';
 import { Notes } from '../components/Notes';
 import { AdditionalInfo } from '../components/AdditionalInfo';
 import { request } from 'common/helpers/request';
-import { endpoint, isProduction } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';

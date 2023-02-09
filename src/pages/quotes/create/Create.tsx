@@ -9,7 +9,6 @@
  */
 
 import { blankInvitation } from 'common/constants/blank-invitation';
-import { isProduction } from 'common/helpers';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
