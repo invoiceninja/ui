@@ -231,7 +231,7 @@ export function useActions() {
   const cloneToProject = (project: Project) => {
     setProject({ ...project, id: '', documents: [], number: '' });
 
-    navigate('/projects/create');
+    navigate('/projects/create?action=clone');
   };
 
   const actions = [

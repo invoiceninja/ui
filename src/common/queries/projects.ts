@@ -13,15 +13,17 @@ import { request } from 'common/helpers/request';
 import { Project } from 'common/interfaces/project';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
+import { GenericQueryOptions } from './invoices';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
-export function useBlankProjectQuery() {
+export function useBlankProjectQuery(options?: GenericQueryOptions) {
   return useQuery<Project>(
     '/api/v1/projects/create',
     () =>
       request('GET', endpoint('/api/v1/projects/create')).then(
-        (response) => response.data.data
+        (response: GenericSingleResourceResponse<Project>) => response.data.data
       ),
-    { staleTime: Infinity }
+    { ...options, staleTime: Infinity }
   );
 }
 
