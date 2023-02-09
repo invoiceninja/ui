@@ -51,7 +51,7 @@ export function Actions(props: Props) {
   const cloneToTask = () => {
     setTask({ ...task, id: '', documents: [], number: '' });
 
-    navigate('/tasks/create');
+    navigate('/tasks/create?action=clone');
   };
 
   return (
