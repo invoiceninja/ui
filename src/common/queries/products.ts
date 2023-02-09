@@ -43,7 +43,7 @@ export function useBlankProductQuery(options?: GenericQueryOptions) {
       request('GET', endpoint('/api/v1/products/create')).then(
         (response: GenericSingleResourceResponse<Product>) => response.data.data
       ),
-    { staleTime: Infinity, ...options }
+    { ...options, staleTime: Infinity }
   );
 }
 
