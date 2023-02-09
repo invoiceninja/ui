@@ -19,31 +19,33 @@ import { useBlankProductQuery } from 'common/queries/products';
 import { Container } from 'components/Container';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
-import { useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { ProductTableResource } from 'pages/invoices/common/components/ProductsTable';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { productAtom } from '../common/atoms';
 import { CreateProduct } from '../common/components/CreateProduct';
 
 export function Create() {
   const [t] = useTranslation();
 
-  const { data: blankProductData } = useBlankProductQuery();
-
+  const [product, setProduct] = useAtom(productAtom);
   const navigate = useNavigate();
+
+  const { data } = useBlankProductQuery({
+    enabled: typeof product === 'undefined',
+  });
 
   const pages = [
     { name: t('products'), href: '/products' },
     { name: t('new_product'), href: '/products/create' },
   ];
 
-  const product = useAtomValue(productAtom);
-
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
-
   const [errors, setErrors] = useState<ValidationBag>();
+  const [searchParams] = useSearchParams();
 
   const handleSave = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -76,20 +78,38 @@ export function Create() {
     }
   };
 
+  useEffect(() => {
+    setProduct((current) => {
+      let value = current;
+
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
+      }
+
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const _product = cloneDeep(data);
+
+        value = _product;
+      }
+
+      return value;
+    });
+  }, [data]);
+
   return (
     <Default
       title={t('new_product')}
       breadcrumbs={pages}
-      disableSaveButton={!blankProductData || isFormBusy}
+      disableSaveButton={!data || isFormBusy}
       onSaveClick={handleSave}
     >
       <Container>
-        {blankProductData?.data.data ? (
-          <CreateProduct
-            product={blankProductData.data.data}
-            errors={errors}
-            setErrors={setErrors}
-          />
+        {data ? (
+          <CreateProduct product={data} errors={errors} setErrors={setErrors} />
         ) : (
           <Spinner />
         )}

@@ -15,6 +15,7 @@ import { route } from 'common/helpers/route';
 import { endpoint } from '../helpers';
 import { Product } from 'common/interfaces/product';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { GenericQueryOptions } from './invoices';
 
 export function useProductsQuery() {
   return useQuery<Product[]>(
@@ -35,11 +36,14 @@ export function useProductQuery(params: { id: string | undefined }) {
     { staleTime: Infinity }
   );
 }
-export function useBlankProductQuery() {
+export function useBlankProductQuery(options?: GenericQueryOptions) {
   return useQuery(
     route('/api/v1/products/create'),
-    () => request('GET', endpoint('/api/v1/products/create')),
-    { staleTime: Infinity }
+    () =>
+      request('GET', endpoint('/api/v1/products/create')).then(
+        (response: GenericSingleResourceResponse<Product>) => response.data.data
+      ),
+    { staleTime: Infinity, ...options }
   );
 }
 
