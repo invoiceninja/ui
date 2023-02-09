@@ -91,9 +91,7 @@ export function Create() {
         typeof value === 'undefined' &&
         searchParams.get('action') !== 'clone'
       ) {
-        const _product = cloneDeep(data);
-
-        value = _product;
+        value = cloneDeep(data);
       }
 
       return value;
@@ -109,7 +107,7 @@ export function Create() {
     >
       <Container>
         {data ? (
-          <CreateProduct product={data} errors={errors} setErrors={setErrors} />
+          <CreateProduct errors={errors} setErrors={setErrors} />
         ) : (
           <Spinner />
         )}
