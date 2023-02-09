@@ -273,7 +273,7 @@ export function useActions() {
   const cloneToCredit = (credit: Credit) => {
     setCredit({ ...credit, number: '', documents: [] });
 
-    navigate('/credits/create');
+    navigate('/credits/create?action=clone');
   };
 
   const cloneToInvoice = (credit: Credit) => {
@@ -482,7 +482,7 @@ export const creditColumns = [
   // 'vendor', @Todo: Need to fetch the relationship
 ] as const;
 
-type CreditColumns = typeof creditColumns[number];
+type CreditColumns = (typeof creditColumns)[number];
 
 export const defaultColumns: CreditColumns[] = [
   'status',
