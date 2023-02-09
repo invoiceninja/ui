@@ -57,8 +57,7 @@ export function Create() {
   const productColumns = useProductColumns();
 
   const { data } = useBlankCreditQuery({
-    enabled:
-      typeof credit === 'undefined' || searchParams.get('action') === 'clone',
+    enabled: typeof credit === 'undefined',
   });
 
   const {
