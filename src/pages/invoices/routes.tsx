@@ -19,6 +19,7 @@ import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { or } from 'common/guards/guards/or';
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -27,8 +28,8 @@ export const invoiceRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Invoices),
-            () => permission('view_invoice'),
+            enabled(ModuleBitmask.Invoices),
+            or(permission('view_invoice')),
           ]}
           component={<Invoices />}
         />
