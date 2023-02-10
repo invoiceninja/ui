@@ -17,6 +17,9 @@ import { useTaxRatesQuery } from 'common/queries/tax-rates';
 import { TaxRate } from 'common/interfaces/tax-rate';
 import { useCurrentCompany } from '../useCurrentCompany';
 import { usePlan } from 'common/guards/guards/free-plan';
+import { useHasPermission } from '../permissions/useHasPermission';
+import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { useEnabled } from 'common/guards/guards/enabled';
 
 interface EntityAction {
   key: string;
@@ -29,10 +32,13 @@ interface EntityAction {
 export function useQuickCreateActions() {
   const currentCompany = useCurrentCompany();
 
+  const hasPermission = useHasPermission();
+  const enabled = useEnabled();
+
   const { data: gatewaysData } = useCompanyGatewaysQuery();
   const { data: bankAccountsData } = useBankAccountsQuery();
   const { data: taxRatesData } = useTaxRatesQuery({});
-  const { enterprisePlan } = usePlan();
+  const { proPlan, enterprisePlan } = usePlan();
 
   const [gateways, setGateways] = useState<CompanyGateway[]>();
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>();
@@ -57,73 +63,79 @@ export function useQuickCreateActions() {
       key: 'client',
       url: '/clients/create',
       section: 'income',
-      visible: true,
+      visible: hasPermission('create_client'),
     },
     {
       key: 'product',
       url: '/products/create',
       section: 'income',
-      visible: true,
+      visible: hasPermission('create_product'),
     },
     {
       key: 'invoice',
       url: '/invoices/create',
       section: 'income',
-      visible: true,
+      visible:
+        hasPermission('create_invoice') && enabled(ModuleBitmask.Invoices),
     },
     {
       key: 'recurring_invoice',
       url: '/recurring_invoices/create',
       section: 'income',
-      visible: true,
+      visible:
+        hasPermission('create_recurring_invoice') &&
+        enabled(ModuleBitmask.RecurringInvoices),
     },
     {
       key: 'quote',
       url: '/quotes/create',
       section: 'income',
-      visible: true,
+      visible: hasPermission('create_quote') && enabled(ModuleBitmask.Quotes),
     },
     {
       key: 'credit',
       url: '/credits/create',
       section: 'income',
-      visible: true,
+      visible: hasPermission('create_credit') && enabled(ModuleBitmask.Credits),
     },
     {
       key: 'payment',
       url: '/payments/create',
       section: 'income',
-      visible: true,
+      visible: hasPermission('create_payment'),
     },
     {
       key: 'subscription',
       url: '/settings/subscription/create',
       section: 'income',
-      visible: true,
+      visible: proPlan || enterprisePlan,
     },
     {
       key: 'expense',
       url: '/expenses/create',
       section: 'expense',
-      visible: true,
+      visible:
+        hasPermission('create_expense') && enabled(ModuleBitmask.Expenses),
     },
     {
       key: 'purchase_order',
       url: '/purchase_orders/create',
       section: 'expense',
-      visible: true,
+      visible:
+        hasPermission('create_purchase_order') &&
+        enabled(ModuleBitmask.PurchaseOrders),
     },
     {
       key: 'vendor',
       url: '/vendors/create',
       section: 'expense',
-      visible: true,
+      visible: hasPermission('create_vendor') && enabled(ModuleBitmask.Vendors),
     },
     {
       key: 'transaction',
       url: '/transactions/create',
       section: 'expense',
-      visible: true,
+      visible: hasPermission('create_bank_transaction'),
     },
     {
       key: 'add_stripe',
@@ -153,7 +165,7 @@ export function useQuickCreateActions() {
       key: 'templates_and_reminders',
       url: '/settings/templates_and_reminders',
       section: 'settings',
-      visible: true,
+      visible: proPlan || enterprisePlan,
     },
   ];
 

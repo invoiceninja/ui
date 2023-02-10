@@ -11,6 +11,7 @@
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField, SelectField } from '@invoiceninja/forms';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { CustomField } from 'components/CustomField';
 import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
@@ -19,11 +20,12 @@ import { ChangeHandler } from '../hooks';
 
 interface Props {
   handleChange: ChangeHandler;
+  errors: ValidationBag | undefined;
 }
 
 export function CreditDetails(props: Props) {
   const { t } = useTranslation();
-  const { handleChange } = props;
+  const { handleChange, errors } = props;
 
   const company = useCurrentCompany();
 
@@ -37,6 +39,7 @@ export function CreditDetails(props: Props) {
             type="date"
             onValueChange={(value) => handleChange('date', value)}
             value={credit?.date || ''}
+            errorMessage={errors?.errors.date}
           />
         </Element>
 
@@ -45,6 +48,7 @@ export function CreditDetails(props: Props) {
             type="date"
             onValueChange={(value) => handleChange('due_date', value)}
             value={credit?.due_date || ''}
+            errorMessage={errors?.errors.due_date}
           />
         </Element>
 
@@ -56,6 +60,7 @@ export function CreditDetails(props: Props) {
               handleChange('partial', parseFloat(value))
             }
             value={credit?.partial || ''}
+            errorMessage={errors?.errors.partial}
           />
         </Element>
 
@@ -65,6 +70,7 @@ export function CreditDetails(props: Props) {
               type="date"
               onValueChange={(value) => handleChange('partial_due_date', value)}
               value={credit?.partial_due_date || ''}
+              errorMessage={errors?.errors.partial_due_date}
             />
           </Element>
         )}
@@ -98,6 +104,7 @@ export function CreditDetails(props: Props) {
             id="number"
             onValueChange={(value) => handleChange('number', value)}
             value={credit?.number || ''}
+            errorMessage={errors?.errors.number}
           />
         </Element>
 
@@ -106,6 +113,7 @@ export function CreditDetails(props: Props) {
             id="po_number"
             onValueChange={(value) => handleChange('po_number', value)}
             value={credit?.po_number || ''}
+            errorMessage={errors?.errors.po_number}
           />
         </Element>
 
@@ -118,6 +126,7 @@ export function CreditDetails(props: Props) {
                   handleChange('discount', parseFloat(value))
                 }
                 value={credit?.discount || ''}
+                errorMessage={errors?.errors.discount}
               />
             </div>
 
@@ -127,6 +136,7 @@ export function CreditDetails(props: Props) {
                   handleChange('is_amount_discount', JSON.parse(value))
                 }
                 value={credit?.is_amount_discount.toString()}
+                errorMessage={errors?.errors.is_amount_discount}
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>

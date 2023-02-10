@@ -20,6 +20,7 @@ export interface ExpenseCategorySelectorProps
   initiallyVisible?: boolean;
   setVisible?: Dispatch<SetStateAction<boolean>>;
   setSelectedIds?: Dispatch<SetStateAction<string[]>>;
+  staleTime?: number;
 }
 
 export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
@@ -33,11 +34,14 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
         visible={props.initiallyVisible || isModalOpen}
         setVisible={props.setVisible || setIsModalOpen}
         setSelectedIds={props.setSelectedIds}
+        onCreatedCategory={(category: ExpenseCategory) =>
+          props.onChange(category)
+        }
       />
 
       {!props.setSelectedIds && (
         <DebouncedCombobox
-          {...props}
+          inputLabel={props.inputLabel}
           value="id"
           endpoint="/api/v1/expense_categories"
           label="name"
@@ -45,8 +49,15 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
           onChange={(category: Record<ExpenseCategory>) =>
             category.resource && props.onChange(category.resource)
           }
+          disabled={props.readonly}
+          clearButton={props.clearButton}
+          onClearButtonClick={props.onClearButtonClick}
+          queryAdditional
+          initiallyVisible={props.initiallyVisible}
           actionLabel={t('new_expense_category')}
           onActionClick={() => setIsModalOpen(true)}
+          sortBy="name|asc"
+          staleTime={props.staleTime}
         />
       )}
     </>

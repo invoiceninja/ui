@@ -14,9 +14,14 @@ import { toast } from 'common/helpers/toast/toast';
 import { Task } from 'common/interfaces/task';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
+import { useLocation } from 'react-router-dom';
 
 export function useStart() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+  const location = useLocation();
 
   return (task: Task) => {
     toast.processing();
@@ -27,7 +32,9 @@ export function useStart() {
       task
     )
       .then(() => {
-        toast.success('started_task');
+        !location.pathname.endsWith('/create')
+          ? toast.success('started_task')
+          : toast.dismiss();
 
         queryClient.invalidateQueries('/api/v1/tasks');
 
@@ -42,6 +49,9 @@ export function useStart() {
             projectId: task.project_id,
           })
         );
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
       })
       .catch((error) => {
         console.error(error);

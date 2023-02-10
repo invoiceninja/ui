@@ -10,7 +10,7 @@
 
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
-import { Link, SelectField } from '../../../../components/forms';
+import { SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStaticsQuery } from 'common/queries/statics';
@@ -49,20 +49,6 @@ export function Defaults() {
     <>
       {companyChanges?.settings && (
         <Card title={t('defaults')}>
-          <Element leftSide={t('auto_bill')}>
-            <SelectField
-              value={companyChanges?.settings?.auto_bill}
-              onChange={handleChange}
-              id="settings.auto_bill"
-            >
-              <option defaultChecked></option>
-              <option value="always">{t('enabled')}</option>
-              <option value="optout">{t('optout')}</option>
-              <option value="optin">{t('optin')}</option>
-              <option value="off">{t('disabled')}</option>
-            </SelectField>
-          </Element>
-
           <Element leftSide={t('payment_type')}>
             <SelectField
               value={companyChanges?.settings?.payment_type_id}
@@ -79,27 +65,6 @@ export function Defaults() {
               )}
             </SelectField>
           </Element>
-
-          {terms && (
-            <Element leftSide={t('payment_terms')}>
-              <SelectField
-                value={companyChanges?.settings?.payment_terms}
-                id="settings.payment_terms"
-                onChange={handleChange}
-              >
-                <option value=""></option>
-                {terms.data.data.map((type: PaymentTerm) => (
-                  <option key={type.id} value={type.num_days}>
-                    {type.name}
-                  </option>
-                ))}
-              </SelectField>
-
-              <Link to="/settings/payment_terms" className="block mt-2">
-                {t('configure_payment_terms')}
-              </Link>
-            </Element>
-          )}
 
           {terms && (
             <Element leftSide={t('quote_valid_until')}>
@@ -154,7 +119,10 @@ export function Defaults() {
             />
           </Element>
 
-          <Element leftSide={t('use_quote_terms')}>
+          <Element
+            leftSide={t('use_quote_terms')}
+            leftSideHelp={t('use_quote_terms_help')}
+          >
             <Toggle
               checked={companyChanges?.use_quote_terms_on_conversion}
               onChange={(value: boolean) =>

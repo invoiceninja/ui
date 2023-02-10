@@ -16,7 +16,7 @@ import { Details } from '../components/Details';
 import { Notes } from '../components/Notes';
 import { AdditionalInfo } from '../components/AdditionalInfo';
 import { request } from 'common/helpers/request';
-import { endpoint, isProduction } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
@@ -30,6 +30,7 @@ import { RecurringExpense } from 'common/interfaces/recurring-expense';
 import { useBlankRecurringExpenseQuery } from 'common/queries/recurring-expense';
 import { useHandleChange } from '../common/hooks';
 import { RecurringExpensesFrequency } from 'common/enums/recurring-expense-frequency';
+import { cloneDeep } from 'lodash';
 
 export function Create() {
   const [t] = useTranslation();
@@ -52,7 +53,7 @@ export function Create() {
   const [recurringExpense, setRecurringExpense] = useAtom(recurringExpenseAtom);
 
   const { data } = useBlankRecurringExpenseQuery({
-    enabled: !recurringExpense,
+    enabled: typeof recurringExpense === 'undefined',
   });
 
   const [errors, setErrors] = useState<ValidationBag>();
@@ -60,36 +61,36 @@ export function Create() {
   const handleChange = useHandleChange({ setRecurringExpense, setErrors });
 
   useEffect(() => {
-    if (data && !recurringExpense) {
-      setRecurringExpense({
-        ...data,
-        frequency_id: RecurringExpensesFrequency.FREQUENCY_MONTHLY,
-      });
-    }
+    setRecurringExpense((current) => {
+      let value = current;
 
-    if (searchParams.has('client')) {
-      setRecurringExpense(
-        (current) =>
-          current && {
-            ...current,
-            client_id: searchParams.get('client') as string,
-          }
-      );
-    }
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
+      }
 
-    if (searchParams.has('vendor')) {
-      setRecurringExpense(
-        (current) =>
-          current && {
-            ...current,
-            vendor_id: searchParams.get('vendor') as string,
-          }
-      );
-    }
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const _recurringExpense = cloneDeep(data);
 
-    return () => {
-      isProduction() && setRecurringExpense(undefined);
-    };
+        _recurringExpense.frequency_id =
+          RecurringExpensesFrequency.FREQUENCY_MONTHLY;
+
+        if (searchParams.get('client')) {
+          _recurringExpense.client_id = searchParams.get('client')!;
+        }
+
+        if (searchParams.get('vendor')) {
+          _recurringExpense.vendor_id = searchParams.get('vendor')!;
+        }
+
+        value = _recurringExpense;
+      }
+
+      return value;
+    });
   }, [data]);
 
   const onSave = (recurringExpense: RecurringExpense) => {

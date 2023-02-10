@@ -125,7 +125,7 @@ export function Edit() {
           readonly
         />
 
-        <InvoiceDetails handleChange={handleChange} />
+        <InvoiceDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
           {recurringInvoice && client ? (

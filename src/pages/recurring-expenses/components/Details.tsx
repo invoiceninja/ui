@@ -23,6 +23,7 @@ import { VendorSelector } from 'components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import frequencies from 'common/constants/recurring-expense-frequency';
 import dayjs from 'dayjs';
+import { useSearchParams } from 'react-router-dom';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -45,6 +46,8 @@ export function Details(props: Props) {
 
   const { recurringExpense, handleChange, taxInputType, pageType, errors } =
     props;
+
+  const [searchParams] = useSearchParams();
 
   return (
     <Card title={t('details')} isLoading={!recurringExpense}>
@@ -78,6 +81,8 @@ export function Details(props: Props) {
             onClearButtonClick={() => handleChange('client_id', '')}
             onChange={(client) => handleChange('client_id', client.id)}
             errorMessage={errors?.errors.client_id}
+            staleTime={Infinity}
+            disableWithSpinner={searchParams.get('action') === 'create'}
           />
         </Element>
       )}
@@ -149,12 +154,14 @@ export function Details(props: Props) {
               <InputField
                 label={t('tax_name')}
                 onValueChange={(value) => handleChange('tax_name1', value)}
+                errorMessage={errors?.errors.tax_name1}
               />
               <InputField
                 label={t('tax_amount')}
                 onValueChange={(value) =>
                   handleChange('tax_amount1', parseFloat(value))
                 }
+                errorMessage={errors?.errors.tax_amount1}
               />
             </div>
           </Element>
@@ -191,12 +198,14 @@ export function Details(props: Props) {
               <InputField
                 label={t('tax_name')}
                 onValueChange={(value) => handleChange('tax_name2', value)}
+                errorMessage={errors?.errors.tax_name2}
               />
               <InputField
                 label={t('tax_amount')}
                 onValueChange={(value) =>
                   handleChange('tax_amount2', parseFloat(value))
                 }
+                errorMessage={errors?.errors.tax_amount2}
               />
             </div>
           </Element>
@@ -233,12 +242,14 @@ export function Details(props: Props) {
               <InputField
                 label={t('tax_name')}
                 onValueChange={(value) => handleChange('tax_name3', value)}
+                errorMessage={errors?.errors.tax_name3}
               />
               <InputField
                 label={t('tax_amount')}
                 onValueChange={(value) =>
                   handleChange('tax_amount3', parseFloat(value))
                 }
+                errorMessage={errors?.errors.tax_amount3}
               />
             </div>
           </Element>

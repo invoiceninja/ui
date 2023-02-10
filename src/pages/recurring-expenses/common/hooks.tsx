@@ -37,13 +37,14 @@ import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useUpdateAtom } from 'jotai/utils';
+import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import { Icon } from 'components/icons/Icon';
 import {
   MdControlPointDuplicate,
   MdNotStarted,
   MdStopCircle,
 } from 'react-icons/md';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 
 export const recurringExpenseColumns = [
   'status',
@@ -375,6 +376,7 @@ export function useRecurringExpenseColumns() {
 
 export function useToggleStartStop() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (recurringExpense: RecurringExpense, action: 'start' | 'stop') => {
     toast.processing();
@@ -393,6 +395,9 @@ export function useToggleStartStop() {
             id: recurringExpense.id,
           })
         );
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
 
         toast.success(action === 'start' ? 'start' : 'stop');
       })
@@ -418,7 +423,7 @@ export function useActions() {
   const cloneToRecurringExpense = (recurringExpense: RecurringExpense) => {
     setRecurringExpense({ ...recurringExpense, documents: [], number: '' });
 
-    navigate('/recurring_expenses/create');
+    navigate('/recurring_expenses/create?action=clone');
   };
 
   const cloneToExpense = (recurringExpense: RecurringExpense) => {
@@ -428,7 +433,7 @@ export function useActions() {
       number: '',
     });
 
-    navigate('/expenses/create');
+    navigate('/expenses/create?action=clone');
   };
 
   const actions: Action<RecurringExpense>[] = [

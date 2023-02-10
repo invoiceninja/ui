@@ -16,18 +16,21 @@ import { route } from 'common/helpers/route';
 import { Params } from './common/params.interface';
 
 export function useTaxRatesQuery(params: Params) {
-  return useQuery(['/api/v1/tax_rates', params], () =>
-    request(
-      'GET',
-      endpoint(
-        '/api/v1/tax_rates?per_page=:perPage&page=:currentPage&sort=:sort',
-        {
-          perPage: params.perPage,
-          currentPage: params.currentPage,
-          sort: params.sort ?? 'id|asc',
-        }
-      )
-    )
+  return useQuery(
+    ['/api/v1/tax_rates', params],
+    () =>
+      request(
+        'GET',
+        endpoint(
+          '/api/v1/tax_rates?per_page=:perPage&page=:currentPage&sort=:sort',
+          {
+            perPage: params.perPage,
+            currentPage: params.currentPage,
+            sort: params.sort ?? 'id|asc',
+          }
+        )
+      ),
+    { staleTime: Infinity }
   );
 }
 

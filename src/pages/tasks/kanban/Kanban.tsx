@@ -50,7 +50,8 @@ import { Link as ReactRouterLink } from 'react-router-dom';
 import { Card, Element } from '@invoiceninja/cards';
 import { ProjectSelector } from 'components/projects/ProjectSelector';
 import { Inline } from 'components/Inline';
-import { MdAddCircle } from 'react-icons/md';
+import { CreateTaskStatusModal } from 'pages/settings/task-statuses/components/CreateTaskStatusModal';
+import { MdAdd, MdAddCircle } from 'react-icons/md';
 import {
   CreateTaskModal,
   TaskDetails,
@@ -87,6 +88,9 @@ export function Kanban() {
   ];
 
   const queryClient = useQueryClient();
+
+  const [isTaskStatusModalOpened, setIsTaskStatusModalOpened] =
+    useState<boolean>(false);
 
   const [apiEndpoint, setApiEndpoint] = useState('/api/v1/tasks?per_page=1000');
   const [projectId, setProjectId] = useState<string>();
@@ -354,7 +358,10 @@ export function Kanban() {
                         className="cursor-pointer text-gray-500 hover:text-gray-800"
                         fontSize={22}
                         onClick={() => {
-                          setTaskDetails({ taskStatusId: board.id, projectId });
+                          setTaskDetails({
+                            taskStatusId: board.id,
+                            projectId,
+                          });
                           setIsTaskModalOpened(true);
                         }}
                       />
@@ -437,8 +444,23 @@ export function Kanban() {
               </Droppable>
             ))}
           </DragDropContext>
+
+          <div>
+            <div className="bg-white shadow rounded p-1">
+              <MdAdd
+                className="cursor-pointer text-gray-500 hover:text-gray-800"
+                fontSize={28}
+                onClick={() => setIsTaskStatusModalOpened(true)}
+              />
+            </div>
+          </div>
         </div>
       )}
+
+      <CreateTaskStatusModal
+        visible={isTaskStatusModalOpened}
+        setVisible={setIsTaskStatusModalOpened}
+      />
 
       <CreateTaskModal
         visible={isTaskModalOpened}

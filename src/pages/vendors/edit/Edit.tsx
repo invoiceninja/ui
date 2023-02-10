@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
@@ -16,6 +16,7 @@ import { toast } from 'common/helpers/toast/toast';
 import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Vendor } from 'common/interfaces/vendor';
 import { useVendorQuery } from 'common/queries/vendor';
 import { updateRecord } from 'common/stores/slices/company-users';
@@ -37,6 +38,8 @@ export function Edit() {
   const { data } = useVendorQuery({ id });
 
   const [vendor, setVendor] = useState<Vendor>();
+
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const company = useInjectCompanyChanges();
   const dispatch = useDispatch();
@@ -76,10 +79,14 @@ export function Edit() {
           updateRecord({ object: 'company', data: response[1].data.data })
         );
       })
-      .catch((error) => {
-        console.error(error);
-
-        toast.error();
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       });
   };
 
@@ -93,7 +100,7 @@ export function Edit() {
       onSaveClick={onSave}
       disableSaveButton={!hasPermission('edit_vendor')}
     >
-      {vendor && <Form vendor={vendor} setVendor={setVendor} />}
+      {vendor && <Form vendor={vendor} setVendor={setVendor} errors={errors} />}
     </Default>
   );
 }

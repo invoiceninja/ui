@@ -18,9 +18,11 @@ import { ChangeHandler } from '../hooks';
 import { useAtom } from 'jotai';
 import { recurringInvoiceAtom } from '../atoms';
 import dayjs from 'dayjs';
+import { ValidationBag } from 'common/interfaces/validation-bag';
 
 interface Props {
   handleChange: ChangeHandler;
+  errors: ValidationBag | undefined;
 }
 
 export function InvoiceDetails(props: Props) {
@@ -38,6 +40,7 @@ export function InvoiceDetails(props: Props) {
           <SelectField
             value={recurringInvoice?.frequency_id}
             onValueChange={(value) => handleChange('frequency_id', value)}
+            errorMessage={props.errors?.errors.frequency_id}
           >
             {Object.keys(frequencies).map((frequency, index) => (
               <option key={index} value={frequency}>
@@ -59,6 +62,7 @@ export function InvoiceDetails(props: Props) {
                 : new Date().toISOString().split('T')[0]
             }
             min={new Date().toISOString().split('T')[0]}
+            errorMessage={props.errors?.errors.next_send_date}
           />
         </Element>
 
@@ -68,6 +72,7 @@ export function InvoiceDetails(props: Props) {
             onValueChange={(value) =>
               handleChange('remaining_cycles', parseInt(value))
             }
+            errorMessage={props.errors?.errors.remaining_cycles}
           >
             <option value="-1">{t('endless')}</option>
             {[...Array(37).keys()].map((number, index) => (
@@ -82,6 +87,7 @@ export function InvoiceDetails(props: Props) {
           <SelectField
             value={recurringInvoice?.due_date_days}
             onValueChange={(value) => handleChange('due_date_days', value)}
+            errorMessage={props.errors?.errors.due_date_days}
           >
             <option value="terms">{t('use_payment_terms')}</option>
             {[...Array(31).keys()].map((number, index) => (
@@ -121,6 +127,7 @@ export function InvoiceDetails(props: Props) {
             id="number"
             onValueChange={(value) => handleChange('number', value)}
             value={recurringInvoice?.number || ''}
+            errorMessage={props.errors?.errors.number}
           />
         </Element>
 
@@ -129,6 +136,7 @@ export function InvoiceDetails(props: Props) {
             id="po_number"
             onValueChange={(value) => handleChange('po_number', value)}
             value={recurringInvoice?.po_number || ''}
+            errorMessage={props.errors?.errors.po_number}
           />
         </Element>
 
@@ -141,6 +149,7 @@ export function InvoiceDetails(props: Props) {
                   handleChange('discount', parseFloat(value))
                 }
                 value={recurringInvoice?.discount || ''}
+                errorMessage={props.errors?.errors.discount}
               />
             </div>
 
@@ -150,6 +159,7 @@ export function InvoiceDetails(props: Props) {
                   handleChange('is_amount_discount', JSON.parse(value))
                 }
                 value={recurringInvoice?.is_amount_discount.toString()}
+                errorMessage={props.errors?.errors.is_amount_discount}
               >
                 <option value="false">{t('percent')}</option>
                 <option value="true">{t('amount')}</option>
@@ -162,6 +172,7 @@ export function InvoiceDetails(props: Props) {
           <SelectField
             value={recurringInvoice?.auto_bill || false}
             onValueChange={(value) => handleChange('auto_bill', value)}
+            errorMessage={props.errors?.errors.auto_bill}
           >
             <option value="always">{t('enabled')}</option>
             <option value="optout">{t('optout')}</option>
