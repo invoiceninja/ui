@@ -26,6 +26,7 @@ interface Props {
   onClearButtonClick: () => unknown;
   onContactCheckboxChange: (contactId: string, value: boolean) => unknown;
   errorMessage?: string | string[];
+  disableWithSpinner?: boolean;
 }
 
 export function ClientSelector(props: Props) {
@@ -58,11 +59,12 @@ export function ClientSelector(props: Props) {
           inputLabel={t('client')}
           onChange={(client) => props.onChange(client.id)}
           value={resource?.client_id}
-          readonly={props.readonly}
+          readonly={props.readonly || !resource}
           clearButton={Boolean(resource?.client_id)}
           onClearButtonClick={props.onClearButtonClick}
           initiallyVisible={!resource?.client_id}
           errorMessage={props.errorMessage}
+          disableWithSpinner={props.disableWithSpinner}
         />
 
         {client && (
