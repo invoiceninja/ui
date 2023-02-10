@@ -9,44 +9,76 @@
  */
 
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { Default } from 'components/layouts/Default';
+import { Spinner } from 'components/Spinner';
 import { Unauthorized } from 'pages/errors/401';
 import { useEffect, useState } from 'react';
 
+export type Guard = (ctx: Context) => Promise<boolean>;
+
+export interface Context {}
+
 interface Props {
-  guards: { (): boolean }[];
+  guards: Guard[];
   component: JSX.Element;
 }
 
 export function Guard(props: Props) {
   const [pass, setPass] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const user = useCurrentUser();
 
-  const check = () => {
-    for (let index = 0; index < props.guards.length; index++) {
-      const pass = props.guards[index]();
+  const check = async () => {
+    setLoading(true);
 
-      if (pass) {
-        setPass(true);
+    const values: boolean[] = [];
 
-        continue;
-      }
-
-      setPass(false);
-
-      break;
+    for (const guard of props.guards) {
+      values.push(await guard({}));
     }
+
+    return values;
   };
 
   useEffect(() => {
-    check();
+    check()
+      .then((values) => {
+        console.log(values);
+
+        if (values.includes(false)) {
+          return setPass(false);
+        }
+
+        return setPass(true);
+      })
+      .finally(() => setLoading(false));
   }, [user]);
 
   useEffect(() => {
-    check();
+    check()
+      .then((values) => {
+        console.log(values);
+
+        if (values.includes(false)) {
+          return setPass(false);
+        }
+
+        return setPass(true);
+      })
+      .finally(() => setLoading(false));
   });
 
   if (pass) {
     return props.component;
+  }
+
+  if (loading) {
+    return (
+      <Default>
+        <Spinner />
+      </Default>
+    );
   }
 
   return <Unauthorized />;
