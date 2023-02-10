@@ -10,12 +10,17 @@
 
 import { store } from 'common/stores/store';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { Guard } from '../Guard';
 
-export function enabled(module: ModuleBitmask) {
+export function enabled(module: ModuleBitmask): Guard {
   const index = store.getState().companyUsers.currentIndex;
 
-  return Boolean(
-    store.getState().companyUsers.api?.[index]?.company?.enabled_modules &
-      module
-  );
+  return () => {
+    const value = Boolean(
+      store.getState().companyUsers.api?.[index]?.company?.enabled_modules &
+        module
+    );
+
+    return new Promise((resolve) => resolve(value));
+  };
 }
