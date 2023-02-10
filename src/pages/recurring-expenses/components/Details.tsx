@@ -23,6 +23,7 @@ import { VendorSelector } from 'components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 import frequencies from 'common/constants/recurring-expense-frequency';
 import dayjs from 'dayjs';
+import { useSearchParams } from 'react-router-dom';
 
 export interface RecurringExpenseCardProps {
   recurringExpense: RecurringExpense | undefined;
@@ -45,6 +46,8 @@ export function Details(props: Props) {
 
   const { recurringExpense, handleChange, taxInputType, pageType, errors } =
     props;
+
+  const [searchParams] = useSearchParams();
 
   return (
     <Card title={t('details')} isLoading={!recurringExpense}>
@@ -79,6 +82,7 @@ export function Details(props: Props) {
             onChange={(client) => handleChange('client_id', client.id)}
             errorMessage={errors?.errors.client_id}
             staleTime={Infinity}
+            disableWithSpinner={searchParams.get('action') === 'create'}
           />
         </Element>
       )}

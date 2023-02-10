@@ -9,7 +9,6 @@
  */
 
 import { blankInvitation } from 'common/constants/blank-invitation';
-import { isProduction } from 'common/helpers';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useTitle } from 'common/hooks/useTitle';
@@ -61,7 +60,7 @@ export function Create() {
   const productColumns = useProductColumns();
   const taskColumns = useTaskColumns();
 
-  const [invoiceSum] = useAtom(invoiceSumAtom);
+  const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
 
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -88,38 +87,50 @@ export function Create() {
   const save = useHandleCreate(setErrors);
 
   useEffect(() => {
-    if (typeof data !== 'undefined' && typeof invoice === 'undefined') {
-      const _invoice = cloneDeep(data);
+    setInvoiceSum(undefined);
 
-      if (company && company.enabled_tax_rates > 0) {
-        _invoice.tax_name1 = company.settings.tax_name1;
-        _invoice.tax_rate1 = company.settings.tax_rate1;
+    setInvoice((current) => {
+      let value = current;
+
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
       }
 
-      if (company && company.enabled_tax_rates > 1) {
-        _invoice.tax_name2 = company.settings.tax_name2;
-        _invoice.tax_rate2 = company.settings.tax_rate2;
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const _invoice = cloneDeep(data);
+
+        if (company && company.enabled_tax_rates > 0) {
+          _invoice.tax_name1 = company.settings.tax_name1;
+          _invoice.tax_rate1 = company.settings.tax_rate1;
+        }
+
+        if (company && company.enabled_tax_rates > 1) {
+          _invoice.tax_name2 = company.settings.tax_name2;
+          _invoice.tax_rate2 = company.settings.tax_rate2;
+        }
+
+        if (company && company.enabled_tax_rates > 2) {
+          _invoice.tax_name3 = company.settings.tax_name3;
+          _invoice.tax_rate3 = company.settings.tax_rate3;
+        }
+
+        if (typeof _invoice.line_items === 'string') {
+          _invoice.line_items = [];
+        }
+
+        if (searchParams.get('client')) {
+          _invoice.client_id = searchParams.get('client')!;
+        }
+
+        value = _invoice;
       }
 
-      if (company && company.enabled_tax_rates > 2) {
-        _invoice.tax_name3 = company.settings.tax_name3;
-        _invoice.tax_rate3 = company.settings.tax_rate3;
-      }
-
-      if (typeof _invoice.line_items === 'string') {
-        _invoice.line_items = [];
-      }
-
-      if (searchParams.get('client')) {
-        _invoice.client_id = searchParams.get('client')!;
-      }
-
-      setInvoice(_invoice);
-    }
-
-    return () => {
-      isProduction() && setInvoice(undefined);
-    };
+      return value;
+    });
   }, [data]);
 
   useEffect(() => {
@@ -165,6 +176,7 @@ export function Create() {
           onContactCheckboxChange={handleInvitationChange}
           readonly={searchParams.get('table') === 'tasks'}
           errorMessage={errors?.errors.client_id}
+          disableWithSpinner={searchParams.get('action') === 'create'}
         />
 
         <InvoiceDetails

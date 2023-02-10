@@ -248,7 +248,7 @@ export function useActions() {
   const cloneToProduct = (product: Product) => {
     setProduct({ ...product, id: '', documents: [] });
 
-    navigate('/products/create');
+    navigate('/products/create?action=clone');
   };
 
   const handleResourcefulAction = (

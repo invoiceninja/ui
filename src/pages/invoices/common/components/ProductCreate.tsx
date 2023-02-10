@@ -84,7 +84,7 @@ export function ProductCreate(props: Props) {
 
   useEffect(() => {
     if (blankProduct) {
-      setProduct(blankProduct.data.data);
+      setProduct(blankProduct);
     }
   }, [blankProduct]);
 

@@ -18,7 +18,7 @@ import { Details } from './components/Details';
 import { Notes } from './components/Notes';
 import { AdditionalInfo } from './components/AdditionalInfo';
 import { request } from 'common/helpers/request';
-import { endpoint, isProduction } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { toast } from 'common/helpers/toast/toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
@@ -29,6 +29,7 @@ import { route } from 'common/helpers/route';
 import { useAtom } from 'jotai';
 import { expenseAtom } from '../common/atoms';
 import { useHandleChange } from '../common/hooks';
+import { cloneDeep } from 'lodash';
 
 export function Create() {
   const [t] = useTranslation();
@@ -46,7 +47,9 @@ export function Create() {
 
   const [expense, setExpense] = useAtom(expenseAtom);
 
-  const { data } = useBlankExpenseQuery({ enabled: !expense });
+  const { data } = useBlankExpenseQuery({
+    enabled: typeof expense === 'undefined',
+  });
 
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
@@ -57,33 +60,33 @@ export function Create() {
   const handleChange = useHandleChange({ setExpense, setErrors });
 
   useEffect(() => {
-    if (data && !expense) {
-      setExpense(data);
-    }
+    setExpense((current) => {
+      let value = current;
 
-    if (searchParams.has('vendor')) {
-      setExpense(
-        (current) =>
-          current && {
-            ...current,
-            vendor_id: searchParams.get('vendor') as string,
-          }
-      );
-    }
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
+      }
 
-    if (searchParams.has('client')) {
-      setExpense(
-        (prevState) =>
-          prevState && {
-            ...prevState,
-            client_id: searchParams.get('client') as string,
-          }
-      );
-    }
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const _expense = cloneDeep(data);
 
-    return () => {
-      isProduction() && setExpense(undefined);
-    };
+        if (searchParams.has('vendor')) {
+          _expense.vendor_id = searchParams.get('vendor') as string;
+        }
+
+        if (searchParams.has('client')) {
+          _expense.vendor_id = searchParams.get('client') as string;
+        }
+
+        value = _expense;
+      }
+
+      return value;
+    });
   }, [data]);
 
   const onSave = (expense: Expense) => {
