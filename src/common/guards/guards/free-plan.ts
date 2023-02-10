@@ -9,10 +9,7 @@
  */
 
 import { isSelfHosted } from 'common/helpers';
-import { useCurrentCompanyUser } from 'common/hooks/useCurrentCompanyUser';
-import { useQueryClient } from 'react-query';
-import { useParams } from 'react-router-dom';
-import { GuardContext } from '../Guard';
+import { GuardContext, useGuardContext } from '../Guard';
 import { enterprisePlan } from './enterprise-plan';
 import { proPlan } from './pro-plan';
 
@@ -29,19 +26,11 @@ export function freePlan() {
 }
 
 export function usePlan() {
-  const params = useParams();
-  const queryClient = useQueryClient();
-  const companyUser = useCurrentCompanyUser();
-
-  const payload: GuardContext = {
-    params,
-    queryClient,
-    companyUser,
-  };
+  const context = useGuardContext();
 
   return {
-    freePlan: freePlan()(payload),
-    proPlan: proPlan()(payload),
-    enterprisePlan: enterprisePlan()(payload),
+    freePlan: freePlan()(context),
+    proPlan: proPlan()(context),
+    enterprisePlan: enterprisePlan()(context),
   };
 }

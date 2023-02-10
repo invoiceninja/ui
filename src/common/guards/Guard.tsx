@@ -33,29 +33,29 @@ interface Props {
 export interface GuardContext {
   user?: User;
   companyUser?: CompanyUser;
-  company?: Company;
+  company: Company;
   params: Readonly<Params<string>>;
   queryClient: QueryClient;
 }
 
-export function Guard(props: Props) {
-  const [pass, setPass] = useState(false);
-
+export function useGuardContext() {
   const companyUser = useCurrentCompanyUser();
   const user = useCurrentUser();
   const params = useParams();
   const queryClient = useQueryClient();
   const company = useCurrentCompany();
 
+  return { companyUser, user, params, queryClient, company };
+}
+
+export function Guard(props: Props) {
+  const [pass, setPass] = useState(false);
+
+  const guardContext = useGuardContext();
+
   const check = async () => {
     for (let index = 0; index < props.guards.length; index++) {
-      const pass = await props.guards[index]()({
-        user,
-        companyUser,
-        company,
-        params,
-        queryClient,
-      });
+      const pass = await props.guards[index]()({ ...guardContext });
 
       if (pass) {
         setPass(true);
@@ -71,7 +71,7 @@ export function Guard(props: Props) {
 
   useEffect(() => {
     check();
-  }, [user]);
+  }, [guardContext.user]);
 
   useEffect(() => {
     check();
