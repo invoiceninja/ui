@@ -46,6 +46,7 @@ export function ExpenseCategories() {
       resource="expense_category"
       columns={columns}
       linkToCreate="/settings/expense_categories/create"
+      linkToEdit={route('/settings/expense_categories/:id/edit')}
       withResourcefulActions
     />
   );
