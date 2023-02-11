@@ -8,22 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isDemo } from 'common/helpers';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useTitle } from 'common/hooks/useTitle';
-
+import { Tab, Tabs } from 'components/Tabs';
 import { useTranslation } from 'react-i18next';
+import { Outlet } from 'react-router-dom';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
-import {
-  EnabledModules,
-  Integrations,
-  Overview,
-  Plan,
-  SecuritySettings,
-} from './component';
-import { DangerZone } from './component/DangerZone';
+import { useAccountManagementTabs } from './common/hooks/useAccountManagementTabs';
 
 export function AccountManagement() {
   const [t] = useTranslation();
@@ -39,6 +32,8 @@ export function AccountManagement() {
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
 
+  const tabs: Tab[] = useAccountManagementTabs();
+
   return (
     <Settings
       onSaveClick={onSave}
@@ -47,12 +42,11 @@ export function AccountManagement() {
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#account_management"
     >
-      <Plan />
-      <Overview />
-      <EnabledModules />
-      <Integrations />
-      <SecuritySettings />
-      {!isDemo() && <DangerZone />}
+      <Tabs tabs={tabs} className="mt-6" />
+
+      <div className="my-4">
+        <Outlet />
+      </div>
     </Settings>
   );
 }
