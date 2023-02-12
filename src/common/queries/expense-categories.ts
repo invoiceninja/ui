@@ -70,3 +70,15 @@ export function bulk(
     ids: id,
   });
 }
+
+export function useBlankExpenseCategoryQuery() {
+  return useQuery<ExpenseCategory>(
+    '/api/v1/expense_categories/create',
+    () =>
+      request('GET', endpoint('/api/v1/expense_categories/create')).then(
+        (response: GenericSingleResourceResponse<ExpenseCategory>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}

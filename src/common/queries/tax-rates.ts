@@ -14,6 +14,8 @@ import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { Params } from './common/params.interface';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { TaxRate } from 'common/interfaces/tax-rate';
 
 export function useTaxRatesQuery(params: Params) {
   return useQuery(
@@ -50,4 +52,15 @@ export function bulk(
     action,
     ids: id,
   });
+}
+
+export function useBlankTaxRateQuery() {
+  return useQuery<TaxRate>(
+    '/api/v1/tax_rates/create',
+    () =>
+      request('GET', endpoint('/api/v1/tax_rates/create')).then(
+        (response: GenericSingleResourceResponse<TaxRate>) => response.data.data
+      ),
+    { staleTime: Infinity }
+  );
 }
