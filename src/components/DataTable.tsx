@@ -352,10 +352,11 @@ export function DataTable<T extends object>(props: Props<T>) {
                       )}
 
                       {props.customActions &&
-                        props.customActions?.map(
-                          (action: any, index: number) => (
-                            <div key={index}>{action(resource)}</div>
-                          )
+                        props.customActions.map(
+                          (action: any, index: number) =>
+                            action(resource).key !== 'purge' && (
+                              <div key={index}>{action(resource)}</div>
+                            )
                         )}
 
                       {props.customActions && <Divider withoutPadding />}
@@ -386,6 +387,14 @@ export function DataTable<T extends object>(props: Props<T>) {
                           {t('delete')}
                         </DropdownElement>
                       )}
+
+                      {props.customActions &&
+                        props.customActions.map(
+                          (action: any, index: number) =>
+                            action(resource).key === 'purge' && (
+                              <div key={index}>{action(resource)}</div>
+                            )
+                        )}
                     </Dropdown>
                   </Td>
                 )}
