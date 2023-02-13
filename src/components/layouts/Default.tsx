@@ -37,7 +37,6 @@ import { MobileSidebar } from './components/MobileSidebar';
 import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
-import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 import { QuickCreatePopover } from 'components/QuickCreatePopover';
 import { isSelfHosted } from 'common/helpers';
@@ -45,6 +44,7 @@ import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useUnlockButtonForHosted } from 'common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from 'common/hooks/useUnlockButtonForSelfHosted';
 import { useCurrentCompanyUser } from 'common/hooks/useCurrentCompanyUser';
+import { useEnabled } from 'common/guards/guards/enabled';
 
 interface Props extends CommonProps {
   title?: string | null;
@@ -80,6 +80,7 @@ export function Default(props: Props) {
   const location = useLocation();
   const navigate = useNavigate();
   const companyUser = useCurrentCompanyUser();
+  const enabled = useEnabled();
 
   const navigation: NavigationItem[] = [
     {
