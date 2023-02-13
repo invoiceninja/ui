@@ -8,13 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { AxiosError } from 'axios';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { toast } from 'common/helpers/toast/toast';
+import { useAtomValue } from 'jotai';
+import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
 export function usePurgeClient(clientId: string | undefined) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (password: string) => {
     toast.processing();
@@ -28,6 +34,9 @@ export function usePurgeClient(clientId: string | undefined) {
       .then(() => {
         toast.success('purged_client');
 
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
+
         navigate('/clients');
       })
       .catch((error: AxiosError) => {
@@ -36,7 +45,6 @@ export function usePurgeClient(clientId: string | undefined) {
         error.response?.status === 412
           ? toast.error('password_error_incorrect')
           : toast.error();
-      })
-      .finally(() => {});
+      });
   };
 }
