@@ -314,7 +314,7 @@ export function useActions() {
 
   const start = useStart();
 
-  const stop = useStop();
+  const stop = useStop({});
 
   const invoiceTask = useInvoiceTask();
 

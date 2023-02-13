@@ -31,7 +31,8 @@ export function parseTime(timestamp: number) {
   const [hours, minutes, seconds] = timeValues.split(':');
 
   if (formattedTimestamp.includes('PM')) {
-    const updatedHours = Number(hours) + 12;
+    const updatedHours =
+      Number(hours) !== 12 ? Number(hours) + 12 : Number(hours);
 
     return (
       updatedHours.toString() +
@@ -52,22 +53,6 @@ export function parseTime(timestamp: number) {
     seconds.toString()
   );
 }
-
-export const combineDateAndTime = (
-  date: string | undefined,
-  time: string | undefined
-) => {
-  if (date && time) {
-    const dateValue = new Date(date);
-    const [hours, minutes, seconds] = time.split(':');
-
-    dateValue.setHours(Number(hours));
-    dateValue.setMinutes(Number(minutes));
-    dateValue.setSeconds(Number(seconds));
-
-    return dateValue;
-  }
-};
 
 export function duration(
   start: number,

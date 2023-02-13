@@ -33,16 +33,17 @@ import { BiPlusCircle } from 'react-icons/bi';
 
 interface Props {
   task: Task;
+  handleChange: (property: keyof Task, value: unknown) => unknown;
 }
 
 export function Actions(props: Props) {
-  const { task } = props;
+  const { task, handleChange } = props;
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
   const start = useStart();
-  const stop = useStop();
+  const stop = useStop({ handleChange });
   const bulk = useBulkAction();
   const invoiceTask = useInvoiceTask();
 

@@ -17,7 +17,6 @@ import { useEffect, useState } from 'react';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
-  combineDateAndTime,
   duration,
   handleTaskDateChange,
   handleTaskDurationChange,
@@ -114,25 +113,11 @@ export function TaskTable(props: Props) {
     if (typeof lastChangedIndex === 'number') {
       const parsedTimeLog = parseTimeLog(task.time_log);
 
-      const startTimeValue = parseTime(parsedTimeLog[lastChangedIndex][0]);
-      const startDateValue = parseTimeToDate(
-        parsedTimeLog[lastChangedIndex][0]
-      );
+      const startTime = parsedTimeLog[lastChangedIndex][0];
+      const endTime = parsedTimeLog[lastChangedIndex][1];
 
-      const startDateTime = combineDateAndTime(startDateValue, startTimeValue);
-
-      const endTimeValue = parseTime(parsedTimeLog[lastChangedIndex][1]);
-      const endDateValue = parseTimeToDate(parsedTimeLog[lastChangedIndex][1]);
-
-      const endDateTime = combineDateAndTime(endDateValue, endTimeValue);
-
-      if (startDateTime && endDateTime && startDateTime > endDateTime) {
-        const unixTimestamp = dayjs(
-          `${startDateValue} ${startTimeValue}`,
-          'YYYY-MM-DD hh:mm:ss'
-        ).unix();
-
-        parsedTimeLog[lastChangedIndex][1] = unixTimestamp;
+      if (startTime && endTime && startTime > endTime) {
+        parsedTimeLog[lastChangedIndex][1] = startTime;
 
         handleChange('time_log', JSON.stringify(parsedTimeLog));
       }
