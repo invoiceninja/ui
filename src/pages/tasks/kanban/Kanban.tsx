@@ -116,7 +116,7 @@ export function Kanban() {
   );
 
   const startTask = useStart();
-  const stopTask = useStop({});
+  const stopTask = useStop();
 
   useHandleCurrentTask(currentTaskId);
 

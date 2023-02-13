@@ -20,33 +20,23 @@ import { parseTimeLog } from '../helpers/calculate-time';
 import dayjs from 'dayjs';
 import { isOverlapping } from '../helpers/is-overlapping';
 
-interface Params {
-  handleChange?: (property: keyof Task, value: unknown) => unknown;
-}
-
-export function useStop(params: Params) {
+export function useStop() {
   const queryClient = useQueryClient();
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (task: Task) => {
     toast.processing();
 
-    const { handleChange } = params;
-
     const logs = parseTimeLog(task.time_log);
 
     if (logs[logs.length - 1][0] && logs[logs.length - 1][0] > dayjs().unix()) {
-      if (handleChange) {
-        logs[logs.length - 1][0] += 1;
+      logs[logs.length - 1][1] = logs[logs.length - 1][0] + 1;
 
-        handleChange('time_log', JSON.stringify(logs));
+      task.time_log = JSON.stringify(logs);
+    } else {
+      if (isOverlapping(task)) {
+        return toast.error('task_errors');
       }
-
-      return toast.error('task_errors');
-    }
-
-    if (isOverlapping(task)) {
-      return toast.error('task_errors');
     }
 
     request(
