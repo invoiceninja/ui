@@ -11,15 +11,21 @@
 import { useCurrentCompanyUser } from 'common/hooks/useCurrentCompanyUser';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { CompanyUser } from 'common/interfaces/company-user';
+import { User } from 'common/interfaces/user';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { Unauthorized } from 'pages/errors/401';
 import { useEffect, useState } from 'react';
+import { QueryClient, useQueryClient } from 'react-query';
+import { Params, useParams } from 'react-router-dom';
 
 export type Guard = (ctx: Context) => Promise<boolean>;
 
 export interface Context {
+  queryClient: QueryClient;
+  params: Readonly<Params<string>>;
   companyUser?: CompanyUser;
+  user?: User;
 }
 
 interface Props {
@@ -29,17 +35,18 @@ interface Props {
 
 export function useGuardContext() {
   const companyUser = useCurrentCompanyUser();
+  const queryClient = useQueryClient();
+  const params = useParams();
+  const user = useCurrentUser();
 
-  return { companyUser };
+  return { companyUser, queryClient, params, user };
 }
 
 export function Guard(props: Props) {
   const [pass, setPass] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const user = useCurrentUser();
-
-  const ctx = useGuardContext();
+  const { companyUser, queryClient, params, user } = useGuardContext();
 
   const check = async () => {
     setLoading(true);
@@ -47,24 +54,23 @@ export function Guard(props: Props) {
     const values: boolean[] = [];
 
     for (const guard of props.guards) {
-      values.push(await guard(ctx));
+      values.push(await guard({ companyUser, queryClient, params, user }));
     }
 
     return values;
   };
 
-  useEffect(() => {
-    check()
-      .then((values) => {
+  // useEffect(() => {
+  //   check()
+  //     .then((values) => {
+  //       if (values.includes(false)) {
+  //         return setPass(false);
+  //       }
 
-        if (values.includes(false)) {
-          return setPass(false);
-        }
-
-        return setPass(true);
-      })
-      .finally(() => setLoading(false));
-  }, [user]);
+  //       return setPass(true);
+  //     })
+  //     .finally(() => setLoading(false));
+  // }, [user]);
 
   useEffect(() => {
     check()
@@ -78,17 +84,17 @@ export function Guard(props: Props) {
       .finally(() => setLoading(false));
   });
 
-  if (pass) {
-    return props.component;
-  }
+  return (
+    <>
+      {pass && !loading && props.component}
 
-  if (loading) {
-    return (
-      <Default>
-        <Spinner />
-      </Default>
-    );
-  }
+      {loading && (
+        <Default>
+          <Spinner />
+        </Default>
+      )}
 
-  return <Unauthorized />;
+      {!pass && !loading && <Unauthorized />}
+    </>
+  );
 }
