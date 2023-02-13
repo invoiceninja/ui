@@ -95,7 +95,7 @@ export function Edit() {
       .fetchQuery(generatePath('/api/v1/users/:id', { id: id! }), () =>
         request(
           'GET',
-          endpoint('/api/v1/users/:id', { id: id! }),
+          endpoint('/api/v1/users/:id?include=company_user', { id: id! }),
           {},
           { headers: { 'X-Api-Password': password } }
         )
