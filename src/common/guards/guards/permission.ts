@@ -9,22 +9,19 @@
  */
 
 import { Permissions } from 'common/hooks/permissions/useHasPermission';
-import { store } from 'common/stores/store';
 import { Guard } from '../Guard';
 
 export function permission(permission: Permissions): Guard {
-  const state = store.getState();
-  const user = state.companyUsers.api[state.companyUsers.currentIndex];
-
-  const permissions = user?.permissions ?? '';
   const [action] = permission.split('_');
 
-  return () => {
+  return ({ companyUser }) => {
+    const permissions = companyUser?.permissions ?? '';
+
     const value = Boolean(
-      user?.is_admin ||
-        user?.is_owner ||
+      companyUser?.is_admin ||
+        companyUser?.is_owner ||
         permissions.includes(permission) ||
-        permission.includes(action)
+        permissions.includes(action)
     );
 
     return new Promise((resolve) => resolve(value));
