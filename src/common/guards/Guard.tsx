@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { useCurrentCompanyUser } from 'common/hooks/useCurrentCompanyUser';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { CompanyUser } from 'common/interfaces/company-user';
 import { Default } from 'components/layouts/Default';
 import { Spinner } from 'components/Spinner';
 import { Unauthorized } from 'pages/errors/401';
@@ -16,11 +18,19 @@ import { useEffect, useState } from 'react';
 
 export type Guard = (ctx: Context) => Promise<boolean>;
 
-export interface Context {}
+export interface Context {
+  companyUser?: CompanyUser;
+}
 
 interface Props {
   guards: Guard[];
   component: JSX.Element;
+}
+
+export function useGuardContext() {
+  const companyUser = useCurrentCompanyUser();
+
+  return { companyUser };
 }
 
 export function Guard(props: Props) {
@@ -29,13 +39,15 @@ export function Guard(props: Props) {
 
   const user = useCurrentUser();
 
+  const ctx = useGuardContext();
+
   const check = async () => {
     setLoading(true);
 
     const values: boolean[] = [];
 
     for (const guard of props.guards) {
-      values.push(await guard({}));
+      values.push(await guard(ctx));
     }
 
     return values;
@@ -44,7 +56,6 @@ export function Guard(props: Props) {
   useEffect(() => {
     check()
       .then((values) => {
-        console.log(values);
 
         if (values.includes(false)) {
           return setPass(false);
@@ -58,8 +69,6 @@ export function Guard(props: Props) {
   useEffect(() => {
     check()
       .then((values) => {
-        console.log(values);
-
         if (values.includes(false)) {
           return setPass(false);
         }
