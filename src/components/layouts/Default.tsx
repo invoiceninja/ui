@@ -44,6 +44,7 @@ import { isSelfHosted } from 'common/helpers';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useUnlockButtonForHosted } from 'common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from 'common/hooks/useUnlockButtonForSelfHosted';
+import { useCurrentCompanyUser } from 'common/hooks/useCurrentCompanyUser';
 
 interface Props extends CommonProps {
   title?: string | null;
@@ -78,6 +79,7 @@ export function Default(props: Props) {
   const hasPermission = useHasPermission();
   const location = useLocation();
   const navigate = useNavigate();
+  const companyUser = useCurrentCompanyUser();
 
   const navigation: NavigationItem[] = [
     {
@@ -92,7 +94,10 @@ export function Default(props: Props) {
       href: '/clients',
       icon: Users,
       current: location.pathname.startsWith('/clients'),
-      visible: hasPermission('view_client'),
+      visible:
+        hasPermission('view_client') ||
+        hasPermission('create_client') ||
+        hasPermission('edit_client'),
       rightButton: {
         icon: PlusCircle,
         to: '/clients/create',
@@ -105,7 +110,10 @@ export function Default(props: Props) {
       href: '/products',
       icon: Box,
       current: location.pathname.startsWith('/products'),
-      visible: hasPermission('view_product'),
+      visible:
+        hasPermission('view_product') ||
+        hasPermission('create_product') ||
+        hasPermission('edit_product'),
       rightButton: {
         icon: PlusCircle,
         to: '/products/create',
@@ -118,7 +126,11 @@ export function Default(props: Props) {
       href: '/invoices',
       icon: FileText,
       current: location.pathname.startsWith('/invoices'),
-      visible: enabled(ModuleBitmask.Invoices) && hasPermission('view_invoice'),
+      visible:
+        enabled(ModuleBitmask.Invoices) &&
+        (hasPermission('view_invoice') ||
+          hasPermission('create_invoice') ||
+          hasPermission('edit_invoice')),
       rightButton: {
         icon: PlusCircle,
         to: '/invoices/create',
@@ -132,8 +144,10 @@ export function Default(props: Props) {
       icon: Repeat,
       current: location.pathname.startsWith('/recurring_invoices'),
       visible:
-        enabled(ModuleBitmask.RecurringInvoices) &&
-        hasPermission('view_recurring_invoice'),
+        (enabled(ModuleBitmask.RecurringInvoices) &&
+          hasPermission('view_recurring_invoice')) ||
+        hasPermission('create_recurring_invoice') ||
+        hasPermission('edit_recurring_invoice'),
       rightButton: {
         icon: PlusCircle,
         to: '/recurring_invoices/create',
@@ -146,7 +160,10 @@ export function Default(props: Props) {
       href: '/payments',
       icon: CreditCard,
       current: location.pathname.startsWith('/payments'),
-      visible: hasPermission('view_payment'),
+      visible:
+        hasPermission('view_payment') ||
+        hasPermission('create_payment') ||
+        hasPermission('edit_payment'),
       rightButton: {
         icon: PlusCircle,
         to: '/payments/create',
@@ -159,7 +176,11 @@ export function Default(props: Props) {
       href: '/quotes',
       icon: File,
       current: location.pathname.startsWith('/quotes'),
-      visible: enabled(ModuleBitmask.Quotes) && hasPermission('view_quote'),
+      visible:
+        enabled(ModuleBitmask.Quotes) &&
+        (hasPermission('view_quote') ||
+          hasPermission('create_quote') ||
+          hasPermission('edit_quote')),
       rightButton: {
         icon: PlusCircle,
         to: '/quotes/create',
@@ -172,7 +193,11 @@ export function Default(props: Props) {
       href: '/credits',
       icon: FileText,
       current: location.pathname.startsWith('/credits'),
-      visible: enabled(ModuleBitmask.Credits) && hasPermission('view_credit'),
+      visible:
+        enabled(ModuleBitmask.Credits) &&
+        (hasPermission('view_credit') ||
+          hasPermission('create_credit') ||
+          hasPermission('edit_credit')),
       rightButton: {
         icon: PlusCircle,
         to: '/credits/create',
@@ -185,7 +210,11 @@ export function Default(props: Props) {
       href: '/projects',
       icon: Briefcase,
       current: location.pathname.startsWith('/projects'),
-      visible: enabled(ModuleBitmask.Projects) && hasPermission('view_project'),
+      visible:
+        enabled(ModuleBitmask.Projects) &&
+        (hasPermission('view_project') ||
+          hasPermission('create_project') ||
+          hasPermission('edit_project')),
       rightButton: {
         icon: PlusCircle,
         to: '/projects/create',
@@ -198,7 +227,11 @@ export function Default(props: Props) {
       href: '/tasks',
       icon: Clock,
       current: location.pathname.startsWith('/tasks'),
-      visible: enabled(ModuleBitmask.Tasks) && hasPermission('view_task'),
+      visible:
+        enabled(ModuleBitmask.Tasks) &&
+        (hasPermission('view_task') ||
+          hasPermission('edit_task') ||
+          hasPermission('create_task')),
       rightButton: {
         icon: PlusCircle,
         to: '/tasks/create',
@@ -211,7 +244,11 @@ export function Default(props: Props) {
       href: '/vendors',
       icon: BiBuildings,
       current: location.pathname.startsWith('/vendors'),
-      visible: enabled(ModuleBitmask.Vendors) && hasPermission('view_vendor'),
+      visible:
+        enabled(ModuleBitmask.Vendors) &&
+        (hasPermission('view_vendor') ||
+          hasPermission('create_vendor') ||
+          hasPermission('edit_vendor')),
       rightButton: {
         icon: PlusCircle,
         to: '/vendors/create',
@@ -224,12 +261,16 @@ export function Default(props: Props) {
       href: '/purchase_orders',
       icon: BiFile,
       current: location.pathname.startsWith('/purchase_orders'),
-      visible: true,
+      visible:
+        enabled(ModuleBitmask.PurchaseOrders) &&
+        (hasPermission('view_purchase_order') ||
+          hasPermission('create_purchase_order') ||
+          hasPermission('edit_purchase_order')),
       rightButton: {
         icon: PlusCircle,
         to: '/purchase_orders/create',
         label: t('new_purchase_order'),
-        visible: true,
+        visible: hasPermission('create_purchase_order'),
       },
     },
     {
@@ -237,7 +278,11 @@ export function Default(props: Props) {
       href: '/expenses',
       icon: BiWallet,
       current: location.pathname.startsWith('/expenses'),
-      visible: enabled(ModuleBitmask.Expenses) && hasPermission('view_expense'),
+      visible:
+        enabled(ModuleBitmask.Expenses) &&
+        (hasPermission('view_expense') ||
+          hasPermission('create_expense') ||
+          hasPermission('edit_expense')),
       rightButton: {
         icon: PlusCircle,
         to: '/expenses/create',
@@ -252,7 +297,9 @@ export function Default(props: Props) {
       current: location.pathname.startsWith('/recurring_expenses'),
       visible:
         enabled(ModuleBitmask.RecurringExpenses) &&
-        hasPermission('view_recurring_expense'),
+        (hasPermission('view_recurring_expense') ||
+          hasPermission('create_recurring_expense') ||
+          hasPermission('edit_recurring_expense')),
       rightButton: {
         icon: PlusCircle,
         to: '/recurring_expenses/create',
@@ -265,14 +312,17 @@ export function Default(props: Props) {
       href: '/reports',
       icon: PieChart,
       current: location.pathname.startsWith('/reports'),
-      visible: true,
+      visible: companyUser?.is_admin || companyUser?.is_owner || false,
     },
     {
       name: t('transactions'),
       href: '/transactions',
       icon: AiOutlineBank,
       current: location.pathname.startsWith('/transactions'),
-      visible: true,
+      visible:
+        hasPermission('view_bank_transaction') ||
+        hasPermission('create_bank_transaction') ||
+        hasPermission('edit_bank_transaction'),
       rightButton: {
         icon: PlusCircle,
         to: '/transactions/create',
@@ -282,7 +332,10 @@ export function Default(props: Props) {
     },
     {
       name: t('settings'),
-      href: '/settings/company_details',
+      href:
+        companyUser?.is_admin || companyUser?.is_owner
+          ? '/settings/company_details'
+          : '/settings/user_details',
       icon: Settings,
       current: location.pathname.startsWith('/settings'),
       visible: true,
@@ -292,7 +345,7 @@ export function Default(props: Props) {
       href: '/system_logs',
       icon: ShieldOff,
       current: location.pathname.startsWith('/system_logs'),
-      visible: true,
+      visible: companyUser?.is_admin || companyUser?.is_owner || false,
     },
   ];
 
