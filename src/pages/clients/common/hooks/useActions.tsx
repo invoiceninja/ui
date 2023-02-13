@@ -8,23 +8,39 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { EntityState } from 'common/enums/entity-state';
+import { getEntityState } from 'common/helpers';
 import { route } from 'common/helpers/route';
 import { Client } from 'common/interfaces/client';
+import { Divider } from 'components/cards/Divider';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Icon } from 'components/icons/Icon';
 import { Action } from 'components/ResourceActions';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiGitMerge, BiPlusCircle } from 'react-icons/bi';
-import { MdCloudCircle, MdPictureAsPdf } from 'react-icons/md';
+import {
+  MdArchive,
+  MdCloudCircle,
+  MdDelete,
+  MdDeleteForever,
+  MdPictureAsPdf,
+  MdRestore,
+} from 'react-icons/md';
+import { useLocation } from 'react-router-dom';
+import { useBulk } from './useBulk';
 
 interface Params {
   setIsMergeModalOpen: Dispatch<SetStateAction<boolean>>;
-  setMergeFromClientId: Dispatch<SetStateAction<string>>;
+  setMergeFromClientId?: Dispatch<SetStateAction<string>>;
+  setPasswordConfirmModalOpen: Dispatch<SetStateAction<boolean>>;
+  setPurgeClientId?: Dispatch<SetStateAction<string>>;
 }
 
 export function useActions(params: Params) {
   const [t] = useTranslation();
+  const bulk = useBulk();
+  const location = useLocation();
 
   const actions: Action<Client>[] = [
     (client) => (
@@ -78,12 +94,57 @@ export function useActions(params: Params) {
     (client) => (
       <DropdownElement
         onClick={() => {
-          params.setMergeFromClientId(client.id);
+          params.setMergeFromClientId?.(client.id);
           params.setIsMergeModalOpen(true);
         }}
         icon={<Icon element={BiGitMerge} />}
       >
         {t('merge')}
+      </DropdownElement>
+    ),
+    () => !location.pathname.endsWith('/clients') && <Divider withoutPadding />,
+    (client) =>
+      !location.pathname.endsWith('/clients') &&
+      getEntityState(client) === EntityState.Active && (
+        <DropdownElement
+          onClick={() => bulk(client.id, 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (client) =>
+      !location.pathname.endsWith('/clients') &&
+      (getEntityState(client) === EntityState.Archived ||
+        getEntityState(client) === EntityState.Deleted) && (
+        <DropdownElement
+          onClick={() => bulk(client.id, 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (client) =>
+      !location.pathname.endsWith('/clients') &&
+      (getEntityState(client) === EntityState.Active ||
+        getEntityState(client) === EntityState.Archived) && (
+        <DropdownElement
+          onClick={() => bulk(client.id, 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
+    (client) => (
+      <DropdownElement
+        key="purge"
+        onClick={() => {
+          params.setPurgeClientId?.(client.id);
+          params.setPasswordConfirmModalOpen(true);
+        }}
+        icon={<Icon element={MdDeleteForever} />}
+      >
+        {t('purge')}
       </DropdownElement>
     ),
   ];
