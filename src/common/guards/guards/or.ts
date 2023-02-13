@@ -11,19 +11,19 @@
 import { Guard } from '../Guard';
 
 export function or(...guards: Guard[]): Guard {
-  return async () => {
+  return async (ctx) => {
     const values: boolean[] = [];
 
     for (const guard of guards) {
-      values.push(await guard({}));
+      values.push(await guard(ctx));
     }
 
     return await new Promise((resolve) => {
-      if (values.includes(false)) {
-        return resolve(false);
+      if (values.includes(true)) {
+        return resolve(true);
       }
 
-      return resolve(true);
+      return resolve(false);
     });
   };
 }
