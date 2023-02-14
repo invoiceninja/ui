@@ -10,6 +10,7 @@
 
 import { route } from 'common/helpers/route';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -44,6 +45,10 @@ export function Edit() {
   const { id } = useParams();
   const { documentTitle } = useTitle('edit_recurring_invoice');
   const { data } = useRecurringInvoiceQuery({ id: id! });
+  const user = useCurrentUser();
+
+  const showPdfPreview =
+    user?.company_user?.settings?.react_settings?.show_pdf_preview;
 
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
@@ -159,17 +164,19 @@ export function Edit() {
         )}
       </div>
 
-      <div className="my-4">
-        {recurringInvoice && (
-          <InvoicePreview
-            for="invoice"
-            resource={recurringInvoice}
-            entity="recurring_invoice"
-            relationType="client_id"
-            endpoint="/api/v1/live_preview?entity=:entity"
-          />
-        )}
-      </div>
+      {(showPdfPreview === true || typeof showPdfPreview === 'undefined') && (
+        <div className="my-4">
+          {recurringInvoice && (
+            <InvoicePreview
+              for="invoice"
+              resource={recurringInvoice}
+              entity="recurring_invoice"
+              relationType="client_id"
+              endpoint="/api/v1/live_preview?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

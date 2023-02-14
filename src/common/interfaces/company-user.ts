@@ -45,10 +45,15 @@ export type ReactTableColumns =
   | 'expense'
   | 'recurringExpense';
 
+interface ReactSettings {
+  show_pdf_preview: boolean;
+}
+
 export interface Settings {
   accent_color: string;
   table_columns?: Record<ReactTableColumns, string[]>;
   react_table_columns?: Record<ReactTableColumns, string[]>;
+  react_settings: ReactSettings;
 }
 
 export interface Notifications {

@@ -11,6 +11,7 @@
 import { blankInvitation } from 'common/constants/blank-invitation';
 import { isProduction } from 'common/helpers';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -37,6 +38,10 @@ import { useBlankCreditQuery } from '../common/queries';
 export function Create() {
   const { documentTitle } = useTitle('new_credit');
   const { t } = useTranslation();
+  const user = useCurrentUser();
+
+  const showPdfPreview =
+    user?.company_user?.settings?.react_settings?.show_pdf_preview;
 
   const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
@@ -174,17 +179,19 @@ export function Create() {
         )}
       </div>
 
-      <div className="my-4">
-        {credit && (
-          <InvoicePreview
-            for="create"
-            resource={credit}
-            entity="credit"
-            relationType="client_id"
-            endpoint="/api/v1/live_preview?entity=:entity"
-          />
-        )}
-      </div>
+      {(showPdfPreview === true || typeof showPdfPreview === 'undefined') && (
+        <div className="my-4">
+          {credit && (
+            <InvoicePreview
+              for="create"
+              resource={credit}
+              entity="credit"
+              relationType="client_id"
+              endpoint="/api/v1/live_preview?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

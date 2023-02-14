@@ -11,6 +11,7 @@
 import { blankInvitation } from 'common/constants/blank-invitation';
 import { isProduction } from 'common/helpers';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -37,6 +38,10 @@ import { useBlankQuoteQuery } from '../common/queries';
 export function Create() {
   const { documentTitle } = useTitle('new_quote');
   const { t } = useTranslation();
+  const user = useCurrentUser();
+
+  const showPdfPreview =
+    user?.company_user?.settings?.react_settings?.show_pdf_preview;
 
   const pages: Page[] = [
     { name: t('quotes'), href: '/quotes' },
@@ -172,17 +177,19 @@ export function Create() {
         )}
       </div>
 
-      <div className="my-4">
-        {quote && (
-          <InvoicePreview
-            for="create"
-            resource={quote}
-            entity="quote"
-            relationType="client_id"
-            endpoint="/api/v1/live_preview?entity=:entity"
-          />
-        )}
-      </div>
+      {(showPdfPreview === true || typeof showPdfPreview === 'undefined') && (
+        <div className="my-4">
+          {quote && (
+            <InvoicePreview
+              for="create"
+              resource={quote}
+              entity="quote"
+              relationType="client_id"
+              endpoint="/api/v1/live_preview?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

@@ -11,6 +11,7 @@
 import { InvoiceStatus } from 'common/enums/invoice-status';
 import { route } from 'common/helpers/route';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -44,6 +45,10 @@ export function Edit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const [searchParams] = useSearchParams();
+  const user = useCurrentUser();
+
+  const showPdfPreview =
+    user?.company_user?.settings?.react_settings?.show_pdf_preview;
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -203,17 +208,19 @@ export function Edit() {
         )}
       </div>
 
-      <div className="my-4">
-        {invoice && (
-          <InvoicePreview
-            for="invoice"
-            resource={invoice}
-            entity="invoice"
-            relationType="client_id"
-            endpoint="/api/v1/live_preview?entity=:entity"
-          />
-        )}
-      </div>
+      {(showPdfPreview === true || typeof showPdfPreview === 'undefined') && (
+        <div className="my-4">
+          {invoice && (
+            <InvoicePreview
+              for="invoice"
+              resource={invoice}
+              entity="invoice"
+              relationType="client_id"
+              endpoint="/api/v1/live_preview?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

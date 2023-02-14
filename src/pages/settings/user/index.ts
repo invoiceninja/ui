@@ -16,5 +16,6 @@ export {
   TwoFactorAuthentication,
   Connect,
   CustomFields as UserCustomFields,
+  Preferences,
 } from '././components/index';
 export { UserDetails } from './UserDetails';
