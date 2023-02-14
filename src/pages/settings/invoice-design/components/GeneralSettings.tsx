@@ -963,13 +963,21 @@ export function GeneralSettings() {
       <Divider />
 
       <Element leftSide={t('empty_columns')}>
-        <Toggle
-          checked={company?.settings?.hide_empty_columns_on_pdf}
-          id="settings.hide_empty_columns_on_pdf"
-          onChange={(value: boolean) =>
-            handleToggleChange('settings.hide_empty_columns_on_pdf', value)
-          }
-        />
+        <div className="flex items-center space-x-4">
+          <Toggle
+            checked={company?.settings?.hide_empty_columns_on_pdf}
+            id="settings.hide_empty_columns_on_pdf"
+            onChange={(value: boolean) =>
+              handleToggleChange('settings.hide_empty_columns_on_pdf', value)
+            }
+          />
+
+          <span>
+            {company?.settings.hide_empty_columns_on_pdf
+              ? t('hide')
+              : t('show')}
+          </span>
+        </div>
       </Element>
 
       <Element leftSide={t('page_numbering')}>
