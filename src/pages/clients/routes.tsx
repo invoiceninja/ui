@@ -9,6 +9,7 @@
  */
 
 import { Guard } from 'common/guards/Guard';
+import { or } from 'common/guards/guards/or';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
@@ -32,19 +33,14 @@ export const clientRoutes = (
     <Route
       path=""
       element={
-        <Guard
-          guards={[() => permission('view_client')]}
-          component={<Clients />}
-        />
+        <Guard guards={[permission('view_client')]} component={<Clients />} />
       }
     />
     <Route
       path="import"
       element={
         <Guard
-          guards={[
-            () => permission('create_client') || permission('edit_client'),
-          ]}
+          guards={[or(permission('create_client'), permission('edit_client'))]}
           component={<Import />}
         />
       }
@@ -52,28 +48,19 @@ export const clientRoutes = (
     <Route
       path="create"
       element={
-        <Guard
-          guards={[() => permission('create_client')]}
-          component={<Create />}
-        />
+        <Guard guards={[permission('create_client')]} component={<Create />} />
       }
     />
     <Route
       path=":id/edit"
       element={
-        <Guard
-          guards={[() => permission('edit_client')]}
-          component={<Edit />}
-        />
+        <Guard guards={[permission('edit_client')]} component={<Edit />} />
       }
     />
     <Route
       path=":id"
       element={
-        <Guard
-          guards={[() => permission('view_client')]}
-          component={<Client />}
-        />
+        <Guard guards={[permission('view_client')]} component={<Client />} />
       }
     >
       <Route path="" element={<Invoices />} />
