@@ -9,7 +9,7 @@
  */
 
 import { Guard } from 'common/guards/Guard';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
+import { plan } from 'common/guards/guards/plan';
 import { Route } from 'react-router-dom';
 import * as Settings from './index';
 
@@ -138,7 +138,7 @@ export const settingsRoutes = (
         path=":id/edit"
         element={
           <Guard
-            guards={[() => enterprisePlan()]}
+            guards={[plan('enterprise')]}
             component={<Settings.EditUser />}
           />
         }
