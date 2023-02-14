@@ -987,7 +987,7 @@ export function GeneralSettings() {
           id="settings.page_numbering_alignment"
           onChange={handleChange}
           disabled={company?.settings?.page_numbering ? false : true}
-          value={company?.settings?.page_numbering_alignment.toString()}
+          value={company?.settings?.page_numbering_alignment?.toString()}
         >
           <option value="C">{t('center')}</option>
           <option value="R">{t('right')}</option>
