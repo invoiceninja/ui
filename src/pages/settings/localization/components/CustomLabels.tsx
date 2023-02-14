@@ -97,7 +97,7 @@ export function CustomLabels() {
       (label) => label.property === property
     );
 
-    return possibleDefault ? possibleDefault.translation : property;
+    return possibleDefault ? possibleDefault.translation : t(property);
   };
 
   const handleSelectChange = (property: string): void => {
