@@ -25,6 +25,9 @@ export function InvoiceStatus(props: Props) {
   if (props.entity.archived_at)
     return <Badge variant="orange">{t('archived')}</Badge>;
 
+  if (props.entity.due_date && new Date(props.entity.due_date) < new Date())
+    return <Badge variant="yellow">{t('overdue')}</Badge>;
+
   switch (props.entity.status_id) {
     case '1':
       return <Badge variant="generic">{t('draft')}</Badge>;
@@ -41,8 +44,5 @@ export function InvoiceStatus(props: Props) {
 
     default:
       return <Badge variant="light-blue">{t('reversed')}</Badge>;
-      break;
   }
-
-  return <></>;
 }
