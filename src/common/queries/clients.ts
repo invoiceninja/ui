@@ -13,12 +13,15 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 interface BlankQueryParams {
   refetchOnWindowFocus?: boolean;
 }
 
 export function useBlankClientQuery(params: BlankQueryParams) {
+  const hasPermission = useHasPermission();
+
   return useQuery(
     '/api/v1/clients/create',
     () =>
@@ -28,6 +31,7 @@ export function useBlankClientQuery(params: BlankQueryParams) {
     {
       refetchOnWindowFocus: Boolean(params.refetchOnWindowFocus),
       staleTime: Infinity,
+      enabled: hasPermission('create_client'),
     }
   );
 }
@@ -37,13 +41,18 @@ interface Props {
 }
 
 export function useClientsQuery(props: Props) {
+  const hasPermission = useHasPermission();
+
   return useQuery(
     ['/api/v1/clients?filter_deleted_clients=true'],
     () =>
       request('GET', endpoint('/api/v1/clients')).then(
         (response) => response.data.data
       ),
-    { enabled: props.enabled ?? true, staleTime: Infinity }
+    {
+      enabled: hasPermission('view_client') ? props.enabled || true : false,
+      staleTime: Infinity,
+    }
   );
 }
 
