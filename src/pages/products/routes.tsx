@@ -9,6 +9,8 @@
  */
 
 import { Guard } from 'common/guards/Guard';
+import { assigned } from 'common/guards/guards/assigned';
+import { or } from 'common/guards/guards/or';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
@@ -26,7 +28,9 @@ export const productRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_product')]}
+          guards={[
+            or(permission('view_product'), permission('create_product')),
+          ]}
           component={<Products />}
         />
       }
@@ -36,7 +40,7 @@ export const productRoutes = (
       element={
         <Guard
           guards={[
-            () => permission('create_product') || permission('edit_product'),
+            or(permission('create_product'), permission('edit_product')),
           ]}
           component={<Import />}
         />
@@ -45,17 +49,16 @@ export const productRoutes = (
     <Route
       path="create"
       element={
-        <Guard
-          guards={[() => permission('create_product')]}
-          component={<Create />}
-        />
+        <Guard guards={[permission('create_product')]} component={<Create />} />
       }
     />
     <Route
       path=":id"
       element={
         <Guard
-          guards={[() => permission('view_product')]}
+          guards={[
+            or(permission('view_product'), assigned('/api/v1/products/:id')),
+          ]}
           component={<Product />}
         />
       }
@@ -68,7 +71,9 @@ export const productRoutes = (
       path=":id/edit"
       element={
         <Guard
-          guards={[() => permission('edit_product')]}
+          guards={[
+            or(permission('view_product'), assigned('/api/v1/products/:id')),
+          ]}
           component={<Product />}
         />
       }
