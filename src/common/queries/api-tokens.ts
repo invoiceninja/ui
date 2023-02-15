@@ -17,20 +17,28 @@ import { Params } from './common/params.interface';
 import { ApiToken } from 'common/interfaces/api-token';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { toast } from 'common/helpers/toast/toast';
+import { useAdmin } from 'common/hooks/permissions/useHasPermission';
 
 export function useApiTokensQuery(params: Params) {
-  return useQuery(['/api/v1/tokens', params], () =>
-    request(
-      'GET',
-      endpoint('/api/v1/tokens?per_page=:perPage&page=:currentPage', {
-        perPage: params.perPage,
-        currentPage: params.currentPage,
-      })
-    )
+  const { isOwner } = useAdmin();
+
+  return useQuery(
+    ['/api/v1/tokens', params],
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/tokens?per_page=:perPage&page=:currentPage', {
+          perPage: params.perPage,
+          currentPage: params.currentPage,
+        })
+      ),
+    { staleTime: Infinity, enabled: isOwner }
   );
 }
 
 export function useApiTokenQuery(params: { id: string | undefined }) {
+  const { isOwner } = useAdmin();
+
   return useQuery<ApiToken>(
     route('/api/v1/tokens/:id', { id: params.id }),
     () =>
@@ -38,7 +46,7 @@ export function useApiTokenQuery(params: { id: string | undefined }) {
         (response: GenericSingleResourceResponse<ApiToken>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isOwner }
   );
 }
 
@@ -68,6 +76,8 @@ export function useBulkAction() {
 }
 
 export function useBlankApiTokenQuery() {
+  const { isOwner } = useAdmin();
+
   return useQuery<ApiToken>(
     '/api/v1/tokens/create',
     () =>
@@ -75,6 +85,6 @@ export function useBlankApiTokenQuery() {
         (response: GenericSingleResourceResponse<ApiToken>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isOwner }
   );
 }
