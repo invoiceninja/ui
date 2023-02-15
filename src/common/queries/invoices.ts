@@ -15,6 +15,7 @@ import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-res
 import { Invoice } from 'common/interfaces/invoice';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 export interface GenericQueryOptions {
   enabled: boolean;
@@ -35,13 +36,19 @@ export function useInvoiceQuery(params: { id: string | undefined }) {
 }
 
 export function useBlankInvoiceQuery(options?: GenericQueryOptions) {
+  const hasPermission = useHasPermission();
+
   return useQuery<Invoice>(
     route('/api/v1/invoices/create'),
     () =>
       request('GET', endpoint('/api/v1/invoices/create')).then(
         (response: GenericSingleResourceResponse<Invoice>) => response.data.data
       ),
-    { ...options, staleTime: Infinity }
+    {
+      ...options,
+      staleTime: Infinity,
+      enabled: hasPermission('create_invoice'),
+    }
   );
 }
 
