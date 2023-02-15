@@ -21,7 +21,7 @@ export function permission(permission: Permissions): Guard {
       companyUser?.is_admin ||
         companyUser?.is_owner ||
         permissions.includes(permission) ||
-        permissions.includes(action)
+        permissions.includes(`${action}_all`)
     );
 
     return new Promise((resolve) => resolve(value));
