@@ -13,6 +13,7 @@ import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { GenericQueryOptions } from './invoices';
+import { useAdmin } from 'common/hooks/permissions/useHasPermission';
 
 export function useUsersQuery() {
   return useQuery('/api/v1/users', () =>
@@ -37,9 +38,11 @@ export function useUserQuery(options: UserQueryProps) {
 }
 
 export function useBlankUserQuery() {
+  const { isAdmin } = useAdmin();
+
   return useQuery(
     route('/api/v1/users/create'),
     () => request('GET', endpoint('/api/v1/users/create')),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isAdmin }
   );
 }
