@@ -29,8 +29,11 @@ export function useStop() {
 
     const logs = parseTimeLog(task.time_log);
 
-    if (logs[logs.length - 1][0] && logs[logs.length - 1][0] > dayjs().unix()) {
-      logs[logs.length - 1][1] = logs[logs.length - 1][0] + 1;
+    const startTime = logs[logs.length - 1][0];
+    const currentTime = dayjs().unix();
+
+    if (startTime && startTime > currentTime) {
+      logs[logs.length - 1][1] = startTime + 1;
 
       task.time_log = JSON.stringify(logs);
     } else {
