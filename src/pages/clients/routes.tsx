@@ -9,6 +9,7 @@
  */
 
 import { Guard } from 'common/guards/Guard';
+import { assigned } from 'common/guards/guards/assigned';
 import { or } from 'common/guards/guards/or';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
@@ -33,7 +34,10 @@ export const clientRoutes = (
     <Route
       path=""
       element={
-        <Guard guards={[permission('view_client')]} component={<Clients />} />
+        <Guard
+          guards={[or(permission('view_client'), permission('create_client'))]}
+          component={<Clients />}
+        />
       }
     />
     <Route
@@ -54,13 +58,23 @@ export const clientRoutes = (
     <Route
       path=":id/edit"
       element={
-        <Guard guards={[permission('edit_client')]} component={<Edit />} />
+        <Guard
+          guards={[
+            or(permission('edit_client'), assigned('/api/v1/clients/:id')),
+          ]}
+          component={<Edit />}
+        />
       }
     />
     <Route
       path=":id"
       element={
-        <Guard guards={[permission('view_client')]} component={<Client />} />
+        <Guard
+          guards={[
+            or(permission('view_client'), assigned('/api/v1/clients/:id')),
+          ]}
+          component={<Client />}
+        />
       }
     >
       <Route path="" element={<Invoices />} />
