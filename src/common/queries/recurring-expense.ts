@@ -14,12 +14,15 @@ import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { RecurringExpense } from 'common/interfaces/recurring-expense';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 interface BlankQueryParams {
   enabled?: boolean;
 }
 
 export function useBlankRecurringExpenseQuery(params: BlankQueryParams) {
+  const hasPermission = useHasPermission();
+
   return useQuery<RecurringExpense>(
     '/api/v1/recurring_expenses/create',
     () =>
@@ -27,7 +30,12 @@ export function useBlankRecurringExpenseQuery(params: BlankQueryParams) {
         (response: GenericSingleResourceResponse<RecurringExpense>) =>
           response.data.data
       ),
-    { enabled: params.enabled ?? true, staleTime: Infinity }
+    {
+      enabled: hasPermission('create_recurring_expense')
+        ? params.enabled ?? true
+        : false,
+      staleTime: Infinity,
+    }
   );
 }
 
