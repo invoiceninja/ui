@@ -15,19 +15,25 @@ import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Params } from './common/params.interface';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 interface BlankQueryParams {
   enabled?: boolean;
 }
 
 export function useBlankExpenseQuery(params: BlankQueryParams) {
+  const hasPermission = useHasPermission();
+
   return useQuery<Expense>(
     route('/api/v1/expenses/create'),
     () =>
       request('GET', endpoint('/api/v1/expenses/create')).then(
         (response) => response.data.data
       ),
-    { enabled: params.enabled ?? true, staleTime: Infinity }
+    {
+      enabled: hasPermission('create_expense') ? params.enabled ?? true : false,
+      staleTime: Infinity,
+    }
   );
 }
 
