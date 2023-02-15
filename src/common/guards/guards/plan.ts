@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isSelfHosted } from 'common/helpers';
 import { Guard } from '../Guard';
 
 export type Plan = 'pro' | 'enterprise' | 'white_label';
@@ -15,6 +16,10 @@ export type Plan = 'pro' | 'enterprise' | 'white_label';
 export function plan(p: Plan): Guard {
   return ({ companyUser }) =>
     new Promise((resolve) => {
+      if (isSelfHosted()) {
+        return resolve(true);
+      }
+
       if (companyUser?.account.plan === p) {
         return resolve(true);
       }
