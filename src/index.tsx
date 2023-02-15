@@ -40,7 +40,13 @@ i18n.use(initReactI18next).init({
 const Router =
   import.meta.env.VITE_ROUTER === 'hash' ? HashRouter : BrowserRouter;
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+    },
+  },
+});
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_URL as unknown as string,
