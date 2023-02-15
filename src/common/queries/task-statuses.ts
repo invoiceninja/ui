@@ -16,8 +16,11 @@ import { TaskStatus } from 'common/interfaces/task-status';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 export function useBlankTaskStatusQuery() {
+  const hasPermission = useHasPermission();
+
   return useQuery<TaskStatus>(
     '/api/v1/task_statuses/create',
     () =>
@@ -25,7 +28,7 @@ export function useBlankTaskStatusQuery() {
         (response: GenericSingleResourceResponse<TaskStatus>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: hasPermission('create_task') }
   );
 }
 
