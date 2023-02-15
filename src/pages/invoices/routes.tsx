@@ -66,7 +66,11 @@ export const invoiceRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Invoices),
-            or(permission('view_invoice'), permission('edit_invoice'), assigned('/api/v1/invoices/:id')),
+            or(
+              permission('view_invoice'),
+              permission('edit_invoice'),
+              assigned('/api/v1/invoices/:id')
+            ),
           ]}
           component={<Edit />}
         />
