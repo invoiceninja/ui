@@ -10,7 +10,7 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
-import classNames from 'classnames';
+import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import { TransactionRule } from 'common/interfaces/transaction-rules';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -19,7 +19,7 @@ import Toggle from 'components/forms/Toggle';
 import { VendorSelector } from 'components/vendors/VendorSelector';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdAdd, MdClose, MdEdit } from 'react-icons/md';
+import { MdAdd, MdDelete, MdEdit } from 'react-icons/md';
 import { useHandleChange } from '../hooks/useHandleChange';
 import { RuleModal } from './RuleModal';
 
@@ -87,69 +87,7 @@ export function TransactionRuleForm(props: Props) {
             onValueChange={(value) => handleChange('auto_convert', value)}
           />
         </Element>
-      </Card>
 
-      <Card>
-        <div className={`flex px-6`}>
-          {Boolean(transactionRule.rules?.length) && (
-            <div className="flex flex-col w-full">
-              <div className="grid w-full grid-cols-4 text-gray-600">
-                <span>{t('field')}</span>
-                <span>{t('operator')}</span>
-                <span>{t('value')}</span>
-              </div>
-
-              <div className="flex flex-col mt-3 space-y-5 border-b border-gray-200 pb-2">
-                {transactionRule.rules.map((rule, index) => (
-                  <div key={index} className="grid w-full grid-cols-4 text-sm">
-                    <span>{t(rule.search_key)}</span>
-                    <span>{t(rule.operator)}</span>
-                    <span>{rule.value}</span>
-
-                    <div className="flex space-x-6">
-                      <MdEdit
-                        className="cursor-pointer"
-                        color={accentColor}
-                        fontSize={22}
-                        onClick={() => {
-                          setRuleIndex(index);
-                          setIsRuleModalOpen(true);
-                        }}
-                      />
-
-                      <MdClose
-                        className="cursor-pointer"
-                        color={accentColor}
-                        fontSize={22}
-                        onClick={() => handleRemoveRule(index)}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        <Element
-          leftSide={t('add_rule')}
-          className={classNames({
-            'mt-3': transactionRule.rules?.length,
-          })}
-        >
-          <MdAdd
-            className="cursor-pointer hover:bg-gray-100"
-            color={accentColor}
-            fontSize={26}
-            onClick={() => {
-              setRuleIndex(-1);
-              setIsRuleModalOpen(true);
-            }}
-          />
-        </Element>
-      </Card>
-
-      <Card>
         <Element leftSide={t('vendor')}>
           <VendorSelector
             value={transactionRule.vendor_id}
@@ -172,6 +110,69 @@ export function TransactionRuleForm(props: Props) {
           />
         </Element>
       </Card>
+
+      <Table>
+        <Thead>
+          <Th key="field">{t('field')}</Th>
+          <Th key="operator">{t('operator')}</Th>
+          <Th key="value">{t('value')}</Th>
+        </Thead>
+
+        <Tbody>
+          {transactionRule.rules?.map((rule, index) => (
+            <Tr key={index} className="py-2">
+              <Td width="30%">{t(rule.search_key)}</Td>
+
+              <Td width="30%">{t(rule.operator)}</Td>
+
+              <Td width="40%">
+                <div className="flex justify-between">
+                  <span>{rule.value}</span>
+
+                  <div className="flex space-x-8">
+                    <MdEdit
+                      className="cursor-pointer"
+                      color={accentColor}
+                      fontSize={22}
+                      onClick={() => {
+                        setRuleIndex(index);
+                        setIsRuleModalOpen(true);
+                      }}
+                    />
+
+                    <MdDelete
+                      className="cursor-pointer"
+                      color={accentColor}
+                      fontSize={22}
+                      onClick={() => handleRemoveRule(index)}
+                    />
+                  </div>
+                </div>
+              </Td>
+            </Tr>
+          ))}
+
+          <Tr className="bg-slate-100 hover:bg-slate-200">
+            <Td colSpan={100}>
+              <button
+                onClick={() => {
+                  setRuleIndex(-1);
+                  setIsRuleModalOpen(true);
+                }}
+                className="w-full py-1 inline-flex justify-center items-center space-x-2"
+              >
+                <MdAdd
+                  className="cursor-pointer"
+                  color={accentColor}
+                  fontSize={18}
+                />
+
+                <span>{t('add_rule')}</span>
+              </button>
+            </Td>
+          </Tr>
+        </Tbody>
+      </Table>
 
       <RuleModal
         visible={isRuleModalOpen}
