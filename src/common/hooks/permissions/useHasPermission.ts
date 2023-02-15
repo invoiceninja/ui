@@ -60,3 +60,12 @@ export function useHasPermission() {
   return (permission: Permissions) =>
     user?.is_admin || user?.is_owner || permissions.includes(permission);
 }
+
+export function useAdmin() {
+  const user = useCurrentCompanyUser();
+
+  return {
+    isAdmin: Boolean(user?.is_admin),
+    isOwner: Boolean(user?.is_owner || user?.is_owner),
+  };
+}
