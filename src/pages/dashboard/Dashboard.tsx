@@ -9,6 +9,7 @@
  */
 
 import { isDemo, isSelfHosted } from 'common/helpers';
+import { useAdmin } from 'common/hooks/permissions/useHasPermission';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTitle } from 'common/hooks/useTitle';
 import { SwitchToFlutter } from 'components/SwitchToFlutter';
@@ -30,6 +31,8 @@ export function Dashboard() {
   // const pages = [{ name: t('dashboard'), href: '/dashboard' }];
   const user = useCurrentUser();
 
+  const { isAdmin } = useAdmin();
+
   return (
     <Default
       title={t('dashboard')}
@@ -41,8 +44,8 @@ export function Dashboard() {
         )
       }
     >
-      <Totals />
-
+      {isAdmin && <Totals />}
+      
       <div className="grid grid-cols-12 gap-4 my-6">
         <div className="col-span-12 lg:col-span-6">
           <Activity />
