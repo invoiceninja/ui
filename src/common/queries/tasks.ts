@@ -16,6 +16,7 @@ import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
 import { GenericQueryOptions } from './invoices';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 interface TaskParams {
   id?: string;
@@ -34,13 +35,15 @@ export function useTaskQuery(params: TaskParams) {
 }
 
 export function useBlankTaskQuery(options?: GenericQueryOptions) {
+  const hasPermission = useHasPermission();
+
   return useQuery(
     route('/api/v1/tasks/create'),
     () =>
       request('GET', endpoint('/api/v1/tasks/create')).then(
         (response: GenericSingleResourceResponse<Task>) => response.data.data
       ),
-    { ...options, staleTime: Infinity }
+    { ...options, staleTime: Infinity, enabled: hasPermission('create_task') }
   );
 }
 
