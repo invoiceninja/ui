@@ -26,6 +26,8 @@ import { EntityStatus } from 'components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { InvoiceStatus } from '../components/InvoiceStatus';
+import { useAllInvoiceColumns } from './useAllInvoiceColumns';
+import { useDefaultInvoiceColumns } from './useDefaultInvoiceColumns';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -33,61 +35,6 @@ export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   label: string;
   format?: (field: string | number, resource: TResource) => unknown;
 }[];
-
-export const invoiceColumns = [
-  'status',
-  'number',
-  'amount',
-  'client',
-  'balance',
-  'date',
-  'due_date',
-  'auto_bill_enabled',
-  'client_postal_code',
-  'archived_at',
-  'client_city',
-  'client_country',
-  'client_state',
-  'contact_email',
-  'contact_name',
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'discount',
-  'documents',
-  'entity_state',
-  'exchange_rate',
-  'is_deleted',
-  'is_viewed',
-  'last_sent_date',
-  'last_sent_template',
-  'next_send_date',
-  'partial_due',
-  'partial_due_date',
-  'po_number',
-  'private_notes',
-  'public_notes',
-  'reminder1_sent',
-  'reminder2_sent',
-  'reminder3_sent',
-  'reminder_last_sent',
-  'tax_amount',
-  'created_at',
-  'updated_at',
-] as const;
-
-type InvoiceColumns = typeof invoiceColumns[number];
-
-export const defaultColumns: InvoiceColumns[] = [
-  'status',
-  'number',
-  'client',
-  'amount',
-  'balance',
-  'date',
-  'due_date',
-];
 
 export function resourceViewedAt(resource: Invoice | Credit) {
   let viewed = '';
@@ -102,12 +49,37 @@ export function resourceViewedAt(resource: Invoice | Credit) {
 }
 
 export function useInvoiceColumns(): DataTableColumns<Invoice> {
+  const invoiceColumns = useAllInvoiceColumns();
+  type InvoiceColumns = typeof invoiceColumns[number];
+
+  const defaultColumns = useDefaultInvoiceColumns();
+
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
   const resolveCountry = useResolveCountry();
+
+  const firstCustomFieldLabel =
+    (company?.custom_fields.invoice1 &&
+      customField(company?.custom_fields.invoice1).label()) ||
+    t('first_custom');
+
+  const secondCustomFieldLabel =
+    (company?.custom_fields.invoice2 &&
+      customField(company?.custom_fields.invoice2).label()) ||
+    t('second_custom');
+
+  const thirdCustomFieldLabel =
+    (company?.custom_fields.invoice3 &&
+      customField(company?.custom_fields.invoice3).label()) ||
+    t('third_custom');
+
+  const fourthCustomFieldLabel =
+    (company?.custom_fields.invoice4 &&
+      customField(company?.custom_fields.invoice4).label()) ||
+    t('fourth_custom');
 
   const currentUser = useSelector((state: RootState) => state.user.user) as
     | User
@@ -239,36 +211,24 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustomFieldLabel,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.invoice1 &&
-          customField(company?.custom_fields.invoice1).label()) ||
-        t('first_custom'),
+      label: firstCustomFieldLabel,
     },
     {
-      column: 'custom2',
+      column: secondCustomFieldLabel,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.invoice2 &&
-          customField(company?.custom_fields.invoice2).label()) ||
-        t('second_custom'),
+      label: secondCustomFieldLabel,
     },
     {
-      column: 'custom3',
+      column: thirdCustomFieldLabel,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.invoice3 &&
-          customField(company?.custom_fields.invoice3).label()) ||
-        t('third_custom'),
+      label: thirdCustomFieldLabel,
     },
     {
-      column: 'custom4',
+      column: fourthCustomFieldLabel,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.invoice4 &&
-          customField(company?.custom_fields.invoice4).label()) ||
-        t('forth_custom'),
+      label: fourthCustomFieldLabel,
     },
     {
       column: 'discount',

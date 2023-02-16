@@ -95,10 +95,20 @@ export function DataTableColumnsPicker(props: Props) {
       });
   };
 
-  const handleDelete = (column: string) => {
-    setCurrentColumns((current) =>
-      current.filter((columns) => !columns.includes(column))
+  const handleDelete = (passedColumn: string) => {
+    const updatedCurrentColumns = currentColumns.filter(
+      (columns) => !columns.includes(passedColumn)
     );
+
+    setCurrentColumns(updatedCurrentColumns);
+
+    const updatedFilteredColumns = props.columns.filter((column) =>
+      Boolean(
+        !updatedCurrentColumns.find((currentColumn) => currentColumn === column)
+      )
+    );
+
+    setFilteredColumns(updatedFilteredColumns);
   };
 
   const onDragEnd = (result: DropResult) => {
@@ -113,6 +123,8 @@ export function DataTableColumnsPicker(props: Props) {
 
   const handleReset = useCallback(() => {
     setCurrentColumns(defaultColumns);
+
+    setFilteredColumns(props.columns);
   }, []);
 
   return (
