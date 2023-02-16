@@ -774,7 +774,7 @@ export function GeneralSettings() {
     { value: 'Zeyada', label: 'Zeyada' },
   ];
 
-  const isChangedDesign = (entity: string) => {
+  const isDesignChanged = (entity: string) => {
     const foundRecord = updatingRecords?.find(
       (record) => record.entity === entity
     );
@@ -811,7 +811,7 @@ export function GeneralSettings() {
         entity === 'credit' ||
         entity === 'purchase_order'
       ) {
-        if (isChangedDesign(entity)) {
+        if (isDesignChanged(entity)) {
           const updatedRecords = updatingRecords?.map((record) => ({
             ...record,
             design_id:
@@ -875,7 +875,7 @@ export function GeneralSettings() {
               ))}
           </SelectField>
 
-          {isChangedDesign('invoice') && (
+          {isDesignChanged('invoice') && (
             <div className="flex space-x-10 pl-5">
               <span>{t('update_all_records')}</span>
               <Toggle
@@ -904,7 +904,7 @@ export function GeneralSettings() {
               ))}
           </SelectField>
 
-          {isChangedDesign('quote') && (
+          {isDesignChanged('quote') && (
             <div className="flex space-x-10 pl-5">
               <span>{t('update_all_records')}</span>
               <Toggle
@@ -933,7 +933,7 @@ export function GeneralSettings() {
               ))}
           </SelectField>
 
-          {isChangedDesign('credit') && (
+          {isDesignChanged('credit') && (
             <div className="flex space-x-10 pl-5">
               <span>{t('update_all_records')}</span>
               <Toggle
@@ -962,7 +962,7 @@ export function GeneralSettings() {
               ))}
           </SelectField>
 
-          {isChangedDesign('purchase_order') && (
+          {isDesignChanged('purchase_order') && (
             <div className="flex space-x-10 pl-5">
               <span>{t('update_all_records')}</span>
               <Toggle
