@@ -11,6 +11,7 @@
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { updateChanges } from 'common/stores/slices/company-users';
+import { CopyToClipboard } from 'components/CopyToClipboard';
 import React, { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -71,7 +72,7 @@ export function Invoices() {
             onClick={() => setPattern(pattern + item)}
             key={index}
           >
-            {item}
+            <CopyToClipboard text={item} />
           </ClickableElement>
         ))}
       </Card>

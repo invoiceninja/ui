@@ -17,6 +17,7 @@ import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useDispatch } from 'react-redux';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { ChangeEvent } from 'react';
+import { CopyToClipboard } from 'components/CopyToClipboard';
 
 export function Vendors() {
   const [t] = useTranslation();
@@ -71,7 +72,7 @@ export function Vendors() {
             onClick={() => setPattern(pattern + item)}
             key={index}
           >
-            {item}
+            <CopyToClipboard text={item} />
           </ClickableElement>
         ))}
       </Card>
