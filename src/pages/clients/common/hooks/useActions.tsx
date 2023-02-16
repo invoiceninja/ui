@@ -43,66 +43,75 @@ export function useActions(params: Params) {
   const location = useLocation();
 
   const actions: Action<Client>[] = [
-    (client) => (
-      <DropdownElement
-        to={route('/clients/:id/statement', { id: client.id })}
-        icon={<Icon element={MdPictureAsPdf} />}
-      >
-        {t('view_statement')}
-      </DropdownElement>
-    ),
-    (client) => (
-      <DropdownElement
-        onClick={() => window.open(client.contacts[0].link, '__blank')}
-        icon={<Icon element={MdCloudCircle} />}
-      >
-        {t('client_portal')}
-      </DropdownElement>
-    ),
-    (client) => (
-      <DropdownElement
-        to={route('/invoices/create?client=:id', { id: client.id })}
-        icon={<Icon element={BiPlusCircle} />}
-      >
-        {t('new_invoice')}
-      </DropdownElement>
-    ),
-    (client) => (
-      <DropdownElement
-        to={route('/payments/create?client=:id', { id: client.id })}
-        icon={<Icon element={BiPlusCircle} />}
-      >
-        {t('new_payment')}
-      </DropdownElement>
-    ),
-    (client) => (
-      <DropdownElement
-        to={route('/quotes/create?client=:id', { id: client.id })}
-        icon={<Icon element={BiPlusCircle} />}
-      >
-        {t('new_quote')}
-      </DropdownElement>
-    ),
-    (client) => (
-      <DropdownElement
-        to={route('/credits/create?client=:id', { id: client.id })}
-        icon={<Icon element={BiPlusCircle} />}
-      >
-        {t('new_credit')}
-      </DropdownElement>
-    ),
-    (client) => (
-      <DropdownElement
-        onClick={() => {
-          params.setMergeFromClientId?.(client.id);
-          params.setIsMergeModalOpen(true);
-        }}
-        icon={<Icon element={BiGitMerge} />}
-      >
-        {t('merge')}
-      </DropdownElement>
-    ),
-    () => !location.pathname.endsWith('/clients') && <Divider withoutPadding />,
+    (client) =>
+      !client.is_deleted && (
+        <DropdownElement
+          to={route('/clients/:id/statement', { id: client.id })}
+          icon={<Icon element={MdPictureAsPdf} />}
+        >
+          {t('view_statement')}
+        </DropdownElement>
+      ),
+    (client) =>
+      !client.is_deleted && (
+        <DropdownElement
+          onClick={() => window.open(client.contacts[0].link, '__blank')}
+          icon={<Icon element={MdCloudCircle} />}
+        >
+          {t('client_portal')}
+        </DropdownElement>
+      ),
+    (client) =>
+      !client.is_deleted && (
+        <DropdownElement
+          to={route('/invoices/create?client=:id', { id: client.id })}
+          icon={<Icon element={BiPlusCircle} />}
+        >
+          {t('new_invoice')}
+        </DropdownElement>
+      ),
+    (client) =>
+      !client.is_deleted && (
+        <DropdownElement
+          to={route('/payments/create?client=:id', { id: client.id })}
+          icon={<Icon element={BiPlusCircle} />}
+        >
+          {t('new_payment')}
+        </DropdownElement>
+      ),
+    (client) =>
+      !client.is_deleted && (
+        <DropdownElement
+          to={route('/quotes/create?client=:id', { id: client.id })}
+          icon={<Icon element={BiPlusCircle} />}
+        >
+          {t('new_quote')}
+        </DropdownElement>
+      ),
+    (client) =>
+      !client.is_deleted && (
+        <DropdownElement
+          to={route('/credits/create?client=:id', { id: client.id })}
+          icon={<Icon element={BiPlusCircle} />}
+        >
+          {t('new_credit')}
+        </DropdownElement>
+      ),
+    (client) =>
+      !client.is_deleted && (
+        <DropdownElement
+          onClick={() => {
+            params.setMergeFromClientId?.(client.id);
+            params.setIsMergeModalOpen(true);
+          }}
+          icon={<Icon element={BiGitMerge} />}
+        >
+          {t('merge')}
+        </DropdownElement>
+      ),
+    (client) =>
+      !location.pathname.endsWith('/clients') &&
+      !client.is_deleted && <Divider withoutPadding />,
     (client) =>
       !location.pathname.endsWith('/clients') &&
       getEntityState(client) === EntityState.Active && (
