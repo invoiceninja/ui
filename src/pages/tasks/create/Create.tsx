@@ -9,7 +9,7 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint, isProduction } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
@@ -21,6 +21,7 @@ import { useTaskStatusesQuery } from 'common/queries/task-statuses';
 import { useBlankTaskQuery } from 'common/queries/tasks';
 import { Default } from 'components/layouts/Default';
 import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -32,61 +33,52 @@ import { useStart } from '../common/hooks/useStart';
 
 export function Create() {
   const [t] = useTranslation();
-
   const { documentTitle } = useTitle('new_task');
 
-  const [searchParams] = useSearchParams();
-
-  const { data } = useBlankTaskQuery();
   const company = useCurrentCompany();
-
   const start = useStart();
+  const navigate = useNavigate();
+
+  const [task, setTask] = useAtom(taskAtom);
+  const [searchParams] = useSearchParams();
+  const [errors, setErrors] = useState<ValidationBag>();
 
   const { data: taskStatuses } = useTaskStatusesQuery();
+  const { data } = useBlankTaskQuery({ enabled: typeof task === 'undefined' });
 
   const pages = [
     { name: t('tasks'), href: '/tasks' },
     { name: t('new_task'), href: '/tasks/create' },
   ];
 
-  const [task, setTask] = useAtom(taskAtom);
-
-  const [errors, setErrors] = useState<ValidationBag>();
-
-  const navigate = useNavigate();
-
   useEffect(() => {
-    if (data && taskStatuses && !task) {
-      setTask({
-        ...data,
-        status_id: taskStatuses.data.length > 0 ? taskStatuses.data[0].id : '',
-      });
-    }
+    setTask((current) => {
+      let value = current;
 
-    if (data && taskStatuses && task) {
-      setTask(
-        (prevState) =>
-          prevState && {
-            ...prevState,
-            status_id:
-              taskStatuses.data.length > 0 ? taskStatuses.data[0].id : '',
-          }
-      );
-    }
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
+      }
 
-    if (searchParams.has('client')) {
-      setTask(
-        (prevState) =>
-          prevState && {
-            ...prevState,
-            client_id: searchParams.get('client') as string,
-          }
-      );
-    }
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone' &&
+        taskStatuses
+      ) {
+        const _task = cloneDeep(data);
 
-    return () => {
-      isProduction() && setTask(undefined);
-    };
+        _task.status_id =
+          taskStatuses.data.length > 0 ? taskStatuses.data[0].id : '';
+
+        if (searchParams.get('client')) {
+          _task.client_id = searchParams.get('client')!;
+        }
+
+        value = _task;
+      }
+
+      return value;
+    });
   }, [data, taskStatuses]);
 
   const handleChange = (property: keyof Task, value: unknown) => {
