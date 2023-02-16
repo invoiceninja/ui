@@ -55,10 +55,18 @@ export type Permissions =
 
 export function useHasPermission() {
   const user = useCurrentCompanyUser();
-  const permissions = user?.permissions ?? '';
 
-  return (permission: Permissions) =>
-    user?.is_admin || user?.is_owner || permissions.includes(permission);
+  return (permission: Permissions) => {
+    const permissions = user?.permissions ?? '';
+    const [action] = permission.split('_');
+
+    return Boolean(
+      user?.is_admin ||
+        user?.is_owner ||
+        permissions.includes(permission) ||
+        permissions.includes(`${action}_all`)
+    );
+  };
 }
 
 export function useAdmin() {
