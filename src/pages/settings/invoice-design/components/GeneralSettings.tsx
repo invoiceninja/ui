@@ -876,7 +876,7 @@ export function GeneralSettings() {
           </SelectField>
 
           {isDesignChanged('invoice') && (
-            <div className="flex space-x-10 pl-5">
+            <div className="flex space-x-10">
               <span>{t('update_all_records')}</span>
               <Toggle
                 checked={isUpdateAllRecordsChecked('invoice')}
@@ -905,7 +905,7 @@ export function GeneralSettings() {
           </SelectField>
 
           {isDesignChanged('quote') && (
-            <div className="flex space-x-10 pl-5">
+            <div className="flex space-x-10">
               <span>{t('update_all_records')}</span>
               <Toggle
                 checked={isUpdateAllRecordsChecked('quote')}
@@ -934,7 +934,7 @@ export function GeneralSettings() {
           </SelectField>
 
           {isDesignChanged('credit') && (
-            <div className="flex space-x-10 pl-5">
+            <div className="flex space-x-10">
               <span>{t('update_all_records')}</span>
               <Toggle
                 checked={isUpdateAllRecordsChecked('credit')}
@@ -963,7 +963,7 @@ export function GeneralSettings() {
           </SelectField>
 
           {isDesignChanged('purchase_order') && (
-            <div className="flex space-x-10 pl-5">
+            <div className="flex space-x-10">
               <span>{t('update_all_records')}</span>
               <Toggle
                 checked={isUpdateAllRecordsChecked('purchase_order')}
