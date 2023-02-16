@@ -34,7 +34,10 @@ import { useSelector } from 'react-redux';
 import { RootState } from 'common/stores/store';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
-import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
+import {
+  useAdmin,
+  useHasPermission,
+} from 'common/hooks/permissions/useHasPermission';
 import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
@@ -350,6 +353,8 @@ export function Default(props: Props) {
     },
   ];
 
+  const { isOwner } = useAdmin();
+
   return (
     <>
       <div>
@@ -398,7 +403,9 @@ export function Default(props: Props) {
                     }
                   >
                     <span>
-                      {isSelfHosted() ? t('upgrade') : t('unlock_pro')}
+                      {isSelfHosted() && isOwner
+                        ? t('upgrade')
+                        : t('unlock_pro')}
                     </span>
                   </button>
                 )}
