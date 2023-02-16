@@ -323,7 +323,7 @@ export function useActions() {
   const cloneToTask = (task: Task) => {
     setTask({ ...task, id: '', documents: [], number: '' });
 
-    navigate('/tasks/create');
+    navigate('/tasks/create?action=clone');
   };
 
   const actions = [

@@ -14,6 +14,8 @@ import { GenericManyResponse } from 'common/interfaces/generic-many-response';
 import { Task } from 'common/interfaces/task';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
+import { GenericQueryOptions } from './invoices';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 
 interface TaskParams {
   id?: string;
@@ -31,11 +33,14 @@ export function useTaskQuery(params: TaskParams) {
   );
 }
 
-export function useBlankTaskQuery() {
-  return useQuery<Task>(route('/api/v1/tasks/create'), () =>
-    request('GET', endpoint('/api/v1/tasks/create')).then(
-      (response) => response.data.data
-    )
+export function useBlankTaskQuery(options?: GenericQueryOptions) {
+  return useQuery(
+    route('/api/v1/tasks/create'),
+    () =>
+      request('GET', endpoint('/api/v1/tasks/create')).then(
+        (response: GenericSingleResourceResponse<Task>) => response.data.data
+      ),
+    { ...options, staleTime: Infinity }
   );
 }
 
