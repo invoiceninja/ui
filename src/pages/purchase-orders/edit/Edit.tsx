@@ -46,8 +46,7 @@ export function Edit() {
   const { data } = usePurchaseOrderQuery({ id });
   const user = useCurrentUser();
 
-  const showPdfPreview =
-    user?.company_user?.settings?.react_settings?.show_pdf_preview;
+  const showPdfPreview = user?.company_user?.react_settings?.show_pdf_preview;
 
   const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },

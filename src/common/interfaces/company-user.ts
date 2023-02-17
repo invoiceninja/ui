@@ -12,6 +12,10 @@ import { Account } from './account';
 import { Company } from './company.interface';
 import { User } from './user';
 
+interface ReactSettings {
+  show_pdf_preview: boolean;
+}
+
 export interface CompanyUser {
   permissions: string;
   notifications: Notifications;
@@ -28,6 +32,7 @@ export interface CompanyUser {
   company: Company;
   token: Token;
   account: Account;
+  react_settings: ReactSettings;
 }
 
 export type ReactTableColumns =
@@ -45,15 +50,10 @@ export type ReactTableColumns =
   | 'expense'
   | 'recurringExpense';
 
-interface ReactSettings {
-  show_pdf_preview: boolean;
-}
-
 export interface Settings {
   accent_color: string;
   table_columns?: Record<ReactTableColumns, string[]>;
   react_table_columns?: Record<ReactTableColumns, string[]>;
-  react_settings: ReactSettings;
 }
 
 export interface Notifications {

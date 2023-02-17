@@ -21,7 +21,7 @@ export function Preferences() {
   const dispatch = useDispatch();
 
   const showPdfPreview =
-    userChanges?.company_user?.settings?.react_settings?.show_pdf_preview;
+    userChanges?.company_user?.react_settings?.show_pdf_preview;
 
   const handleChange = (property: string, value: string | boolean) => {
     dispatch(
@@ -40,10 +40,7 @@ export function Preferences() {
             showPdfPreview === true || typeof showPdfPreview === 'undefined'
           }
           onValueChange={(value) =>
-            handleChange(
-              'company_user.settings.react_settings.show_pdf_preview',
-              value
-            )
+            handleChange('company_user.react_settings.show_pdf_preview', value)
           }
         />
       </Element>

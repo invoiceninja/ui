@@ -51,8 +51,7 @@ export function Create() {
   const { documentTitle } = useTitle('new_invoice');
   const user = useCurrentUser();
 
-  const showPdfPreview =
-    user?.company_user?.settings?.react_settings?.show_pdf_preview;
+  const showPdfPreview = user?.company_user?.react_settings?.show_pdf_preview;
 
   const [invoice, setInvoice] = useAtom(invoiceAtom);
 

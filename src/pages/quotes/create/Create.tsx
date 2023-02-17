@@ -40,8 +40,7 @@ export function Create() {
   const { t } = useTranslation();
   const user = useCurrentUser();
 
-  const showPdfPreview =
-    user?.company_user?.settings?.react_settings?.show_pdf_preview;
+  const showPdfPreview = user?.company_user?.react_settings?.show_pdf_preview;
 
   const pages: Page[] = [
     { name: t('quotes'), href: '/quotes' },

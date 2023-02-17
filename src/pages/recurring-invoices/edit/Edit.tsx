@@ -47,8 +47,7 @@ export function Edit() {
   const { data } = useRecurringInvoiceQuery({ id: id! });
   const user = useCurrentUser();
 
-  const showPdfPreview =
-    user?.company_user?.settings?.react_settings?.show_pdf_preview;
+  const showPdfPreview = user?.company_user?.react_settings?.show_pdf_preview;
 
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
