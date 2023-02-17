@@ -24,6 +24,7 @@ import {
   MdCloudCircle,
   MdDelete,
   MdDeleteForever,
+  MdEdit,
   MdPictureAsPdf,
   MdRestore,
 } from 'react-icons/md';
@@ -43,6 +44,21 @@ export function useActions(params: Params) {
   const location = useLocation();
 
   const actions: Action<Client>[] = [
+    (client) =>
+      !client.is_deleted &&
+      !location.pathname.endsWith('/clients') &&
+      !location.pathname.endsWith('/edit') && (
+        <DropdownElement
+          to={route('/clients/:id/edit', { id: client.id })}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    (client) =>
+      !location.pathname.endsWith('/clients') &&
+      !location.pathname.endsWith('/edit') &&
+      !client.is_deleted && <Divider withoutPadding />,
     (client) =>
       !client.is_deleted && (
         <DropdownElement

@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
 import { useTitle } from 'common/hooks/useTitle';
 import { useClientQuery } from 'common/queries/clients';
 import { Page } from 'components/Breadcrumbs';
@@ -99,11 +98,6 @@ export function Client() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      topRight={
-        <Button to={route('/clients/:id/edit', { id })}>
-          {t('edit_client')}
-        </Button>
-      }
       navigationTopRight={
         client && (
           <ResourceActions
