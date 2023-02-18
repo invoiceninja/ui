@@ -15,4 +15,4 @@ For the code of conduct, check our [main repository](https://github.com/invoicen
 
 ### Licence
 
-For the licence, check our [main repository](https://github.com/invoiceninja/invoiceninja/blob/master/LICENSE).
+For the licence, check our [main repository](https://github.com/invoiceninja/invoiceninja/blob/v5-stable/LICENSE).
