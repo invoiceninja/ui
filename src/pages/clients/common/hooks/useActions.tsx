@@ -44,10 +44,6 @@ export function useActions(params: Params) {
 
   const actions: Action<Client>[] = [
     (client) =>
-      !location.pathname.endsWith('/clients') &&
-      !location.pathname.endsWith('/edit') &&
-      !client.is_deleted && <Divider withoutPadding />,
-    (client) =>
       !client.is_deleted && (
         <DropdownElement
           to={route('/clients/:id/statement', { id: client.id })}
