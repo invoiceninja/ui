@@ -29,6 +29,7 @@ import { Gateways } from './components/Gateways';
 import { ResourceActions } from 'components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { MergeClientModal } from '../common/components/MergeClientModal';
+import { Button } from '@invoiceninja/forms';
 
 export function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -99,13 +100,19 @@ export function Client() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={
-        client && (
-          <ResourceActions
-            label={t('more_actions')}
-            resource={client.data.data}
-            actions={actions}
-          />
-        )
+        <div className="flex space-x-3">
+          <Button to={route('/clients/:id/edit', { id })}>
+            {t('edit_client')}
+          </Button>
+
+          {client && (
+            <ResourceActions
+              label={t('more_actions')}
+              resource={client.data.data}
+              actions={actions}
+            />
+          )}
+        </div>
       }
     >
       {isLoading && <Spinner />}
