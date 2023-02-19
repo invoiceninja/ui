@@ -44,8 +44,6 @@ export function EmailSettings() {
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
-  console.log(company);
-
   return (
     <Settings
       title={t('email_settings')}
