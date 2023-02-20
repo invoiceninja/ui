@@ -29,7 +29,11 @@ export const creditRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Credits),
-            or(permission('view_credit'), permission('create_credit')),
+            or(
+              permission('view_credit'),
+              permission('create_credit'),
+              permission('edit_credit')
+            ),
           ]}
           component={<Credits />}
         />
@@ -62,7 +66,7 @@ export const creditRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Credits),
-            or(permission('edit_credit'), assigned('/api/v1/credits/:id')),
+            or(permission('view_credit'), assigned('/api/v1/credits/:id')),
           ]}
           component={<Pdf />}
         />

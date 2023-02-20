@@ -28,7 +28,11 @@ export const taskRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Tasks),
-            or(permission('view_task'), permission('create_task')),
+            or(
+              permission('view_task'),
+              permission('create_task'),
+              permission('edit_task')
+            ),
           ]}
           component={<Tasks />}
         />

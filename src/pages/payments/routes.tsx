@@ -29,7 +29,11 @@ export const paymentRoutes = (
       element={
         <Guard
           guards={[
-            or(permission('view_payment'), permission('create_payment')),
+            or(
+              permission('view_payment'),
+              permission('create_payment'),
+              permission('edit_payment')
+            ),
           ]}
           component={<Payments />}
         />

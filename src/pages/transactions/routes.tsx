@@ -29,7 +29,8 @@ export const transactionRoutes = (
           guards={[
             or(
               permission('view_bank_transaction'),
-              permission('create_bank_transaction')
+              permission('create_bank_transaction'),
+              permission('edit_bank_transaction')
             ),
           ]}
           component={<Transactions />}

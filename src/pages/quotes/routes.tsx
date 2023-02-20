@@ -30,7 +30,11 @@ export const quoteRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Quotes),
-            or(permission('view_quote'), permission('create_quote')),
+            or(
+              permission('view_quote'),
+              permission('create_quote'),
+              permission('edit_quote')
+            ),
           ]}
           component={<Quotes />}
         />

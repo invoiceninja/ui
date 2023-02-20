@@ -29,7 +29,11 @@ export const expenseRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Expenses),
-            or(permission('view_expense'), permission('create_expense')),
+            or(
+              permission('view_expense'),
+              permission('create_expense'),
+              permission('edit_expense')
+            ),
           ]}
           component={<Expenses />}
         />

@@ -30,7 +30,8 @@ export const recurringInvoiceRoutes = (
             enabled(ModuleBitmask.RecurringInvoices),
             or(
               permission('view_recurring_invoice'),
-              permission('create_recurring_invoice')
+              permission('create_recurring_invoice'),
+              permission('edit_recurring_invoice')
             ),
           ]}
           component={<RecurringInvoices />}

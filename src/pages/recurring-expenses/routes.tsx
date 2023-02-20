@@ -30,7 +30,8 @@ export const recurringExpenseRoutes = (
             enabled(ModuleBitmask.RecurringExpenses),
             or(
               permission('view_recurring_expense'),
-              permission('create_recurring_expense')
+              permission('create_recurring_expense'),
+              permission('edit_recurring_expense')
             ),
           ]}
           component={<RecurringExpenses />}

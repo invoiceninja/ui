@@ -33,7 +33,11 @@ export const vendorRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Vendors),
-            or(permission('view_vendor'), permission('create_vendor')),
+            or(
+              permission('view_vendor'),
+              permission('create_vendor'),
+              permission('edit_vendor')
+            ),
           ]}
           component={<Vendors />}
         />
@@ -45,7 +49,7 @@ export const vendorRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Vendors),
-            or(permission('create_vendor'), permission('edit_vendor')),
+            or(permission('edit_vendor'), permission('edit_vendor')),
           ]}
           component={<Import />}
         />

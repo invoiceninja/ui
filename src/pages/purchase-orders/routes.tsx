@@ -31,7 +31,8 @@ export const purchaseOrderRoutes = (
             enabled(ModuleBitmask.PurchaseOrders),
             or(
               permission('view_purchase_order'),
-              permission('create_purchase_order')
+              permission('create_purchase_order'),
+              permission('edit_purchase_order')
             ),
           ]}
           component={<PurchaseOrders />}
