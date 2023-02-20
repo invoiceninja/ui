@@ -56,6 +56,15 @@ export function EmailSettings() {
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       <Card title={t('settings')}>
+        <Element leftSide={t('show_email_footer')}>
+          <Toggle
+            checked={company?.settings.show_email_footer}
+            onValueChange={(value) =>
+              handleChange('settings.show_email_footer', value)
+            }
+          />
+        </Element>
+
         <Element leftSide={t('attach_pdf')}>
           <Toggle
             checked={company?.settings.pdf_email_attachment}

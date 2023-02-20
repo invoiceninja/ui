@@ -11,12 +11,14 @@
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { updateChanges } from 'common/stores/slices/company-users';
+import { Divider } from 'components/cards/Divider';
 import { CopyToClipboard } from 'components/CopyToClipboard';
 import React, { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
+import { LinkToVariables } from '../common/components/LinkToVariables';
 
 export function Invoices() {
   const [t] = useTranslation();
@@ -66,16 +68,20 @@ export function Invoices() {
         />
       </Element>
 
-      <Card>
-        {variables.map((item, index) => (
-          <ClickableElement
-            onClick={() => setPattern(pattern + item)}
-            key={index}
-          >
-            <CopyToClipboard text={item} />
-          </ClickableElement>
-        ))}
-      </Card>
+      <Divider />
+
+      {variables.map((item, index) => (
+        <ClickableElement
+          onClick={() => setPattern(pattern + item)}
+          key={index}
+        >
+          <CopyToClipboard text={item} />
+        </ClickableElement>
+      ))}
+
+      <Divider />
+
+      <LinkToVariables />
     </Card>
   );
 }

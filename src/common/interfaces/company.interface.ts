@@ -47,6 +47,7 @@ export interface CompanyInput {
 
 export interface Settings {
   auto_archive_invoice: boolean;
+  auto_bill_standard_invoices: boolean;
   lock_invoices: string;
   enable_client_portal_tasks: boolean;
   show_all_tasks_client_portal: string;
@@ -61,6 +62,7 @@ export interface Settings {
   military_time: boolean;
   language_id: string;
   show_currency_code: boolean;
+  show_email_footer: boolean;
   company_gateway_ids: string;
   currency_id: string;
   custom_value1: string;
