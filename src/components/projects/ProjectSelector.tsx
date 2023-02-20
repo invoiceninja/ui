@@ -41,6 +41,7 @@ export function ProjectSelector(props: GenericSelectorProps<Project>) {
         queryAdditional
         actionLabel={t('new_project')}
         onActionClick={() => setIsModalOpen(true)}
+        errorMessage={props.errorMessage}
       />
     </>
   );
