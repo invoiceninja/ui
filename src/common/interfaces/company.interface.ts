@@ -61,6 +61,7 @@ export interface Settings {
   military_time: boolean;
   language_id: string;
   show_currency_code: boolean;
+  show_email_footer: boolean;
   company_gateway_ids: string;
   currency_id: string;
   custom_value1: string;
