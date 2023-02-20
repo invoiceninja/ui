@@ -109,6 +109,9 @@ export interface Settings {
   payment_number_counter: number;
   project_number_pattern: string;
   project_number_counter: number;
+  postmark_secret: string;
+  mailgun_secret: string;
+  mailgun_domain: string;
   purchase_order_number_pattern: string;
   purchase_order_number_counter: number;
   shared_invoice_quote_counter: boolean;
