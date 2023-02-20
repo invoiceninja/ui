@@ -21,13 +21,15 @@ interface Props {
 export function RecurringExpenseStatus(props: Props) {
   const [t] = useTranslation();
 
-  if (props.recurringExpense.remaining_cycles === 0)
+  const { recurringExpense } = props;
+
+  if (recurringExpense.remaining_cycles === 0)
     return <Badge variant="green">{t('completed')}</Badge>;
 
   return (
     <StatusBadge
       for={recurringExpenseStatus}
-      code={props.recurringExpense.status_id}
+      code={recurringExpense.status_id}
     />
   );
 }
