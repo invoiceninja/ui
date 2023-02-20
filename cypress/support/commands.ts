@@ -1,13 +1,5 @@
 /// <reference types="cypress" />
 
-// eslint-disable-next-line @typescript-eslint/no-namespace
-declare namespace Cypress {
-  interface Chainable {
-    login(username?: string, password?: string): Chainable<any>;
-    logout(): Chainable<any>;
-  }
-}
-
 Cypress.Commands.add('login', (email?: string, password?: string) => {
   cy.clearAllCookies();
   cy.clearAllLocalStorage();
