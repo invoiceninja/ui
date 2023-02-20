@@ -55,7 +55,8 @@
     "format": "prettier --write src/",
     "lint": "eslint \"**/*.{ts,tsx}\" --max-warnings=0",
     "test": "jest",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "preview": "vite preview"
   },
   "browserslist": {
     "production": [
