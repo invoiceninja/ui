@@ -47,6 +47,7 @@ export interface CompanyInput {
 
 export interface Settings {
   auto_archive_invoice: boolean;
+  auto_bill_standard_invoices: boolean;
   lock_invoices: string;
   enable_client_portal_tasks: boolean;
   show_all_tasks_client_portal: string;
