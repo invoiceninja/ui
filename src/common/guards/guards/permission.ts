@@ -24,6 +24,6 @@ export function permission(permission: Permissions): Guard {
         permissions.includes(`${action}_all`)
     );
 
-    return new Promise((resolve) => resolve(value));
+    return Promise.resolve(value);
   };
 }

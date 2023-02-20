@@ -15,22 +15,21 @@ import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-res
 import { Guard } from '../Guard';
 
 export function assigned(apiEndpoint: string, key = 'id'): Guard {
-  return async ({ params, user }) => {
+  return ({ params, user }) => {
     const id = params[key];
     const path = route(apiEndpoint, { id });
 
-    const response: GenericSingleResourceResponse<any> = await request(
-      'GET',
-      endpoint(path)
-    );
+    return request('GET', endpoint(path))
+      .then((response: GenericSingleResourceResponse<any>) => {
+        if (
+          response.data.data.user_id === user?.id ||
+          response.data.data.assigned_user_id === user?.id
+        ) {
+          return Promise.resolve(true);
+        }
 
-    if (
-      response.data.data.user_id === user?.id ||
-      response.data.data.assigned_user_id === user?.id
-    ) {
-      return new Promise((resolve) => resolve(true));
-    }
-
-    return new Promise((resolve) => resolve(false));
+        return Promise.resolve(false);
+      })
+      .catch(() => Promise.resolve(false));
   };
 }
