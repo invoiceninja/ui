@@ -42,59 +42,41 @@ export function useGuardContext() {
   return { companyUser, queryClient, params, user };
 }
 
-export function Guard(props: Props) {
-  const [pass, setPass] = useState(false);
-  const [loading, setLoading] = useState(false);
+enum State {
+  Authorized = 'authorized',
+  Loading = 'loading',
+  Unauthorized = 'unauthorized',
+}
 
+export function Guard(props: Props) {
+  const [state, setState] = useState<State>(State.Loading);
   const { companyUser, queryClient, params, user } = useGuardContext();
 
-  const check = async () => {
-    setLoading(true);
-
-    const values: boolean[] = [];
-
-    for (const guard of props.guards) {
-      values.push(await guard({ companyUser, queryClient, params, user }));
-    }
-
-    return values;
-  };
-
-  // useEffect(() => {
-  //   check()
-  //     .then((values) => {
-  //       if (values.includes(false)) {
-  //         return setPass(false);
-  //       }
-
-  //       return setPass(true);
-  //     })
-  //     .finally(() => setLoading(false));
-  // }, [user]);
-
   useEffect(() => {
-    check()
-      .then((values) => {
-        if (values.includes(false)) {
-          return setPass(false);
-        }
+    const promises = props.guards.map((guard) =>
+      guard({ companyUser, queryClient, params, user })
+    );
 
-        return setPass(true);
+    Promise.all(promises)
+      .then((values) => {
+        values.includes(false)
+          ? setState(State.Unauthorized)
+          : setState(State.Authorized);
       })
-      .finally(() => setLoading(false));
+      .catch(() => setState(State.Loading));
   });
 
-  return (
-    <>
-      {pass && !loading && props.component}
+  if (state === State.Loading) {
+    return (
+      <Default>
+        <Spinner />
+      </Default>
+    );
+  }
 
-      {loading && (
-        <Default>
-          <Spinner />
-        </Default>
-      )}
+  if (state === State.Unauthorized) {
+    return <Unauthorized />;
+  }
 
-      {!pass && !loading && <Unauthorized />}
-    </>
-  );
+  return props.component;
 }
