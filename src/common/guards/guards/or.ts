@@ -11,19 +11,19 @@
 import { Guard } from '../Guard';
 
 export function or(...guards: Guard[]): Guard {
-  return async (ctx) => {
-    const values: boolean[] = [];
+  return async (ctx) =>
+    // eslint-disable-next-line no-async-promise-executor
+    new Promise(async (resolve) => {
+      for (const guard of guards) {
+        const value = await guard(ctx);
 
-    for (const guard of guards) {
-      values.push(await guard(ctx));
-    }
+        if (value === true) {
+          resolve(true);
 
-    return await new Promise((resolve) => {
-      if (values.includes(true)) {
-        return resolve(true);
+          break;
+        }
       }
 
-      return resolve(false);
+      resolve(false);
     });
-  };
 }
