@@ -104,10 +104,10 @@ export function EmailSettings() {
             <option defaultChecked value="default">
               {t('default')}
             </option>
-            <option value="gmail">{t('gmail')}</option>
-            <option value="microsoft">{t('microsoft')}</option>
-            <option value="client_postmark">{t('postmark')}</option>
-            <option value="client_mailgun">{t('mailgun')}</option>
+            <option value="gmail">Gmail</option>
+            <option value="microsoft">Microsoft</option>
+            <option value="client_postmark">Postmark</option>
+            <option value="client_mailgun">Mailgun</option>
           </SelectField>
         </Element>
 
