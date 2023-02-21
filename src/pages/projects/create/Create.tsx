@@ -29,6 +29,7 @@ import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectAtom } from '../common/atoms';
 
@@ -36,6 +37,7 @@ export function Create() {
   const { documentTitle } = useTitle('new_project');
 
   const [t] = useTranslation();
+  const queryClient = useQueryClient();
 
   const pages = [
     { name: t('projects'), href: '/projects' },
@@ -104,6 +106,8 @@ export function Create() {
     request('POST', endpoint('/api/v1/projects'), project)
       .then((response) => {
         toast.success('created_project');
+
+        queryClient.invalidateQueries('/api/v1/projects');
 
         navigate(route('/projects/:id/edit', { id: response.data.data.id }));
       })
