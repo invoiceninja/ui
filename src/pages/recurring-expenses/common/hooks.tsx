@@ -10,7 +10,6 @@
 
 import { Expense } from 'common/interfaces/expense';
 import { StatusBadge } from 'components/StatusBadge';
-import recurringExpenseStatus from 'common/constants/recurring-expense';
 import recurringExpensesFrequency from 'common/constants/recurring-expense-frequency';
 import { useTranslation } from 'react-i18next';
 import { date, endpoint } from 'common/helpers';
@@ -45,6 +44,7 @@ import {
   MdStopCircle,
 } from 'react-icons/md';
 import { invalidationQueryAtom } from 'common/atoms/data-table';
+import { RecurringExpenseStatus as RecurringExpenseStatusBadge } from './components/RecurringExpenseStatus';
 
 export const recurringExpenseColumns = [
   'status',
@@ -129,7 +129,7 @@ export function useRecurringExpenseColumns() {
             id: recurringExpense.id,
           })}
         >
-          <StatusBadge for={recurringExpenseStatus} code={value} />
+          <RecurringExpenseStatusBadge recurringExpense={recurringExpense} />
         </Link>
       ),
     },
