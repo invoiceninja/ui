@@ -142,6 +142,11 @@ export const settingsRoutes = (
       <Route path="create" element={<Settings.CreateSubscription />} />
       <Route path=":id/edit" element={<Settings.EditSubscription />} />
     </Route>
+    <Route path="schedules">
+      <Route path="" element={<Settings.Schedules />} />
+      <Route path="create" element={<Settings.CreateSchedule />} />
+      <Route path=":id/edit" element={<Settings.EditSchedule />} />
+    </Route>
     <Route path="users">
       <Route path="" element={<Settings.Users />} />
       <Route path="create" element={<Settings.CreateUser />} />
