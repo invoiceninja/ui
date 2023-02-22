@@ -55,6 +55,7 @@ export function VendorSelector(props: VendorSelectorProps) {
           onActionClick={() => setIsModalOpen(true)}
           sortBy="name|asc"
           staleTime={props.staleTime}
+          errorMessage={props.errorMessage}
         />
       )}
     </>
