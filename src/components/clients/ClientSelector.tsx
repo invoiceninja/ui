@@ -56,6 +56,7 @@ export function ClientSelector(props: ClientSelectorProps) {
         staleTime={props.staleTime || 500}
         clearInputAfterSelection={props.clearInputAfterSelection}
         disableWithSpinner={props.disableWithSpinner}
+        errorMessage={props.errorMessage}
       />
     </>
   );
