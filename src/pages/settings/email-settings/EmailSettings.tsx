@@ -94,6 +94,56 @@ export function EmailSettings() {
 
         <Divider />
 
+        <Element leftSide={t('email_provider')}>
+          <SelectField
+            value={company?.settings.email_sending_method}
+            onValueChange={(value) =>
+              handleChange('settings.email_sending_method', value)
+            }
+          >
+            <option defaultChecked value="default">
+              {t('default')}
+            </option>
+            <option value="gmail">Gmail</option>
+            <option value="microsoft">Microsoft</option>
+            <option value="client_postmark">Postmark</option>
+            <option value="client_mailgun">Mailgun</option>
+          </SelectField>
+        </Element>
+
+        {company?.settings.email_sending_method === 'client_postmark' && (
+          <Element leftSide={t('secret')}>
+            <InputField
+              value={company?.settings.postmark_secret}
+              onValueChange={(value) =>
+                handleChange('settings.postmark_secret', value)
+              }
+            />
+          </Element>
+        )}
+
+        {company?.settings.email_sending_method === 'client_mailgun' && (
+          <>
+            <Element leftSide={t('secret')}>
+              <InputField
+                value={company?.settings.mailgun_secret}
+                onValueChange={(value) =>
+                  handleChange('settings.mailgun_secret', value)
+                }
+              />
+            </Element>
+
+            <Element leftSide={t('domain')}>
+              <InputField
+                value={company?.settings.mailgun_domain}
+                onValueChange={(value) =>
+                  handleChange('settings.mailgun_domain', value)
+                }
+              />
+            </Element>
+          </>
+        )}
+
         <Element leftSide={t('from_name')}>
           <InputField
             value={company?.settings.email_from_name}
