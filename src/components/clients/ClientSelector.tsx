@@ -21,6 +21,7 @@ export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   exclude?: (string | number)[];
   staleTime?: number;
   disableWithSpinner?: boolean;
+  clearInputAfterSelection?: boolean;
 }
 
 export function ClientSelector(props: ClientSelectorProps) {
@@ -53,6 +54,7 @@ export function ClientSelector(props: ClientSelectorProps) {
         sortBy="display_name|asc"
         exclude={props.exclude}
         staleTime={props.staleTime || 500}
+        clearInputAfterSelection={props.clearInputAfterSelection}
         disableWithSpinner={props.disableWithSpinner}
       />
     </>
