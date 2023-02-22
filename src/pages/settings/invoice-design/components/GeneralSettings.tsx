@@ -20,7 +20,7 @@ import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, ClickableElement, Element } from '../../../../components/cards';
-import { SelectField } from '../../../../components/forms';
+import { Radio, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 
 export function GeneralSettings() {
@@ -963,12 +963,19 @@ export function GeneralSettings() {
       <Divider />
 
       <Element leftSide={t('empty_columns')}>
-        <Toggle
-          checked={company?.settings?.hide_empty_columns_on_pdf}
-          id="settings.hide_empty_columns_on_pdf"
-          onChange={(value: boolean) =>
-            handleToggleChange('settings.hide_empty_columns_on_pdf', value)
+        <Radio
+          name="empty_columns"
+          options={[
+            { id: 'hide', title: t('hide'), value: 'true' },
+            { id: 'show', title: t('show'), value: 'false' },
+          ]}
+          onValueChange={(value) =>
+            handleToggleChange(
+              'settings.hide_empty_columns_on_pdf',
+              value === 'true' ? true : false
+            )
           }
+          defaultSelected={company?.settings?.hide_empty_columns_on_pdf?.toString()}
         />
       </Element>
 
