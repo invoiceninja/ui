@@ -145,6 +145,11 @@ export function Settings(props: Props) {
       current: location.pathname.startsWith('/settings/subscriptions'),
     },
     {
+      name: t('schedules'),
+      href: '/settings/schedules',
+      current: location.pathname.startsWith('/settings/schedules'),
+    },
+    {
       name: t('user_management'),
       href: '/settings/users',
       current: location.pathname.startsWith('/settings/users'),
