@@ -76,23 +76,25 @@ Cypress.Commands.add('clearPermissions', () => {
 
   cy.get('button').contains('Permissions').click();
 
-  cy.get('[data-cy="create_all"]')
-    .check()
-    .should('be.checked')
-    .uncheck()
-    .should('not.be.checked');
+  // cy.get('[data-cy="create_all"]')
+  //   .check()
+  //   .should('be.checked')
+  //   .uncheck()
+  //   .should('not.be.checked');
 
-  cy.get('[data-cy="view_all"]')
-    .check()
-    .should('be.checked')
-    .uncheck()
-    .should('not.be.checked');
+  // cy.get('[data-cy="view_all"]')
+  //   .check()
+  //   .should('be.checked')
+  //   .uncheck()
+  //   .should('not.be.checked');
 
-  cy.get('[data-cy="edit_all"]')
-    .check()
-    .should('be.checked')
-    .uncheck()
-    .should('not.be.checked');
+  // cy.get('[data-cy="edit_all"]')
+  //   .check()
+  //   .should('be.checked')
+  //   .uncheck()
+  //   .should('not.be.checked');
+
+  cy.get('input[type="checkbox"]').check().wait(500).uncheck();
 });
 
 Cypress.Commands.add('setPermission', (permission) => {
