@@ -136,6 +136,13 @@ export const settingsRoutes = (
       <Route path="create" element={<Settings.CreateBankAccount />} />
       <Route path=":id/edit" element={<Settings.EditBankAccount />} />
     </Route>
+
+    <Route path="bank_accounts/transaction_rules">
+      <Route path="" element={<Settings.TransactionRules />} />
+      <Route path="create" element={<Settings.CreateTransactionRule />} />
+      <Route path=":id/edit" element={<Settings.EditTransactionRule />} />
+    </Route>
+
     <Route path="group_settings" element={<Settings.GroupSettings />} />
     <Route path="subscriptions">
       <Route path="" element={<Settings.Subscriptions />} />
