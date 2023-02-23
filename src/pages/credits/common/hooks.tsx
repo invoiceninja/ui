@@ -273,19 +273,19 @@ export function useActions() {
   const cloneToCredit = (credit: Credit) => {
     setCredit({ ...credit, number: '', documents: [] });
 
-    navigate('/credits/create');
+    navigate('/credits/create?action=clone');
   };
 
   const cloneToInvoice = (credit: Credit) => {
     setInvoice({ ...credit, number: '', documents: [] });
 
-    navigate('/invoices/create');
+    navigate('/invoices/create?action=clone');
   };
 
   const cloneToQuote = (credit: Credit) => {
     setQuote({ ...(credit as Quote), number: '', documents: [] });
 
-    navigate('/quotes/create');
+    navigate('/quotes/create?action=clone');
   };
 
   const cloneToRecurringInvoice = (credit: Credit) => {
@@ -295,7 +295,7 @@ export function useActions() {
       documents: [],
     });
 
-    navigate('/recurring_invoices/create');
+    navigate('/recurring_invoices/create?action=clone');
   };
 
   const cloneToPurchaseOrder = (credit: Credit) => {
@@ -305,7 +305,7 @@ export function useActions() {
       documents: [],
     });
 
-    navigate('/purchase_orders/create');
+    navigate('/purchase_orders/create?action=clone');
   };
 
   const actions: Action<Credit>[] = [
@@ -482,7 +482,7 @@ export const creditColumns = [
   // 'vendor', @Todo: Need to fetch the relationship
 ] as const;
 
-type CreditColumns = typeof creditColumns[number];
+type CreditColumns = (typeof creditColumns)[number];
 
 export const defaultColumns: CreditColumns[] = [
   'status',
