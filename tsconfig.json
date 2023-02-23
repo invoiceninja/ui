@@ -14,7 +14,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "isolatedModules": true,
+    "isolatedModules": false,
     "noEmit": true,
     "jsx": "react-jsx",
     "downlevelIteration": true,
@@ -23,7 +23,8 @@
       "@invoiceninja/forms": ["components/forms"],
       "@invoiceninja/cards": ["components/cards"],
       "@invoiceninja/tables": ["components/tables"]
-    }
+    },
+    "types": ["cypress"]
   },
-  "include": ["src"]
+  "include": ["src", "cypress/**/*.ts"]
 }
