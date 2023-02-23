@@ -10,7 +10,7 @@
 
 import { route } from 'common/helpers/route';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -45,9 +45,8 @@ export function Edit() {
   const { id } = useParams();
   const { documentTitle } = useTitle('edit_recurring_invoice');
   const { data } = useRecurringInvoiceQuery({ id: id! });
-  const user = useCurrentUser();
 
-  const showPdfPreview = user?.company_user?.react_settings?.show_pdf_preview;
+  const reactSettings = useReactSettings();
 
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
@@ -163,7 +162,7 @@ export function Edit() {
         )}
       </div>
 
-      {(showPdfPreview === true || typeof showPdfPreview === 'undefined') && (
+      {reactSettings?.show_pdf_preview && (
         <div className="my-4">
           {recurringInvoice && (
             <InvoicePreview

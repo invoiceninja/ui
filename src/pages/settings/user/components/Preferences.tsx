@@ -17,11 +17,10 @@ import { updateChanges } from 'common/stores/slices/user';
 
 export function Preferences() {
   const [t] = useTranslation();
-  const userChanges = useSelector((state: RootState) => state.user.changes);
+  const reactSettingsChanges = useSelector(
+    (state: RootState) => state.user.changes?.company_user?.react_settings
+  );
   const dispatch = useDispatch();
-
-  const showPdfPreview =
-    userChanges?.company_user?.react_settings?.show_pdf_preview;
 
   const handleChange = (property: string, value: string | boolean) => {
     dispatch(
@@ -37,7 +36,8 @@ export function Preferences() {
       <Element leftSide={t('show_pdf_preview')}>
         <Toggle
           checked={
-            showPdfPreview === true || typeof showPdfPreview === 'undefined'
+            reactSettingsChanges.show_pdf_preview === true ||
+            typeof reactSettingsChanges.show_pdf_preview === 'undefined'
           }
           onValueChange={(value) =>
             handleChange('company_user.react_settings.show_pdf_preview', value)

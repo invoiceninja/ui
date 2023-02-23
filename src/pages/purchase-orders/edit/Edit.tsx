@@ -10,7 +10,7 @@
 
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { route } from 'common/helpers/route';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -44,9 +44,8 @@ export function Edit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { data } = usePurchaseOrderQuery({ id });
-  const user = useCurrentUser();
 
-  const showPdfPreview = user?.company_user?.react_settings?.show_pdf_preview;
+  const reactSettings = useReactSettings();
 
   const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
@@ -184,7 +183,7 @@ export function Edit() {
         )}
       </div>
 
-      {(showPdfPreview === true || typeof showPdfPreview === 'undefined') && (
+      {reactSettings?.show_pdf_preview && (
         <div className="my-4">
           {purchaseOrder && (
             <InvoicePreview

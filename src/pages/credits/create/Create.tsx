@@ -10,7 +10,7 @@
 
 import { blankInvitation } from 'common/constants/blank-invitation';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -37,9 +37,8 @@ import { useBlankCreditQuery } from '../common/queries';
 export function Create() {
   const { documentTitle } = useTitle('new_credit');
   const { t } = useTranslation();
-  const user = useCurrentUser();
 
-  const showPdfPreview = user?.company_user?.react_settings?.show_pdf_preview;
+  const reactSettings = useReactSettings();
 
   const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
@@ -190,7 +189,7 @@ export function Create() {
         )}
       </div>
 
-      {(showPdfPreview === true || typeof showPdfPreview === 'undefined') && (
+      {reactSettings?.show_pdf_preview && (
         <div className="my-4">
           {credit && (
             <InvoicePreview

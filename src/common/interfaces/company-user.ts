@@ -12,7 +12,7 @@ import { Account } from './account';
 import { Company } from './company.interface';
 import { User } from './user';
 
-interface ReactSettings {
+export interface ReactSettings {
   show_pdf_preview: boolean;
 }
 

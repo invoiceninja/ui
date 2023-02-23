@@ -11,7 +11,7 @@
 import { blankInvitation } from 'common/constants/blank-invitation';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { Invoice } from 'common/interfaces/invoice';
@@ -48,9 +48,8 @@ export type ChangeHandler = <T extends keyof Invoice>(
 export function Create() {
   const { t } = useTranslation();
   const { documentTitle } = useTitle('new_invoice');
-  const user = useCurrentUser();
 
-  const showPdfPreview = user?.company_user?.react_settings?.show_pdf_preview;
+  const reactSettings = useReactSettings();
 
   const [invoice, setInvoice] = useAtom(invoiceAtom);
 
@@ -256,7 +255,7 @@ export function Create() {
         )}
       </div>
 
-      {(showPdfPreview === true || typeof showPdfPreview === 'undefined') && (
+      {reactSettings?.show_pdf_preview && (
         <div className="my-4">
           {invoice && (
             <InvoicePreview
