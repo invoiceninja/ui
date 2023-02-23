@@ -10,6 +10,7 @@
 
 import { Guard } from 'common/guards/Guard';
 import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
+import { isDemo } from 'common/helpers';
 import { Route } from 'react-router-dom';
 import * as Settings from './index';
 
@@ -51,7 +52,17 @@ export const settingsRoutes = (
     <Route path="expense_settings" element={<Settings.ExpenseSettings />} />
     <Route path="workflow_settings" element={<Settings.WorkflowSettings />} />
     <Route path="import_export" element={<Settings.ImportExport />} />
-    <Route path="account_management" element={<Settings.AccountManagement />} />
+    <Route path="account_management" element={<Settings.AccountManagement />}>
+      <Route path="" element={<Settings.Plan />} />
+      <Route path="overview" element={<Settings.AccountManagementOverview />} />
+      <Route path="enabled_modules" element={<Settings.EnabledModules />} />
+      <Route path="integrations" element={<Settings.Integrations />} />
+      <Route path="security_settings" element={<Settings.SecuritySettings />} />
+      {!isDemo() && (
+        <Route path="danger_zone" element={<Settings.DangerZone />} />
+      )}
+    </Route>
+
     <Route path="backup_restore" element={<Settings.CompanyBackupRestore />}>
       <Route path="" element={<Settings.CompanyBackup />} />
       <Route path="restore" element={<Settings.CompanyRestore />} />
@@ -126,6 +137,13 @@ export const settingsRoutes = (
       <Route path="create" element={<Settings.CreateBankAccount />} />
       <Route path=":id/edit" element={<Settings.EditBankAccount />} />
     </Route>
+
+    <Route path="bank_accounts/transaction_rules">
+      <Route path="" element={<Settings.TransactionRules />} />
+      <Route path="create" element={<Settings.CreateTransactionRule />} />
+      <Route path=":id/edit" element={<Settings.EditTransactionRule />} />
+    </Route>
+
     <Route path="group_settings" element={<Settings.GroupSettings />} />
     <Route path="subscriptions">
       <Route path="" element={<Settings.Subscriptions />} />

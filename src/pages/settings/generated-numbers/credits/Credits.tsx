@@ -17,6 +17,9 @@ import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { useDispatch } from 'react-redux';
 import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
 import { ChangeEvent } from 'react';
+import { CopyToClipboard } from 'components/CopyToClipboard';
+import { Divider } from 'components/cards/Divider';
+import { LinkToVariables } from '../common/components/LinkToVariables';
 
 export function Credits() {
   const [t] = useTranslation();
@@ -65,16 +68,20 @@ export function Credits() {
         />
       </Element>
 
-      <Card>
-        {variables.map((item, index) => (
-          <ClickableElement
-            onClick={() => setPattern(pattern + item)}
-            key={index}
-          >
-            {item}
-          </ClickableElement>
-        ))}
-      </Card>
+      <Divider />
+
+      {variables.map((item, index) => (
+        <ClickableElement
+          onClick={() => setPattern(pattern + item)}
+          key={index}
+        >
+          <CopyToClipboard text={item} />
+        </ClickableElement>
+      ))}
+
+      <Divider />
+
+      <LinkToVariables />
     </Card>
   );
 }

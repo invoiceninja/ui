@@ -105,5 +105,5 @@ export function isDemo() {
 }
 
 export function isProduction() {
-  return import.meta.env.VITE_IS_PRODUCTION === 'true';
+  return import.meta.env.PROD;
 }

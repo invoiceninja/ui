@@ -58,6 +58,7 @@ export function ExpenseCategorySelector(props: ExpenseCategorySelectorProps) {
           onActionClick={() => setIsModalOpen(true)}
           sortBy="name|asc"
           staleTime={props.staleTime}
+          errorMessage={props.errorMessage}
         />
       )}
     </>

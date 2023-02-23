@@ -22,6 +22,7 @@ interface Props {
   onClearButtonClick?: () => unknown;
   onProductCreated?: (product: Product) => unknown;
   onInputFocus?: () => unknown;
+  errorMessage?: string | string[];
 }
 
 export function ProductSelector(props: Props) {
@@ -45,6 +46,7 @@ export function ProductSelector(props: Props) {
         onInputFocus={props.onInputFocus}
         sortBy="product_key|asc"
         withShadowRecord
+        errorMessage={props.errorMessage}
       />
 
       <ProductCreate

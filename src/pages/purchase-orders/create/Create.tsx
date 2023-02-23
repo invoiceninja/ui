@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isProduction } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTitle } from 'common/hooks/useTitle';
@@ -63,36 +62,41 @@ export function Create() {
   });
 
   useEffect(() => {
-    if (data && !purchaseOrder) {
-      const po = cloneDeep(data);
+    setPurchaseOrder((current) => {
+      let value = current;
 
-      if (typeof po.line_items === 'string') {
-        po.line_items = [];
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
       }
 
-      po.line_items.forEach((item) => (item._id = v4()));
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const po = cloneDeep(data);
 
-      po.invitations.forEach(
-        (invitation) =>
-          (invitation['client_contact_id'] = invitation.client_contact_id || '')
-      );
+        if (typeof po.line_items === 'string') {
+          po.line_items = [];
+        }
 
-      setPurchaseOrder(po);
-    }
+        if (searchParams.get('vendor')) {
+          po.vendor_id = searchParams.get('vendor')!;
+        }
 
-    if (searchParams.has('vendor')) {
-      setPurchaseOrder(
-        (current) =>
-          current && {
-            ...current,
-            vendor_id: searchParams.get('vendor') as string,
-          }
-      );
-    }
+        po.line_items.forEach((item) => (item._id = v4()));
 
-    return () => {
-      isProduction() && setPurchaseOrder(undefined);
-    };
+        po.invitations.forEach(
+          (invitation) =>
+            (invitation['client_contact_id'] =
+              invitation.client_contact_id || '')
+        );
+
+        value = po;
+      }
+
+      return value;
+    });
   }, [data]);
 
   const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();

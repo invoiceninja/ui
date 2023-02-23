@@ -9,7 +9,6 @@
  */
 
 import { blankInvitation } from 'common/constants/blank-invitation';
-import { isProduction } from 'common/helpers';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useTitle } from 'common/hooks/useTitle';
@@ -76,23 +75,33 @@ export function Create() {
   } = useQuoteUtilities({ client });
 
   useEffect(() => {
-    if (typeof data !== 'undefined' && typeof quote === 'undefined') {
-      const _quote = cloneDeep(data);
+    setQuote((current) => {
+      let value = current;
 
-      if (typeof _quote.line_items === 'string') {
-        _quote.line_items = [];
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
       }
 
-      if (searchParams.get('client')) {
-        _quote.client_id = searchParams.get('client')!;
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const _quote = cloneDeep(data);
+
+        if (typeof _quote.line_items === 'string') {
+          _quote.line_items = [];
+        }
+
+        if (searchParams.get('client')) {
+          _quote.client_id = searchParams.get('client')!;
+        }
+
+        return (value = _quote);
       }
 
-      setQuote(_quote);
-    }
-
-    return () => {
-      isProduction() && setQuote(undefined);
-    };
+      return value;
+    });
   }, [data]);
 
   useEffect(() => {
@@ -137,6 +146,7 @@ export function Create() {
           onClearButtonClick={() => handleChange('client_id', '')}
           onContactCheckboxChange={handleInvitationChange}
           errorMessage={errors?.errors.client_id}
+          disableWithSpinner={searchParams.get('action') === 'create'}
         />
 
         <QuoteDetails handleChange={handleChange} errors={errors} />

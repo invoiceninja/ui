@@ -89,7 +89,7 @@ export function useActions() {
   const cloneToExpense = (expense: Expense) => {
     setExpense({ ...expense, documents: [], number: '' });
 
-    navigate('/expenses/create');
+    navigate('/expenses/create?action=clone');
   };
 
   const cloneToRecurringExpense = (expense: Expense) => {
@@ -99,7 +99,7 @@ export function useActions() {
       number: '',
     });
 
-    navigate('/recurring_expenses/create');
+    navigate('/recurring_expenses/create?action=clone');
   };
 
   const actions: Action<Expense>[] = [
