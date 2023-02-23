@@ -7,44 +7,38 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+
 import { AxiosError } from 'axios';
 import { invalidationQueryAtom } from 'common/atoms/data-table';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
+import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
 
-export function usePurgeClient(clientId: string | undefined) {
-  const navigate = useNavigate();
+export function useBulk() {
   const queryClient = useQueryClient();
-
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (password: string) => {
+  return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
 
-    request(
-      'POST',
-      endpoint('/api/v1/clients/:id/purge', { id: clientId }),
-      {},
-      { headers: { 'X-Api-Password': password } }
-    )
+    request('POST', endpoint('/api/v1/clients/bulk'), {
+      action,
+      ids: [id],
+    })
       .then(() => {
-        toast.success('purged_client');
+        toast.success(`${action}d_client`);
 
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
 
-        navigate('/clients');
+        queryClient.invalidateQueries(route('/api/v1/clients/:id', { id }));
       })
       .catch((error: AxiosError) => {
         console.error(error);
-
-        error.response?.status === 412
-          ? toast.error('password_error_incorrect')
-          : toast.error();
+        toast.error();
       });
   };
 }
