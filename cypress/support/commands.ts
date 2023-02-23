@@ -34,6 +34,8 @@ declare global {
       login(email?: string, password?: string): Chainable<void>;
       logout(): Chainable<void>;
       clearPermissions(): Chainable<void>;
+      setPermission(permission: string): Chainable<void>;
+      clearPermission(permission: string): Chainable<void>;
     }
   }
 }
@@ -74,11 +76,31 @@ Cypress.Commands.add('clearPermissions', () => {
 
   cy.get('button').contains('Permissions').click();
 
-  cy.get('[data-cy="create_all"]').uncheck().should('not.be.checked');
+  cy.get('[data-cy="create_all"]')
+    .check()
+    .should('be.checked')
+    .uncheck()
+    .should('not.be.checked');
 
-  cy.get('[data-cy="view_all"]').uncheck().should('not.be.checked');
+  cy.get('[data-cy="view_all"]')
+    .check()
+    .should('be.checked')
+    .uncheck()
+    .should('not.be.checked');
 
-  cy.get('[data-cy="edit_all"]').uncheck().should('not.be.checked');
+  cy.get('[data-cy="edit_all"]')
+    .check()
+    .should('be.checked')
+    .uncheck()
+    .should('not.be.checked');
+});
+
+Cypress.Commands.add('setPermission', (permission) => {
+  cy.get(`[data-cy="${permission}"]`).check().should('be.checked');
+});
+
+Cypress.Commands.add('clearPermission', (permission) => {
+  cy.get(`[data-cy="${permission}"]`).uncheck().should('not.be.checked');
 });
 
 export {};
