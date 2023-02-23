@@ -13,6 +13,7 @@ import { endpoint, isProduction } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import React, {
   ChangeEvent,
+  ReactElement,
   ReactNode,
   useEffect,
   useRef,
@@ -72,6 +73,8 @@ interface Props<T> {
   onTableRowClick?: (resource: T) => unknown;
   beforeFilter?: ReactNode;
 }
+
+type ResourceAction<T> = (resource: T) => ReactElement;
 
 export const datatablePerPageAtom = atomWithStorage('perPage', '10');
 
@@ -353,7 +356,10 @@ export function DataTable<T extends object>(props: Props<T>) {
 
                       {props.customActions &&
                         props.customActions.map(
-                          (action: any, index: number) =>
+                          (
+                            action: ResourceAction<typeof resource>,
+                            index: number
+                          ) =>
                             action(resource).key !== 'purge' && (
                               <div key={index}>{action(resource)}</div>
                             )
@@ -390,7 +396,10 @@ export function DataTable<T extends object>(props: Props<T>) {
 
                       {props.customActions &&
                         props.customActions.map(
-                          (action: any, index: number) =>
+                          (
+                            action: ResourceAction<typeof resource>,
+                            index: number
+                          ) =>
                             action(resource).key === 'purge' && (
                               <div key={index}>{action(resource)}</div>
                             )
