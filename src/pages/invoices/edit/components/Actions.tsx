@@ -72,19 +72,19 @@ export function useActions() {
   const cloneToInvoice = (invoice: Invoice) => {
     setInvoice({ ...invoice, number: '', documents: [] });
 
-    navigate('/invoices/create');
+    navigate('/invoices/create?action=clone');
   };
 
   const cloneToQuote = (invoice: Invoice) => {
     setQuote({ ...(invoice as unknown as Quote), number: '', documents: [] });
 
-    navigate('/quotes/create');
+    navigate('/quotes/create?action=clone');
   };
 
   const cloneToCredit = (invoice: Invoice) => {
     setCredit({ ...(invoice as unknown as Credit), number: '', documents: [] });
 
-    navigate('/credits/create');
+    navigate('/credits/create?action=clone');
   };
 
   const cloneToRecurringInvoice = (invoice: Invoice) => {
@@ -94,7 +94,7 @@ export function useActions() {
       documents: [],
     });
 
-    navigate('/recurring_invoices/create');
+    navigate('/recurring_invoices/create?action=clone');
   };
 
   const cloneToPurchaseOrder = (invoice: Invoice) => {
@@ -104,7 +104,7 @@ export function useActions() {
       documents: [],
     });
 
-    navigate('/purchase_orders/create');
+    navigate('/purchase_orders/create?action=clone');
   };
 
   return [

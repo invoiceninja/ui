@@ -76,6 +76,8 @@ export function Project() {
         toast.success('updated_project');
 
         queryClient.invalidateQueries(route('/api/v1/projects/:id', { id }));
+
+        queryClient.invalidateQueries('/api/v1/projects');
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status == 422) {

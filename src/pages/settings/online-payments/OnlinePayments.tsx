@@ -64,6 +64,18 @@ export function OnlinePayments() {
       onCancelClick={onCancel}
     >
       <Card title={t('settings')}>
+        <Element leftSide={t('auto_bill_standard_invoices')}>
+          <Toggle
+            checked={company?.settings?.auto_bill_standard_invoices || false}
+            onChange={(value) =>
+              handleChangeProperty(
+                'settings.auto_bill_standard_invoices',
+                value
+              )
+            }
+          />
+        </Element>
+
         <Element leftSide={t('auto_bill')}>
           <SelectField
             value={company?.settings?.auto_bill}

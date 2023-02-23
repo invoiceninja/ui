@@ -34,6 +34,7 @@ export function UserSelector(props: GenericSelectorProps<User>) {
       queryAdditional
       actionLabel={t('new_user')}
       onActionClick={() => navigate('/settings/users')}
+      errorMessage={props.errorMessage}
     />
   );
 }
