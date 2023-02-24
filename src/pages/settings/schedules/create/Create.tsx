@@ -9,6 +9,7 @@
  */
 
 import { AxiosError } from 'axios';
+import { Frequency } from 'common/enums/frequency';
 import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
@@ -54,7 +55,7 @@ export function Create() {
       setSchedule({
         ...blankSchedule,
         template: 'email_statement',
-        frequency_id: '5',
+        frequency_id: Frequency.Monthly,
         parameters: {
           clients: [],
           date_range: 'last7_days',
