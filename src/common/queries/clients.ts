@@ -38,9 +38,9 @@ interface Props {
 
 export function useClientsQuery(props: Props) {
   return useQuery(
-    ['/api/v1/clients?filter_deleted_clients=true'],
+    ['/api/v1/clients?filter_deleted_clients=true?per_page=500'],
     () =>
-      request('GET', endpoint('/api/v1/clients')).then(
+      request('GET', endpoint('/api/v1/clients?per_page=500')).then(
         (response) => response.data.data
       ),
     { enabled: props.enabled ?? true, staleTime: Infinity }
