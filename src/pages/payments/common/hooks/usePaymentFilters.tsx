@@ -28,8 +28,8 @@ export function usePaymentFilters() {
       backgroundColor: '#6B7280',
     },
     {
-      label: t('voided'),
-      value: 'voided',
+      label: t('cancelled'),
+      value: 'cancelled',
       color: 'white',
       backgroundColor: '#93C5FD',
     },
@@ -54,12 +54,6 @@ export function usePaymentFilters() {
     {
       label: t('refunded'),
       value: 'refunded',
-      color: 'white',
-      backgroundColor: '#6B7280',
-    },
-    {
-      label: t('unapplied'),
-      value: 'unapplied',
       color: 'white',
       backgroundColor: '#6B7280',
     },
