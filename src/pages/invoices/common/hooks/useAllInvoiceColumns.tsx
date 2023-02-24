@@ -15,6 +15,7 @@ import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 export function useAllInvoiceColumns() {
   const [t] = useTranslation();
   const company = useCurrentCompany();
+  const customFields = company?.custom_fields;
 
   const invoiceColumns = [
     'status',
@@ -32,18 +33,18 @@ export function useAllInvoiceColumns() {
     'client_state',
     'contact_email',
     'contact_name',
-    (company?.custom_fields.invoice1 &&
-      customField(company?.custom_fields.invoice1).label()) ||
-      t('custom1'),
-    (company?.custom_fields.invoice2 &&
-      customField(company?.custom_fields.invoice2).label()) ||
-      t('custom2'),
-    (company?.custom_fields.invoice3 &&
-      customField(company?.custom_fields.invoice3).label()) ||
-      t('custom3'),
-    (company?.custom_fields.invoice4 &&
-      customField(company?.custom_fields.invoice4).label()) ||
-      t('custom4'),
+    customFields?.invoice1
+      ? customField(customFields.invoice1).label()
+      : t('custom1'),
+    customFields?.invoice2
+      ? customField(customFields.invoice2).label()
+      : t('custom2'),
+    customFields?.invoice3
+      ? customField(customFields.invoice3).label()
+      : t('custom3'),
+    customFields?.invoice4
+      ? customField(customFields.invoice4).label()
+      : t('custom4'),
     'discount',
     'documents',
     'entity_state',

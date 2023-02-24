@@ -14,17 +14,15 @@ import { route } from 'common/helpers/route';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { useResolveCountry } from 'common/hooks/useResolveCountry';
 import { Credit } from 'common/interfaces/credit';
 import { Invoice } from 'common/interfaces/invoice';
-import { User } from 'common/interfaces/user';
-import { RootState } from 'common/stores/store';
 import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
 import { DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useAllInvoiceColumns } from './useAllInvoiceColumns';
 import { useDefaultInvoiceColumns } from './useDefaultInvoiceColumns';
@@ -57,33 +55,28 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const currentUser = useCurrentUser();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
   const resolveCountry = useResolveCountry();
 
-  const firstCustomFieldLabel =
-    (company?.custom_fields.invoice1 &&
-      customField(company?.custom_fields.invoice1).label()) ||
-    t('first_custom');
+  const customFields = company?.custom_fields;
 
-  const secondCustomFieldLabel =
-    (company?.custom_fields.invoice2 &&
-      customField(company?.custom_fields.invoice2).label()) ||
-    t('second_custom');
+  const firstCustomFieldLabel = customFields?.invoice1
+    ? customField(customFields.invoice1).label()
+    : t('first_custom');
 
-  const thirdCustomFieldLabel =
-    (company?.custom_fields.invoice3 &&
-      customField(company?.custom_fields.invoice3).label()) ||
-    t('third_custom');
+  const secondCustomFieldLabel = customFields?.invoice2
+    ? customField(customFields.invoice2).label()
+    : t('second_custom');
 
-  const fourthCustomFieldLabel =
-    (company?.custom_fields.invoice4 &&
-      customField(company?.custom_fields.invoice4).label()) ||
-    t('fourth_custom');
+  const thirdCustomFieldLabel = customFields?.invoice3
+    ? customField(customFields.invoice3).label()
+    : t('third_custom');
 
-  const currentUser = useSelector((state: RootState) => state.user.user) as
-    | User
-    | undefined;
+  const fourthCustomFieldLabel = customFields?.invoice4
+    ? customField(customFields.invoice4).label()
+    : t('fourth_custom');
 
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
