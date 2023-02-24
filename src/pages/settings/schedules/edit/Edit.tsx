@@ -63,7 +63,7 @@ export function Edit() {
       setErrors(undefined);
       toast.processing();
 
-      request('PUT', endpoint('/api/v1/task_schedulers'), schedule)
+      request('PUT', endpoint('/api/v1/task_schedulers/:id', { id }), schedule)
         .then(() => {
           toast.success('updated_schedule');
 
@@ -100,6 +100,7 @@ export function Edit() {
           schedule={schedule}
           handleChange={handleChange}
           errors={errors}
+          page="edit"
         />
       ) : (
         <Spinner />

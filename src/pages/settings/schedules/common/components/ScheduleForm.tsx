@@ -24,15 +24,16 @@ interface Props {
     value: Schedule[keyof Schedule]
   ) => void;
   errors: ValidationBag | undefined;
+  page?: 'create' | 'edit';
 }
 
 export function ScheduleForm(props: Props) {
   const [t] = useTranslation();
 
-  const { schedule, handleChange, errors } = props;
+  const { schedule, handleChange, errors, page } = props;
 
   return (
-    <Card title={t('new_schedule')}>
+    <Card title={page === 'edit' ? t('edit_schedule') : t('new_schedule')}>
       <Element leftSide={t('name')} required>
         <InputField
           value={schedule.name}
@@ -97,6 +98,7 @@ export function ScheduleForm(props: Props) {
           schedule={schedule}
           handleChange={handleChange}
           errors={errors}
+          page={page}
         />
       )}
     </Card>
