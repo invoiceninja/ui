@@ -14,6 +14,7 @@ import { useAccentColor } from 'common/hooks/useAccentColor';
 import { Client } from 'common/interfaces/client';
 import { Schedule } from 'common/interfaces/schedule';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useClientsQuery } from 'common/queries/clients';
 import { ClientSelector } from 'components/clients/ClientSelector';
 import Toggle from 'components/forms/Toggle';
 import { useEffect, useState } from 'react';
@@ -27,13 +28,18 @@ interface Props {
     value: Schedule[keyof Schedule]
   ) => void;
   errors: ValidationBag | undefined;
+  page?: 'create' | 'edit';
 }
 
 export function EmailStatement(props: Props) {
   const [t] = useTranslation();
   const accentColor = useAccentColor();
 
-  const { schedule, handleChange, errors } = props;
+  const { schedule, handleChange, errors, page } = props;
+
+  const { data: clientsResponse } = useClientsQuery({
+    enabled: page === 'edit',
+  });
 
   const [selectedClients, setSelectedClients] = useState<Client[]>([]);
 
@@ -46,8 +52,18 @@ export function EmailStatement(props: Props) {
   };
 
   useEffect(() => {
+    if (page === 'edit') {
+      const clients = clientsResponse?.filter((client: Client) =>
+        schedule.parameters.clients?.includes(client.id)
+      );
+
+      setSelectedClients(clients);
+    }
+  }, []);
+
+  useEffect(() => {
     const currentParameters = { ...schedule.parameters };
-    currentParameters.clients = selectedClients.map(({ id }) => id);
+    currentParameters.clients = selectedClients?.map(({ id }) => id);
 
     handleChange('parameters', currentParameters);
   }, [selectedClients]);
@@ -122,7 +138,7 @@ export function EmailStatement(props: Props) {
 
         <div className="flex justify-center">
           <div className="flex flex-col space-y-2 pt-3">
-            {selectedClients.map((client, index) => (
+            {selectedClients?.map((client, index) => (
               <div
                 key={client.id}
                 className="flex items-center justify-between"
@@ -139,7 +155,7 @@ export function EmailStatement(props: Props) {
             ))}
           </div>
 
-          {!selectedClients.length && (
+          {!selectedClients?.length && (
             <span className="text-gray-500 self-center text-xl mt-4">
               {t('all_clients')}
             </span>
