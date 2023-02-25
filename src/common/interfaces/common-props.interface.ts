@@ -20,4 +20,5 @@ export default interface CommonProps {
   innerRef?: any;
   disabled?: boolean;
   style?: CSSProperties;
+  cypressRef?: string;
 }
