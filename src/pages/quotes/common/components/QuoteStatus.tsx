@@ -20,6 +20,12 @@ interface Props {
 export function QuoteStatus(props: Props) {
   const [t] = useTranslation();
 
+  const checkInvoiceInvitationsViewedDate = () => {
+    return props.entity.invitations.every(
+      (invitation) => invitation.viewed_date
+    );
+  };
+
   if (props.entity.is_deleted)
     return <Badge variant="red">{t('deleted')}</Badge>;
 
@@ -28,6 +34,12 @@ export function QuoteStatus(props: Props) {
 
   if (props.entity.invoice_id)
     return <Badge variant="green">{t('converted')}</Badge>;
+
+  if (
+    props.entity.status_id === QuoteStatusEnum.Sent &&
+    checkInvoiceInvitationsViewedDate()
+  )
+    return <Badge variant="yellow">{t('viewed')}</Badge>;
 
   switch (props.entity.status_id) {
     case QuoteStatusEnum.Draft:
