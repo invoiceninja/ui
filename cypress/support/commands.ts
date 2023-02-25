@@ -36,6 +36,8 @@ declare global {
       clearPermissions(): Chainable<void>;
       setPermission(permission: string): Chainable<void>;
       clearPermission(permission: string): Chainable<void>;
+      assertNoPermissionNotVisible(): Chainable<void>;
+      assertNoPermissionIsVisible(): Chainable<void>;
     }
   }
 }
@@ -76,24 +78,6 @@ Cypress.Commands.add('clearPermissions', () => {
 
   cy.get('button').contains('Permissions').click();
 
-  // cy.get('[data-cy="create_all"]')
-  //   .check()
-  //   .should('be.checked')
-  //   .uncheck()
-  //   .should('not.be.checked');
-
-  // cy.get('[data-cy="view_all"]')
-  //   .check()
-  //   .should('be.checked')
-  //   .uncheck()
-  //   .should('not.be.checked');
-
-  // cy.get('[data-cy="edit_all"]')
-  //   .check()
-  //   .should('be.checked')
-  //   .uncheck()
-  //   .should('not.be.checked');
-
   cy.get('input[type="checkbox"]').check().wait(500).uncheck();
 });
 
@@ -103,6 +87,18 @@ Cypress.Commands.add('setPermission', (permission) => {
 
 Cypress.Commands.add('clearPermission', (permission) => {
   cy.get(`[data-cy="${permission}"]`).uncheck().should('not.be.checked');
+});
+
+Cypress.Commands.add('assertNoPermissionNotVisible', () => {
+  cy.wait(1000)
+    .get('body')
+    .should('not.contain.text', "Sorry, you don't have the needed permissions");
+});
+
+Cypress.Commands.add('assertNoPermissionIsVisible', () => {
+  cy.wait(1000)
+    .get('body')
+    .should('contain.text', "Sorry, you don't have the needed permissions");
 });
 
 export {};
