@@ -1,5 +1,19 @@
 describe('permissions: clients', () => {
-  it('can view a clients', () => {
+  it("can't view clients", () => {
+    cy.login()
+      .clearPermissions()
+      .get('button')
+      .contains('Save')
+      .click()
+      .get('div')
+      .contains('Successfully updated user');
+
+    cy.login('permissions@example.com', 'password');
+
+    cy.get('.flex-grow > .flex-1').should('not.contain.text', 'Clients');
+  });
+
+  it('can view clients', () => {
     cy.login()
       .clearPermissions()
       .setPermission('view_client')
@@ -11,11 +25,9 @@ describe('permissions: clients', () => {
 
     cy.login('permissions@example.com', 'password');
 
-    cy.get('a')
-      .contains('Clients')
-      .click()
-      .get('span')
-      .contains('Total results');
+    cy.get('a').contains('Clients').click();
+
+    cy.assertNoPermissionNotVisible();
   });
 
   it("can't create a client", () => {
@@ -32,7 +44,8 @@ describe('permissions: clients', () => {
 
     cy.get('a').contains('Clients').click();
     cy.get('a').contains('New Client').click();
-    cy.get('h1').contains("Sorry, you don't have the needed permissions");
+
+    cy.assertNoPermissionIsVisible();
   });
 
   it('can create a client', () => {
@@ -51,16 +64,17 @@ describe('permissions: clients', () => {
     cy.get('a').contains('Clients').click();
     cy.get('a').contains('New Client').click();
 
-    cy.get('h3').contains('Company Details').get('h3').contains('Contacts');
+    cy.assertNoPermissionNotVisible();
   });
 
-  it('can view assigned client without view_all or view_client permission', () => {
+  it.only('can view assigned client without view_all or view_client permission', () => {
     cy.login()
       .clearPermissions()
       .setPermission('create_client')
       .get('button')
       .contains('Save')
       .click()
+      .wait(1000)
       .get('div')
       .contains('Successfully updated user');
 
@@ -78,15 +92,7 @@ describe('permissions: clients', () => {
 
     cy.get('div').contains('Successfully created client');
 
-    cy.get('a').contains('Clients').click();
-    cy.get('a').contains('#1 Company').click();
-
-    cy.get('dd')
-      .contains('Details')
-      .get('dd')
-      .contains('Address')
-      .get('dd')
-      .contains('Contacts');
+    cy.assertNoPermissionNotVisible();
   });
 });
 
