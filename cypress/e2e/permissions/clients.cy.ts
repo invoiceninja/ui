@@ -54,7 +54,7 @@ describe('permissions: clients', () => {
     cy.get('h3').contains('Company Details').get('h3').contains('Contacts');
   });
 
-  it.only('can view assigned client without view_all or view_client permission', () => {
+  it('can view assigned client without view_all or view_client permission', () => {
     cy.login()
       .clearPermissions()
       .setPermission('create_client')
