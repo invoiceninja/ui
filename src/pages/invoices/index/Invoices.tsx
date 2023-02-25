@@ -13,12 +13,14 @@ import { DataTable } from 'components/DataTable';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useActions } from '../edit/components/Actions';
-import { useInvoiceColumns } from '../common/hooks/useInvoiceColumns';
+import {
+  defaultColumns,
+  useInvoiceColumns,
+} from '../common/hooks/useInvoiceColumns';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { useInvoiceFilters } from '../common/hooks/useInvoiceFilters';
 import { ImportButton } from 'components/import/ImportButton';
 import { useAllInvoiceColumns } from '../common/hooks/useAllInvoiceColumns';
-import { useDefaultInvoiceColumns } from '../common/hooks/useDefaultInvoiceColumns';
 
 export function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -29,7 +31,6 @@ export function Invoices() {
 
   const filters = useInvoiceFilters();
 
-  const defaultColumns = useDefaultInvoiceColumns();
   const invoiceColumns = useAllInvoiceColumns();
 
   const columns = useInvoiceColumns();

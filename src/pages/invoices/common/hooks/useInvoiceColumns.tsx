@@ -25,7 +25,6 @@ import { EntityStatus } from 'components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useAllInvoiceColumns } from './useAllInvoiceColumns';
-import { useDefaultInvoiceColumns } from './useDefaultInvoiceColumns';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -46,11 +45,19 @@ export function resourceViewedAt(resource: Invoice | Credit) {
   return viewed;
 }
 
+export const defaultColumns: string[] = [
+  'status',
+  'number',
+  'client',
+  'amount',
+  'balance',
+  'date',
+  'due_date',
+];
+
 export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const invoiceColumns = useAllInvoiceColumns();
   type InvoiceColumns = typeof invoiceColumns[number];
-
-  const defaultColumns = useDefaultInvoiceColumns();
 
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
