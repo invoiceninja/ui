@@ -132,6 +132,7 @@ export function Create() {
               value={project?.name}
               onValueChange={(value) => handleChange('name', value)}
               errorMessage={errors?.errors.name}
+              cypressRef="name"
             />
           </Element>
 

@@ -1,5 +1,11 @@
 describe('permissions: create_all', () => {
   before(() => {
+    cy.log('Seeding & preparing for test.')
+      .exec('cd ../invoiceninja && make prepare-for-cypress')
+      .log('Seeding complete. Running tests.');
+  });
+
+  before(() => {
     cy.login()
       .clearPermissions()
       .setPermission('create_all')

@@ -1,4 +1,10 @@
 describe('permissions: clients', () => {
+  before(() => {
+    cy.log('Seeding & preparing for test.')
+      .exec('cd ../invoiceninja && make prepare-for-cypress')
+      .log('Seeding complete. Running tests.');
+  });
+
   it("can't view clients", () => {
     cy.login()
       .clearPermissions()
