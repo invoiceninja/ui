@@ -38,6 +38,7 @@ export function Permissions(props: Props) {
     'expense',
     'bank_transaction',
     'purchase_order',
+    'recurring_expense',
   ];
 
   const handleAdministratorToggle = (value: boolean) => {

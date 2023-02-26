@@ -89,6 +89,8 @@ describe('permissions: projects', () => {
     cy.get('a').contains('Projects').click();
     cy.get('a').contains('New Project').click();
 
+    cy.get('[data-cy="name"]').type('Test project');
+
     cy.get('#headlessui-combobox-input-\\:rg\\:')
       .click()
       .get('[data-cy="dc-0"]')
