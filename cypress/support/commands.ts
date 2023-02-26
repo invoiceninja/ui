@@ -47,7 +47,7 @@ Cypress.Commands.add('login', (email?: string, password?: string) => {
   cy.clearAllLocalStorage();
 
   cy.visit('/login').contains('Login');
-  cy.get('#email').type(email ?? 'small@example.com');
+  cy.get('#email').type(email ?? 'user@example.com');
   cy.get('#password').type(password ?? 'password');
   cy.get('[type=submit]').click();
 });
@@ -66,9 +66,7 @@ Cypress.Commands.add('clearPermissions', () => {
     .should('include.text', 'User Management')
     .click();
 
-  cy.get('[href*="/settings/users/Wpmbk5ezJn/edit"]')
-    .should('include.text', 'Permissions Test')
-    .click();
+  cy.get('a').contains('Permissions Test').click();
 
   cy.get('#current_password').type('password');
 

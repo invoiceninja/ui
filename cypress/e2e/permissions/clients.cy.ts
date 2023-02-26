@@ -67,7 +67,7 @@ describe('permissions: clients', () => {
     cy.assertNoPermissionNotVisible();
   });
 
-  it.only('can view assigned client without view_all or view_client permission', () => {
+  it('can view assigned client without view_all or view_client permission', () => {
     cy.login()
       .clearPermissions()
       .setPermission('create_client')
