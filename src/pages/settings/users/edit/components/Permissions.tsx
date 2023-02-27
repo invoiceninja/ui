@@ -36,6 +36,9 @@ export function Permissions(props: Props) {
     'task',
     'vendor',
     'expense',
+    'bank_transaction',
+    'purchase_order',
+    'recurring_expense',
   ];
 
   const handleAdministratorToggle = (value: boolean) => {
@@ -119,6 +122,7 @@ export function Permissions(props: Props) {
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 handlePermissionChange('create_all', event.target.checked)
               }
+              cypressRef="create_all"
             />
           </div>
           <div className="col-1">
@@ -127,6 +131,7 @@ export function Permissions(props: Props) {
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 handlePermissionChange('view_all', event.target.checked)
               }
+              cypressRef="view_all"
             />
           </div>
           <div className="col-1">
@@ -135,6 +140,7 @@ export function Permissions(props: Props) {
               onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                 handlePermissionChange('edit_all', event.target.checked)
               }
+              cypressRef="edit_all"
             />
           </div>
         </div>
@@ -152,6 +158,7 @@ export function Permissions(props: Props) {
                     event.target.checked
                   )
                 }
+                cypressRef={`create_${permission}`}
               />
             </div>
             <div className="col-1">
@@ -163,6 +170,7 @@ export function Permissions(props: Props) {
                     event.target.checked
                   )
                 }
+                cypressRef={`view_${permission}`}
               />
             </div>
             <div className="col-1">
@@ -174,6 +182,7 @@ export function Permissions(props: Props) {
                     event.target.checked
                   )
                 }
+                cypressRef={`edit_${permission}`}
               />
             </div>
           </div>

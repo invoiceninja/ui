@@ -8,9 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CompanyUser } from 'common/interfaces/company-user';
-import { RootState } from 'common/stores/store';
-import { useSelector } from 'react-redux';
+import { useCurrentCompanyUser } from '../useCurrentCompanyUser';
 
 type ClientPermissions = 'create_client' | 'view_client' | 'edit_client';
 type ProductPermissions = 'create_product' | 'view_product' | 'edit_product';
@@ -56,13 +54,26 @@ export type Permissions =
   | PurchaseOrderPermissions;
 
 export function useHasPermission() {
-  const user = useSelector(
-    (state: RootState) =>
-      state.companyUsers.api[state.companyUsers.currentIndex]
-  ) as CompanyUser;
+  const user = useCurrentCompanyUser();
 
-  const permissions = user?.permissions ?? '';
+  return (permission: Permissions) => {
+    const permissions = user?.permissions ?? '';
+    const [action] = permission.split('_');
 
-  return (permission: Permissions) =>
-    user?.is_admin || user?.is_owner || permissions.includes(permission);
+    return Boolean(
+      user?.is_admin ||
+        user?.is_owner ||
+        permissions.includes(permission) ||
+        permissions.includes(`${action}_all`)
+    );
+  };
+}
+
+export function useAdmin() {
+  const user = useCurrentCompanyUser();
+
+  return {
+    isAdmin: Boolean(user?.is_admin),
+    isOwner: Boolean(user?.is_owner || user?.is_owner),
+  };
 }

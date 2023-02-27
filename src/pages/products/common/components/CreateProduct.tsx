@@ -32,7 +32,6 @@ export function CreateProduct(props: Props) {
     setProduct,
   });
 
-
   return (
     <Card title={t('new_product')}>
       {product && (
