@@ -53,7 +53,7 @@ export const vendorColumns = [
   'website',
 ] as const;
 
-type VendorColumns = typeof vendorColumns[number];
+type VendorColumns = (typeof vendorColumns)[number];
 
 export const defaultColumns: VendorColumns[] = [
   'number',
