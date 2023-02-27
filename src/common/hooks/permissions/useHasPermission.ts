@@ -36,6 +36,10 @@ type PurchaseOrderPermissions =
   | 'create_purchase_order'
   | 'view_purchase_order'
   | 'edit_purchase_order';
+type TaskSchedulePermissions =
+  | 'create_task_schedule'
+  | 'view_task_schedule'
+  | 'edit_task_schedule';
 
 export type Permissions =
   | ClientPermissions
@@ -51,7 +55,8 @@ export type Permissions =
   | ExpensePermissions
   | RecurringExpensePermissions
   | BankTransactionsPermissions
-  | PurchaseOrderPermissions;
+  | PurchaseOrderPermissions
+  | TaskSchedulePermissions;
 
 export function useHasPermission() {
   const user = useCurrentCompanyUser();
