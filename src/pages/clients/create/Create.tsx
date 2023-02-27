@@ -59,8 +59,8 @@ export function Create() {
   });
 
   useEffect(() => {
-    if (blankClient?.data.data) {
-      setClient(blankClient.data.data);
+    if (blankClient) {
+      setClient(blankClient.data?.data);
     }
   }, [blankClient]);
 

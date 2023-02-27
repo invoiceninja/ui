@@ -17,20 +17,28 @@ import { Params } from './common/params.interface';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { ApiWebhook } from 'common/interfaces/api-webhook';
 import { toast } from 'common/helpers/toast/toast';
+import { useAdmin } from 'common/hooks/permissions/useHasPermission';
 
 export function useApiWebhooksQuery(params: Params) {
-  return useQuery(['/api/v1/webhooks', params], () =>
-    request(
-      'GET',
-      endpoint('/api/v1/webhooks?per_page=:perPage&page=:currentPage', {
-        perPage: params.perPage,
-        currentPage: params.currentPage,
-      })
-    )
+  const { isAdmin } = useAdmin();
+
+  return useQuery(
+    ['/api/v1/webhooks', params],
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/webhooks?per_page=:perPage&page=:currentPage', {
+          perPage: params.perPage,
+          currentPage: params.currentPage,
+        })
+      ),
+    { enabled: isAdmin }
   );
 }
 
 export function useApiWebhookQuery(params: { id: string | undefined }) {
+  const { isAdmin } = useAdmin();
+
   return useQuery<ApiWebhook>(
     route('/api/v1/webhooks/:id', { id: params.id }),
     () =>
@@ -38,11 +46,13 @@ export function useApiWebhookQuery(params: { id: string | undefined }) {
         (response: GenericSingleResourceResponse<ApiWebhook>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isAdmin }
   );
 }
 
 export function useBlankApiWebhookQuery() {
+  const { isAdmin } = useAdmin();
+
   return useQuery<ApiWebhook>(
     '/api/v1/webhooks/create',
     () =>
@@ -50,7 +60,7 @@ export function useBlankApiWebhookQuery() {
         (response: GenericSingleResourceResponse<ApiWebhook>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isAdmin }
   );
 }
 
