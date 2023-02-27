@@ -15,9 +15,12 @@ import { DataTable, DataTableColumns } from 'components/DataTable';
 import { Settings } from 'components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 import { route } from 'common/helpers/route';
+import { useCurrentUser } from 'common/hooks/useCurrentUser';
 
 export function Users() {
   useTitle('user_management');
+
+  const currentUser = useCurrentUser();
 
   const [t] = useTranslation();
 
@@ -48,7 +51,9 @@ export function Users() {
       <DataTable
         resource="user"
         columns={columns}
-        endpoint="/api/v1/users"
+        endpoint={route('/api/v1/users?without=:userId', {
+          userId: currentUser?.id,
+        })}
         linkToCreate="/settings/users/create"
       />
     </Settings>
