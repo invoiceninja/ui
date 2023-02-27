@@ -17,11 +17,14 @@ export function useDocumentsQuery(params: Params) {
   return useQuery(['/api/v1/documents', params], () =>
     request(
       'GET',
-      endpoint('/api/v1/documents?per_page=:perPage&page=:currentPage&company_documents=:companyDocuments', {
-        perPage: params.perPage,
-        currentPage: params.currentPage,
-        companyDocuments: params.companyDocuments ?? 'false'
-      })
+      endpoint(
+        '/api/v1/documents?per_page=:perPage&page=:currentPage&company_documents=:companyDocuments',
+        {
+          perPage: params.perPage,
+          currentPage: params.currentPage,
+          companyDocuments: params.companyDocuments ?? 'false',
+        }
+      )
     )
   );
 }

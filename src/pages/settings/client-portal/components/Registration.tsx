@@ -40,6 +40,7 @@ export function Registration() {
     { field: 'state', label: t('state') },
     { field: 'postal_code', label: t('postal_code') },
     { field: 'country_id', label: t('country') },
+    { field: 'currency_id', label: t('currency') },
     { field: 'custom_value1', label: t('custom1') },
     { field: 'custom_value2', label: t('custom2') },
     { field: 'custom_value3', label: t('custom3') },
@@ -53,21 +54,36 @@ export function Registration() {
       company?.client_registration_fields || []
     );
 
-    return fields.find((field) => field.key === property)?.required;
+    return Boolean(fields.find((field) => field.key === property)?.required);
   };
 
   const handleRegistrationToggle = (property: string, value: boolean) => {
-    const fields: Field[] = cloneDeep(
+    let existingFields: Field[] = cloneDeep(
       company?.client_registration_fields || []
     );
 
-    const index = fields.findIndex((field) => field.key === property);
+    const alreadyAdded = existingFields.some((field) => field.key === property);
+    const index = fields.findIndex((field) => field.field === property);
 
     if (index >= 0) {
-      fields[index].required = value;
-    }
+      if (alreadyAdded) {
+        const updatedFields = existingFields.map((field) => ({
+          ...field,
+          required: field.key === property ? value : field.required,
+        }));
 
-    handleChange('client_registration_fields', [...fields]);
+        handleChange('client_registration_fields', updatedFields);
+      } else {
+        const foundField = fields[index];
+
+        existingFields = [
+          ...existingFields,
+          { key: foundField.field, required: value },
+        ];
+
+        handleChange('client_registration_fields', existingFields);
+      }
+    }
   };
 
   return (

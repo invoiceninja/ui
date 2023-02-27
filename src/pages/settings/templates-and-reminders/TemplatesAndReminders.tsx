@@ -31,6 +31,8 @@ import { useTranslation } from 'react-i18next';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
 import { Variable } from './common/components/Variable';
+import { commonVariables } from './common/constants/variables/common-variables';
+import { paymentVariables } from './common/constants/variables/payment-variables';
 
 export function TemplatesAndReminders() {
   useTitle('templates_and_reminders');
@@ -101,67 +103,8 @@ export function TemplatesAndReminders() {
     }).then((response) => setPreview(response.data));
   }, [templateBody]);
 
-  const variables = {
-    invoice: [
-      '$amount',
-      '$balance',
-      '$date',
-      '$due_date',
-      '$footer',
-      '$number',
-      '$payment_url',
-      '$po_number',
-      '$terms',
-      '$view_url',
-      '$assigned_to_user',
-      '$created_by_user',
-      '$discount',
-      '$exchange_rate',
-      '$invoices',
-      '$payment_button',
-      '$payments',
-      '$public_notes',
-      '$view_button',
-    ],
-    client: [
-      '$client_address1',
-      '$client.city',
-      '$client.credit_balance',
-      '$client.name',
-      '$client.postal_code',
-      '$client.shipping_address1',
-      '$client.shipping_city',
-      '$client.shipping_postal_code',
-      '$client.state',
-      '$client.address2',
-      '$client.country',
-      '$client.id_number',
-      '$client.phone',
-      '$client.public_notes',
-      '$client.shipping_address2',
-      '$client.shipping_country',
-      '$client.shipping_state',
-      '$client.vat_number',
-    ],
-    contact: [
-      '$contact.email',
-      '$contact.first_name',
-      '$contact.last_name',
-      '$contact.phone',
-    ],
-    company: [
-      '$company.address1',
-      '$company.address2',
-      '$company.country',
-      '$company.email',
-      '$company.id_number',
-      '$company.name',
-      '$company.phone',
-      '$company.state',
-      '$company.vat_number',
-      '$company.website',
-    ],
-  };
+  const variables =
+    templateId === 'payment' ? paymentVariables : commonVariables;
 
   return (
     <Settings

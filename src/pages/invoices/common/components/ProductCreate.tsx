@@ -74,7 +74,7 @@ export function ProductCreate(props: Props) {
             setErrors(error.response.data);
             toast.dismiss();
           } else {
-            console.log(error);
+            console.error(error);
             toast.error();
           }
         })
@@ -84,7 +84,7 @@ export function ProductCreate(props: Props) {
 
   useEffect(() => {
     if (blankProduct) {
-      setProduct(blankProduct.data.data);
+      setProduct(blankProduct);
     }
   }, [blankProduct]);
 

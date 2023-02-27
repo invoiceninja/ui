@@ -271,13 +271,13 @@ export function useActions() {
   const cloneToQuote = (quote: Quote) => {
     setQuote({ ...quote, number: '', documents: [] });
 
-    navigate('/quotes/create');
+    navigate('/quotes/create?action=clone');
   };
 
   const cloneToCredit = (quote: Quote) => {
     setCredit({ ...quote, number: '', documents: [] });
 
-    navigate('/credits/create');
+    navigate('/credits/create?action=clone');
   };
 
   const cloneToRecurringInvoice = (quote: Quote) => {
@@ -287,7 +287,7 @@ export function useActions() {
       documents: [],
     });
 
-    navigate('/recurring_invoices/create');
+    navigate('/recurring_invoices/create?action=clone');
   };
 
   const cloneToPurchaseOrder = (quote: Quote) => {
@@ -297,12 +297,12 @@ export function useActions() {
       documents: [],
     });
 
-    navigate('/purchase_orders/create');
+    navigate('/purchase_orders/create?action=clone');
   };
 
   const cloneToInvoice = (quote: Quote) => {
     setInvoice({ ...quote, number: '', documents: [] });
-    navigate('/invoices/create');
+    navigate('/invoices/create?action=clone');
   };
 
   const actions: Action<Quote>[] = [
@@ -482,7 +482,7 @@ export const quoteColumns = [
   // 'vendor', @Todo: Need to resolve relationship
 ] as const;
 
-type QuoteColumns = typeof quoteColumns[number];
+type QuoteColumns = (typeof quoteColumns)[number];
 
 export const defaultColumns: QuoteColumns[] = [
   'status',

@@ -67,7 +67,7 @@ export const productColumns = [
   'updated_at',
 ] as const;
 
-type ProductColumns = typeof productColumns[number];
+type ProductColumns = (typeof productColumns)[number];
 
 export const defaultColumns: ProductColumns[] = [
   'product_key',
@@ -248,7 +248,7 @@ export function useActions() {
   const cloneToProduct = (product: Product) => {
     setProduct({ ...product, id: '', documents: [] });
 
-    navigate('/products/create');
+    navigate('/products/create?action=clone');
   };
 
   const handleResourcefulAction = (

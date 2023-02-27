@@ -53,6 +53,7 @@ interface Props {
   withProperty?: string;
   sortBy?: string;
   staleTime?: number; // in ms
+  disableWithSpinner?: boolean;
 }
 
 export function DebouncedCombobox(props: Props) {
@@ -304,7 +305,7 @@ export function DebouncedCombobox(props: Props) {
 
             {(!props.clearButton || (!props.defaultValue && !props.value)) &&
               !isLoading && (
-                <div className="absolute inset-y-0 right-0 mt-2.5 mr-1 cursor-pointer">
+                <div className="absolute inset-y-0 right-0 mt-2.5 mr-1 cursor-pointer bg-white">
                   <ChevronDown
                     className="absolute inset-y-0 right-0 text-gray-400 h-4"
                     aria-hidden="true"
@@ -313,8 +314,8 @@ export function DebouncedCombobox(props: Props) {
                 </div>
               )}
 
-            {isLoading && (
-              <div className="absolute inset-y-0 right-0 mt-2 mr-1.5 cursor-pointer">
+            {(isLoading || (props.disabled && props.disableWithSpinner)) && (
+              <div className="absolute inset-y-0 right-0 mt-2 mr-1.5 cursor-pointer bg-white">
                 <Spinner />
               </div>
             )}
@@ -352,6 +353,7 @@ export function DebouncedCombobox(props: Props) {
                   className="cursor-pointer select-none relative py-2 px-3 text-gray-900 hover:bg-gray-100"
                   key={index}
                   value={record}
+                  data-cy={`dc-${index}`}
                 >
                   {record.label}
                 </Combobox.Option>
