@@ -74,7 +74,7 @@ export const taskColumns = [
   'updated_at',
 ] as const;
 
-type TaskColumns = typeof taskColumns[number];
+type TaskColumns = (typeof taskColumns)[number];
 
 export const defaultColumns: TaskColumns[] = [
   'status',
