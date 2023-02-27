@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-interface Parameters {
+export interface Parameters {
   date_range: string;
   show_payments_table: boolean;
   show_aging_table: boolean;

@@ -17,9 +17,11 @@ import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useClientsQuery } from 'common/queries/clients';
 import { ClientSelector } from 'components/clients/ClientSelector';
 import Toggle from 'components/forms/Toggle';
+import { useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdClose } from 'react-icons/md';
+import { scheduleParametersAtom } from '../atoms';
 
 interface Props {
   schedule: Schedule;
@@ -35,10 +37,12 @@ export function EmailStatement(props: Props) {
   const [t] = useTranslation();
   const accentColor = useAccentColor();
 
+  const parametersAtom = useAtomValue(scheduleParametersAtom);
+
   const { schedule, handleChange, errors, page } = props;
 
   const { data: clientsResponse } = useClientsQuery({
-    enabled: page === 'edit',
+    enabled: page === 'edit' || Boolean(parametersAtom),
   });
 
   const [selectedClients, setSelectedClients] = useState<Client[]>([]);
@@ -52,7 +56,7 @@ export function EmailStatement(props: Props) {
   };
 
   useEffect(() => {
-    if (page === 'edit') {
+    if (page === 'edit' || parametersAtom) {
       const clients = clientsResponse?.filter((client: Client) =>
         schedule.parameters.clients?.includes(client.id)
       );

@@ -10,7 +10,7 @@
 
 import { AxiosError } from 'axios';
 import { Frequency } from 'common/enums/frequency';
-import { endpoint } from 'common/helpers';
+import { endpoint, isProduction } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
@@ -23,10 +23,12 @@ import { useBlankScheduleQuery } from 'common/queries/schedules';
 import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
 import { Settings } from 'components/layouts/Settings';
 import { Spinner } from 'components/Spinner';
+import { useAtom } from 'jotai';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { scheduleParametersAtom } from '../common/atoms';
 import { ScheduleForm } from '../common/components/ScheduleForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 
@@ -36,6 +38,8 @@ export function Create() {
   const [t] = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const [searchParams] = useSearchParams();
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
@@ -49,6 +53,7 @@ export function Create() {
 
   const [schedule, setSchedule] = useState<Schedule>();
   const [errors, setErrors] = useState<ValidationBag>();
+  const [parametersAtom, setParametersAtom] = useAtom(scheduleParametersAtom);
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
@@ -58,9 +63,10 @@ export function Create() {
     if (blankSchedule) {
       setSchedule({
         ...blankSchedule,
-        template: 'email_statement',
+        template: searchParams.get('template') || 'email_statement',
         frequency_id: Frequency.Monthly,
-        parameters: {
+        remaining_cycles: -1,
+        parameters: parametersAtom || {
           clients: [],
           date_range: 'last7_days',
           show_aging_table: false,
@@ -69,6 +75,10 @@ export function Create() {
         },
       });
     }
+
+    return () => {
+      isProduction() && setParametersAtom(undefined);
+    };
   }, [blankSchedule]);
 
   const handleSave = (event: FormEvent<HTMLFormElement>) => {
