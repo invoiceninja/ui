@@ -9,7 +9,9 @@
  */
 
 import { Guard } from 'common/guards/Guard';
+import { assigned } from 'common/guards/guards/assigned';
 import { enabled } from 'common/guards/guards/enabled';
+import { or } from 'common/guards/guards/or';
 import { permission } from 'common/guards/guards/permission';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
@@ -26,8 +28,12 @@ export const projectRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Projects),
-            () => permission('view_project'),
+            enabled(ModuleBitmask.Projects),
+            or(
+              permission('view_project'),
+              permission('create_project'),
+              permission('edit_project')
+            ),
           ]}
           component={<Projects />}
         />
@@ -38,8 +44,8 @@ export const projectRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Projects),
-            () => permission('create_project'),
+            enabled(ModuleBitmask.Projects),
+            permission('create_project'),
           ]}
           component={<Create />}
         />
@@ -50,8 +56,12 @@ export const projectRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Projects),
-            () => permission('edit_project'),
+            enabled(ModuleBitmask.Projects),
+            or(
+              permission('view_project'),
+              permission('edit_project'),
+              assigned('/api/v1/projects/:id')
+            ),
           ]}
           component={<Project />}
         />

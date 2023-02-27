@@ -10,7 +10,11 @@
 
 import { isHosted } from 'common/helpers';
 import { IconType } from 'react-icons';
-import { MdAreaChart, MdOutlineBuild, MdOutlineShoppingBag } from 'react-icons/md';
+import {
+  MdAreaChart,
+  MdOutlineBuild,
+  MdOutlineShoppingBag,
+} from 'react-icons/md';
 
 interface EntitySection {
   name: string;

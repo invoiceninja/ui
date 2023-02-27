@@ -19,6 +19,8 @@ import { Pdf } from './pdf/Pdf';
 import { Import } from 'pages/quotes/import/Import';
 import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { or } from 'common/guards/guards/or';
+import { assigned } from 'common/guards/guards/assigned';
 
 export const quoteRoutes = (
   <Route path="/quotes">
@@ -27,8 +29,12 @@ export const quoteRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Quotes),
-            () => permission('view_quote'),
+            enabled(ModuleBitmask.Quotes),
+            or(
+              permission('view_quote'),
+              permission('create_quote'),
+              permission('edit_quote')
+            ),
           ]}
           component={<Quotes />}
         />
@@ -39,8 +45,8 @@ export const quoteRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Quotes),
-            () => permission('create_quote') || permission('edit_quote'),
+            enabled(ModuleBitmask.Quotes),
+            or(permission('create_quote'), permission('edit_quote')),
           ]}
           component={<Import />}
         />
@@ -51,8 +57,8 @@ export const quoteRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Quotes),
-            () => permission('edit_quote'),
+            enabled(ModuleBitmask.Quotes),
+            or(permission('edit_quote'), assigned('/api/v1/quotes/:id')),
           ]}
           component={<Edit />}
         />
@@ -62,10 +68,7 @@ export const quoteRoutes = (
       path="create"
       element={
         <Guard
-          guards={[
-            () => enabled(ModuleBitmask.Quotes),
-            () => permission('create_quote'),
-          ]}
+          guards={[enabled(ModuleBitmask.Quotes), permission('create_quote')]}
           component={<Create />}
         />
       }
@@ -75,8 +78,8 @@ export const quoteRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Quotes),
-            () => permission('view_quote'),
+            enabled(ModuleBitmask.Quotes),
+            or(permission('view_quote'), assigned('/api/v1/quotes/:id')),
           ]}
           component={<Pdf />}
         />
