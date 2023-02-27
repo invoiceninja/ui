@@ -353,6 +353,7 @@ export function DebouncedCombobox(props: Props) {
                   className="cursor-pointer select-none relative py-2 px-3 text-gray-900 hover:bg-gray-100"
                   key={index}
                   value={record}
+                  data-cy={`dc-${index}`}
                 >
                   {record.label}
                 </Combobox.Option>

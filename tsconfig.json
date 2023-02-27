@@ -23,7 +23,7 @@
       "@invoiceninja/forms": ["components/forms"],
       "@invoiceninja/cards": ["components/cards"],
       "@invoiceninja/tables": ["components/tables"]
-    }
+    },
   },
-  "include": ["src"]
+  "include": ["src"],
 }
