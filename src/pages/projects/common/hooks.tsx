@@ -60,7 +60,7 @@ export const projectColumns = [
   'updated_at',
 ] as const;
 
-export type ProjectColumns = typeof projectColumns[number];
+export type ProjectColumns = (typeof projectColumns)[number];
 
 export const defaultColumns: ProjectColumns[] = [
   'name',

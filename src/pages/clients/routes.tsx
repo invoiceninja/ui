@@ -9,6 +9,8 @@
  */
 
 import { Guard } from 'common/guards/Guard';
+import { assigned } from 'common/guards/guards/assigned';
+import { or } from 'common/guards/guards/or';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
@@ -33,7 +35,13 @@ export const clientRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_client')]}
+          guards={[
+            or(
+              permission('view_client'),
+              permission('create_client'),
+              permission('edit_client')
+            ),
+          ]}
           component={<Clients />}
         />
       }
@@ -42,9 +50,7 @@ export const clientRoutes = (
       path="import"
       element={
         <Guard
-          guards={[
-            () => permission('create_client') || permission('edit_client'),
-          ]}
+          guards={[or(permission('create_client'), permission('edit_client'))]}
           component={<Import />}
         />
       }
@@ -52,17 +58,16 @@ export const clientRoutes = (
     <Route
       path="create"
       element={
-        <Guard
-          guards={[() => permission('create_client')]}
-          component={<Create />}
-        />
+        <Guard guards={[permission('create_client')]} component={<Create />} />
       }
     />
     <Route
       path=":id/edit"
       element={
         <Guard
-          guards={[() => permission('edit_client')]}
+          guards={[
+            or(permission('edit_client'), assigned('/api/v1/clients/:id')),
+          ]}
           component={<Edit />}
         />
       }
@@ -71,7 +76,9 @@ export const clientRoutes = (
       path=":id"
       element={
         <Guard
-          guards={[() => permission('view_client')]}
+          guards={[
+            or(permission('view_client'), assigned('/api/v1/clients/:id')),
+          ]}
           component={<Client />}
         />
       }

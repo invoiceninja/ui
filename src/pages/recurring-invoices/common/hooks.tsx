@@ -445,7 +445,7 @@ export const recurringInvoiceColumns = [
   'updated_at',
 ] as const;
 
-type RecurringInvoiceColumns = typeof recurringInvoiceColumns[number];
+type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
 
 export const defaultColumns: RecurringInvoiceColumns[] = [
   'status',
