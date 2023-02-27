@@ -8,7 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Route } from 'react-router-dom';
+import { Guard } from 'common/guards/Guard';
+import { assigned } from 'common/guards/guards/assigned';
+import { enabled } from 'common/guards/guards/enabled';
+import { or } from 'common/guards/guards/or';
+import { permission } from 'common/guards/guards/permission';
+import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { Outlet, Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Email } from './email/Email';
@@ -17,12 +23,48 @@ import { Pdf } from './pdf/Pdf';
 
 export const purchaseOrderRoutes = (
   <Route path="/purchase_orders">
-    <Route path="" element={<PurchaseOrders />} />
-    <Route path=":id">
+    <Route
+      path=""
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.PurchaseOrders),
+            or(
+              permission('view_purchase_order'),
+              permission('create_purchase_order'),
+              permission('edit_purchase_order')
+            ),
+          ]}
+          component={<PurchaseOrders />}
+        />
+      }
+    />
+    <Route
+      path=":id"
+      element={
+        <Guard
+          guards={[
+            or(
+              permission('view_purchase_order'),
+              assigned('/api/v1/purhcase_orders/:id')
+            ),
+          ]}
+          component={<Outlet />}
+        />
+      }
+    >
       <Route path="edit" element={<Edit />} />
       <Route path="email" element={<Email />} />
       <Route path="pdf" element={<Pdf />} />
     </Route>
-    <Route path="create" element={<Create />} />
+    <Route
+      path="create"
+      element={
+        <Guard
+          guards={[permission('create_purchase_order')]}
+          component={<Create />}
+        />
+      }
+    />
   </Route>
 );

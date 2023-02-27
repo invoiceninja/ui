@@ -30,6 +30,7 @@ import { freePlan } from 'common/guards/guards/free-plan';
 import { Icon } from './icons/Icon';
 import { MdLogout, MdManageAccounts } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
+import { useAdmin } from 'common/hooks/permissions/useHasPermission';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();
@@ -100,6 +101,8 @@ export function CompanySwitcher() {
     }
   }, []);
 
+  const { isOwner } = useAdmin();
+
   return (
     <>
       <CompanyCreate
@@ -107,10 +110,12 @@ export function CompanySwitcher() {
         setIsModalOpen={setIsCompanyCreateModalOpened}
       />
 
-      <CompanyEdit
-        isModalOpen={isCompanyEditModalOpened}
-        setIsModalOpen={setIsCompanyEditModalOpened}
-      />
+      {isOwner && (
+        <CompanyEdit
+          isModalOpen={isCompanyEditModalOpened}
+          setIsModalOpen={setIsCompanyEditModalOpened}
+        />
+      )}
 
       <Menu as="div" className="relative inline-block text-left">
         <div>

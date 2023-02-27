@@ -8,11 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Element } from '@invoiceninja/cards';
 import { Link } from '@invoiceninja/forms';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Client } from 'common/interfaces/client';
 import { InfoCard } from 'components/InfoCard';
+import { EntityStatus } from 'components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -36,6 +38,10 @@ export function Details(props: Props) {
             title={t('details')}
             value={
               <>
+                <Element leftSide={t('status')} noExternalPadding>
+                  <EntityStatus entity={client} />
+                </Element>
+
                 <Link to={client.website} external>
                   {client.website}
                 </Link>

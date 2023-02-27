@@ -12,16 +12,21 @@ import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { useQuery } from 'react-query';
 import { route } from 'common/helpers/route';
+import { useAdmin } from 'common/hooks/permissions/useHasPermission';
 
 export function useCompanyGatewaysQuery() {
+  const { isAdmin } = useAdmin();
+
   return useQuery(
     route('/api/v1/company_gateways'),
     () => request('GET', endpoint('/api/v1/company_gateways')),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isAdmin }
   );
 }
 
 export function useCompanyGatewayQuery(params: { id: string | undefined }) {
+  const { isAdmin } = useAdmin();
+
   return useQuery(
     route('/api/v1/company_gateways/:id', { id: params.id }),
     () =>
@@ -29,14 +34,16 @@ export function useCompanyGatewayQuery(params: { id: string | undefined }) {
         'GET',
         endpoint('/api/v1/company_gateways/:id', { id: params.id })
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isAdmin }
   );
 }
 
 export function useBlankCompanyGatewayQuery() {
+  const { isAdmin } = useAdmin();
+
   return useQuery(
     route('/api/v1/company_gateways/create'),
     () => request('GET', endpoint('/api/v1/company_gateways/create')),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isAdmin }
   );
 }

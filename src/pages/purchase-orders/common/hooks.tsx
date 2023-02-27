@@ -112,7 +112,7 @@ export const purchaseOrderColumns = [
   'exchange_rate',
 ] as const;
 
-type PurchaseOrderColumns = typeof purchaseOrderColumns[number];
+type PurchaseOrderColumns = (typeof purchaseOrderColumns)[number];
 
 export const defaultColumns: PurchaseOrderColumns[] = [
   'status',
