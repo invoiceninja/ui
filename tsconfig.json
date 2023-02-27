@@ -24,7 +24,6 @@
       "@invoiceninja/cards": ["components/cards"],
       "@invoiceninja/tables": ["components/tables"]
     },
-    "types": ["cypress"]
   },
-  "include": ["src", "cypress/**/*.ts"]
+  "include": ["src"],
 }
