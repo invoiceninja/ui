@@ -14,3 +14,4 @@ export * from './Notifications';
 export * from './Password';
 export * from './TwoFactorAuthentication';
 export * from './CustomFields';
+export * from './Preferences';
