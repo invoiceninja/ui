@@ -91,6 +91,6 @@ export function useFormatMoney(props: Props) {
       return Number.formatMoney(value, currency, country);
     }
 
-    return parseFloat(value.toString()).toFixed(2);
+    return value;
   };
 }
