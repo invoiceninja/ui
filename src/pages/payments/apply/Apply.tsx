@@ -102,14 +102,34 @@ export function Apply() {
       <Element leftSide={t('amount')}>
         <InputField
           disabled
-          value={formatMoney((payment?.data.data.amount - payment?.data.data.refunded), payment?.data.data.client.country_id, payment?.data.data.client.settings.currency_id)}
+          value={formatMoney(
+            payment?.data.data.amount - payment?.data.data.refunded,
+            payment?.data.data.client.country_id,
+            payment?.data.data.client.settings.currency_id
+          )}
         />
       </Element>
       <Element leftSide={t('applied')}>
-        <InputField disabled value={formatMoney(payment?.data.data.applied, payment?.data.data.client.country_id, payment?.data.data.client.settings.currency_id)} />
+        <InputField
+          disabled
+          value={formatMoney(
+            payment?.data.data.applied,
+            payment?.data.data.client.country_id,
+            payment?.data.data.client.settings.currency_id
+          )}
+        />
       </Element>
       <Element leftSide={t('unapplied')}>
-        <InputField disabled value={formatMoney(((payment?.data.data.amount - payment?.data.data.refunded) - payment?.data.data.applied), payment?.data.data.client.country_id, payment?.data.data.client.settings.currency_id)} />
+        <InputField
+          disabled
+          value={formatMoney(
+            payment?.data.data.amount -
+              payment?.data.data.refunded -
+              payment?.data.data.applied,
+            payment?.data.data.client.country_id,
+            payment?.data.data.client.settings.currency_id
+          )}
+        />
       </Element>
       <Element leftSide={t('invoices')}>
         <DebouncedCombobox
@@ -130,7 +150,7 @@ export function Apply() {
         )}
       </Element>
       {formik.values.invoices.map(
-        (record: { _id: string; amount: number; number: string; }, index) => (
+        (record: { _id: string; amount: number; number: string }, index) => (
           <Element key={index} leftSide={t('applied')}>
             <div className="flex items-center space-x-2">
               <InputField

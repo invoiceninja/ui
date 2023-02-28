@@ -1,0 +1,14 @@
+{
+    "compilerOptions": {
+        "types": [
+            "cypress",
+            "./support/commands"
+        ]
+    },
+    "include": [
+        "./**/*.cy.ts"
+    ],
+    "files": [
+        "../cypress.config.ts"
+    ]
+}

@@ -482,7 +482,7 @@ export const quoteColumns = [
   // 'vendor', @Todo: Need to resolve relationship
 ] as const;
 
-type QuoteColumns = typeof quoteColumns[number];
+type QuoteColumns = (typeof quoteColumns)[number];
 
 export const defaultColumns: QuoteColumns[] = [
   'status',

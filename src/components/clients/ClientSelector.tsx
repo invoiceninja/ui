@@ -54,6 +54,7 @@ export function ClientSelector(props: ClientSelectorProps) {
         exclude={props.exclude}
         staleTime={props.staleTime || 500}
         disableWithSpinner={props.disableWithSpinner}
+        errorMessage={props.errorMessage}
       />
     </>
   );

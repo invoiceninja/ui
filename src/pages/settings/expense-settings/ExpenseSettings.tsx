@@ -81,6 +81,18 @@ export function ExpenseSettings() {
         </Element>
 
         <Element
+          leftSide={t('convert_currency')}
+          leftSideHelp={t('convert_expense_currency_help')}
+        >
+          <Toggle
+            checked={companyChanges?.convert_expense_currency}
+            onChange={(value: boolean) =>
+              handleToggleChange('convert_expense_currency', value)
+            }
+          />
+        </Element>
+
+        <Element
           leftSide={t('add_documents_to_invoice')}
           leftSideHelp={t('add_documents_to_invoice_help')}
         >

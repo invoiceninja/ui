@@ -10,8 +10,10 @@
 
 import { route } from 'common/helpers/route';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
+import { Credit } from 'common/interfaces/credit';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
@@ -29,7 +31,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
-import { creditAtom, invoiceSumAtom } from '../common/atoms';
+import { invoiceSumAtom } from '../common/atoms';
 import { CreditDetails } from '../common/components/CreditDetails';
 import { CreditFooter } from '../common/components/CreditFooter';
 import { useActions, useCreditUtilities, useSave } from '../common/hooks';
@@ -39,6 +41,8 @@ export function Edit() {
   const { documentTitle } = useTitle('edit_credit');
   const { t } = useTranslation();
   const { id } = useParams();
+
+  const reactSettings = useReactSettings();
 
   const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
@@ -50,7 +54,7 @@ export function Edit() {
 
   const { data } = useCreditQuery({ id: id! });
 
-  const [credit, setQuote] = useAtom(creditAtom);
+  const [credit, setCredit] = useState<Credit>();
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();
@@ -75,7 +79,7 @@ export function Edit() {
 
       _credit.line_items.map((item) => (item._id = v4()));
 
-      setQuote(_credit);
+      setCredit(_credit);
 
       if (_credit && _credit.client) {
         setClient(_credit.client);
@@ -155,17 +159,19 @@ export function Edit() {
         )}
       </div>
 
-      <div className="my-4">
-        {credit && (
-          <InvoicePreview
-            for="invoice"
-            resource={credit}
-            entity="credit"
-            relationType="client_id"
-            endpoint="/api/v1/live_preview?entity=:entity"
-          />
-        )}
-      </div>
+      {reactSettings?.show_pdf_preview && (
+        <div className="my-4">
+          {credit && (
+            <InvoicePreview
+              for="invoice"
+              resource={credit}
+              entity="credit"
+              relationType="client_id"
+              endpoint="/api/v1/live_preview?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

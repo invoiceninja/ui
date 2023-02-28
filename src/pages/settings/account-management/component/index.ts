@@ -10,6 +10,7 @@
 export * from './EnabledModules';
 export * from './Integrations';
 export * from './Licence';
-export * from './Overview';
+export { Overview as AccountManagementOverview } from './Overview';
 export * from './Plan';
 export * from './SecuritySettings';
+export * from './DangerZone';

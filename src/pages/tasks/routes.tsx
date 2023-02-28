@@ -9,7 +9,9 @@
  */
 
 import { Guard } from 'common/guards/Guard';
+import { assigned } from 'common/guards/guards/assigned';
 import { enabled } from 'common/guards/guards/enabled';
+import { or } from 'common/guards/guards/or';
 import { permission } from 'common/guards/guards/permission';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
@@ -25,8 +27,12 @@ export const taskRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Tasks),
-            () => permission('view_task'),
+            enabled(ModuleBitmask.Tasks),
+            or(
+              permission('view_task'),
+              permission('create_task'),
+              permission('edit_task')
+            ),
           ]}
           component={<Tasks />}
         />
@@ -37,8 +43,8 @@ export const taskRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Tasks),
-            () => permission('view_task'),
+            enabled(ModuleBitmask.Tasks),
+            or(permission('view_task'), permission('edit_task')),
           ]}
           component={<Kanban />}
         />
@@ -48,10 +54,7 @@ export const taskRoutes = (
       path="create"
       element={
         <Guard
-          guards={[
-            () => enabled(ModuleBitmask.Tasks),
-            () => permission('create_task'),
-          ]}
+          guards={[enabled(ModuleBitmask.Tasks), permission('create_task')]}
           component={<Create />}
         />
       }
@@ -61,8 +64,12 @@ export const taskRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Tasks),
-            () => permission('edit_task'),
+            enabled(ModuleBitmask.Tasks),
+            or(
+              permission('view_task'),
+              permission('edit_task'),
+              assigned('/api/v1/tasks/:id')
+            ),
           ]}
           component={<Edit />}
         />

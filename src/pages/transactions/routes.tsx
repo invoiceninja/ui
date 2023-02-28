@@ -9,6 +9,8 @@
  */
 
 import { Guard } from 'common/guards/Guard';
+import { assigned } from 'common/guards/guards/assigned';
+import { or } from 'common/guards/guards/or';
 import { permission } from 'common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import {
@@ -24,7 +26,13 @@ export const transactionRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_bank_transaction')]}
+          guards={[
+            or(
+              permission('view_bank_transaction'),
+              permission('create_bank_transaction'),
+              permission('edit_bank_transaction')
+            ),
+          ]}
           component={<Transactions />}
         />
       }
@@ -33,7 +41,7 @@ export const transactionRoutes = (
       path="create"
       element={
         <Guard
-          guards={[() => permission('create_bank_transaction')]}
+          guards={[permission('create_bank_transaction')]}
           component={<CreateTransaction />}
         />
       }
@@ -43,9 +51,10 @@ export const transactionRoutes = (
       element={
         <Guard
           guards={[
-            () =>
-              permission('create_bank_transaction') ||
-              permission('edit_bank_transaction'),
+            or(
+              permission('create_bank_transaction'),
+              permission('edit_bank_transaction')
+            ),
           ]}
           component={<Import />}
         />
@@ -55,7 +64,13 @@ export const transactionRoutes = (
       path=":id/edit"
       element={
         <Guard
-          guards={[() => permission('edit_bank_transaction')]}
+          guards={[
+            or(
+              permission('view_bank_transaction'),
+              permission('edit_bank_transaction'),
+              assigned('/api/v1/bank_transactions/:id')
+            ),
+          ]}
           component={<EditTransaction />}
         />
       }
