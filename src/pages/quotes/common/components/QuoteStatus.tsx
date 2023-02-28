@@ -21,7 +21,7 @@ export function QuoteStatus(props: Props) {
   const [t] = useTranslation();
 
   const checkInvoiceInvitationsViewedDate = () => {
-    return props.entity.invitations.every(
+    return props.entity.invitations.some(
       (invitation) => invitation.viewed_date
     );
   };
