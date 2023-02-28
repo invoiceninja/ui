@@ -29,7 +29,11 @@ export const productRoutes = (
       element={
         <Guard
           guards={[
-            or(permission('view_product'), permission('create_product')),
+            or(
+              permission('view_product'),
+              permission('create_product'),
+              permission('edit_product')
+            ),
           ]}
           component={<Products />}
         />
@@ -57,7 +61,11 @@ export const productRoutes = (
       element={
         <Guard
           guards={[
-            or(permission('view_product'), assigned('/api/v1/products/:id')),
+            or(
+              permission('view_product'),
+              permission('edit_product'),
+              assigned('/api/v1/products/:id')
+            ),
           ]}
           component={<Product />}
         />
@@ -72,7 +80,11 @@ export const productRoutes = (
       element={
         <Guard
           guards={[
-            or(permission('view_product'), assigned('/api/v1/products/:id')),
+            or(
+              permission('view_product'),
+              permission('edit_product'),
+              assigned('/api/v1/products/:id')
+            ),
           ]}
           component={<Product />}
         />

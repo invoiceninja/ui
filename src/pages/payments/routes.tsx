@@ -50,7 +50,11 @@ export const paymentRoutes = (
       element={
         <Guard
           guards={[
-            or(permission('view_payment'), assigned('/api/v1/payments/:id')),
+            or(
+              permission('view_payment'),
+              permission('edit_payment'),
+              assigned('/api/v1/payments/:id')
+            ),
           ]}
           component={<Payment />}
         />
@@ -67,7 +71,11 @@ export const paymentRoutes = (
         element={
           <Guard
             guards={[
-              or(permission('edit_payment'), assigned('/api/v1/payments/:id')),
+              or(
+                permission('edit_payment'),
+                permission('view_payment'),
+                assigned('/api/v1/payments/:id')
+              ),
             ]}
             component={<Edit />}
           />

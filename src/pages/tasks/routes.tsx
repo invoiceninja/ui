@@ -42,7 +42,10 @@ export const taskRoutes = (
       path="kanban"
       element={
         <Guard
-          guards={[enabled(ModuleBitmask.Tasks), permission('view_task')]}
+          guards={[
+            enabled(ModuleBitmask.Tasks),
+            or(permission('view_task'), permission('edit_task')),
+          ]}
           component={<Kanban />}
         />
       }
@@ -62,7 +65,11 @@ export const taskRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Tasks),
-            or(permission('edit_task'), assigned('/api/v1/tasks/:id')),
+            or(
+              permission('view_task'),
+              permission('edit_task'),
+              assigned('/api/v1/tasks/:id')
+            ),
           ]}
           component={<Edit />}
         />
