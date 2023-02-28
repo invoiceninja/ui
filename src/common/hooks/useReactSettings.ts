@@ -13,13 +13,15 @@ import { RootState } from 'common/stores/store';
 import { useSelector } from 'react-redux';
 
 export function useReactSettings() {
-  let reactSettings = useSelector(
-    (state: RootState) => state.user.changes?.company_user?.react_settings
-  ) as ReactSettings | undefined;
+  const reactSettings =
+    useSelector(
+      (state: RootState) => state.user.changes?.company_user?.react_settings
+    ) || {};
 
-  if (reactSettings && typeof reactSettings.show_pdf_preview === 'undefined') {
-    reactSettings = { ...reactSettings, show_pdf_preview: true };
-  }
+  const settings: ReactSettings = {
+    show_pdf_preview: true,
+    ...reactSettings,
+  };
 
-  return reactSettings;
+  return settings;
 }
