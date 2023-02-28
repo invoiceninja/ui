@@ -8,19 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { RootState } from 'common/stores/store';
 import Toggle from 'components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { updateChanges } from 'common/stores/slices/user';
+import { useReactSettings } from 'common/hooks/useReactSettings';
 
 export function Preferences() {
   const [t] = useTranslation();
-  const reactSettingsChanges = useSelector(
-    (state: RootState) => state.user.changes?.company_user?.react_settings
-  );
   const dispatch = useDispatch();
+  const reactSettings = useReactSettings();
 
   const handleChange = (property: string, value: string | boolean) => {
     dispatch(
@@ -35,10 +33,7 @@ export function Preferences() {
     <Card title={t('preferences')}>
       <Element leftSide={t('show_pdf_preview')}>
         <Toggle
-          checked={
-            reactSettingsChanges.show_pdf_preview === true ||
-            typeof reactSettingsChanges.show_pdf_preview === 'undefined'
-          }
+          checked={reactSettings.show_pdf_preview}
           onValueChange={(value) =>
             handleChange('company_user.react_settings.show_pdf_preview', value)
           }
