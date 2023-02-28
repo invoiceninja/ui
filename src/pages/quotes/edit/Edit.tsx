@@ -14,6 +14,7 @@ import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
+import { Quote } from 'common/interfaces/quote';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
@@ -30,7 +31,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
-import { invoiceSumAtom, quoteAtom } from '../common/atoms';
+import { invoiceSumAtom } from '../common/atoms';
 import { QuoteDetails } from '../common/components/QuoteDetails';
 import { QuoteFooter } from '../common/components/QuoteFooter';
 import { useActions, useQuoteUtilities, useSave } from '../common/hooks';
@@ -53,7 +54,7 @@ export function Edit() {
 
   const { data } = useQuoteQuery({ id: id! });
 
-  const [quote, setQuote] = useAtom(quoteAtom);
+  const [quote, setQuote] = useState<Quote>();
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();

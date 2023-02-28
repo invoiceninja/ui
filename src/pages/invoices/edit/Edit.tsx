@@ -14,6 +14,7 @@ import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
+import { Invoice } from 'common/interfaces/invoice';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useInvoiceQuery } from 'common/queries/invoices';
@@ -28,7 +29,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
-import { invoiceAtom, invoiceSumAtom } from '../common/atoms';
+import { invoiceSumAtom } from '../common/atoms';
 import { ClientSelector } from '../common/components/ClientSelector';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
@@ -62,7 +63,7 @@ export function Edit() {
   const { documentTitle } = useTitle('edit_invoice');
   const { data } = useInvoiceQuery({ id });
 
-  const [invoice, setInvoice] = useAtom(invoiceAtom);
+  const [invoice, setInvoice] = useState<Invoice>();
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client | undefined>();

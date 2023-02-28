@@ -14,6 +14,7 @@ import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
+import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
@@ -30,7 +31,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
-import { invoiceSumAtom, recurringInvoiceAtom } from '../common/atoms';
+import { invoiceSumAtom } from '../common/atoms';
 import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import {
@@ -56,7 +57,7 @@ export function Edit() {
     },
   ];
 
-  const [recurringInvoice, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
+  const [recurringInvoice, setRecurringInvoice] = useState<RecurringInvoice>();
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();
