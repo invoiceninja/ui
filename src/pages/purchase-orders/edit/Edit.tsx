@@ -10,6 +10,7 @@
 
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
 import { route } from 'common/helpers/route';
+import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -43,6 +44,8 @@ export function Edit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { data } = usePurchaseOrderQuery({ id });
+
+  const reactSettings = useReactSettings();
 
   const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
@@ -180,17 +183,19 @@ export function Edit() {
         )}
       </div>
 
-      <div className="my-4">
-        {purchaseOrder && (
-          <InvoicePreview
-            for="invoice"
-            resource={purchaseOrder}
-            entity="purchase_order"
-            relationType="vendor_id"
-            endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
-          />
-        )}
-      </div>
+      {reactSettings?.show_pdf_preview && (
+        <div className="my-4">
+          {purchaseOrder && (
+            <InvoicePreview
+              for="invoice"
+              resource={purchaseOrder}
+              entity="purchase_order"
+              relationType="vendor_id"
+              endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

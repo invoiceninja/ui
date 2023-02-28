@@ -66,6 +66,7 @@ export const transactionRoutes = (
         <Guard
           guards={[
             or(
+              permission('view_bank_transaction'),
               permission('edit_bank_transaction'),
               assigned('/api/v1/bank_transactions/:id')
             ),
