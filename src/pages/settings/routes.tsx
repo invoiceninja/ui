@@ -27,6 +27,7 @@ export const settingsRoutes = (
         element={<Settings.TwoFactorAuthentication />}
       />
       <Route path="custom_fields" element={<Settings.UserCustomFields />} />
+      <Route path="preferences" element={<Settings.Preferences />} />
     </Route>
 
     <Route element={<Guard guards={[admin()]} component={<Outlet />} />}>

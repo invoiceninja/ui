@@ -10,26 +10,25 @@
 
 import { request } from 'common/helpers/request';
 import { useEffect, useRef } from 'react';
-import { useQueryClient } from 'react-query';
+import { Resource } from './InvoicePreview';
 
 interface Props {
   link: string;
-  resource?: unknown;
+  resource?: Resource;
   method: 'GET' | 'POST';
   onLink?: (url: string) => unknown;
 }
 
 export function InvoiceViewer(props: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const queryClient = useQueryClient();
 
   useEffect(() => {
-    queryClient
-      .fetchQuery(props.link, () =>
-        request(props.method, props.link, props.resource, {
-          responseType: 'arraybuffer',
-        })
-      )
+    const controller = new AbortController();
+
+    request(props.method, props.link, props.resource, {
+      responseType: 'arraybuffer',
+      signal: controller.signal,
+    })
       .then((response) => {
         const blob = new Blob([response.data], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
@@ -41,7 +40,9 @@ export function InvoiceViewer(props: Props) {
         }
       })
       .catch((error) => console.error(error));
-  }, [props.link, props.resource]);
+
+    return () => controller.abort();
+  }, [props.link, props.resource?.id]);
 
   return <iframe ref={iframeRef} width="100%" height={1500} />;
 }

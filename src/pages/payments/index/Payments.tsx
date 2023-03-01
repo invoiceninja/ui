@@ -20,6 +20,7 @@ import {
 } from '../common/hooks/usePaymentColumns';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { useActions } from '../common/hooks/useActions';
+import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
 
 export function Payments() {
   useTitle('payments');
@@ -31,6 +32,8 @@ export function Payments() {
   const columns = usePaymentColumns();
 
   const actions = useActions();
+
+  const filters = usePaymentFilters();
 
   return (
     <Default
@@ -47,6 +50,9 @@ export function Payments() {
         linkToEdit="/payments/:id/edit"
         withResourcefulActions
         customActions={actions}
+        customFilters={filters}
+        customFilterQueryKey="client_status"
+        customFilterPlaceholder="status"
         leftSideChevrons={
           <DataTableColumnsPicker
             columns={paymentColumns as unknown as string[]}

@@ -11,6 +11,7 @@
 import { blankInvitation } from 'common/constants/blank-invitation';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { Invoice } from 'common/interfaces/invoice';
@@ -47,6 +48,8 @@ export type ChangeHandler = <T extends keyof Invoice>(
 export function Create() {
   const { t } = useTranslation();
   const { documentTitle } = useTitle('new_invoice');
+
+  const reactSettings = useReactSettings();
 
   const [invoice, setInvoice] = useAtom(invoiceAtom);
 
@@ -174,7 +177,7 @@ export function Create() {
           onChange={(id) => handleChange('client_id', id)}
           onClearButtonClick={() => handleChange('client_id', '')}
           onContactCheckboxChange={handleInvitationChange}
-          readonly={searchParams.get('table') === 'tasks'}
+          readonly={searchParams.get('project') === 'true'}
           errorMessage={errors?.errors.client_id}
           disableWithSpinner={searchParams.get('action') === 'create'}
         />
@@ -252,17 +255,19 @@ export function Create() {
         )}
       </div>
 
-      <div className="my-4">
-        {invoice && (
-          <InvoicePreview
-            for="create"
-            resource={invoice}
-            entity="invoice"
-            relationType="client_id"
-            endpoint="/api/v1/live_preview?entity=:entity"
-          />
-        )}
-      </div>
+      {reactSettings?.show_pdf_preview && (
+        <div className="my-4">
+          {invoice && (
+            <InvoicePreview
+              for="create"
+              resource={invoice}
+              entity="invoice"
+              relationType="client_id"
+              endpoint="/api/v1/live_preview?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

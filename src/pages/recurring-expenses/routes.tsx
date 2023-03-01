@@ -58,6 +58,7 @@ export const recurringExpenseRoutes = (
             guards={[
               enabled(ModuleBitmask.RecurringExpenses),
               or(
+                permission('view_recurring_expense'),
                 permission('edit_recurring_expense'),
                 assigned('/api/v1/recurring_expenses/:id')
               ),
@@ -74,6 +75,7 @@ export const recurringExpenseRoutes = (
               enabled(ModuleBitmask.RecurringExpenses),
               or(
                 permission('view_recurring_expense'),
+                permission('edit_recurring_expense'),
                 assigned('/api/v1/recurring_expenses/:id')
               ),
             ]}

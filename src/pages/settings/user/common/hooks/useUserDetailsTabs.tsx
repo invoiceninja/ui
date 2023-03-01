@@ -40,6 +40,10 @@ export function useUserDetailsTabs() {
       name: t('custom_fields'),
       href: '/settings/user_details/custom_fields',
     },
+    {
+      name: t('preferences'),
+      href: '/settings/user_details/preferences',
+    },
   ];
 
   return tabs;
