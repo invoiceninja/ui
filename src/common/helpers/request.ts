@@ -38,5 +38,6 @@ export function request(
     data,
     ...config,
     headers: { ...defaultHeaders(), ...config?.headers },
+    signal: config?.signal,
   });
 }
