@@ -68,7 +68,7 @@ export const clientColumns = [
   'website',
 ] as const;
 
-type ClientColumns = typeof clientColumns[number];
+type ClientColumns = (typeof clientColumns)[number];
 
 export const defaultColumns: ClientColumns[] = [
   'name',

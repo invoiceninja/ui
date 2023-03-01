@@ -89,7 +89,7 @@ export const recurringExpenseColumns = [
   'next_send_date',
 ] as const;
 
-type RecurringExpenseColumns = typeof recurringExpenseColumns[number];
+type RecurringExpenseColumns = (typeof recurringExpenseColumns)[number];
 
 export const defaultColumns: RecurringExpenseColumns[] = [
   'status',

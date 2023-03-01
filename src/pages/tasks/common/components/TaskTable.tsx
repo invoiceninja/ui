@@ -13,6 +13,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Task } from 'common/interfaces/task';
 import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
@@ -41,6 +42,8 @@ export function TaskTable(props: Props) {
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
+
+  const [lastChangedIndex, setLastChangedIndex] = useState<number>();
 
   const createTableRow = () => {
     const logs = parseTimeLog(task.time_log);
@@ -71,6 +74,8 @@ export function TaskTable(props: Props) {
     position: number,
     index: number
   ) => {
+    setLastChangedIndex(index);
+
     handleChange(
       'time_log',
       handleTaskTimeChange(task.time_log, unix, time, position, index)
@@ -83,6 +88,8 @@ export function TaskTable(props: Props) {
     index: number,
     position: number
   ) => {
+    setLastChangedIndex(index);
+
     handleChange(
       'time_log',
       handleTaskDateChange(task.time_log, unix, value, index, position)
@@ -94,11 +101,30 @@ export function TaskTable(props: Props) {
     start: number,
     index: number
   ) => {
+    setLastChangedIndex(index);
+
     handleChange(
       'time_log',
       handleTaskDurationChange(task.time_log, value, start, index)
     );
   };
+
+  useEffect(() => {
+    if (typeof lastChangedIndex === 'number') {
+      const parsedTimeLog = parseTimeLog(task.time_log);
+
+      const startTime = parsedTimeLog[lastChangedIndex][0];
+      const endTime = parsedTimeLog[lastChangedIndex][1];
+
+      if (startTime && endTime && startTime > endTime) {
+        parsedTimeLog[lastChangedIndex][1] = startTime;
+
+        handleChange('time_log', JSON.stringify(parsedTimeLog));
+      }
+
+      setLastChangedIndex(undefined);
+    }
+  }, [lastChangedIndex]);
 
   return (
     <Table>
@@ -139,7 +165,7 @@ export function TaskTable(props: Props) {
                       type="date"
                       value={parseTimeToDate(stop)}
                       onValueChange={(value) =>
-                        handleDateChange(start, value, index, LogPosition.End)
+                        handleDateChange(stop, value, index, LogPosition.End)
                       }
                     />
                   </Td>
@@ -149,7 +175,7 @@ export function TaskTable(props: Props) {
                     type="time"
                     value={parseTime(stop || 0)}
                     onValueChange={(value) =>
-                      handleTimeChange(start, value, LogPosition.End, index)
+                      handleTimeChange(stop, value, LogPosition.End, index)
                     }
                     step="1"
                   />
@@ -158,7 +184,7 @@ export function TaskTable(props: Props) {
                   <div className="flex items-center space-x-4">
                     <InputField
                       debounceTimeout={1000}
-                      value={duration(start, stop)}
+                      value={duration(start, stop, company?.show_task_end_date)}
                       onValueChange={(value) =>
                         handleDurationChange(value, start, index)
                       }

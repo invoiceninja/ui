@@ -19,7 +19,7 @@ import { TaxRate } from 'common/interfaces/tax-rate';
 import { useCurrentCompany } from '../useCurrentCompany';
 import { useHasPermission } from '../permissions/useHasPermission';
 import { proPlan } from 'common/guards/guards/pro-plan';
-import { enabled } from 'common/guards/guards/enabled';
+import { useEnabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
 
 interface EntityAction {
@@ -32,19 +32,15 @@ interface EntityAction {
 
 export function useQuickCreateActions() {
   const currentCompany = useCurrentCompany();
-
   const hasPermission = useHasPermission();
+  const enabled = useEnabled();
 
   const { data: gatewaysData } = useCompanyGatewaysQuery();
-
   const { data: bankAccountsData } = useBankAccountsQuery();
-
   const { data: taxRatesData } = useTaxRatesQuery({});
 
   const [gateways, setGateways] = useState<CompanyGateway[]>();
-
   const [bankAccounts, setBankAccounts] = useState<BankAccount[]>();
-
   const [taxRates, setTaxRates] = useState<TaxRate[]>();
 
   useEffect(() => {

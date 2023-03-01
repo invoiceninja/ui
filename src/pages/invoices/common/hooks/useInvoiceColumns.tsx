@@ -78,7 +78,7 @@ export const invoiceColumns = [
   'updated_at',
 ] as const;
 
-type InvoiceColumns = typeof invoiceColumns[number];
+type InvoiceColumns = (typeof invoiceColumns)[number];
 
 export const defaultColumns: InvoiceColumns[] = [
   'status',

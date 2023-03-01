@@ -54,7 +54,7 @@ export const paymentColumns = [
   'updated_at',
 ] as const;
 
-type PaymentColumns = typeof paymentColumns[number];
+type PaymentColumns = (typeof paymentColumns)[number];
 
 export const defaultColumns = [
   'status',

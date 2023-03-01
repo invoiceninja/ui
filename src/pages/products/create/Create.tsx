@@ -70,7 +70,7 @@ export function Create() {
             setErrors(error.response.data);
             toast.dismiss();
           } else {
-            console.log(error);
+            console.error(error);
             toast.error();
           }
         })

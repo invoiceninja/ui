@@ -76,7 +76,7 @@ export const expenseColumns = [
   'updated_at',
 ] as const;
 
-type ExpenseColumns = typeof expenseColumns[number];
+type ExpenseColumns = (typeof expenseColumns)[number];
 
 export function useActions() {
   const [t] = useTranslation();

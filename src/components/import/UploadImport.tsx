@@ -26,6 +26,7 @@ import { MdClose } from 'react-icons/md';
 interface Props {
   entity: string;
   onSuccess: boolean;
+  onFileImported?: () => unknown;
   type: string;
 }
 
@@ -117,6 +118,7 @@ export function UploadImport(props: Props) {
     request('POST', endpoint(endPointUrl, params), requestData)
       .then((response) => {
         toast.success(response?.data?.message ?? 'error_title');
+        props.onFileImported?.();
         props.onSuccess;
       })
       .catch((error) => {
