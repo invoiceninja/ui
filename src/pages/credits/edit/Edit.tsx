@@ -13,7 +13,6 @@ import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
-import { Credit } from 'common/interfaces/credit';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { Page } from 'components/Breadcrumbs';
@@ -31,7 +30,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
-import { invoiceSumAtom } from '../common/atoms';
+import { creditAtom, invoiceSumAtom } from '../common/atoms';
 import { CreditDetails } from '../common/components/CreditDetails';
 import { CreditFooter } from '../common/components/CreditFooter';
 import { useActions, useCreditUtilities, useSave } from '../common/hooks';
@@ -54,7 +53,7 @@ export function Edit() {
 
   const { data } = useCreditQuery({ id: id! });
 
-  const [credit, setCredit] = useState<Credit>();
+  const [credit, setQuote] = useAtom(creditAtom);
   const [invoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();
@@ -79,7 +78,7 @@ export function Edit() {
 
       _credit.line_items.map((item) => (item._id = v4()));
 
-      setCredit(_credit);
+      setQuote(_credit);
 
       if (_credit && _credit.client) {
         setClient(_credit.client);
