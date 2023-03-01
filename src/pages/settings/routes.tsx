@@ -13,6 +13,7 @@ import { admin } from 'common/guards/guards/admin';
 import { Outlet, Route } from 'react-router-dom';
 import { plan } from 'common/guards/guards/plan';
 import * as Settings from './index';
+import { isDemo } from 'common/helpers';
 
 export const settingsRoutes = (
   <Route path="/settings">
@@ -54,10 +55,22 @@ export const settingsRoutes = (
       <Route path="expense_settings" element={<Settings.ExpenseSettings />} />
       <Route path="workflow_settings" element={<Settings.WorkflowSettings />} />
       <Route path="import_export" element={<Settings.ImportExport />} />
-      <Route
-        path="account_management"
-        element={<Settings.AccountManagement />}
-      />
+      <Route path="account_management" element={<Settings.AccountManagement />}>
+        <Route path="" element={<Settings.Plan />} />
+        <Route
+          path="overview"
+          element={<Settings.AccountManagementOverview />}
+        />
+        <Route path="enabled_modules" element={<Settings.EnabledModules />} />
+        <Route path="integrations" element={<Settings.Integrations />} />
+        <Route
+          path="security_settings"
+          element={<Settings.SecuritySettings />}
+        />
+        {!isDemo() && (
+          <Route path="danger_zone" element={<Settings.DangerZone />} />
+        )}
+      </Route>
       <Route path="backup_restore" element={<Settings.CompanyBackupRestore />}>
         <Route path="" element={<Settings.CompanyBackup />} />
         <Route path="restore" element={<Settings.CompanyRestore />} />
