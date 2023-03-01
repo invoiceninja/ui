@@ -23,6 +23,7 @@ import { customField } from 'components/CustomField';
 import { SelectOption } from 'components/datatables/Actions';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { Icon } from 'components/icons/Icon';
+import { Tooltip } from 'components/Tooltip';
 import dayjs from 'dayjs';
 import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
@@ -135,7 +136,11 @@ export function useTaskColumns() {
       column: 'description',
       id: 'description',
       label: t('description'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'duration',

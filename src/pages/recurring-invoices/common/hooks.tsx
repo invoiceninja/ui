@@ -58,6 +58,7 @@ import {
   MdStopCircle,
 } from 'react-icons/md';
 import { invalidationQueryAtom } from 'common/atoms/data-table';
+import { Tooltip } from 'components/Tooltip';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -644,13 +645,21 @@ export function useRecurringInvoiceColumns() {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'updated_at',

@@ -45,6 +45,7 @@ import {
 } from 'react-icons/md';
 import { invalidationQueryAtom } from 'common/atoms/data-table';
 import { RecurringExpenseStatus as RecurringExpenseStatusBadge } from './components/RecurringExpenseStatus';
+import { Tooltip } from 'components/Tooltip';
 
 export const recurringExpenseColumns = [
   'status',
@@ -190,7 +191,11 @@ export function useRecurringExpenseColumns() {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'entity_state',
@@ -289,7 +294,11 @@ export function useRecurringExpenseColumns() {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'should_be_invoiced',

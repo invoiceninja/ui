@@ -23,6 +23,7 @@ import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
 import { Inline } from 'components/Inline';
+import { Tooltip } from 'components/Tooltip';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useCallback } from 'react';
 import { ExternalLink } from 'react-feather';
@@ -291,13 +292,21 @@ export function useClientColumns() {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'state',
