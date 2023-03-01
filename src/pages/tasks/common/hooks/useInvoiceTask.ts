@@ -22,6 +22,7 @@ import collect from 'collect.js';
 import toast from 'react-hot-toast';
 import { useAtom } from 'jotai';
 import { invoiceAtom } from 'pages/invoices/common/atoms';
+import { route } from 'common/helpers/route';
 
 export function useInvoiceTask() {
   const navigate = useNavigate();
@@ -31,6 +32,25 @@ export function useInvoiceTask() {
   const { data } = useBlankInvoiceQuery();
 
   const [, setInvoice] = useAtom(invoiceAtom);
+
+  const calculateTaskHours = (timeLog: string) => {
+    const parsedTimeLogs = parseTimeLog(timeLog);
+
+    let hoursSum = 0;
+
+    if (parsedTimeLogs.length) {
+      parsedTimeLogs.forEach(([start, stop]) => {
+        const unixStart = dayjs.unix(start);
+        const unixStop = dayjs.unix(stop);
+
+        hoursSum += Number(
+          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
+        );
+      });
+    }
+
+    return hoursSum;
+  };
 
   return (tasks: Task[]) => {
     if (data) {
@@ -71,9 +91,14 @@ export function useInvoiceTask() {
           );
         });
 
+        const taskQuantity = calculateTaskHours(task.time_log);
+
         const item: InvoiceItem = {
           ...blankLineItem(),
           type_id: InvoiceItemType.Task,
+          cost: task.rate,
+          quantity: taskQuantity,
+          line_total: Number((task.rate * taskQuantity).toFixed(2)),
         };
 
         item.notes = [
@@ -90,7 +115,11 @@ export function useInvoiceTask() {
 
       setInvoice(invoice);
 
-      navigate('/invoices/create&table=tasks');
+      navigate(
+        route('/invoices/create?table=tasks&project=:projectAssigned', {
+          projectAssigned: Boolean(tasks[0].project_id),
+        })
+      );
     }
   };
 }
