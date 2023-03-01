@@ -85,7 +85,7 @@ export function Edit() {
         }
       })
       .finally(() =>
-        queryClient.invalidateQueries(route('/api/v1/invoices/:id', { id }))
+        queryClient.invalidateQueries(route('/api/v1/tasks/:id', { id }))
       );
   };
 

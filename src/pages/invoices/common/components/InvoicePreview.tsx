@@ -17,9 +17,11 @@ import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
 import { InvoiceViewer } from './InvoiceViewer';
 import { RelationType } from './ProductsTable';
 
+export type Resource = Invoice | RecurringInvoice | Quote | Credit | PurchaseOrder;
+
 interface Props {
   for: 'create' | 'invoice';
-  resource: Invoice | RecurringInvoice | Quote | Credit | PurchaseOrder;
+  resource: Resource;
   entity:
     | 'invoice'
     | 'recurring_invoice'
