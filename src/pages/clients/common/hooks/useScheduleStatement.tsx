@@ -30,8 +30,6 @@ export function useScheduleStatement() {
           : statement.dateRangeId,
     });
 
-    console.log('ok');
-
     navigate('/settings/schedules/create?template=email_statement');
   };
 }
