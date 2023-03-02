@@ -71,6 +71,7 @@ import {
   MdPictureAsPdf,
   MdRestore,
 } from 'react-icons/md';
+import { Tooltip } from 'components/Tooltip';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -482,7 +483,7 @@ export const creditColumns = [
   // 'vendor', @Todo: Need to fetch the relationship
 ] as const;
 
-type CreditColumns = (typeof creditColumns)[number];
+type CreditColumns = typeof creditColumns[number];
 
 export const defaultColumns: CreditColumns[] = [
   'status',
@@ -720,13 +721,21 @@ export function useCreditColumns() {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'tax_amount',
