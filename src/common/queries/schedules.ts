@@ -14,10 +14,10 @@ import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { route } from 'common/helpers/route';
 import { Schedule } from 'common/interfaces/schedule';
-import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
+import { useAdmin } from 'common/hooks/permissions/useHasPermission';
 
 export function useBlankScheduleQuery() {
-  const hasPermission = useHasPermission();
+  const { isAdmin, isOwner } = useAdmin();
 
   return useQuery<Schedule>(
     '/api/v1/task_schedulers/create',
@@ -26,7 +26,7 @@ export function useBlankScheduleQuery() {
         (response: GenericSingleResourceResponse<Schedule>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: hasPermission('create_task_schedule') }
+    { staleTime: Infinity, enabled: isAdmin || isOwner }
   );
 }
 
@@ -35,7 +35,7 @@ interface ScheduleParams {
 }
 
 export function useScheduleQuery(params: ScheduleParams) {
-  const hasPermission = useHasPermission();
+  const { isAdmin, isOwner } = useAdmin();
 
   return useQuery<Schedule>(
     route('/api/v1/task_schedulers/:id', { id: params.id }),
@@ -47,6 +47,6 @@ export function useScheduleQuery(params: ScheduleParams) {
         (response: GenericSingleResourceResponse<Schedule>) =>
           response.data.data
       ),
-    { staleTime: Infinity, enabled: hasPermission('edit_task_schedule') }
+    { staleTime: Infinity, enabled: isAdmin || isOwner }
   );
 }
