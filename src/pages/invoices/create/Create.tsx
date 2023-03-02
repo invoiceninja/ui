@@ -95,7 +95,10 @@ export function Create() {
     setInvoice((current) => {
       let value = current;
 
-      if (searchParams.get('action') !== 'clone') {
+      if (
+        searchParams.get('action') !== 'clone' &&
+        searchParams.get('action') !== 'invoice'
+      ) {
         value = undefined;
       }
 

@@ -115,7 +115,9 @@ export function useInvoiceProject() {
 
       setInvoice(invoice);
 
-      navigate(route('/invoices/create?table=tasks&project=true'));
+      navigate(
+        route('/invoices/create?table=tasks&project=true&action=invoice')
+      );
     }
   };
 }
