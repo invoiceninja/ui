@@ -68,7 +68,7 @@ export const projectColumns = [
   'updated_at',
 ] as const;
 
-export type ProjectColumns = (typeof projectColumns)[number];
+export type ProjectColumns = typeof projectColumns[number];
 
 export const defaultColumns: ProjectColumns[] = [
   'name',
@@ -266,11 +266,7 @@ export function useActions() {
             );
 
             if (!response.data.data.length) {
-              toast.error('no_assigned_tasks');
-            }
-
-            if (!unInvoicedTasks.length && response.data.data.length) {
-              toast.error('no_uninvoiced_tasks');
+              return toast.error('no_assigned_tasks');
             }
 
             invoiceProject(unInvoicedTasks);
