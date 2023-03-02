@@ -32,6 +32,7 @@ import { updateRecord } from 'common/stores/slices/company-users';
 import { toast } from 'common/helpers/toast/toast';
 import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useAdmin } from 'common/hooks/permissions/useHasPermission';
 
 export function UserDetails() {
   useTitle('user_details');
@@ -58,25 +59,35 @@ export function UserDetails() {
 
   const userState = useSelector((state: RootState) => state.user);
 
+  const { isAdmin } = useAdmin();
+
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {
     toast.processing();
+
     setErrors(undefined);
 
-    axios
-      .all([
-        request(
-          'PUT',
-          endpoint('/api/v1/users/:id?include=company_user', { id: user!.id }),
-          userState.changes,
-          { headers: { 'X-Api-Password': password } }
-        ),
+    const requests = [
+      request(
+        'PUT',
+        endpoint('/api/v1/users/:id?include=company_user', { id: user!.id }),
+        userState.changes,
+        { headers: { 'X-Api-Password': password } }
+      ),
+    ];
+
+    if (isAdmin) {
+      requests.push(
         request(
           'PUT',
           endpoint('/api/v1/companies/:id', { id: company?.id }),
           company
-        ),
-      ])
+        )
+      );
+    }
+
+    axios
+      .all(requests)
       .then((response) => {
         toast.success('updated_settings');
 
@@ -84,9 +95,10 @@ export function UserDetails() {
 
         window.dispatchEvent(new CustomEvent('user.updated'));
 
-        dispatch(
-          updateRecord({ object: 'company', data: response[1].data.data })
-        );
+        isAdmin &&
+          dispatch(
+            updateRecord({ object: 'company', data: response[1].data.data })
+          );
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 412) {

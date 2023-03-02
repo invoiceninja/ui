@@ -51,13 +51,13 @@ export function Actions(props: Props) {
   const cloneToTask = () => {
     setTask({ ...task, id: '', documents: [], number: '' });
 
-    navigate('/tasks/create');
+    navigate('/tasks/create?action=clone');
   };
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
       <div>
-        {!isTaskRunning(task) && (
+        {!isTaskRunning(task) && !task.invoice_id && (
           <DropdownElement
             onClick={() => start(task)}
             icon={<Icon element={MdNotStarted} />}
@@ -66,7 +66,7 @@ export function Actions(props: Props) {
           </DropdownElement>
         )}
 
-        {isTaskRunning(task) && (
+        {isTaskRunning(task) && !task.invoice_id && (
           <DropdownElement
             onClick={() => stop(task)}
             icon={<Icon element={MdStopCircle} />}

@@ -9,9 +9,9 @@
  */
 
 import { blankInvitation } from 'common/constants/blank-invitation';
-import { isProduction } from 'common/helpers';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { Invoice } from 'common/interfaces/invoice';
@@ -49,6 +49,8 @@ export function Create() {
   const { t } = useTranslation();
   const { documentTitle } = useTitle('new_invoice');
 
+  const reactSettings = useReactSettings();
+
   const [invoice, setInvoice] = useAtom(invoiceAtom);
 
   const { data } = useBlankInvoiceQuery({
@@ -61,7 +63,7 @@ export function Create() {
   const productColumns = useProductColumns();
   const taskColumns = useTaskColumns();
 
-  const [invoiceSum] = useAtom(invoiceSumAtom);
+  const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
 
   const [searchParams] = useSearchParams();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -88,38 +90,50 @@ export function Create() {
   const save = useHandleCreate(setErrors);
 
   useEffect(() => {
-    if (typeof data !== 'undefined' && typeof invoice === 'undefined') {
-      const _invoice = cloneDeep(data);
+    setInvoiceSum(undefined);
 
-      if (company && company.enabled_tax_rates > 0) {
-        _invoice.tax_name1 = company.settings.tax_name1;
-        _invoice.tax_rate1 = company.settings.tax_rate1;
+    setInvoice((current) => {
+      let value = current;
+
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
       }
 
-      if (company && company.enabled_tax_rates > 1) {
-        _invoice.tax_name2 = company.settings.tax_name2;
-        _invoice.tax_rate2 = company.settings.tax_rate2;
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const _invoice = cloneDeep(data);
+
+        if (company && company.enabled_tax_rates > 0) {
+          _invoice.tax_name1 = company.settings.tax_name1;
+          _invoice.tax_rate1 = company.settings.tax_rate1;
+        }
+
+        if (company && company.enabled_tax_rates > 1) {
+          _invoice.tax_name2 = company.settings.tax_name2;
+          _invoice.tax_rate2 = company.settings.tax_rate2;
+        }
+
+        if (company && company.enabled_tax_rates > 2) {
+          _invoice.tax_name3 = company.settings.tax_name3;
+          _invoice.tax_rate3 = company.settings.tax_rate3;
+        }
+
+        if (typeof _invoice.line_items === 'string') {
+          _invoice.line_items = [];
+        }
+
+        if (searchParams.get('client')) {
+          _invoice.client_id = searchParams.get('client')!;
+        }
+
+        value = _invoice;
       }
 
-      if (company && company.enabled_tax_rates > 2) {
-        _invoice.tax_name3 = company.settings.tax_name3;
-        _invoice.tax_rate3 = company.settings.tax_rate3;
-      }
-
-      if (typeof _invoice.line_items === 'string') {
-        _invoice.line_items = [];
-      }
-
-      if (searchParams.get('client')) {
-        _invoice.client_id = searchParams.get('client')!;
-      }
-
-      setInvoice(_invoice);
-    }
-
-    return () => {
-      isProduction() && setInvoice(undefined);
-    };
+      return value;
+    });
   }, [data]);
 
   useEffect(() => {
@@ -163,8 +177,9 @@ export function Create() {
           onChange={(id) => handleChange('client_id', id)}
           onClearButtonClick={() => handleChange('client_id', '')}
           onContactCheckboxChange={handleInvitationChange}
-          readonly={searchParams.get('table') === 'tasks'}
+          readonly={searchParams.get('project') === 'true'}
           errorMessage={errors?.errors.client_id}
+          disableWithSpinner={searchParams.get('action') === 'create'}
         />
 
         <InvoiceDetails
@@ -240,17 +255,19 @@ export function Create() {
         )}
       </div>
 
-      <div className="my-4">
-        {invoice && (
-          <InvoicePreview
-            for="create"
-            resource={invoice}
-            entity="invoice"
-            relationType="client_id"
-            endpoint="/api/v1/live_preview?entity=:entity"
-          />
-        )}
-      </div>
+      {reactSettings?.show_pdf_preview && (
+        <div className="my-4">
+          {invoice && (
+            <InvoicePreview
+              for="create"
+              resource={invoice}
+              entity="invoice"
+              relationType="client_id"
+              endpoint="/api/v1/live_preview?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

@@ -112,7 +112,7 @@ export const purchaseOrderColumns = [
   'exchange_rate',
 ] as const;
 
-type PurchaseOrderColumns = typeof purchaseOrderColumns[number];
+type PurchaseOrderColumns = (typeof purchaseOrderColumns)[number];
 
 export const defaultColumns: PurchaseOrderColumns[] = [
   'status',
@@ -376,7 +376,7 @@ export function useActions() {
   const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
     setPurchaseOrder({ ...purchaseOrder, number: '', documents: [] });
 
-    navigate('/purchase_orders/create');
+    navigate('/purchase_orders/create?action=clone');
   };
 
   const actions: Action<PurchaseOrder>[] = [

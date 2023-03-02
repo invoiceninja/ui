@@ -119,7 +119,30 @@ export function Defaults() {
             />
           </Element>
 
-          <Element leftSide={t('use_quote_terms')}>
+          <Element
+            leftSide={t('mark_paid_payment_email')}
+            leftSideHelp={t('mark_paid_payment_email_help')}
+          >
+            <Toggle
+              checked={
+                companyChanges?.settings?.mark_paid_payment_email || false
+              }
+              onChange={(value: boolean) =>
+                dispatch(
+                  updateChanges({
+                    object: 'company',
+                    property: 'settings.mark_paid_payment_email',
+                    value,
+                  })
+                )
+              }
+            />
+          </Element>
+
+          <Element
+            leftSide={t('use_quote_terms')}
+            leftSideHelp={t('use_quote_terms_help')}
+          >
             <Toggle
               checked={companyChanges?.use_quote_terms_on_conversion}
               onChange={(value: boolean) =>

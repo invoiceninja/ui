@@ -11,24 +11,13 @@
 import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
+import { Tabs } from 'components/Tabs';
 import { useTranslation } from 'react-i18next';
+import { Outlet } from 'react-router-dom';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
-import {
-  GeneralSettings,
-  ClientDetails,
-  CompanyDetails,
-  CompanyAddress,
-  InvoiceDetails,
-  CreditDetails,
-  QuoteDetails,
-  ProductColumns,
-  TaskColumns,
-  TotalFields,
-} from './components';
-import { PurchaseOrderDetails } from './components/PurchaseOrderDetails';
-import { VendorDetails } from './components/VendorDetails';
+import { useInvoiceDesignTabs } from './common/hooks';
 
 export function InvoiceDesign() {
   useTitle('invoice_design');
@@ -46,6 +35,8 @@ export function InvoiceDesign() {
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
+  const tabs = useInvoiceDesignTabs();
+
   return (
     <Settings
       title={t('invoice_design')}
@@ -55,20 +46,13 @@ export function InvoiceDesign() {
       onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
     >
+      <Tabs tabs={tabs} className="mt-6" />
+
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
-      <GeneralSettings />
-      <ClientDetails />
-      <CompanyDetails />
-      <CompanyAddress />
-      <InvoiceDetails />
-      <QuoteDetails />
-      <CreditDetails />
-      <VendorDetails />
-      <PurchaseOrderDetails />
-      <ProductColumns />
-      <TaskColumns />
-      <TotalFields />
+      <div className="my-4">
+        <Outlet />
+      </div>
     </Settings>
   );
 }

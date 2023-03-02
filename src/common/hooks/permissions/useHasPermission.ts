@@ -8,9 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CompanyUser } from 'common/interfaces/company-user';
-import { RootState } from 'common/stores/store';
-import { useSelector } from 'react-redux';
+import { useCurrentCompanyUser } from '../useCurrentCompanyUser';
 
 type ClientPermissions = 'create_client' | 'view_client' | 'edit_client';
 type ProductPermissions = 'create_product' | 'view_product' | 'edit_product';
@@ -31,9 +29,13 @@ type RecurringExpensePermissions =
   | 'view_recurring_expense'
   | 'edit_recurring_expense';
 type BankTransactionsPermissions =
-  | 'create_transaction'
-  | 'view_transaction'
-  | 'edit_transaction';
+  | 'create_bank_transaction'
+  | 'view_bank_transaction'
+  | 'edit_bank_transaction';
+type PurchaseOrderPermissions =
+  | 'create_purchase_order'
+  | 'view_purchase_order'
+  | 'edit_purchase_order';
 
 export type Permissions =
   | ClientPermissions
@@ -48,16 +50,30 @@ export type Permissions =
   | VendorPermissions
   | ExpensePermissions
   | RecurringExpensePermissions
-  | BankTransactionsPermissions;
+  | BankTransactionsPermissions
+  | PurchaseOrderPermissions;
 
 export function useHasPermission() {
-  const user = useSelector(
-    (state: RootState) =>
-      state.companyUsers.api[state.companyUsers.currentIndex]
-  ) as CompanyUser;
+  const user = useCurrentCompanyUser();
 
-  const permissions = user?.permissions ?? '';
+  return (permission: Permissions) => {
+    const permissions = user?.permissions ?? '';
+    const [action] = permission.split('_');
 
-  return (permission: Permissions) =>
-    user?.is_admin || user?.is_owner || permissions.includes(permission);
+    return Boolean(
+      user?.is_admin ||
+        user?.is_owner ||
+        permissions.includes(permission) ||
+        permissions.includes(`${action}_all`)
+    );
+  };
+}
+
+export function useAdmin() {
+  const user = useCurrentCompanyUser();
+
+  return {
+    isAdmin: Boolean(user?.is_admin),
+    isOwner: Boolean(user?.is_owner || user?.is_owner),
+  };
 }

@@ -14,12 +14,33 @@ import { toast } from 'common/helpers/toast/toast';
 import { Task } from 'common/interfaces/task';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
+import { parseTimeLog } from '../helpers/calculate-time';
+import dayjs from 'dayjs';
+import { isOverlapping } from '../helpers/is-overlapping';
 
 export function useStop() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (task: Task) => {
     toast.processing();
+
+    const logs = parseTimeLog(task.time_log);
+
+    const startTime = logs[logs.length - 1][0];
+    const currentTime = dayjs().unix();
+
+    if (startTime && startTime > currentTime) {
+      logs[logs.length - 1][1] = startTime + 1;
+
+      task.time_log = JSON.stringify(logs);
+    } else {
+      if (isOverlapping(task)) {
+        return toast.error('task_errors');
+      }
+    }
 
     request(
       'PUT',
@@ -42,6 +63,9 @@ export function useStop() {
             projectId: task.project_id,
           })
         );
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
       })
       .catch((error) => {
         console.error(error);

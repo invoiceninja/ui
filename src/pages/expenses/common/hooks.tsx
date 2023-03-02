@@ -75,7 +75,7 @@ export const expenseColumns = [
   'updated_at',
 ] as const;
 
-type ExpenseColumns = typeof expenseColumns[number];
+type ExpenseColumns = (typeof expenseColumns)[number];
 
 export function useActions() {
   const [t] = useTranslation();
@@ -89,7 +89,7 @@ export function useActions() {
   const cloneToExpense = (expense: Expense) => {
     setExpense({ ...expense, documents: [], number: '' });
 
-    navigate('/expenses/create');
+    navigate('/expenses/create?action=clone');
   };
 
   const cloneToRecurringExpense = (expense: Expense) => {
@@ -99,7 +99,7 @@ export function useActions() {
       number: '',
     });
 
-    navigate('/recurring_expenses/create');
+    navigate('/recurring_expenses/create?action=clone');
   };
 
   const actions: Action<Expense>[] = [

@@ -9,10 +9,11 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
+import { endpoint, isProduction } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import React, {
   ChangeEvent,
+  ReactElement,
   ReactNode,
   useEffect,
   useRef,
@@ -39,10 +40,11 @@ import {
   Thead,
   Tr,
 } from './tables';
-import { atomWithStorage } from 'jotai/utils';
+import { atomWithStorage, useUpdateAtom } from 'jotai/utils';
 import { useAtom } from 'jotai';
 import { Icon } from './icons/Icon';
 import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -72,6 +74,8 @@ interface Props<T> {
   beforeFilter?: ReactNode;
 }
 
+type ResourceAction<T> = (resource: T) => ReactElement;
+
 export const datatablePerPageAtom = atomWithStorage('perPage', '10');
 
 export function DataTable<T extends object>(props: Props<T>) {
@@ -80,6 +84,9 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [apiEndpoint, setApiEndpoint] = useState(
     new URL(endpoint(props.endpoint))
   );
+
+  const setInvalidationQueryAtom = useUpdateAtom(invalidationQueryAtom);
+  setInvalidationQueryAtom(props.endpoint);
 
   const queryClient = useQueryClient();
 
@@ -118,18 +125,14 @@ export function DataTable<T extends object>(props: Props<T>) {
     apiEndpoint.searchParams.set('status', status as unknown as string);
 
     setApiEndpoint(apiEndpoint);
+
+    return () => {
+      isProduction() && setInvalidationQueryAtom(undefined);
+    };
   }, [perPage, currentPage, filter, sort, status, customFilter]);
 
   const { data, isLoading, isError } = useQuery(
-    [
-      props.endpoint,
-      perPage,
-      currentPage,
-      filter,
-      sort,
-      status,
-      customFilter,
-    ],
+    [props.endpoint, perPage, currentPage, filter, sort, status, customFilter],
     () => request('GET', apiEndpoint.href),
     {
       staleTime: props.staleTime || 5000,
@@ -178,7 +181,7 @@ export function DataTable<T extends object>(props: Props<T>) {
         toast.error();
       })
       .finally(() => {
-        queryClient.invalidateQueries(apiEndpoint.pathname);
+        queryClient.invalidateQueries([props.endpoint]);
         setSelected([]);
       });
   };
@@ -352,12 +355,14 @@ export function DataTable<T extends object>(props: Props<T>) {
                       )}
 
                       {props.customActions &&
-                        props.customActions?.map(
-                          (action: any, index: number) => (
-                            <React.Fragment key={index}>
-                              {action(resource)}
-                            </React.Fragment>
-                          )
+                        props.customActions.map(
+                          (
+                            action: ResourceAction<typeof resource>,
+                            index: number
+                          ) =>
+                            action(resource).key !== 'purge' && (
+                              <div key={index}>{action(resource)}</div>
+                            )
                         )}
 
                       {props.customActions && <Divider withoutPadding />}
@@ -388,6 +393,17 @@ export function DataTable<T extends object>(props: Props<T>) {
                           {t('delete')}
                         </DropdownElement>
                       )}
+
+                      {props.customActions &&
+                        props.customActions.map(
+                          (
+                            action: ResourceAction<typeof resource>,
+                            index: number
+                          ) =>
+                            action(resource).key === 'purge' && (
+                              <div key={index}>{action(resource)}</div>
+                            )
+                        )}
                     </Dropdown>
                   </Td>
                 )}

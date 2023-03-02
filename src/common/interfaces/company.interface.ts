@@ -17,6 +17,7 @@ export interface Company {
   enabled_tax_rates: number;
   enabled_item_tax_rates: number;
   enable_product_discount: boolean;
+  convert_expense_currency: boolean;
   custom_surcharge_taxes1: boolean;
   custom_surcharge_taxes2: boolean;
   custom_surcharge_taxes3: boolean;
@@ -31,8 +32,10 @@ export interface Company {
   enable_applying_payments: boolean;
   enabled_expense_tax_rates: number;
   stock_notification: boolean;
+  invoice_task_lock: boolean;
   track_inventory: boolean;
   stop_on_unpaid_recurring: boolean;
+  enabled_modules: number;
 }
 
 export interface CompanyInput {
@@ -44,6 +47,7 @@ export interface CompanyInput {
 
 export interface Settings {
   auto_archive_invoice: boolean;
+  auto_bill_standard_invoices: boolean;
   lock_invoices: string;
   enable_client_portal_tasks: boolean;
   show_all_tasks_client_portal: string;
@@ -58,6 +62,7 @@ export interface Settings {
   military_time: boolean;
   language_id: string;
   show_currency_code: boolean;
+  show_email_footer: boolean;
   company_gateway_ids: string;
   currency_id: string;
   custom_value1: string;
@@ -106,6 +111,9 @@ export interface Settings {
   payment_number_counter: number;
   project_number_pattern: string;
   project_number_counter: number;
+  postmark_secret: string;
+  mailgun_secret: string;
+  mailgun_domain: string;
   purchase_order_number_pattern: string;
   purchase_order_number_counter: number;
   shared_invoice_quote_counter: boolean;

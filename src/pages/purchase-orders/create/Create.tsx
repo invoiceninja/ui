@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isProduction } from 'common/helpers';
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -42,6 +42,8 @@ export function Create() {
   const { documentTitle } = useTitle('new_purchase_order');
   const { t } = useTranslation();
 
+  const reactSettings = useReactSettings();
+
   const [searchParams] = useSearchParams();
 
   const pages: Page[] = [
@@ -59,36 +61,41 @@ export function Create() {
   });
 
   useEffect(() => {
-    if (data && !purchaseOrder) {
-      const po = cloneDeep(data);
+    setPurchaseOrder((current) => {
+      let value = current;
 
-      if (typeof po.line_items === 'string') {
-        po.line_items = [];
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
       }
 
-      po.line_items.forEach((item) => (item._id = v4()));
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const po = cloneDeep(data);
 
-      po.invitations.forEach(
-        (invitation) =>
-          (invitation['client_contact_id'] = invitation.client_contact_id || '')
-      );
+        if (typeof po.line_items === 'string') {
+          po.line_items = [];
+        }
 
-      setPurchaseOrder(po);
-    }
+        if (searchParams.get('vendor')) {
+          po.vendor_id = searchParams.get('vendor')!;
+        }
 
-    if (searchParams.has('vendor')) {
-      setPurchaseOrder(
-        (current) =>
-          current && {
-            ...current,
-            vendor_id: searchParams.get('vendor') as string,
-          }
-      );
-    }
+        po.line_items.forEach((item) => (item._id = v4()));
 
-    return () => {
-      isProduction() && setPurchaseOrder(undefined);
-    };
+        po.invitations.forEach(
+          (invitation) =>
+            (invitation['client_contact_id'] =
+              invitation.client_contact_id || '')
+        );
+
+        value = po;
+      }
+
+      return value;
+    });
   }, [data]);
 
   const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();
@@ -190,17 +197,19 @@ export function Create() {
         )}
       </div>
 
-      <div className="my-4">
-        {purchaseOrder && (
-          <InvoicePreview
-            for="create"
-            resource={purchaseOrder}
-            entity="purchase_order"
-            relationType="vendor_id"
-            endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
-          />
-        )}
-      </div>
+      {reactSettings?.show_pdf_preview && (
+        <div className="my-4">
+          {purchaseOrder && (
+            <InvoicePreview
+              for="create"
+              resource={purchaseOrder}
+              entity="purchase_order"
+              relationType="vendor_id"
+              endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

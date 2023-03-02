@@ -14,9 +14,13 @@ import { Invoice } from 'common/interfaces/invoice';
 import { useQueryClient } from 'react-query';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 
 export function useMarkSent() {
   const queryClient = useQueryClient();
+
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (invoice: Invoice) => {
     toast.processing();
@@ -34,6 +38,9 @@ export function useMarkSent() {
         queryClient.invalidateQueries(
           route('/api/v1/invoices/:id', { id: invoice.id })
         );
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
       })
       .catch((error) => {
         toast.error();

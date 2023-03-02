@@ -21,6 +21,10 @@ import {
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { ImportButton } from 'components/import/ImportButton';
 import { useActions } from '../common/hooks/useActions';
+import { MergeClientModal } from '../common/components/MergeClientModal';
+import { useState } from 'react';
+import { PasswordConfirmation } from 'components/PasswordConfirmation';
+import { usePurgeClient } from '../common/hooks/usePurgeClient';
 
 export function Clients() {
   useTitle('clients');
@@ -29,9 +33,23 @@ export function Clients() {
 
   const pages: Page[] = [{ name: t('clients'), href: '/clients' }];
 
-  const actions = useActions();
+  const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
+  const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
+    useState<boolean>(false);
+
+  const [mergeFromClientId, setMergeFromClientId] = useState<string>('');
+  const [purgeClientId, setPurgeClientId] = useState<string>('');
+
+  const actions = useActions({
+    setIsMergeModalOpen,
+    setMergeFromClientId,
+    setPasswordConfirmModalOpen,
+    setPurgeClientId,
+  });
 
   const columns = useClientColumns();
+
+  const handlePurgeClient = usePurgeClient(purgeClientId);
 
   return (
     <Default breadcrumbs={pages} title={t('clients')} docsLink="docs/clients">
@@ -51,6 +69,18 @@ export function Clients() {
             defaultColumns={defaultColumns}
           />
         }
+      />
+
+      <MergeClientModal
+        visible={isMergeModalOpen}
+        setVisible={setIsMergeModalOpen}
+        mergeFromClientId={mergeFromClientId}
+      />
+
+      <PasswordConfirmation
+        show={isPasswordConfirmModalOpen}
+        onClose={setPasswordConfirmModalOpen}
+        onSave={handlePurgeClient}
       />
     </Default>
   );

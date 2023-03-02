@@ -95,7 +95,7 @@ export function SignInProviders() {
 
   return (
     <div className="grid grid-cols-3 text-sm mt-4">
-      <div className="col-span-3 flex flex-col space-y-3">
+      <div className="col-span-3 flex flex-col items-center space-y-3">
         <GoogleLogin
           clientId={googleClientId}
           render={(renderProps) => (

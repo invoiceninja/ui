@@ -9,8 +9,8 @@
  */
 
 import { blankInvitation } from 'common/constants/blank-invitation';
-import { isProduction } from 'common/helpers';
 import { useClientResolver } from 'common/hooks/clients/useClientResolver';
+import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { Client } from 'common/interfaces/client';
 import { InvoiceItemType } from 'common/interfaces/invoice-item';
@@ -37,6 +37,8 @@ import { useBlankQuoteQuery } from '../common/queries';
 export function Create() {
   const { documentTitle } = useTitle('new_quote');
   const { t } = useTranslation();
+
+  const reactSettings = useReactSettings();
 
   const pages: Page[] = [
     { name: t('quotes'), href: '/quotes' },
@@ -72,23 +74,33 @@ export function Create() {
   } = useQuoteUtilities({ client });
 
   useEffect(() => {
-    if (typeof data !== 'undefined' && typeof quote === 'undefined') {
-      const _quote = cloneDeep(data);
+    setQuote((current) => {
+      let value = current;
 
-      if (typeof _quote.line_items === 'string') {
-        _quote.line_items = [];
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
       }
 
-      if (searchParams.get('client')) {
-        _quote.client_id = searchParams.get('client')!;
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const _quote = cloneDeep(data);
+
+        if (typeof _quote.line_items === 'string') {
+          _quote.line_items = [];
+        }
+
+        if (searchParams.get('client')) {
+          _quote.client_id = searchParams.get('client')!;
+        }
+
+        return (value = _quote);
       }
 
-      setQuote(_quote);
-    }
-
-    return () => {
-      isProduction() && setQuote(undefined);
-    };
+      return value;
+    });
   }, [data]);
 
   useEffect(() => {
@@ -133,6 +145,7 @@ export function Create() {
           onClearButtonClick={() => handleChange('client_id', '')}
           onContactCheckboxChange={handleInvitationChange}
           errorMessage={errors?.errors.client_id}
+          disableWithSpinner={searchParams.get('action') === 'create'}
         />
 
         <QuoteDetails handleChange={handleChange} errors={errors} />
@@ -172,17 +185,19 @@ export function Create() {
         )}
       </div>
 
-      <div className="my-4">
-        {quote && (
-          <InvoicePreview
-            for="create"
-            resource={quote}
-            entity="quote"
-            relationType="client_id"
-            endpoint="/api/v1/live_preview?entity=:entity"
-          />
-        )}
-      </div>
+      {reactSettings?.show_pdf_preview && (
+        <div className="my-4">
+          {quote && (
+            <InvoicePreview
+              for="create"
+              resource={quote}
+              entity="quote"
+              relationType="client_id"
+              endpoint="/api/v1/live_preview?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

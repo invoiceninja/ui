@@ -8,20 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Element } from '@invoiceninja/cards';
 import { Link } from '@invoiceninja/forms';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useClientQuery } from 'common/queries/clients';
+import { Client } from 'common/interfaces/client';
 import { InfoCard } from 'components/InfoCard';
+import { EntityStatus } from 'components/EntityStatus';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
 
-export function Details() {
+interface Props {
+  client: Client;
+}
+
+export function Details(props: Props) {
   const [t] = useTranslation();
-  const { id } = useParams();
-  const { data: client } = useClientQuery({ id });
+
   const formatMoney = useFormatMoney();
+
   const company = useCurrentCompany();
+
+  const { client } = props;
 
   return (
     <>
@@ -31,36 +38,39 @@ export function Details() {
             title={t('details')}
             value={
               <>
-                <Link to={client.data.data.website} external>
-                  {client.data.data.website}
+                <Element leftSide={t('status')} noExternalPadding>
+                  <EntityStatus entity={client} />
+                </Element>
+
+                <Link to={client.website} external>
+                  {client.website}
                 </Link>
 
-                {client.data.data.vat_number.length > 1 && (
+                {client.vat_number.length > 1 && (
                   <p>
-                    {t('vat_number')}: {client.data.data.vat_number}
+                    {t('vat_number')}: {client.vat_number}
                   </p>
                 )}
 
-                {client.data.data.phone.length > 1 && (
+                {client.phone.length > 1 && (
                   <p>
-                    {t('phone')}: {client.data.data.phone}
+                    {t('phone')}: {client.phone}
                   </p>
                 )}
 
-                {parseFloat(client.data.data.settings.default_task_rate) >
-                  0 && (
+                {parseFloat(client.settings.default_task_rate) > 0 && (
                   <p className="space-x-1">
                     <span>{t('task_rate')}:</span>
                     <span>
-                      {client.data.data.settings.default_task_rate
+                      {client.settings.default_task_rate
                         ? formatMoney(
-                            client.data.data.settings.default_task_rate,
-                            client.data.data.country_id,
-                            client.data.data.settings.currency_id
+                            client.settings.default_task_rate,
+                            client.country_id,
+                            client.settings.currency_id
                           )
                         : formatMoney(
                             company.settings.default_task_rate,
-                            client.data.data.country_id,
+                            client.country_id,
                             company.settings.currency_id
                           )}
                     </span>

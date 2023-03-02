@@ -15,6 +15,8 @@ import { route } from 'common/helpers/route';
 import { endpoint } from '../helpers';
 import { Product } from 'common/interfaces/product';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { GenericQueryOptions } from './invoices';
+import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
 
 export function useProductsQuery() {
   return useQuery<Product[]>(
@@ -35,11 +37,20 @@ export function useProductQuery(params: { id: string | undefined }) {
     { staleTime: Infinity }
   );
 }
-export function useBlankProductQuery() {
+export function useBlankProductQuery(options?: GenericQueryOptions) {
+  const hasPermission = useHasPermission();
+
   return useQuery(
     route('/api/v1/products/create'),
-    () => request('GET', endpoint('/api/v1/products/create')),
-    { staleTime: Infinity }
+    () =>
+      request('GET', endpoint('/api/v1/products/create')).then(
+        (response: GenericSingleResourceResponse<Product>) => response.data.data
+      ),
+    {
+      ...options,
+      staleTime: Infinity,
+      enabled: hasPermission('create_product'),
+    }
   );
 }
 

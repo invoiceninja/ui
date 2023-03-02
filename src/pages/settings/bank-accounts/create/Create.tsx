@@ -10,6 +10,9 @@
 
 import { Card, Element } from '@invoiceninja/cards';
 import { InputField } from '@invoiceninja/forms';
+import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
+import { proPlan } from 'common/guards/guards/pro-plan';
+import { isHosted } from 'common/helpers';
 import { useTitle } from 'common/hooks/useTitle';
 import { BankAccount } from 'common/interfaces/bank-accounts';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -65,6 +68,7 @@ export function Create() {
       title={t('new_bank_account')}
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#create_bank_account"
+      disableSaveButton={!enterprisePlan() && !proPlan() && isHosted()}
       onSaveClick={handleSave}
     >
       <Card onFormSubmit={handleSave} title={t('new_bank_account')}>

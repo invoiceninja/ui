@@ -8,15 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { invalidationQueryAtom } from 'common/atoms/data-table';
 import { Invoice } from 'common/interfaces/invoice';
 import { bulk } from 'common/queries/invoices';
+import { useAtomValue } from 'jotai';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
 export function useHandleCancel() {
   const [t] = useTranslation();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (invoice: Invoice) => {
     const toastId = toast.loading(t('processing'));
@@ -24,6 +29,9 @@ export function useHandleCancel() {
     bulk([invoice.id], 'cancel')
       .then(() => {
         toast.success(t('cancelled_invoice'), { id: toastId });
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
 
         navigate('/invoices');
       })

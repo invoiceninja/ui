@@ -18,6 +18,8 @@ import { Expenses } from './index/Expenses';
 import { Import } from 'pages/expenses/import/Import';
 import { enabled } from 'common/guards/guards/enabled';
 import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { or } from 'common/guards/guards/or';
+import { assigned } from 'common/guards/guards/assigned';
 
 export const expenseRoutes = (
   <Route path="expenses">
@@ -26,8 +28,12 @@ export const expenseRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Expenses),
-            () => permission('view_expense'),
+            enabled(ModuleBitmask.Expenses),
+            or(
+              permission('view_expense'),
+              permission('create_expense'),
+              permission('edit_expense')
+            ),
           ]}
           component={<Expenses />}
         />
@@ -38,8 +44,8 @@ export const expenseRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Expenses),
-            () => permission('create_expense') || permission('edit_expense'),
+            enabled(ModuleBitmask.Expenses),
+            or(permission('create_expense'), permission('edit_expense')),
           ]}
           component={<Import />}
         />
@@ -50,8 +56,8 @@ export const expenseRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Expenses),
-            () => permission('create_expense'),
+            enabled(ModuleBitmask.Expenses),
+            permission('create_expense'),
           ]}
           component={<Create />}
         />
@@ -63,8 +69,12 @@ export const expenseRoutes = (
         element={
           <Guard
             guards={[
-              () => enabled(ModuleBitmask.Expenses),
-              () => permission('edit_expense'),
+              enabled(ModuleBitmask.Expenses),
+              or(
+                permission('view_expense'),
+                permission('edit_expense'),
+                assigned('/api/v1/expenses/:id')
+              ),
             ]}
             component={<Edit />}
           />
@@ -75,8 +85,12 @@ export const expenseRoutes = (
         element={
           <Guard
             guards={[
-              () => enabled(ModuleBitmask.Expenses),
-              () => permission('view_expense'),
+              enabled(ModuleBitmask.Expenses),
+              or(
+                permission('view_expense'),
+                permission('edit_expense'),
+                assigned('/api/v1/expenses/:id')
+              ),
             ]}
             component={<Documents />}
           />

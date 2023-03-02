@@ -19,6 +19,7 @@ import { useUserQuery } from 'common/queries/users';
 import { Alert } from 'components/Alert';
 import { Settings } from 'components/layouts/Settings';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
+import { TabGroup } from 'components/TabGroup';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -40,6 +41,8 @@ export function Edit() {
 
   const [user, setUser] = useState<User>();
   const [t] = useTranslation();
+
+  const tabs: string[] = [t('details'), t('notifications'), t('permissions')];
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -92,7 +95,7 @@ export function Edit() {
       .fetchQuery(generatePath('/api/v1/users/:id', { id: id! }), () =>
         request(
           'GET',
-          endpoint('/api/v1/users/:id', { id: id! }),
+          endpoint('/api/v1/users/:id?include=company_user', { id: id! }),
           {},
           { headers: { 'X-Api-Password': password } }
         )
@@ -125,9 +128,11 @@ export function Edit() {
         <Alert type="warning">{t('email_sent_to_confirm_email')}.</Alert>
       )}
 
-      {user && <Details user={user} setUser={setUser} />}
-      {user && <Notifications user={user} setUser={setUser} />}
-      {user && <Permissions user={user} setUser={setUser} />}
+      <TabGroup tabs={tabs}>
+        <div>{user && <Details user={user} setUser={setUser} />}</div>
+        <div>{user && <Notifications user={user} setUser={setUser} />}</div>
+        <div>{user && <Permissions user={user} setUser={setUser} />}</div>
+      </TabGroup>
     </Settings>
   );
 }
