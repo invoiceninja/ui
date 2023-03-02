@@ -16,10 +16,10 @@ import { useNavigate } from 'react-router-dom';
 export function useScheduleStatement() {
   const navigate = useNavigate();
 
-  const updateScheduleParameters = useUpdateAtom(scheduleParametersAtom);
+  const setScheduleParameters = useUpdateAtom(scheduleParametersAtom);
 
   return (statement: Statement) => {
-    updateScheduleParameters({
+    setScheduleParameters({
       clients: [statement.client_id],
       show_aging_table: statement.show_aging_table,
       show_payments_table: statement.show_payments_table,
