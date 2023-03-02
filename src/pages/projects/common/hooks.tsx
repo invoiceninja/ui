@@ -9,14 +9,19 @@
  */
 
 import { Link } from '@invoiceninja/forms';
+import { AxiosError } from 'axios';
 import { EntityState } from 'common/enums/entity-state';
-import { date, getEntityState } from 'common/helpers';
+import { date, endpoint, getEntityState } from 'common/helpers';
+import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
+import { toast } from 'common/helpers/toast/toast';
 import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Project } from 'common/interfaces/project';
+import { Task } from 'common/interfaces/task';
 import { Divider } from 'components/cards/Divider';
 import { customField } from 'components/CustomField';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
@@ -25,16 +30,18 @@ import { Icon } from 'components/icons/Icon';
 import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
-import { BiPlusCircle } from 'react-icons/bi';
 import {
   MdArchive,
   MdControlPointDuplicate,
   MdDelete,
   MdRestore,
+  MdTextSnippet,
 } from 'react-icons/md';
+import { useQueryClient } from 'react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { projectAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
+import { useInvoiceProject } from './hooks/useInvoiceProject';
 
 export const projectColumns = [
   'name',
@@ -218,12 +225,14 @@ export function useProjectColumns() {
 
 export function useActions() {
   const [t] = useTranslation();
-
   const location = useLocation();
-
   const navigate = useNavigate();
 
+  const queryClient = useQueryClient();
+
   const bulk = useBulkAction();
+
+  const invoiceProject = useInvoiceProject();
 
   const isEditPage = location.pathname.endsWith('/edit');
 
@@ -235,11 +244,49 @@ export function useActions() {
     navigate('/projects/create');
   };
 
+  const handleInvoiceProject = (project: Project) => {
+    toast.processing();
+
+    queryClient.fetchQuery({
+      queryKey: route('/api/v1/tasks?project_tasks=:projectId&per_page=100', {
+        projectId: project.id,
+      }),
+      queryFn: () =>
+        request(
+          'GET',
+          endpoint('/api/v1/tasks?project_tasks=:projectId&per_page=100', {
+            projectId: project.id,
+          })
+        )
+          .then((response: GenericSingleResourceResponse<Task[]>) => {
+            toast.dismiss();
+
+            const unInvoicedTasks = response.data.data.filter(
+              (task) => !task.invoice_id
+            );
+
+            if (!response.data.data.length) {
+              toast.error('no_assigned_tasks');
+            }
+
+            if (!unInvoicedTasks.length && response.data.data.length) {
+              toast.error('no_uninvoiced_tasks');
+            }
+
+            invoiceProject(unInvoicedTasks);
+          })
+          .catch((error: AxiosError) => {
+            toast.error();
+            console.error(error);
+          }),
+    });
+  };
+
   const actions = [
     (project: Project) => (
       <DropdownElement
-        onClick={() => cloneToProject(project)}
-        icon={<Icon element={BiPlusCircle} />}
+        onClick={() => handleInvoiceProject(project)}
+        icon={<Icon element={MdTextSnippet} />}
       >
         {t('invoice_project')}
       </DropdownElement>
