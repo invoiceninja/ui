@@ -53,7 +53,7 @@ export function useInvoiceProject() {
   };
 
   return (tasks: Task[]) => {
-    if (data && tasks.length) {
+    if (data) {
       const invoice: Invoice = { ...data };
 
       if (company && company.enabled_tax_rates > 0) {
@@ -77,7 +77,7 @@ export function useInvoiceProject() {
         return toast.error('multiple_client_error');
       }
 
-      invoice.client_id = tasks[0].client_id;
+      invoice.client_id = tasks.length ? tasks[0].client_id : '';
 
       tasks.forEach((task) => {
         const logs = parseTimeLog(task.time_log);
