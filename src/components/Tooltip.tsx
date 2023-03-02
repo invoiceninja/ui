@@ -46,7 +46,7 @@ export function Tooltip(props: Props) {
 
   return (
     <div
-      className={classNames(`${props.className}`, {
+      className={classNames(props.className, {
         'max-w-sm': props.size === undefined || props.size === 'small',
         'max-w-md': props.size === 'regular',
         'max-w-xl': props.size === 'large',
