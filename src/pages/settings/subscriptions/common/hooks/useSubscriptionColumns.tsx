@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Subscription } from 'common/interfaces/subscription';
-import { DataTableColumns } from 'components/DataTable';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Subscription } from '$app/common/interfaces/subscription';
+import { DataTableColumns } from '$app/components/DataTable';
 import { useTranslation } from 'react-i18next';
 
 export const useSubscriptionColumns = () => {

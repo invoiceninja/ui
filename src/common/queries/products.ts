@@ -9,14 +9,14 @@
  */
 
 import { AxiosResponse } from 'axios';
-import { request } from 'common/helpers/request';
+import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { endpoint } from '../helpers';
-import { Product } from 'common/interfaces/product';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { Product } from '$app/common/interfaces/product';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GenericQueryOptions } from './invoices';
-import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export function useProductsQuery() {
   return useQuery<Product[]>(

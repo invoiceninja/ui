@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { Page } from 'components/Breadcrumbs';
-import { DataTable } from 'components/DataTable';
-import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
-import { Default } from 'components/layouts/Default';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Page } from '$app/components/Breadcrumbs';
+import { DataTable } from '$app/components/DataTable';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,

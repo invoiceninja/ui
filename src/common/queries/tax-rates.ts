@@ -9,10 +9,10 @@
  */
 
 import { AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { Params } from './common/params.interface';
 
 export function useTaxRatesQuery(params: Params) {

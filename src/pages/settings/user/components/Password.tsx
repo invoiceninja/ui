@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { deletePassword, updateChanges } from 'common/stores/slices/user';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { deletePassword, updateChanges } from '$app/common/stores/slices/user';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';

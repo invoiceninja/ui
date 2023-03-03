@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { aliases } from 'common/constants/product-aliases';
+import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import { aliases } from '$app/common/constants/product-aliases';
 import { resolveKey } from './resolve-key';
 
 export function resolveProperty(property: string) {

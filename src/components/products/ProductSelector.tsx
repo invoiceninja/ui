@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Product } from 'common/interfaces/product';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
-import { ProductCreate } from 'pages/invoices/common/components/ProductCreate';
+import { Product } from '$app/common/interfaces/product';
+import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import { ProductCreate } from '$app/pages/invoices/common/components/ProductCreate';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

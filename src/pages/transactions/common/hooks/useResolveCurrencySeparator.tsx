@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 
 export function useResolveCurrencySeparator() {
   const resolveCurrency = useResolveCurrency();

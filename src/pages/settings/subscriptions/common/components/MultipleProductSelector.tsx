@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Product } from 'common/interfaces/product';
-import { Subscription } from 'common/interfaces/subscription';
-import { Link, SelectField } from '@invoiceninja/forms';
+import { Product } from '$app/common/interfaces/product';
+import { Subscription } from '$app/common/interfaces/subscription';
+import { Link, SelectField } from '$app/components/forms';
 import { MdClose } from 'react-icons/md';
 import { useEffect, useState } from 'react';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { route } from 'common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { route } from '$app/common/helpers/route';
 import { BsBox } from 'react-icons/bs';
 import { useNavigate } from 'react-router-dom';
 

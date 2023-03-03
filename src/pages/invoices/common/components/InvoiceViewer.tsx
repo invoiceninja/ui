@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { request } from 'common/helpers/request';
+import { request } from '$app/common/helpers/request';
 import { useEffect, useRef } from 'react';
 import { Resource } from './InvoicePreview';
 

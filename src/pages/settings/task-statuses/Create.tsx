@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ButtonOption, Card, CardContainer } from '@invoiceninja/cards';
-import { InputField, InputLabel } from '@invoiceninja/forms';
+import { ButtonOption, Card, CardContainer } from '$app/components/cards';
+import { InputField, InputLabel } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { useTitle } from 'common/hooks/useTitle';
-import { TaskStatus } from 'common/interfaces/task-status';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankTaskStatusQuery } from 'common/queries/task-statuses';
-import { Breadcrumbs } from 'components/Breadcrumbs';
-import { Container } from 'components/Container';
-import { ColorPicker } from 'components/forms/ColorPicker';
-import { Icon } from 'components/icons/Icon';
-import { Settings } from 'components/layouts/Settings';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { TaskStatus } from '$app/common/interfaces/task-status';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankTaskStatusQuery } from '$app/common/queries/task-statuses';
+import { Breadcrumbs } from '$app/components/Breadcrumbs';
+import { Container } from '$app/components/Container';
+import { ColorPicker } from '$app/components/forms/ColorPicker';
+import { Icon } from '$app/components/icons/Icon';
+import { Settings } from '$app/components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';

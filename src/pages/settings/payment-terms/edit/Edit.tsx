@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
+import { Card, CardContainer, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { useTitle } from 'common/hooks/useTitle';
-import { PaymentTerm } from 'common/interfaces/payment-term';
-import { usePaymentTermQuery } from 'common/queries/payment-terms';
-import { Badge } from 'components/Badge';
-import { Breadcrumbs } from 'components/Breadcrumbs';
-import { Container } from 'components/Container';
-import { Settings } from 'components/layouts/Settings';
-import { Spinner } from 'components/Spinner';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { usePaymentTermQuery } from '$app/common/queries/payment-terms';
+import { Badge } from '$app/components/Badge';
+import { Breadcrumbs } from '$app/components/Breadcrumbs';
+import { Container } from '$app/components/Container';
+import { Settings } from '$app/components/layouts/Settings';
+import { Spinner } from '$app/components/Spinner';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';

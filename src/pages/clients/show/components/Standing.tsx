@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { Client } from 'common/interfaces/client';
-import { InfoCard } from 'components/InfoCard';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { Client } from '$app/common/interfaces/client';
+import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
 
 interface Props {

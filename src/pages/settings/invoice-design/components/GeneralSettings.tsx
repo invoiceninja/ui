@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import colors from 'common/constants/colors';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { Design } from 'common/interfaces/design';
-import { useDesignsQuery } from 'common/queries/designs';
-import { updateChanges } from 'common/stores/slices/company-users';
-import { Divider } from 'components/cards/Divider';
-import { ColorPicker } from 'components/forms/ColorPicker';
+import colors from '$app/common/constants/colors';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { Design } from '$app/common/interfaces/design';
+import { useDesignsQuery } from '$app/common/queries/designs';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Divider } from '$app/components/cards/Divider';
+import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { useAtom } from 'jotai';
 import { range } from 'lodash';
 import { ChangeEvent, useEffect } from 'react';

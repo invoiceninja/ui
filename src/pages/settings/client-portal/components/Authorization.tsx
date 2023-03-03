@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { Divider } from 'components/cards/Divider';
-import Toggle from 'components/forms/Toggle';
-import { useHandleCurrentCompanyChangeProperty } from 'pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { Card, Element } from '$app/components/cards';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { Divider } from '$app/components/cards/Divider';
+import Toggle from '$app/components/forms/Toggle';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 
 export function Authorization() {

@@ -9,12 +9,12 @@
  */
 
 import React from 'react';
-import { useCurrencyResolver } from 'common/helpers/currencies/currency-resolver';
-import { Client } from 'common/interfaces/client';
-import { Currency } from 'common/interfaces/currency';
-import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
-import { Vendor } from 'common/interfaces/vendor';
-import { RelationType } from 'pages/invoices/common/components/ProductsTable';
+import { useCurrencyResolver } from '$app/common/helpers/currencies/currency-resolver';
+import { Client } from '$app/common/interfaces/client';
+import { Currency } from '$app/common/interfaces/currency';
+import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { RelationType } from '$app/pages/invoices/common/components/ProductsTable';
 import { useClientResolver } from './clients/useClientResolver';
 import { useCurrentCompany } from './useCurrentCompany';
 import { useResolveCountry } from './useResolveCountry';

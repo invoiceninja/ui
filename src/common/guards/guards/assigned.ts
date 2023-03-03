@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Guard } from '../Guard';
 
 export function assigned(apiEndpoint: string, key = 'id'): Guard {

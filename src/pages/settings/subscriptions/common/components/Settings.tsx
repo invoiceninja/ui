@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
+import { Card, Element } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SubscriptionProps } from './Overview';
-import frequencies from 'common/constants/frequency';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { Inline } from 'components/Inline';
-import Toggle from 'components/forms/Toggle';
-import { Subscription } from 'common/interfaces/subscription';
+import frequencies from '$app/common/constants/frequency';
+import { InputField, SelectField } from '$app/components/forms';
+import { Inline } from '$app/components/Inline';
+import Toggle from '$app/components/forms/Toggle';
+import { Subscription } from '$app/common/interfaces/subscription';
 
 export function Settings(props: SubscriptionProps) {
   const [t] = useTranslation();

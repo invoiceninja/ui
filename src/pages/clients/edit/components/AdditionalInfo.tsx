@@ -8,26 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
 import MDEditor from '@uiw/react-md-editor';
-import { endpoint } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useCurrencies } from 'common/hooks/useCurrencies';
-import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useLanguages } from 'common/hooks/useLanguages';
-import { useQuery } from 'common/hooks/useQuery';
-import { Client } from 'common/interfaces/client';
-import { PaymentTerm } from 'common/interfaces/payment-term';
-import { useStaticsQuery } from 'common/queries/statics';
-import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
-import { DocumentsTable } from 'components/DocumentsTable';
-import Toggle from 'components/forms/Toggle';
-import { TabGroup } from 'components/TabGroup';
+import { endpoint } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useCurrencies } from '$app/common/hooks/useCurrencies';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useLanguages } from '$app/common/hooks/useLanguages';
+import { useQuery } from '$app/common/hooks/useQuery';
+import { Client } from '$app/common/interfaces/client';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { useStaticsQuery } from '$app/common/queries/statics';
+import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import Toggle from '$app/components/forms/Toggle';
+import { TabGroup } from '$app/components/TabGroup';
 import { set } from 'lodash';
-import { Upload } from 'pages/settings/company/documents/components';
-import { Field } from 'pages/settings/custom-fields/components';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { Field } from '$app/pages/settings/custom-fields/components';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';

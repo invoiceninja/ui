@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useShouldDisableCustomFields } from 'common/hooks/useShouldDisableCustomFields';
+import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer, Element } from '../../../../components/cards';

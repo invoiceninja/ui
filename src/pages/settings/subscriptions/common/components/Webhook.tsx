@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { Subscription } from 'common/interfaces/subscription';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { Subscription } from '$app/common/interfaces/subscription';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';

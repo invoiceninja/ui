@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
 import MDEditor from '@uiw/react-md-editor';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
-import { freePlan } from 'common/guards/guards/free-plan';
-import { proPlan } from 'common/guards/guards/pro-plan';
-import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
-import { useHandleSend } from 'common/hooks/emails/useHandleSend';
-import { useResolveTemplate } from 'common/hooks/emails/useResolveTemplate';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Invoice } from 'common/interfaces/invoice';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { Quote } from 'common/interfaces/quote';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
-import { Contact } from 'components/emails/Contact';
-import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
-import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
-import { MailerComponent } from 'pages/purchase-orders/email/Email';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { freePlan } from '$app/common/guards/guards/free-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
+import { useHandleSend } from '$app/common/hooks/emails/useHandleSend';
+import { useResolveTemplate } from '$app/common/hooks/emails/useResolveTemplate';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Contact } from '$app/components/emails/Contact';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { useGeneratePdfUrl } from '$app/pages/invoices/common/hooks/useGeneratePdfUrl';
+import { MailerComponent } from '$app/pages/purchase-orders/email/Email';
 import { forwardRef, RefObject, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

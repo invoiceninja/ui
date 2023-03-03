@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
+import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
-import { TabGroup } from 'components/TabGroup';
+import { TabGroup } from '$app/components/TabGroup';
 import { BillingAddress } from './address/BillingAddress';
 import { ShippingAddress } from './address/ShippingAddress';
-import { Client } from 'common/interfaces/client';
+import { Client } from '$app/common/interfaces/client';
 
 interface Props {
   client: Client | undefined;

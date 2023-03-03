@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from 'components/Badge';
+import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 
 interface Props {
   entity: RecurringInvoice;

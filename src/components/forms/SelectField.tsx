@@ -9,7 +9,7 @@
  */
 
 import classNames from 'classnames';
-import { Alert } from 'components/Alert';
+import { Alert } from '$app/components/Alert';
 import { InputLabel } from '.';
 import CommonProps from '../../common/interfaces/common-props.interface';
 

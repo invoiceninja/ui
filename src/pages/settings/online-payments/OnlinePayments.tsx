@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
+import { Card, Element } from '$app/components/cards';
 
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useTitle } from 'common/hooks/useTitle';
-import Toggle from 'components/forms/Toggle';
-import { Settings } from 'components/layouts/Settings';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
+import Toggle from '$app/components/forms/Toggle';
+import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 import { InputField, Link, SelectField } from '../../../components/forms';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
@@ -23,8 +23,8 @@ import {
   useHandleCurrentCompanyChangeProperty,
 } from '../common/hooks/useHandleCurrentCompanyChange';
 import { Gateways } from '../gateways/index/Gateways';
-import { usePaymentTermsQuery } from 'common/queries/payment-terms';
-import { PaymentTerm } from 'common/interfaces/payment-term';
+import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { useEffect, useState } from 'react';
 
 export function OnlinePayments() {

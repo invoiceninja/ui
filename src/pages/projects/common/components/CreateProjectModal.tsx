@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField } from '@invoiceninja/forms';
+import { Button, InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
-import { useClientResolver } from 'common/hooks/clients/useClientResolver';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { Project } from 'common/interfaces/project';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankProjectQuery } from 'common/queries/projects';
-import { ClientSelector } from 'components/clients/ClientSelector';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
-import { Modal } from 'components/Modal';
-import { Spinner } from 'components/Spinner';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Project } from '$app/common/interfaces/project';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankProjectQuery } from '$app/common/queries/projects';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { DebouncedCombobox } from '$app/components/forms/DebouncedCombobox';
+import { Modal } from '$app/components/Modal';
+import { Spinner } from '$app/components/Spinner';
 import {
   Dispatch,
   FormEvent,

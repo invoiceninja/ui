@@ -8,44 +8,44 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Expense } from 'common/interfaces/expense';
-import { StatusBadge } from 'components/StatusBadge';
-import recurringExpensesFrequency from 'common/constants/recurring-expense-frequency';
+import { Expense } from '$app/common/interfaces/expense';
+import { StatusBadge } from '$app/components/StatusBadge';
+import recurringExpensesFrequency from '$app/common/constants/recurring-expense-frequency';
 import { useTranslation } from 'react-i18next';
-import { date, endpoint } from 'common/helpers';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { EntityStatus } from 'components/EntityStatus';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { Link } from '@invoiceninja/forms';
-import { route } from 'common/helpers/route';
-import { Divider } from 'components/cards/Divider';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Action } from 'components/ResourceActions';
+import { date, endpoint } from '$app/common/helpers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { Link } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Action } from '$app/components/ResourceActions';
 import { useNavigate } from 'react-router-dom';
 import { recurringExpenseAtom } from './atoms';
-import { RecurringExpense } from 'common/interfaces/recurring-expense';
-import { RecurringExpenseStatus } from 'common/enums/recurring-expense-status';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
+import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
+import { RecurringExpenseStatus } from '$app/common/enums/recurring-expense-status';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
-import { expenseAtom } from 'pages/expenses/common/atoms';
-import paymentType from 'common/constants/payment-type';
-import { customField } from 'components/CustomField';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { expenseAtom } from '$app/pages/expenses/common/atoms';
+import paymentType from '$app/common/constants/payment-type';
+import { customField } from '$app/components/CustomField';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAtomValue, useUpdateAtom } from 'jotai/utils';
-import { Icon } from 'components/icons/Icon';
+import { Icon } from '$app/components/icons/Icon';
 import {
   MdControlPointDuplicate,
   MdNotStarted,
   MdStopCircle,
 } from 'react-icons/md';
-import { invalidationQueryAtom } from 'common/atoms/data-table';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { RecurringExpenseStatus as RecurringExpenseStatusBadge } from './components/RecurringExpenseStatus';
-import { Tooltip } from 'components/Tooltip';
+import { Tooltip } from '$app/components/Tooltip';
 
 export const recurringExpenseColumns = [
   'status',

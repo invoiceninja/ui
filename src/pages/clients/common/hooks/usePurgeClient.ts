@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { AxiosError } from 'axios';
-import { invalidationQueryAtom } from 'common/atoms/data-table';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';

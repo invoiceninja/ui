@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { DesignSelector } from 'common/generic/DesignSelector';
-import { endpoint } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { ClientSelector } from 'components/clients/ClientSelector';
-import { DocumentsTable } from 'components/DocumentsTable';
-import { MarkdownEditor } from 'components/forms/MarkdownEditor';
-import { ProjectSelector } from 'components/projects/ProjectSelector';
-import { TabGroup } from 'components/TabGroup';
-import { UserSelector } from 'components/users/UserSelector';
-import { Upload } from 'pages/settings/company/documents/components';
+import { Card } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { DesignSelector } from '$app/common/generic/DesignSelector';
+import { endpoint } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { ProjectSelector } from '$app/components/projects/ProjectSelector';
+import { TabGroup } from '$app/components/TabGroup';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { Upload } from '$app/pages/settings/company/documents/components';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';

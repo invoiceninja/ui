@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { useTitle } from 'common/hooks/useTitle';
-import { Settings } from 'components/layouts/Settings';
+import { Card } from '$app/components/cards';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 import { CreateExpenseCategoryForm } from './components/CreateExpenseCategoryForm';
 

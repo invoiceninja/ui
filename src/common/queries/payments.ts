@@ -9,17 +9,17 @@
  */
 
 import { AxiosError } from 'axios';
-import { request } from 'common/helpers/request';
+import { request } from '$app/common/helpers/request';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { endpoint } from '../helpers';
-import { Payment } from 'common/interfaces/payment';
+import { Payment } from '$app/common/interfaces/payment';
 import { Params } from './common/params.interface';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { toast } from 'common/helpers/toast/toast';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
-import { invalidationQueryAtom } from 'common/atoms/data-table';
-import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface PaymentParams {
   id: string | undefined;
