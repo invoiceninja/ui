@@ -57,7 +57,7 @@
     "lint": "eslint \"**/*.{ts,tsx}\" --max-warnings=0",
     "test": "jest",
     "prepare": "husky install",
-    "preview": "npm run build && vite preview"
+    "preview": "vite preview"
   },
   "browserslist": {
     "production": [
