@@ -14,6 +14,7 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { Transaction } from 'common/interfaces/transactions';
 import { DataTableColumns } from 'components/DataTable';
+import { Tooltip } from 'components/Tooltip';
 import { EntityStatus } from 'pages/transactions/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 
@@ -67,6 +68,11 @@ export function useTransactionColumns() {
     {
       id: 'description',
       label: t('description'),
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     { id: 'invoices', label: t('invoices') },
     { id: 'expense', label: t('expense') },

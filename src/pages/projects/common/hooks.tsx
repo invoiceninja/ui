@@ -22,6 +22,7 @@ import { customField } from 'components/CustomField';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
 import { Icon } from 'components/icons/Icon';
+import { Tooltip } from 'components/Tooltip';
 import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +61,7 @@ export const projectColumns = [
   'updated_at',
 ] as const;
 
-export type ProjectColumns = typeof projectColumns[number];
+export type ProjectColumns = (typeof projectColumns)[number];
 
 export const defaultColumns: ProjectColumns[] = [
   'name',
@@ -112,13 +113,21 @@ export function useProjectColumns() {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'budgeted_hours',

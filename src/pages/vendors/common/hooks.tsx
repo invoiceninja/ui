@@ -20,6 +20,7 @@ import { Vendor } from 'common/interfaces/vendor';
 import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
+import { Tooltip } from 'components/Tooltip';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -53,7 +54,7 @@ export const vendorColumns = [
   'website',
 ] as const;
 
-type VendorColumns = typeof vendorColumns[number];
+type VendorColumns = (typeof vendorColumns)[number];
 
 export const defaultColumns: VendorColumns[] = [
   'number',
@@ -218,7 +219,11 @@ export function useVendorColumns() {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'updated_at',

@@ -9,6 +9,7 @@
  */
 
 import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { useReactSettings } from 'common/hooks/useReactSettings';
 import { useTitle } from 'common/hooks/useTitle';
 import { PurchaseOrder } from 'common/interfaces/purchase-order';
 import { ValidationBag } from 'common/interfaces/validation-bag';
@@ -40,6 +41,8 @@ import { useHandleProductChange } from '../edit/hooks/useHandleProductChange';
 export function Create() {
   const { documentTitle } = useTitle('new_purchase_order');
   const { t } = useTranslation();
+
+  const reactSettings = useReactSettings();
 
   const [searchParams] = useSearchParams();
 
@@ -194,17 +197,19 @@ export function Create() {
         )}
       </div>
 
-      <div className="my-4">
-        {purchaseOrder && (
-          <InvoicePreview
-            for="create"
-            resource={purchaseOrder}
-            entity="purchase_order"
-            relationType="vendor_id"
-            endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
-          />
-        )}
-      </div>
+      {reactSettings?.show_pdf_preview && (
+        <div className="my-4">
+          {purchaseOrder && (
+            <InvoicePreview
+              for="create"
+              resource={purchaseOrder}
+              entity="purchase_order"
+              relationType="vendor_id"
+              endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

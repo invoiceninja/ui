@@ -21,6 +21,7 @@ import { Payment } from 'common/interfaces/payment';
 import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
 import { StatusBadge } from 'components/StatusBadge';
+import { Tooltip } from 'components/Tooltip';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import { PaymentStatus } from '../components/PaymentStatus';
@@ -53,7 +54,7 @@ export const paymentColumns = [
   'updated_at',
 ] as const;
 
-type PaymentColumns = typeof paymentColumns[number];
+type PaymentColumns = (typeof paymentColumns)[number];
 
 export const defaultColumns = [
   'status',
@@ -230,7 +231,11 @@ export function usePaymentColumns() {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'refunded',

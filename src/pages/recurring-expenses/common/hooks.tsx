@@ -10,7 +10,6 @@
 
 import { Expense } from 'common/interfaces/expense';
 import { StatusBadge } from 'components/StatusBadge';
-import recurringExpenseStatus from 'common/constants/recurring-expense';
 import recurringExpensesFrequency from 'common/constants/recurring-expense-frequency';
 import { useTranslation } from 'react-i18next';
 import { date, endpoint } from 'common/helpers';
@@ -45,6 +44,8 @@ import {
   MdStopCircle,
 } from 'react-icons/md';
 import { invalidationQueryAtom } from 'common/atoms/data-table';
+import { RecurringExpenseStatus as RecurringExpenseStatusBadge } from './components/RecurringExpenseStatus';
+import { Tooltip } from 'components/Tooltip';
 
 export const recurringExpenseColumns = [
   'status',
@@ -88,7 +89,7 @@ export const recurringExpenseColumns = [
   'next_send_date',
 ] as const;
 
-type RecurringExpenseColumns = typeof recurringExpenseColumns[number];
+type RecurringExpenseColumns = (typeof recurringExpenseColumns)[number];
 
 export const defaultColumns: RecurringExpenseColumns[] = [
   'status',
@@ -129,7 +130,7 @@ export function useRecurringExpenseColumns() {
             id: recurringExpense.id,
           })}
         >
-          <StatusBadge for={recurringExpenseStatus} code={value} />
+          <RecurringExpenseStatusBadge recurringExpense={recurringExpense} />
         </Link>
       ),
     },
@@ -190,7 +191,11 @@ export function useRecurringExpenseColumns() {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'entity_state',
@@ -289,7 +294,11 @@ export function useRecurringExpenseColumns() {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'should_be_invoiced',

@@ -220,7 +220,7 @@ const reports: Report[] = [
   {
     identifier: 'product_sales',
     label: 'product_sales',
-    endpoint: '/api/v1/reports/products',
+    endpoint: '/api/v1/reports/product_sales',
     payload: {
       start_date: '',
       end_date: '',

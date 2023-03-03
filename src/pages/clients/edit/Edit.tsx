@@ -22,6 +22,7 @@ import { updateRecord } from 'common/stores/slices/company-users';
 import { Page } from 'components/Breadcrumbs';
 import { Default } from 'components/layouts/Default';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
+import { ResourceActions } from 'components/ResourceActions';
 import { Spinner } from 'components/Spinner';
 import { ValidationAlert } from 'components/ValidationAlert';
 import { set } from 'lodash';
@@ -31,7 +32,8 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
-import { CustomResourcefulActions } from '../common/components/CustomResourcefulActions';
+import { MergeClientModal } from '../common/components/MergeClientModal';
+import { useActions } from '../common/hooks/useActions';
 import { usePurgeClient } from '../common/hooks/usePurgeClient';
 import { AdditionalInfo } from './components/AdditionalInfo';
 import { Address } from './components/Address';
@@ -59,7 +61,9 @@ export function Edit() {
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
-    useState(false);
+    useState<boolean>(false);
+
+  const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
 
   const onPasswordConformation = usePurgeClient(id);
 
@@ -132,18 +136,26 @@ export function Edit() {
       );
   };
 
+  const actions = useActions({
+    setIsMergeModalOpen,
+    setPasswordConfirmModalOpen,
+  });
+
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      navigationTopRight={
-        <CustomResourcefulActions
-          clientId={id}
-          openPurgeModal={setPasswordConfirmModalOpen}
-        />
-      }
       onBackClick={route('/clients/:id', { id })}
       onSaveClick={onSave}
+      navigationTopRight={
+        client && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={client}
+            actions={actions}
+          />
+        )
+      }
     >
       {isLoading && <Spinner />}
 
@@ -165,6 +177,15 @@ export function Edit() {
             <AdditionalInfo client={client} setClient={setClient} />
           </div>
         </div>
+      )}
+
+      {id && (
+        <MergeClientModal
+          visible={isMergeModalOpen}
+          setVisible={setIsMergeModalOpen}
+          mergeFromClientId={id}
+          editPage
+        />
       )}
 
       <PasswordConfirmation

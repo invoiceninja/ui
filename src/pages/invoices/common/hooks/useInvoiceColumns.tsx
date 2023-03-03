@@ -22,6 +22,7 @@ import { CopyToClipboard } from 'components/CopyToClipboard';
 import { customField } from 'components/CustomField';
 import { DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
+import { Tooltip } from 'components/Tooltip';
 import { useTranslation } from 'react-i18next';
 import { InvoiceStatus } from '../components/InvoiceStatus';
 import { useAllInvoiceColumns } from './useAllInvoiceColumns';
@@ -57,7 +58,7 @@ export const defaultColumns: string[] = [
 
 export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const invoiceColumns = useAllInvoiceColumns();
-  type InvoiceColumns = typeof invoiceColumns[number];
+  type InvoiceColumns = (typeof invoiceColumns)[number];
 
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -317,13 +318,21 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'reminder1_sent',
