@@ -19,6 +19,7 @@
     "collect.js": "^4.34.3",
     "currency.js": "^2.0.4",
     "dayjs": "^1.11.7",
+    "dotenv": "^16.0.3",
     "formik": "^2.2.9",
     "history": "^5.3.0",
     "i18next": "^22.1.4",
