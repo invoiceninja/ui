@@ -33,6 +33,8 @@ export function Payments() {
 
   const actions = useActions();
 
+  console.log('ok');
+
   const filters = usePaymentFilters();
 
   return (
