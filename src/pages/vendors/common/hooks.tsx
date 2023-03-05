@@ -11,52 +11,20 @@
 import { Link } from '@invoiceninja/forms';
 import { date } from 'common/helpers';
 import { route } from 'common/helpers/route';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useEntityCustomFields } from 'common/hooks/useEntityCustomFields';
 import { useResolveCountry } from 'common/hooks/useResolveCountry';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { Vendor } from 'common/interfaces/vendor';
 import { CopyToClipboard } from 'components/CopyToClipboard';
-import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
 import { Tooltip } from 'components/Tooltip';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const vendorColumns = [
-  'number',
-  'name',
-  'city',
-  'phone',
-  'entity_state',
-  'created_at',
-  'address2',
-  'archived_at',
-  //   'assigned_to', @Todo: Need to resolve relationship
-  'contacts',
-  'country_id',
-  //   'created_by', @Todo: Need to resolve relationship
-  'currency_id',
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'documents',
-  'id_number',
-  'is_deleted',
-  'postal_code',
-  'private_notes',
-  'address1',
-  'updated_at',
-  'vat_number',
-  'website',
-] as const;
-
-type VendorColumns = (typeof vendorColumns)[number];
-
-export const defaultColumns: VendorColumns[] = [
+export const defaultColumns: string[] = [
   'number',
   'name',
   'city',
@@ -65,14 +33,54 @@ export const defaultColumns: VendorColumns[] = [
   'created_at',
 ];
 
+export function useAllVendorColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'vendor',
+    });
+
+  const vendorColumns = [
+    'number',
+    'name',
+    'city',
+    'phone',
+    'entity_state',
+    'created_at',
+    'address2',
+    'archived_at',
+    //   'assigned_to', @Todo: Need to resolve relationship
+    'contacts',
+    'country_id',
+    //   'created_by', @Todo: Need to resolve relationship
+    'currency_id',
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'documents',
+    'id_number',
+    'is_deleted',
+    'postal_code',
+    'private_notes',
+    'address1',
+    'updated_at',
+    'vat_number',
+    'website',
+  ] as const;
+
+  return vendorColumns;
+}
+
 export function useVendorColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const currentUser = useCurrentUser();
-  const company = useCurrentCompany();
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
+
+  const vendorColumns = useAllVendorColumns();
+  type VendorColumns = (typeof vendorColumns)[number];
 
   const getContactsColumns = useCallback((vendor: Vendor) => {
     const names: string[] = [];
@@ -83,6 +91,11 @@ export function useVendorColumns() {
 
     return names.join('<br />');
   }, []);
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'vendor',
+    });
 
   const columns: DataTableColumnsExtended<Vendor, VendorColumns> = [
     {
@@ -162,36 +175,24 @@ export function useVendorColumns() {
       format: (value) => value && resolveCurrency(value)?.code,
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.vendor1 &&
-          customField(company?.custom_fields.vendor1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.vendor2 &&
-          customField(company?.custom_fields.vendor2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.vendor3 &&
-          customField(company?.custom_fields.vendor3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.vendor4 &&
-          customField(company?.custom_fields.vendor4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'documents',

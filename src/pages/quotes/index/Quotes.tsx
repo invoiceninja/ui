@@ -16,8 +16,8 @@ import { useTranslation } from 'react-i18next';
 import { route } from 'common/helpers/route';
 import {
   defaultColumns,
-  quoteColumns,
   useActions,
+  useAllQuoteColumns,
   useQuoteColumns,
   useQuoteFilters,
 } from '../common/hooks';
@@ -34,6 +34,8 @@ export function Quotes() {
   const columns = useQuoteColumns();
 
   const actions = useActions();
+
+  const quoteColumns = useAllQuoteColumns();
 
   const filters = useQuoteFilters();
 

@@ -15,12 +15,12 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
-  paymentColumns,
   usePaymentColumns,
 } from '../common/hooks/usePaymentColumns';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { useActions } from '../common/hooks/useActions';
 import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
+import { useAllPaymentColumns } from '../common/hooks/useAllPaymentColumns';
 
 export function Payments() {
   useTitle('payments');
@@ -32,6 +32,8 @@ export function Payments() {
   const columns = usePaymentColumns();
 
   const actions = useActions();
+
+  const paymentColumns = useAllPaymentColumns();
 
   const filters = usePaymentFilters();
 

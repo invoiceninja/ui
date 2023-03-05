@@ -16,8 +16,8 @@ import { useTranslation } from 'react-i18next';
 import { BsKanban } from 'react-icons/bs';
 import {
   defaultColumns,
-  taskColumns,
   useActions,
+  useAllTaskColumns,
   useTaskColumns,
   useTaskFilters,
 } from '../common/hooks';
@@ -36,6 +36,8 @@ export function Tasks() {
   const filters = useTaskFilters();
 
   const actions = useActions();
+
+  const taskColumns = useAllTaskColumns();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>

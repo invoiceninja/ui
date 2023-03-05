@@ -14,8 +14,8 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
-  projectColumns,
   useActions,
+  useAllProjectColumns,
   useProjectColumns,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
@@ -30,6 +30,8 @@ export function Projects() {
   const columns = useProjectColumns();
 
   const actions = useActions();
+
+  const projectColumns = useAllProjectColumns();
 
   return (
     <Default

@@ -16,9 +16,9 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useEntityCustomFields } from 'common/hooks/useEntityCustomFields';
 import { Project } from 'common/interfaces/project';
 import { Divider } from 'components/cards/Divider';
-import { customField } from 'components/CustomField';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
 import { Icon } from 'components/icons/Icon';
@@ -36,34 +36,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { projectAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
 
-export const projectColumns = [
-  'name',
-  //   'client', @Todo: Need to resolve translation
-  'task_rate',
-  'due_date',
-  'public_notes',
-  'private_notes',
-  'budgeted_hours',
-  'entity_state',
-  'archived_at',
-  //   'assigned_to', @Todo: Need to resolve translation
-  //   'client_id_number', @Todo: Need to resolve translation
-  //   'client_number', @Todo: Need to resolve translation
-  'created_at',
-  //   'created_by', @Todo: Need to resolve translation
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'documents',
-  'is_deleted',
-  'number',
-  'updated_at',
-] as const;
-
-export type ProjectColumns = (typeof projectColumns)[number];
-
-export const defaultColumns: ProjectColumns[] = [
+export const defaultColumns: string[] = [
   'name',
   'task_rate',
   'due_date',
@@ -73,6 +46,40 @@ export const defaultColumns: ProjectColumns[] = [
   'entity_state',
 ];
 
+export function useAllProjectColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'project',
+    });
+
+  const projectColumns = [
+    'name',
+    //   'client', @Todo: Need to resolve translation
+    'task_rate',
+    'due_date',
+    'public_notes',
+    'private_notes',
+    'budgeted_hours',
+    'entity_state',
+    'archived_at',
+    //   'assigned_to', @Todo: Need to resolve translation
+    //   'client_id_number', @Todo: Need to resolve translation
+    //   'client_number', @Todo: Need to resolve translation
+    'created_at',
+    //   'created_by', @Todo: Need to resolve translation
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'documents',
+    'is_deleted',
+    'number',
+    'updated_at',
+  ] as const;
+
+  return projectColumns;
+}
+
 export function useProjectColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -80,6 +87,14 @@ export function useProjectColumns() {
   const currentUser = useCurrentUser();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
+
+  const projectColumns = useAllProjectColumns();
+  type ProjectColumns = (typeof projectColumns)[number];
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'project',
+    });
 
   const columns: DataTableColumnsExtended<Project, ProjectColumns> = [
     {
@@ -159,36 +174,24 @@ export function useProjectColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.project1 &&
-          customField(company?.custom_fields.project1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.project2 &&
-          customField(company?.custom_fields.project2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.project3 &&
-          customField(company?.custom_fields.project3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.project4 &&
-          customField(company?.custom_fields.project4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'documents',

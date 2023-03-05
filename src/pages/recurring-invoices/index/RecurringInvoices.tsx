@@ -15,8 +15,8 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
-  recurringInvoiceColumns,
   useActions,
+  useAllRecurringInvoiceColumns,
   useRecurringInvoiceColumns,
   useRecurringInvoiceFilters,
 } from '../common/hooks';
@@ -34,6 +34,8 @@ export function RecurringInvoices() {
   const actions = useActions();
 
   const filters = useRecurringInvoiceFilters();
+
+  const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
 
   const columns = useRecurringInvoiceColumns();
 

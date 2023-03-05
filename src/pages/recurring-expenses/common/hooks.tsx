@@ -31,7 +31,6 @@ import { toast } from 'common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
 import { expenseAtom } from 'pages/expenses/common/atoms';
 import paymentType from 'common/constants/payment-type';
-import { customField } from 'components/CustomField';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
@@ -46,52 +45,9 @@ import {
 import { invalidationQueryAtom } from 'common/atoms/data-table';
 import { RecurringExpenseStatus as RecurringExpenseStatusBadge } from './components/RecurringExpenseStatus';
 import { Tooltip } from 'components/Tooltip';
+import { useEntityCustomFields } from 'common/hooks/useEntityCustomFields';
 
-export const recurringExpenseColumns = [
-  'status',
-  'number',
-  'vendor',
-  'client',
-  'date',
-  'amount',
-  'public_notes',
-  'entity_state',
-  'archived_at',
-  //   'assigned_to', @Todo: Need to resolve relationship
-  //   'category', @Todo: Need to resolve relationship
-  'created_at',
-  'created_by',
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'documents',
-  'exchange_rate',
-  'is_deleted',
-  'net_amount', // @Todo: `net_amount` vs `amount`?
-  'payment_date',
-  'payment_type',
-  'private_notes',
-  //   'project', @Todo: Need to resolve relationship
-  //   'recurring_expense', @Todo: Need to resolve relationship
-  'should_be_invoiced',
-  //   'tax_amount', @Todo: Need to calc
-  'tax_name1',
-  'tax_name2',
-  'tax_name3',
-  'tax_rate1',
-  'tax_rate2',
-  'tax_rate3',
-  'transaction_reference',
-  'updated_at',
-  'frequency',
-  'remaining_cycles',
-  'next_send_date',
-] as const;
-
-type RecurringExpenseColumns = (typeof recurringExpenseColumns)[number];
-
-export const defaultColumns: RecurringExpenseColumns[] = [
+export const defaultColumns: string[] = [
   'status',
   'number',
   'vendor',
@@ -105,6 +61,57 @@ export const defaultColumns: RecurringExpenseColumns[] = [
   'entity_state',
 ];
 
+export function useAllRecurringExpenseColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'expense',
+    });
+
+  const recurringExpenseColumns = [
+    'status',
+    'number',
+    'vendor',
+    'client',
+    'date',
+    'amount',
+    'public_notes',
+    'entity_state',
+    'archived_at',
+    //   'assigned_to', @Todo: Need to resolve relationship
+    //   'category', @Todo: Need to resolve relationship
+    'created_at',
+    'created_by',
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'documents',
+    'exchange_rate',
+    'is_deleted',
+    'net_amount', // @Todo: `net_amount` vs `amount`?
+    'payment_date',
+    'payment_type',
+    'private_notes',
+    //   'project', @Todo: Need to resolve relationship
+    //   'recurring_expense', @Todo: Need to resolve relationship
+    'should_be_invoiced',
+    //   'tax_amount', @Todo: Need to calc
+    'tax_name1',
+    'tax_name2',
+    'tax_name3',
+    'tax_rate1',
+    'tax_rate2',
+    'tax_rate3',
+    'transaction_reference',
+    'updated_at',
+    'frequency',
+    'remaining_cycles',
+    'next_send_date',
+  ] as const;
+
+  return recurringExpenseColumns;
+}
+
 export function useRecurringExpenseColumns() {
   const [t] = useTranslation();
 
@@ -115,6 +122,14 @@ export function useRecurringExpenseColumns() {
   const formatMoney = useFormatMoney();
 
   const currentUser = useCurrentUser();
+
+  const recurringExpenseColumns = useAllRecurringExpenseColumns();
+  type RecurringExpenseColumns = (typeof recurringExpenseColumns)[number];
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'expense',
+    });
 
   const columns: DataTableColumnsExtended<
     RecurringExpense,
@@ -216,36 +231,24 @@ export function useRecurringExpenseColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.expense1 &&
-          customField(company?.custom_fields.expense1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.expense2 &&
-          customField(company?.custom_fields.expense2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.expense3 &&
-          customField(company?.custom_fields.expense3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.expense4 &&
-          customField(company?.custom_fields.expense4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'documents',

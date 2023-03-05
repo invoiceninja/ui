@@ -14,8 +14,8 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
-  recurringExpenseColumns,
   useActions,
+  useAllRecurringExpenseColumns,
   useRecurringExpenseColumns,
 } from '../common/hooks';
 
@@ -31,6 +31,8 @@ export function RecurringExpenses() {
   const columns = useRecurringExpenseColumns();
 
   const actions = useActions();
+
+  const recurringExpenseColumns = useAllRecurringExpenseColumns();
 
   return (
     <Default

@@ -16,47 +16,18 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useEntityCustomFields } from 'common/hooks/useEntityCustomFields';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { Payment } from 'common/interfaces/payment';
-import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
 import { StatusBadge } from 'components/StatusBadge';
 import { Tooltip } from 'components/Tooltip';
 import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import { PaymentStatus } from '../components/PaymentStatus';
+import { useAllPaymentColumns } from './useAllPaymentColumns';
 
-export const paymentColumns = [
-  'status',
-  'number',
-  'client',
-  'amount',
-  'invoice_number',
-  'date',
-  'type',
-  'transaction_reference',
-  'archived_at',
-  //   'assigned_to', @Todo: Need to resolve relationship
-  'converted_amount', // @Todo: How's this different to `amount`?
-  'created_at',
-  //   'created_by', @Todo: Need to resolve relationship
-  //   'credit_number', @Todo: Need to resolve relationship
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'entity_state',
-  'exchange_rate',
-  //   'gateway', @Todo: Need to resolve relationship
-  'is_deleted',
-  'private_notes',
-  'refunded',
-  'updated_at',
-] as const;
-
-type PaymentColumns = (typeof paymentColumns)[number];
-
-export const defaultColumns = [
+export const defaultColumns: string[] = [
   'status',
   'number',
   'client',
@@ -70,6 +41,9 @@ export const defaultColumns = [
 export function usePaymentColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const paymentColumns = useAllPaymentColumns();
+  type PaymentColumns = (typeof paymentColumns)[number];
 
   const currentUser = useCurrentUser();
   const company = useCurrentCompany();
@@ -91,6 +65,11 @@ export function usePaymentColumns() {
 
     return payment.amount;
   };
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'payment',
+    });
 
   const columns: DataTableColumnsExtended<Payment, PaymentColumns> = [
     {
@@ -179,36 +158,24 @@ export function usePaymentColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.payment1 &&
-          customField(company?.custom_fields.payment1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.payment2 &&
-          customField(company?.custom_fields.payment2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.payment3 &&
-          customField(company?.custom_fields.payment3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.payment4 &&
-          customField(company?.custom_fields.payment4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'entity_state',

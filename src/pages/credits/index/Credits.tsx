@@ -14,9 +14,9 @@ import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
-  creditColumns,
   defaultColumns,
   useActions,
+  useAllCreditColumns,
   useCreditColumns,
 } from '../common/hooks';
 
@@ -29,6 +29,8 @@ export function Credits() {
 
   const actions = useActions();
   const columns = useCreditColumns();
+
+  const creditColumns = useAllCreditColumns();
 
   return (
     <Default title={t('credits')} breadcrumbs={pages} docsLink="docs/credits/">

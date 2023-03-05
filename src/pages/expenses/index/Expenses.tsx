@@ -14,8 +14,8 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
-  expenseColumns,
   useActions,
+  useAllExpenseColumns,
   useExpenseColumns,
   useExpenseFilters,
 } from '../common/hooks';
@@ -34,6 +34,8 @@ export function Expenses() {
   const actions = useActions();
 
   const filters = useExpenseFilters();
+
+  const expenseColumns = useAllExpenseColumns();
 
   return (
     <Default title={t('expenses')} breadcrumbs={pages} docsLink="docs/expenses">

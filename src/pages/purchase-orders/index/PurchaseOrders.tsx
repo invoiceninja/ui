@@ -16,8 +16,8 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
-  purchaseOrderColumns,
   useActions,
+  useAllPurchaseOrderColumns,
   usePurchaseOrderColumns,
   usePurchaseOrderFilters,
 } from '../common/hooks';
@@ -36,6 +36,8 @@ export function PurchaseOrders() {
   const filters = usePurchaseOrderFilters();
 
   const actions = useActions();
+
+  const purchaseOrderColumns = useAllPurchaseOrderColumns();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>

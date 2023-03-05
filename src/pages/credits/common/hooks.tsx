@@ -56,7 +56,6 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useResolveCountry } from 'common/hooks/useResolveCountry';
 import { CopyToClipboard } from 'components/CopyToClipboard';
-import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
 import { Icon } from 'components/icons/Icon';
 import {
@@ -72,6 +71,7 @@ import {
   MdRestore,
 } from 'react-icons/md';
 import { Tooltip } from 'components/Tooltip';
+import { useEntityCustomFields } from 'common/hooks/useEntityCustomFields';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -443,49 +443,7 @@ export function useActions() {
   return actions;
 }
 
-export const creditColumns = [
-  'status',
-  'number',
-  'client',
-  'amount',
-  'date',
-  'remaining',
-  'archived_at',
-  // 'assigned_to', @Todo: Need to resolve relationship
-  'client_city',
-  'client_country',
-  'client_postal_code',
-  'client_state',
-  'contact_email',
-  'contact_name',
-  'created_at',
-  // 'created_by', @Todo: Need to resolve relationship
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'discount',
-  'documents',
-  'entity_state',
-  'exchange_rate',
-  'is_deleted',
-  'is_viewed',
-  'last_sent_date',
-  'partial',
-  'partial_due_date',
-  'po_number',
-  'private_notes',
-  // 'project', @Todo: Need to fetch the relationship
-  'public_notes',
-  'tax_amount',
-  'updated_at',
-  'valid_until',
-  // 'vendor', @Todo: Need to fetch the relationship
-] as const;
-
-type CreditColumns = typeof creditColumns[number];
-
-export const defaultColumns: CreditColumns[] = [
+export const defaultColumns: string[] = [
   'status',
   'number',
   'client',
@@ -494,14 +452,71 @@ export const defaultColumns: CreditColumns[] = [
   'remaining',
 ];
 
+export function useAllCreditColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'credit',
+    });
+
+  const creditColumns = [
+    'status',
+    'number',
+    'client',
+    'amount',
+    'date',
+    'remaining',
+    'archived_at',
+    // 'assigned_to', @Todo: Need to resolve relationship
+    'client_city',
+    'client_country',
+    'client_postal_code',
+    'client_state',
+    'contact_email',
+    'contact_name',
+    'created_at',
+    // 'created_by', @Todo: Need to resolve relationship
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'discount',
+    'documents',
+    'entity_state',
+    'exchange_rate',
+    'is_deleted',
+    'is_viewed',
+    'last_sent_date',
+    'partial',
+    'partial_due_date',
+    'po_number',
+    'private_notes',
+    // 'project', @Todo: Need to fetch the relationship
+    'public_notes',
+    'tax_amount',
+    'updated_at',
+    'valid_until',
+    // 'vendor', @Todo: Need to fetch the relationship
+  ] as const;
+
+  return creditColumns;
+}
+
 export function useCreditColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const creditColumns = useAllCreditColumns();
+  type CreditColumns = (typeof creditColumns)[number];
 
   const currentUser = useCurrentUser();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'credit',
+    });
 
   const columns: DataTableColumnsExtended<Credit, CreditColumns> = [
     {
@@ -615,36 +630,24 @@ export function useCreditColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.credit1 &&
-          customField(company?.custom_fields.credit1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.credit2 &&
-          customField(company?.custom_fields.credit2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.credit3 &&
-          customField(company?.custom_fields.credit3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.credit4 &&
-          customField(company?.custom_fields.credit4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'discount',

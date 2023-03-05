@@ -10,54 +10,50 @@
 
 import { useEntityCustomFields } from 'common/hooks/useEntityCustomFields';
 
-export function useAllInvoiceColumns() {
+export function useAllClientColumns() {
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
-      entity: 'invoice',
+      entity: 'client',
     });
 
-  const invoiceColumns = [
-    'status',
+  const clientColumns = [
     'number',
-    'amount',
-    'client',
+    'name',
     'balance',
-    'date',
-    'due_date',
-    'auto_bill_enabled',
-    'client_postal_code',
-    'archived_at',
-    'client_city',
-    'client_country',
-    'client_state',
-    'contact_email',
+    'paid_to_date',
     'contact_name',
+    'contact_email',
+    'last_login_at',
+    'address2',
+    'archived_at',
+    //   'assigned_to',
+    'contact_phone',
+    'contacts',
+    'country',
+    'created_at',
+    //   'created_by',
+    'credit_balance',
+    'currency',
     firstCustom,
     secondCustom,
     thirdCustom,
     fourthCustom,
-    'discount',
     'documents',
     'entity_state',
-    'exchange_rate',
+    //   'group',
+    'id_number',
     'is_deleted',
-    'is_viewed',
-    'last_sent_date',
-    'last_sent_template',
-    'next_send_date',
-    'partial_due',
-    'partial_due_date',
-    'po_number',
+    'language',
+    'phone',
     'private_notes',
     'public_notes',
-    'reminder1_sent',
-    'reminder2_sent',
-    'reminder3_sent',
-    'reminder_last_sent',
-    'tax_amount',
-    'created_at',
+    'state',
+    'address1',
+    'task_rate',
     'updated_at',
+    'vat_number',
+    'website',
   ] as const;
 
-  return invoiceColumns;
+  return clientColumns;
 }

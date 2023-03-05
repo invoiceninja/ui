@@ -15,12 +15,12 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useEntityCustomFields } from 'common/hooks/useEntityCustomFields';
 import { useResolveCountry } from 'common/hooks/useResolveCountry';
 import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
 import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
 import { Client } from 'common/interfaces/client';
 import { CopyToClipboard } from 'components/CopyToClipboard';
-import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
 import { Inline } from 'components/Inline';
 import { Tooltip } from 'components/Tooltip';
@@ -28,49 +28,9 @@ import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoice
 import { useCallback } from 'react';
 import { ExternalLink } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { useAllClientColumns } from './useAllClientColumns';
 
-export const clientColumns = [
-  'number',
-  'name',
-  'balance',
-  'paid_to_date',
-  'contact_name',
-  'contact_email',
-  'last_login_at',
-  'address2',
-  'archived_at',
-  //   'assigned_to',
-  'contact_phone',
-  'contacts',
-  'country',
-  'created_at',
-  //   'created_by',
-  'credit_balance',
-  'currency',
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'documents',
-  'entity_state',
-  //   'group',
-  'id_number',
-  'is_deleted',
-  'language',
-  'phone',
-  'private_notes',
-  'public_notes',
-  'state',
-  'address1',
-  'task_rate',
-  'updated_at',
-  'vat_number',
-  'website',
-] as const;
-
-type ClientColumns = (typeof clientColumns)[number];
-
-export const defaultColumns: ClientColumns[] = [
+export const defaultColumns: string[] = [
   'name',
   'contact_email',
   'id_number',
@@ -102,6 +62,14 @@ export function useClientColumns() {
 
     return names.join('<br />');
   }, []);
+
+  const clientColumns = useAllClientColumns();
+  type ClientColumns = (typeof clientColumns)[number];
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'client',
+    });
 
   const columns: DataTableColumnsExtended<Client, ClientColumns> = [
     {
@@ -220,36 +188,24 @@ export function useClientColumns() {
         resolveCurrency(client.settings.currency_id)?.code,
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.client1 &&
-          customField(company?.custom_fields.client1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.client2 &&
-          customField(company?.custom_fields.client2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.client3 &&
-          customField(company?.custom_fields.client3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.client4 &&
-          customField(company?.custom_fields.client4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'documents',

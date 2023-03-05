@@ -47,7 +47,6 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { StatusBadge } from 'components/StatusBadge';
 import recurringInvoicesFrequency from 'common/constants/recurring-invoices-frequency';
-import { customField } from 'components/CustomField';
 import { EntityStatus } from 'components/EntityStatus';
 import { SelectOption } from 'components/datatables/Actions';
 import { Icon } from 'components/icons/Icon';
@@ -59,6 +58,7 @@ import {
 } from 'react-icons/md';
 import { invalidationQueryAtom } from 'common/atoms/data-table';
 import { Tooltip } from 'components/Tooltip';
+import { useEntityCustomFields } from 'common/hooks/useEntityCustomFields';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -417,38 +417,7 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
   };
 }
 
-export const recurringInvoiceColumns = [
-  'status',
-  'number',
-  'client',
-  'amount',
-  'remaining_cycles',
-  'next_send_date',
-  'frequency',
-  'due_date_days',
-  'auto_bill',
-  'archived_at',
-  // 'assigned_to', @Todo: Need to fetch the relationship.
-  'created_at',
-  // 'created_by', @Todo: Need to fetch the relationship.
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'discount',
-  'documents',
-  'entity_state',
-  'exchange_rate',
-  'is_deleted',
-  'po_number',
-  'private_notes',
-  'public_notes',
-  'updated_at',
-] as const;
-
-type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
-
-export const defaultColumns: RecurringInvoiceColumns[] = [
+export const defaultColumns: string[] = [
   'status',
   'number',
   'client',
@@ -460,13 +429,59 @@ export const defaultColumns: RecurringInvoiceColumns[] = [
   'auto_bill',
 ];
 
+export function useAllRecurringInvoiceColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'invoice',
+    });
+
+  const recurringInvoiceColumns = [
+    'status',
+    'number',
+    'client',
+    'amount',
+    'remaining_cycles',
+    'next_send_date',
+    'frequency',
+    'due_date_days',
+    'auto_bill',
+    'archived_at',
+    // 'assigned_to', @Todo: Need to fetch the relationship.
+    'created_at',
+    // 'created_by', @Todo: Need to fetch the relationship.
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'discount',
+    'documents',
+    'entity_state',
+    'exchange_rate',
+    'is_deleted',
+    'po_number',
+    'private_notes',
+    'public_notes',
+    'updated_at',
+  ] as const;
+
+  return recurringInvoiceColumns;
+}
+
 export function useRecurringInvoiceColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const recurringInvoiceColumns = useAllRecurringInvoiceColumns();
+  type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
+
   const company = useCurrentCompany();
   const currentUser = useCurrentUser();
   const formatMoney = useFormatMoney();
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'invoice',
+    });
 
   const columns: DataTableColumnsExtended<
     RecurringInvoice,
@@ -565,36 +580,24 @@ export function useRecurringInvoiceColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.invoice1 &&
-          customField(company?.custom_fields.invoice1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.invoice2 &&
-          customField(company?.custom_fields.invoice2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.invoice3 &&
-          customField(company?.custom_fields.invoice3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.invoice4 &&
-          customField(company?.custom_fields.invoice4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'discount',

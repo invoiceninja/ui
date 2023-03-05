@@ -95,9 +95,9 @@ export function DataTableColumnsPicker(props: Props) {
       });
   };
 
-  const handleDelete = (passedColumn: string) => {
+  const handleDelete = (columnKey: string) => {
     const updatedCurrentColumns = currentColumns.filter(
-      (columns) => !columns.includes(passedColumn)
+      (columns) => !columns.includes(columnKey)
     );
 
     setCurrentColumns(updatedCurrentColumns);

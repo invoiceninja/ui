@@ -16,10 +16,10 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useEntityCustomFields } from 'common/hooks/useEntityCustomFields';
 import { Expense } from 'common/interfaces/expense';
 import { RecurringExpense } from 'common/interfaces/recurring-expense';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { customField } from 'components/CustomField';
 import { SelectOption } from 'components/datatables/Actions';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
@@ -36,47 +36,6 @@ import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { expenseAtom } from './atoms';
 import { ExpenseStatus } from './components/ExpenseStatus';
-
-export const expenseColumns = [
-  'status',
-  'number',
-  'vendor',
-  'client',
-  'date',
-  'amount',
-  'public_notes',
-  'entity_state',
-  'archived_at',
-  //   'assigned_to', @Todo: Need to resolve relationship
-  //   'category', @Todo: Need to resolve relationship
-  'created_at',
-  'created_by',
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'documents',
-  'exchange_rate',
-  'is_deleted',
-  'net_amount', // @Todo: `net_amount` vs `amount`?
-  'payment_date',
-  'payment_type',
-  'private_notes',
-  //   'project', @Todo: Need to resolve relationship
-  //   'recurring_expense', @Todo: Need to resolve relationship
-  'should_be_invoiced',
-  //   'tax_amount', @Todo: Need to calc
-  'tax_name1',
-  'tax_name2',
-  'tax_name3',
-  'tax_rate1',
-  'tax_rate2',
-  'tax_rate3',
-  'transaction_reference',
-  'updated_at',
-] as const;
-
-type ExpenseColumns = (typeof expenseColumns)[number];
 
 export function useActions() {
   const [t] = useTranslation();
@@ -125,7 +84,7 @@ export function useActions() {
   return actions;
 }
 
-export const defaultColumns: ExpenseColumns[] = [
+export const defaultColumns: string[] = [
   'status',
   'number',
   'client',
@@ -135,6 +94,54 @@ export const defaultColumns: ExpenseColumns[] = [
   'public_notes',
 ];
 
+export function useAllExpenseColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'expense',
+    });
+
+  const expenseColumns = [
+    'status',
+    'number',
+    'vendor',
+    'client',
+    'date',
+    'amount',
+    'public_notes',
+    'entity_state',
+    'archived_at',
+    //   'assigned_to', @Todo: Need to resolve relationship
+    //   'category', @Todo: Need to resolve relationship
+    'created_at',
+    'created_by',
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'documents',
+    'exchange_rate',
+    'is_deleted',
+    'net_amount', // @Todo: `net_amount` vs `amount`?
+    'payment_date',
+    'payment_type',
+    'private_notes',
+    //   'project', @Todo: Need to resolve relationship
+    //   'recurring_expense', @Todo: Need to resolve relationship
+    'should_be_invoiced',
+    //   'tax_amount', @Todo: Need to calc
+    'tax_name1',
+    'tax_name2',
+    'tax_name3',
+    'tax_rate1',
+    'tax_rate2',
+    'tax_rate3',
+    'transaction_reference',
+    'updated_at',
+  ] as const;
+
+  return expenseColumns;
+}
+
 export function useExpenseColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -142,6 +149,14 @@ export function useExpenseColumns() {
   const currentUser = useCurrentUser();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
+
+  const expenseColumns = useAllExpenseColumns();
+  type ExpenseColumns = (typeof expenseColumns)[number];
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'expense',
+    });
 
   const columns: DataTableColumnsExtended<Expense, ExpenseColumns> = [
     {
@@ -234,36 +249,24 @@ export function useExpenseColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.expense1 &&
-          customField(company?.custom_fields.expense1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.expense2 &&
-          customField(company?.custom_fields.expense2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.expense3 &&
-          customField(company?.custom_fields.expense3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.expense4 &&
-          customField(company?.custom_fields.expense4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'documents',

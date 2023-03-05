@@ -15,11 +15,11 @@ import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useEntityCustomFields } from 'common/hooks/useEntityCustomFields';
 import { useResolveCountry } from 'common/hooks/useResolveCountry';
 import { Credit } from 'common/interfaces/credit';
 import { Invoice } from 'common/interfaces/invoice';
 import { CopyToClipboard } from 'components/CopyToClipboard';
-import { customField } from 'components/CustomField';
 import { DataTableColumns } from 'components/DataTable';
 import { EntityStatus } from 'components/EntityStatus';
 import { Tooltip } from 'components/Tooltip';
@@ -68,23 +68,10 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const company = useCurrentCompany();
   const resolveCountry = useResolveCountry();
 
-  const customFields = company?.custom_fields;
-
-  const firstCustomFieldLabel = customFields?.invoice1
-    ? customField(customFields.invoice1).label()
-    : t('first_custom');
-
-  const secondCustomFieldLabel = customFields?.invoice2
-    ? customField(customFields.invoice2).label()
-    : t('second_custom');
-
-  const thirdCustomFieldLabel = customFields?.invoice3
-    ? customField(customFields.invoice3).label()
-    : t('third_custom');
-
-  const fourthCustomFieldLabel = customFields?.invoice4
-    ? customField(customFields.invoice4).label()
-    : t('fourth_custom');
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'invoice',
+    });
 
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
@@ -212,24 +199,24 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: firstCustomFieldLabel,
+      column: firstCustom,
       id: 'custom_value1',
-      label: firstCustomFieldLabel,
+      label: firstCustom,
     },
     {
-      column: secondCustomFieldLabel,
+      column: secondCustom,
       id: 'custom_value2',
-      label: secondCustomFieldLabel,
+      label: secondCustom,
     },
     {
-      column: thirdCustomFieldLabel,
+      column: thirdCustom,
       id: 'custom_value3',
-      label: thirdCustomFieldLabel,
+      label: thirdCustom,
     },
     {
-      column: fourthCustomFieldLabel,
+      column: fourthCustom,
       id: 'custom_value4',
-      label: fourthCustomFieldLabel,
+      label: fourthCustom,
     },
     {
       column: 'discount',

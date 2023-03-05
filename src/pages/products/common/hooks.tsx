@@ -19,7 +19,6 @@ import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDate
 import { useCurrentUser } from 'common/hooks/useCurrentUser';
 import { Product } from 'common/interfaces/product';
 import { ValidationBag } from 'common/interfaces/validation-bag';
-import { customField } from 'components/CustomField';
 import { DropdownElement } from 'components/dropdown/DropdownElement';
 import { EntityStatus } from 'components/EntityStatus';
 import { Icon } from 'components/icons/Icon';
@@ -39,51 +38,67 @@ import { bulk } from 'common/queries/products';
 import { useQueryClient } from 'react-query';
 import { Divider } from 'components/cards/Divider';
 import { Tooltip } from 'components/Tooltip';
+import { useEntityCustomFields } from 'common/hooks/useEntityCustomFields';
 
-export const productColumns = [
-  'product_key',
-  'description',
-  'price',
-  'quantity',
-  'archived_at',
-  // 'assigned_to', @Todo: Relationship not included.
-  'created_at',
-  // 'created_by', @Todo: Relationship not included.
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'documents',
-  'entity_state',
-  'is_deleted',
-  'notification_threshold',
-  'stock_quantity',
-  'tax_name1',
-  'tax_name2',
-  'tax_name3',
-  'tax_rate1',
-  'tax_rate2',
-  'tax_rate3',
-  'updated_at',
-] as const;
-
-type ProductColumns = (typeof productColumns)[number];
-
-export const defaultColumns: ProductColumns[] = [
+export const defaultColumns: string[] = [
   'product_key',
   'description',
   'price',
   'quantity',
 ];
 
+export function useAllProductColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'product',
+    });
+
+  const productColumns = [
+    'product_key',
+    'description',
+    'price',
+    'quantity',
+    'archived_at',
+    // 'assigned_to', @Todo: Relationship not included.
+    'created_at',
+    // 'created_by', @Todo: Relationship not included.
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'documents',
+    'entity_state',
+    'is_deleted',
+    'notification_threshold',
+    'stock_quantity',
+    'tax_name1',
+    'tax_name2',
+    'tax_name3',
+    'tax_rate1',
+    'tax_rate2',
+    'tax_rate3',
+    'updated_at',
+  ] as const;
+
+  return productColumns;
+}
+
 export function useProductColumns() {
   const { t } = useTranslation();
+
+  const productColumns = useAllProductColumns();
+  type ProductColumns = (typeof productColumns)[number];
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const company = useCurrentCompany();
   const currentUser = useCurrentUser();
   const formatMoney = useFormatMoney();
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'product',
+    });
 
   const columns: DataTableColumnsExtended<Product, ProductColumns> = [
     {
@@ -141,36 +156,24 @@ export function useProductColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.product1 &&
-          customField(company?.custom_fields.product1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.product2 &&
-          customField(company?.custom_fields.product2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.product3 &&
-          customField(company?.custom_fields.product3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.product4 &&
-          customField(company?.custom_fields.product4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'documents',
