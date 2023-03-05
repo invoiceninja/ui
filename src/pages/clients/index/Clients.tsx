@@ -15,6 +15,7 @@ import { Default } from 'components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
+  useAllClientColumns,
   useClientColumns,
 } from '../common/hooks/useClientColumns';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
@@ -24,7 +25,6 @@ import { MergeClientModal } from '../common/components/MergeClientModal';
 import { useState } from 'react';
 import { PasswordConfirmation } from 'components/PasswordConfirmation';
 import { usePurgeClient } from '../common/hooks/usePurgeClient';
-import { useAllClientColumns } from '../common/hooks/useAllClientColumns';
 
 export function Clients() {
   useTitle('clients');

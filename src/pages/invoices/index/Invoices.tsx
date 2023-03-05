@@ -15,12 +15,12 @@ import { useTranslation } from 'react-i18next';
 import { useActions } from '../edit/components/Actions';
 import {
   defaultColumns,
+  useAllInvoiceColumns,
   useInvoiceColumns,
 } from '../common/hooks/useInvoiceColumns';
 import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
 import { useInvoiceFilters } from '../common/hooks/useInvoiceFilters';
 import { ImportButton } from 'components/import/ImportButton';
-import { useAllInvoiceColumns } from '../common/hooks/useAllInvoiceColumns';
 
 export function Invoices() {
   const { documentTitle } = useTitle('invoices');
