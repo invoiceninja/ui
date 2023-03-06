@@ -131,11 +131,7 @@ export function ListBox(props: Props) {
   };
 
   const getClientName = (clientId: string) => {
-    const foundClient = clients?.find(({ id }) => id === clientId);
-
-    const { name, display_name } = foundClient || {};
-
-    return name || display_name;
+    return clients?.find(({ id }) => id === clientId)?.display_name;
   };
 
   const getFormattedResourceList = (resourceList: any) => {
