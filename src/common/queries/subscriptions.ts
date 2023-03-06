@@ -14,8 +14,11 @@ import { useQuery } from 'react-query';
 import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
 import { Subscription } from 'common/interfaces/subscription';
 import { route } from 'common/helpers/route';
+import { useAdmin } from 'common/hooks/permissions/useHasPermission';
 
 export function useBlankSubscriptionQuery() {
+  const { isAdmin, isOwner } = useAdmin();
+
   return useQuery<Subscription>(
     '/api/v1/subscriptions/create',
     () =>
@@ -23,15 +26,13 @@ export function useBlankSubscriptionQuery() {
         (response: GenericSingleResourceResponse<Subscription>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isAdmin || isOwner }
   );
 }
 
-interface SubscriptionParams {
-  id: string | undefined;
-}
+export function useSubscriptionQuery(params: { id: string | undefined }) {
+  const { isAdmin, isOwner } = useAdmin();
 
-export function useSubscriptionQuery(params: SubscriptionParams) {
   return useQuery<Subscription>(
     route('/api/v1/subscriptions/:id', { id: params.id }),
     () =>
@@ -42,6 +43,6 @@ export function useSubscriptionQuery(params: SubscriptionParams) {
         (response: GenericSingleResourceResponse<Subscription>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isAdmin || isOwner }
   );
 }

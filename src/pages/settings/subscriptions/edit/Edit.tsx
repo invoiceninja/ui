@@ -18,6 +18,7 @@ import { Product } from 'common/interfaces/product';
 import { Subscription } from 'common/interfaces/subscription';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useProductsQuery } from 'common/queries/products';
+import { useSubscriptionQuery } from 'common/queries/subscriptions';
 import { Settings } from 'components/layouts/Settings';
 import { TabGroup } from 'components/TabGroup';
 import { FormEvent, useEffect, useState } from 'react';
@@ -27,7 +28,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Overview } from '../common/components/Overview';
 import { Settings as SubscriptionSettings } from '../common/components/Settings';
 import { Webhook } from '../common/components/Webhook';
-import { useSubscriptionQuery } from '../common/hooks/useBlankSubscriptionQuery';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 
 export function Edit() {

@@ -27,11 +27,11 @@ import { useNavigate } from 'react-router-dom';
 import { Overview } from '../common/components/Overview';
 import { Settings as SubscriptionSettings } from '../common/components/Settings';
 import { Webhook } from '../common/components/Webhook';
-import { useBlankSubscriptionQuery } from '../common/hooks/useBlankSubscriptionQuery';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 import { Frequency } from 'common/enums/frequency';
 import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
 import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
+import { useBlankSubscriptionQuery } from 'common/queries/subscriptions';
 
 export function Create() {
   const [t] = useTranslation();
