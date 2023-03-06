@@ -3,6 +3,7 @@
 
 
 ## Setup
+- Setup Playwright: `npx playwright install`
 - Make sure system dependencies are installed: `npx playwright install-deps`
 - Make sure both Laravel & React apps are up-to-date.
 - Make sure Laravel application is running (it has to match with `VITE_API_URL`).
