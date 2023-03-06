@@ -59,7 +59,7 @@ test("can't create an invoice", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.only('can create an invoice', async ({ page }) => {
+test('can create an invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -78,4 +78,28 @@ test.only('can create an invoice', async ({ page }) => {
       name: "Sorry, you don't have the needed permissions.",
     })
   ).not.toBeVisible();
+});
+
+test('can view assigned invoice with create_invoice', async ({ page }) => {
+  const { clear, save, set } = permissions(page);
+
+  await login(page);
+  await clear();
+  await set('create_invoice');
+  await save();
+  await logout(page);
+
+  await login(page, 'permissions@example.com', 'password');
+
+  await page.getByRole('link', { name: 'Invoices' }).click();
+  await page
+    .getByRole('main')
+    .getByRole('link', { name: 'New Invoice' })
+    .click();
+  await page.getByRole('option', { name: 'cypress' }).click();
+  await page.getByRole('button', { name: 'Save' }).click();
+
+  await expect(
+    page.getByRole('heading', { name: 'Edit Invoice' })
+  ).toBeVisible();
 });
