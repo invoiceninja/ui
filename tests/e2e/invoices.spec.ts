@@ -50,7 +50,7 @@ test("can't create an invoice", async ({ page }) => {
   await login(page, 'permissions@example.com', 'password');
 
   await page.getByRole('link', { name: 'Invoices', exact: true }).click();
-  await page.getByRole('link', { name: 'New Invoice', exact: true }).click();
+  await page.getByText('New Invoice').click();
 
   await expect(
     page.getByRole('heading', {
