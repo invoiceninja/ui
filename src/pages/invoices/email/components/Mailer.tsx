@@ -28,6 +28,7 @@ import { useGeneratePdfUrl } from '$app/pages/invoices/common/hooks/useGenerateP
 import { MailerComponent } from '$app/pages/purchase-orders/email/Email';
 import { forwardRef, RefObject, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { isHosted } from '$app/common/helpers';
 
 export type MailerResourceType =
   | 'invoice'
@@ -146,7 +147,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
             label={t('subject')}
             value={subject || template?.raw_subject}
             onValueChange={(value) => setSubject(value)}
-            disabled={freePlan()}
+            disabled={freePlan() && isHosted()}
           />
 
           {(proPlan() || enterprisePlan()) && (
