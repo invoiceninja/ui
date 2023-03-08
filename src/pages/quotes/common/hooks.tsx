@@ -73,6 +73,7 @@ import {
 } from 'react-icons/md';
 import { SelectOption } from 'components/datatables/Actions';
 import { useAccentColor } from 'common/hooks/useAccentColor';
+import { Tooltip } from 'components/Tooltip';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -744,13 +745,21 @@ export function useQuoteColumns() {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'tax_amount',
