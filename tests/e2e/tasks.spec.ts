@@ -1,7 +1,7 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 
-test.skip("can't view tasks without permission", async ({ page }) => {
+test("can't view tasks without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -16,7 +16,7 @@ test.skip("can't view tasks without permission", async ({ page }) => {
   );
 });
 
-test.skip('can view tasks', async ({ page }) => {
+test('can view tasks', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -38,7 +38,7 @@ test.skip('can view tasks', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip("can't create a task", async ({ page }) => {
+test("can't create a task", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -59,7 +59,7 @@ test.skip("can't create a task", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create a task', async ({ page }) => {
+test('can create a task', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -80,7 +80,7 @@ test.skip('can create a task', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip('can view assigned task with create_task', async ({ page }) => {
+test('can view assigned task with create_task', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);

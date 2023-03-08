@@ -1,7 +1,7 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 
-test.skip("can't view credits without permission", async ({ page }) => {
+test("can't view credits without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -16,7 +16,7 @@ test.skip("can't view credits without permission", async ({ page }) => {
   );
 });
 
-test.skip('can view credits', async ({ page }) => {
+test('can view credits', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -38,7 +38,7 @@ test.skip('can view credits', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip("can't create a credit", async ({ page }) => {
+test("can't create a credit", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -59,7 +59,7 @@ test.skip("can't create a credit", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create a credit', async ({ page }) => {
+test('can create a credit', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -80,7 +80,7 @@ test.skip('can create a credit', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip('can view assigned credit with create_credit', async ({ page }) => {
+test('can view assigned credit with create_credit', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);

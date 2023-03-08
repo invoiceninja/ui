@@ -1,7 +1,7 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 
-test.skip("can't view invoices without permission", async ({ page }) => {
+test("can't view invoices without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -16,7 +16,7 @@ test.skip("can't view invoices without permission", async ({ page }) => {
   );
 });
 
-test.skip('can view invoices', async ({ page }) => {
+test('can view invoices', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -38,7 +38,7 @@ test.skip('can view invoices', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip("can't create an invoice", async ({ page }) => {
+test("can't create an invoice", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -59,7 +59,7 @@ test.skip("can't create an invoice", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create an invoice', async ({ page }) => {
+test('can create an invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -80,7 +80,7 @@ test.skip('can create an invoice', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip('can view assigned invoice with create_invoice', async ({ page }) => {
+test('can view assigned invoice with create_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);

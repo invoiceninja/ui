@@ -1,9 +1,7 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 
-test.skip("can't view recurring invoices without permission", async ({
-  page,
-}) => {
+test("can't view recurring invoices without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -18,7 +16,7 @@ test.skip("can't view recurring invoices without permission", async ({
   );
 });
 
-test.skip('can view recurring invoices', async ({ page }) => {
+test('can view recurring invoices', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -42,7 +40,7 @@ test.skip('can view recurring invoices', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip("can't create a recurring invoice", async ({ page }) => {
+test("can't create a recurring invoice", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -65,7 +63,7 @@ test.skip("can't create a recurring invoice", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create a recurring invoice', async ({ page }) => {
+test('can create a recurring invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -88,7 +86,7 @@ test.skip('can create a recurring invoice', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip('can view assigned recurring invoice with create_recurring_invoice', async ({
+test('can view assigned recurring invoice with create_recurring_invoice', async ({
   page,
 }) => {
   const { clear, save, set } = permissions(page);

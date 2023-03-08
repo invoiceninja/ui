@@ -1,9 +1,7 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 
-test.skip("can't view bank transactions without permission", async ({
-  page,
-}) => {
+test("can't view bank transactions without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -18,7 +16,7 @@ test.skip("can't view bank transactions without permission", async ({
   );
 });
 
-test.skip('can view bank transactions', async ({ page }) => {
+test('can view bank transactions', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -40,7 +38,7 @@ test.skip('can view bank transactions', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip("can't create a bank transaction", async ({ page }) => {
+test("can't create a bank transaction", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -61,7 +59,7 @@ test.skip("can't create a bank transaction", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create a bank transaction', async ({ page }) => {
+test('can create a bank transaction', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -82,7 +80,6 @@ test.skip('can create a bank transaction', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-//Should be skipped until we get bank account tests
 test.skip('can view assigned bank_transaction with create_bank_transaction', async ({
   page,
 }) => {

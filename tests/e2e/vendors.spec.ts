@@ -1,7 +1,7 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 
-test.skip("can't view vendors without permission", async ({ page }) => {
+test("can't view vendors without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -16,7 +16,7 @@ test.skip("can't view vendors without permission", async ({ page }) => {
   );
 });
 
-test.skip('can view vendors', async ({ page }) => {
+test('can view vendors', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -38,7 +38,7 @@ test.skip('can view vendors', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip("can't create a vendor", async ({ page }) => {
+test("can't create a vendor", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -59,7 +59,7 @@ test.skip("can't create a vendor", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create a vendor', async ({ page }) => {
+test('can create a vendor', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -80,7 +80,7 @@ test.skip('can create a vendor', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip('can view assigned vendor with create_vendor', async ({ page }) => {
+test('can view assigned vendor with create_vendor', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);

@@ -1,7 +1,7 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 
-test.skip("can't view expenses without permission", async ({ page }) => {
+test("can't view expenses without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -16,7 +16,7 @@ test.skip("can't view expenses without permission", async ({ page }) => {
   );
 });
 
-test.skip('can view expenses', async ({ page }) => {
+test('can view expenses', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -38,7 +38,7 @@ test.skip('can view expenses', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip("can't create an expense", async ({ page }) => {
+test("can't create an expense", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -59,7 +59,7 @@ test.skip("can't create an expense", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create an expense', async ({ page }) => {
+test('can create an expense', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -80,7 +80,7 @@ test.skip('can create an expense', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip('can view assigned expense with create_expense', async ({ page }) => {
+test('can view assigned expense with create_expense', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);

@@ -1,7 +1,7 @@
 import { login, logout, permissions } from '$tests/e2e/helpers';
 import test, { expect } from '@playwright/test';
 
-test.skip("can't view purchase orders without permission", async ({ page }) => {
+test("can't view purchase orders without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
@@ -16,7 +16,7 @@ test.skip("can't view purchase orders without permission", async ({ page }) => {
   );
 });
 
-test.skip('can view purchase orders', async ({ page }) => {
+test('can view purchase orders', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -40,7 +40,7 @@ test.skip('can view purchase orders', async ({ page }) => {
   ).not.toBeVisible();
 });
 
-test.skip("can't create a purchase orders", async ({ page }) => {
+test("can't create a purchase orders", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -63,7 +63,7 @@ test.skip("can't create a purchase orders", async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create a purchase order', async ({ page }) => {
+test('can create a purchase order', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -89,7 +89,7 @@ test.skip('can create a purchase order', async ({ page }) => {
 test.skip('can view assigned purchase order with create_purchase_order', async ({
   page,
 }) => {
-  //Reason for skipping -> Missing vendor
+  //Blocker vendor
 
   const { clear, save, set } = permissions(page);
 

@@ -19,14 +19,14 @@ test.beforeEach(
   async ({ page }) => await login(page, 'permissions@example.com', 'password')
 );
 
-test.skip('can create a client', async ({ page }) => {
+test('can create a client', async ({ page }) => {
   await page.getByRole('link', { name: 'Clients', exact: true }).click();
   await page.getByText('New Client').click();
 
   await expect(page.getByRole('heading', { name: 'New Client' })).toBeVisible();
 });
 
-test.skip('can create a product', async ({ page }) => {
+test('can create a product', async ({ page }) => {
   await page.getByRole('link', { name: 'Products', exact: true }).click();
   await page.getByText('New Product').click();
 
@@ -35,7 +35,7 @@ test.skip('can create a product', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create an invoice', async ({ page }) => {
+test('can create an invoice', async ({ page }) => {
   await page.getByRole('link', { name: 'Invoices', exact: true }).click();
   await page.getByText('New Invoice').click();
 
@@ -44,7 +44,7 @@ test.skip('can create an invoice', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create a recurring invoice', async ({ page }) => {
+test('can create a recurring invoice', async ({ page }) => {
   await page
     .getByRole('link', { name: 'Recurring Invoices', exact: true })
     .click();
@@ -55,7 +55,7 @@ test.skip('can create a recurring invoice', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create a payment', async ({ page }) => {
+test('can create a payment', async ({ page }) => {
   await page.getByRole('link', { name: 'Payments', exact: true }).click();
   await page.getByText('Enter Payment').click();
 
@@ -64,14 +64,14 @@ test.skip('can create a payment', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create a quote', async ({ page }) => {
+test('can create a quote', async ({ page }) => {
   await page.getByRole('link', { name: 'Quotes', exact: true }).click();
   await page.getByText('New Quote').click();
 
   await expect(page.getByRole('heading', { name: 'New Quote' })).toBeVisible();
 });
 
-test.skip('can create a credit', async ({ page }) => {
+test('can create a credit', async ({ page }) => {
   await page.getByRole('link', { name: 'Credits', exact: true }).click();
   await page.getByText('Enter Credit').click();
 
@@ -80,7 +80,7 @@ test.skip('can create a credit', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create a project', async ({ page }) => {
+test('can create a project', async ({ page }) => {
   await page.getByRole('link', { name: 'Projects', exact: true }).click();
   await page.getByText('New Project').click();
 
@@ -89,14 +89,14 @@ test.skip('can create a project', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create a task', async ({ page }) => {
+test('can create a task', async ({ page }) => {
   await page.getByRole('link', { name: 'Tasks', exact: true }).click();
   await page.getByText('New Task').click();
 
   await expect(page.getByRole('heading', { name: 'New Task' })).toBeVisible();
 });
 
-test.skip('can create a vendor', async ({ page }) => {
+test('can create a vendor', async ({ page }) => {
   await page.getByRole('link', { name: 'Vendors', exact: true }).click();
   await page.getByText('New Vendor').click();
 
@@ -104,7 +104,7 @@ test.skip('can create a vendor', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Contacts' })).toBeVisible();
 });
 
-test.skip('can create a purchase order', async ({ page }) => {
+test('can create a purchase order', async ({ page }) => {
   await page
     .getByRole('link', { name: 'Purchase Orders', exact: true })
     .click();
@@ -115,7 +115,7 @@ test.skip('can create a purchase order', async ({ page }) => {
   ).toBeVisible();
 });
 
-test.skip('can create an expense', async ({ page }) => {
+test('can create an expense', async ({ page }) => {
   await page.getByRole('link', { name: 'Expenses', exact: true }).click();
   await page.getByText('Enter Expense').click();
 
@@ -123,7 +123,7 @@ test.skip('can create an expense', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Notes' })).toBeVisible();
 });
 
-test.skip('can create a recurring expense', async ({ page }) => {
+test('can create a recurring expense', async ({ page }) => {
   await page
     .getByRole('link', { name: 'Recurring Expenses', exact: true })
     .click();
@@ -133,7 +133,7 @@ test.skip('can create a recurring expense', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Notes' })).toBeVisible();
 });
 
-test.skip('can create a bank transaction', async ({ page }) => {
+test('can create a bank transaction', async ({ page }) => {
   await page.getByRole('link', { name: 'Transactions', exact: true }).click();
   await page.getByText('New Transaction').click();
 
