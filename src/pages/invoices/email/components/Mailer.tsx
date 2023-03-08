@@ -14,6 +14,7 @@ import MDEditor from '@uiw/react-md-editor';
 import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
 import { freePlan } from 'common/guards/guards/free-plan';
 import { proPlan } from 'common/guards/guards/pro-plan';
+import { isHosted } from 'common/helpers';
 import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
 import { useHandleSend } from 'common/hooks/emails/useHandleSend';
 import { useResolveTemplate } from 'common/hooks/emails/useResolveTemplate';
@@ -146,7 +147,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
             label={t('subject')}
             value={subject || template?.raw_subject}
             onValueChange={(value) => setSubject(value)}
-            disabled={freePlan()}
+            disabled={freePlan() && isHosted()}
           />
 
           {(proPlan() || enterprisePlan()) && (
