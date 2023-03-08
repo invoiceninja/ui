@@ -81,8 +81,6 @@ test.skip('can create an expense', async ({ page }) => {
 });
 
 test.skip('can view assigned expense with create_expense', async ({ page }) => {
-  //Reason for skipping -> Missing vendor
-
   const { clear, save, set } = permissions(page);
 
   await login(page);
@@ -98,10 +96,10 @@ test.skip('can view assigned expense with create_expense', async ({ page }) => {
     .getByRole('main')
     .getByRole('link', { name: 'Enter Expense' })
     .click();
-  await page.getByRole('option', { name: 'test vendor' }).click();
+
+  await page.waitForTimeout(200);
+
   await page.getByRole('button', { name: 'Save' }).click();
 
-  await expect(
-    page.getByRole('heading', { name: 'Edit Expense' })
-  ).toBeVisible();
+  await expect(page.getByText('Successfully created expense')).toBeVisible();
 });
