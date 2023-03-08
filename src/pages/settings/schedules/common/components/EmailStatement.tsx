@@ -147,7 +147,7 @@ export function EmailStatement(props: Props) {
                 key={client.id}
                 className="flex items-center justify-between"
               >
-                <span>{client.name}</span>
+                <span>{client.display_name}</span>
 
                 <MdClose
                   className="cursor-pointer ml-16"
