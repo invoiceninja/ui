@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useLogo } from 'common/hooks/useLogo';
-import { RootState } from 'common/stores/store';
-import { CompanySwitcher } from 'components/CompanySwitcher';
-import { HelpSidebarIcons } from 'components/HelpSidebarIcons';
+import { useLogo } from '$app/common/hooks/useLogo';
+import { RootState } from '$app/common/stores/store';
+import { CompanySwitcher } from '$app/components/CompanySwitcher';
+import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
 import { Icon } from 'react-feather';
 import { useSelector } from 'react-redux';
 import { SidebarItem } from './SidebarItem';

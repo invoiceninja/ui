@@ -9,16 +9,16 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { useQuery } from 'common/hooks/useQuery';
-import { Client } from 'common/interfaces/client';
-import { ClientContact } from 'common/interfaces/client-contact';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { useQuery } from '$app/common/hooks/useQuery';
+import { Client } from '$app/common/interfaces/client';
+import { ClientContact } from '$app/common/interfaces/client-contact';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
 import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';

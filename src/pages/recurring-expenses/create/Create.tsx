@@ -8,28 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { Default } from 'components/layouts/Default';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Details } from '../components/Details';
 import { Notes } from '../components/Notes';
 import { AdditionalInfo } from '../components/AdditionalInfo';
-import { request } from 'common/helpers/request';
-import { endpoint } from 'common/helpers';
-import { toast } from 'common/helpers/toast/toast';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { TaxSettings } from '../components/Taxes';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { recurringExpenseAtom } from '../common/atoms';
 import { useAtom } from 'jotai';
-import { RecurringExpense } from 'common/interfaces/recurring-expense';
-import { useBlankRecurringExpenseQuery } from 'common/queries/recurring-expense';
+import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
+import { useBlankRecurringExpenseQuery } from '$app/common/queries/recurring-expense';
 import { useHandleChange } from '../common/hooks';
-import { RecurringExpensesFrequency } from 'common/enums/recurring-expense-frequency';
+import { RecurringExpensesFrequency } from '$app/common/enums/recurring-expense-frequency';
 import { cloneDeep } from 'lodash';
 
 export function Create() {

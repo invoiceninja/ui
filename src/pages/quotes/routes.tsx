@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Guard } from 'common/guards/Guard';
-import { permission } from 'common/guards/guards/permission';
+import { Guard } from '$app/common/guards/Guard';
+import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
 import { Email } from './email/Email';
 import { Quotes } from './index/Quotes';
 import { Pdf } from './pdf/Pdf';
-import { Import } from 'pages/quotes/import/Import';
-import { enabled } from 'common/guards/guards/enabled';
-import { ModuleBitmask } from 'pages/settings/account-management/component';
-import { or } from 'common/guards/guards/or';
-import { assigned } from 'common/guards/guards/assigned';
+import { Import } from '$app/pages/quotes/import/Import';
+import { enabled } from '$app/common/guards/guards/enabled';
+import { ModuleBitmask } from '$app/pages/settings/account-management/component';
+import { or } from '$app/common/guards/guards/or';
+import { assigned } from '$app/common/guards/guards/assigned';
 
 export const quoteRoutes = (
   <Route path="/quotes">

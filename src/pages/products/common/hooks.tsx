@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { EntityState } from 'common/enums/entity-state';
-import { date, getEntityState } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { Product } from 'common/interfaces/product';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { customField } from 'components/CustomField';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { EntityStatus } from 'components/EntityStatus';
-import { Icon } from 'components/icons/Icon';
+import { Link } from '$app/components/forms';
+import { EntityState } from '$app/common/enums/entity-state';
+import { date, getEntityState } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { Product } from '$app/common/interfaces/product';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { customField } from '$app/components/CustomField';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
 import { useUpdateAtom } from 'jotai/utils';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -35,10 +35,10 @@ import {
 } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { productAtom } from './atoms';
-import { bulk } from 'common/queries/products';
+import { bulk } from '$app/common/queries/products';
 import { useQueryClient } from 'react-query';
-import { Divider } from 'components/cards/Divider';
-import { Tooltip } from 'components/Tooltip';
+import { Divider } from '$app/components/cards/Divider';
+import { Tooltip } from '$app/components/Tooltip';
 
 export const productColumns = [
   'product_key',

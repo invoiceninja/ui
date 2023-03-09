@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { Button, InputField, Link, SelectField } from '@invoiceninja/forms';
-import { freePlan } from 'common/guards/guards/free-plan';
-import { endpoint, isHosted, isSelfHosted } from 'common/helpers';
-import { generateEmailPreview } from 'common/helpers/emails/generate-email-preview';
-import { request } from 'common/helpers/request';
-import { EmailTemplate } from 'common/hooks/emails/useResolveTemplate';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
-import { useTitle } from 'common/hooks/useTitle';
-import { Settings as CompanySettings } from 'common/interfaces/company.interface';
-import { TemplateBody, Templates } from 'common/interfaces/statics';
-import { useStaticsQuery } from 'common/queries/statics';
-import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
-import { MarkdownEditor } from 'components/forms/MarkdownEditor';
-import { Settings } from 'components/layouts/Settings';
-import { useHandleCancel } from 'pages/invoices/edit/hooks/useHandleCancel';
+import { Card, Element } from '$app/components/cards';
+import { Button, InputField, Link, SelectField } from '$app/components/forms';
+import { freePlan } from '$app/common/guards/guards/free-plan';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
+import { generateEmailPreview } from '$app/common/helpers/emails/generate-email-preview';
+import { request } from '$app/common/helpers/request';
+import { EmailTemplate } from '$app/common/hooks/emails/useResolveTemplate';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
+import { TemplateBody, Templates } from '$app/common/interfaces/statics';
+import { useStaticsQuery } from '$app/common/queries/statics';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { Settings } from '$app/components/layouts/Settings';
+import { useHandleCancel } from '$app/pages/invoices/edit/hooks/useHandleCancel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';

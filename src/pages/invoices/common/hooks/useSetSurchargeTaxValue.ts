@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { updateChanges } from 'common/stores/slices/company-users';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 
 export function useSetSurchageTaxValue() {

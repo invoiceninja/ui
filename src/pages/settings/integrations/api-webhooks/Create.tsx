@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { Button, InputField, SelectField } from '@invoiceninja/forms';
+import { Card, Element } from '$app/components/cards';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useTitle } from 'common/hooks/useTitle';
-import { ApiWebhook, ApiWebHookHeader } from 'common/interfaces/api-webhook';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankApiWebhookQuery } from 'common/queries/api-webhooks';
-import { Settings } from 'components/layouts/Settings';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { ApiWebhook, ApiWebHookHeader } from '$app/common/interfaces/api-webhook';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankApiWebhookQuery } from '$app/common/queries/api-webhooks';
+import { Settings } from '$app/components/layouts/Settings';
 import { useEffect, useState } from 'react';
 import { PlusCircle, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';

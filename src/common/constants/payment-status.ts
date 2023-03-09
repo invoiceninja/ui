@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { PaymentStatus } from 'common/enums/payment-status';
+import { PaymentStatus } from '$app/common/enums/payment-status';
 
 export default {
   [PaymentStatus.PartiallyUnapplied]: 'partially_unapplied',

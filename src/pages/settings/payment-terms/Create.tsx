@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, CardContainer } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
+import { Card, CardContainer } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import { AxiosError, AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { PaymentTerm } from 'common/interfaces/payment-term';
-import { Breadcrumbs } from 'components/Breadcrumbs';
-import { Container } from 'components/Container';
-import { Settings } from 'components/layouts/Settings';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { Breadcrumbs } from '$app/components/Breadcrumbs';
+import { Container } from '$app/components/Container';
+import { Settings } from '$app/components/layouts/Settings';
 import { useFormik } from 'formik';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';

@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Inline } from 'components/Inline';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Inline } from '$app/components/Inline';
 import { useTranslation } from 'react-i18next';
-import { date as formatDate } from 'common/helpers';
+import { date as formatDate } from '$app/common/helpers';
 
 export interface PurchaseOrderCardProps {
   purchaseOrder: PurchaseOrder;

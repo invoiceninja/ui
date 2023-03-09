@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isDemo, isSelfHosted } from 'common/helpers';
-import { useAdmin } from 'common/hooks/permissions/useHasPermission';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { useTitle } from 'common/hooks/useTitle';
-import { SwitchToFlutter } from 'components/SwitchToFlutter';
-import { Activity } from 'pages/dashboard/components/Activity';
-import { PastDueInvoices } from 'pages/dashboard/components/PastDueInvoices';
-import { RecentPayments } from 'pages/dashboard/components/RecentPayments';
-import { Totals } from 'pages/dashboard/components/Totals';
-import { UpcomingInvoices } from 'pages/dashboard/components/UpcomingInvoices';
+import { isDemo, isSelfHosted } from '$app/common/helpers';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { SwitchToFlutter } from '$app/components/SwitchToFlutter';
+import { Activity } from '$app/pages/dashboard/components/Activity';
+import { PastDueInvoices } from '$app/pages/dashboard/components/PastDueInvoices';
+import { RecentPayments } from '$app/pages/dashboard/components/RecentPayments';
+import { Totals } from '$app/pages/dashboard/components/Totals';
+import { UpcomingInvoices } from '$app/pages/dashboard/components/UpcomingInvoices';
 import { useTranslation } from 'react-i18next';
 import { Default } from '../../components/layouts/Default';
 import { ExpiredQuotes } from './components/ExpiredQuotes';

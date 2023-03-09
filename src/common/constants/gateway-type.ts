@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { GatewayType } from 'common/enums/gateway-type';
+import { GatewayType } from '$app/common/enums/gateway-type';
 
 export default {
   [GatewayType.CreditCard]: 'credit_card',

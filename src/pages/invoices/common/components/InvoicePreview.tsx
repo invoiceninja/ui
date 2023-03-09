@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { previewEndpoint } from 'common/helpers';
-import { Credit } from 'common/interfaces/credit';
-import { Invoice } from 'common/interfaces/invoice';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { Quote } from 'common/interfaces/quote';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { previewEndpoint } from '$app/common/helpers';
+import { Credit } from '$app/common/interfaces/credit';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { InvoiceViewer } from './InvoiceViewer';
 import { RelationType } from './ProductsTable';
 

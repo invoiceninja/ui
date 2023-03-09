@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField, SelectField } from '@invoiceninja/forms';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import { AxiosError, AxiosResponse } from 'axios';
-import { endpoint, isHosted } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useLanguages } from 'common/hooks/useLanguages';
-import { CompanyInput } from 'common/interfaces/company.interface';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { CurrencySelector } from 'components/CurrencySelector';
-import { Modal } from 'components/Modal';
+import { endpoint, isHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useLanguages } from '$app/common/hooks/useLanguages';
+import { CompanyInput } from '$app/common/interfaces/company.interface';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { Modal } from '$app/components/Modal';
 import {
   FormEvent,
   useState,

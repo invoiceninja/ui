@@ -12,13 +12,13 @@ import { useEffect, useRef, useState } from 'react';
 import { Combobox } from '@headlessui/react';
 import { ChevronDown, X } from 'react-feather';
 import { debounce } from 'lodash';
-import { endpoint } from 'common/helpers';
+import { endpoint } from '$app/common/helpers';
 import { useQueryClient } from 'react-query';
 import { InputLabel } from './InputLabel';
-import { Spinner } from 'components/Spinner';
+import { Spinner } from '$app/components/Spinner';
 import { useTranslation } from 'react-i18next';
-import { Alert } from 'components/Alert';
-import { request as httpRequest } from 'common/helpers/request';
+import { Alert } from '$app/components/Alert';
+import { request as httpRequest } from '$app/common/helpers/request';
 import { useDebounce } from 'react-use';
 
 export interface Record<T = any> {

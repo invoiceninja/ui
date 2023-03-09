@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { classNames } from 'common/helpers';
-import { RootState } from 'common/stores/store';
+import { classNames } from '$app/common/helpers';
+import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { NavigationItem } from './DesktopSidebar';

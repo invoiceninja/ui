@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { useTitle } from 'common/hooks/useTitle';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useTitle } from '$app/common/hooks/useTitle';
 import {
   deletePassword,
   injectInChanges,
   resetChanges,
   updateUser,
-} from 'common/stores/slices/user';
-import { RootState } from 'common/stores/store';
-import { PasswordConfirmation } from 'components/PasswordConfirmation';
-import { Tabs } from 'components/Tabs';
+} from '$app/common/stores/slices/user';
+import { RootState } from '$app/common/stores/store';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { Tabs } from '$app/components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
@@ -28,11 +28,11 @@ import { Outlet } from 'react-router-dom';
 import { Settings } from '../../../components/layouts/Settings';
 import { useUserDetailsTabs } from './common/hooks/useUserDetailsTabs';
 import axios, { AxiosError } from 'axios';
-import { updateRecord } from 'common/stores/slices/company-users';
-import { toast } from 'common/helpers/toast/toast';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useAdmin } from 'common/hooks/permissions/useHasPermission';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function UserDetails() {
   useTitle('user_details');

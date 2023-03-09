@@ -8,29 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
-import { MarkdownEditor } from 'components/forms/MarkdownEditor';
-import { TabGroup } from 'components/TabGroup';
-import { Field } from 'pages/settings/custom-fields/components';
+import { Card } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { TabGroup } from '$app/components/TabGroup';
+import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
-import Toggle from 'components/forms/Toggle';
+import Toggle from '$app/components/forms/Toggle';
 import { ChangeHandler } from '../hooks';
 import { useAtom } from 'jotai';
 import { creditAtom } from '../atoms';
 import { useLocation, useParams } from 'react-router-dom';
-import { Upload } from 'pages/settings/company/documents/components';
-import { endpoint } from 'common/helpers';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { endpoint } from '$app/common/helpers';
 import { useQueryClient } from 'react-query';
-import { DocumentsTable } from 'components/DocumentsTable';
-import { UserSelector } from 'components/users/UserSelector';
-import { VendorSelector } from 'components/vendors/VendorSelector';
-import { DesignSelector } from 'common/generic/DesignSelector';
-import { ProjectSelector } from 'components/projects/ProjectSelector';
-import { route } from 'common/helpers/route';
-import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { VendorSelector } from '$app/components/vendors/VendorSelector';
+import { DesignSelector } from '$app/common/generic/DesignSelector';
+import { ProjectSelector } from '$app/components/projects/ProjectSelector';
+import { route } from '$app/common/helpers/route';
+import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 
 interface Props {
   handleChange: ChangeHandler;

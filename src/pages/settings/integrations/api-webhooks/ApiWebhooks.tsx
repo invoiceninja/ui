@@ -7,13 +7,13 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { useTitle } from 'common/hooks/useTitle';
-import { Settings } from 'components/layouts/Settings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { DataTable, DataTableColumns } from 'components/DataTable';
-import { ApiWebhook } from 'common/interfaces/api-webhook';
-import { Link } from '@invoiceninja/forms';
-import { route } from 'common/helpers/route';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
+import { ApiWebhook } from '$app/common/interfaces/api-webhook';
+import { Link } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
 
 export function ApiWebhooks() {
   const [t] = useTranslation();

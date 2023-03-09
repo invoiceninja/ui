@@ -8,9 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from 'components/Badge';
+import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
-import { Invoice } from 'common/interfaces/invoice';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
 
 interface Props {
   entity: Invoice;
@@ -18,6 +19,12 @@ interface Props {
 
 export function InvoiceStatus(props: Props) {
   const [t] = useTranslation();
+
+  const checkInvoiceInvitationsViewedDate = () => {
+    return props.entity.invitations.some(
+      (invitation) => invitation.viewed_date
+    );
+  };
 
   if (props.entity.is_deleted)
     return <Badge variant="red">{t('deleted')}</Badge>;
@@ -27,6 +34,12 @@ export function InvoiceStatus(props: Props) {
 
   if (props.entity.due_date && new Date(props.entity.due_date) < new Date())
     return <Badge variant="yellow">{t('overdue')}</Badge>;
+
+  if (
+    props.entity.status_id === InvoiceStatusEnum.Sent &&
+    checkInvoiceInvitationsViewedDate()
+  )
+    return <Badge variant="yellow">{t('viewed')}</Badge>;
 
   switch (props.entity.status_id) {
     case '1':

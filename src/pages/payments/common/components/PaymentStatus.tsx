@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from 'components/Badge';
+import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
-import { Payment } from 'common/interfaces/payment';
+import { Payment } from '$app/common/interfaces/payment';
 
 interface Props {
   entity: Payment;

@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ClickableElement } from '@invoiceninja/cards';
-import { Button, InputField } from '@invoiceninja/forms';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Task } from 'common/interfaces/task';
-import { TaskStatus } from 'common/interfaces/task-status';
-import { ClientSelector } from 'components/clients/ClientSelector';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
-import { Modal } from 'components/Modal';
-import { ProjectSelector } from 'components/projects/ProjectSelector';
-import { TabGroup } from 'components/TabGroup';
-import { UserSelector } from 'components/users/UserSelector';
+import { ClickableElement } from '$app/components/cards';
+import { Button, InputField } from '$app/components/forms';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Task } from '$app/common/interfaces/task';
+import { TaskStatus } from '$app/common/interfaces/task-status';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import { Modal } from '$app/components/Modal';
+import { ProjectSelector } from '$app/components/projects/ProjectSelector';
+import { TabGroup } from '$app/components/TabGroup';
+import { UserSelector } from '$app/components/users/UserSelector';
 import { useAtom } from 'jotai';
-import { LogPosition } from 'pages/tasks/common/components/TaskTable';
+import { LogPosition } from '$app/pages/tasks/common/components/TaskTable';
 import {
   duration,
   handleTaskDateChange,
@@ -28,9 +28,9 @@ import {
   handleTaskTimeChange,
   parseTime,
   parseTimeToDate,
-} from 'pages/tasks/common/helpers';
-import { parseTimeLog } from 'pages/tasks/common/helpers/calculate-time';
-import { useSave } from 'pages/tasks/common/hooks';
+} from '$app/pages/tasks/common/helpers';
+import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
+import { useSave } from '$app/pages/tasks/common/hooks';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { currentTaskAtom } from '../common/atoms';

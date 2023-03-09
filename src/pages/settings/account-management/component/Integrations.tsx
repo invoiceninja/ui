@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Divider } from 'components/cards/Divider';
+import { Divider } from '$app/components/cards/Divider';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement } from '../../../../components/cards';
 

@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { Credit } from 'common/interfaces/credit';
-import { defaultHeaders } from 'common/queries/common/headers';
+import { endpoint } from '$app/common/helpers';
+import { Credit } from '$app/common/interfaces/credit';
+import { defaultHeaders } from '$app/common/queries/common/headers';
 
 export class CreditResolver {
   protected declare credit: Credit;

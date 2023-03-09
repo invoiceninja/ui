@@ -12,7 +12,7 @@ import { useState } from 'react';
 import { Switch } from '@headlessui/react';
 import { classNames } from '../../common/helpers';
 import CommonProps from '../../common/interfaces/common-props.interface';
-import { useAccentColor } from 'common/hooks/useAccentColor';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { useEffect } from 'react';
 
 interface Props extends CommonProps {

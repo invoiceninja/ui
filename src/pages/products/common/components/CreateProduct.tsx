@@ -10,8 +10,8 @@
 
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card } from '@invoiceninja/cards';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { Card } from '$app/components/cards';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAtom } from 'jotai';
 import { productAtom } from '../atoms';
 import { useHandleChange } from '../hooks';

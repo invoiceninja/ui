@@ -10,7 +10,7 @@
 
 import { Fragment, ReactNode } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import CommonProps from 'common/interfaces/common-props.interface';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 import { MdClose } from 'react-icons/md';
 import classNames from 'classnames';
 

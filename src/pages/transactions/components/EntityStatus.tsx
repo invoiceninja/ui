@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { transactionStatuses } from 'common/constants/transactions';
-import { TransactionStatus } from 'common/enums/transactions';
-import { Badge } from 'components/Badge';
+import { Link } from '$app/components/forms';
+import { transactionStatuses } from '$app/common/constants/transactions';
+import { TransactionStatus } from '$app/common/enums/transactions';
+import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 
 interface Props {

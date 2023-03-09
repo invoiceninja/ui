@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isSelfHosted } from 'common/helpers';
+import { isSelfHosted } from '$app/common/helpers';
 import { Guard } from '../Guard';
 
 export type Plan = 'pro' | 'enterprise' | 'white_label';

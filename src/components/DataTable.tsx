@@ -9,8 +9,8 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint, isProduction } from 'common/helpers';
-import { request } from 'common/helpers/request';
+import { endpoint, isProduction } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import React, {
   ChangeEvent,
   ReactElement,
@@ -19,10 +19,10 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { toast } from 'common/helpers/toast/toast';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { Divider } from './cards/Divider';
 import { Actions, SelectOption } from './datatables/Actions';
 import { Dropdown } from './dropdown/Dropdown';
@@ -44,7 +44,7 @@ import { atomWithStorage, useUpdateAtom } from 'jotai/utils';
 import { useAtom } from 'jotai';
 import { Icon } from './icons/Icon';
 import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
-import { invalidationQueryAtom } from 'common/atoms/data-table';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 
 export type DataTableColumns<T = any> = {
   id: string;

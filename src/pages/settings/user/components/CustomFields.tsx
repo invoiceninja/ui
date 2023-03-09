@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
-import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
-import { Field } from 'pages/settings/custom-fields/components';
+import { Card } from '$app/components/cards';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
+import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 
 export function CustomFields() {

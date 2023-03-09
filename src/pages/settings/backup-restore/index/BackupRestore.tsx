@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Settings } from 'components/layouts/Settings';
-import { Tabs } from 'components/Tabs';
+import { Settings } from '$app/components/layouts/Settings';
+import { Tabs } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router-dom';
 import { useCompanyBackupRestoreTabs } from '../common/hooks/useCompanyBackupRestoreTabs';

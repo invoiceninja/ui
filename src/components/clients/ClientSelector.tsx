@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Client } from 'common/interfaces/client';
-import { GenericSelectorProps } from 'common/interfaces/generic-selector-props';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
-import { ClientCreate } from 'pages/invoices/common/components/ClientCreate';
+import { Client } from '$app/common/interfaces/client';
+import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
+import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

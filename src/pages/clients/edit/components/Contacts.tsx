@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { ClientContact } from 'common/interfaces/client-contact';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { CustomField } from 'components/CustomField';
-import Toggle from 'components/forms/Toggle';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { ClientContact } from '$app/common/interfaces/client-contact';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { CustomField } from '$app/components/CustomField';
+import Toggle from '$app/components/forms/Toggle';
 import { set } from 'lodash';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';

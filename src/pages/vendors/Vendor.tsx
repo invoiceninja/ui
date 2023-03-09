@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, Link } from '@invoiceninja/forms';
-import { route } from 'common/helpers/route';
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { useCountries } from 'common/hooks/useCountries';
-import { useTitle } from 'common/hooks/useTitle';
-import { useVendorQuery } from 'common/queries/vendor';
-import { Page } from 'components/Breadcrumbs';
-import { InfoCard } from 'components/InfoCard';
-import { Default } from 'components/layouts/Default';
-import { Tab, Tabs } from 'components/Tabs';
+import { Button, Link } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCountries } from '$app/common/hooks/useCountries';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { useVendorQuery } from '$app/common/queries/vendor';
+import { Page } from '$app/components/Breadcrumbs';
+import { InfoCard } from '$app/components/InfoCard';
+import { Default } from '$app/components/layouts/Default';
+import { Tab, Tabs } from '$app/components/Tabs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import companySettings from 'common/constants/company-settings';
+import companySettings from '$app/common/constants/company-settings';
 import { useCurrentCompany } from './useCurrentCompany';
 import { useTranslation } from 'react-i18next';
 
