@@ -16,6 +16,7 @@ import { route } from '$app/common/helpers/route';
 import { Params } from './common/params.interface';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface ExpenseCategoriesParams extends Params {
   enabled?: boolean;
@@ -69,4 +70,18 @@ export function bulk(
     action,
     ids: id,
   });
+}
+
+export function useBlankExpenseCategoryQuery() {
+  const hasPermission = useHasPermission();
+
+  return useQuery<ExpenseCategory>(
+    '/api/v1/expense_categories/create',
+    () =>
+      request('GET', endpoint('/api/v1/expense_categories/create')).then(
+        (response: GenericSingleResourceResponse<ExpenseCategory>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity, enabled: hasPermission('create_expense') }
+  );
 }
