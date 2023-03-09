@@ -24,7 +24,6 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { customField } from '$app/components/CustomField';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { EntityStatus } from '$app/components/EntityStatus';

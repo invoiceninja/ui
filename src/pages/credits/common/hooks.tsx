@@ -56,7 +56,6 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { customField } from '$app/components/CustomField';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Icon } from '$app/components/icons/Icon';
 import {
