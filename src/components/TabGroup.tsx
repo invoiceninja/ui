@@ -66,7 +66,7 @@ export function TabGroup(props: Props) {
               key: index,
               // eslint-disable-next-line @typescript-eslint/ban-ts-comment
               // @ts-ignore
-              className: classNames({
+              className: classNames(element.props?.className, {
                 'flex flex-col flex-1': props.height === 'full',
                 'block my-4': props.height !== 'full',
                 hidden: currentIndex !== index,
