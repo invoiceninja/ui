@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { BankAccount } from 'common/interfaces/bank-accounts';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 

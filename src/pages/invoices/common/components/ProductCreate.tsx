@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
+import { Button } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { useTitle } from 'common/hooks/useTitle';
-import { useBlankProductQuery } from 'common/queries/products';
-import { Modal } from 'components/Modal';
+import { endpoint } from '$app/common/helpers';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { useBlankProductQuery } from '$app/common/queries/products';
+import { Modal } from '$app/components/Modal';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Product } from 'common/interfaces/product';
-import { request } from 'common/helpers/request';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useHandleChange } from 'pages/products/common/hooks';
-import { toast } from 'common/helpers/toast/toast';
-import { ProductForm } from 'pages/products/common/components/ProductForm';
+import { Product } from '$app/common/interfaces/product';
+import { request } from '$app/common/helpers/request';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useHandleChange } from '$app/pages/products/common/hooks';
+import { toast } from '$app/common/helpers/toast/toast';
+import { ProductForm } from '$app/pages/products/common/components/ProductForm';
 import { useQueryClient } from 'react-query';
 
 interface Props {

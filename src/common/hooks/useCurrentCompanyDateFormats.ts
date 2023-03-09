@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useStaticsQuery } from 'common/queries/statics';
+import { useStaticsQuery } from '$app/common/queries/statics';
 import { useEffect, useState } from 'react';
 import { useCurrentCompany } from './useCurrentCompany';
 

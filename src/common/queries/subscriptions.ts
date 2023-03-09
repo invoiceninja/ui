@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { Subscription } from 'common/interfaces/subscription';
-import { route } from 'common/helpers/route';
-import { useAdmin } from 'common/hooks/permissions/useHasPermission';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Subscription } from '$app/common/interfaces/subscription';
+import { route } from '$app/common/helpers/route';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function useBlankSubscriptionQuery() {
   const { isAdmin, isOwner } = useAdmin();

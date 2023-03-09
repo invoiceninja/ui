@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Guard } from 'common/guards/Guard';
-import { assigned } from 'common/guards/guards/assigned';
-import { or } from 'common/guards/guards/or';
-import { permission } from 'common/guards/guards/permission';
+import { Guard } from '$app/common/guards/Guard';
+import { assigned } from '$app/common/guards/guards/assigned';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Documents } from './documents/Documents';

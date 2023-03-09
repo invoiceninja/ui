@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { request } from 'common/helpers/request';
-import { Vendor } from 'common/interfaces/vendor';
+import { request } from '$app/common/helpers/request';
+import { Vendor } from '$app/common/interfaces/vendor';
 import { useQuery } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { endpoint } from '../helpers';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Params } from './common/params.interface';
 
 interface VendorParams {

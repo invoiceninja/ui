@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isDemo } from 'common/helpers';
-import { Tab } from 'components/Tabs';
+import { isDemo } from '$app/common/helpers';
+import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 
 export function useAccountManagementTabs() {

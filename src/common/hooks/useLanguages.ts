@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Language } from 'common/interfaces/language';
-import { useStaticsQuery } from 'common/queries/statics';
+import { Language } from '$app/common/interfaces/language';
+import { useStaticsQuery } from '$app/common/queries/statics';
 import { useEffect, useState } from 'react';
 
 export function useLanguages(): Language[] {

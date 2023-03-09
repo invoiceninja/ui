@@ -9,16 +9,16 @@
  */
 
 import { AxiosResponse } from 'axios';
-import { AuthenticationTypes } from 'common/dtos/authentication';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { CompanyUser } from 'common/interfaces/company-user';
+import { AuthenticationTypes } from '$app/common/dtos/authentication';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
   changeCurrentIndex,
   updateCompanyUsers,
-} from 'common/stores/slices/company-users';
-import { setMsal } from 'common/stores/slices/user';
-import { authenticate } from 'common/stores/slices/user';
+} from '$app/common/stores/slices/company-users';
+import { setMsal } from '$app/common/stores/slices/user';
+import { authenticate } from '$app/common/stores/slices/user';
 import { useDispatch } from 'react-redux';
 import MicrosoftLogin from 'react-microsoft-login';
 import { ReactNode } from 'react';

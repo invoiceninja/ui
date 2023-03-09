@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Breadcrumbs, Page } from 'components/Breadcrumbs';
+import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { useAtom } from 'jotai';
 import { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -17,7 +17,7 @@ import { classNames } from '../../common/helpers';
 import { SelectField } from '../forms';
 import { Default } from './Default';
 import { companySettingsErrorsAtom } from '../../pages/settings/common/atoms';
-import { ValidationAlert } from 'components/ValidationAlert';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 import { useSettingsRoutes } from './common/hooks';
 
 interface Props {

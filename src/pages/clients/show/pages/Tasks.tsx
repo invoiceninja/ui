@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from 'common/helpers/route';
-import { DataTable } from 'components/DataTable';
-import { useTaskColumns, useTaskFilters } from 'pages/tasks/common/hooks';
+import { route } from '$app/common/helpers/route';
+import { DataTable } from '$app/components/DataTable';
+import { useTaskColumns, useTaskFilters } from '$app/pages/tasks/common/hooks';
 import { useParams } from 'react-router-dom';
 
 export const dataTableStaleTime = 50;

@@ -28,26 +28,26 @@ import {
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button } from '@invoiceninja/forms';
-import { Breadcrumbs, Page } from 'components/Breadcrumbs';
+import { Button } from '$app/components/forms';
+import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { useSelector } from 'react-redux';
-import { RootState } from 'common/stores/store';
+import { RootState } from '$app/common/stores/store';
 import { DesktopSidebar, NavigationItem } from './components/DesktopSidebar';
 import { MobileSidebar } from './components/MobileSidebar';
 import {
   useAdmin,
   useHasPermission,
-} from 'common/hooks/permissions/useHasPermission';
+} from '$app/common/hooks/permissions/useHasPermission';
 import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
-import { ModuleBitmask } from 'pages/settings/account-management/component';
-import { QuickCreatePopover } from 'components/QuickCreatePopover';
-import { isSelfHosted } from 'common/helpers';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { useUnlockButtonForHosted } from 'common/hooks/useUnlockButtonForHosted';
-import { useUnlockButtonForSelfHosted } from 'common/hooks/useUnlockButtonForSelfHosted';
-import { useCurrentCompanyUser } from 'common/hooks/useCurrentCompanyUser';
-import { useEnabled } from 'common/guards/guards/enabled';
+import { ModuleBitmask } from '$app/pages/settings/account-management/component';
+import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
+import { isSelfHosted } from '$app/common/helpers';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
+import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
+import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
+import { useEnabled } from '$app/common/guards/guards/enabled';
 
 interface Props extends CommonProps {
   title?: string | null;

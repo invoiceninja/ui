@@ -9,15 +9,15 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { Params } from './common/params.interface';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { ApiWebhook } from 'common/interfaces/api-webhook';
-import { toast } from 'common/helpers/toast/toast';
-import { useAdmin } from 'common/hooks/permissions/useHasPermission';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { ApiWebhook } from '$app/common/interfaces/api-webhook';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function useApiWebhooksQuery(params: Params) {
   const { isAdmin } = useAdmin();

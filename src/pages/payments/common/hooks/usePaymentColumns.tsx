@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import paymentType from 'common/constants/payment-type';
-import { date } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
-import { Payment } from 'common/interfaces/payment';
-import { customField } from 'components/CustomField';
-import { EntityStatus } from 'components/EntityStatus';
-import { StatusBadge } from 'components/StatusBadge';
-import { Tooltip } from 'components/Tooltip';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { Link } from '$app/components/forms';
+import paymentType from '$app/common/constants/payment-type';
+import { date } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { Payment } from '$app/common/interfaces/payment';
+import { customField } from '$app/components/CustomField';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { StatusBadge } from '$app/components/StatusBadge';
+import { Tooltip } from '$app/components/Tooltip';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import { PaymentStatus } from '../components/PaymentStatus';
 

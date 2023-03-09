@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { useTranslation } from 'react-i18next';
 import { Card } from '../../../../components/cards';
 import { Settings } from '../../../../components/layouts/Settings';

@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useStaticsQuery } from 'common/queries/statics';
-import { updateChanges } from 'common/stores/slices/company-users';
-import { RootState } from 'common/stores/store';
-import { Card } from 'components/cards/Card';
-import { Element } from 'components/cards/Element';
-import { CustomField } from 'components/CustomField';
-import { InputField } from 'components/forms/InputField';
-import { SelectField } from 'components/forms/SelectField';
+import { useStaticsQuery } from '$app/common/queries/statics';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { RootState } from '$app/common/stores/store';
+import { Card } from '$app/components/cards/Card';
+import { Element } from '$app/components/cards/Element';
+import { CustomField } from '$app/components/CustomField';
+import { InputField } from '$app/components/forms/InputField';
+import { SelectField } from '$app/components/forms/SelectField';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 

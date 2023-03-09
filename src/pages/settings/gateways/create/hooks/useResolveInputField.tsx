@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { CompanyGateway } from 'common/interfaces/company-gateway';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { ColorPicker } from 'components/forms/ColorPicker';
-import Toggle from 'components/forms/Toggle';
+import { InputField, SelectField } from '$app/components/forms';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { ColorPicker } from '$app/components/forms/ColorPicker';
+import Toggle from '$app/components/forms/Toggle';
 import { ChangeEvent } from 'react';
 import { useHandleCredentialsChange } from './useHandleCredentialsChange';
 import { useResolveConfigValue } from './useResolveConfigValue';

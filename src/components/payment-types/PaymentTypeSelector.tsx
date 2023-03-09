@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { SelectField } from '@invoiceninja/forms';
-import { useStaticsQuery } from 'common/queries/statics';
-import { GenericSelectorProps } from 'components/CountrySelector';
+import { SelectField } from '$app/components/forms';
+import { useStaticsQuery } from '$app/common/queries/statics';
+import { GenericSelectorProps } from '$app/components/CountrySelector';
 
 export function PaymentTypeSelector(props: GenericSelectorProps) {
   const statics = useStaticsQuery();

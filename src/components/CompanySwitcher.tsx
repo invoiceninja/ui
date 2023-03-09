@@ -9,28 +9,28 @@
  */
 
 import { Menu, Transition } from '@headlessui/react';
-import { AuthenticationTypes } from 'common/dtos/authentication';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { authenticate } from 'common/stores/slices/user';
-import { RootState } from 'common/stores/store';
+import { AuthenticationTypes } from '$app/common/dtos/authentication';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { authenticate } from '$app/common/stores/slices/user';
+import { RootState } from '$app/common/stores/store';
 import { Fragment, useEffect, useState } from 'react';
 import { Check, ChevronDown } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { DropdownElement } from './dropdown/DropdownElement';
-import { useLogo } from 'common/hooks/useLogo';
-import { useCompanyName } from 'common/hooks/useLogo';
-import { CompanyCreate } from 'pages/settings/company/create/CompanyCreate';
-import { CompanyEdit } from 'pages/settings/company/edit/CompanyEdit';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { isDemo, isHosted, isSelfHosted } from 'common/helpers';
-import { freePlan } from 'common/guards/guards/free-plan';
+import { useLogo } from '$app/common/hooks/useLogo';
+import { useCompanyName } from '$app/common/hooks/useLogo';
+import { CompanyCreate } from '$app/pages/settings/company/create/CompanyCreate';
+import { CompanyEdit } from '$app/pages/settings/company/edit/CompanyEdit';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
+import { freePlan } from '$app/common/guards/guards/free-plan';
 import { Icon } from './icons/Icon';
 import { MdLogout, MdManageAccounts } from 'react-icons/md';
 import { BiPlusCircle } from 'react-icons/bi';
-import { useAdmin } from 'common/hooks/permissions/useHasPermission';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function CompanySwitcher() {
   const [t] = useTranslation();

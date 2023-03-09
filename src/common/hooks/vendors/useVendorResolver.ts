@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { Vendor } from 'common/interfaces/vendor';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { Vendor } from '$app/common/interfaces/vendor';
 
 export class VendorResolver {
   protected declare vendor: Vendor;

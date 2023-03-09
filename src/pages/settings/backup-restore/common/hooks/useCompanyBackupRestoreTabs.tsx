@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Tab } from 'components/Tabs';
+import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 
 export function useCompanyBackupRestoreTabs() {

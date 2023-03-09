@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Vendor } from 'common/interfaces/vendor';
-import { Modal } from 'components/Modal';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CreateVendorForm } from './CreateVendorForm';

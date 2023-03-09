@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { InputLabel } from '$app/components/forms/InputLabel';
 import MDEditor from '@uiw/react-md-editor';
 import { debounce } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
@@ -15,6 +16,7 @@ import { useEffect, useRef, useState } from 'react';
 interface Props {
   value?: string | undefined;
   onChange: (value: string) => unknown;
+  label?: string;
 }
 
 export function MarkdownEditor(props: Props) {
@@ -38,8 +40,15 @@ export function MarkdownEditor(props: Props) {
   };
 
   return (
-    <div>
-      <MDEditor value={value} onChange={handleChange} preview="edit" />
+    <div className="space-y-4">
+      {props.label && <InputLabel>{props.label}</InputLabel>}
+      
+      <MDEditor
+        value={value}
+        onChange={handleChange}
+        preview="edit"
+        data-color-mode="light"
+      />
     </div>
   );
 }

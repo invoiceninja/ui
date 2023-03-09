@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceStatus } from 'common/enums/invoice-status';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
 
 export default {
   [InvoiceStatus.Cancelled]: 'cancelled',

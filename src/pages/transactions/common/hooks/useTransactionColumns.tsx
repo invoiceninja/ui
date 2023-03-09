@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ApiTransactionType } from 'common/enums/transactions';
-import { route } from 'common/helpers/route';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Transaction } from 'common/interfaces/transactions';
-import { DataTableColumns } from 'components/DataTable';
-import { Tooltip } from 'components/Tooltip';
-import { EntityStatus } from 'pages/transactions/components/EntityStatus';
+import { ApiTransactionType } from '$app/common/enums/transactions';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Transaction } from '$app/common/interfaces/transactions';
+import { DataTableColumns } from '$app/components/DataTable';
+import { Tooltip } from '$app/components/Tooltip';
+import { EntityStatus } from '$app/pages/transactions/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 
 export function useTransactionColumns() {

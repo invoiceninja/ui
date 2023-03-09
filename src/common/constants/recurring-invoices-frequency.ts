@@ -7,7 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { RecurringInvoicesFrequency } from 'common/enums/recurring-invoices-frequency';
+import { RecurringInvoicesFrequency } from '$app/common/enums/recurring-invoices-frequency';
 
 export default {
   [RecurringInvoicesFrequency.FREQUENCY_ANNUALLY]: 'freq_annually',

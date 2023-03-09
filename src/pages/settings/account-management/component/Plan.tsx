@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date, isHosted, isSelfHosted } from 'common/helpers';
-import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { date, isHosted, isSelfHosted } from '$app/common/helpers';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { License } from '.';
 import { Card, Element } from '../../../../components/cards';

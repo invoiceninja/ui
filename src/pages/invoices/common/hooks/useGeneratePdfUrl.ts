@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
+import { endpoint } from '$app/common/helpers';
 import {
   MailerResource,
   MailerResourceType,
-} from 'pages/invoices/email/components/Mailer';
+} from '$app/pages/invoices/email/components/Mailer';
 
 interface Props {
   resourceType: MailerResourceType;

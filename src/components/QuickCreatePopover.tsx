@@ -4,10 +4,10 @@ import { BiPlus } from 'react-icons/bi';
 import { useTranslation } from 'react-i18next';
 import classNames from 'classnames';
 import { useNavigate } from 'react-router-dom';
-import { useQuickCreateSections } from 'common/hooks/entities/useQuickCreateSections';
-import { useQuickCreateActions } from 'common/hooks/entities/useQuickCreateActions';
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { isHosted, isSelfHosted } from 'common/helpers';
+import { useQuickCreateSections } from '$app/common/hooks/entities/useQuickCreateSections';
+import { useQuickCreateActions } from '$app/common/hooks/entities/useQuickCreateActions';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { isHosted, isSelfHosted } from '$app/common/helpers';
 import { MdArrowDropDown } from 'react-icons/md';
 
 export function QuickCreatePopover() {

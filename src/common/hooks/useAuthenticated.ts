@@ -9,12 +9,12 @@
  */
 
 import { AxiosError } from 'axios';
-import { request } from 'common/helpers/request';
-import { CompanyUser } from 'common/interfaces/company-user';
+import { request } from '$app/common/helpers/request';
+import { CompanyUser } from '$app/common/interfaces/company-user';
 import {
   changeCurrentIndex,
   updateCompanyUsers,
-} from 'common/stores/slices/company-users';
+} from '$app/common/stores/slices/company-users';
 import { useQueryClient } from 'react-query';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router';

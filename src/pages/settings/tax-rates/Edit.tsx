@@ -8,25 +8,25 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ActionCard, Card, CardContainer, Element } from '@invoiceninja/cards';
-import { Button, InputField } from '@invoiceninja/forms';
+import { ActionCard, Card, CardContainer, Element } from '$app/components/cards';
+import { Button, InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { bulk, useTaxRateQuery } from 'common/queries/tax-rates';
-import { Badge } from 'components/Badge';
-import { Container } from 'components/Container';
-import { Settings } from 'components/layouts/Settings';
-import { Spinner } from 'components/Spinner';
+import { endpoint } from '$app/common/helpers';
+import { bulk, useTaxRateQuery } from '$app/common/queries/tax-rates';
+import { Badge } from '$app/components/Badge';
+import { Container } from '$app/components/Container';
+import { Settings } from '$app/components/layouts/Settings';
+import { Spinner } from '$app/components/Spinner';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Breadcrumbs } from 'components/Breadcrumbs';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { Breadcrumbs } from '$app/components/Breadcrumbs';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export function Edit() {
   const [t] = useTranslation();

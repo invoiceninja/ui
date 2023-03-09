@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { CompanyGateway } from 'common/interfaces/company-gateway';
-import { Gateway } from 'common/interfaces/statics';
-import { Divider } from 'components/cards/Divider';
-import Toggle from 'components/forms/Toggle';
+import { Card, Element } from '$app/components/cards';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { Gateway } from '$app/common/interfaces/statics';
+import { Divider } from '$app/components/cards/Divider';
+import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 
 interface Props {

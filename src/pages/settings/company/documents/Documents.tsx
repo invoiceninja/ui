@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { endpoint } from '$app/common/helpers';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useQueryClient } from 'react-query';
 import { Table as DocumentsTable, Upload } from './components';
 

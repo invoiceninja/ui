@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Guard } from 'common/guards/Guard';
-import { admin } from 'common/guards/guards/admin';
+import { Guard } from '$app/common/guards/Guard';
+import { admin } from '$app/common/guards/guards/admin';
 import { Outlet, Route } from 'react-router-dom';
-import { plan } from 'common/guards/guards/plan';
+import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
-import { isDemo } from 'common/helpers';
+import { isDemo } from '$app/common/helpers';
 
 export const settingsRoutes = (
   <Route path="/settings">
@@ -162,6 +162,11 @@ export const settingsRoutes = (
         <Route path="" element={<Settings.Subscriptions />} />
         <Route path="create" element={<Settings.CreateSubscription />} />
         <Route path=":id/edit" element={<Settings.EditSubscription />} />
+      </Route>
+      <Route path="schedules">
+        <Route path="" element={<Settings.Schedules />} />
+        <Route path="create" element={<Settings.CreateSchedule />} />
+        <Route path=":id/edit" element={<Settings.EditSchedule />} />
       </Route>
       <Route path="users">
         <Route path="" element={<Settings.Users />} />
