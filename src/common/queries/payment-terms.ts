@@ -17,6 +17,7 @@ import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
 import { PaymentTerm } from '$app/common/interfaces/payment-term';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function usePaymentTermsQuery(params: Params) {
   return useQuery(['/api/v1/payment_terms', params], () =>
@@ -56,6 +57,8 @@ export function bulk(
 }
 
 export function useBlankPaymentTermQuery() {
+  const { isAdmin } = useAdmin();
+
   return useQuery<PaymentTerm>(
     '/api/v1/payment_terms/create',
     () =>
@@ -63,6 +66,6 @@ export function useBlankPaymentTermQuery() {
         (response: GenericSingleResourceResponse<PaymentTerm>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: isAdmin }
   );
 }
