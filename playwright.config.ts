@@ -40,6 +40,10 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+
+    /** Screenshots & videos. */
+    video: 'retain-on-failure',
+    screenshot: 'only-on-failure',
   },
 
   /* Configure projects for major browsers */
@@ -87,5 +91,6 @@ export default defineConfig({
   webServer: {
     command: 'npm run preview',
     port: 4173,
+    reuseExistingServer: true,
   },
 });
