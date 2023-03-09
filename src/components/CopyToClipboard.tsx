@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { toast } from 'common/helpers/toast/toast';
+import { toast } from '$app/common/helpers/toast/toast';
 import { MdOutlineContentCopy } from 'react-icons/md';
 
 interface Props {

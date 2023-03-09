@@ -12,6 +12,10 @@ import { Account } from './account';
 import { Company } from './company.interface';
 import { User } from './user';
 
+export interface ReactSettings {
+  show_pdf_preview: boolean;
+}
+
 export interface CompanyUser {
   permissions: string;
   notifications: Notifications;
@@ -28,6 +32,7 @@ export interface CompanyUser {
   company: Company;
   token: Token;
   account: Account;
+  react_settings: ReactSettings;
 }
 
 export type ReactTableColumns =

@@ -11,7 +11,7 @@
 import { AxiosRequestHeaders, AxiosResponse, Method } from 'axios';
 import dayjs from 'dayjs';
 import { t } from 'i18next';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import entityState from './constants/entity-state';
 import { request } from './helpers/request';
 
@@ -105,5 +105,5 @@ export function isDemo() {
 }
 
 export function isProduction() {
-  return import.meta.env.VITE_IS_PRODUCTION === 'true';
+  return import.meta.env.PROD;
 }

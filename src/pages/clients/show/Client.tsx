@@ -8,26 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
-import { useTitle } from 'common/hooks/useTitle';
-import { useClientQuery } from 'common/queries/clients';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
-import { Tabs } from 'components/Tabs';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { useClientQuery } from '$app/common/queries/clients';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
+import { Tabs } from '$app/components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
-import { Tab } from 'components/Tabs';
+import { Tab } from '$app/components/Tabs';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
 import { Standing } from './components/Standing';
-import { PasswordConfirmation } from 'components/PasswordConfirmation';
-import { CustomResourcefulActions } from '../common/components/CustomResourcefulActions';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { usePurgeClient } from '../common/hooks/usePurgeClient';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { Gateways } from './components/Gateways';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { useActions } from '../common/hooks/useActions';
+import { MergeClientModal } from '../common/components/MergeClientModal';
+import { Button } from '$app/components/forms';
 
 export function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
@@ -36,8 +38,10 @@ export function Client() {
 
   const [t] = useTranslation();
 
+  const [isMergeModalOpen, setIsMergeModalOpen] = useState<boolean>(false);
+
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
-    useState(false);
+    useState<boolean>(false);
 
   useEffect(() => {
     setDocumentTitle(client?.data?.data?.display_name || 'view_client');
@@ -51,7 +55,7 @@ export function Client() {
     },
   ];
 
-  const onSave = usePurgeClient(id);
+  const handlePurgeClient = usePurgeClient(id);
 
   const tabs: Tab[] = [
     { name: t('invoices'), href: route('/clients/:id', { id }) },
@@ -86,19 +90,28 @@ export function Client() {
     },
   ];
 
+  const actions = useActions({
+    setIsMergeModalOpen,
+    setPasswordConfirmModalOpen,
+  });
+
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      topRight={
-        <div className="inline-flex items-center space-x-2">
+      navigationTopRight={
+        <div className="flex space-x-3">
           <Button to={route('/clients/:id/edit', { id })}>
             {t('edit_client')}
           </Button>
-          <CustomResourcefulActions
-            clientId={id}
-            openPurgeModal={setPasswordConfirmModalOpen}
-          />
+
+          {client && (
+            <ResourceActions
+              label={t('more_actions')}
+              resource={client.data.data}
+              actions={actions}
+            />
+          )}
         </div>
       }
     >
@@ -123,10 +136,20 @@ export function Client() {
           </div>
         </>
       )}
+
+      {id && (
+        <MergeClientModal
+          visible={isMergeModalOpen}
+          setVisible={setIsMergeModalOpen}
+          mergeFromClientId={id}
+          editPage
+        />
+      )}
+
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
         onClose={setPasswordConfirmModalOpen}
-        onSave={onSave}
+        onSave={handlePurgeClient}
       />
     </Default>
   );

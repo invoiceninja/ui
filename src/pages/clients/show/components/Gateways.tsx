@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Client } from 'common/interfaces/client';
-import { InfoCard } from 'components/InfoCard';
+import { Client } from '$app/common/interfaces/client';
+import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
 import { MdChevronRight, MdLaunch, MdPayment } from 'react-icons/md';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { GatewayTypeIcon } from './GatewayTypeIcon';
-import { useCompanyGatewaysQuery } from 'common/queries/company-gateways';
+import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { useEffect, useState } from 'react';
-import { CompanyGateway } from 'common/interfaces/company-gateway';
-import { Link } from '@invoiceninja/forms';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { Link } from '$app/components/forms';
 
 interface Props {
   client: Client;

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { TransactionStatus, TransactionType } from 'common/enums/transactions';
+import { TransactionStatus, TransactionType } from '$app/common/enums/transactions';
 
 export const transactionTypes = {
   [TransactionType.Deposit]: 'deposit',

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { bulk } from 'common/queries/payment-terms';
+import { bulk } from '$app/common/queries/payment-terms';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useInvalidatePaymentTermCache } from './useInvalidatePaymentTermCache';

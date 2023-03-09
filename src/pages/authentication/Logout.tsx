@@ -11,11 +11,11 @@
 import { useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 // import { useGoogleLogout } from 'react-google-login';
-import { RootState } from 'common/stores/store';
+import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
-import { isHosted } from 'common/helpers';
+import { isHosted } from '$app/common/helpers';
 
 export function Logout() {
   const navigate = useNavigate();

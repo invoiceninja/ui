@@ -9,18 +9,18 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { Product as ProductInterface } from 'common/interfaces/product';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useProductQuery } from 'common/queries/products';
-import { Page } from 'components/Breadcrumbs';
-import { Container } from 'components/Container';
-import { Default } from 'components/layouts/Default';
-import { ResourceActions } from 'components/ResourceActions';
-import { Tab, Tabs } from 'components/Tabs';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Product as ProductInterface } from '$app/common/interfaces/product';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useProductQuery } from '$app/common/queries/products';
+import { Page } from '$app/components/Breadcrumbs';
+import { Container } from '$app/components/Container';
+import { Default } from '$app/components/layouts/Default';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Tab, Tabs } from '$app/components/Tabs';
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';

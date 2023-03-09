@@ -8,14 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
-import { Task } from 'common/interfaces/task';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Task } from '$app/common/interfaces/task';
 import { useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { useAtomValue } from 'jotai';
-import { invalidationQueryAtom } from 'common/atoms/data-table';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { parseTimeLog } from '../helpers/calculate-time';
+import dayjs from 'dayjs';
+import { isOverlapping } from '../helpers/is-overlapping';
 
 export function useStop() {
   const queryClient = useQueryClient();
@@ -23,6 +26,21 @@ export function useStop() {
 
   return (task: Task) => {
     toast.processing();
+
+    const logs = parseTimeLog(task.time_log);
+
+    const startTime = logs[logs.length - 1][0];
+    const currentTime = dayjs().unix();
+
+    if (startTime && startTime > currentTime) {
+      logs[logs.length - 1][1] = startTime + 1;
+
+      task.time_log = JSON.stringify(logs);
+    } else {
+      if (isOverlapping(task)) {
+        return toast.error('task_errors');
+      }
+    }
 
     request(
       'PUT',

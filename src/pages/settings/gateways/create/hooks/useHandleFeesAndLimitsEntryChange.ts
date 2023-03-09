@@ -11,7 +11,7 @@
 import {
   CompanyGateway,
   FeesAndLimitsEntry,
-} from 'common/interfaces/company-gateway';
+} from '$app/common/interfaces/company-gateway';
 
 export function useHandleFeesAndLimitsEntryChange(
   setCompanyGateway: React.Dispatch<

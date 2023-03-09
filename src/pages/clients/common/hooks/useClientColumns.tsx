@@ -8,22 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { useResolveCountry } from 'common/hooks/useResolveCountry';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
-import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
-import { Client } from 'common/interfaces/client';
-import { CopyToClipboard } from 'components/CopyToClipboard';
-import { customField } from 'components/CustomField';
-import { EntityStatus } from 'components/EntityStatus';
-import { Inline } from 'components/Inline';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { Link } from '$app/components/forms';
+import { date } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
+import { Client } from '$app/common/interfaces/client';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { customField } from '$app/components/CustomField';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Inline } from '$app/components/Inline';
+import { Tooltip } from '$app/components/Tooltip';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useCallback } from 'react';
 import { ExternalLink } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -67,7 +68,7 @@ export const clientColumns = [
   'website',
 ] as const;
 
-type ClientColumns = typeof clientColumns[number];
+type ClientColumns = (typeof clientColumns)[number];
 
 export const defaultColumns: ClientColumns[] = [
   'name',
@@ -291,13 +292,21 @@ export function useClientColumns() {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'state',

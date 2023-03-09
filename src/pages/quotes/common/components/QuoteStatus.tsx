@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Quote } from 'common/interfaces/quote';
-import { Badge } from 'components/Badge';
+import { Quote } from '$app/common/interfaces/quote';
+import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
-import { QuoteStatus as QuoteStatusEnum } from 'common/enums/quote-status';
+import { QuoteStatus as QuoteStatusEnum } from '$app/common/enums/quote-status';
 
 interface Props {
   entity: Quote;
@@ -19,6 +19,12 @@ interface Props {
 
 export function QuoteStatus(props: Props) {
   const [t] = useTranslation();
+
+  const checkInvoiceInvitationsViewedDate = () => {
+    return props.entity.invitations.some(
+      (invitation) => invitation.viewed_date
+    );
+  };
 
   if (props.entity.is_deleted)
     return <Badge variant="red">{t('deleted')}</Badge>;
@@ -28,6 +34,12 @@ export function QuoteStatus(props: Props) {
 
   if (props.entity.invoice_id)
     return <Badge variant="green">{t('converted')}</Badge>;
+
+  if (
+    props.entity.status_id === QuoteStatusEnum.Sent &&
+    checkInvoiceInvitationsViewedDate()
+  )
+    return <Badge variant="yellow">{t('viewed')}</Badge>;
 
   switch (props.entity.status_id) {
     case QuoteStatusEnum.Draft:

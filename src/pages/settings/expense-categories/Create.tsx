@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ButtonOption, Card } from '@invoiceninja/cards';
+import { ButtonOption, Card } from '$app/components/cards';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { useTitle } from 'common/hooks/useTitle';
-import { ExpenseCategory } from 'common/interfaces/expense-category';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankExpenseCategoryQuery } from 'common/queries/expense-categories';
-import { Icon } from 'components/icons/Icon';
-import { Settings } from 'components/layouts/Settings';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { ExpenseCategory } from '$app/common/interfaces/expense-category';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankExpenseCategoryQuery } from '$app/common/queries/expense-categories';
+import { Icon } from '$app/components/icons/Icon';
+import { Settings } from '$app/components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';

@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { InvoiceItemSum } from './invoice-item-sum';
-import { Invoice } from 'common/interfaces/invoice';
+import { Invoice } from '$app/common/interfaces/invoice';
 import collect from 'collect.js';
-import { InvoiceStatus } from 'common/enums/invoice-status';
-import { Currency } from 'common/interfaces/currency';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { Currency } from '$app/common/interfaces/currency';
 import { NumberFormatter } from '../number-formatter';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 
 export interface TaxItem {
   key?: string;

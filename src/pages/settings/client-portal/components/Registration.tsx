@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { cloneDeep } from 'lodash';
-import { useHandleCurrentCompanyChangeProperty } from 'pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';

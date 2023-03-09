@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { Statics } from 'common/interfaces/statics';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { Statics } from '$app/common/interfaces/statics';
 import { useQuery } from 'react-query';
 
 export function useStaticsQuery() {

@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { Product } from 'common/interfaces/product';
+import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import { Product } from '$app/common/interfaces/product';
 import { ProductTableResource } from '../components/ProductsTable';
 
 interface Props {

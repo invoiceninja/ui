@@ -8,29 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { route } from 'common/helpers/route';
-import { useTitle } from 'common/hooks/useTitle';
-import { Page } from 'components/Breadcrumbs';
-import Toggle from 'components/forms/Toggle';
-import { Default } from 'components/layouts/Default';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Page } from '$app/components/Breadcrumbs';
+import Toggle from '$app/components/forms/Toggle';
+import { Default } from '$app/components/layouts/Default';
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import quarter from 'dayjs/plugin/quarterOfYear';
-import { request } from 'common/helpers/request';
-import { endpoint } from 'common/helpers';
-import { toast } from 'common/helpers/toast/toast';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { AxiosError } from 'axios';
-import { Dropdown } from 'components/dropdown/Dropdown';
-import { Icon } from 'components/icons/Icon';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { Icon } from '$app/components/icons/Icon';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { MdDownload, MdSend } from 'react-icons/md';
-import { useClientQuery } from 'common/queries/clients';
-import { Client } from 'common/interfaces/client';
+import { useClientQuery } from '$app/common/queries/clients';
+import { Client } from '$app/common/interfaces/client';
 
 dayjs.extend(quarter);
 

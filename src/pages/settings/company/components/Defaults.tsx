@@ -13,15 +13,15 @@ import { Card, Element } from '../../../../components/cards';
 import { SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { useDispatch, useSelector } from 'react-redux';
-import { useStaticsQuery } from 'common/queries/statics';
+import { useStaticsQuery } from '$app/common/queries/statics';
 import { ChangeEvent } from 'react';
 import MDEditor from '@uiw/react-md-editor';
-import { endpoint } from 'common/helpers';
+import { endpoint } from '$app/common/helpers';
 import { useQuery } from 'react-query';
-import { RootState } from 'common/stores/store';
-import { updateChanges } from 'common/stores/slices/company-users';
+import { RootState } from '$app/common/stores/store';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 import { PaymentTerm } from '../../../../common/interfaces/payment-term';
-import { request } from 'common/helpers/request';
+import { request } from '$app/common/helpers/request';
 
 export function Defaults() {
   const [t] = useTranslation();
@@ -112,6 +112,26 @@ export function Defaults() {
                   updateChanges({
                     object: 'company',
                     property: 'settings.client_online_payment_notification',
+                    value,
+                  })
+                )
+              }
+            />
+          </Element>
+
+          <Element
+            leftSide={t('mark_paid_payment_email')}
+            leftSideHelp={t('mark_paid_payment_email_help')}
+          >
+            <Toggle
+              checked={
+                companyChanges?.settings?.mark_paid_payment_email || false
+              }
+              onChange={(value: boolean) =>
+                dispatch(
+                  updateChanges({
+                    object: 'company',
+                    property: 'settings.mark_paid_payment_email',
                     value,
                   })
                 )

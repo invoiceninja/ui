@@ -9,16 +9,19 @@
  */
 
 import { AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface BlankQueryParams {
   refetchOnWindowFocus?: boolean;
 }
 
 export function useBlankClientQuery(params: BlankQueryParams) {
+  const hasPermission = useHasPermission();
+
   return useQuery(
     '/api/v1/clients/create',
     () =>
@@ -28,6 +31,7 @@ export function useBlankClientQuery(params: BlankQueryParams) {
     {
       refetchOnWindowFocus: Boolean(params.refetchOnWindowFocus),
       staleTime: Infinity,
+      enabled: hasPermission('create_client'),
     }
   );
 }

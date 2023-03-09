@@ -9,12 +9,12 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
-import { BankAccount } from 'common/interfaces/bank-accounts';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, FormEvent, SetStateAction } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';

@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ApiWebhook } from 'common/interfaces/api-webhook';
-import { useBulkAction } from 'common/queries/api-webhooks';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Icon } from 'components/icons/Icon';
-import { Action } from 'components/ResourceActions';
+import { ApiWebhook } from '$app/common/interfaces/api-webhook';
+import { useBulkAction } from '$app/common/queries/api-webhooks';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
 

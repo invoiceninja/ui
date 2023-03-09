@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { Client } from 'common/interfaces/client';
-import { ClientContact } from 'common/interfaces/client-contact';
-import { InfoCard } from 'components/InfoCard';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { Client } from '$app/common/interfaces/client';
+import { ClientContact } from '$app/common/interfaces/client-contact';
+import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
-import { CopyToClipboard } from 'components/CopyToClipboard';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
 
 interface Props {
   client: Client;

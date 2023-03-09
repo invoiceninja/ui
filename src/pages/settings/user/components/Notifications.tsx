@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { trans } from 'common/helpers';
-import { injectInChangesWithData } from 'common/stores/slices/user';
-import { RootState } from 'common/stores/store';
+import { trans } from '$app/common/helpers';
+import { injectInChangesWithData } from '$app/common/stores/slices/user';
+import { RootState } from '$app/common/stores/store';
 import { cloneDeep, set } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

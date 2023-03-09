@@ -9,7 +9,7 @@
  */
 
 import { arrayMoveImmutable } from 'array-move';
-import { InvoiceItem } from 'common/interfaces/invoice-item';
+import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { DropResult } from '@hello-pangea/dnd';
 import { ProductTableResource } from '../components/ProductsTable';
 

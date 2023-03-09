@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { CompanyGateway } from 'common/interfaces/company-gateway';
-import { DataTable, DataTableColumns } from 'components/DataTable';
+import { Link } from '$app/components/forms';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 
 export function Gateways() {
   const [t] = useTranslation();

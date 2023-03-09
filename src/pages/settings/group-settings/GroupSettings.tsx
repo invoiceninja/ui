@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
+import { Button } from '$app/components/forms';
 import {
   Pagination,
   Table,
@@ -17,8 +17,8 @@ import {
   Th,
   Thead,
   Tr,
-} from '@invoiceninja/tables';
-import { Settings } from 'components/layouts/Settings';
+} from '$app/components/tables';
+import { Settings } from '$app/components/layouts/Settings';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 

@@ -8,10 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Guard } from 'common/guards/Guard';
-import { enabled } from 'common/guards/guards/enabled';
-import { permission } from 'common/guards/guards/permission';
-import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { Guard } from '$app/common/guards/Guard';
+import { assigned } from '$app/common/guards/guards/assigned';
+import { enabled } from '$app/common/guards/guards/enabled';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
+import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
@@ -25,8 +27,12 @@ export const recurringInvoiceRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.RecurringInvoices),
-            () => permission('view_recurring_invoice'),
+            enabled(ModuleBitmask.RecurringInvoices),
+            or(
+              permission('view_recurring_invoice'),
+              permission('create_recurring_invoice'),
+              permission('edit_recurring_invoice')
+            ),
           ]}
           component={<RecurringInvoices />}
         />
@@ -37,8 +43,8 @@ export const recurringInvoiceRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.RecurringInvoices),
-            () => permission('create_recurring_invoice'),
+            enabled(ModuleBitmask.RecurringInvoices),
+            permission('create_recurring_invoice'),
           ]}
           component={<Create />}
         />
@@ -50,8 +56,12 @@ export const recurringInvoiceRoutes = (
         element={
           <Guard
             guards={[
-              () => enabled(ModuleBitmask.RecurringInvoices),
-              () => permission('edit_recurring_invoice'),
+              enabled(ModuleBitmask.RecurringInvoices),
+              or(
+                permission('edit_recurring_invoice'),
+                permission('view_recurring_invoice'),
+                assigned('/api/v1/recurring_invoices/:id')
+              ),
             ]}
             component={<Edit />}
           />
@@ -62,8 +72,8 @@ export const recurringInvoiceRoutes = (
         element={
           <Guard
             guards={[
-              () => enabled(ModuleBitmask.RecurringInvoices),
-              () => permission('view_recurring_invoice'),
+              enabled(ModuleBitmask.RecurringInvoices),
+              permission('view_recurring_invoice'),
             ]}
             component={<Pdf />}
           />

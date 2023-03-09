@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { GroupSettings } from 'common/interfaces/group-settings';
-import { User } from 'common/interfaces/user';
-import { useGroupSettingsQuery } from 'common/queries/group-settings';
-import { useUsersQuery } from 'common/queries/users';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { GroupSettings } from '$app/common/interfaces/group-settings';
+import { User } from '$app/common/interfaces/user';
+import { useGroupSettingsQuery } from '$app/common/queries/group-settings';
+import { useUsersQuery } from '$app/common/queries/users';
 import { useTranslation } from 'react-i18next';
-import { Client } from 'common/interfaces/client';
+import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
 import { ChangeEvent } from 'react';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { CustomField } from 'components/CustomField';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { CustomField } from '$app/components/CustomField';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 interface Props {
   client: Client | undefined;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;

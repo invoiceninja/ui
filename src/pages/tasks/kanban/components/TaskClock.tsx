@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Task } from 'common/interfaces/task';
-import { isTaskRunning } from 'pages/tasks/common/helpers/calculate-entity-state';
-import { calculateTime } from 'pages/tasks/common/helpers/calculate-time';
+import { Task } from '$app/common/interfaces/task';
+import { isTaskRunning } from '$app/pages/tasks/common/helpers/calculate-entity-state';
+import { calculateTime } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useEffect, useState } from 'react';
 
 interface Props {

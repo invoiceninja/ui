@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CardContainer } from '@invoiceninja/cards';
-import { InputField, InputLabel } from '@invoiceninja/forms';
-import { ExpenseCategory } from 'common/interfaces/expense-category';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { ColorPicker } from 'components/forms/ColorPicker';
+import { CardContainer } from '$app/components/cards';
+import { InputField, InputLabel } from '$app/components/forms';
+import { ExpenseCategory } from '$app/common/interfaces/expense-category';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 

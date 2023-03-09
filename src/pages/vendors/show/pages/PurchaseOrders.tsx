@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from 'common/helpers/route';
-import { DataTable } from 'components/DataTable';
+import { route } from '$app/common/helpers/route';
+import { DataTable } from '$app/components/DataTable';
 import {
   usePurchaseOrderColumns,
   usePurchaseOrderFilters,
-} from 'pages/purchase-orders/common/hooks';
+} from '$app/pages/purchase-orders/common/hooks';
 import { useParams } from 'react-router-dom';
 
 const dataTableStaleTime = 50;

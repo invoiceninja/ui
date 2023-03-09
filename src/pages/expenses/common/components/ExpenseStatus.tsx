@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from 'components/Badge';
+import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
-import { Expense } from 'common/interfaces/expense';
-import { ResourceItem } from 'pages/transactions/components/ListBox';
+import { Expense } from '$app/common/interfaces/expense';
+import { ResourceItem } from '$app/pages/transactions/components/ListBox';
 
 interface Props {
   entity: Expense | ResourceItem;

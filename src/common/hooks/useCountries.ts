@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Country } from 'common/interfaces/country';
-import { useStaticsQuery } from 'common/queries/statics';
+import { Country } from '$app/common/interfaces/country';
+import { useStaticsQuery } from '$app/common/queries/statics';
 import { useEffect, useState } from 'react';
 
 export function useCountries(): Country[] {

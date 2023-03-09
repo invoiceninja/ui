@@ -8,20 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
-import { route } from 'common/helpers/route';
-import { useTitle } from 'common/hooks/useTitle';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { ResourceActions } from 'components/ResourceActions';
-import { Spinner } from 'components/Spinner';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { route } from '$app/common/helpers/route';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
 import { cloneDeep } from 'lodash';
-import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
-import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
-import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
-import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
+import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
+import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
+import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
+import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -43,6 +44,8 @@ export function Edit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { data } = usePurchaseOrderQuery({ id });
+
+  const reactSettings = useReactSettings();
 
   const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
@@ -180,17 +183,19 @@ export function Edit() {
         )}
       </div>
 
-      <div className="my-4">
-        {purchaseOrder && (
-          <InvoicePreview
-            for="invoice"
-            resource={purchaseOrder}
-            entity="purchase_order"
-            relationType="vendor_id"
-            endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
-          />
-        )}
-      </div>
+      {reactSettings?.show_pdf_preview && (
+        <div className="my-4">
+          {purchaseOrder && (
+            <InvoicePreview
+              for="invoice"
+              resource={purchaseOrder}
+              entity="purchase_order"
+              relationType="vendor_id"
+              endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

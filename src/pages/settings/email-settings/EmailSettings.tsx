@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { trans } from 'common/helpers';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
-import { useTitle } from 'common/hooks/useTitle';
-import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
-import { Divider } from 'components/cards/Divider';
-import { MarkdownEditor } from 'components/forms/MarkdownEditor';
-import Toggle from 'components/forms/Toggle';
-import { Settings } from 'components/layouts/Settings';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { trans } from '$app/common/helpers';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { Divider } from '$app/components/cards/Divider';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import Toggle from '$app/components/forms/Toggle';
+import { Settings } from '$app/components/layouts/Settings';
 import dayjs from 'dayjs';
-import { useHandleCancel } from 'pages/invoices/edit/hooks/useHandleCancel';
+import { useHandleCancel } from '$app/pages/invoices/edit/hooks/useHandleCancel';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
@@ -56,6 +56,15 @@ export function EmailSettings() {
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 
       <Card title={t('settings')}>
+        <Element leftSide={t('show_email_footer')}>
+          <Toggle
+            checked={company?.settings.show_email_footer}
+            onValueChange={(value) =>
+              handleChange('settings.show_email_footer', value)
+            }
+          />
+        </Element>
+
         <Element leftSide={t('attach_pdf')}>
           <Toggle
             checked={company?.settings.pdf_email_attachment}
@@ -84,6 +93,56 @@ export function EmailSettings() {
         </Element>
 
         <Divider />
+
+        <Element leftSide={t('email_provider')}>
+          <SelectField
+            value={company?.settings.email_sending_method}
+            onValueChange={(value) =>
+              handleChange('settings.email_sending_method', value)
+            }
+          >
+            <option defaultChecked value="default">
+              {t('default')}
+            </option>
+            <option value="gmail">Gmail</option>
+            <option value="microsoft">Microsoft</option>
+            <option value="client_postmark">Postmark</option>
+            <option value="client_mailgun">Mailgun</option>
+          </SelectField>
+        </Element>
+
+        {company?.settings.email_sending_method === 'client_postmark' && (
+          <Element leftSide={t('secret')}>
+            <InputField
+              value={company?.settings.postmark_secret}
+              onValueChange={(value) =>
+                handleChange('settings.postmark_secret', value)
+              }
+            />
+          </Element>
+        )}
+
+        {company?.settings.email_sending_method === 'client_mailgun' && (
+          <>
+            <Element leftSide={t('secret')}>
+              <InputField
+                value={company?.settings.mailgun_secret}
+                onValueChange={(value) =>
+                  handleChange('settings.mailgun_secret', value)
+                }
+              />
+            </Element>
+
+            <Element leftSide={t('domain')}>
+              <InputField
+                value={company?.settings.mailgun_domain}
+                onValueChange={(value) =>
+                  handleChange('settings.mailgun_domain', value)
+                }
+              />
+            </Element>
+          </>
+        )}
 
         <Element leftSide={t('from_name')}>
           <InputField

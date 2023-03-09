@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useProductQuery } from 'common/queries/products';
-import { DocumentsTable } from 'components/DocumentsTable';
-import { Upload } from 'pages/settings/company/documents/components';
+import { endpoint } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useProductQuery } from '$app/common/queries/products';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { Upload } from '$app/pages/settings/company/documents/components';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 

@@ -8,8 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Guard } from 'common/guards/Guard';
-import { permission } from 'common/guards/guards/permission';
+import { Guard } from '$app/common/guards/Guard';
+import { assigned } from '$app/common/guards/guards/assigned';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { Apply } from './apply/Apply';
 import { Create } from './create/Create';
@@ -26,7 +28,13 @@ export const paymentRoutes = (
       path=""
       element={
         <Guard
-          guards={[() => permission('view_payment')]}
+          guards={[
+            or(
+              permission('view_payment'),
+              permission('create_payment'),
+              permission('edit_payment')
+            ),
+          ]}
           component={<Payments />}
         />
       }
@@ -34,17 +42,20 @@ export const paymentRoutes = (
     <Route
       path="create"
       element={
-        <Guard
-          guards={[() => permission('create_payment')]}
-          component={<Create />}
-        />
+        <Guard guards={[permission('create_payment')]} component={<Create />} />
       }
     />
     <Route
       path=":id"
       element={
         <Guard
-          guards={[() => permission('view_payment')]}
+          guards={[
+            or(
+              permission('view_payment'),
+              permission('edit_payment'),
+              assigned('/api/v1/payments/:id')
+            ),
+          ]}
           component={<Payment />}
         />
       }
@@ -59,7 +70,13 @@ export const paymentRoutes = (
         path=""
         element={
           <Guard
-            guards={[() => permission('edit_payment')]}
+            guards={[
+              or(
+                permission('edit_payment'),
+                permission('view_payment'),
+                assigned('/api/v1/payments/:id')
+              ),
+            ]}
             component={<Edit />}
           />
         }

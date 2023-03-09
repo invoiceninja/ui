@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { EntityState } from 'common/enums/entity-state';
-import { getEntityState } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { Payment } from 'common/interfaces/payment';
-import { useBulk } from 'common/queries/payments';
-import { Divider } from 'components/cards/Divider';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Icon } from 'components/icons/Icon';
-import { Action } from 'components/ResourceActions';
+import { EntityState } from '$app/common/enums/entity-state';
+import { getEntityState } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { Payment } from '$app/common/interfaces/payment';
+import { useBulk } from '$app/common/queries/payments';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,

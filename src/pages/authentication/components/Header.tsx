@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from 'common/hooks/useAccentColor';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Link } from '../../../components/forms/Link';
 import Logo from '../../../resources/images/invoiceninja-logo@dark.png';
 

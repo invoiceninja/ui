@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ButtonOption, Card, CardContainer } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
+import { ButtonOption, Card, CardContainer } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import { AxiosError, AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useTitle } from 'common/hooks/useTitle';
-import { PaymentTerm } from 'common/interfaces/payment-term';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankPaymentTermQuery } from 'common/queries/payment-terms';
-import { Breadcrumbs } from 'components/Breadcrumbs';
-import { Container } from 'components/Container';
-import { Icon } from 'components/icons/Icon';
-import { Settings } from 'components/layouts/Settings';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankPaymentTermQuery } from '$app/common/queries/payment-terms';
+import { Breadcrumbs } from '$app/components/Breadcrumbs';
+import { Container } from '$app/components/Container';
+import { Icon } from '$app/components/icons/Icon';
+import { Settings } from '$app/components/layouts/Settings';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';

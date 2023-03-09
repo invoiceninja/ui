@@ -8,19 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceStatus } from 'common/enums/invoice-status';
-import { route } from 'common/helpers/route';
-import { useClientResolver } from 'common/hooks/clients/useClientResolver';
-import { useTitle } from 'common/hooks/useTitle';
-import { Client } from 'common/interfaces/client';
-import { InvoiceItemType } from 'common/interfaces/invoice-item';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useInvoiceQuery } from 'common/queries/invoices';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { ResourceActions } from 'components/ResourceActions';
-import { Spinner } from 'components/Spinner';
-import { TabGroup } from 'components/TabGroup';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { route } from '$app/common/helpers/route';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Client } from '$app/common/interfaces/client';
+import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useInvoiceQuery } from '$app/common/queries/invoices';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
+import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
@@ -44,6 +45,8 @@ export function Edit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const [searchParams] = useSearchParams();
+
+  const reactSettings = useReactSettings();
 
   const pages: Page[] = [
     { name: t('invoices'), href: '/invoices' },
@@ -203,17 +206,19 @@ export function Edit() {
         )}
       </div>
 
-      <div className="my-4">
-        {invoice && (
-          <InvoicePreview
-            for="invoice"
-            resource={invoice}
-            entity="invoice"
-            relationType="client_id"
-            endpoint="/api/v1/live_preview?entity=:entity"
-          />
-        )}
-      </div>
+      {reactSettings?.show_pdf_preview && (
+        <div className="my-4">
+          {invoice && (
+            <InvoicePreview
+              for="invoice"
+              resource={invoice}
+              entity="invoice"
+              relationType="client_id"
+              endpoint="/api/v1/live_preview?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

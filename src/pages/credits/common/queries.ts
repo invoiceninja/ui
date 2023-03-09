@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { Credit } from 'common/interfaces/credit';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { GenericQueryOptions } from 'common/queries/invoices';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { Credit } from '$app/common/interfaces/credit';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 
 export function useBlankCreditQuery(options?: GenericQueryOptions) {
   return useQuery<Credit>(

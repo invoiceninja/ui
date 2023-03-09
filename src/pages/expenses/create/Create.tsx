@@ -8,27 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { Expense } from 'common/interfaces/expense';
-import { useBlankExpenseQuery } from 'common/queries/expenses';
-import { Default } from 'components/layouts/Default';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Expense } from '$app/common/interfaces/expense';
+import { useBlankExpenseQuery } from '$app/common/queries/expenses';
+import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Details } from './components/Details';
 import { Notes } from './components/Notes';
 import { AdditionalInfo } from './components/AdditionalInfo';
-import { request } from 'common/helpers/request';
-import { endpoint, isProduction } from 'common/helpers';
-import { toast } from 'common/helpers/toast/toast';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { TaxSettings } from './components/Taxes';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { useAtom } from 'jotai';
 import { expenseAtom } from '../common/atoms';
 import { useHandleChange } from '../common/hooks';
+import { cloneDeep } from 'lodash';
 
 export function Create() {
   const [t] = useTranslation();
@@ -46,7 +47,9 @@ export function Create() {
 
   const [expense, setExpense] = useAtom(expenseAtom);
 
-  const { data } = useBlankExpenseQuery({ enabled: !expense });
+  const { data } = useBlankExpenseQuery({
+    enabled: typeof expense === 'undefined',
+  });
 
   const [taxInputType, setTaxInputType] = useState<'by_rate' | 'by_amount'>(
     'by_rate'
@@ -57,33 +60,33 @@ export function Create() {
   const handleChange = useHandleChange({ setExpense, setErrors });
 
   useEffect(() => {
-    if (data && !expense) {
-      setExpense(data);
-    }
+    setExpense((current) => {
+      let value = current;
 
-    if (searchParams.has('vendor')) {
-      setExpense(
-        (current) =>
-          current && {
-            ...current,
-            vendor_id: searchParams.get('vendor') as string,
-          }
-      );
-    }
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
+      }
 
-    if (searchParams.has('client')) {
-      setExpense(
-        (prevState) =>
-          prevState && {
-            ...prevState,
-            client_id: searchParams.get('client') as string,
-          }
-      );
-    }
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const _expense = cloneDeep(data);
 
-    return () => {
-      isProduction() && setExpense(undefined);
-    };
+        if (searchParams.has('vendor')) {
+          _expense.vendor_id = searchParams.get('vendor') as string;
+        }
+
+        if (searchParams.has('client')) {
+          _expense.vendor_id = searchParams.get('client') as string;
+        }
+
+        value = _expense;
+      }
+
+      return value;
+    });
   }, [data]);
 
   const onSave = (expense: Expense) => {

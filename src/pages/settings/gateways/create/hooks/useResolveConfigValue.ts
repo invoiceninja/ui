@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CompanyGateway } from 'common/interfaces/company-gateway';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 
 export function useResolveConfigValue(companyGateway: CompanyGateway) {
   const config = JSON.parse(companyGateway.config);
