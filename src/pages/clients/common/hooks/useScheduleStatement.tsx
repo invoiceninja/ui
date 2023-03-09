@@ -9,8 +9,8 @@
  */
 
 import { useUpdateAtom } from 'jotai/utils';
-import { Statement } from 'pages/clients/statement/Statement';
-import { scheduleParametersAtom } from 'pages/settings/schedules/common/components/EmailStatement';
+import { Statement } from '$app/pages/clients/statement/Statement';
+import { scheduleParametersAtom } from '$app/pages/settings/schedules/common/components/EmailStatement';
 import { useNavigate } from 'react-router-dom';
 
 export function useScheduleStatement() {

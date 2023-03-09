@@ -9,20 +9,20 @@
  */
 
 import { AxiosError } from 'axios';
-import { Frequency } from 'common/enums/frequency';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
-import { useTitle } from 'common/hooks/useTitle';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { Schedule } from 'common/interfaces/schedule';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankScheduleQuery } from 'common/queries/schedules';
-import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
-import { Settings } from 'components/layouts/Settings';
-import { Spinner } from 'components/Spinner';
+import { Frequency } from '$app/common/enums/frequency';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Schedule } from '$app/common/interfaces/schedule';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankScheduleQuery } from '$app/common/queries/schedules';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { Settings } from '$app/components/layouts/Settings';
+import { Spinner } from '$app/components/Spinner';
 import { useAtom } from 'jotai';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';

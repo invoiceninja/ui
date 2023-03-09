@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
-import { Schedule } from 'common/interfaces/schedule';
+import { Schedule } from '$app/common/interfaces/schedule';
 import { cloneDeep, set } from 'lodash';
 
 interface Params {

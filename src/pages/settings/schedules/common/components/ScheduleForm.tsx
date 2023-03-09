@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { Schedule } from 'common/interfaces/schedule';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { Schedule } from '$app/common/interfaces/schedule';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTranslation } from 'react-i18next';
-import frequencies from 'common/constants/frequency';
-import { Divider } from 'components/cards/Divider';
+import frequencies from '$app/common/constants/frequency';
+import { Divider } from '$app/components/cards/Divider';
 import { EmailStatement } from './EmailStatement';
 
 interface Props {
