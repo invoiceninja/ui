@@ -27,8 +27,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Overview } from '../common/components/Overview';
 import { Settings as SubscriptionSettings } from '../common/components/Settings';
 import { Webhook } from '../common/components/Webhook';
-import { useSubscriptionQuery } from '../common/hooks/useBlankSubscriptionQuery';
 import { useHandleChange } from '../common/hooks/useHandleChange';
+import { useSubscriptionQuery } from '$app/common/queries/subscriptions';
 
 export function Edit() {
   const [t] = useTranslation();
