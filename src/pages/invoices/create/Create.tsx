@@ -97,7 +97,7 @@ export function Create() {
 
       if (
         searchParams.get('action') !== 'clone' &&
-        searchParams.get('action') !== 'invoice'
+        searchParams.get('action') !== 'project_invoicing'
       ) {
         value = undefined;
       }
