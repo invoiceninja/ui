@@ -15,8 +15,8 @@ import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
+  useAllVendorColumns,
   useVendorColumns,
-  vendorColumns,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
@@ -29,6 +29,8 @@ export function Vendors() {
   const pages: Page[] = [{ name: t('vendors'), href: '/vendors' }];
 
   const columns = useVendorColumns();
+
+  const vendorColumns = useAllVendorColumns();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>

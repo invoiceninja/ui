@@ -15,7 +15,7 @@ import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
-  paymentColumns,
+  useAllPaymentColumns,
   usePaymentColumns,
 } from '../common/hooks/usePaymentColumns';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
@@ -32,6 +32,8 @@ export function Payments() {
   const columns = usePaymentColumns();
 
   const actions = useActions();
+
+  const paymentColumns = useAllPaymentColumns();
 
   const filters = usePaymentFilters();
 

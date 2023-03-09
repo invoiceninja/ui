@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useActions } from '../edit/components/Actions';
 import {
   defaultColumns,
-  invoiceColumns,
+  useAllInvoiceColumns,
   useInvoiceColumns,
 } from '../common/hooks/useInvoiceColumns';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
@@ -30,6 +30,8 @@ export function Invoices() {
   const actions = useActions();
 
   const filters = useInvoiceFilters();
+
+  const invoiceColumns = useAllInvoiceColumns();
 
   const columns = useInvoiceColumns();
 

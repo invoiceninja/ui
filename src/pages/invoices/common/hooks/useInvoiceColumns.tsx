@@ -17,16 +17,14 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { Credit } from '$app/common/interfaces/credit';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { User } from '$app/common/interfaces/user';
-import { RootState } from '$app/common/stores/store';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { customField } from '$app/components/CustomField';
 import { DataTableColumns } from '$app/components/DataTable';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Tooltip } from '$app/components/Tooltip';
 import { useTranslation } from 'react-i18next';
-import { useSelector } from 'react-redux';
 import { InvoiceStatus } from '../components/InvoiceStatus';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -34,61 +32,6 @@ export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   label: string;
   format?: (field: string | number, resource: TResource) => unknown;
 }[];
-
-export const invoiceColumns = [
-  'status',
-  'number',
-  'amount',
-  'client',
-  'balance',
-  'date',
-  'due_date',
-  'auto_bill_enabled',
-  'client_postal_code',
-  'archived_at',
-  'client_city',
-  'client_country',
-  'client_state',
-  'contact_email',
-  'contact_name',
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'discount',
-  'documents',
-  'entity_state',
-  'exchange_rate',
-  'is_deleted',
-  'is_viewed',
-  'last_sent_date',
-  'last_sent_template',
-  'next_send_date',
-  'partial_due',
-  'partial_due_date',
-  'po_number',
-  'private_notes',
-  'public_notes',
-  'reminder1_sent',
-  'reminder2_sent',
-  'reminder3_sent',
-  'reminder_last_sent',
-  'tax_amount',
-  'created_at',
-  'updated_at',
-] as const;
-
-type InvoiceColumns = (typeof invoiceColumns)[number];
-
-export const defaultColumns: InvoiceColumns[] = [
-  'status',
-  'number',
-  'client',
-  'amount',
-  'balance',
-  'date',
-  'due_date',
-];
 
 export function resourceViewedAt(resource: Invoice | Credit) {
   let viewed = '';
@@ -102,17 +45,84 @@ export function resourceViewedAt(resource: Invoice | Credit) {
   return viewed;
 }
 
+export const defaultColumns: string[] = [
+  'status',
+  'number',
+  'client',
+  'amount',
+  'balance',
+  'date',
+  'due_date',
+];
+
+export function useAllInvoiceColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'invoice',
+    });
+
+  const invoiceColumns = [
+    'status',
+    'number',
+    'amount',
+    'client',
+    'balance',
+    'date',
+    'due_date',
+    'auto_bill_enabled',
+    'client_postal_code',
+    'archived_at',
+    'client_city',
+    'client_country',
+    'client_state',
+    'contact_email',
+    'contact_name',
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'discount',
+    'documents',
+    'entity_state',
+    'exchange_rate',
+    'is_deleted',
+    'is_viewed',
+    'last_sent_date',
+    'last_sent_template',
+    'next_send_date',
+    'partial_due',
+    'partial_due_date',
+    'po_number',
+    'private_notes',
+    'public_notes',
+    'reminder1_sent',
+    'reminder2_sent',
+    'reminder3_sent',
+    'reminder_last_sent',
+    'tax_amount',
+    'created_at',
+    'updated_at',
+  ] as const;
+
+  return invoiceColumns;
+}
+
 export function useInvoiceColumns(): DataTableColumns<Invoice> {
+  const invoiceColumns = useAllInvoiceColumns();
+  type InvoiceColumns = (typeof invoiceColumns)[number];
+
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const currentUser = useCurrentUser();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
   const resolveCountry = useResolveCountry();
 
-  const currentUser = useSelector((state: RootState) => state.user.user) as
-    | User
-    | undefined;
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'invoice',
+    });
 
   const columns: DataTableColumnsExtended<Invoice, InvoiceColumns> = [
     {
@@ -240,36 +250,24 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.invoice1 &&
-          customField(company?.custom_fields.invoice1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.invoice2 &&
-          customField(company?.custom_fields.invoice2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.invoice3 &&
-          customField(company?.custom_fields.invoice3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.invoice4 &&
-          customField(company?.custom_fields.invoice4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'discount',

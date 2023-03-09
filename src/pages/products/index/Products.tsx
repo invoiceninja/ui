@@ -15,8 +15,8 @@ import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import {
   defaultColumns,
-  productColumns,
   useActions,
+  useAllProductColumns,
   useProductColumns,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
@@ -28,6 +28,8 @@ export function Products() {
   const [t] = useTranslation();
 
   const pages: Page[] = [{ name: t('products'), href: '/products' }];
+
+  const productColumns = useAllProductColumns();
 
   const columns = useProductColumns();
 

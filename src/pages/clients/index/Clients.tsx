@@ -14,8 +14,8 @@ import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
-  clientColumns,
   defaultColumns,
+  useAllClientColumns,
   useClientColumns,
 } from '../common/hooks/useClientColumns';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
@@ -48,6 +48,8 @@ export function Clients() {
   });
 
   const columns = useClientColumns();
+
+  const clientColumns = useAllClientColumns();
 
   const handlePurgeClient = usePurgeClient(purgeClientId);
 
