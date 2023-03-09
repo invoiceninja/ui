@@ -10,7 +10,7 @@
 
 import { AxiosError } from 'axios';
 import { Frequency } from 'common/enums/frequency';
-import { endpoint, isProduction } from 'common/helpers';
+import { endpoint } from 'common/helpers';
 import { request } from 'common/helpers/request';
 import { route } from 'common/helpers/route';
 import { toast } from 'common/helpers/toast/toast';
@@ -28,7 +28,7 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { scheduleParametersAtom } from '../common/atoms';
+import { scheduleParametersAtom } from '../common/components/EmailStatement';
 import { ScheduleForm } from '../common/components/ScheduleForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
 
@@ -61,24 +61,29 @@ export function Create() {
 
   useEffect(() => {
     if (blankSchedule) {
-      setSchedule({
-        ...blankSchedule,
-        template: searchParams.get('template') || 'email_statement',
-        frequency_id: Frequency.Monthly,
-        remaining_cycles: -1,
-        parameters: parametersAtom || {
-          clients: [],
-          date_range: 'last7_days',
-          show_aging_table: false,
-          show_payments_table: false,
-          status: 'all',
-        },
+      setSchedule(() => {
+        let currentParameters = parametersAtom;
+
+        if (!searchParams.get('template')) {
+          currentParameters = undefined;
+          setParametersAtom(undefined);
+        }
+
+        return {
+          ...blankSchedule,
+          template: searchParams.get('template') || 'email_statement',
+          frequency_id: Frequency.Monthly,
+          remaining_cycles: -1,
+          parameters: currentParameters || {
+            clients: [],
+            date_range: 'last7_days',
+            show_aging_table: false,
+            show_payments_table: false,
+            status: 'all',
+          },
+        };
       });
     }
-
-    return () => {
-      isProduction() && setParametersAtom(undefined);
-    };
   }, [blankSchedule]);
 
   const handleSave = (event: FormEvent<HTMLFormElement>) => {

@@ -12,16 +12,15 @@ import { Element } from '@invoiceninja/cards';
 import { SelectField } from '@invoiceninja/forms';
 import { useAccentColor } from 'common/hooks/useAccentColor';
 import { Client } from 'common/interfaces/client';
-import { Schedule } from 'common/interfaces/schedule';
+import { Parameters, Schedule } from 'common/interfaces/schedule';
 import { ValidationBag } from 'common/interfaces/validation-bag';
 import { useClientsQuery } from 'common/queries/clients';
 import { ClientSelector } from 'components/clients/ClientSelector';
 import Toggle from 'components/forms/Toggle';
-import { useAtomValue } from 'jotai';
+import { atom, useAtomValue } from 'jotai';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdClose } from 'react-icons/md';
-import { scheduleParametersAtom } from '../atoms';
 
 interface Props {
   schedule: Schedule;
@@ -32,6 +31,8 @@ interface Props {
   errors: ValidationBag | undefined;
   page?: 'create' | 'edit';
 }
+
+export const scheduleParametersAtom = atom<Parameters | undefined>(undefined);
 
 export function EmailStatement(props: Props) {
   const [t] = useTranslation();
@@ -56,14 +57,14 @@ export function EmailStatement(props: Props) {
   };
 
   useEffect(() => {
-    if (page === 'edit' || parametersAtom) {
+    if ((page === 'edit' || parametersAtom) && clientsResponse) {
       const clients = clientsResponse?.filter((client: Client) =>
         schedule.parameters.clients?.includes(client.id)
       );
 
       setSelectedClients(clients);
     }
-  }, []);
+  }, [clientsResponse]);
 
   useEffect(() => {
     const currentParameters = { ...schedule.parameters };
