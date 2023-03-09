@@ -18,6 +18,7 @@ import { toast } from 'common/helpers/toast/toast';
 import { useTitle } from 'common/hooks/useTitle';
 import { BankAccount } from 'common/interfaces/bank-accounts';
 import { ValidationBag } from 'common/interfaces/validation-bag';
+import Toggle from 'components/forms/Toggle';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -118,6 +119,22 @@ export function Edit() {
             value={accountDetails?.bank_account_name}
             onValueChange={(value) => handleChange('bank_account_name', value)}
             errorMessage={errors?.errors.bank_account_name}
+          />
+        </Element>
+
+        <Element leftSide={t('sync_from')}>
+          <InputField
+            type="date"
+            value={accountDetails?.from_date}
+            onValueChange={(value) => handleChange('from_date', value)}
+            errorMessage={errors?.errors.from_date}
+          />
+        </Element>
+
+        <Element leftSide={t('auto_sync')}>
+          <Toggle
+            checked={accountDetails?.auto_sync || false}
+            onValueChange={(value) => handleChange('auto_sync', value)}
           />
         </Element>
       </Card>
