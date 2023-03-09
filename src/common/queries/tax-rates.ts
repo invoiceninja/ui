@@ -14,8 +14,8 @@ import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { Params } from './common/params.interface';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { TaxRate } from 'common/interfaces/tax-rate';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
 
 export function useTaxRatesQuery(params: Params) {
   return useQuery(

@@ -15,8 +15,8 @@ import { useQuery } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
-import { PaymentTerm } from 'common/interfaces/payment-term';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 export function usePaymentTermsQuery(params: Params) {
   return useQuery(['/api/v1/payment_terms', params], () =>

@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { PaymentTerm } from 'common/interfaces/payment-term';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
 
 interface Params {
