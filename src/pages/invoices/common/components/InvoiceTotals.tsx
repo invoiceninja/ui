@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { TaxRate } from 'common/interfaces/tax-rate';
-import { Record } from 'components/forms/DebouncedCombobox';
+import { Card, Element } from '$app/components/cards';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { Record } from '$app/components/forms/DebouncedCombobox';
 import { Fragment, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useResolveTotalVariable } from '../hooks/useResolveTotalVariable';
 import { useTotalVariables } from '../hooks/useTotalVariables';
-import { CustomSurchargeField } from 'components/CustomSurchargeField';
-import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { CustomSurchargeField } from '$app/components/CustomSurchargeField';
+import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { ProductTableResource, RelationType } from './ProductsTable';
 
 interface Props {

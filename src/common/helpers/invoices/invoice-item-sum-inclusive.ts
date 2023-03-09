@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import collect from 'collect.js';
-import { Invoice } from 'common/interfaces/invoice';
-import { InvoiceItem } from 'common/interfaces/invoice-item';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 
 export class InvoiceItemSumInclusive {
   public taxCollection = collect();

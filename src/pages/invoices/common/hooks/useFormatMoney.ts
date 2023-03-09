@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Number } from 'common/helpers/number';
-import { useClientResolver } from 'common/hooks/clients/useClientResolver';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useResolveCountry } from 'common/hooks/useResolveCountry';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
-import { useVendorResolver } from 'common/hooks/vendors/useVendorResolver';
-import { Client } from 'common/interfaces/client';
-import { Country } from 'common/interfaces/country';
-import { Currency } from 'common/interfaces/currency';
-import { Vendor } from 'common/interfaces/vendor';
+import { Number } from '$app/common/helpers/number';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
+import { Client } from '$app/common/interfaces/client';
+import { Country } from '$app/common/interfaces/country';
+import { Currency } from '$app/common/interfaces/currency';
+import { Vendor } from '$app/common/interfaces/vendor';
 import { useEffect, useState } from 'react';
 import {
   ProductTableResource,

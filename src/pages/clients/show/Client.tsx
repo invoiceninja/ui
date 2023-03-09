@@ -8,28 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { useClientQuery } from 'common/queries/clients';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
-import { Tabs } from 'components/Tabs';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { useClientQuery } from '$app/common/queries/clients';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
+import { Tabs } from '$app/components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
-import { Tab } from 'components/Tabs';
+import { Tab } from '$app/components/Tabs';
 import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
 import { Standing } from './components/Standing';
-import { PasswordConfirmation } from 'components/PasswordConfirmation';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { usePurgeClient } from '../common/hooks/usePurgeClient';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { Gateways } from './components/Gateways';
-import { ResourceActions } from 'components/ResourceActions';
+import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 import { MergeClientModal } from '../common/components/MergeClientModal';
-import { Button } from '@invoiceninja/forms';
+import { Button } from '$app/components/forms';
 
 export function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');

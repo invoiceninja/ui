@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
+import { Link } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 
 export function LinkToVariables() {

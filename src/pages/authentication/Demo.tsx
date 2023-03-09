@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint, isDemo } from 'common/helpers';
-import { request } from 'common/helpers/request';
+import { endpoint, isDemo } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLogin } from './common/hooks';

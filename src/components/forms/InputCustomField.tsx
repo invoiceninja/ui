@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AvailableTypes } from 'pages/settings/custom-fields/components';
+import { AvailableTypes } from '$app/pages/settings/custom-fields/components';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { InputField, SelectField } from '.';
 import Toggle from './Toggle';

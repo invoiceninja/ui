@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Credit } from 'common/interfaces/credit';
-import { Badge } from 'components/Badge';
+import { Credit } from '$app/common/interfaces/credit';
+import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 
 interface Props {

@@ -9,13 +9,13 @@
  */
 
 import { AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { Invoice } from 'common/interfaces/invoice';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { useQuery } from 'react-query';
-import { route } from 'common/helpers/route';
-import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
+import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export interface GenericQueryOptions {
   enabled: boolean;

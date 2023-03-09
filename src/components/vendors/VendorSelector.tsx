@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { GenericSelectorProps } from 'common/interfaces/generic-selector-props';
-import { Vendor } from 'common/interfaces/vendor';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
-import { CreateVendorModal } from 'pages/vendors/components/CreateVendorModal';
+import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import { CreateVendorModal } from '$app/pages/vendors/components/CreateVendorModal';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

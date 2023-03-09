@@ -9,17 +9,17 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { updateRecord } from 'common/stores/slices/company-users';
+import { endpoint } from '$app/common/helpers';
+import { updateRecord } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
-import { request } from 'common/helpers/request';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { request } from '$app/common/helpers/request';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useQueryClient } from 'react-query';
-import { toast } from 'common/helpers/toast/toast';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../atoms';
-import { updatingRecords as updatingRecordsAtom } from 'pages/settings/invoice-design/common/atoms';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { updatingRecords as updatingRecordsAtom } from '$app/pages/settings/invoice-design/common/atoms';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();

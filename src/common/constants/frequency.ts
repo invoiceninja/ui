@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Frequency } from 'common/enums/frequency';
+import { Frequency } from '$app/common/enums/frequency';
 
 export default {
   [Frequency.Daily]: 'freq_daily',

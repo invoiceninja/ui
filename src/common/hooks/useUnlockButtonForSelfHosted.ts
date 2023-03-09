@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isSelfHosted } from 'common/helpers';
+import { isSelfHosted } from '$app/common/helpers';
 import { useCurrentAccount } from './useCurrentAccount';
 
 export function useUnlockButtonForSelfHosted() {

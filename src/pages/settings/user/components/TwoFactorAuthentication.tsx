@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { Button, InputField, Link } from '@invoiceninja/forms';
+import { Card, Element } from '$app/components/cards';
+import { Button, InputField, Link } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint, isHosted } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { updateUser } from 'common/stores/slices/user';
-import { Modal } from 'components/Modal';
+import { endpoint, isHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { updateUser } from '$app/common/stores/slices/user';
+import { Modal } from '$app/components/Modal';
 import { merge } from 'lodash';
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';

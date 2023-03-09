@@ -9,20 +9,20 @@
  */
 
 import { FormEvent, useEffect, useState } from 'react';
-import { toast } from 'common/helpers/toast/toast';
-import { request } from 'common/helpers/request';
-import { endpoint } from 'common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
 import { AxiosError } from 'axios';
 import { useQueryClient } from 'react-query';
-import { TransactionStatus } from 'common/enums/transactions';
-import { route } from 'common/helpers/route';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
+import { TransactionStatus } from '$app/common/enums/transactions';
+import { route } from '$app/common/helpers/route';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ListBox } from './ListBox';
-import { Button } from '@invoiceninja/forms';
+import { Button } from '$app/components/forms';
 import { MdContentCopy, MdLink } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
-import { TabGroup } from 'components/TabGroup';
-import { Transaction } from 'common/interfaces/transactions';
+import { TabGroup } from '$app/components/TabGroup';
+import { Transaction } from '$app/common/interfaces/transactions';
 
 export interface TransactionDetails {
   base_type: string;

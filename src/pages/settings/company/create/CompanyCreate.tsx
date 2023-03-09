@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
+import { Button } from '$app/components/forms';
 import { AxiosError, AxiosResponse } from 'axios';
-import { AuthenticationTypes } from 'common/dtos/authentication';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { updateCompanyUsers } from 'common/stores/slices/company-users';
-import { authenticate } from 'common/stores/slices/user';
-import { Modal } from 'components/Modal';
+import { AuthenticationTypes } from '$app/common/dtos/authentication';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
+import { authenticate } from '$app/common/stores/slices/user';
+import { Modal } from '$app/components/Modal';
 import { useState, SetStateAction, Dispatch } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';

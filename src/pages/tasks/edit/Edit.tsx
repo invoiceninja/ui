@@ -9,17 +9,17 @@
  */
 
 import axios, { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useTitle } from 'common/hooks/useTitle';
-import { Task } from 'common/interfaces/task';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useTaskQuery } from 'common/queries/tasks';
-import { updateRecord } from 'common/stores/slices/company-users';
-import { Default } from 'components/layouts/Default';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Task } from '$app/common/interfaces/task';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useTaskQuery } from '$app/common/queries/tasks';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import { Default } from '$app/components/layouts/Default';
 import { useEffect, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';

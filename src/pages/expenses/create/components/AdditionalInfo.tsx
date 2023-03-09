@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
-import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
-import { CurrencySelector } from 'components/CurrencySelector';
-import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
-import Toggle from 'components/forms/Toggle';
-import { PaymentTypeSelector } from 'components/payment-types/PaymentTypeSelector';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
+import Toggle from '$app/components/forms/Toggle';
+import { PaymentTypeSelector } from '$app/components/payment-types/PaymentTypeSelector';
 import dayjs from 'dayjs';
-import { useResolveCurrencySeparator } from 'pages/transactions/common/hooks/useResolveCurrencySeparator';
+import { useResolveCurrencySeparator } from '$app/pages/transactions/common/hooks/useResolveCurrencySeparator';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ExpenseCardProps } from './Details';

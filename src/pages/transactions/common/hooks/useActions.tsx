@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Transaction } from 'common/interfaces/transactions';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Icon } from 'components/icons/Icon';
-import { Action } from 'components/ResourceActions';
+import { Transaction } from '$app/common/interfaces/transactions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
 import { useBulkAction } from './useBulkAction';

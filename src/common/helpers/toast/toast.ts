@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { trans } from 'common/helpers';
+import { trans } from '$app/common/helpers';
 import { t } from 'i18next';
 import { toast as helper } from 'react-hot-toast';
 

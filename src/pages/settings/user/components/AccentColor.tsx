@@ -11,10 +11,10 @@
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { useDispatch, useSelector } from 'react-redux';
-import { updateChanges } from 'common/stores/slices/user';
+import { updateChanges } from '$app/common/stores/slices/user';
 import { RootState } from '../../../../common/stores/store';
-import colors from 'common/constants/colors';
-import { ColorPicker } from 'components/forms/ColorPicker';
+import colors from '$app/common/constants/colors';
+import { ColorPicker } from '$app/components/forms/ColorPicker';
 
 export function AccentColor() {
   const [t] = useTranslation();

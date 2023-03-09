@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isDemo } from 'common/helpers';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { DateFormat } from 'common/interfaces/date-format';
-import { Language } from 'common/interfaces/language';
-import { Timezone } from 'common/interfaces/timezone';
-import { useStaticsQuery } from 'common/queries/statics';
-import { updateChanges } from 'common/stores/slices/company-users';
-import { Divider } from 'components/cards/Divider';
+import { isDemo } from '$app/common/helpers';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { DateFormat } from '$app/common/interfaces/date-format';
+import { Language } from '$app/common/interfaces/language';
+import { Timezone } from '$app/common/interfaces/timezone';
+import { useStaticsQuery } from '$app/common/queries/statics';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Divider } from '$app/components/cards/Divider';
 import dayjs from 'dayjs';
-import { useHandleCurrentCompanyChange } from 'pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { useHandleCurrentCompanyChange } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';

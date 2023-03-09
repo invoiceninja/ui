@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useClientResolver } from 'common/hooks/clients/useClientResolver';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useTitle } from 'common/hooks/useTitle';
-import { Project } from 'common/interfaces/project';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankProjectQuery } from 'common/queries/projects';
-import { ClientSelector } from 'components/clients/ClientSelector';
-import { Container } from 'components/Container';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
-import { Default } from 'components/layouts/Default';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Project } from '$app/common/interfaces/project';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankProjectQuery } from '$app/common/queries/projects';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { Container } from '$app/components/Container';
+import { DebouncedCombobox } from '$app/components/forms/DebouncedCombobox';
+import { Default } from '$app/components/layouts/Default';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import React, { useEffect, useState } from 'react';

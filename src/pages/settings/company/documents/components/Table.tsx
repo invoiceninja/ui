@@ -16,18 +16,18 @@ import {
   Th,
   Thead,
   Tr,
-} from '@invoiceninja/tables';
-import { date, endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { Document } from 'common/interfaces/document.interface';
-import { useDocumentsQuery } from 'common/queries/documents';
-import { Dropdown } from 'components/dropdown/Dropdown';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { FileIcon } from 'components/FileIcon';
-import { Icon } from 'components/icons/Icon';
-import { PasswordConfirmation } from 'components/PasswordConfirmation';
-import { Spinner } from 'components/Spinner';
+} from '$app/components/tables';
+import { date, endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { Document } from '$app/common/interfaces/document.interface';
+import { useDocumentsQuery } from '$app/common/queries/documents';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { FileIcon } from '$app/components/FileIcon';
+import { Icon } from '$app/components/icons/Icon';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { Spinner } from '$app/components/Spinner';
 import prettyBytes from 'pretty-bytes';
 import { useState } from 'react';
 import toast from 'react-hot-toast';

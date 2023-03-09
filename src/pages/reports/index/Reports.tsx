@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
-import { useTitle } from 'common/hooks/useTitle';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Page } from 'components/Breadcrumbs';
-import { ClientSelector } from 'components/clients/ClientSelector';
-import Toggle from 'components/forms/Toggle';
-import { Default } from 'components/layouts/Default';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Page } from '$app/components/Breadcrumbs';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import Toggle from '$app/components/forms/Toggle';
+import { Default } from '$app/components/layouts/Default';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

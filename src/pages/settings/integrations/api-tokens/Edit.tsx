@@ -8,29 +8,29 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
+import { Card, Element } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
-import { Settings } from 'components/layouts/Settings';
-import { InputField } from '@invoiceninja/forms';
+import { Settings } from '$app/components/layouts/Settings';
+import { InputField } from '$app/components/forms';
 import { useEffect, useState } from 'react';
 import { AxiosError } from 'axios';
-import { date, endpoint } from 'common/helpers';
+import { date, endpoint } from '$app/common/helpers';
 import { useNavigate, useParams } from 'react-router-dom';
-import { PasswordConfirmation } from 'components/PasswordConfirmation';
-import { useApiTokenQuery } from 'common/queries/api-tokens';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { useApiTokenQuery } from '$app/common/queries/api-tokens';
 import { useQueryClient } from 'react-query';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { Badge } from 'components/Badge';
-import { useTitle } from 'common/hooks/useTitle';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { ApiToken } from 'common/interfaces/api-token';
-import { toast } from 'common/helpers/toast/toast';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { Badge } from '$app/components/Badge';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { ApiToken } from '$app/common/interfaces/api-token';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useHandleChange } from './common/hooks/hooks';
-import { ResourceActions } from 'components/ResourceActions';
+import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from './common/hooks/useActions';
-import { CopyToClipboard } from 'components/CopyToClipboard';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
 
 export function Edit() {
   const [t] = useTranslation();

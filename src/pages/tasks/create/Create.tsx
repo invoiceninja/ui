@@ -9,17 +9,17 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useTitle } from 'common/hooks/useTitle';
-import { Task } from 'common/interfaces/task';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useTaskStatusesQuery } from 'common/queries/task-statuses';
-import { useBlankTaskQuery } from 'common/queries/tasks';
-import { Default } from 'components/layouts/Default';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Task } from '$app/common/interfaces/task';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useTaskStatusesQuery } from '$app/common/queries/task-statuses';
+import { useBlankTaskQuery } from '$app/common/queries/tasks';
+import { Default } from '$app/components/layouts/Default';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';

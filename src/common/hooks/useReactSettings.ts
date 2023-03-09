@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ReactSettings } from 'common/interfaces/company-user';
-import { RootState } from 'common/stores/store';
+import { ReactSettings } from '$app/common/interfaces/company-user';
+import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
 
 export function useReactSettings() {

@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { Client } from 'common/interfaces/client';
+import { endpoint } from '$app/common/helpers';
+import { Client } from '$app/common/interfaces/client';
 import { request } from '../request';
 
 export class ClientResolver {
