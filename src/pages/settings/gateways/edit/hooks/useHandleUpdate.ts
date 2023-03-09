@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { CompanyGateway } from 'common/interfaces/company-gateway';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
 import { Dispatch, SetStateAction } from 'react';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export function useHandleUpdate(
   companyGateway: CompanyGateway | undefined,

@@ -9,8 +9,8 @@
  */
 
 import { atom } from 'jotai';
-import { Quote } from 'common/interfaces/quote';
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { Quote } from '$app/common/interfaces/quote';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 
 export const quoteAtom = atom<Quote | undefined>(undefined);
 export const invoiceSumAtom = atom<InvoiceSum | undefined>(undefined);

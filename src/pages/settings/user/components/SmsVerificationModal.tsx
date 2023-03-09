@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField } from '@invoiceninja/forms';
-import { Modal } from 'components/Modal';
+import { Button, InputField } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

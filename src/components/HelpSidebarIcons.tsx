@@ -10,13 +10,13 @@
 
 import Tippy from '@tippyjs/react';
 import { AxiosError } from 'axios';
-import { endpoint, isSelfHosted } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { updateCompanyUsers } from 'common/stores/slices/company-users';
-import { setIsMiniSidebar } from 'common/stores/slices/settings';
-import { RootState } from 'common/stores/store';
+import { endpoint, isSelfHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
+import { setIsMiniSidebar } from '$app/common/stores/slices/settings';
+import { RootState } from '$app/common/stores/store';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import {

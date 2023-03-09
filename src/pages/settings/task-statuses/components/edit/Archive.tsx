@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ActionCard } from '@invoiceninja/cards';
-import { Button } from '@invoiceninja/forms';
-import { route } from 'common/helpers/route';
-import { bulk, useTaskStatusQuery } from 'common/queries/task-statuses';
+import { ActionCard } from '$app/components/cards';
+import { Button } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
+import { bulk, useTaskStatusQuery } from '$app/common/queries/task-statuses';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';

@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { blankLineItem } from 'common/constants/blank-line-item';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { cloneDeep } from 'lodash';
 
 export function useHandleCreateLineItem(

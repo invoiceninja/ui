@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { EntityState } from 'common/enums/entity-state';
-import { getEntityState } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { Client } from 'common/interfaces/client';
-import { Divider } from 'components/cards/Divider';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Icon } from 'components/icons/Icon';
-import { Action } from 'components/ResourceActions';
+import { EntityState } from '$app/common/enums/entity-state';
+import { getEntityState } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { Client } from '$app/common/interfaces/client';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiGitMerge, BiPlusCircle } from 'react-icons/bi';

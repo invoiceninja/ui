@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Task } from 'common/interfaces/task';
+import { Task } from '$app/common/interfaces/task';
 import { parseTimeLog } from './calculate-time';
 
 export function isOverlapping(task: Task) {

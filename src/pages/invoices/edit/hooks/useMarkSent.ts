@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { Invoice } from 'common/interfaces/invoice';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useAtomValue } from 'jotai';
-import { invalidationQueryAtom } from 'common/atoms/data-table';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 
 export function useMarkSent() {
   const queryClient = useQueryClient();

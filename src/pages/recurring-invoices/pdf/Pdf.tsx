@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from 'common/helpers/route';
-import { useTitle } from 'common/hooks/useTitle';
-import { Default } from 'components/layouts/Default';
-import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
-import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
+import { route } from '$app/common/helpers/route';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Default } from '$app/components/layouts/Default';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { useGeneratePdfUrl } from '$app/pages/invoices/common/hooks/useGeneratePdfUrl';
 import { useParams } from 'react-router-dom';
 import { useRecurringInvoiceQuery } from '../common/queries';
 

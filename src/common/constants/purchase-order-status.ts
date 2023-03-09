@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { PurchaseOrderStatus } from 'common/enums/purchase-order-status';
+import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
 
 export default {
   [PurchaseOrderStatus.Accepted]: 'accepted',

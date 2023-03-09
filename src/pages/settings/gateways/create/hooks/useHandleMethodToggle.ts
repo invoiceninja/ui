@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CompanyGateway } from 'common/interfaces/company-gateway';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 
 export const blankFeesAndLimitsRecord = {
   adjust_fee_percent: false,

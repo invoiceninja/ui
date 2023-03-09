@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { Project } from 'common/interfaces/project';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useProjectQuery } from 'common/queries/projects';
-import { ClientSelector } from 'components/clients/ClientSelector';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { Project } from '$app/common/interfaces/project';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useProjectQuery } from '$app/common/queries/projects';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { DebouncedCombobox } from '$app/components/forms/DebouncedCombobox';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useParams } from 'react-router-dom';

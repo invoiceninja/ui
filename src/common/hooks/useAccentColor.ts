@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import colors from 'common/constants/colors';
-import { RootState } from 'common/stores/store';
+import colors from '$app/common/constants/colors';
+import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
 import { useCurrentUser } from './useCurrentUser';
 

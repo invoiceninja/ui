@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { updateChanges } from 'common/stores/slices/company-users';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 import { ChangeEvent } from 'react';
 import { useDispatch } from 'react-redux';
 

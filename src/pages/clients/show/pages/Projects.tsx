@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { Project } from 'common/interfaces/project';
-import { DataTable, DataTableColumns } from 'components/DataTable';
+import { Link } from '$app/components/forms';
+import { date } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { Project } from '$app/common/interfaces/project';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';

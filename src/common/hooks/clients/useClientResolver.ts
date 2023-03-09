@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ClientResolver } from 'common/helpers/clients/client-resolver';
+import { ClientResolver } from '$app/common/helpers/clients/client-resolver';
 
 const clientResolver = new ClientResolver();
 

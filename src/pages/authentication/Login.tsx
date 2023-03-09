@@ -22,11 +22,11 @@ import { InputLabel } from '../../components/forms/InputLabel';
 import { Alert } from '../../components/Alert';
 import { HostedLinks } from './components/HostedLinks';
 import { Header } from './components/Header';
-import { useTitle } from 'common/hooks/useTitle';
-import { request } from 'common/helpers/request';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { request } from '$app/common/helpers/request';
 import { SignInProviders } from './components/SignInProviders';
 import { useLogin } from './common/hooks';
-import { GenericValidationBag } from 'common/interfaces/validation-bag';
+import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 
 export function Login() {
   useTitle('login');

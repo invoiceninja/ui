@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from 'components/Badge';
+import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
-import { Invoice } from 'common/interfaces/invoice';
-import { InvoiceStatus as InvoiceStatusEnum } from 'common/enums/invoice-status';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceStatus as InvoiceStatusEnum } from '$app/common/enums/invoice-status';
 
 interface Props {
   entity: Invoice;

@@ -11,7 +11,7 @@
 import { useEffect, useState } from 'react';
 import { Element } from './cards';
 import { Props } from './forms/InputCustomField';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { InputField } from './forms';
 
 export function CustomSurchargeField(props: Props) {

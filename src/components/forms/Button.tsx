@@ -9,7 +9,7 @@
  */
 
 import classNames from 'classnames';
-import { useAccentColor } from 'common/hooks/useAccentColor';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import React, { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import CommonProps from '../../common/interfaces/common-props.interface';

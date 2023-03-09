@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompanyUser } from 'common/hooks/useCurrentCompanyUser';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { CompanyUser } from 'common/interfaces/company-user';
-import { User } from 'common/interfaces/user';
-import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
-import { Unauthorized } from 'pages/errors/401';
+import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { CompanyUser } from '$app/common/interfaces/company-user';
+import { User } from '$app/common/interfaces/user';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
+import { Unauthorized } from '$app/pages/errors/401';
 import { useEffect, useState } from 'react';
 import { QueryClient, useQueryClient } from 'react-query';
 import { Params, useParams } from 'react-router-dom';

@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
+import { Card } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { RecurringExpenseCardProps } from './Details';
 

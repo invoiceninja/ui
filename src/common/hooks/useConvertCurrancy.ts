@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { usePaymentQuery } from 'common/queries/payments';
+import { usePaymentQuery } from '$app/common/queries/payments';
 import { useEffect, useState } from 'react';
 
 export function useConvertCurrencyToggle(params: {

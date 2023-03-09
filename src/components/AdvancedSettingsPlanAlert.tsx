@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { Alert } from './Alert';
 import { Link } from './forms';

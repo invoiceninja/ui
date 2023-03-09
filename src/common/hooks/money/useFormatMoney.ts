@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Number } from 'common/helpers/number';
+import { Number } from '$app/common/helpers/number';
 import { useCurrentCompany } from '../useCurrentCompany';
 import { useResolveCountry } from '../useResolveCountry';
 import { useResolveCurrency } from '../useResolveCurrency';

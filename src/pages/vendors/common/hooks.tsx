@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { useResolveCountry } from 'common/hooks/useResolveCountry';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
-import { Vendor } from 'common/interfaces/vendor';
-import { CopyToClipboard } from 'components/CopyToClipboard';
-import { customField } from 'components/CustomField';
-import { EntityStatus } from 'components/EntityStatus';
-import { Tooltip } from 'components/Tooltip';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { Link } from '$app/components/forms';
+import { date } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { customField } from '$app/components/CustomField';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Tooltip } from '$app/components/Tooltip';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 

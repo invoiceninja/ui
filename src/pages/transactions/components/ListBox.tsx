@@ -10,16 +10,16 @@
 
 import { TransactionDetails } from './TransactionMatchDetails';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
-import { useClientsQuery } from 'common/queries/clients';
-import { Client } from 'common/interfaces/client';
-import CommonProps from 'common/interfaces/common-props.interface';
+import { useClientsQuery } from '$app/common/queries/clients';
+import { Client } from '$app/common/interfaces/client';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 import { SearchArea } from './SearchArea';
 import { ListBoxItem } from './ListBoxItem';
-import { useInvoicesQuery } from 'pages/invoices/common/queries';
-import { useVendorsQuery } from 'common/queries/vendor';
-import { useExpenseCategoriesQuery } from 'common/queries/expense-categories';
-import { usePaymentsQuery } from 'common/queries/payments';
-import { useExpensesQuery } from 'common/queries/expenses';
+import { useInvoicesQuery } from '$app/pages/invoices/common/queries';
+import { useVendorsQuery } from '$app/common/queries/vendor';
+import { useExpenseCategoriesQuery } from '$app/common/queries/expense-categories';
+import { usePaymentsQuery } from '$app/common/queries/payments';
+import { useExpensesQuery } from '$app/common/queries/expenses';
 
 export interface ResourceItem {
   id: string;

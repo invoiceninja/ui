@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputField } from '@invoiceninja/forms';
-import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Task } from 'common/interfaces/task';
+import { InputField } from '$app/components/forms';
+import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Task } from '$app/common/interfaces/task';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { Plus, Trash2 } from 'react-feather';

@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { route } from 'common/helpers/route';
-import { TaxRate } from 'common/interfaces/tax-rate';
-import { DataTableColumns } from 'components/DataTable';
+import { Link } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { DataTableColumns } from '$app/components/DataTable';
 import { useTranslation } from 'react-i18next';
 
 export const useTaxRateColumns = () => {

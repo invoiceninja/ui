@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { TabGroup } from 'components/TabGroup';
+import { Card } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 import { recurringInvoiceAtom } from '../atoms';
 import { ChangeHandler } from '../hooks';
-import { MarkdownEditor } from 'components/forms/MarkdownEditor';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { useLocation, useParams } from 'react-router-dom';
-import { Upload } from 'pages/settings/company/documents/components';
-import { endpoint } from 'common/helpers';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { endpoint } from '$app/common/helpers';
 import { useQueryClient } from 'react-query';
-import { DocumentsTable } from 'components/DocumentsTable';
-import { ProjectSelector } from 'components/projects/ProjectSelector';
-import { UserSelector } from 'components/users/UserSelector';
-import { VendorSelector } from 'components/vendors/VendorSelector';
-import { route } from 'common/helpers/route';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { ProjectSelector } from '$app/components/projects/ProjectSelector';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { VendorSelector } from '$app/components/vendors/VendorSelector';
+import { route } from '$app/common/helpers/route';
 
 interface Props {
   handleChange: ChangeHandler;

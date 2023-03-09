@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { transactionTypes } from 'common/constants/transactions';
-import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
-import { ApiTransactionType, TransactionType } from 'common/enums/transactions';
+import { Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { transactionTypes } from '$app/common/constants/transactions';
+import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
+import { ApiTransactionType, TransactionType } from '$app/common/enums/transactions';
 import { BankAccountSelector } from '../components/BankAccountSelector';
-import { Transaction } from 'common/interfaces/transactions';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { Transaction } from '$app/common/interfaces/transactions';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTranslation } from 'react-i18next';
-import { useCurrencies } from 'common/hooks/useCurrencies';
-import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
+import { useCurrencies } from '$app/common/hooks/useCurrencies';
+import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
 
 interface Props {
   transaction: Transaction;

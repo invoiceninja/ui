@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { Page } from 'components/Breadcrumbs';
-import { DataTable } from 'components/DataTable';
-import { Default } from 'components/layouts/Default';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Page } from '$app/components/Breadcrumbs';
+import { DataTable } from '$app/components/DataTable';
+import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   clientColumns,
   defaultColumns,
   useClientColumns,
 } from '../common/hooks/useClientColumns';
-import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
-import { ImportButton } from 'components/import/ImportButton';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { ImportButton } from '$app/components/import/ImportButton';
 import { useActions } from '../common/hooks/useActions';
 import { MergeClientModal } from '../common/components/MergeClientModal';
 import { useState } from 'react';
-import { PasswordConfirmation } from 'components/PasswordConfirmation';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { usePurgeClient } from '../common/hooks/usePurgeClient';
 
 export function Clients() {

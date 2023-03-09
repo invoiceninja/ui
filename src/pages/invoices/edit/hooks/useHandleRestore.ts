@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Invoice } from 'common/interfaces/invoice';
-import { bulk } from 'common/queries/invoices';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { bulk } from '$app/common/queries/invoices';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 
 export function useHandleRestore() {
   const [t] = useTranslation();

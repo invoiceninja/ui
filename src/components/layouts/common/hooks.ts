@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAdmin } from 'common/hooks/permissions/useHasPermission';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 

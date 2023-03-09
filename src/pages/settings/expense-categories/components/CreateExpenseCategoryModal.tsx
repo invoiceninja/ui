@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ExpenseCategory } from 'common/interfaces/expense-category';
-import { Modal } from 'components/Modal';
+import { ExpenseCategory } from '$app/common/interfaces/expense-category';
+import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CreateExpenseCategoryForm } from './CreateExpenseCategoryForm';
