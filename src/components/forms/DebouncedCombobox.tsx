@@ -161,6 +161,8 @@ export function DebouncedCombobox(props: Props) {
 
       if (props.clearInputAfterSelection) {
         setSelectedOption({ record: internalRecord, withoutEvents: true });
+
+        debouncedSearch('');
       }
     }
   }, [selectedOption]);

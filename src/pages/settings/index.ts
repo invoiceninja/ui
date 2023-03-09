@@ -28,6 +28,7 @@ export * from './client-portal/ClientPortal';
 export * from './templates-and-reminders/TemplatesAndReminders';
 export * from './bank-accounts';
 export * from './subscriptions/index';
+export * from './schedules';
 export * from './backup-restore';
 
 export * from './group-settings/GroupSettings';

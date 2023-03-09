@@ -141,6 +141,12 @@ export function useSettingsRoutes() {
       enabled: isAdmin || isOwner || false,
     },
     {
+      name: t('schedules'),
+      href: '/settings/schedules',
+      current: location.pathname.startsWith('/settings/schedules'),
+      enabled: isAdmin || isOwner || false,
+    },
+    {
       name: t('user_management'),
       href: '/settings/users',
       current: location.pathname.startsWith('/settings/users'),
