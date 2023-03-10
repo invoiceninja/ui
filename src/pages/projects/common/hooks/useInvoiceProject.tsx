@@ -8,20 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Task } from 'common/interfaces/task';
-import { useBlankInvoiceQuery } from 'common/queries/invoices';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Task } from '$app/common/interfaces/task';
+import { useBlankInvoiceQuery } from '$app/common/queries/invoices';
 import { useNavigate } from 'react-router-dom';
-import { blankLineItem } from 'common/constants/blank-line-item';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import dayjs from 'dayjs';
-import { Invoice } from 'common/interfaces/invoice';
-import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
+import { Invoice } from '$app/common/interfaces/invoice';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '$app/common/interfaces/invoice-item';
 import collect from 'collect.js';
 import toast from 'react-hot-toast';
-import { invoiceAtom } from 'pages/invoices/common/atoms';
-import { route } from 'common/helpers/route';
-import { parseTimeLog } from 'pages/tasks/common/helpers/calculate-time';
+import { invoiceAtom } from '$app/pages/invoices/common/atoms';
+import { route } from '$app/common/helpers/route';
+import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useUpdateAtom } from 'jotai/utils';
 
 export function useInvoiceProject() {
