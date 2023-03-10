@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Settings } from 'components/layouts/Settings';
+import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { DataTable, DataTableColumns } from 'components/DataTable';
-import { useTitle } from 'common/hooks/useTitle';
-import { ApiToken } from 'common/interfaces/api-token';
-import { Link } from '@invoiceninja/forms';
-import { route } from 'common/helpers/route';
-import { date } from 'common/helpers';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { ApiToken } from '$app/common/interfaces/api-token';
+import { Link } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
+import { date } from '$app/common/helpers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 export function ApiTokens() {
   const [t] = useTranslation();

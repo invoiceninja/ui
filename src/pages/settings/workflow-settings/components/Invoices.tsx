@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { SelectField } from '@invoiceninja/forms';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { updateChanges } from 'common/stores/slices/company-users';
-import { Divider } from 'components/cards/Divider';
+import { SelectField } from '$app/components/forms';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Divider } from '$app/components/cards/Divider';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';

@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { CurrencySelector } from 'components/CurrencySelector';
-import Toggle from 'components/forms/Toggle';
-import { PaymentTypeSelector } from 'components/payment-types/PaymentTypeSelector';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import Toggle from '$app/components/forms/Toggle';
+import { PaymentTypeSelector } from '$app/components/payment-types/PaymentTypeSelector';
 import dayjs from 'dayjs';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';

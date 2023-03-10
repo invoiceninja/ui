@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { SelectField } from '@invoiceninja/forms';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { TaxRate } from 'common/interfaces/tax-rate';
-import { updateChanges } from 'common/stores/slices/company-users';
+import { Card, Element } from '$app/components/cards';
+import { SelectField } from '$app/components/forms';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';

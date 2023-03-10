@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { TaxRate } from 'common/interfaces/tax-rate';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
-import { TaxCreate } from 'pages/invoices/common/components/TaxCreate';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
+import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import { TaxCreate } from '$app/pages/invoices/common/components/TaxCreate';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

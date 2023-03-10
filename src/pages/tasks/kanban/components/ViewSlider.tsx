@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ClickableElement, Element } from '@invoiceninja/cards';
-import { endpoint } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { NonClickableElement } from 'components/cards/NonClickableElement';
-import { DocumentsTable } from 'components/DocumentsTable';
-import { TabGroup } from 'components/TabGroup';
+import { ClickableElement, Element } from '$app/components/cards';
+import { endpoint } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
-import { Upload } from 'pages/settings/company/documents/components';
-import { TaskStatus } from 'pages/tasks/common/components/TaskStatus';
-import { isTaskRunning } from 'pages/tasks/common/helpers/calculate-entity-state';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { TaskStatus } from '$app/pages/tasks/common/components/TaskStatus';
+import { isTaskRunning } from '$app/pages/tasks/common/helpers/calculate-entity-state';
 import {
   calculateTime,
   calculateDifferenceBetweenLogs,
-} from 'pages/tasks/common/helpers/calculate-time';
+} from '$app/pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { currentTaskAtom } from '../common/atoms';

@@ -23,9 +23,9 @@ import { Alert } from '../../components/Alert';
 import { Button } from '../../components/forms/Button';
 import { HostedLinks } from './components/HostedLinks';
 import { Link } from '../../components/forms/Link';
-import { request } from 'common/helpers/request';
+import { request } from '$app/common/helpers/request';
 import { SignInProviders } from './components/SignInProviders';
-import { GenericValidationBag } from 'common/interfaces/validation-bag';
+import { GenericValidationBag } from '$app/common/interfaces/validation-bag';
 
 export function Register() {
   const [t] = useTranslation();

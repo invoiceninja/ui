@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import gatewayType from 'common/constants/gateway-type';
+import gatewayType from '$app/common/constants/gateway-type';
 import { useTranslation } from 'react-i18next';
 
 export function useResolveGatewayTypeTranslation() {

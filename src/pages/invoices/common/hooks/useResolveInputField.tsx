@@ -10,19 +10,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { resolveProperty } from 'pages/invoices/common/helpers/resolve-property';
+import { resolveProperty } from '$app/pages/invoices/common/helpers/resolve-property';
 import { useHandleProductChange } from './useHandleProductChange';
-import { InputField } from '@invoiceninja/forms';
+import { InputField } from '$app/components/forms';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useFormatMoney } from './useFormatMoney';
-import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { DecimalNumberInput } from 'components/forms/DecimalNumberInput';
-import { useGetCurrencySeparators } from 'common/hooks/useGetCurrencySeparators';
-import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
-import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
-import { ProductSelector } from 'components/products/ProductSelector';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { CustomField } from 'components/CustomField';
+import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
+import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
+import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
+import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
+import { ProductSelector } from '$app/components/products/ProductSelector';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { CustomField } from '$app/components/CustomField';
 import {
   ProductTableResource,
   RelationType,

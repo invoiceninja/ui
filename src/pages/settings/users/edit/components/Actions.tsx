@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { User } from 'common/interfaces/user';
-import { Dropdown } from 'components/dropdown/Dropdown';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Icon } from 'components/icons/Icon';
-import { PasswordConfirmation } from 'components/PasswordConfirmation';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { User } from '$app/common/interfaces/user';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';

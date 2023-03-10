@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { freePlan } from 'common/guards/guards/free-plan';
-import { isHosted } from 'common/helpers';
+import { freePlan } from '$app/common/guards/guards/free-plan';
+import { isHosted } from '$app/common/helpers';
 import { useCurrentAccount } from './useCurrentAccount';
 
 export function useUnlockButtonForHosted() {

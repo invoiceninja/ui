@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from 'common/helpers/route';
-import { Tab } from 'components/Tabs';
+import { route } from '$app/common/helpers/route';
+import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 
 export function useInvoiceDesignTabs() {

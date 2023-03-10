@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { Checkbox, Link } from '@invoiceninja/forms';
-import { useClientResolver } from 'common/hooks/clients/useClientResolver';
-import { Client } from 'common/interfaces/client';
-import { Invoice } from 'common/interfaces/invoice';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { Card } from '$app/components/cards';
+import { Checkbox, Link } from '$app/components/forms';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { Client } from '$app/common/interfaces/client';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ClientSelector as Selector } from 'components/clients/ClientSelector';
-import { route } from 'common/helpers/route';
+import { ClientSelector as Selector } from '$app/components/clients/ClientSelector';
+import { route } from '$app/common/helpers/route';
 
 interface Props {
   readonly?: boolean;

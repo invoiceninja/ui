@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CreditResolver } from 'common/helpers/credits/credit-resolver';
+import { CreditResolver } from '$app/common/helpers/credits/credit-resolver';
 
 const creditResolver = new CreditResolver();
 

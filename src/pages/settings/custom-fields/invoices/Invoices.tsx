@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useShouldDisableCustomFields } from 'common/hooks/useShouldDisableCustomFields';
-import { useTitle } from 'common/hooks/useTitle';
-import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
+import { useShouldDisableCustomFields } from '$app/common/hooks/useShouldDisableCustomFields';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';

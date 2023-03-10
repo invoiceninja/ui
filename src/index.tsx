@@ -17,7 +17,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
-import { ScrollToTop } from 'components/ScrollToTop';
+import { ScrollToTop } from '$app/components/ScrollToTop';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { createRoot } from 'react-dom/client';
 

@@ -14,9 +14,9 @@ import { InputField, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { useDispatch } from 'react-redux';
 import { ChangeEvent } from 'react';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { updateChanges } from 'common/stores/slices/company-users';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 
 export function Settings() {
   const [t] = useTranslation();

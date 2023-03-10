@@ -7,18 +7,18 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Card, ClickableElement } from '@invoiceninja/cards';
-import { Button, InputField } from '@invoiceninja/forms';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Modal } from 'components/Modal';
+import { Card, ClickableElement } from '$app/components/cards';
+import { Button, InputField } from '$app/components/forms';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Modal } from '$app/components/Modal';
 import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { useSelector } from 'react-redux';
-import { RootState } from 'common/stores/store';
-import { toast } from 'common/helpers/toast/toast';
+import { RootState } from '$app/common/stores/store';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function DangerZone() {
   const [t] = useTranslation();

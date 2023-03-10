@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, SelectField } from '@invoiceninja/forms';
+import { Button, SelectField } from '$app/components/forms';
 import { AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { Chart } from 'pages/dashboard/components/Chart';
+import { endpoint } from '$app/common/helpers';
+import { Chart } from '$app/pages/dashboard/components/Chart';
 import { useEffect, useState } from 'react';
-import { Spinner } from 'components/Spinner';
+import { Spinner } from '$app/components/Spinner';
 import { DropdownDateRangePicker } from '../../../components/DropdownDateRangePicker';
-import { Card } from '@invoiceninja/cards';
+import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
-import { InfoCard } from 'components/InfoCard';
-import { request } from 'common/helpers/request';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { InfoCard } from '$app/components/InfoCard';
+import { request } from '$app/common/helpers/request';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };

@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { DataTable } from 'components/DataTable';
-import { Default } from 'components/layouts/Default';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { DataTable } from '$app/components/DataTable';
+import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useTransactionColumns } from '../common/hooks/useTransactionColumns';
-import { ImportButton } from 'components/import/ImportButton';
+import { ImportButton } from '$app/components/import/ImportButton';
 import { useEffect, useState } from 'react';
 import { Details } from '../components/Details';
-import { Slider } from 'components/cards/Slider';
-import { Transaction } from 'common/interfaces/transactions';
+import { Slider } from '$app/components/cards/Slider';
+import { Transaction } from '$app/common/interfaces/transactions';
 import { useTransactionFilters } from '../common/hooks/useTransactionFilters';
 
 export function Transactions() {

@@ -8,74 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import paymentType from 'common/constants/payment-type';
-import { date } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { Expense } from 'common/interfaces/expense';
-import { RecurringExpense } from 'common/interfaces/recurring-expense';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { customField } from 'components/CustomField';
-import { SelectOption } from 'components/datatables/Actions';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { EntityStatus } from 'components/EntityStatus';
-import { Icon } from 'components/icons/Icon';
-import { Action } from 'components/ResourceActions';
-import { StatusBadge } from 'components/StatusBadge';
+import { Link } from '$app/components/forms';
+import paymentType from '$app/common/constants/payment-type';
+import { date } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { Expense } from '$app/common/interfaces/expense';
+import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
+import { StatusBadge } from '$app/components/StatusBadge';
+import { Tooltip } from '$app/components/Tooltip';
 import { useUpdateAtom } from 'jotai/utils';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
-import { recurringExpenseAtom } from 'pages/recurring-expenses/common/atoms';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { recurringExpenseAtom } from '$app/pages/recurring-expenses/common/atoms';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdControlPointDuplicate } from 'react-icons/md';
 import { useNavigate } from 'react-router-dom';
 import { expenseAtom } from './atoms';
 import { ExpenseStatus } from './components/ExpenseStatus';
-
-export const expenseColumns = [
-  'status',
-  'number',
-  'vendor',
-  'client',
-  'date',
-  'amount',
-  'public_notes',
-  'entity_state',
-  'archived_at',
-  //   'assigned_to', @Todo: Need to resolve relationship
-  //   'category', @Todo: Need to resolve relationship
-  'created_at',
-  'created_by',
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'documents',
-  'exchange_rate',
-  'is_deleted',
-  'net_amount', // @Todo: `net_amount` vs `amount`?
-  'payment_date',
-  'payment_type',
-  'private_notes',
-  //   'project', @Todo: Need to resolve relationship
-  //   'recurring_expense', @Todo: Need to resolve relationship
-  'should_be_invoiced',
-  //   'tax_amount', @Todo: Need to calc
-  'tax_name1',
-  'tax_name2',
-  'tax_name3',
-  'tax_rate1',
-  'tax_rate2',
-  'tax_rate3',
-  'transaction_reference',
-  'updated_at',
-] as const;
-
-type ExpenseColumns = (typeof expenseColumns)[number];
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -124,7 +84,7 @@ export function useActions() {
   return actions;
 }
 
-export const defaultColumns: ExpenseColumns[] = [
+export const defaultColumns: string[] = [
   'status',
   'number',
   'client',
@@ -134,6 +94,54 @@ export const defaultColumns: ExpenseColumns[] = [
   'public_notes',
 ];
 
+export function useAllExpenseColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'expense',
+    });
+
+  const expenseColumns = [
+    'status',
+    'number',
+    'vendor',
+    'client',
+    'date',
+    'amount',
+    'public_notes',
+    'entity_state',
+    'archived_at',
+    //   'assigned_to', @Todo: Need to resolve relationship
+    //   'category', @Todo: Need to resolve relationship
+    'created_at',
+    'created_by',
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'documents',
+    'exchange_rate',
+    'is_deleted',
+    'net_amount', // @Todo: `net_amount` vs `amount`?
+    'payment_date',
+    'payment_type',
+    'private_notes',
+    //   'project', @Todo: Need to resolve relationship
+    //   'recurring_expense', @Todo: Need to resolve relationship
+    'should_be_invoiced',
+    //   'tax_amount', @Todo: Need to calc
+    'tax_name1',
+    'tax_name2',
+    'tax_name3',
+    'tax_rate1',
+    'tax_rate2',
+    'tax_rate3',
+    'transaction_reference',
+    'updated_at',
+  ] as const;
+
+  return expenseColumns;
+}
+
 export function useExpenseColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -141,6 +149,14 @@ export function useExpenseColumns() {
   const currentUser = useCurrentUser();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
+
+  const expenseColumns = useAllExpenseColumns();
+  type ExpenseColumns = (typeof expenseColumns)[number];
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'expense',
+    });
 
   const columns: DataTableColumnsExtended<Expense, ExpenseColumns> = [
     {
@@ -208,7 +224,11 @@ export function useExpenseColumns() {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'entity_state',
@@ -229,36 +249,24 @@ export function useExpenseColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.expense1 &&
-          customField(company?.custom_fields.expense1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.expense2 &&
-          customField(company?.custom_fields.expense2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.expense3 &&
-          customField(company?.custom_fields.expense3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.expense4 &&
-          customField(company?.custom_fields.expense4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'documents',
@@ -306,7 +314,11 @@ export function useExpenseColumns() {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'should_be_invoiced',

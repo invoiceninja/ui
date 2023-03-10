@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { TransactionRule } from 'common/interfaces/transaction-rules';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { ExpenseCategorySelector } from 'components/expense-categories/ExpenseCategorySelector';
-import Toggle from 'components/forms/Toggle';
-import { VendorSelector } from 'components/vendors/VendorSelector';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { TransactionRule } from '$app/common/interfaces/transaction-rules';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { ExpenseCategorySelector } from '$app/components/expense-categories/ExpenseCategorySelector';
+import Toggle from '$app/components/forms/Toggle';
+import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdAdd, MdDelete, MdEdit } from 'react-icons/md';

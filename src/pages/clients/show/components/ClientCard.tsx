@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from 'common/helpers/route';
-import { Client } from 'common/interfaces/client';
-import { InfoCard } from 'components/InfoCard';
+import { route } from '$app/common/helpers/route';
+import { Client } from '$app/common/interfaces/client';
+import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 

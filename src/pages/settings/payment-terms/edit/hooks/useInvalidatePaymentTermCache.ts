@@ -9,7 +9,7 @@
  */
 
 import { useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 
 export function useInvalidatePaymentTermCache() {
   const queryClient = useQueryClient();

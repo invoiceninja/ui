@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Checkbox } from '@invoiceninja/forms';
-import { StatusBadge } from 'components/StatusBadge';
-import invoiceStatus from 'common/constants/invoice-status';
+import { Checkbox } from '$app/components/forms';
+import { StatusBadge } from '$app/components/StatusBadge';
+import invoiceStatus from '$app/common/constants/invoice-status';
 import { ResourceItem } from './ListBox';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import paymentStatus from 'common/constants/payment-status';
-import { ExpenseStatus } from 'pages/expenses/common/components/ExpenseStatus';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import paymentStatus from '$app/common/constants/payment-status';
+import { ExpenseStatus } from '$app/pages/expenses/common/components/ExpenseStatus';
 
 interface Props {
   resourceItem: ResourceItem;

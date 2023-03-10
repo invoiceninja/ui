@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from 'common/helpers/route';
-import { Invoice } from 'common/interfaces/invoice';
-import { useInvoiceQuery } from 'common/queries/invoices';
-import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
+import { route } from '$app/common/helpers/route';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { useInvoiceQuery } from '$app/common/queries/invoices';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams, useSearchParams } from 'react-router-dom';

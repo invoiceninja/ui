@@ -18,13 +18,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { CompanyGateway } from 'common/interfaces/company-gateway';
-import { Gateway, Option } from 'common/interfaces/statics';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Divider } from 'components/cards/Divider';
-import Toggle from 'components/forms/Toggle';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { Gateway, Option } from '$app/common/interfaces/statics';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Divider } from '$app/components/cards/Divider';
+import Toggle from '$app/components/forms/Toggle';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleMethodToggle } from '../hooks/useHandleMethodToggle';

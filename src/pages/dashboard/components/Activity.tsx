@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { Spinner } from 'components/Spinner';
-import { request } from 'common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { Spinner } from '$app/components/Spinner';
+import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { Card } from '@invoiceninja/cards';
+import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
-import { NonClickableElement } from 'components/cards/NonClickableElement';
-import { ActivityRecord } from 'common/interfaces/activity-record';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
+import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
 import React from 'react';
 
