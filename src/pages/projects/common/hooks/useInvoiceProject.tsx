@@ -120,7 +120,7 @@ export function useInvoiceProject() {
 
       navigate(
         route(
-          '/invoices/create?table=tasks&project=true&action=project_invoicing'
+          '/invoices/create?table=tasks&project=true&action=invoice_project'
         )
       );
     }
