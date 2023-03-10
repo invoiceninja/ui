@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { StatusBadge } from 'components/StatusBadge';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { StatusBadge } from '$app/components/StatusBadge';
 import { useTranslation } from 'react-i18next';
-import paymentStatus from 'common/constants/payment-status';
-import { Payment } from 'common/interfaces/payment';
+import paymentStatus from '$app/common/constants/payment-status';
+import { Payment } from '$app/common/interfaces/payment';
 import { PaymentOverviewInvoice } from './PaymentOverviewInvoice';
 
 interface Props {

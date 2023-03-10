@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { DataTable } from 'components/DataTable';
-import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
-import { Default } from 'components/layouts/Default';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { DataTable } from '$app/components/DataTable';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
-  creditColumns,
   defaultColumns,
   useActions,
+  useAllCreditColumns,
   useCreditColumns,
 } from '../common/hooks';
 
@@ -29,6 +29,8 @@ export function Credits() {
 
   const actions = useActions();
   const columns = useCreditColumns();
+
+  const creditColumns = useAllCreditColumns();
 
   return (
     <Default title={t('credits')} breadcrumbs={pages} docsLink="docs/credits/">

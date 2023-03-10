@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { Checkbox } from '@invoiceninja/forms';
-import { User } from 'common/interfaces/user';
-import Toggle from 'components/forms/Toggle';
+import { Card, Element } from '$app/components/cards';
+import { Checkbox } from '$app/components/forms';
+import { User } from '$app/common/interfaces/user';
+import Toggle from '$app/components/forms/Toggle';
 import { clone } from 'lodash';
 import { useTranslation } from 'react-i18next';
 

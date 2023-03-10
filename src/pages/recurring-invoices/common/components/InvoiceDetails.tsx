@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { CustomField } from 'components/CustomField';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { CustomField } from '$app/components/CustomField';
 import { useTranslation } from 'react-i18next';
-import frequencies from 'common/constants/frequency';
+import frequencies from '$app/common/constants/frequency';
 import { ChangeHandler } from '../hooks';
 import { useAtom } from 'jotai';
 import { recurringInvoiceAtom } from '../atoms';
 import dayjs from 'dayjs';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   handleChange: ChangeHandler;

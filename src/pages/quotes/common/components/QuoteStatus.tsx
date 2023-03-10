@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Quote } from 'common/interfaces/quote';
-import { Badge } from 'components/Badge';
+import { Quote } from '$app/common/interfaces/quote';
+import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
-import { QuoteStatus as QuoteStatusEnum } from 'common/enums/quote-status';
+import { QuoteStatus as QuoteStatusEnum } from '$app/common/enums/quote-status';
 
 interface Props {
   entity: Quote;

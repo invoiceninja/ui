@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { toast } from 'common/helpers/toast/toast';
-import { Card, Element } from '@invoiceninja/cards';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Card, Element } from '$app/components/cards';
 import { useFormik } from 'formik';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { request } from 'common/helpers/request';
-import { endpoint } from 'common/helpers';
-import { Button, SelectField } from '@invoiceninja/forms';
-import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
-import Toggle from 'components/forms/Toggle';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { Button, SelectField } from '$app/components/forms';
+import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
+import { DebouncedCombobox } from '$app/components/forms/DebouncedCombobox';
+import Toggle from '$app/components/forms/Toggle';
 import { MdClose } from 'react-icons/md';
 
 interface Props {

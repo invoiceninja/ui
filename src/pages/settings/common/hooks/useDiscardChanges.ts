@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { resetChanges } from 'common/stores/slices/company-users';
+import { resetChanges } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 
 export function useDiscardChanges() {

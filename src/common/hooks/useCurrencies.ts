@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Currency } from 'common/interfaces/currency';
-import { useStaticsQuery } from 'common/queries/statics';
+import { Currency } from '$app/common/interfaces/currency';
+import { useStaticsQuery } from '$app/common/queries/statics';
 import { useEffect, useState } from 'react';
 
 export function useCurrencies(): Currency[] {

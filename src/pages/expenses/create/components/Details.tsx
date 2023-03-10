@@ -8,18 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Expense } from 'common/interfaces/expense';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { ClientSelector } from 'components/clients/ClientSelector';
-import { CurrencySelector } from 'components/CurrencySelector';
-import { ExpenseCategorySelector } from 'components/expense-categories/ExpenseCategorySelector';
-import { ProjectSelector } from 'components/projects/ProjectSelector';
-import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
-import { UserSelector } from 'components/users/UserSelector';
-import { VendorSelector } from 'components/vendors/VendorSelector';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Expense } from '$app/common/interfaces/expense';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { CurrencySelector } from '$app/components/CurrencySelector';
+import { ExpenseCategorySelector } from '$app/components/expense-categories/ExpenseCategorySelector';
+import { ProjectSelector } from '$app/components/projects/ProjectSelector';
+import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useTranslation } from 'react-i18next';
 
 export interface ExpenseCardProps {

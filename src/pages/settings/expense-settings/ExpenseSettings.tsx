@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useTitle } from 'common/hooks/useTitle';
-import { updateChanges } from 'common/stores/slices/company-users';
-import { Divider } from 'components/cards/Divider';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Divider } from '$app/components/cards/Divider';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../components/cards';

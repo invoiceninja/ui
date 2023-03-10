@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { Divider } from 'components/cards/Divider';
-import { CopyToClipboard } from 'components/CopyToClipboard';
-import { useHandleCurrentCompanyChangeProperty } from 'pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { Divider } from '$app/components/cards/Divider';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';

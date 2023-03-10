@@ -9,7 +9,7 @@
  */
 
 import classNames from 'classnames';
-import CommonProps from 'common/interfaces/common-props.interface';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   className?: string;

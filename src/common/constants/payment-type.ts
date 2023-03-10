@@ -7,7 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { PaymentType } from 'common/enums/payment-type';
+import { PaymentType } from '$app/common/enums/payment-type';
 
 export default {
   [PaymentType.ACH]: 'payment_type_ACH',

@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
-import { TaskStatus } from 'common/interfaces/task-status';
+import { TaskStatus } from '$app/common/interfaces/task-status';
 
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;

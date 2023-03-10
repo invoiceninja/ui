@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { RecurringExpenseStatus } from 'common/enums/recurring-expense-status';
+import { RecurringExpenseStatus } from '$app/common/enums/recurring-expense-status';
 
 export default {
   [RecurringExpenseStatus.ACTIVE]: 'active',

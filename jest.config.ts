@@ -9,6 +9,7 @@ const config: JestConfigWithTsJest = {
       },
     ],
   },
+  modulePathIgnorePatterns: ['<rootDir>/tests/e2e'],
 };
 
 export default config;

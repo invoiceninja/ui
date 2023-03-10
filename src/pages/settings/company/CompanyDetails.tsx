@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useTitle } from 'common/hooks/useTitle';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
-import { Tabs } from 'components/Tabs';
+import { Tabs } from '$app/components/Tabs';
 import { Outlet } from 'react-router-dom';
 import { useCompanyDetailsTabs } from './common/hooks/useCompanyDetailsTabs';
 

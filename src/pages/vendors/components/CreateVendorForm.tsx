@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
+import { Button } from '$app/components/forms';
 import axios, { AxiosError } from 'axios';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
-import { endpoint } from 'common/helpers';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { Vendor } from 'common/interfaces/vendor';
-import { useBlankVendorQuery } from 'common/queries/vendor';
-import { updateRecord } from 'common/stores/slices/company-users';
-import { Form } from 'pages/vendors/edit/components/Form';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { endpoint } from '$app/common/helpers';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { useBlankVendorQuery } from '$app/common/queries/vendor';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import { Form } from '$app/pages/vendors/edit/components/Form';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;

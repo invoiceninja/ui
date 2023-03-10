@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from 'common/helpers/route';
-import { useTitle } from 'common/hooks/useTitle';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { Mailer } from 'pages/invoices/email/components/Mailer';
+import { route } from '$app/common/helpers/route';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { Mailer } from '$app/pages/invoices/email/components/Mailer';
 import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';

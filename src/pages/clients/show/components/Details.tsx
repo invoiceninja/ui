@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '@invoiceninja/cards';
-import { Link } from '@invoiceninja/forms';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Client } from 'common/interfaces/client';
-import { InfoCard } from 'components/InfoCard';
-import { EntityStatus } from 'components/EntityStatus';
+import { Element } from '$app/components/cards';
+import { Link } from '$app/components/forms';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Client } from '$app/common/interfaces/client';
+import { InfoCard } from '$app/components/InfoCard';
+import { EntityStatus } from '$app/components/EntityStatus';
 import { useTranslation } from 'react-i18next';
 
 interface Props {

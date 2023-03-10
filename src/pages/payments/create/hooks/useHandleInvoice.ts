@@ -9,7 +9,7 @@
  */
 
 import collect from 'collect.js';
-import { Invoice } from 'common/interfaces/invoice';
+import { Invoice } from '$app/common/interfaces/invoice';
 import { v4 } from 'uuid';
 import { PaymentOnCreation } from '../Create';
 

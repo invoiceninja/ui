@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
-import { Task } from 'common/interfaces/task';
-import { TaskStatus } from 'common/interfaces/task-status';
-import { User } from 'common/interfaces/user';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { ClientSelector } from 'components/clients/ClientSelector';
-import { CustomField } from 'components/CustomField';
-import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
-import { ProjectSelector } from 'components/projects/ProjectSelector';
-import { TabGroup } from 'components/TabGroup';
-import { Field } from 'pages/settings/custom-fields/components';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { Task } from '$app/common/interfaces/task';
+import { TaskStatus } from '$app/common/interfaces/task-status';
+import { User } from '$app/common/interfaces/user';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { CustomField } from '$app/components/CustomField';
+import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
+import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import { ProjectSelector } from '$app/components/projects/ProjectSelector';
+import { TabGroup } from '$app/components/TabGroup';
+import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 

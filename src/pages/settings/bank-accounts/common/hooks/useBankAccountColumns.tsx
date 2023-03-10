@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { route } from 'common/helpers/route';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { BankAccount } from 'common/interfaces/bank-accounts';
-import { DataTableColumns } from 'components/DataTable';
+import { Link } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { DataTableColumns } from '$app/components/DataTable';
 import { useTranslation } from 'react-i18next';
 
 export const useBankAccountColumns = () => {

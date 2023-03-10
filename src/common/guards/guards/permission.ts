@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Permissions } from 'common/hooks/permissions/useHasPermission';
+import { Permissions } from '$app/common/hooks/permissions/useHasPermission';
 import { Guard } from '../Guard';
 
 export function permission(permission: Permissions): Guard {

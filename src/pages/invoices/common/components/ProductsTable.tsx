@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Table, Tbody, Td, Th, Thead, Tr } from '@invoiceninja/tables';
+import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useResolveInputField } from '../hooks/useResolveInputField';
@@ -16,11 +16,11 @@ import { useResolveTranslation } from '../hooks/useResolveTranslation';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
 import { resolveColumnWidth } from '../helpers/resolve-column-width';
-import { Invoice } from 'common/interfaces/invoice';
-import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Fragment } from 'react';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';

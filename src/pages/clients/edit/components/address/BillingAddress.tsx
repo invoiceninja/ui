@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { useCountries } from 'common/hooks/useCountries';
-import { Client } from 'common/interfaces/client';
+import { Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { useCountries } from '$app/common/hooks/useCountries';
+import { Client } from '$app/common/interfaces/client';
 import { set } from 'lodash';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';

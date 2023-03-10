@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { Invoice } from 'common/interfaces/invoice';
-import { Dropdown } from 'components/dropdown/Dropdown';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import Toggle from 'components/forms/Toggle';
-import { Icon } from 'components/icons/Icon';
-import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
+import { endpoint } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import Toggle from '$app/components/forms/Toggle';
+import { Icon } from '$app/components/icons/Icon';
+import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDownload, MdSend } from 'react-icons/md';

@@ -21,7 +21,7 @@ import { Button } from '../../components/forms/Button';
 import { HostedLinks } from './components/HostedLinks';
 import { Link } from '../../components/forms/Link';
 import { Header } from './components/Header';
-import { request } from 'common/helpers/request';
+import { request } from '$app/common/helpers/request';
 
 interface Response {
   message: string;

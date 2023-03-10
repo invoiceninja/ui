@@ -9,22 +9,22 @@
  */
 
 import axios, { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useTitle } from 'common/hooks/useTitle';
-import { Client } from 'common/interfaces/client';
-import { ClientContact } from 'common/interfaces/client-contact';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useClientQuery } from 'common/queries/clients';
-import { updateRecord } from 'common/stores/slices/company-users';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { PasswordConfirmation } from 'components/PasswordConfirmation';
-import { ResourceActions } from 'components/ResourceActions';
-import { Spinner } from 'components/Spinner';
-import { ValidationAlert } from 'components/ValidationAlert';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Client } from '$app/common/interfaces/client';
+import { ClientContact } from '$app/common/interfaces/client-contact';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useClientQuery } from '$app/common/queries/clients';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Spinner } from '$app/components/Spinner';
+import { ValidationAlert } from '$app/components/ValidationAlert';
 import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';

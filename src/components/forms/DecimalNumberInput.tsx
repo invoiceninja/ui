@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import classNames from 'classnames';
-import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
-import { Alert } from 'components/Alert';
+import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
+import { Alert } from '$app/components/Alert';
 import currency from 'currency.js';
 import { useEffect, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';

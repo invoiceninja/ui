@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import paymentType from 'common/constants/payment-type';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useTitle } from 'common/hooks/useTitle';
-import { Payment } from 'common/interfaces/payment';
-import { usePaymentQuery } from 'common/queries/payments';
-import { Divider } from 'components/cards/Divider';
-import { ConvertCurrency } from 'components/ConvertCurrency';
-import { CustomField } from 'components/CustomField';
-import Toggle from 'components/forms/Toggle';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import paymentType from '$app/common/constants/payment-type';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Payment } from '$app/common/interfaces/payment';
+import { usePaymentQuery } from '$app/common/queries/payments';
+import { Divider } from '$app/components/cards/Divider';
+import { ConvertCurrency } from '$app/components/ConvertCurrency';
+import { CustomField } from '$app/components/CustomField';
+import Toggle from '$app/components/forms/Toggle';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useParams } from 'react-router-dom';
 import { PaymentOverview } from './PaymentOverview';
-import { ClientCard } from 'pages/clients/show/components/ClientCard';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { ClientCard } from '$app/pages/clients/show/components/ClientCard';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Context {
   errors: ValidationBag | undefined;

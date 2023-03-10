@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
-import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { cloneDeep } from 'lodash';
 import { useCalculateInvoiceSum } from './useCalculateInvoiceSum';
 

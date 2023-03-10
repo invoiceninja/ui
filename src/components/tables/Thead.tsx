@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from 'common/hooks/useAccentColor';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
 type Props = CommonProps;

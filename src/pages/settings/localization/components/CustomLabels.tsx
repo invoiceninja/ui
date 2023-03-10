@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import {
   injectInChanges,
   updateChanges,
-} from 'common/stores/slices/company-users';
-import { Divider } from 'components/cards/Divider';
-import { Modal } from 'components/Modal';
+} from '$app/common/stores/slices/company-users';
+import { Divider } from '$app/components/cards/Divider';
+import { Modal } from '$app/components/Modal';
 import { cloneDeep } from 'lodash';
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { X } from 'react-feather';

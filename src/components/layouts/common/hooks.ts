@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAdmin } from 'common/hooks/permissions/useHasPermission';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
@@ -138,6 +138,12 @@ export function useSettingsRoutes() {
       name: t('subscriptions'),
       href: '/settings/subscriptions',
       current: location.pathname.startsWith('/settings/subscriptions'),
+      enabled: isAdmin || isOwner || false,
+    },
+    {
+      name: t('schedules'),
+      href: '/settings/schedules',
+      current: location.pathname.startsWith('/settings/schedules'),
       enabled: isAdmin || isOwner || false,
     },
     {

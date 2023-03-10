@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
-import { useReactSettings } from 'common/hooks/useReactSettings';
-import { useTitle } from 'common/hooks/useTitle';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
-import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
-import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
-import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
+import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
+import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
+import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
+import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
