@@ -22,8 +22,9 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Settings } from '../../../../components/layouts/Settings';
-import { useBankAccountQuery } from '../common/queries';
+import Toggle from '$app/components/forms/Toggle';
+import { useBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
+import { Settings } from '$app/components/layouts/Settings';
 
 export function Edit() {
   useTitle('edit_bank_account');
