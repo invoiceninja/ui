@@ -259,11 +259,11 @@ export function useActions() {
   const handleInvoiceProject = (project: Project) => {
     toast.processing();
 
-    queryClient.fetchQuery({
-      queryKey: route('/api/v1/tasks?project_tasks=:projectId&per_page=100', {
+    queryClient.fetchQuery(
+      route('/api/v1/tasks?project_tasks=:projectId&per_page=100', {
         projectId: project.id,
       }),
-      queryFn: () =>
+      () =>
         request(
           'GET',
           endpoint('/api/v1/tasks?project_tasks=:projectId&per_page=100', {
@@ -286,8 +286,8 @@ export function useActions() {
           .catch((error: AxiosError) => {
             toast.error();
             console.error(error);
-          }),
-    });
+          })
+    );
   };
 
   const actions = [
