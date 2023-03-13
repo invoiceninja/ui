@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
+import { Button } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { useQuery } from 'common/hooks/useQuery';
-import { Client } from 'common/interfaces/client';
-import { ClientContact } from 'common/interfaces/client-contact';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Modal } from 'components/Modal';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { Client } from '$app/common/interfaces/client';
+import { ClientContact } from '$app/common/interfaces/client-contact';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankClientQuery } from '$app/common/queries/clients';
+import { Modal } from '$app/components/Modal';
 import { set } from 'lodash';
-import { AdditionalInfo } from 'pages/clients/edit/components/AdditionalInfo';
-import { Address } from 'pages/clients/edit/components/Address';
-import { Contacts } from 'pages/clients/edit/components/Contacts';
-import { Details } from 'pages/clients/edit/components/Details';
+import { AdditionalInfo } from '$app/pages/clients/edit/components/AdditionalInfo';
+import { Address } from '$app/pages/clients/edit/components/Address';
+import { Contacts } from '$app/pages/clients/edit/components/Contacts';
+import { Details } from '$app/pages/clients/edit/components/Details';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
@@ -49,21 +49,15 @@ export function ClientCreate(props: Props) {
 
   const queryClient = useQueryClient();
 
-  const { data: blankClient } = useQuery('/api/v1/clients/create', {
+  const { data: blankClient } = useBlankClientQuery({
     refetchOnWindowFocus: false,
   });
 
   useEffect(() => {
-    if (blankClient?.data.data) {
-      setClient(blankClient.data.data);
+    if (blankClient) {
+      setClient(blankClient);
     }
   }, [blankClient]);
-
-  useEffect(() => {
-    if (!props.isModalOpen) {
-      queryClient.invalidateQueries('/api/v1/clients/create');
-    }
-  }, [props.isModalOpen]);
 
   const onSave = () => {
     set(client as Client, 'contacts', contacts);
@@ -92,6 +86,8 @@ export function ClientCreate(props: Props) {
         props.setIsModalOpen(false);
 
         props.onClientCreated && props.onClientCreated(response.data.data);
+
+        queryClient.invalidateQueries('/api/v1/clients');
 
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {

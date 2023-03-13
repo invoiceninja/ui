@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from 'components/Modal';
+import { Modal } from '$app/components/Modal';
 import { useEffect, useState } from 'react';
 import { HexColorPicker, HexColorInput } from 'react-colorful';
 import { useTranslation } from 'react-i18next';

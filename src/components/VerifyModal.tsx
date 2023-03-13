@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Button } from './forms';
@@ -53,8 +53,8 @@ export function VerifyModal(props: Props) {
       <div className="flex flex-col justify-center space-y-7 pb-1 px-3 text-left">
         <span className="text-gray-800 text-xl font-semibold">
           {props.type === 'email'
-            ? t('confirm_your_email_address')
-            : t('confirm_your_phone_number')}
+            ? t('confirmation_required', { link: '' })
+            : t('verify_phone_number_help')}
         </span>
 
         <span className="text-base">

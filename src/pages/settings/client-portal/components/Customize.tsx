@@ -8,10 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useHandleCurrentCompanyChangeProperty } from 'pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { isSelfHosted } from '$app/common/helpers';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 
 export function Customize() {
@@ -41,25 +42,29 @@ export function Customize() {
         />
       </Element>
 
-      <Element leftSide={t('custom_css')}>
-        <InputField
-          element="textarea"
-          value={company?.settings.portal_custom_css}
-          onValueChange={(value) =>
-            handleChange('settings.portal_custom_css', value)
-          }
-        />
-      </Element>
+      {isSelfHosted() && (
+        <>
+          <Element leftSide={t('custom_css')}>
+            <InputField
+              element="textarea"
+              value={company?.settings.portal_custom_css}
+              onValueChange={(value) =>
+                handleChange('settings.portal_custom_css', value)
+              }
+            />
+          </Element>
 
-      <Element leftSide={t('custom_javascript')}>
-        <InputField
-          element="textarea"
-          value={company?.settings.portal_custom_js}
-          onValueChange={(value) =>
-            handleChange('settings.portal_custom_js', value)
-          }
-        />
-      </Element>
+          <Element leftSide={t('custom_javascript')}>
+            <InputField
+              element="textarea"
+              value={company?.settings.portal_custom_js}
+              onValueChange={(value) =>
+                handleChange('settings.portal_custom_js', value)
+              }
+            />
+          </Element>
+        </>
+      )}
     </Card>
   );
 }

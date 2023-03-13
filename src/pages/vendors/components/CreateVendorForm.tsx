@@ -8,24 +8,26 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
+import { Button } from '$app/components/forms';
 import axios, { AxiosError } from 'axios';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
-import { endpoint } from 'common/helpers';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { Vendor } from 'common/interfaces/vendor';
-import { useBlankVendorQuery } from 'common/queries/vendor';
-import { updateRecord } from 'common/stores/slices/company-users';
-import { Form } from 'pages/vendors/edit/components/Form';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { endpoint } from '$app/common/helpers';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { useBlankVendorQuery } from '$app/common/queries/vendor';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import { Form } from '$app/pages/vendors/edit/components/Form';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 interface Props {
   setVisible: Dispatch<SetStateAction<boolean>>;
-  setSelectedIds: Dispatch<SetStateAction<string[]>>;
+  setSelectedIds?: Dispatch<SetStateAction<string[]>>;
+  onVendorCreated?: (vendor: Vendor) => unknown;
 }
 
 export function CreateVendorForm(props: Props) {
@@ -40,6 +42,8 @@ export function CreateVendorForm(props: Props) {
   const company = useInjectCompanyChanges();
 
   const [vendor, setVendor] = useState<Vendor>();
+
+  const [errors, setErrors] = useState<ValidationBag>();
 
   useEffect(() => {
     if (data) {
@@ -98,19 +102,31 @@ export function CreateVendorForm(props: Props) {
           })
         );
 
-        props.setSelectedIds([response[0].data.data.id]);
+        if (props.setSelectedIds) {
+          props.setSelectedIds([response[0].data.data.id]);
+        }
 
+        if (props.onVendorCreated) {
+          props.onVendorCreated(response[0].data.data);
+        }
+
+        setVendor(data);
         props.setVisible(false);
       })
-      .catch((error: AxiosError) => {
-        console.error(error);
-        toast.error();
+      .catch((error: AxiosError<ValidationBag>) => {
+        if (error.response?.status === 422) {
+          toast.dismiss();
+          setErrors(error.response.data);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       });
   };
 
   return (
     <>
-      {vendor && <Form vendor={vendor} setVendor={setVendor} />}
+      {vendor && <Form vendor={vendor} setVendor={setVendor} errors={errors} />}
 
       <div className="flex justify-end space-x-4 mt-5">
         <Button onClick={handleSave}>{t('save')}</Button>

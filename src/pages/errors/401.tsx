@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
 import { useEffect, useState } from 'react';
 import { AlertTriangle } from 'react-feather';
 import { useTranslation } from 'react-i18next';

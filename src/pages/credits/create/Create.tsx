@@ -8,23 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { blankInvitation } from 'common/constants/blank-invitation';
-import { isProduction } from 'common/helpers';
-import { useClientResolver } from 'common/hooks/clients/useClientResolver';
-import { useTitle } from 'common/hooks/useTitle';
-import { Client } from 'common/interfaces/client';
-import { InvoiceItemType } from 'common/interfaces/invoice-item';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
+import { blankInvitation } from '$app/common/constants/blank-invitation';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Client } from '$app/common/interfaces/client';
+import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { ClientSelector } from 'pages/invoices/common/components/ClientSelector';
-import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
-import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
-import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
-import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
+import { ClientSelector } from '$app/pages/invoices/common/components/ClientSelector';
+import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
+import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
+import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
+import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -38,6 +38,8 @@ export function Create() {
   const { documentTitle } = useTitle('new_credit');
   const { t } = useTranslation();
 
+  const reactSettings = useReactSettings();
+
   const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
     {
@@ -49,7 +51,7 @@ export function Create() {
   const [searchParams] = useSearchParams();
 
   const [credit, setCredit] = useAtom(creditAtom);
-  const [invoiceSum] = useAtom(invoiceSumAtom);
+  const [invoiceSum, setInvoiceSum] = useAtom(invoiceSumAtom);
 
   const [client, setClient] = useState<Client>();
   const [errors, setErrors] = useState<ValidationBag>();
@@ -74,23 +76,35 @@ export function Create() {
   });
 
   useEffect(() => {
-    if (typeof data !== 'undefined' && typeof credit === 'undefined') {
-      const _credit = cloneDeep(data);
+    setInvoiceSum(undefined);
 
-      if (typeof _credit.line_items === 'string') {
-        _credit.line_items = [];
+    setCredit((current) => {
+      let value = current;
+
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
       }
 
-      if (searchParams.get('client')) {
-        _credit.client_id = searchParams.get('client')!;
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const _credit = cloneDeep(data);
+
+        if (typeof _credit.line_items === 'string') {
+          _credit.line_items = [];
+        }
+
+        if (searchParams.get('client')) {
+          _credit.client_id = searchParams.get('client')!;
+        }
+
+        value = _credit;
       }
 
-      setCredit(_credit);
-    }
-
-    return () => {
-      isProduction() && setCredit(undefined);
-    };
+      return value;
+    });
   }, [data]);
 
   useEffect(() => {
@@ -135,9 +149,10 @@ export function Create() {
           onClearButtonClick={() => handleChange('client_id', '')}
           onContactCheckboxChange={handleInvitationChange}
           errorMessage={errors?.errors.client_id}
+          disableWithSpinner={searchParams.get('action') === 'create'}
         />
 
-        <CreditDetails handleChange={handleChange} />
+        <CreditDetails handleChange={handleChange} errors={errors} />
 
         <div className="col-span-12">
           {credit && client ? (
@@ -174,17 +189,19 @@ export function Create() {
         )}
       </div>
 
-      <div className="my-4">
-        {credit && (
-          <InvoicePreview
-            for="create"
-            resource={credit}
-            entity="credit"
-            relationType="client_id"
-            endpoint="/api/v1/live_preview?entity=:entity"
-          />
-        )}
-      </div>
+      {reactSettings?.show_pdf_preview && (
+        <div className="my-4">
+          {credit && (
+            <InvoicePreview
+              for="create"
+              resource={credit}
+              entity="credit"
+              relationType="client_id"
+              endpoint="/api/v1/live_preview?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

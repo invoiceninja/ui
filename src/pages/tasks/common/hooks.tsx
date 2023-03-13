@@ -8,33 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { date, endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { Task } from 'common/interfaces/task';
-import { Divider } from 'components/cards/Divider';
-import { customField } from 'components/CustomField';
-import { SelectOption } from 'components/datatables/Actions';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Icon } from 'components/icons/Icon';
+import { Link } from '$app/components/forms';
+import { date, endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { Task } from '$app/common/interfaces/task';
+import { Divider } from '$app/components/cards/Divider';
+import { customField } from '$app/components/CustomField';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Tooltip } from '$app/components/Tooltip';
 import dayjs from 'dayjs';
 import { useUpdateAtom } from 'jotai/utils';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
   MdControlPointDuplicate,
+  MdEdit,
   MdNotStarted,
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { taskAtom } from './atoms';
 import { TaskStatus } from './components/TaskStatus';
 import {
@@ -73,7 +75,7 @@ export const taskColumns = [
   'updated_at',
 ] as const;
 
-type TaskColumns = typeof taskColumns[number];
+type TaskColumns = (typeof taskColumns)[number];
 
 export const defaultColumns: TaskColumns[] = [
   'status',
@@ -134,7 +136,11 @@ export function useTaskColumns() {
       column: 'description',
       id: 'description',
       label: t('description'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'duration',
@@ -307,6 +313,10 @@ export function useActions() {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+  const company = useCurrentCompany();
+
   const start = useStart();
 
   const stop = useStop();
@@ -318,12 +328,28 @@ export function useActions() {
   const cloneToTask = (task: Task) => {
     setTask({ ...task, id: '', documents: [], number: '' });
 
-    navigate('/tasks/create');
+    navigate('/tasks/create?action=clone');
   };
 
   const actions = [
     (task: Task) =>
-      !isTaskRunning(task) && (
+      !location.pathname.endsWith('/edit') &&
+      (!task.invoice_id || !company?.invoice_task_lock) && (
+        <DropdownElement
+          onClick={() => navigate(route('/tasks/:id/edit', { id: task.id }))}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    (task: Task) =>
+      !location.pathname.endsWith('/edit') &&
+      (!task.invoice_id || !company?.invoice_task_lock) && (
+        <Divider withoutPadding />
+      ),
+    (task: Task) =>
+      !isTaskRunning(task) &&
+      !task.invoice_id && (
         <DropdownElement
           onClick={() => start(task)}
           icon={<Icon element={MdNotStarted} />}
@@ -332,7 +358,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) =>
-      isTaskRunning(task) && (
+      isTaskRunning(task) &&
+      !task.invoice_id && (
         <DropdownElement
           onClick={() => stop(task)}
           icon={<Icon element={MdStopCircle} />}
@@ -340,15 +367,6 @@ export function useActions() {
           {t('stop')}
         </DropdownElement>
       ),
-    () => <Divider withoutPadding />,
-    (task: Task) => (
-      <DropdownElement
-        onClick={() => cloneToTask(task)}
-        icon={<Icon element={MdControlPointDuplicate} />}
-      >
-        {t('clone')}
-      </DropdownElement>
-    ),
     (task: Task) =>
       !isTaskRunning(task) &&
       !task.invoice_id && (
@@ -359,6 +377,14 @@ export function useActions() {
           {t('invoice_task')}
         </DropdownElement>
       ),
+    (task: Task) => (
+      <DropdownElement
+        onClick={() => cloneToTask(task)}
+        icon={<Icon element={MdControlPointDuplicate} />}
+      >
+        {t('clone')}
+      </DropdownElement>
+    ),
   ];
 
   return actions;

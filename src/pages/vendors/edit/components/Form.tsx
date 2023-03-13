@@ -8,30 +8,35 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { Button, InputField } from '@invoiceninja/forms';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
-import { Vendor } from 'common/interfaces/vendor';
-import { VendorContact } from 'common/interfaces/vendor-contact';
-import { Divider } from 'components/cards/Divider';
-import { CountrySelector } from 'components/CountrySelector';
-import { CustomField } from 'components/CustomField';
-import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
-import Toggle from 'components/forms/Toggle';
-import { UserSelector } from 'components/users/UserSelector';
+import { Card, Element } from '$app/components/cards';
+import { Button, InputField } from '$app/components/forms';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { VendorContact } from '$app/common/interfaces/vendor-contact';
+import { Divider } from '$app/components/cards/Divider';
+import { CountrySelector } from '$app/components/CountrySelector';
+import { CustomField } from '$app/components/CustomField';
+import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
+import Toggle from '$app/components/forms/Toggle';
+import { UserSelector } from '$app/components/users/UserSelector';
 import { set } from 'lodash';
-import { Field } from 'pages/settings/custom-fields/components';
+import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
+import { TabGroup } from '$app/components/TabGroup';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { CurrencySelector } from '$app/components/CurrencySelector';
 
 interface Props {
   vendor: Vendor;
   setVendor: React.Dispatch<React.SetStateAction<Vendor | undefined>>;
+  errors: ValidationBag | undefined;
 }
 
 export function Form(props: Props) {
   const [t] = useTranslation();
-  const { vendor, setVendor } = props;
+  const { vendor, setVendor, errors } = props;
 
   const company = useCurrentCompany();
   const handleCustomFieldChange = useHandleCustomFieldChange();
@@ -92,6 +97,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.name}
               onValueChange={(value) => handleChange('name', value)}
+              errorMessage={errors?.errors.name}
             />
           </Element>
 
@@ -99,6 +105,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.number}
               onValueChange={(value) => handleChange('number', value)}
+              errorMessage={errors?.errors.number}
             />
           </Element>
 
@@ -108,6 +115,7 @@ export function Form(props: Props) {
               onChange={(user) => handleChange('assigned_user_id', user.id)}
               onClearButtonClick={() => handleChange('assigned_user_id', '')}
               clearButton
+              errorMessage={errors?.errors.assigned_user_id}
             />
           </Element>
 
@@ -115,6 +123,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.id_number}
               onValueChange={(value) => handleChange('id_number', value)}
+              errorMessage={errors?.errors.id_number}
             />
           </Element>
 
@@ -122,6 +131,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.vat_number}
               onValueChange={(value) => handleChange('vat_number', value)}
+              errorMessage={errors?.errors.vat_number}
             />
           </Element>
 
@@ -129,6 +139,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.website}
               onValueChange={(value) => handleChange('website', value)}
+              errorMessage={errors?.errors.website}
             />
           </Element>
 
@@ -136,6 +147,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.phone}
               onValueChange={(value) => handleChange('phone', value)}
+              errorMessage={errors?.errors.phone}
             />
           </Element>
 
@@ -181,6 +193,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.address1}
               onValueChange={(value) => handleChange('address1', value)}
+              errorMessage={errors?.errors.address1}
             />
           </Element>
 
@@ -188,6 +201,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.address2}
               onValueChange={(value) => handleChange('address2', value)}
+              errorMessage={errors?.errors.address2}
             />
           </Element>
 
@@ -195,6 +209,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.city}
               onValueChange={(value) => handleChange('city', value)}
+              errorMessage={errors?.errors.city}
             />
           </Element>
 
@@ -202,6 +217,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.state}
               onValueChange={(value) => handleChange('state', value)}
+              errorMessage={errors?.errors.state}
             />
           </Element>
 
@@ -209,6 +225,7 @@ export function Form(props: Props) {
             <InputField
               value={vendor.postal_code}
               onValueChange={(value) => handleChange('postal_code', value)}
+              errorMessage={errors?.errors.postal_code}
             />
           </Element>
 
@@ -299,19 +316,45 @@ export function Form(props: Props) {
           ))}
         </Card>
 
-        <Card title={t('custom_fields')}>
-          <CustomFieldsPlanAlert className="px-6" />
+        <Card title={t('additional_info')}>
+          <TabGroup className="px-5" tabs={[t('settings'), t('custom_fields')]}>
+            <div className="flex flex-col space-y-4">
+              <Element leftSide={t('currency')} noExternalPadding>
+                <CurrencySelector
+                  value={vendor.currency_id}
+                  onChange={(value) => handleChange('currency_id', parseInt(value))}
+                />
+              </Element>
 
-          {company &&
-            ['vendor1', 'vendor2', 'vendor3', 'vendor4'].map((field) => (
-              <Field
-                key={field}
-                initialValue={company.custom_fields[field]}
-                field={field}
-                placeholder={t('contact_field')}
-                onChange={(value) => handleCustomFieldChange(field, value)}
+              <MarkdownEditor
+                label={t('public_notes').toString()}
+                onChange={(value) => handleChange('public_notes', value)}
+                value={vendor.public_notes}
               />
-            ))}
+
+              <MarkdownEditor
+                label={t('private_notes').toString()}
+                onChange={(value) => handleChange('private_notes', value)}
+                value={vendor.private_notes}
+              />
+            </div>
+
+            <div>
+              <CustomFieldsPlanAlert />
+
+              {company &&
+                ['vendor1', 'vendor2', 'vendor3', 'vendor4'].map((field) => (
+                  <Field
+                    key={field}
+                    initialValue={company.custom_fields[field]}
+                    field={field}
+                    placeholder={t('contact_field')}
+                    onChange={(value) => handleCustomFieldChange(field, value)}
+                    noExternalPadding
+                  />
+                ))}
+            </div>
+          </TabGroup>
         </Card>
       </div>
     </div>

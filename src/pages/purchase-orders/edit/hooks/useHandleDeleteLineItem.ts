@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { cloneDeep } from 'lodash';
 
 export function useHandleDeleteLineItem(

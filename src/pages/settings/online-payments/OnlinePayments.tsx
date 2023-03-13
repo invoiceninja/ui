@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
+import { Card, Element } from '$app/components/cards';
 
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useTitle } from 'common/hooks/useTitle';
-import Toggle from 'components/forms/Toggle';
-import { Settings } from 'components/layouts/Settings';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
+import Toggle from '$app/components/forms/Toggle';
+import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { InputField, SelectField } from '../../../components/forms';
+import { InputField, Link, SelectField } from '../../../components/forms';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import {
@@ -23,6 +23,9 @@ import {
   useHandleCurrentCompanyChangeProperty,
 } from '../common/hooks/useHandleCurrentCompanyChange';
 import { Gateways } from '../gateways/index/Gateways';
+import { usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { useEffect, useState } from 'react';
 
 export function OnlinePayments() {
   const [t] = useTranslation();
@@ -34,6 +37,10 @@ export function OnlinePayments() {
     { name: t('online_payments'), href: '/settings/online_payments' },
   ];
 
+  const [paymentTerms, setPaymentTerms] = useState<PaymentTerm[]>();
+
+  const { data: termsResponse } = usePaymentTermsQuery({});
+
   const company = useInjectCompanyChanges();
 
   const handleChange = useHandleCurrentCompanyChange();
@@ -41,6 +48,12 @@ export function OnlinePayments() {
 
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
+
+  useEffect(() => {
+    if (termsResponse) {
+      setPaymentTerms(termsResponse.data.data);
+    }
+  }, [termsResponse]);
 
   return (
     <Settings
@@ -51,6 +64,32 @@ export function OnlinePayments() {
       onCancelClick={onCancel}
     >
       <Card title={t('settings')}>
+        <Element leftSide={t('auto_bill_standard_invoices')}>
+          <Toggle
+            checked={company?.settings?.auto_bill_standard_invoices || false}
+            onChange={(value) =>
+              handleChangeProperty(
+                'settings.auto_bill_standard_invoices',
+                value
+              )
+            }
+          />
+        </Element>
+
+        <Element leftSide={t('auto_bill')}>
+          <SelectField
+            value={company?.settings?.auto_bill}
+            onChange={handleChange}
+            id="settings.auto_bill"
+          >
+            <option defaultChecked></option>
+            <option value="always">{t('enabled')}</option>
+            <option value="optout">{t('optout')}</option>
+            <option value="optin">{t('optin')}</option>
+            <option value="off">{t('disabled')}</option>
+          </SelectField>
+        </Element>
+
         <Element leftSide={t('auto_bill_on')}>
           <SelectField
             id="settings.auto_bill_date"
@@ -73,6 +112,27 @@ export function OnlinePayments() {
             <option value="off">{t('off')}</option>
           </SelectField>
         </Element>
+
+        {paymentTerms && (
+          <Element leftSide={t('payment_terms')}>
+            <SelectField
+              value={company?.settings?.payment_terms}
+              id="settings.payment_terms"
+              onChange={handleChange}
+            >
+              <option value=""></option>
+              {paymentTerms.map((type: PaymentTerm) => (
+                <option key={type.id} value={type.num_days}>
+                  {type.name}
+                </option>
+              ))}
+            </SelectField>
+
+            <Link to="/settings/payment_terms" className="block mt-2">
+              {t('configure_payment_terms')}
+            </Link>
+          </Element>
+        )}
 
         <Element leftSide={t('enable_applying_payments')}>
           <Toggle

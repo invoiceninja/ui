@@ -8,22 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isProduction } from 'common/helpers';
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
-import { useTitle } from 'common/hooks/useTitle';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { InvoicePreview } from 'pages/invoices/common/components/InvoicePreview';
-import { InvoiceTotals } from 'pages/invoices/common/components/InvoiceTotals';
-import { ProductsTable } from 'pages/invoices/common/components/ProductsTable';
-import { useProductColumns } from 'pages/invoices/common/hooks/useProductColumns';
+import { InvoicePreview } from '$app/pages/invoices/common/components/InvoicePreview';
+import { InvoiceTotals } from '$app/pages/invoices/common/components/InvoiceTotals';
+import { ProductsTable } from '$app/pages/invoices/common/components/ProductsTable';
+import { useProductColumns } from '$app/pages/invoices/common/hooks/useProductColumns';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { purchaseOrderAtom } from '../common/atoms';
 import { useCreate } from '../common/hooks';
@@ -41,6 +42,10 @@ export function Create() {
   const { documentTitle } = useTitle('new_purchase_order');
   const { t } = useTranslation();
 
+  const reactSettings = useReactSettings();
+
+  const [searchParams] = useSearchParams();
+
   const pages: Page[] = [
     { name: t('purchase_orders'), href: '/purchase_orders' },
     {
@@ -56,26 +61,41 @@ export function Create() {
   });
 
   useEffect(() => {
-    if (data && !purchaseOrder) {
-      const po = cloneDeep(data);
+    setPurchaseOrder((current) => {
+      let value = current;
 
-      if (typeof po.line_items === 'string') {
-        po.line_items = [];
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
       }
 
-      po.line_items.forEach((item) => (item._id = v4()));
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const po = cloneDeep(data);
 
-      po.invitations.forEach(
-        (invitation) =>
-          (invitation['client_contact_id'] = invitation.client_contact_id || '')
-      );
+        if (typeof po.line_items === 'string') {
+          po.line_items = [];
+        }
 
-      setPurchaseOrder(po);
-    }
+        if (searchParams.get('vendor')) {
+          po.vendor_id = searchParams.get('vendor')!;
+        }
 
-    return () => {
-      isProduction() && setPurchaseOrder(undefined)
-    };
+        po.line_items.forEach((item) => (item._id = v4()));
+
+        po.invitations.forEach(
+          (invitation) =>
+            (invitation['client_contact_id'] =
+              invitation.client_contact_id || '')
+        );
+
+        value = po;
+      }
+
+      return value;
+    });
   }, [data]);
 
   const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();
@@ -177,17 +197,19 @@ export function Create() {
         )}
       </div>
 
-      <div className="my-4">
-        {purchaseOrder && (
-          <InvoicePreview
-            for="create"
-            resource={purchaseOrder}
-            entity="purchase_order"
-            relationType="vendor_id"
-            endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
-          />
-        )}
-      </div>
+      {reactSettings?.show_pdf_preview && (
+        <div className="my-4">
+          {purchaseOrder && (
+            <InvoicePreview
+              for="create"
+              resource={purchaseOrder}
+              entity="purchase_order"
+              relationType="vendor_id"
+              endpoint="/api/v1/live_preview/purchase_order?entity=:entity"
+            />
+          )}
+        </div>
+      )}
     </Default>
   );
 }

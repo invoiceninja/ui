@@ -8,31 +8,39 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import paymentType from 'common/constants/payment-type';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useTitle } from 'common/hooks/useTitle';
-import { Payment } from 'common/interfaces/payment';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { usePaymentQuery } from 'common/queries/payments';
-import { Divider } from 'components/cards/Divider';
-import { ConvertCurrency } from 'components/ConvertCurrency';
-import { CustomField } from 'components/CustomField';
-import Toggle from 'components/forms/Toggle';
-import { useEffect, useState } from 'react';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import paymentType from '$app/common/constants/payment-type';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Payment } from '$app/common/interfaces/payment';
+import { usePaymentQuery } from '$app/common/queries/payments';
+import { Divider } from '$app/components/cards/Divider';
+import { ConvertCurrency } from '$app/components/ConvertCurrency';
+import { CustomField } from '$app/components/CustomField';
+import Toggle from '$app/components/forms/Toggle';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import { useSave } from './hooks/useSave';
+import { useOutletContext, useParams } from 'react-router-dom';
 import { PaymentOverview } from './PaymentOverview';
-import { ClientCard } from 'pages/clients/show/components/ClientCard';
+import { ClientCard } from '$app/pages/clients/show/components/ClientCard';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+
+interface Context {
+  errors: ValidationBag | undefined;
+  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  payment: Payment;
+  setPayment: Dispatch<SetStateAction<Payment | undefined>>;
+}
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_payment');
-
   const [t] = useTranslation();
-  const [errors, setErrors] = useState<ValidationBag>();
-  const [payment, setPayment] = useState<Payment>();
+
+  const context: Context = useOutletContext();
+
+  const { setPayment, payment, errors } = context;
+
   const [convertCurrency, setConvertCurrency] = useState(false);
 
   const { id } = useParams();
@@ -59,18 +67,8 @@ export function Edit() {
     setPayment((current) => current && { ...current, [field]: value });
   };
 
-  const onSave = useSave(setErrors);
-
   return (
-    <Card
-      title={documentTitle}
-      withSaveButton
-      onFormSubmit={(event) => {
-        event.preventDefault();
-
-        payment && onSave(payment);
-      }}
-    >
+    <Card title={documentTitle}>
       {payment?.client && <ClientCard client={payment.client} />}
       {payment && <PaymentOverview payment={data?.data.data} />}
 
@@ -81,7 +79,7 @@ export function Edit() {
           id="number"
           value={payment?.number}
           onValueChange={(value) => handleChange('number', value)}
-          errorMessage={errors?.errors.payment_amount}
+          errorMessage={errors?.errors.number}
         />
       </Element>
 

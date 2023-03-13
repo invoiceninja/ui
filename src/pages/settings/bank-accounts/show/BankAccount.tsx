@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from 'common/helpers/route';
-import { useTitle } from 'common/hooks/useTitle';
-import { BankAccountDetails } from 'common/interfaces/bank-accounts';
+import { route } from '$app/common/helpers/route';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { BankAccount as BankAccountEntity } from '$app/common/interfaces/bank-accounts';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
@@ -36,7 +36,7 @@ export function BankAccount() {
 
   const { data: response } = useBankAccountQuery({ id });
 
-  const [accountDetails, setAccountDetails] = useState<BankAccountDetails>();
+  const [accountDetails, setAccountDetails] = useState<BankAccountEntity>();
 
   useEffect(() => {
     setAccountDetails(response);

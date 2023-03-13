@@ -9,23 +9,33 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 
 export function useBulkAction() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
-  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+  return (
+    id: string,
+    action: 'archive' | 'restore' | 'delete' | 'convert_to_invoice'
+  ) => {
     toast.processing();
 
     request('POST', endpoint('/api/v1/quotes/bulk'), {
       action,
       ids: [id],
     })
-      .then(() => toast.success(`${action}d_quote`))
+      .then(() => {
+        action === 'convert_to_invoice'
+          ? toast.success('converted_quote')
+          : toast.success(`${action}d_quote`);
+      })
       .catch((error: AxiosError) => {
         console.error(error);
 
@@ -35,6 +45,9 @@ export function useBulkAction() {
         queryClient.invalidateQueries('/api/v1/quotes');
 
         queryClient.invalidateQueries(route('/api/v1/quotes/:id', { id }));
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
       });
   };
 }

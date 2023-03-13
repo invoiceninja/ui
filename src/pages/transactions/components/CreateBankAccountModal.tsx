@@ -8,42 +8,49 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from 'components/Modal';
-import { Dispatch, SetStateAction } from 'react';
+import { Modal } from '$app/components/Modal';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Button, InputField } from '@invoiceninja/forms';
-import { BankAccountInput } from 'common/interfaces/bank-accounts';
+import { Button, InputField } from '$app/components/forms';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { useState } from 'react';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useHandleCreate } from 'pages/settings/bank-accounts/create/hooks/useHandleCreate';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useHandleCreate } from '$app/pages/settings/bank-accounts/create/hooks/useHandleCreate';
+import { useBlankBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
 
 interface Props {
   isModalOpen: boolean;
   setIsModalOpen: Dispatch<SetStateAction<boolean>>;
+  onCreatedBankAccount?: (account: BankAccount) => unknown;
 }
 
 export function CreateBankAccountModal(props: Props) {
   const [t] = useTranslation();
 
+  const { data } = useBlankBankAccountQuery();
+
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const [errors, setErrors] = useState<ValidationBag>();
 
-  const [bankAccount, setBankAccount] = useState<BankAccountInput>();
+  const [bankAccount, setBankAccount] = useState<BankAccount>();
 
   const handleSave = useHandleCreate(
     bankAccount,
     setErrors,
     setIsFormBusy,
     isFormBusy,
-    props.setIsModalOpen
+    props.setIsModalOpen,
+    props.onCreatedBankAccount
   );
 
   const handleChange = (
-    property: keyof BankAccountInput,
-    value: BankAccountInput[keyof BankAccountInput]
+    property: keyof BankAccount,
+    value: BankAccount[keyof BankAccount]
   ) => {
-    setBankAccount((prevState) => ({ ...prevState, [property]: value }));
+    setBankAccount(
+      (prevState) => prevState && { ...prevState, [property]: value }
+    );
   };
 
   const handleCancel = () => {
@@ -51,6 +58,12 @@ export function CreateBankAccountModal(props: Props) {
       props.setIsModalOpen(false);
     }
   };
+
+  useEffect(() => {
+    if (data) {
+      setBankAccount(data);
+    }
+  }, [data]);
 
   return (
     <Modal

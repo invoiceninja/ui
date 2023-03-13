@@ -9,10 +9,32 @@
  */
 
 import { AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+
+interface BlankQueryParams {
+  refetchOnWindowFocus?: boolean;
+}
+
+export function useBlankClientQuery(params: BlankQueryParams) {
+  const hasPermission = useHasPermission();
+
+  return useQuery(
+    '/api/v1/clients/create',
+    () =>
+      request('GET', endpoint('/api/v1/clients/create')).then(
+        (response) => response.data.data
+      ),
+    {
+      refetchOnWindowFocus: Boolean(params.refetchOnWindowFocus),
+      staleTime: Infinity,
+      enabled: hasPermission('create_client'),
+    }
+  );
+}
 
 interface Props {
   enabled?: boolean;
@@ -20,9 +42,9 @@ interface Props {
 
 export function useClientsQuery(props: Props) {
   return useQuery(
-    ['/api/v1/clients?filter_deleted_clients=true'],
+    ['/api/v1/clients?filter_deleted_clients=true?per_page=500'],
     () =>
-      request('GET', endpoint('/api/v1/clients')).then(
+      request('GET', endpoint('/api/v1/clients?per_page=500')).then(
         (response) => response.data.data
       ),
     { enabled: props.enabled ?? true, staleTime: Infinity }

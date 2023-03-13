@@ -8,34 +8,51 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
+import { Link } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import purchaseOrderStatus from 'common/constants/purchase-order-status';
-import { date, endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { CopyToClipboard } from 'components/CopyToClipboard';
-import { customField } from 'components/CustomField';
-import { SelectOption } from 'components/datatables/Actions';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { EntityStatus } from 'components/EntityStatus';
-import { Icon } from 'components/icons/Icon';
-import { Action } from 'components/ResourceActions';
-import { StatusBadge } from 'components/StatusBadge';
+import purchaseOrderStatus from '$app/common/constants/purchase-order-status';
+import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
+import { date, endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { customField } from '$app/components/CustomField';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
+import { StatusBadge } from '$app/components/StatusBadge';
 import { useAtom } from 'jotai';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
-import { MdControlPointDuplicate } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
+import {
+  MdArchive,
+  MdCloudCircle,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdDownload,
+  MdMarkEmailRead,
+  MdPageview,
+  MdPictureAsPdf,
+  MdRestore,
+  MdSend,
+  MdSwitchRight,
+} from 'react-icons/md';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { purchaseOrderAtom } from './atoms';
+import { useBulk, useMarkSent } from './queries';
+import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
+import { Divider } from '$app/components/cards/Divider';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -95,7 +112,7 @@ export const purchaseOrderColumns = [
   'exchange_rate',
 ] as const;
 
-type PurchaseOrderColumns = typeof purchaseOrderColumns[number];
+type PurchaseOrderColumns = (typeof purchaseOrderColumns)[number];
 
 export const defaultColumns: PurchaseOrderColumns[] = [
   'status',
@@ -344,15 +361,94 @@ export function useActions() {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+  const bulk = useBulk();
+
+  const markSent = useMarkSent();
+
+  const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
+
+  const isEditPage = location.pathname.endsWith('/edit');
+
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
     setPurchaseOrder({ ...purchaseOrder, number: '', documents: [] });
 
-    navigate('/purchase_orders/create');
+    navigate('/purchase_orders/create?action=clone');
   };
 
   const actions: Action<PurchaseOrder>[] = [
+    (purchaseOrder) => (
+      <DropdownElement
+        onClick={() =>
+          navigate(
+            route('/purchase_orders/:id/email', { id: purchaseOrder.id })
+          )
+        }
+        icon={<Icon element={MdSend} />}
+      >
+        {t('send_email')}
+      </DropdownElement>
+    ),
+    (purchaseOrder) => (
+      <DropdownElement
+        onClick={() =>
+          navigate(route('/purchase_orders/:id/pdf', { id: purchaseOrder.id }))
+        }
+        icon={<Icon element={MdPictureAsPdf} />}
+      >
+        {t('view_pdf')}
+      </DropdownElement>
+    ),
+    (purchaseOrder) => (
+      <DropdownElement
+        onClick={() => downloadPdf(purchaseOrder)}
+        icon={<Icon element={MdDownload} />}
+      >
+        {t('download')}
+      </DropdownElement>
+    ),
+    (purchaseOrder) =>
+      purchaseOrder.status_id !== PurchaseOrderStatus.Sent && (
+        <DropdownElement
+          onClick={() => markSent(purchaseOrder)}
+          icon={<Icon element={MdMarkEmailRead} />}
+        >
+          {t('mark_sent')}
+        </DropdownElement>
+      ),
+    (purchaseOrder) =>
+      Boolean(!purchaseOrder.expense_id.length) && (
+        <DropdownElement
+          onClick={() => bulk(purchaseOrder.id, 'expense')}
+          icon={<Icon element={MdSwitchRight} />}
+        >
+          {t('convert_to_expense')}
+        </DropdownElement>
+      ),
+    (purchaseOrder) =>
+      Boolean(purchaseOrder.expense_id.length) && (
+        <DropdownElement
+          onClick={() =>
+            navigate(
+              route('/expenses/:id/edit', { id: purchaseOrder.expense_id })
+            )
+          }
+          icon={<Icon element={MdPageview} />}
+        >
+          {`${t('view')} ${t('expense')}`}
+        </DropdownElement>
+      ),
+    (purchaseOrder) => (
+      <DropdownElement
+        onClick={() => openClientPortal(purchaseOrder)}
+        icon={<Icon element={MdCloudCircle} />}
+      >
+        {t('vendor_portal')}
+      </DropdownElement>
+    ),
     (purchaseOrder) => (
       <DropdownElement
         onClick={() => cloneToPurchaseOrder(purchaseOrder)}
@@ -361,6 +457,37 @@ export function useActions() {
         {t('clone')}
       </DropdownElement>
     ),
+    () => isEditPage && <Divider withoutPadding />,
+    (purchaseOrder) =>
+      Boolean(!purchaseOrder.archived_at) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => bulk(purchaseOrder.id, 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (purchaseOrder) =>
+      Boolean(purchaseOrder.archived_at) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => bulk(purchaseOrder.id, 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (purchaseOrder) =>
+      !purchaseOrder.is_deleted &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => bulk(purchaseOrder.id, 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
   ];
 
   return actions;

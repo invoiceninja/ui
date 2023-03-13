@@ -9,12 +9,28 @@
  */
 
 import { AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { GenericManyResponse } from 'common/interfaces/generic-many-response';
-import { TaskStatus } from 'common/interfaces/task-status';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { TaskStatus } from '$app/common/interfaces/task-status';
 import { useQuery } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+
+export function useBlankTaskStatusQuery() {
+  const hasPermission = useHasPermission();
+
+  return useQuery<TaskStatus>(
+    '/api/v1/task_statuses/create',
+    () =>
+      request('GET', endpoint('/api/v1/task_statuses/create')).then(
+        (response: GenericSingleResourceResponse<TaskStatus>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity, enabled: hasPermission('create_task') }
+  );
+}
 
 export function useTaskStatusesQuery() {
   return useQuery<GenericManyResponse<TaskStatus>>(

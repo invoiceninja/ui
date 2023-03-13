@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { SelectField } from '@invoiceninja/forms';
-import { User } from 'common/interfaces/user';
+import { Card, Element } from '$app/components/cards';
+import { SelectField } from '$app/components/forms';
+import { User } from '$app/common/interfaces/user';
 import { cloneDeep } from 'lodash';
 import { useTranslation } from 'react-i18next';
 
@@ -25,7 +25,7 @@ export function Notifications(props: Props) {
 
   const notifications = [
     { id: 'invoice_created', label: 'invoice_created' },
-    { id: 'invoice_sent', label: 'notification_invoice_sent' },
+    { id: 'invoice_sent', label: 'invoice_sent_notification_label' },
     { id: 'invoice_viewed', label: 'invoice_viewed' },
     { id: 'invoice_late', label: 'invoice_late' },
     { id: 'payment_success', label: 'payment_success' },

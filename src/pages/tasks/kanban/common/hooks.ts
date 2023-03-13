@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date } from 'common/helpers';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useTaskQuery } from 'common/queries/tasks';
+import { date } from '$app/common/helpers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useTaskQuery } from '$app/common/queries/tasks';
 import { useSetAtom } from 'jotai';
-import { parseTimeLog } from 'pages/tasks/common/helpers/calculate-time';
+import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { currentTaskAtom, isKanbanViewSliderVisibleAtom } from './atoms';

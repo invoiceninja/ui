@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useTitle } from 'common/hooks/useTitle';
-import { updateChanges } from 'common/stores/slices/company-users';
-import { Divider } from 'components/cards/Divider';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Divider } from '$app/components/cards/Divider';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../components/cards';
@@ -76,6 +76,18 @@ export function ExpenseSettings() {
             checked={companyChanges?.mark_expenses_paid}
             onChange={(value: boolean) =>
               handleToggleChange('mark_expenses_paid', value)
+            }
+          />
+        </Element>
+
+        <Element
+          leftSide={t('convert_currency')}
+          leftSideHelp={t('convert_expense_currency_help')}
+        >
+          <Toggle
+            checked={companyChanges?.convert_expense_currency}
+            onChange={(value: boolean) =>
+              handleToggleChange('convert_expense_currency', value)
             }
           />
         </Element>

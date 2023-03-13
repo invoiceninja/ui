@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { Button, SelectField } from '@invoiceninja/forms';
+import { Card, Element } from '$app/components/cards';
+import { Button, SelectField } from '$app/components/forms';
 import { arrayMoveImmutable } from 'array-move';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { injectInChanges } from 'common/stores/slices/company-users';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { injectInChanges } from '$app/common/stores/slices/company-users';
 import { cloneDeep, set } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
 import {

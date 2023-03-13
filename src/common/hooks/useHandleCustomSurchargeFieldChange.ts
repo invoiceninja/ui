@@ -11,7 +11,7 @@
 import {
   injectInChanges,
   updateChanges,
-} from 'common/stores/slices/company-users';
+} from '$app/common/stores/slices/company-users';
 import { cloneDeep } from 'lodash';
 import { useDispatch } from 'react-redux';
 import { useInjectCompanyChanges } from './useInjectCompanyChanges';

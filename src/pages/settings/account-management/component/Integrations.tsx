@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Divider } from 'components/cards/Divider';
+import { Divider } from '$app/components/cards/Divider';
 import { useTranslation } from 'react-i18next';
 import { Card, ClickableElement } from '../../../../components/cards';
 
@@ -38,8 +38,8 @@ export function Integrations() {
         Zapier
       </ClickableElement>
 
-      <ClickableElement to="/settings/integrations/google_analytics">
-        {t('google_analytics')}
+      <ClickableElement to="/settings/integrations/analytics">
+        {t('analytics')}
       </ClickableElement>
     </Card>
   );

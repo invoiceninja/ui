@@ -9,12 +9,15 @@
  */
 
 import { AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { defaultHeaders } from './common/headers';
 import { Params } from './common/params.interface';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function usePaymentTermsQuery(params: Params) {
   return useQuery(['/api/v1/payment_terms', params], () =>
@@ -51,4 +54,18 @@ export function bulk(
     action,
     ids: id,
   });
+}
+
+export function useBlankPaymentTermQuery() {
+  const { isAdmin } = useAdmin();
+
+  return useQuery<PaymentTerm>(
+    '/api/v1/payment_terms/create',
+    () =>
+      request('GET', endpoint('/api/v1/payment_terms/create')).then(
+        (response: GenericSingleResourceResponse<PaymentTerm>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity, enabled: isAdmin }
+  );
 }

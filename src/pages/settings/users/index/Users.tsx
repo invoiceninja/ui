@@ -8,16 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { useTitle } from 'common/hooks/useTitle';
-import { User } from 'common/interfaces/user';
-import { DataTable, DataTableColumns } from 'components/DataTable';
-import { Settings } from 'components/layouts/Settings';
+import { Link } from '$app/components/forms';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { User } from '$app/common/interfaces/user';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
+import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 
 export function Users() {
   useTitle('user_management');
+
+  const currentUser = useCurrentUser();
 
   const [t] = useTranslation();
 
@@ -48,7 +51,9 @@ export function Users() {
       <DataTable
         resource="user"
         columns={columns}
-        endpoint="/api/v1/users"
+        endpoint={route('/api/v1/users?without=:userId', {
+          userId: currentUser?.id,
+        })}
         linkToCreate="/settings/users/create"
       />
     </Settings>

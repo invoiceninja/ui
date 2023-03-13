@@ -8,6 +8,38 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from '$app/common/helpers/route';
+import { DataTable } from '$app/components/DataTable';
+import {
+  useExpenseColumns,
+  useExpenseFilters,
+} from '$app/pages/expenses/common/hooks';
+import { useParams } from 'react-router-dom';
+
+const dataTableStaleTime = 50;
+
 export function Expenses() {
-  return <div>Expenses</div>;
+  const { id } = useParams();
+
+  const columns = useExpenseColumns();
+
+  const filters = useExpenseFilters();
+
+  return (
+    <DataTable
+      resource="expense"
+      endpoint={route('/api/v1/expenses?include=client,vendor&vendor_id=:id', {
+        id,
+      })}
+      columns={columns}
+      customFilters={filters}
+      customFilterQueryKey="client_status"
+      customFilterPlaceholder="status"
+      withResourcefulActions
+      bulkRoute="/api/v1/expenses/bulk"
+      linkToCreate={route('/expenses/create?vendor=:id', { id })}
+      linkToEdit="/expenses/:id/edit"
+      staleTime={dataTableStaleTime}
+    />
+  );
 }

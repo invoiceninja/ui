@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { GenericSelectorProps } from 'common/interfaces/generic-selector-props';
-import { User } from 'common/interfaces/user';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
+import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
+import { User } from '$app/common/interfaces/user';
+import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 
@@ -34,6 +34,7 @@ export function UserSelector(props: GenericSelectorProps<User>) {
       queryAdditional
       actionLabel={t('new_user')}
       onActionClick={() => navigate('/settings/users')}
+      errorMessage={props.errorMessage}
     />
   );
 }

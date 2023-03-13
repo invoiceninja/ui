@@ -8,15 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
-import { Quote } from 'common/interfaces/quote';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Quote } from '$app/common/interfaces/quote';
 import { useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 
 export function useApprove() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (quote: Quote) => {
     toast.processing();
@@ -34,6 +37,9 @@ export function useApprove() {
         );
 
         queryClient.invalidateQueries('/api/v1/quotes');
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
       })
       .catch((error) => {
         toast.error();

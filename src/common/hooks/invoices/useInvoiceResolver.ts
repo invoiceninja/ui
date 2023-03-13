@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceResolver } from 'common/helpers/invoices/invoice-resolver';
+import { InvoiceResolver } from '$app/common/helpers/invoices/invoice-resolver';
 
 const invoiceResolver = new InvoiceResolver();
 

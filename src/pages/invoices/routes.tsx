@@ -8,17 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Guard } from 'common/guards/Guard';
-import { permission } from 'common/guards/guards/permission';
-import { Import } from 'pages/invoices/import/Import';
+import { Guard } from '$app/common/guards/Guard';
+import { permission } from '$app/common/guards/guards/permission';
+import { Import } from '$app/pages/invoices/import/Import';
 import { Route } from 'react-router-dom';
 import { Email } from './email/Email';
 import { Invoices } from './index/Invoices';
 import { Pdf } from './pdf/Pdf';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
-import { enabled } from 'common/guards/guards/enabled';
-import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { enabled } from '$app/common/guards/guards/enabled';
+import { ModuleBitmask } from '$app/pages/settings/account-management/component';
+import { or } from '$app/common/guards/guards/or';
+import { assigned } from '$app/common/guards/guards/assigned';
 
 export const invoiceRoutes = (
   <Route path="/invoices">
@@ -27,8 +29,12 @@ export const invoiceRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Invoices),
-            () => permission('view_invoice'),
+            enabled(ModuleBitmask.Invoices),
+            or(
+              permission('view_invoice'),
+              permission('create_invoice'),
+              permission('edit_invoice')
+            ),
           ]}
           component={<Invoices />}
         />
@@ -39,8 +45,8 @@ export const invoiceRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Invoices),
-            () => permission('create_invoice') || permission('edit_invoice'),
+            enabled(ModuleBitmask.Invoices),
+            or(permission('create_invoice'), permission('edit_invoice')),
           ]}
           component={<Import />}
         />
@@ -51,8 +57,8 @@ export const invoiceRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Invoices),
-            () => permission('create_invoice'),
+            enabled(ModuleBitmask.Invoices),
+            permission('create_invoice'),
           ]}
           component={<Create />}
         />
@@ -63,9 +69,12 @@ export const invoiceRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Invoices),
-            () => permission('view_invoice'),
-            () => permission('edit_invoice'),
+            enabled(ModuleBitmask.Invoices),
+            or(
+              permission('view_invoice'),
+              permission('edit_invoice'),
+              assigned('/api/v1/invoices/:id')
+            ),
           ]}
           component={<Edit />}
         />
@@ -75,10 +84,7 @@ export const invoiceRoutes = (
       path=":id/pdf"
       element={
         <Guard
-          guards={[
-            () => enabled(ModuleBitmask.Invoices),
-            () => permission('view_invoice'),
-          ]}
+          guards={[enabled(ModuleBitmask.Invoices), permission('view_invoice')]}
           component={<Pdf />}
         />
       }

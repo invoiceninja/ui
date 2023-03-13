@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date } from 'common/helpers';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { DataTable, DataTableColumns } from 'components/DataTable';
-import { route } from 'common/helpers/route';
-import { Link } from 'components/forms/Link';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Card } from '@invoiceninja/cards';
-import { Quote } from 'common/interfaces/quote';
+import { date } from '$app/common/helpers';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
+import { route } from '$app/common/helpers/route';
+import { Link } from '$app/components/forms/Link';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Card } from '$app/components/cards';
+import { Quote } from '$app/common/interfaces/quote';
 import { useTranslation } from 'react-i18next';
 
 export function UpcomingQuotes() {

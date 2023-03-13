@@ -8,24 +8,33 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { Project } from 'common/interfaces/project';
-import { customField } from 'components/CustomField';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { EntityStatus } from 'components/EntityStatus';
-import { Icon } from 'components/icons/Icon';
+import { Link } from '$app/components/forms';
+import { EntityState } from '$app/common/enums/entity-state';
+import { date, getEntityState } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { Project } from '$app/common/interfaces/project';
+import { Divider } from '$app/components/cards/Divider';
+import { customField } from '$app/components/CustomField';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
+import { Tooltip } from '$app/components/Tooltip';
 import { useUpdateAtom } from 'jotai/utils';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
-import { MdControlPointDuplicate } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
+import {
+  MdArchive,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdRestore,
+} from 'react-icons/md';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { projectAtom } from './atoms';
+import { useBulkAction } from './hooks/useBulkAction';
 
 export const projectColumns = [
   'name',
@@ -52,7 +61,7 @@ export const projectColumns = [
   'updated_at',
 ] as const;
 
-export type ProjectColumns = typeof projectColumns[number];
+export type ProjectColumns = (typeof projectColumns)[number];
 
 export const defaultColumns: ProjectColumns[] = [
   'name',
@@ -104,13 +113,21 @@ export function useProjectColumns() {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'budgeted_hours',
@@ -210,14 +227,20 @@ export function useProjectColumns() {
 export function useActions() {
   const [t] = useTranslation();
 
+  const location = useLocation();
+
   const navigate = useNavigate();
+
+  const bulk = useBulkAction();
+
+  const isEditPage = location.pathname.endsWith('/edit');
 
   const setProject = useUpdateAtom(projectAtom);
 
   const cloneToProject = (project: Project) => {
     setProject({ ...project, id: '', documents: [], number: '' });
 
-    navigate('/projects/create');
+    navigate('/projects/create?action=clone');
   };
 
   const actions = [
@@ -229,6 +252,39 @@ export function useActions() {
         {t('clone')}
       </DropdownElement>
     ),
+    () => isEditPage && <Divider withoutPadding />,
+    (project: Project) =>
+      getEntityState(project) === EntityState.Active &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => bulk(project.id, 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (project: Project) =>
+      (getEntityState(project) === EntityState.Archived ||
+        getEntityState(project) === EntityState.Deleted) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => bulk(project.id, 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (project: Project) =>
+      (getEntityState(project) === EntityState.Active ||
+        getEntityState(project) === EntityState.Archived) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => bulk(project.id, 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
   ];
 
   return actions;

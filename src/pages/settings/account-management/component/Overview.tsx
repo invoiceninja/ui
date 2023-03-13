@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { updateChanges } from 'common/stores/slices/company-users';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';

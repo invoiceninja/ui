@@ -10,11 +10,11 @@
 
 import { resolveTotalVariable } from '../helpers/resolve-total-variable';
 import { useFormatMoney } from './useFormatMoney';
-import { CustomField } from 'components/CustomField';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Element } from '@invoiceninja/cards';
+import { CustomField } from '$app/components/CustomField';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Element } from '$app/components/cards';
 import { useResolveTranslation } from './useResolveTranslation';
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import {
   ProductTableResource,
   RelationType,
@@ -87,6 +87,7 @@ export function useResolveTotalVariable(props: Props) {
         </Element>
       );
     }
+
     if (variable == '$line_taxes' && invoiceSum) {
       return (
         <Element leftSide={resolveTranslation(variable, '$')}>
@@ -99,6 +100,35 @@ export function useResolveTotalVariable(props: Props) {
       return (
         <Element leftSide={resolveTranslation(variable, '$')}>
           {formatMoney(invoiceSum.total)}
+        </Element>
+      );
+    }
+
+    if (variable == '$paid_to_date' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.invoice.paid_to_date)}
+        </Element>
+      );
+    }
+
+    if (variable == '$balance' && invoiceSum) {
+      return (
+        <Element leftSide={resolveTranslation(variable, '$')}>
+          {formatMoney(invoiceSum.invoice.balance)}
+        </Element>
+      );
+    }
+
+    if (variable == '$taxes' && invoiceSum) {
+      return (
+        <Element leftSide={`${resolveTranslation(variable, '$')}:`}>
+          {invoiceSum?.getTaxMap().map((item, index) => (
+            <div key={index} className="flex space-x-6">
+              <span>{item.name}</span>
+              <span>{formatMoney(item.total)}</span>
+            </div>
+          ))}
         </Element>
       );
     }

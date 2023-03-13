@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Task } from 'common/interfaces/task';
-import { Dropdown } from 'components/dropdown/Dropdown';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { isTaskRunning } from 'pages/tasks/common/helpers/calculate-entity-state';
-import { useBulkAction } from 'pages/tasks/common/hooks/useBulk';
-import { useInvoiceTask } from 'pages/tasks/common/hooks/useInvoiceTask';
-import { useStart } from 'pages/tasks/common/hooks/useStart';
-import { useStop } from 'pages/tasks/common/hooks/useStop';
+import { Task } from '$app/common/interfaces/task';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { isTaskRunning } from '$app/pages/tasks/common/helpers/calculate-entity-state';
+import { useBulkAction } from '$app/pages/tasks/common/hooks/useBulk';
+import { useInvoiceTask } from '$app/pages/tasks/common/hooks/useInvoiceTask';
+import { useStart } from '$app/pages/tasks/common/hooks/useStart';
+import { useStop } from '$app/pages/tasks/common/hooks/useStop';
 import { useTranslation } from 'react-i18next';
-import { Icon } from 'components/icons/Icon';
+import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdControlPointDuplicate,
@@ -28,7 +28,7 @@ import {
   MdTextSnippet,
 } from 'react-icons/md';
 import { useUpdateAtom } from 'jotai/utils';
-import { taskAtom } from 'pages/tasks/common/atoms';
+import { taskAtom } from '$app/pages/tasks/common/atoms';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
@@ -51,13 +51,13 @@ export function Actions(props: Props) {
   const cloneToTask = () => {
     setTask({ ...task, id: '', documents: [], number: '' });
 
-    navigate('/tasks/create');
+    navigate('/tasks/create?action=clone');
   };
 
   return (
     <Dropdown label={t('more_actions')} className="divide-y">
       <div>
-        {!isTaskRunning(task) && (
+        {!isTaskRunning(task) && !task.invoice_id && (
           <DropdownElement
             onClick={() => start(task)}
             icon={<Icon element={MdNotStarted} />}
@@ -66,7 +66,7 @@ export function Actions(props: Props) {
           </DropdownElement>
         )}
 
-        {isTaskRunning(task) && (
+        {isTaskRunning(task) && !task.invoice_id && (
           <DropdownElement
             onClick={() => stop(task)}
             icon={<Icon element={MdStopCircle} />}
@@ -74,13 +74,6 @@ export function Actions(props: Props) {
             {t('stop')}
           </DropdownElement>
         )}
-
-        <DropdownElement
-          onClick={cloneToTask}
-          icon={<Icon element={MdControlPointDuplicate} />}
-        >
-          {t('clone')}
-        </DropdownElement>
 
         {!isTaskRunning(task) && !task.invoice_id && (
           <DropdownElement
@@ -90,6 +83,13 @@ export function Actions(props: Props) {
             {t('invoice_task')}
           </DropdownElement>
         )}
+
+        <DropdownElement
+          onClick={cloneToTask}
+          icon={<Icon element={MdControlPointDuplicate} />}
+        >
+          {t('clone')}
+        </DropdownElement>
       </div>
 
       <div>

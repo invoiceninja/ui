@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import {
   MailerResource,
   MailerResourceType,
-} from 'pages/invoices/email/components/Mailer';
+} from '$app/pages/invoices/email/components/Mailer';
 import { useQueryClient } from 'react-query';
 import { useGeneratePdfUrl } from './useGeneratePdfUrl';
 
@@ -37,9 +37,12 @@ export function useDownloadPdf(props: Props) {
             const blob = new Blob([response.data], { type: 'application/pdf' });
             const url = URL.createObjectURL(blob);
 
+            const [, filename] =
+              response.headers['content-disposition'].split('filename=');
+
             const link = document.createElement('a');
 
-            link.download = `${props.resource}.pdf`;
+            link.download = filename;
             link.href = url;
             link.target = '_blank';
 

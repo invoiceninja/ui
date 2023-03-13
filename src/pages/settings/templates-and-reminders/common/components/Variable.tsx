@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { trans } from 'common/helpers';
+import { trans } from '$app/common/helpers';
 import toast from 'react-hot-toast';
 
 interface Props {

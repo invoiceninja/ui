@@ -8,7 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Modal } from 'components/Modal';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CreateVendorForm } from './CreateVendorForm';
@@ -17,6 +18,7 @@ interface Props {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
   setSelectedIds?: Dispatch<SetStateAction<string[]>>;
+  onVendorCreated: (vendor: Vendor) => unknown;
 }
 
 export function CreateVendorModal(props: Props) {
@@ -29,12 +31,11 @@ export function CreateVendorModal(props: Props) {
       onClose={() => props.setVisible(false)}
       size="large"
     >
-      {props.setSelectedIds && (
-        <CreateVendorForm
-          setSelectedIds={props.setSelectedIds}
-          setVisible={props.setVisible}
-        />
-      )}
+      <CreateVendorForm
+        setSelectedIds={props.setSelectedIds}
+        setVisible={props.setVisible}
+        onVendorCreated={props.onVendorCreated}
+      />
     </Modal>
   );
 }

@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { Currency } from 'common/interfaces/currency';
-import { Statics } from 'common/interfaces/statics';
+import { endpoint } from '$app/common/helpers';
+import { Currency } from '$app/common/interfaces/currency';
+import { Statics } from '$app/common/interfaces/statics';
 import { useState } from 'react';
 import { QueryClient } from 'react-query';
 import { request } from '../request';

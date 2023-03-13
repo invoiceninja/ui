@@ -8,26 +8,37 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { date } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { Product } from 'common/interfaces/product';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { customField } from 'components/CustomField';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { EntityStatus } from 'components/EntityStatus';
-import { Icon } from 'components/icons/Icon';
+import { Link } from '$app/components/forms';
+import { EntityState } from '$app/common/enums/entity-state';
+import { date, getEntityState } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { Product } from '$app/common/interfaces/product';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { customField } from '$app/components/CustomField';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
 import { useUpdateAtom } from 'jotai/utils';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdControlPointDuplicate } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
+import {
+  MdArchive,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdRestore,
+} from 'react-icons/md';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { productAtom } from './atoms';
+import { bulk } from '$app/common/queries/products';
+import { useQueryClient } from 'react-query';
+import { Divider } from '$app/components/cards/Divider';
+import { Tooltip } from '$app/components/Tooltip';
 
 export const productColumns = [
   'product_key',
@@ -56,7 +67,7 @@ export const productColumns = [
   'updated_at',
 ] as const;
 
-type ProductColumns = typeof productColumns[number];
+type ProductColumns = (typeof productColumns)[number];
 
 export const defaultColumns: ProductColumns[] = [
   'product_key',
@@ -93,6 +104,13 @@ export function useProductColumns() {
       column: 'description',
       id: 'notes',
       label: t('notes'),
+      format: (value) => {
+        return (
+          <Tooltip size="regular" truncate message={value as string}>
+            <span>{value}</span>
+          </Tooltip>
+        );
+      },
     },
     {
       column: 'price',
@@ -219,12 +237,36 @@ export function useActions() {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+  const queryClient = useQueryClient();
+
   const setProduct = useUpdateAtom(productAtom);
+
+  const isEditPage = location.pathname.endsWith('/edit');
 
   const cloneToProduct = (product: Product) => {
     setProduct({ ...product, id: '', documents: [] });
 
-    navigate('/products/create');
+    navigate('/products/create?action=clone');
+  };
+
+  const handleResourcefulAction = (
+    action: 'archive' | 'restore' | 'delete',
+    id: string
+  ) => {
+    toast.processing();
+
+    bulk([id], action)
+      .then(() => {
+        toast.success(t(`${action}d_product`) || '');
+
+        queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error();
+      });
   };
 
   const actions = [
@@ -236,6 +278,39 @@ export function useActions() {
         {t('clone')}
       </DropdownElement>
     ),
+    () => isEditPage && <Divider withoutPadding />,
+    (product: Product) =>
+      getEntityState(product) === EntityState.Active &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => handleResourcefulAction('archive', product.id)}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (product: Product) =>
+      (getEntityState(product) === EntityState.Archived ||
+        getEntityState(product) === EntityState.Deleted) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => handleResourcefulAction('restore', product.id)}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (product: Product) =>
+      (getEntityState(product) === EntityState.Active ||
+        getEntityState(product) === EntityState.Archived) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => handleResourcefulAction('delete', product.id)}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
   ];
 
   return actions;

@@ -8,15 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import {
-  BankAccount,
-  BankAccountDetails,
-} from 'common/interfaces/bank-accounts';
-import { route } from 'common/helpers/route';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { route } from '$app/common/helpers/route';
 
 interface BankAccountParams {
   id: string | undefined;
@@ -24,14 +21,14 @@ interface BankAccountParams {
 }
 
 export function useBankAccountQuery(params: BankAccountParams) {
-  return useQuery<BankAccountDetails>(
+  return useQuery<BankAccount>(
     route('/api/v1/bank_integrations/:id', { id: params.id }),
     () =>
       request(
         'GET',
         endpoint('/api/v1/bank_integrations/:id', { id: params.id })
       ).then(
-        (response: GenericSingleResourceResponse<BankAccountDetails>) =>
+        (response: GenericSingleResourceResponse<BankAccount>) =>
           response.data.data
       ),
     { enabled: params.enabled ?? true, staleTime: Infinity }
@@ -44,6 +41,18 @@ export function useBankAccountsQuery() {
     () =>
       request('GET', endpoint('/api/v1/bank_integrations')).then(
         (response: GenericSingleResourceResponse<BankAccount[]>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}
+
+export function useBlankBankAccountQuery() {
+  return useQuery<BankAccount>(
+    '/api/v1/bank_integrations/create',
+    () =>
+      request('GET', endpoint('/api/v1/bank_integrations/create')).then(
+        (response: GenericSingleResourceResponse<BankAccount>) =>
           response.data.data
       ),
     { staleTime: Infinity }

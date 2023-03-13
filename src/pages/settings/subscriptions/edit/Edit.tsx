@@ -9,17 +9,17 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
-import { Product } from 'common/interfaces/product';
-import { Subscription } from 'common/interfaces/subscription';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useProductsQuery } from 'common/queries/products';
-import { Settings } from 'components/layouts/Settings';
-import { TabGroup } from 'components/TabGroup';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
+import { Product } from '$app/common/interfaces/product';
+import { Subscription } from '$app/common/interfaces/subscription';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useProductsQuery } from '$app/common/queries/products';
+import { Settings } from '$app/components/layouts/Settings';
+import { TabGroup } from '$app/components/TabGroup';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';

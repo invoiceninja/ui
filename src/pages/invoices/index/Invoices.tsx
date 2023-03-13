@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { DataTable } from 'components/DataTable';
-import { Default } from 'components/layouts/Default';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { DataTable } from '$app/components/DataTable';
+import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useActions } from '../edit/components/Actions';
 import {
@@ -18,9 +18,9 @@ import {
   invoiceColumns,
   useInvoiceColumns,
 } from '../common/hooks/useInvoiceColumns';
-import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useInvoiceFilters } from '../common/hooks/useInvoiceFilters';
-import { ImportButton } from 'components/import/ImportButton';
+import { ImportButton } from '$app/components/import/ImportButton';
 
 export function Invoices() {
   const { documentTitle } = useTitle('invoices');

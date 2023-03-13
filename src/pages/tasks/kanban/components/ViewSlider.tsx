@@ -8,34 +8,42 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ClickableElement, Element } from '@invoiceninja/cards';
-import { endpoint } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { NonClickableElement } from 'components/cards/NonClickableElement';
-import { DocumentsTable } from 'components/DocumentsTable';
-import { TabGroup } from 'components/TabGroup';
+import { ClickableElement, Element } from '$app/components/cards';
+import { endpoint } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
-import { Upload } from 'pages/settings/company/documents/components';
-import { TaskStatus } from 'pages/tasks/common/components/TaskStatus';
-import { calculateTime } from 'pages/tasks/common/helpers/calculate-time';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { TaskStatus } from '$app/pages/tasks/common/components/TaskStatus';
+import { isTaskRunning } from '$app/pages/tasks/common/helpers/calculate-entity-state';
+import {
+  calculateTime,
+  calculateDifferenceBetweenLogs,
+} from '$app/pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
+import { TaskClock } from './TaskClock';
 
 export function ViewSlider() {
   const [t] = useTranslation();
+
+  const company = useCurrentCompany();
+  const queryClient = useQueryClient();
+  const accentColor = useAccentColor();
+  const formatMoney = useFormatMoney();
+  const formatTimeLog = useFormatTimeLog();
+
   const [currentTask] = useAtom(currentTaskAtom);
 
-  const formatMoney = useFormatMoney();
-  const company = useCurrentCompany();
-  const formatTimeLog = useFormatTimeLog();
-  const accentColor = useAccentColor();
-
-  const queryClient = useQueryClient();
+  const currentTaskTimeLogs =
+    currentTask && formatTimeLog(currentTask.time_log);
 
   const onSuccess = () => {
     queryClient.invalidateQueries(
@@ -73,19 +81,31 @@ export function ViewSlider() {
               </div>
             </NonClickableElement>
 
-            {formatTimeLog(currentTask.time_log).map(
-              ([date, start, end], i) => (
-                <ClickableElement key={i}>
-                  <div>
+            {currentTaskTimeLogs?.map(([date, start, end], i) => (
+              <ClickableElement key={i}>
+                <div className="flex items-center justify-between">
+                  <div className="flex flex-col">
                     <p>{date}</p>
 
                     <small>
                       {start} - {end}
                     </small>
                   </div>
-                </ClickableElement>
-              )
-            )}
+
+                  <div>
+                    {isTaskRunning(currentTask) &&
+                    i === currentTaskTimeLogs.length - 1 ? (
+                      <TaskClock
+                        task={currentTask}
+                        calculateLastTimeLog={true}
+                      />
+                    ) : (
+                      calculateDifferenceBetweenLogs(currentTask.time_log, i)
+                    )}
+                  </div>
+                </div>
+              </ClickableElement>
+            ))}
           </>
         )}
       </div>

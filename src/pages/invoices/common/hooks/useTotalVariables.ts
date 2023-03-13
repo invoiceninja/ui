@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useEffect, useState } from 'react';
 
 export function useTotalVariables() {
@@ -56,6 +56,9 @@ export function useTotalVariables() {
     }
 
     variables.push('$total');
+    variables.push('$paid_to_date');
+    variables.push('$balance');
+    variables.push('$taxes');
 
     setColumns(variables);
   }, [company]);

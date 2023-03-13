@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { trans } from 'common/helpers';
-import { datatablePerPageAtom } from 'components/DataTable';
+import { trans } from '$app/common/helpers';
+import { datatablePerPageAtom } from '$app/components/DataTable';
 import { useAtom } from 'jotai';
 import { ReactNode } from 'react';
 import { ChevronLeft, ChevronRight } from 'react-feather';

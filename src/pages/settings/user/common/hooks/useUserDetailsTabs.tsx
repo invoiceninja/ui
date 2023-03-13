@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Tab } from 'components/Tabs';
+import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
 
 export function useUserDetailsTabs() {
@@ -39,6 +39,10 @@ export function useUserDetailsTabs() {
     {
       name: t('custom_fields'),
       href: '/settings/user_details/custom_fields',
+    },
+    {
+      name: t('preferences'),
+      href: '/settings/user_details/preferences',
     },
   ];
 

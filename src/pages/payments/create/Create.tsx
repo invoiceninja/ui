@@ -8,31 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { Button, InputField, SelectField } from '@invoiceninja/forms';
+import { Card, Element } from '$app/components/cards';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import collect from 'collect.js';
-import paymentType from 'common/constants/payment-type';
-import { route } from 'common/helpers/route';
-import { useCreditResolver } from 'common/hooks/credits/useCreditResolver';
-import { useInvoiceResolver } from 'common/hooks/invoices/useInvoiceResolver';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useTitle } from 'common/hooks/useTitle';
-import { Client } from 'common/interfaces/client';
-import { Credit } from 'common/interfaces/credit';
-import { Invoice } from 'common/interfaces/invoice';
-import { Payment } from 'common/interfaces/payment';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankPaymentQuery } from 'common/queries/payments';
-import { Divider } from 'components/cards/Divider';
-import { Container } from 'components/Container';
-import { ConvertCurrency } from 'components/ConvertCurrency';
-import { CustomField } from 'components/CustomField';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
-import Toggle from 'components/forms/Toggle';
-import { Default } from 'components/layouts/Default';
-import { ValidationAlert } from 'components/ValidationAlert';
-import { useEffect, useState } from 'react';
+import paymentType from '$app/common/constants/payment-type';
+import { route } from '$app/common/helpers/route';
+import { useCreditResolver } from '$app/common/hooks/credits/useCreditResolver';
+import { useInvoiceResolver } from '$app/common/hooks/invoices/useInvoiceResolver';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Client } from '$app/common/interfaces/client';
+import { Credit } from '$app/common/interfaces/credit';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Payment } from '$app/common/interfaces/payment';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankPaymentQuery } from '$app/common/queries/payments';
+import { Divider } from '$app/components/cards/Divider';
+import { Container } from '$app/components/Container';
+import { ConvertCurrency } from '$app/components/ConvertCurrency';
+import { CustomField } from '$app/components/CustomField';
+import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import Toggle from '$app/components/forms/Toggle';
+import { Default } from '$app/components/layouts/Default';
+import { ValidationAlert } from '$app/components/ValidationAlert';
+import { FormEvent, useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
@@ -188,19 +188,19 @@ export function Create() {
   const onSubmit = useSave(setErrors);
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onSaveClick={(event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        onSubmit(payment as unknown as Payment, sendEmail);
+      }}
+      disableSaveButton={!payment}
+    >
       <Container>
         {errors && <ValidationAlert errors={errors} />}
 
-        <Card
-          title={t('enter_payment')}
-          onFormSubmit={(event) => {
-            event.preventDefault();
-
-            payment && onSubmit(payment as unknown as Payment, sendEmail);
-          }}
-          withSaveButton
-        >
+        <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
             <DebouncedCombobox
               endpoint="/api/v1/clients"
@@ -225,7 +225,7 @@ export function Create() {
               onValueChange={(value) =>
                 handleChange('amount', parseFloat(value))
               }
-              errorMessage={errors?.errors.payment_amount}
+              errorMessage={errors?.errors.amount}
             />
           </Element>
 

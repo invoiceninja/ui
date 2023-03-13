@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
-import { Client } from 'common/interfaces/client';
-import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
-import { Invitation } from 'common/interfaces/purchase-order';
-import { blankLineItem } from 'common/constants/blank-line-item';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { Client } from '$app/common/interfaces/client';
+import { InvoiceItem, InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { Invitation } from '$app/common/interfaces/purchase-order';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { useAtom } from 'jotai';
-import { invoiceAtom, invoiceSumAtom } from 'pages/invoices/common/atoms';
+import { invoiceAtom, invoiceSumAtom } from '$app/pages/invoices/common/atoms';
 import { ChangeHandler } from '../Create';
-import { Invoice } from 'common/interfaces/invoice';
+import { Invoice } from '$app/common/interfaces/invoice';
 
 interface Props {
   client?: Client;

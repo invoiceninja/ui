@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { updateChanges } from 'common/stores/slices/user';
-import { RootState } from 'common/stores/store';
-import { CustomField } from 'components/CustomField';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { updateChanges } from '$app/common/stores/slices/user';
+import { RootState } from '$app/common/stores/store';
+import { CustomField } from '$app/components/CustomField';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext } from 'react-router-dom';

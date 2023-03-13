@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Invitation, PurchaseOrder } from 'common/interfaces/purchase-order';
+import { Invitation, PurchaseOrder } from '$app/common/interfaces/purchase-order';
 
 type Handler = <T extends keyof PurchaseOrder>(
   property: T,

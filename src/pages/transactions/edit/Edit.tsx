@@ -8,26 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { useTitle } from 'common/hooks/useTitle';
-import { endpoint } from 'common/helpers';
-import { Transaction } from 'common/interfaces/transactions';
-import { Container } from 'components/Container';
-import { Default } from 'components/layouts/Default';
+import { Card } from '$app/components/cards';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { endpoint } from '$app/common/helpers';
+import { Transaction } from '$app/common/interfaces/transactions';
+import { Container } from '$app/components/Container';
+import { Default } from '$app/components/layouts/Default';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { request } from 'common/helpers/request';
+import { request } from '$app/common/helpers/request';
 import { useNavigate, useParams } from 'react-router-dom';
-import { toast } from 'common/helpers/toast/toast';
+import { toast } from '$app/common/helpers/toast/toast';
 import { AxiosError } from 'axios';
-import { DecimalInputSeparators } from 'common/interfaces/decimal-number-input-separators';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTransactionQuery } from '../common/queries';
 import { useResolveCurrencySeparator } from '../common/hooks/useResolveCurrencySeparator';
 import { TransactionForm } from '../components/TransactionForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { useQueryClient } from 'react-query';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { useActions } from '../common/hooks/useActions';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -39,6 +41,8 @@ export function Edit() {
   const { data } = useTransactionQuery({ id });
 
   const queryClient = useQueryClient();
+
+  const actions = useActions();
 
   const resolveCurrencySeparator = useResolveCurrencySeparator();
 
@@ -105,9 +109,13 @@ export function Edit() {
   };
 
   useEffect(() => {
-    if (!transaction) {
+    if (data) {
       setTransaction(data);
-    } else {
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (transaction) {
       const resolvedCurrencySeparator = resolveCurrencySeparator(
         transaction.currency_id
       );
@@ -116,21 +124,27 @@ export function Edit() {
         setCurrencySeparators(resolvedCurrencySeparator);
       }
     }
-  }, [data, transaction]);
+  }, [transaction]);
 
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
       onBackClick="/transactions"
+      disableSaveButton={!transaction || isFormBusy}
+      onSaveClick={onSave}
+      navigationTopRight={
+        transaction && (
+          <ResourceActions
+            resource={transaction}
+            label={t('more_actions')}
+            actions={actions}
+          />
+        )
+      }
     >
       <Container>
-        <Card
-          title={documentTitle}
-          withSaveButton
-          onSaveClick={onSave}
-          disableSubmitButton={isFormBusy}
-        >
+        <Card title={documentTitle}>
           {transaction && currencySeparators && (
             <TransactionForm
               errors={errors}
