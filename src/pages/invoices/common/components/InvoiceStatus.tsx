@@ -20,6 +20,8 @@ interface Props {
 export function InvoiceStatus(props: Props) {
   const [t] = useTranslation();
 
+  const { status_id, due_date } = props.entity;
+
   const checkInvoiceInvitationsViewedDate = () => {
     return props.entity.invitations.some(
       (invitation) => invitation.viewed_date
@@ -32,22 +34,33 @@ export function InvoiceStatus(props: Props) {
   if (props.entity.archived_at)
     return <Badge variant="orange">{t('archived')}</Badge>;
 
-  if (props.entity.due_date && new Date(props.entity.due_date) < new Date())
+  if (
+    due_date &&
+    new Date(due_date) < new Date() &&
+    (status_id === InvoiceStatusEnum.Sent ||
+      status_id === InvoiceStatusEnum.Partial)
+  )
     return <Badge variant="yellow">{t('overdue')}</Badge>;
 
   if (
-    props.entity.status_id === InvoiceStatusEnum.Sent &&
+    status_id === InvoiceStatusEnum.Sent &&
     checkInvoiceInvitationsViewedDate()
   )
     return <Badge variant="yellow">{t('viewed')}</Badge>;
 
-  switch (props.entity.status_id) {
+  if (status_id === InvoiceStatusEnum.Sent && !due_date)
+    return <Badge variant="light-blue">{t('sent')}</Badge>;
+
+  if (
+    status_id === InvoiceStatusEnum.Partial &&
+    due_date &&
+    new Date(due_date) > new Date()
+  )
+    return <Badge variant="dark-blue">{t('partial')}</Badge>;
+
+  switch (status_id) {
     case '1':
       return <Badge variant="generic">{t('draft')}</Badge>;
-    case '2':
-      return <Badge variant="light-blue">{t('sent')}</Badge>;
-    case '3':
-      return <Badge variant="dark-blue">{t('partial')}</Badge>;
     case '4':
       return <Badge variant="green">{t('paid')}</Badge>;
     case '5':
