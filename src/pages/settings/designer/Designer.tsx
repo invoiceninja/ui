@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { useLogo } from 'common/hooks/useLogo';
-import { ColorPicker } from 'components/forms/ColorPicker';
+import { Link } from '$app/components/forms';
+import { useLogo } from '$app/common/hooks/useLogo';
+import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { useState } from 'react';
 import { ArrowLeft } from 'react-feather';
 
