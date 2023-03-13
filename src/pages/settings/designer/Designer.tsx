@@ -11,8 +11,11 @@
 import { Link } from '$app/components/forms';
 import { useLogo } from '$app/common/hooks/useLogo';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { ArrowLeft } from 'react-feather';
+import { useDispatch } from 'react-redux';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 
 export const template = `
   <style>
@@ -23,7 +26,7 @@ export const template = `
     }
   
     .company-logo {
-      max-width: 65%;
+      max-width: 55%;
     }
 
     .text-primary {
@@ -44,40 +47,44 @@ interface Element {
   selector: string;
   value: string | null;
   property: string;
+  metadata: {
+    companyProperty?: string;
+    magicVariable?: string;
+  };
 }
 
 interface Compilation {
   html: string;
-  elements: Element[];
 }
-
-const defaultSet: Element[] = [
-  { selector: ':root', property: '--primary-color', value: 'red' },
-  { selector: ':root', property: '--secondary-color', value: 'blue' },
-  { selector: '.company-logo', property: 'max-width', value: '15%' },
-];
 
 class Builder {
   #document!: Document;
   #css = new CSSStyleSheet();
 
-  constructor(html: string, public elements: Element[]) {
+  constructor(public html: string) {
     this.#document = new DOMParser().parseFromString(html, 'text/html');
 
     const style = this.#document.querySelector('style');
 
     if (style) {
       this.#css.replaceSync(style.innerHTML);
-      this.#sync();
     }
   }
 
-  #sync() {
-    // This injects elements from the context object (settings)
+  sync(options: { elements: Element[]; magicVariables: boolean }) {
+    options.elements.map((element) => {
+      // We want directly update only elements, that are not linked to company settings.
+      // Example of this is primary color, font, etc.
+      // Anything that can be edited using panel & it's not directly linked to the template itself.
+      const value =
+        element.metadata.magicVariable && options.magicVariables
+          ? element.metadata.magicVariable
+          : element.value;
 
-    this.elements.map((element) => {
-      this.setSelectorValue(element.selector, element.property, element.value);
+      this.setSelectorValue(element.selector, element.property, value);
     });
+
+    return this;
   }
 
   #querySelector(selector: string) {
@@ -112,17 +119,6 @@ class Builder {
     return this.#document.documentElement.innerHTML;
   }
 
-  #elements() {
-    this.elements.map((element, index) => {
-      this.elements[index].value = this.getSelectorValue(
-        element.selector,
-        element.property
-      );
-    });
-
-    return this.elements;
-  }
-
   getSelectorValue(selector: string, property: string) {
     return (
       this.#querySelector(selector)?.style.getPropertyValue(property) || null
@@ -142,37 +138,150 @@ class Builder {
   compile() {
     return {
       html: this.#html(),
-      elements: this.#elements(),
     } satisfies Compilation;
   }
 }
 
-export function Designer() {
-  const logo = useLogo();
-  const [html, setHtml] = useState(template);
-  const [elements] = useState<Element[]>(defaultSet);
-  const builder = new Builder(html, elements);
+function useElements() {
+  const [elements, setElements] = useState<Element[]>([]);
 
-  const handleSelectorChange = (
+  const company = useInjectCompanyChanges();
+  const dispatch = useDispatch();
+
+  const getSelectorValue = (selector: string, property: string) => {
+    const element = elements.find(
+      (e) => e.selector === selector && e.property === property
+    );
+
+    if (element) {
+      return element.value;
+    }
+
+    console.warn(
+      `Trying to access missing selector [${selector}] with property [${property}].`
+    );
+  };
+
+  const setSelectorValue = (
     selector: string,
     property: string,
     value: string
   ) => {
-    const { html } = builder
-      .setSelectorValue(selector, property, value)
-      .compile();
+    const index = elements.findIndex(
+      (e) => e.selector === selector && e.property === property
+    );
 
-    setHtml(html);
+    const element = elements[index];
+
+    if (index) {
+      setElements((current) => {
+        const elements: Element[] = [...current];
+
+        elements[index].value = value;
+
+        return elements;
+      });
+    }
+
+    if (element.metadata.companyProperty) {
+      dispatch(
+        updateChanges({
+          object: 'company',
+          property: element.metadata.companyProperty,
+          value: value,
+        })
+      );
+    }
   };
 
-  // Two ways of updating stuff.
-  // 1. Direct selector (.company-size) example
-  // 2. Updating settings which will trigger update of the elements array (primary color example).
+  useEffect(() => {
+    company &&
+      setElements([
+        {
+          selector: ':root',
+          property: '--primary-color',
+          value: company.settings.primary_color,
+          metadata: {
+            companyProperty: 'settings.primary_color',
+            magicVariable: '$primary_color',
+          },
+        },
+        {
+          selector: ':root',
+          property: '--secondary-color',
+          value: company.settings.secondary_color,
+          metadata: {
+            companyProperty: 'settings.secondary_color',
+            magicVariable: '$secondary_color',
+          },
+        },
+        {
+          selector: '.company-logo',
+          property: 'max-width',
+          value: getSelectorValue('.company-logo', 'max-width') || '65%',
+          metadata: {},
+        },
+      ]);
+  }, [company?.settings]);
+
+  useEffect(() => {
+    window.dispatchEvent(
+      new CustomEvent('designer.data', {
+        detail: elements,
+      })
+    );
+  }, [elements]);
+
+  return { elements, getSelectorValue, setSelectorValue };
+}
+
+function useBuilder() {
+  const builder = new Builder(template);
+
+  const [elements, setElements] = useState<Element[]>([]);
+  const [html, setHtml] = useState<string>();
+
+  useEffect(() => {
+    window.addEventListener('designer.data', (payload: any) => {
+      const e: Element[] = payload.detail;
+
+      setElements(e);
+
+      const { html } = builder
+        .sync({ elements: e, magicVariables: false })
+        .compile();
+
+      setHtml(html);
+    });
+  }, []);
+
+  const build = () => {
+    const artifacts = builder
+      .sync({ elements, magicVariables: true })
+      .compile();
+
+    console.log('Output', artifacts.html);
+
+    builder.sync({ elements, magicVariables: false }).compile();
+  };
+
+  return { html, build };
+}
+
+export function Designer() {
+  const logo = useLogo();
+
+  const { html, build } = useBuilder();
+  const { getSelectorValue, setSelectorValue } = useElements();
 
   return (
     <div className="flex">
       <div className="h-screen w-1/3 bg-gray-100">
-        <div className="inline-flex items-center p-6">
+        <div className="flex flex-col p-6">
+          <div>
+            <button onClick={build}>Export</button>
+          </div>
+
           <Link className="inline-flex items-center space-x-1" to="/settings">
             <ArrowLeft size={16} />
             <span>Back to settings</span>
@@ -201,10 +310,13 @@ export function Designer() {
                   type="range"
                   min="1"
                   max="65"
-                  // value={elements.logo?.size.value || 0}
+                  value={getSelectorValue(
+                    '.company-logo',
+                    'max-width'
+                  )?.replace('%', '')}
                   id="slider"
                   onChange={(event) =>
-                    handleSelectorChange(
+                    setSelectorValue(
                       '.company-logo',
                       'max-width',
                       `${event.target.value}%`
@@ -212,9 +324,7 @@ export function Designer() {
                   }
                 />
                 <span className="text-sm">
-                  {elements.find(
-                    (element) => element.selector === '.company-logo'
-                  )?.value || 0}
+                  {getSelectorValue('.company-logo', 'max-width')}
                 </span>
               </label>
             </div>
@@ -230,15 +340,9 @@ export function Designer() {
               <small className="font-medium">Primary color</small>
 
               <ColorPicker
-                value={
-                  elements.find(
-                    (element) =>
-                      element.selector === ':root' &&
-                      element.property === '--primary-color'
-                  )?.value || '#fff'
-                }
+                value={getSelectorValue(':root', '--primary-color') || '#fff'}
                 onValueChange={(value) =>
-                  handleSelectorChange(':root', '--primary-color', value)
+                  setSelectorValue(':root', '--primary-color', value)
                 }
               />
             </div>
@@ -247,15 +351,9 @@ export function Designer() {
               <small className="font-medium">Secondary color</small>
 
               <ColorPicker
-                value={
-                  elements.find(
-                    (element) =>
-                      element.selector === ':root' &&
-                      element.property === '--secondary-color'
-                  )?.value || '#fff'
-                }
+                value={getSelectorValue(':root', '--secondary-color') || '#fff'}
                 onValueChange={(value) =>
-                  handleSelectorChange(':root', '--secondary-color', value)
+                  setSelectorValue(':root', '--secondary-color', value)
                 }
               />
             </div>
