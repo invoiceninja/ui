@@ -22,7 +22,7 @@ import {
 import { DropdownElement } from './DropdownElement';
 import { useClickAway } from 'react-use';
 import classNames from 'classnames';
-import { useAccentColor } from 'common/hooks/useAccentColor';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 
 interface Props extends CommonProps {
   label?: string | null;

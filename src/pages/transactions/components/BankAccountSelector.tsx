@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { BankAccount } from 'common/interfaces/bank-accounts';
-import { GenericSelectorProps } from 'common/interfaces/generic-selector-props';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
+import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CreateBankAccountModal } from './CreateBankAccountModal';

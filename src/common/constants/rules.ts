@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Rule } from 'common/interfaces/transaction-rules';
+import { Rule } from '$app/common/interfaces/transaction-rules';
 
 export const defaultRule: Rule = {
   search_key: 'description',

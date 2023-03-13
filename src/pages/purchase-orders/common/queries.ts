@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { GenericQueryOptions } from 'common/queries/invoices';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { GenericQueryOptions } from '$app/common/queries/invoices';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
 import { AxiosError } from 'axios';
 import { useAtomValue } from 'jotai';
-import { invalidationQueryAtom } from 'common/atoms/data-table';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 
 export function useBlankPurchaseOrderQuery(options?: GenericQueryOptions) {
   return useQuery<PurchaseOrder>(

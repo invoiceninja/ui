@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { useProductQuery } from 'common/queries/products';
+import { Card } from '$app/components/cards';
+import { useProductQuery } from '$app/common/queries/products';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useOutletContext, useParams } from 'react-router-dom';
 import { ProductForm } from '../common/components/ProductForm';
 import { useHandleChange } from '../common/hooks';
-import { Spinner } from 'components/Spinner';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Product } from 'common/interfaces/product';
+import { Spinner } from '$app/components/Spinner';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Product } from '$app/common/interfaces/product';
 
 interface Context {
   errors: ValidationBag | undefined;

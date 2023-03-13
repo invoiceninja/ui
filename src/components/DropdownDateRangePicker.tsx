@@ -7,8 +7,9 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Button, SelectField } from '@invoiceninja/forms';
-import { Modal } from 'components/Modal';
+
+import { Button, SelectField } from '$app/components/forms';
+import { Modal } from '$app/components/Modal';
 import { ChangeEvent, useState } from 'react';
 import { Calendar } from 'react-feather';
 import { useTranslation } from 'react-i18next';

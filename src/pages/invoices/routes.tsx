@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Guard } from 'common/guards/Guard';
-import { permission } from 'common/guards/guards/permission';
-import { Import } from 'pages/invoices/import/Import';
+import { Guard } from '$app/common/guards/Guard';
+import { permission } from '$app/common/guards/guards/permission';
+import { Import } from '$app/pages/invoices/import/Import';
 import { Route } from 'react-router-dom';
 import { Email } from './email/Email';
 import { Invoices } from './index/Invoices';
 import { Pdf } from './pdf/Pdf';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
-import { enabled } from 'common/guards/guards/enabled';
-import { ModuleBitmask } from 'pages/settings/account-management/component';
-import { or } from 'common/guards/guards/or';
-import { assigned } from 'common/guards/guards/assigned';
+import { enabled } from '$app/common/guards/guards/enabled';
+import { ModuleBitmask } from '$app/pages/settings/account-management/component';
+import { or } from '$app/common/guards/guards/or';
+import { assigned } from '$app/common/guards/guards/assigned';
 
 export const invoiceRoutes = (
   <Route path="/invoices">

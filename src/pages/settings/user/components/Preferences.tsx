@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import Toggle from 'components/forms/Toggle';
+import Toggle from '$app/components/forms/Toggle';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
-import { updateChanges } from 'common/stores/slices/user';
-import { useReactSettings } from 'common/hooks/useReactSettings';
+import { updateChanges } from '$app/common/stores/slices/user';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export function Preferences() {
   const [t] = useTranslation();

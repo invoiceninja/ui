@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { DataTable } from 'components/DataTable';
+import { DataTable } from '$app/components/DataTable';
 import { useTaxRateColumns } from './common/hooks/useTaxRateColumns';
 
 export function TaxRates() {

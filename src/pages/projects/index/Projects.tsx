@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { DataTable } from 'components/DataTable';
-import { Default } from 'components/layouts/Default';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { DataTable } from '$app/components/DataTable';
+import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
-  projectColumns,
   useActions,
+  useAllProjectColumns,
   useProjectColumns,
 } from '../common/hooks';
-import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 
 export function Projects() {
   useTitle('projects');
@@ -30,6 +30,8 @@ export function Projects() {
   const columns = useProjectColumns();
 
   const actions = useActions();
+
+  const projectColumns = useAllProjectColumns();
 
   return (
     <Default

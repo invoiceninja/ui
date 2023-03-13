@@ -7,7 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Alert } from './Alert';
 
 interface Props {

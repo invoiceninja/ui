@@ -9,7 +9,7 @@
  */
 
 import { Dialog, Transition } from '@headlessui/react';
-import { CompanySwitcher } from 'components/CompanySwitcher';
+import { CompanySwitcher } from '$app/components/CompanySwitcher';
 import { Fragment } from 'react';
 import { X } from 'react-feather';
 import { NavigationItem } from './DesktopSidebar';

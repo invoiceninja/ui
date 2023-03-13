@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { EntityState } from 'common/enums/entity-state';
+import { EntityState } from '$app/common/enums/entity-state';
 
 export default {
   [EntityState.Active]: 'active',

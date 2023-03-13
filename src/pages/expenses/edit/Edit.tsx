@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from 'common/helpers/route';
-import { useTitle } from 'common/hooks/useTitle';
-import { Expense } from 'common/interfaces/expense';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useExpenseQuery } from 'common/queries/expenses';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { ResourceActions } from 'components/ResourceActions';
-import { Tab, Tabs } from 'components/Tabs';
+import { route } from '$app/common/helpers/route';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Expense } from '$app/common/interfaces/expense';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useExpenseQuery } from '$app/common/queries/expenses';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Tab, Tabs } from '$app/components/Tabs';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';

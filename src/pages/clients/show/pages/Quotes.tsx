@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import quoteStatus from 'common/constants/quote-status';
-import { route } from 'common/helpers/route';
-import { DataTable, DataTableColumns } from 'components/DataTable';
-import { StatusBadge } from 'components/StatusBadge';
+import { Link } from '$app/components/forms';
+import quoteStatus from '$app/common/constants/quote-status';
+import { route } from '$app/common/helpers/route';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
+import { StatusBadge } from '$app/components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';

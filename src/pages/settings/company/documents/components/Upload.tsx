@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
+import { Card, Element } from '$app/components/cards';
 import { useFormik } from 'formik';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Image } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { request } from 'common/helpers/request';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
-import { isHosted } from 'common/helpers';
-import { Alert } from 'components/Alert';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { Link } from '@invoiceninja/forms';
-import { toast } from 'common/helpers/toast/toast';
+import { request } from '$app/common/helpers/request';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { isHosted } from '$app/common/helpers';
+import { Alert } from '$app/components/Alert';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { Link } from '$app/components/forms';
+import { toast } from '$app/common/helpers/toast/toast';
 import { MdInfoOutline } from 'react-icons/md';
 
 interface Props {

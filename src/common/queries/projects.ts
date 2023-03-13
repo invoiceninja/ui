@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { Project } from 'common/interfaces/project';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { Project } from '$app/common/interfaces/project';
 import { useQuery } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { GenericQueryOptions } from './invoices';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { useHasPermission } from 'common/hooks/permissions/useHasPermission';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 export function useBlankProjectQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();

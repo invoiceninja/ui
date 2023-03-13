@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { Checkbox } from '@invoiceninja/forms';
-import { useVendorResolver } from 'common/hooks/vendors/useVendorResolver';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { Vendor } from 'common/interfaces/vendor';
-import { VendorSelector as Selector } from 'components/vendors/VendorSelector';
+import { Card } from '$app/components/cards';
+import { Checkbox } from '$app/components/forms';
+import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Vendor } from '$app/common/interfaces/vendor';
+import { VendorSelector as Selector } from '$app/components/vendors/VendorSelector';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

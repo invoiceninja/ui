@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { useResolveCurrency } from './useResolveCurrency';
 
 export function useCalculateInvoiceSum(

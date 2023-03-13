@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { Invoice } from 'common/interfaces/invoice';
-import { defaultHeaders } from 'common/queries/common/headers';
+import { endpoint } from '$app/common/helpers';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { defaultHeaders } from '$app/common/queries/common/headers';
 
 export class InvoiceResolver {
   protected declare invoice: Invoice;

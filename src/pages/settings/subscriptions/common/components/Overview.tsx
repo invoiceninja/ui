@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { GroupSettings } from 'common/interfaces/group-settings';
-import { Product } from 'common/interfaces/product';
-import { Subscription } from 'common/interfaces/subscription';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { CopyToClipboard } from 'components/CopyToClipboard';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
-import { UserSelector } from 'components/users/UserSelector';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { GroupSettings } from '$app/common/interfaces/group-settings';
+import { Product } from '$app/common/interfaces/product';
+import { Subscription } from '$app/common/interfaces/subscription';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import { UserSelector } from '$app/components/users/UserSelector';
 import { useTranslation } from 'react-i18next';
 import { MultipleProductSelector } from './MultipleProductSelector';
 

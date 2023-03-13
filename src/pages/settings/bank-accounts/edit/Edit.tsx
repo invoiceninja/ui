@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useTitle } from 'common/hooks/useTitle';
-import { BankAccount } from 'common/interfaces/bank-accounts';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';

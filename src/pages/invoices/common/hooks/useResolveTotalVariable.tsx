@@ -10,11 +10,11 @@
 
 import { resolveTotalVariable } from '../helpers/resolve-total-variable';
 import { useFormatMoney } from './useFormatMoney';
-import { CustomField } from 'components/CustomField';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { Element } from '@invoiceninja/cards';
+import { CustomField } from '$app/components/CustomField';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Element } from '$app/components/cards';
 import { useResolveTranslation } from './useResolveTranslation';
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import {
   ProductTableResource,
   RelationType,

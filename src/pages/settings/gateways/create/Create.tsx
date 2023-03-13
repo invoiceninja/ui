@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { SelectField } from '@invoiceninja/forms';
-import { useTitle } from 'common/hooks/useTitle';
-import { CompanyGateway } from 'common/interfaces/company-gateway';
-import { Gateway } from 'common/interfaces/statics';
+import { Card, Element } from '$app/components/cards';
+import { SelectField } from '$app/components/forms';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { Gateway } from '$app/common/interfaces/statics';
 import {
   useBlankCompanyGatewayQuery,
   useCompanyGatewaysQuery,
-} from 'common/queries/company-gateways';
-import { Settings } from 'components/layouts/Settings';
+} from '$app/common/queries/company-gateways';
+import { Settings } from '$app/components/layouts/Settings';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -28,8 +28,8 @@ import { RequiredFields } from './components/RequiredFields';
 import { Settings as GatewaySettings } from './components/Settings';
 import { useHandleCreate } from './hooks/useHandleCreate';
 import { blankFeesAndLimitsRecord } from './hooks/useHandleMethodToggle';
-import { TabGroup } from 'components/TabGroup';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { TabGroup } from '$app/components/TabGroup';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export function Create() {
   const [t] = useTranslation();

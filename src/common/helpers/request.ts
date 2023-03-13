@@ -9,7 +9,7 @@
  */
 
 import axios, { AxiosError, AxiosRequestConfig, Method } from 'axios';
-import { defaultHeaders } from 'common/queries/common/headers';
+import { defaultHeaders } from '$app/common/queries/common/headers';
 
 const client = axios.create();
 

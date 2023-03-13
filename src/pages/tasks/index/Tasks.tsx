@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { useTitle } from 'common/hooks/useTitle';
-import { DataTable } from 'components/DataTable';
-import { Default } from 'components/layouts/Default';
+import { Link } from '$app/components/forms';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { DataTable } from '$app/components/DataTable';
+import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { BsKanban } from 'react-icons/bs';
 import {
   defaultColumns,
-  taskColumns,
   useActions,
+  useAllTaskColumns,
   useTaskColumns,
   useTaskFilters,
 } from '../common/hooks';
-import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
-import { Inline } from 'components/Inline';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { Inline } from '$app/components/Inline';
 
 export function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -36,6 +36,8 @@ export function Tasks() {
   const filters = useTaskFilters();
 
   const actions = useActions();
+
+  const taskColumns = useAllTaskColumns();
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>

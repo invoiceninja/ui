@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from 'components/Badge';
+import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
-import { StatusBadge } from 'components/StatusBadge';
-import recurringExpenseStatus from 'common/constants/recurring-expense';
-import { RecurringExpense } from 'common/interfaces/recurring-expense';
+import { StatusBadge } from '$app/components/StatusBadge';
+import recurringExpenseStatus from '$app/common/constants/recurring-expense';
+import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 
 interface Props {
   recurringExpense: RecurringExpense;

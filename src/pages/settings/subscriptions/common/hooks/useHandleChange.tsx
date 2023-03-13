@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Subscription } from 'common/interfaces/subscription';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { Subscription } from '$app/common/interfaces/subscription';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
 import { cloneDeep, set } from 'lodash';
 

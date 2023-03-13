@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
-import { endpoint, isHosted } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useTitle } from 'common/hooks/useTitle';
-import { User } from 'common/interfaces/user';
-import { defaultHeaders } from 'common/queries/common/headers';
-import { useBlankUserQuery } from 'common/queries/users';
-import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
-import { Settings } from 'components/layouts/Settings';
-import { PasswordConfirmation } from 'components/PasswordConfirmation';
-import { TabGroup } from 'components/TabGroup';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { endpoint, isHosted } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { User } from '$app/common/interfaces/user';
+import { defaultHeaders } from '$app/common/queries/common/headers';
+import { useBlankUserQuery } from '$app/common/queries/users';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { Settings } from '$app/components/layouts/Settings';
+import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
+import { TabGroup } from '$app/components/TabGroup';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';

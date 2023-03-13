@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTranslation } from 'react-i18next';
-import { Payment, Paymentable } from 'common/interfaces/payment';
-import { Invoice } from 'common/interfaces/invoice';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { date as formatDate } from 'common/helpers';
+import { Payment, Paymentable } from '$app/common/interfaces/payment';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { date as formatDate } from '$app/common/helpers';
 import { Link } from 'react-router-dom';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 
 interface Props {
   payment: Payment;

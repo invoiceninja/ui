@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputField } from '@invoiceninja/forms';
+import { InputField } from '$app/components/forms';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { SearchInput } from './ListBox';

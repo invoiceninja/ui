@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { DataTable } from 'components/DataTable';
-import { Default } from 'components/layouts/Default';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { DataTable } from '$app/components/DataTable';
+import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
-  expenseColumns,
   useActions,
+  useAllExpenseColumns,
   useExpenseColumns,
   useExpenseFilters,
 } from '../common/hooks';
-import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
-import { ImportButton } from 'components/import/ImportButton';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { ImportButton } from '$app/components/import/ImportButton';
 
 export function Expenses() {
   useTitle('expenses');
@@ -34,6 +34,8 @@ export function Expenses() {
   const actions = useActions();
 
   const filters = useExpenseFilters();
+
+  const expenseColumns = useAllExpenseColumns();
 
   return (
     <Default title={t('expenses')} breadcrumbs={pages} docsLink="docs/expenses">

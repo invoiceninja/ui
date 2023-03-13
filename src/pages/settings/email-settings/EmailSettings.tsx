@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { trans } from 'common/helpers';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useShouldDisableAdvanceSettings } from 'common/hooks/useShouldDisableAdvanceSettings';
-import { useTitle } from 'common/hooks/useTitle';
-import { AdvancedSettingsPlanAlert } from 'components/AdvancedSettingsPlanAlert';
-import { Divider } from 'components/cards/Divider';
-import { MarkdownEditor } from 'components/forms/MarkdownEditor';
-import Toggle from 'components/forms/Toggle';
-import { Settings } from 'components/layouts/Settings';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { trans } from '$app/common/helpers';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
+import { Divider } from '$app/components/cards/Divider';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import Toggle from '$app/components/forms/Toggle';
+import { Settings } from '$app/components/layouts/Settings';
 import dayjs from 'dayjs';
-import { useHandleCancel } from 'pages/invoices/edit/hooks/useHandleCancel';
+import { useHandleCancel } from '$app/pages/invoices/edit/hooks/useHandleCancel';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';

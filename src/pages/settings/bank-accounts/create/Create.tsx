@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
-import { proPlan } from 'common/guards/guards/pro-plan';
-import { isHosted } from 'common/helpers';
-import { useTitle } from 'common/hooks/useTitle';
-import { BankAccount } from 'common/interfaces/bank-accounts';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { isHosted } from '$app/common/helpers';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../../components/layouts/Settings';

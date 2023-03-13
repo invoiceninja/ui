@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Credit } from 'common/interfaces/credit';
+import { Credit } from '$app/common/interfaces/credit';
 import { v4 } from 'uuid';
 import { PaymentOnCreation } from '../Create';
 

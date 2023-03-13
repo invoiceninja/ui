@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from 'common/helpers/route';
-import { useTitle } from 'common/hooks/useTitle';
-import { Dropdown } from 'components/dropdown/Dropdown';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Icon } from 'components/icons/Icon';
-import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
-import { InvoiceViewer } from 'pages/invoices/common/components/InvoiceViewer';
-import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
-import { useGeneratePdfUrl } from 'pages/invoices/common/hooks/useGeneratePdfUrl';
+import { route } from '$app/common/helpers/route';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
+import { useGeneratePdfUrl } from '$app/pages/invoices/common/hooks/useGeneratePdfUrl';
 import { useTranslation } from 'react-i18next';
 import { MdCreditCard, MdDownload } from 'react-icons/md';
 import { useParams } from 'react-router-dom';

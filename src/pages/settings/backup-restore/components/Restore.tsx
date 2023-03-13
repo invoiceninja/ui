@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { UploadImport } from 'components/import/UploadImport';
+import { Card } from '$app/components/cards';
+import { UploadImport } from '$app/components/import/UploadImport';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

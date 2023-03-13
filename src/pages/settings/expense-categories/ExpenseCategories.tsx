@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { ExpenseCategory } from 'common/interfaces/expense-category';
-import { DataTable, DataTableColumns } from 'components/DataTable';
-import { route } from 'common/helpers/route';
+import { Link } from '$app/components/forms';
+import { ExpenseCategory } from '$app/common/interfaces/expense-category';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
+import { route } from '$app/common/helpers/route';
 
 export function ExpenseCategories() {
   const columns: DataTableColumns<ExpenseCategory> = [

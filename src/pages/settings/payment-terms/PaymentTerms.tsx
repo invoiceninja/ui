@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, Link } from '@invoiceninja/forms';
+import { Button, Link } from '$app/components/forms';
 import {
   ColumnSortPayload,
   Pagination,
@@ -18,21 +18,21 @@ import {
   Th,
   Thead,
   Tr,
-} from '@invoiceninja/tables';
+} from '$app/components/tables';
 import { AxiosError } from 'axios';
-import { PaymentTerm } from 'common/interfaces/payment-term';
-import { bulk, usePaymentTermsQuery } from 'common/queries/payment-terms';
-import { Breadcrumbs } from 'components/Breadcrumbs';
-import { Dropdown } from 'components/dropdown/Dropdown';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Settings } from 'components/layouts/Settings';
+import { PaymentTerm } from '$app/common/interfaces/payment-term';
+import { bulk, usePaymentTermsQuery } from '$app/common/queries/payment-terms';
+import { Breadcrumbs } from '$app/components/Breadcrumbs';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Settings } from '$app/components/layouts/Settings';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
-import { Icon } from 'components/icons/Icon';
+import { route } from '$app/common/helpers/route';
+import { Icon } from '$app/components/icons/Icon';
 import { MdArchive, MdEdit } from 'react-icons/md';
 
 export function PaymentTerms() {
