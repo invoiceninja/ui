@@ -11,7 +11,7 @@
 import { Link } from '$app/components/forms';
 import { useLogo } from '$app/common/hooks/useLogo';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
-import { useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { ArrowLeft } from 'react-feather';
 import { useDispatch } from 'react-redux';
 import { updateChanges } from '$app/common/stores/slices/company-users';
@@ -142,10 +142,15 @@ class Builder {
   }
 }
 
-function useElements() {
-  const [elements, setElements] = useState<Element[]>([]);
+interface ElementUtilitiesOptions {
+  elements: Element[];
+  setElements: Dispatch<SetStateAction<Element[]>>;
+}
 
-  const company = useInjectCompanyChanges();
+function useElementUtilities({
+  elements,
+  setElements,
+}: ElementUtilitiesOptions) {
   const dispatch = useDispatch();
 
   const getSelectorValue = (selector: string, property: string) => {
@@ -193,6 +198,19 @@ function useElements() {
       );
     }
   };
+
+  return { getSelectorValue, setSelectorValue };
+}
+
+function useElements() {
+  const [elements, setElements] = useState<Element[]>([]);
+
+  const company = useInjectCompanyChanges();
+
+  const { getSelectorValue, setSelectorValue } = useElementUtilities({
+    elements,
+    setElements,
+  });
 
   useEffect(() => {
     company &&
