@@ -87,9 +87,8 @@ export function useResolveInputField(props: Props) {
       getCurrency(resource[props.relationType], props.relationType);
   }, [resource?.[props.relationType]]);
 
-  return (key: string, _id: string) => {
+  return (key: string, index: number) => {
     const property = resolveProperty(key);
-    const index = resource.line_items.findIndex((item) => item._id === _id);
 
     if (property === 'product_key') {
       return (
