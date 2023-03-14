@@ -16,7 +16,7 @@ import { ArrowLeft } from 'react-feather';
 import { useDispatch } from 'react-redux';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import template from './static/example-template.txt?raw'
+import template from './static/example-template.txt?raw';
 
 interface Element {
   selector: string;
@@ -358,7 +358,7 @@ export function Designer() {
           className="bg-white rounded"
           style={{ minWidth: 960, minHeight: 1280 }}
         >
-          {html && <iframe srcDoc={html} width={960} height={1280}></iframe>}
+          {html && <iframe srcDoc={html} className="min-w-full min-h-full" />}
         </div>
       </div>
     </div>
