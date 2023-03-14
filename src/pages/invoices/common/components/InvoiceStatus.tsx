@@ -33,8 +33,7 @@ export function InvoiceStatus(props: Props) {
   const isSent = status_id != InvoiceStatusEnum.Draft;
   const isPaid = status_id == InvoiceStatusEnum.Paid;
   const isUnpaid = !isPaid;
-  const isViewed =
-    status_id === InvoiceStatusEnum.Sent && checkInvoiceInvitationsViewedDate();
+  const isViewed = checkInvoiceInvitationsViewedDate();
   const isPartial = status_id == InvoiceStatusEnum.Partial;
   const isReversed = status_id == InvoiceStatusEnum.Reversed;
   const isCancelled = status_id == InvoiceStatusEnum.Cancelled;
