@@ -16,32 +16,7 @@ import { ArrowLeft } from 'react-feather';
 import { useDispatch } from 'react-redux';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-
-export const template = `
-  <style>
-    :root {
-      --primary-color: $primary_color;
-      --secondary-color: $secondary_color;
-      --line-height: 1.6;
-    }
-  
-    .company-logo {
-      max-width: 55%;
-    }
-
-    .text-primary {
-      color: var(--primary-color);
-    }
-
-    .text-secondary {
-      color: var(--secondary-color);
-    }
-  </style>
-  
-  <img src="https://forum.invoiceninja.com/uploads/default/original/2X/6/672414e38c31024298b506d24ffc4d5e3c3b488e.png" class="company-logo" />
-  <p class="text-primary">Primary text</p>
-  <p class="text-secondary">Secondary text</p>
-`;
+import template from './static/example-template.txt?raw'
 
 interface Element {
   selector: string;
@@ -380,7 +355,7 @@ export function Designer() {
       </div>
       <div className="h-screen w-full bg-gray-300 flex justify-center overflow-y-auto p-10">
         <div
-          className="bg-white p-10 rounded"
+          className="bg-white rounded"
           style={{ minWidth: 960, minHeight: 1280 }}
         >
           {html && <iframe srcDoc={html} width={960} height={1280}></iframe>}

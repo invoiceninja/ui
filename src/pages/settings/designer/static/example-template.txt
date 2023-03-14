@@ -1,0 +1,638 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
+<html><head><style id="style">
+    @import url(https://fonts.googleapis.com/css2?family=Roboto&display=swap);
+
+    :root {
+        --primary-color: #298AAB;
+        --secondary-color: #7081e0;
+        --line-height: 1.6;
+    }
+
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        font-family: Roboto, Helvetica, sans-serif;
+        font-size: 16 !important;
+        zoom: 80%;
+    }
+
+    table tr td, table tr, th {
+        font-size: 16 !important;
+    }
+
+    html {
+        width: 210mm;
+        height: 200mm;     
+    }
+
+    @page {
+        margin: -0.25cm !important;
+        size: A4 portrait;
+        margin-top: 1rem;
+    }
+
+
+    p {
+        margin: 0;
+        padding: 0;
+    }
+
+    .header-wrapper {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        padding: 1rem 0rem 0rem 2rem;
+    }
+
+    .header-wrapper .entity-details-wrapper {
+        background-color: var(--primary-color);
+        padding: 0.5rem;
+        border-radius: 10px;
+    }
+
+    #entity-details p { 
+        margin-right: 20px; 
+        white-space: nowrap;
+        --tw-space-y-reverse: 0;
+        margin-top: calc(.5rem * calc(1 - var(--tw-space-y-reverse)));
+        margin-bottom: calc(.5rem * var(--tw-space-y-reverse));
+    }
+
+    .header-wrapper #entity-details {
+        width: 100%;
+        color: white;
+        text-align: left;
+    }
+
+    .header-wrapper #entity-details > tr,
+    .header-wrapper #entity-details th {
+        font-weight: normal;
+    }
+
+    .company-logo {
+/*        max-width: 65%;*/
+        max-width: 65%;
+    }
+
+    .contacts-wrapper {
+        display: grid;
+        gap: 20px;
+        padding: 1rem 0rem 0rem 2rem;
+        grid-template-columns: 1fr 1fr auto;
+        grid-template-areas: "a b c";
+        grid-auto-columns: minmax(0, 5fr);
+        grid-auto-flow: column;
+        justify-content: space-between;
+
+    }
+
+    .contacts-wrapper .contact-label {
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-left: 1rem;
+    }
+
+    .contacts-wrapper .shipping-label {
+        font-weight: bold;
+        color: var(--primary-color);
+        margin-left: 1rem;
+        display: none;
+    }
+
+    .contacts-wrapper #company-address,
+    .contacts-wrapper #company-details,
+    .contacts-wrapper #client-details {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 0.5rem;
+    }
+
+    .contacts-wrapper #shipping-details {
+        display: none;
+        flex-direction: column;
+        margin-bottom: 0.5rem;
+    }
+
+    .contacts-wrapper .company-info {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-top: 1px solid var(--primary-color);
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .contacts-wrapper #client-details {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-top: 1px solid var(--primary-color);
+    }
+
+    .contacts-wrapper #shipping-details {
+        margin-top: 1rem;
+        padding: 1rem;
+        border-top: 1px solid var(--primary-color);
+    }
+
+
+    .contact-wrapper-left-side,
+    .contact-wrapper-right-side {
+        border-bottom: 1px solid var(--primary-color);
+    }
+
+    .shipping-wrapper-right-side {
+        border-bottom: 1px solid var(--primary-color);
+        display: none;
+    }
+
+    [data-ref="table"] {
+        padding-left: 2rem;
+        padding-right: 0rem;
+        margin-top: 1rem;
+        margin-bottom: 5px;
+        min-width: 100%;
+        table-layout: fixed;
+        overflow-wrap: break-word;
+    }
+
+    .task-time-details {
+        display: block;
+        margin-top: 5px;
+        color: grey;
+    }
+
+    [data-ref="table"] > thead {
+        text-align: left;
+    }
+
+    [data-ref="table"] > thead > tr > th {
+        font-size: 1.2rem;
+        padding: 1rem;
+        background: var(--primary-color);
+        color: white;
+    }
+
+    [data-ref="table"] > thead tr > th:last-child {
+        text-align: right;
+    }
+
+    [data-ref="table"] > thead tr > th:first-child {
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+
+    [data-ref="table"] > thead tr > th:last-child {
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+    }
+
+    [data-ref="table"] > tbody > tr > td {
+        background-color: #F7F7F7;
+        border-bottom: 1px solid var(--primary-color);
+        padding: 1rem;
+    }
+
+    [data-ref="table"] > tbody > tr > td:first-child {
+        color: var(--primary-color);
+    }
+
+    [data-ref="table"] > tbody > tr > td:last-child {
+        text-align: right;
+    }
+
+    #table-totals {
+        margin-top: 0.5rem;
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 80px;
+        padding-left: 2rem;
+        padding-right: 0rem;
+        page-break-inside:auto;
+        overflow: visible !important;
+    }
+
+    #table-totals .totals-table-right-side>* {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    #table-totals>.totals-table-right-side>*> :nth-child(1) {
+        text-align: left;
+        margin-top: .75rem;
+    }
+
+    #table-totals>.totals-table-right-side> * > :not([hidden]) ~ :not([hidden]) {
+        --tw-space-y-reverse: 0;
+        margin-top: calc(.75rem * calc(1 - var(--tw-space-y-reverse)));
+        margin-bottom: calc(.75rem * var(--tw-space-y-reverse));
+    }
+
+    #table-totals>.totals-table-right-side>*> :nth-child(2) {
+        text-align: right;
+    }
+
+    #table-totals
+    > *
+    [data-element='product-table-balance-due-label'],
+    #table-totals
+    > *
+    [data-element='product-table-balance-due'] {
+        font-weight: bold;
+    }
+
+    #table-totals
+    > *
+    [data-element='product-table-balance-due'] {
+        color: var(--primary-color);
+    }
+
+    #table-totals > * > :last-child {
+        text-align: right;
+        padding-right: 1rem;
+    }
+
+    #header {
+        position: fixed;
+        top: 0;
+        min-width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+        margin-left: -10px;
+    }
+
+    #header > * {
+        padding: 10px;
+    }
+
+    [data-ref="total_table-footer"] {
+        text-align: left;
+        padding-left: 2rem;
+        padding-right: rem;
+    }
+
+    #footer {
+        margin-top: 1rem;
+        page-break-inside:auto;
+        overflow: visible !important;
+    }
+
+    /** Markdown-specific styles. **/
+    [data-ref="table"] h3 {
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+
+    #footer-colors {
+        position: fixed;
+        bottom: 0;
+        min-width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr 1fr 1fr;
+        margin-left: -10px;
+   }
+
+   #footer-colors > * {
+        padding: 10px;
+    }
+
+    [data-ref="statement-totals"] {
+        margin-top: 1rem;
+        text-align: right;
+        padding-left: 3rem;
+        padding-right: 3rem;
+    }
+
+    [data-ref*=".line_total-td"] {
+        white-space: nowrap;
+    }
+
+    .repeating-header,
+    .repeating-header-space {
+        height: 20px;
+        page-break-inside:avoid;
+        page-break-before:avoid;
+        page-break-after:avoid;
+    }
+
+    .repeating-footer,
+    .repeating-footer-space {
+        height: 20px;
+    }
+    .repeating-header {
+        position: fixed;
+        top: 0;
+    }
+    .repeating-footer {
+        position: fixed;
+        bottom: 0;
+    }
+
+    [data-element='product_table-product.description-td'], td {
+        min-width:100%;
+        max-width: 300px;
+        overflow-wrap: break-word; 
+    }
+
+    [data-ref="shipping_address-label"] {
+        display: none;
+    }
+
+    .stamp {
+      transform: rotate(12deg);
+        color: #555;
+        font-size: 3rem;
+        font-weight: 700;
+        border: 0.25rem solid #555;
+        display: inline-block;
+        padding: 0.25rem 1rem;
+        text-transform: uppercase;
+        border-radius: 1rem;
+        font-family: 'Courier';
+        mix-blend-mode: multiply;
+        z-index:200 !important;
+        position:  fixed;
+        text-align: center;
+    }
+
+    .is-paid {
+        color:  #D23;
+        border: 1rem double  #D23;
+        transform: rotate(-5deg);
+        font-size: 6rem;
+        font-family: "Open sans", Helvetica, Arial, sans-serif;
+        border-radius: 0;
+        padding: 0.5rem;
+        opacity: 0.2;
+        z-index:200 !important;
+        position:  fixed;
+        display: none;
+
+    } 
+
+    .project-header {
+        font-size: 1.2em;
+        margin-top: 0.1em;
+        margin-bottom: 0;
+        padding-bottom: 0;
+        margin-left: 0;
+        margin-right: 0;
+        font-weight: bold;
+        color: #505050;
+    } 
+
+    .pqrcode {
+        
+    }
+    
+    /** Useful snippets, uncomment to enable. **/
+
+    /** Hide company logo **/
+    /* .company-logo { display: none } */
+
+    /* Hide company details */
+    /* #company-details > * { display: none } */
+
+    /* Hide company address */
+    /* #company-address > * { display: none } */
+
+    /* Hide public notes */
+    /* [data-ref="total_table-public_notes"] { display: none } */
+
+    /* Hide terms label */
+    /* [data-ref="total_table-terms-label"] { display: none } */
+
+    /* Hide totals table */
+    /* #table-totals { display: none } */
+
+    /* Hide totals table left side */
+    /* #table-totals div:first-child > * { display: none !important } */
+
+    /* Hide totals table right side */
+    /* .totals-table-right-side { display: none } */
+
+    /** For more info, please check our docs: https://invoiceninja.github.io **/
+    /** To find out selectors on your own: https://invoiceninja.github.io/docs/custom-fields/#snippets **/
+</style>
+</head><body><div id="body">
+<table style="min-width: 100%">
+   <thead>
+      <tr>
+         <td>
+            <div class="repeating-header-space">&nbsp;</div>
+         </td>
+      </tr>
+   </thead>
+   <tbody>
+      <tr>
+         <td>
+            <div class="header-wrapper">
+                <div>
+                    <img class="company-logo" src="https://invoiceninja.github.io/assets/images/logo-rounded.png" alt=" logo">
+                </div>
+                <div class="entity-details-wrapper">
+                    <table id="entity-details" cellspacing="0" dir="ltr"><tr><th data-state="encoded-html" data-ref="entity_details-invoice.number_label">&lt;p&gt;Invoice Number&lt;/p&gt;
+</th><th data-state="encoded-html" data-ref="entity_details-invoice.number">&lt;p&gt;0029&lt;/p&gt;
+</th></tr><tr><th data-state="encoded-html" data-ref="entity_details-invoice.po_number_label">&lt;p&gt;PO Number&lt;/p&gt;
+</th><th data-state="encoded-html" data-ref="entity_details-invoice.po_number">&lt;p&gt;PO12345&lt;/p&gt;
+</th></tr><tr><th data-state="encoded-html" data-ref="entity_details-invoice.date_label">&lt;p&gt;Invoice Date&lt;/p&gt;
+</th><th data-state="encoded-html" data-ref="entity_details-invoice.date">&lt;p&gt;25/Feb/2023&lt;/p&gt;
+</th></tr><tr><th data-state="encoded-html" data-ref="entity_details-invoice.due_date_label">&lt;p&gt;Due Date&lt;/p&gt;
+</th><th data-state="encoded-html" data-ref="entity_details-invoice.due_date">&lt;p&gt;2023-10-24&lt;/p&gt;
+</th></tr><tr><th data-state="encoded-html" data-ref="entity_details-invoice.total_label">&lt;p&gt;Invoice Total&lt;/p&gt;
+</th><th data-state="encoded-html" data-ref="entity_details-invoice.total">&lt;p&gt;$0.00&lt;/p&gt;
+</th></tr><tr hidden="1"><th data-state="encoded-html" data-ref="entity_details-invoice.balance_due_label">&lt;p&gt;Balance Due&lt;/p&gt;
+</th><th data-state="encoded-html" data-ref="entity_details-invoice.balance_due">&lt;p&gt;$0.00&lt;/p&gt;
+</th></tr></table>
+                </div>
+            </div>
+            <div class="contacts-wrapper">
+                <div class="contact-wrapper-left-side">
+                    <p class="contact-label">From:</p>
+                    <div class="company-info">
+                    <div id="company-details"><p data-state="encoded-html" data-ref="company_details-company.name">&lt;p&gt;&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="company_details-company.id_number">&lt;p&gt;&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="company_details-company.vat_number">&lt;p&gt;&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="company_details-company.website">&lt;p&gt;&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="company_details-company.email">&lt;p&gt;&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="company_details-company.phone">&lt;p&gt;&lt;/p&gt;
+</p></div>
+                    <div id="company-address"><p data-state="encoded-html" data-ref="company_address-company.address1">&lt;p&gt;&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="company_address-company.address2">&lt;p&gt;&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="company_address-company.city_state_postal">&lt;p&gt;Beveley Hills, CA, 90210&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="company_address-company.country">&lt;p&gt;United States&lt;/p&gt;
+</p></div>
+                    </div>
+                </div>
+                <div class="contact-wrapper-right-side">
+                    <p class="contact-label">To:</p>
+                    <div id="client-details"><p data-state="encoded-html" data-ref="client_details-client.name">&lt;p&gt;A Client Called Bob&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="client_details-client.number">&lt;p&gt;12345&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="client_details-client.vat_number">&lt;p&gt;975977515&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="client_details-client.address1">&lt;p&gt;8447&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="client_details-client.address2">&lt;p&gt;63993 Aiyana View&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="client_details-client.city_state_postal">&lt;p&gt;Aufderharchester, North Carolina 11243&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="client_details-client.country">&lt;p&gt;Afghanistan&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="client_details-client.phone">&lt;p&gt;555-123-3212&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="client_details-contact.email">&lt;p&gt;bob@gmail.com&lt;/p&gt;
+</p></div>
+                    <div id="vendor-details"></div>
+                </div>
+
+                <div class="shipping-wrapper-right-side">
+                    <p class="shipping-label">Shipping:</p>
+                    <div id="shipping-details"><p data-state="encoded-html" data-ref="shipping_address-label" style="font-weight: bold; text-transform: uppercase">&lt;p&gt;Shipping Address&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="shipping_address-client.name">&lt;p&gt;Shanahan-Cormier&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="shipping_address-client.shipping_address1">&lt;p&gt;3633&lt;/p&gt;
+</p><p data-state="encoded-html" data-ref="shipping_address-client.shipping_address2">&lt;p&gt;7427 Vergie Pines&lt;/p&gt;
+</p><p><span data-state="encoded-html" ref="shipping_address-client.shipping_city">&lt;p&gt;Lake Itzelbury&lt;/p&gt;
+</span><span data-state="encoded-html" ref="shipping_address-client.shipping_state">&lt;p&gt;South Carolina&lt;/p&gt;
+</span><span data-state="encoded-html" ref="shipping_address-client.shipping_postal_code">&lt;p&gt;62648&lt;/p&gt;
+</span></p><p data-state="encoded-html">&lt;p&gt;Afghanistan&lt;/p&gt;
+</p></div>
+                </div>
+            </div>
+            <table id="product-table" cellspacing="0" data-ref="table"><thead><th data-state="encoded-html" data-ref="product_table-product.item-th">&lt;p&gt;Item&lt;/p&gt;
+</th><th data-state="encoded-html" data-ref="product_table-product.description-th">&lt;p&gt;Description&lt;/p&gt;
+</th><th data-state="encoded-html" data-ref="product_table-product.unit_cost-th">&lt;p&gt;Unit Cost&lt;/p&gt;
+</th><th data-state="encoded-html" data-ref="product_table-product.quantity-th">&lt;p&gt;Quantity&lt;/p&gt;
+</th><th data-state="encoded-html" data-ref="product_table-product.discount-th" style="display: none;">&lt;p&gt;Discount&lt;/p&gt;
+</th><th data-state="encoded-html" data-ref="product_table-product.tax1-th">&lt;p&gt;Tax&lt;/p&gt;
+</th><th data-state="encoded-html" data-ref="product_table-product.line_total-th">&lt;p&gt;Line Total&lt;/p&gt;
+</th></thead><tbody><tr><td data-state="encoded-html" data-ref="product_table-product.item-td">&lt;p&gt;excepturi&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.description-td">&lt;p&gt;Will you, won't you, will you, won't you, won't.&lt;/p&gt;
+</td><td data-state="encoded-html" style="white-space: nowrap;" data-ref="product_table-product.unit_cost-td">&lt;p&gt;$211.62&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.quantity-td">&lt;p&gt;$10.00&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.discount-td" style="display: none;">&lt;p&gt;$7.00&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.tax1-td">&lt;p&gt;10%&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.line_total-td">&lt;p&gt;$2,116.20&lt;/p&gt;
+</td></tr><tr><td data-state="encoded-html" data-ref="product_table-product.item-td">&lt;p&gt;laudantium&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.description-td">&lt;p&gt;Alice, 'or perhaps they won't walk the way down.&lt;/p&gt;
+</td><td data-state="encoded-html" style="white-space: nowrap;" data-ref="product_table-product.unit_cost-td">&lt;p&gt;$47.04&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.quantity-td">&lt;p&gt;$7.00&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.discount-td" style="display: none;">&lt;p&gt;$3.00&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.tax1-td">&lt;p&gt;10%&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.line_total-td">&lt;p&gt;$329.28&lt;/p&gt;
+</td></tr><tr><td data-state="encoded-html" data-ref="product_table-product.item-td">&lt;p&gt;ut&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.description-td">&lt;p&gt;The cook threw a frying-pan after her as she.&lt;/p&gt;
+</td><td data-state="encoded-html" style="white-space: nowrap;" data-ref="product_table-product.unit_cost-td">&lt;p&gt;$952.66&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.quantity-td">&lt;p&gt;$6.00&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.discount-td" style="display: none;">&lt;p&gt;$2.00&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.tax1-td">&lt;p&gt;10%&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.line_total-td">&lt;p&gt;$5,715.96&lt;/p&gt;
+</td></tr><tr><td data-state="encoded-html" data-ref="product_table-product.item-td">&lt;p&gt;et&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.description-td">&lt;p&gt;Alice had been looking over their slates; 'but.&lt;/p&gt;
+</td><td data-state="encoded-html" style="white-space: nowrap;" data-ref="product_table-product.unit_cost-td">&lt;p&gt;$279.07&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.quantity-td">&lt;p&gt;$6.00&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.discount-td" style="display: none;">&lt;p&gt;$3.00&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.tax1-td">&lt;p&gt;10%&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.line_total-td">&lt;p&gt;$1,674.42&lt;/p&gt;
+</td></tr><tr><td data-state="encoded-html" data-ref="product_table-product.item-td">&lt;p&gt;veritatis&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.description-td">&lt;p&gt;Knave of Hearts, and I could say if I fell off.&lt;/p&gt;
+</td><td data-state="encoded-html" style="white-space: nowrap;" data-ref="product_table-product.unit_cost-td">&lt;p&gt;$785.68&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.quantity-td">&lt;p&gt;$4.00&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.discount-td" style="display: none;">&lt;p&gt;$7.00&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.tax1-td">&lt;p&gt;10%&lt;/p&gt;
+</td><td data-state="encoded-html" data-ref="product_table-product.line_total-td">&lt;p&gt;$3,142.72&lt;/p&gt;
+</td></tr></tbody></table>
+            <table id="task-table" cellspacing="0" data-ref="table"></table>
+            <table id="delivery-note-table" cellspacing="0" data-ref="table"></table>
+            <table id="statement-invoice-table" cellspacing="0" data-ref="table"></table>
+            <div id="statement-invoice-table-totals" data-ref="statement-totals"></div>
+            <table id="statement-payment-table" cellspacing="0" data-ref="table"></table>
+            <div id="statement-payment-table-totals" data-ref="statement-totals"></div>
+            <table id="statement-aging-table" cellspacing="0" data-ref="table"></table>
+            <div id="statement-aging-table-totals" data-ref="statement-totals"></div>
+            <div id="table-totals" cellspacing="0"><div class="stamp is-paid"> Paid</div><div style="display: flex; flex-direction: column;"><p data-ref="total_table-public_notes" style="text-align: left;"></p><p style="text-align: left; display: flex; flex-direction: column; page-break-inside: auto;"><span data-state="encoded-html" data-ref="total_table-terms-label" style="font-weight: bold; text-align: left; margin-top: 1rem;">&lt;p&gt;Invoice Terms:&lt;/p&gt;
+</span><span data-state="encoded-html" data-ref="total_table-terms" style="text-align: left;">&lt;p&gt;Impedit inventore earum deleniti non. Provident reprehenderit iste alias sunt alias aut. Possimus earum cumque consectetur rem. Eligendi pariatur officiis voluptates officiis deserunt molestiae. Libero magnam consequuntur architecto mollitia. Quis tempore aspernatur dolore ut aliquam. Fuga voluptate dolorem officiis quo sed laudantium qui. Omnis sint pariatur dolor delectus dolores exercitationem. Ipsum quae magni odio quos nam.&lt;/p&gt;
+</span></p><img style="max-width: 50%; height: auto;" src="" id="contact-signature"><div style="margin-top: 1.5rem; display: flex; align-items: flex-start; page-break-inside: auto;"><img src="https://raw.githubusercontent.com/invoiceninja/invoiceninja/v5-develop/public/images/new_logo.png" style="height: 2.5rem;" id="invoiceninja-whitelabel-logo"></div></div><div class="totals-table-right-side" dir="ltr"><div><span data-state="encoded-html" data-ref="totals_table-net_subtotal-label">&lt;p&gt;Net&lt;/p&gt;
+</span><span data-state="encoded-html" data-ref="totals_table-net_subtotal">&lt;p&gt;$0.00&lt;/p&gt;
+</span></div><div><span data-state="encoded-html" data-ref="totals_table-subtotal-label">&lt;p&gt;Subtotal&lt;/p&gt;
+</span><span data-state="encoded-html" data-ref="totals_table-subtotal">&lt;p&gt;$0.00&lt;/p&gt;
+</span></div><div><span data-state="encoded-html" data-ref="totals_table-discount-label">&lt;p&gt;Discount&lt;/p&gt;
+</span><span data-state="encoded-html" data-ref="totals_table-discount">&lt;p&gt;$0.00&lt;/p&gt;
+</span></div><div><span data-state="encoded-html" hidden="1" data-ref="totals_table-custom_surcharge1-label">&lt;p&gt;&lt;/p&gt;
+</span><span data-state="encoded-html" hidden="1" data-ref="totals_table-custom_surcharge1">&lt;p&gt;$0.00&lt;/p&gt;
+</span></div><div><span data-state="encoded-html" hidden="1" data-ref="totals_table-custom_surcharge2-label">&lt;p&gt;&lt;/p&gt;
+</span><span data-state="encoded-html" hidden="1" data-ref="totals_table-custom_surcharge2">&lt;p&gt;$0.00&lt;/p&gt;
+</span></div><div><span data-state="encoded-html" hidden="1" data-ref="totals_table-custom_surcharge3-label">&lt;p&gt;&lt;/p&gt;
+</span><span data-state="encoded-html" hidden="1" data-ref="totals_table-custom_surcharge3">&lt;p&gt;$0.00&lt;/p&gt;
+</span></div><div><span data-state="encoded-html" hidden="1" data-ref="totals_table-custom_surcharge4-label">&lt;p&gt;&lt;/p&gt;
+</span><span data-state="encoded-html" hidden="1" data-ref="totals_table-custom_surcharge4">&lt;p&gt;$0.00&lt;/p&gt;
+</span></div><div><span data-state="encoded-html" data-ref="totals-table-total_tax_0-label">&lt;p&gt;GST&lt;/p&gt;
+</span><span data-state="encoded-html" data-ref="totals-table-total_tax_0">&lt;p&gt;$10.00&lt;/p&gt;
+</span></div><div><span data-state="encoded-html" data-ref="totals-table-line_tax_0-label">&lt;p&gt;GST&lt;/p&gt;
+</span><span data-state="encoded-html" data-ref="totals-table-line_tax_0">&lt;p&gt;$10.00&lt;/p&gt;
+</span></div><div><span data-state="encoded-html" data-ref="totals_table-total-label">&lt;p&gt;Total&lt;/p&gt;
+</span><span data-state="encoded-html" data-ref="totals_table-total">&lt;p&gt;$0.00&lt;/p&gt;
+</span></div><div><span data-state="encoded-html" data-ref="totals_table-paid_to_date-label">&lt;p&gt;Paid to Date&lt;/p&gt;
+</span><span data-state="encoded-html" data-ref="totals_table-paid_to_date">&lt;p&gt;$0.00&lt;/p&gt;
+</span></div><div><span data-state="encoded-html" data-ref="totals_table-outstanding-label">&lt;p&gt;Balance Due&lt;/p&gt;
+</span><span data-state="encoded-html" data-ref="totals_table-outstanding">&lt;p&gt;$0.00&lt;/p&gt;
+</span></div><div><span></span><span></span></div></div></div>      
+         </td>
+      </tr>
+   </tbody>
+   <tfoot>
+      <tr>
+         <td>
+            <div class="repeating-footer-space">&nbsp;</div>
+         </td>
+      </tr>
+   </tfoot>
+</table>
+</div>
+<div class="repeating-header">
+    <div id="header">
+        <div style="background-color: #00968B"><!-- 1 --></div>
+        <div style="background-color: #1D756E"><!-- 2 --></div>
+        <div style="background-color: #FCB600"><!-- 3 --></div>
+        <div style="background-color: #BA932F"><!-- 4 --></div>
+        <div style="background-color: #A72A4E"><!-- 5 --></div>
+        <div style="background-color: #E20041"><!-- 6 --></div>
+        <div style="background-color: #F8B300"><!-- 7 --></div>
+        <div style="background-color: #009B8F"><!-- 8 --></div>
+    </div>
+</div>
+
+
+
+<div class="repeating-footerx" id="footer">
+    <p data-ref="total_table-footer">Default invoice footer</p>
+
+    <div id="footer-colors">
+        <div style="background-color: #00968B"><!-- 1 --></div>
+        <div style="background-color: #1D756E"><!-- 2 --></div>
+        <div style="background-color: #FCB600"><!-- 3 --></div>
+        <div style="background-color: #BA932F"><!-- 4 --></div>
+        <div style="background-color: #A72A4E"><!-- 5 --></div>
+        <div style="background-color: #E20041"><!-- 6 --></div>
+        <div style="background-color: #F8B300"><!-- 7 --></div>
+        <div style="background-color: #009B8F"><!-- 8 --></div>
+    </div>
+
+        <script>
+            // Clear up space a bit, if [product-table, tasks-table, delivery-note-table] isn't present.
+            document.addEventListener('DOMContentLoaded', () => {
+                let tables = [
+                    'product-table', 'task-table', 'delivery-note-table',
+                    'statement-invoice-table', 'statement-payment-table', 'statement-aging-table-totals',
+                    'statement-invoice-table-totals', 'statement-payment-table-totals', 'statement-aging-table',
+                    'client-details','vendor-details'
+                ];
+
+                tables.forEach((tableIdentifier) => {
+                    console.log(document.getElementById(tableIdentifier));
+
+                    document.getElementById(tableIdentifier)?.childElementCount === 0
+                        ? document.getElementById(tableIdentifier).style.setProperty('display', 'none', 'important')
+                        : '';
+                });
+            });
+        </script>
+<div><script>
+            document.querySelectorAll('#statement-invoice-table > thead > tr > th, #statement-payment-table > thead > tr > th, #statement-aging-table > thead > tr > th').forEach(t => {
+                t.hidden = false;
+            });
+        </script><script>document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll("#product-table > tbody > tr > td, #task-table > tbody > tr > td, #delivery-note-table > tbody > tr > td").forEach(t=>{if(""!==t.innerText){let e=t.getAttribute("data-ref").slice(0,-3);document.querySelector(`th[data-ref="${e}-th"]`).removeAttribute("hidden")}}),document.querySelectorAll("#product-table > tbody > tr > td, #task-table > tbody > tr > td, #delivery-note-table > tbody > tr > td").forEach(t=>{let e=t.getAttribute("data-ref").slice(0,-3);(e=document.querySelector(`th[data-ref="${e}-th"]`)).hasAttribute("hidden")&&""==t.innerText&&t.setAttribute("hidden","true")})},!1);</script><script>document.addEventListener("DOMContentLoaded",function(){document.querySelectorAll(`[data-state="encoded-html"]`).forEach(e=>e.innerHTML=e.innerText)},!1);</script></div></div>
+</body></html>
+  
