@@ -412,6 +412,9 @@
 
     /** For more info, please check our docs: https://invoiceninja.github.io **/
     /** To find out selectors on your own: https://invoiceninja.github.io/docs/custom-fields/#snippets **/
+
+    [data-ref="entity_details-invoice.number_label"] {}
+    [data-ref="entity_details-invoice.number"] {}
 </style>
 </head><body><div id="body">
 <table style="min-width: 100%">

@@ -17,6 +17,7 @@ import { useDispatch } from 'react-redux';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import template from './static/example-template.txt?raw';
+import Toggle from '$app/components/forms/Toggle';
 
 interface Element {
   selector: string;
@@ -105,7 +106,15 @@ class Builder {
     property: string,
     value: string | null
   ): Builder {
-    this.#querySelector(selector)?.style.setProperty(property, value);
+    const element = this.#querySelector(selector);
+
+    if (element) {
+      element.style.setProperty(property, value);
+    }
+
+    if (!element) {
+      console.warn(`Can't find element with selector: ${selector}`);
+    }
 
     return this;
   }
@@ -212,6 +221,32 @@ function useElements() {
           selector: '.company-logo',
           property: 'max-width',
           value: getSelectorValue('.company-logo', 'max-width') || '65%',
+          metadata: {},
+        },
+        {
+          selector: '.company-logo',
+          property: 'display',
+          value: getSelectorValue('.company-logo', 'display') || 'revert',
+          metadata: {},
+        },
+        {
+          selector: '[data-ref="entity_details-invoice.number_label"]',
+          property: 'display',
+          value:
+            getSelectorValue(
+              '[data-ref="entity_details-invoice.number_label"]',
+              'display'
+            ) || 'revert',
+          metadata: {},
+        },
+        {
+          selector: '[data-ref="entity_details-invoice.number"]',
+          property: 'display',
+          value:
+            getSelectorValue(
+              '[data-ref="entity_details-invoice.number"]',
+              'display'
+            ) || 'revert',
           metadata: {},
         },
       ]);
@@ -321,6 +356,22 @@ export function Designer() {
                 </span>
               </label>
             </div>
+
+            <div className="flex flex-col space-y-2 my-4">
+              <Toggle
+                label="Logo visibility"
+                checked={
+                  getSelectorValue('.company-logo', 'display') === 'revert'
+                }
+                onChange={(value) =>
+                  setSelectorValue(
+                    '.company-logo',
+                    'display',
+                    value ? 'revert' : 'none'
+                  )
+                }
+              />
+            </div>
           </div>
 
           <div className="px-6 py-4">
@@ -349,6 +400,42 @@ export function Designer() {
                   setSelectorValue(':root', '--secondary-color', value)
                 }
               />
+            </div>
+          </div>
+
+          <div className="px-6 py-4">
+            <h4 className="uppercase font-semibold">Invoice details</h4>
+            <p className="text-xs">Show or hide invoice information</p>
+
+            <div className="flex flex-col space-y-2 my-4">
+              <Toggle
+                label="Number"
+                checked={
+                  getSelectorValue(
+                    '[data-ref="entity_details-invoice.number_label"]',
+                    'display'
+                  ) === 'revert' ||
+                  getSelectorValue(
+                    '[data-ref="entity_details-invoice.number"]',
+                    'display'
+                  ) === 'revert'
+                }
+                onValueChange={(value) => {
+                  setSelectorValue(
+                    '[data-ref="entity_details-invoice.number_label"]',
+                    'display',
+                    value ? 'revert' : 'none'
+                  );
+
+                  setSelectorValue(
+                    '[data-ref="entity_details-invoice.number"]',
+                    'display',
+                    value ? 'revert' : 'none'
+                  );
+                }}
+              />
+              <Toggle label="Date" />
+              <Toggle label="Total" />
             </div>
           </div>
         </div>
