@@ -37,6 +37,9 @@ export function useFormatMoney(props: Props) {
   const vendorResolver = useVendorResolver();
   const clientResolver = useClientResolver();
 
+  const [clientId, setClientId] = useState<string>('');
+  const [vendorId, setVendorId] = useState<string>('');
+
   const { resource, relationType } = props;
 
   const [country, setCountry] = useState<Country>();
@@ -45,18 +48,20 @@ export function useFormatMoney(props: Props) {
   const [relation, setRelation] = useState<Client | Vendor>();
 
   useEffect(() => {
-    if (resource?.[relationType] && relationType === 'client_id') {
-      clientResolver
-        .find(resource.client_id)
-        .then((client) => setRelation(client));
+    if (clientId && relationType === 'client_id') {
+      clientResolver.find(clientId).then((client) => setRelation(client));
     }
 
-    if (resource?.[relationType] && relationType === 'vendor_id') {
-      vendorResolver
-        .find(resource.vendor_id)
-        .then((vendor) => setRelation(vendor));
+    if (vendorId && relationType === 'vendor_id') {
+      vendorResolver.find(vendorId).then((vendor) => setRelation(vendor));
     }
-  }, [resource]);
+  }, [clientId, vendorId]);
+
+  useEffect(() => {
+    resource?.vendor_id && setVendorId(resource.vendor_id);
+
+    resource?.client_id && setClientId(resource.client_id);
+  }, [resource?.client_id, resource?.vendor_id]);
 
   useEffect(() => {
     if (relation && relationType === 'client_id') {
