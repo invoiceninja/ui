@@ -30,20 +30,21 @@ export function InvoiceStatus(props: Props) {
     );
   };
 
-  const isSent = status_id != InvoiceStatusEnum.Draft;
-  const isPaid = status_id == InvoiceStatusEnum.Paid;
+  const isSent = status_id !== InvoiceStatusEnum.Draft;
+  const isPaid = status_id === InvoiceStatusEnum.Paid;
   const isUnpaid = !isPaid;
   const isViewed = checkInvoiceInvitationsViewedDate();
-  const isPartial = status_id == InvoiceStatusEnum.Partial;
-  const isReversed = status_id == InvoiceStatusEnum.Reversed;
-  const isCancelled = status_id == InvoiceStatusEnum.Cancelled;
+  const isPartial = status_id === InvoiceStatusEnum.Partial;
+  const isReversed = status_id === InvoiceStatusEnum.Reversed;
+  const isCancelled = status_id === InvoiceStatusEnum.Cancelled;
   const isCancelledOrReversed = isCancelled || isReversed;
   const isDeleted = Boolean(props.entity.is_deleted);
 
   const isPastDue = () => {
-    const date = partial != 0 && partial_due_date ? partial_due_date : due_date;
+    const date =
+      partial !== 0 && partial_due_date ? partial_due_date : due_date;
 
-    if (!date || balance == 0) {
+    if (!date || balance === 0) {
       return false;
     }
 
@@ -53,6 +54,11 @@ export function InvoiceStatus(props: Props) {
     return !isDeleted && isSent && isUnpaid && isLessForOneDay;
   };
 
+  if (isDeleted) return <Badge variant="red">{t('deleted')}</Badge>;
+
+  if (props.entity.archived_at)
+    return <Badge variant="orange">{t('archived')}</Badge>;
+
   if (isPastDue() && !isCancelledOrReversed) {
     return <Badge variant="yellow">{t('overdue')}</Badge>;
   }
@@ -60,11 +66,6 @@ export function InvoiceStatus(props: Props) {
   if (isViewed && isUnpaid && !isPartial && !isCancelledOrReversed) {
     return <Badge variant="yellow">{t('viewed')}</Badge>;
   }
-
-  if (isDeleted) return <Badge variant="red">{t('deleted')}</Badge>;
-
-  if (props.entity.archived_at)
-    return <Badge variant="orange">{t('archived')}</Badge>;
 
   switch (status_id) {
     case InvoiceStatusEnum.Draft:
