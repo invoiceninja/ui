@@ -22,8 +22,9 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Settings } from '../../../../components/layouts/Settings';
-import { useBankAccountQuery } from '../common/queries';
+import Toggle from '$app/components/forms/Toggle';
+import { useBankAccountQuery } from '$app/pages/settings/bank-accounts/common/queries';
+import { Settings } from '$app/components/layouts/Settings';
 
 export function Edit() {
   useTitle('edit_bank_account');
@@ -118,6 +119,22 @@ export function Edit() {
             value={accountDetails?.bank_account_name}
             onValueChange={(value) => handleChange('bank_account_name', value)}
             errorMessage={errors?.errors.bank_account_name}
+          />
+        </Element>
+
+        <Element leftSide={t('sync_from')}>
+          <InputField
+            type="date"
+            value={accountDetails?.from_date}
+            onValueChange={(value) => handleChange('from_date', value)}
+            errorMessage={errors?.errors.from_date}
+          />
+        </Element>
+
+        <Element leftSide={t('auto_sync')}>
+          <Toggle
+            checked={accountDetails?.auto_sync || false}
+            onValueChange={(value) => handleChange('auto_sync', value)}
           />
         </Element>
       </Card>

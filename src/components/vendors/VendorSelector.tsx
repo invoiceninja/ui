@@ -10,7 +10,10 @@
 
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { Vendor } from '$app/common/interfaces/vendor';
-import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import {
+  DebouncedCombobox,
+  Record,
+} from '$app/components/forms/DebouncedCombobox';
 import { CreateVendorModal } from '$app/pages/vendors/components/CreateVendorModal';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -54,7 +57,7 @@ export function VendorSelector(props: VendorSelectorProps) {
           actionLabel={t('new_vendor')}
           onActionClick={() => setIsModalOpen(true)}
           sortBy="name|asc"
-          staleTime={props.staleTime}
+          staleTime={props.staleTime || 500}
           errorMessage={props.errorMessage}
         />
       )}
