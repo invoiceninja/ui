@@ -54,10 +54,13 @@ export function InvoiceStatus(props: Props) {
     return !isDeleted && isSent && isUnpaid && isLessForOneDay;
   };
 
-  if (isDeleted) return <Badge variant="red">{t('deleted')}</Badge>;
+  if (isDeleted) {
+    return <Badge variant="red">{t('deleted')}</Badge>;
+  }
 
-  if (props.entity.archived_at)
+  if (props.entity.archived_at) {
     return <Badge variant="orange">{t('archived')}</Badge>;
+  }
 
   if (isPastDue() && !isCancelledOrReversed) {
     return <Badge variant="yellow">{t('overdue')}</Badge>;
@@ -67,21 +70,29 @@ export function InvoiceStatus(props: Props) {
     return <Badge variant="yellow">{t('viewed')}</Badge>;
   }
 
-  switch (status_id) {
-    case InvoiceStatusEnum.Draft:
-      return <Badge variant="generic">{t('draft')}</Badge>;
-    case InvoiceStatusEnum.Sent:
-      return <Badge variant="light-blue">{t('sent')}</Badge>;
-    case InvoiceStatusEnum.Partial:
-      return <Badge variant="dark-blue">{t('partial')}</Badge>;
-    case InvoiceStatusEnum.Paid:
-      return <Badge variant="green">{t('paid')}</Badge>;
-    case InvoiceStatusEnum.Cancelled:
-      return <Badge variant="black">{t('cancelled')}</Badge>;
-    case InvoiceStatusEnum.Reversed:
-      return <Badge variant="purple">{t('reversed')}</Badge>;
-
-    default:
-      return <Badge variant="purple">{t('reversed')}</Badge>;
+  if (status_id === InvoiceStatusEnum.Draft) {
+    return <Badge variant="generic">{t('draft')}</Badge>;
   }
+
+  if (status_id === InvoiceStatusEnum.Sent) {
+    return <Badge variant="light-blue">{t('sent')}</Badge>;
+  }
+
+  if (status_id === InvoiceStatusEnum.Partial) {
+    return <Badge variant="dark-blue">{t('partial')}</Badge>;
+  }
+
+  if (status_id === InvoiceStatusEnum.Paid) {
+    return <Badge variant="green">{t('paid')}</Badge>;
+  }
+
+  if (status_id === InvoiceStatusEnum.Cancelled) {
+    return <Badge variant="black">{t('cancelled')}</Badge>;
+  }
+
+  if (status_id === InvoiceStatusEnum.Reversed) {
+    return <Badge variant="purple">{t('reversed')}</Badge>;
+  }
+
+  return <Badge variant="purple">{t('reversed')}</Badge>;
 }
