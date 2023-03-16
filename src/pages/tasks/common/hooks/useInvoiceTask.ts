@@ -119,9 +119,12 @@ export function useInvoiceTask() {
       setInvoice(invoice);
 
       navigate(
-        route('/invoices/create?table=tasks&project=:projectAssigned', {
-          projectAssigned: Boolean(tasks[0].project_id),
-        })
+        route(
+          '/invoices/create?table=tasks&project=:projectAssigned&action=invoice_task',
+          {
+            projectAssigned: Boolean(tasks[0].project_id),
+          }
+        )
       );
     }
   };
