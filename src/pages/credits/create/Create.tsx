@@ -138,7 +138,6 @@ export function Create() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/credits"
       onSaveClick={() => save(credit!)}
       disableSaveButton={credit?.client_id.length === 0}
     >

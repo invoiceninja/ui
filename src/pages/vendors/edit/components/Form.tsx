@@ -322,7 +322,9 @@ export function Form(props: Props) {
               <Element leftSide={t('currency')} noExternalPadding>
                 <CurrencySelector
                   value={vendor.currency_id}
-                  onChange={(value) => handleChange('currency_id', parseInt(value))}
+                  onChange={(value) =>
+                    handleChange('currency_id', parseInt(value))
+                  }
                 />
               </Element>
 

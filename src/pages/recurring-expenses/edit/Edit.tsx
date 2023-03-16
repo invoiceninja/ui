@@ -118,7 +118,6 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/recurring_expenses"
       onSaveClick={() => recurringExpense && handleSave()}
       navigationTopRight={
         recurringExpense && (

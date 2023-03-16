@@ -170,7 +170,6 @@ export function Create() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/invoices"
       onSaveClick={() => save(invoice as Invoice)}
       disableSaveButton={invoice?.client_id.length === 0}
     >

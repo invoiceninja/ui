@@ -38,7 +38,6 @@ export function Pdf() {
   return (
     <Default
       title={documentTitle}
-      onBackClick={route('/quotes/:id/edit', { id })}
       navigationTopRight={
         quote && (
           <Dropdown label={t('more_actions')}>

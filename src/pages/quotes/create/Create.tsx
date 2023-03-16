@@ -134,7 +134,6 @@ export function Create() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/quotes"
       onSaveClick={() => save(quote!)}
       disableSaveButton={quote?.client_id.length === 0}
     >

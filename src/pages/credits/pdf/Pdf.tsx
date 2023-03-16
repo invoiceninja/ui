@@ -39,7 +39,6 @@ export function Pdf() {
   return (
     <Default
       title={documentTitle}
-      onBackClick={route('/credits/:id/edit', { id })}
       navigationTopRight={
         credit && (
           <Dropdown label={t('more_actions')}>

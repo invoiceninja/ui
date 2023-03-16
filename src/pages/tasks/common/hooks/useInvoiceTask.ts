@@ -17,7 +17,10 @@ import { parseTimeLog } from '../helpers/calculate-time';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import dayjs from 'dayjs';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { InvoiceItem, InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '$app/common/interfaces/invoice-item';
 import collect from 'collect.js';
 import toast from 'react-hot-toast';
 import { useAtom } from 'jotai';

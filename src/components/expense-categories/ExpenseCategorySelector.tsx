@@ -10,7 +10,10 @@
 
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
-import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import {
+  DebouncedCombobox,
+  Record,
+} from '$app/components/forms/DebouncedCombobox';
 import { CreateExpenseCategoryModal } from '$app/pages/settings/expense-categories/components/CreateExpenseCategoryModal';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
