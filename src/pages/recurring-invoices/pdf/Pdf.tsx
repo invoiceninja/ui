@@ -27,7 +27,6 @@ export function Pdf() {
   return (
     <Default
       title={documentTitle}
-      onBackClick={route('/recurring_invoices/:id/edit', { id })}
     >
       {recurringInvoice && (
         <InvoiceViewer link={url(recurringInvoice) as string} method="GET" />

@@ -150,7 +150,6 @@ export function Create() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/recurring_invoices"
       onSaveClick={() => save(recurringInvoice as RecurringInvoice)}
       disableSaveButton={recurringInvoice?.client_id.length === 0}
     >

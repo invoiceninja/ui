@@ -106,7 +106,6 @@ export function Create() {
       title={t('new_client')}
       breadcrumbs={pages}
       onSaveClick={onSave}
-      onBackClick={route('/clients')}
     >
       {isLoading && <Spinner />}
 

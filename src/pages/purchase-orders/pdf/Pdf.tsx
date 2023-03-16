@@ -26,7 +26,6 @@ export function Pdf() {
   return (
     <Default
       title={documentTitle}
-      onBackClick={route('/purchase_orders/:id/edit', { id })}
     >
       {purchaseOrder && (
         <InvoiceViewer link={url(purchaseOrder) as string} method="GET" />

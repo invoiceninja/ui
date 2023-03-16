@@ -93,7 +93,6 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/vendors"
       onSaveClick={onSave}
     >
       {vendor && <Form vendor={vendor} setVendor={setVendor} errors={errors} />}
