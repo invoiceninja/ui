@@ -10,7 +10,6 @@
 
 import { Link } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import purchaseOrderStatus from '$app/common/constants/purchase-order-status';
 import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
 import { date, endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -29,7 +28,6 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
-import { StatusBadge } from '$app/components/StatusBadge';
 import { useAtom } from 'jotai';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
@@ -53,6 +51,7 @@ import { useBulk, useMarkSent } from './queries';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { Divider } from '$app/components/cards/Divider';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { PurchaseOrderStatus as PurchaseOrderBadge } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -160,7 +159,7 @@ export function usePurchaseOrderColumns() {
               id: purchaseOrder.id,
             })}
           >
-            <StatusBadge for={purchaseOrderStatus} code={field} />
+            <PurchaseOrderBadge entity={purchaseOrder} />
           </Link>
         ),
       },
