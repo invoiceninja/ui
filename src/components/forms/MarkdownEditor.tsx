@@ -42,7 +42,7 @@ export function MarkdownEditor(props: Props) {
   return (
     <div className="space-y-4">
       {props.label && <InputLabel>{props.label}</InputLabel>}
-      
+
       <MDEditor
         value={value}
         onChange={handleChange}

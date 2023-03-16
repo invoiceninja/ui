@@ -83,7 +83,11 @@ export const vendorRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Vendors),
-            or(permission('view_vendor'), permission('edit_vendor'), assigned('/api/v1/vendors/:id')),
+            or(
+              permission('view_vendor'),
+              permission('edit_vendor'),
+              assigned('/api/v1/vendors/:id')
+            ),
           ]}
           component={<Edit />}
         />

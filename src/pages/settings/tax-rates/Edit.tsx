@@ -8,7 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ActionCard, Card, CardContainer, Element } from '$app/components/cards';
+import {
+  ActionCard,
+  Card,
+  CardContainer,
+  Element,
+} from '$app/components/cards';
 import { Button, InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';

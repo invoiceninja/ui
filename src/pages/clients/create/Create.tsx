@@ -102,11 +102,7 @@ export function Create() {
   };
 
   return (
-    <Default
-      title={t('new_client')}
-      breadcrumbs={pages}
-      onSaveClick={onSave}
-    >
+    <Default title={t('new_client')} breadcrumbs={pages} onSaveClick={onSave}>
       {isLoading && <Spinner />}
 
       <div className="flex flex-col xl:flex-row xl:gap-4">

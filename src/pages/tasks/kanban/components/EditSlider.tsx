@@ -14,7 +14,10 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Task } from '$app/common/interfaces/task';
 import { TaskStatus } from '$app/common/interfaces/task-status';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
-import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import {
+  DebouncedCombobox,
+  Record,
+} from '$app/components/forms/DebouncedCombobox';
 import { Modal } from '$app/components/Modal';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { TabGroup } from '$app/components/TabGroup';
