@@ -20,16 +20,15 @@ interface Props {
 export function TaskStatus(props: Props) {
   const [t] = useTranslation();
 
-  if (props.entity.is_deleted)
-    return <Badge variant="red">{t('deleted')}</Badge>;
+  const { is_running, invoice_id, archived_at, is_deleted } = props.entity;
 
-  if (props.entity.archived_at)
-    return <Badge variant="orange">{t('archived')}</Badge>;
+  if (is_deleted) return <Badge variant="red">{t('deleted')}</Badge>;
 
-  if (props.entity.invoice_id)
-    return <Badge variant="green">{t('invoiced')}</Badge>;
+  if (archived_at) return <Badge variant="orange">{t('archived')}</Badge>;
+
+  if (invoice_id) return <Badge variant="green">{t('invoiced')}</Badge>;
+
+  if (is_running) return <Badge variant="light-blue">{t('running')}</Badge>;
 
   return <StatusBadge for={{}} code={props.entity.status?.name || 'logged'} />;
-
-  return <></>;
 }
