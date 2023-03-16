@@ -10,7 +10,10 @@
 
 import { Design } from '$app/common/interfaces/design';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
-import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import {
+  DebouncedCombobox,
+  Record,
+} from '$app/components/forms/DebouncedCombobox';
 
 export function DesignSelector(props: GenericSelectorProps<Design>) {
   return (

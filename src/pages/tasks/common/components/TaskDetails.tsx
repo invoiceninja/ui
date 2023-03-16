@@ -19,7 +19,10 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import { CustomField } from '$app/components/CustomField';
 import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
-import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import {
+  DebouncedCombobox,
+  Record,
+} from '$app/components/forms/DebouncedCombobox';
 import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { TabGroup } from '$app/components/TabGroup';
 import { Field } from '$app/pages/settings/custom-fields/components';

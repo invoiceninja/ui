@@ -10,7 +10,10 @@
 
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { Project } from '$app/common/interfaces/project';
-import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import {
+  DebouncedCombobox,
+  Record,
+} from '$app/components/forms/DebouncedCombobox';
 import { CreateProjectModal } from '$app/pages/projects/common/components/CreateProjectModal';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

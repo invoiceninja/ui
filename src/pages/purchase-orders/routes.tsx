@@ -63,7 +63,10 @@ export const purchaseOrderRoutes = (
       path="create"
       element={
         <Guard
-          guards={[enabled(ModuleBitmask.PurchaseOrders), permission('create_purchase_order')]}
+          guards={[
+            enabled(ModuleBitmask.PurchaseOrders),
+            permission('create_purchase_order'),
+          ]}
           component={<Create />}
         />
       }

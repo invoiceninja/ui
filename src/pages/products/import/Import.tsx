@@ -24,7 +24,7 @@ export function Import() {
   ];
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} onBackClick="/products">
+    <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12">
         <div className="col-span-12 xl:col-span-10">
           <UploadImport entity="product" onSuccess={false} type="csv" />

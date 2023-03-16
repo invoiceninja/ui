@@ -16,7 +16,10 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { ApiWebhook, ApiWebHookHeader } from '$app/common/interfaces/api-webhook';
+import {
+  ApiWebhook,
+  ApiWebHookHeader,
+} from '$app/common/interfaces/api-webhook';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankApiWebhookQuery } from '$app/common/queries/api-webhooks';

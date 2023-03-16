@@ -106,7 +106,6 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/purchase_orders"
       onSaveClick={() => purchaseOrder && onSave(purchaseOrder)}
       navigationTopRight={
         purchaseOrder && (

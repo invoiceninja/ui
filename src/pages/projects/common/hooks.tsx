@@ -22,7 +22,6 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Icon } from '$app/components/icons/Icon';
 import { Tooltip } from '$app/components/Tooltip';
-import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
@@ -43,6 +42,7 @@ import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Task } from '$app/common/interfaces/task';
 import { AxiosError } from 'axios';
+import { useSetAtom } from 'jotai';
 
 export const defaultColumns: string[] = [
   'name',
@@ -248,7 +248,7 @@ export function useActions() {
 
   const isEditPage = location.pathname.endsWith('/edit');
 
-  const setProject = useUpdateAtom(projectAtom);
+  const setProject = useSetAtom(projectAtom);
 
   const cloneToProject = (project: Project) => {
     setProject({ ...project, id: '', documents: [], number: '' });

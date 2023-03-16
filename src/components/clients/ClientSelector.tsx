@@ -10,7 +10,10 @@
 
 import { Client } from '$app/common/interfaces/client';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
-import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import {
+  DebouncedCombobox,
+  Record,
+} from '$app/components/forms/DebouncedCombobox';
 import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

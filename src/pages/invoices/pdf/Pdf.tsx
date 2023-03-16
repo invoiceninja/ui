@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { useInvoiceQuery } from '$app/common/queries/invoices';
 import { Default } from '$app/components/layouts/Default';
@@ -56,7 +55,6 @@ export function Pdf() {
   return (
     <Default
       title={t('view_pdf')}
-      onBackClick={invoice && route('/invoices/:id/edit', { id: invoice.id })}
       navigationTopRight={
         invoice && (
           <Actions

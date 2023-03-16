@@ -115,7 +115,6 @@ export function Create() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/expenses"
       onSaveClick={() => expense && onSave(expense)}
     >
       <div className="grid grid-cols-12 gap-4">
