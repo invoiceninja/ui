@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { route } from 'common/helpers/route';
-import { TransactionRule } from 'common/interfaces/transaction-rules';
-import { DataTableColumns } from 'components/DataTable';
+import { Link } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
+import { TransactionRule } from '$app/common/interfaces/transaction-rules';
+import { DataTableColumns } from '$app/components/DataTable';
 import { useTranslation } from 'react-i18next';
 
 export function useTransactionRuleColumns() {

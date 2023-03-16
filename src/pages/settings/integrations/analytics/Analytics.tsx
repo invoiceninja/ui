@@ -8,22 +8,22 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, Link } from '@invoiceninja/forms';
+import { Card, Element } from '$app/components/cards';
+import { InputField, Link } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useTitle } from 'common/hooks/useTitle';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import {
   injectInChanges,
   updateChanges,
   updateRecord,
-} from 'common/stores/slices/company-users';
-import { Settings } from 'components/layouts/Settings';
+} from '$app/common/stores/slices/company-users';
+import { Settings } from '$app/components/layouts/Settings';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';

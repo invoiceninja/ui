@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyGatewaysQuery } from 'common/queries/company-gateways';
+import { useCompanyGatewaysQuery } from '$app/common/queries/company-gateways';
 import { useEffect, useState } from 'react';
-import { CompanyGateway } from 'common/interfaces/company-gateway';
-import { BankAccount } from 'common/interfaces/bank-accounts';
-import { useBankAccountsQuery } from 'pages/settings/bank-accounts/common/queries';
-import { enterprisePlan } from 'common/guards/guards/enterprise-plan';
-import { useTaxRatesQuery } from 'common/queries/tax-rates';
-import { TaxRate } from 'common/interfaces/tax-rate';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { BankAccount } from '$app/common/interfaces/bank-accounts';
+import { useBankAccountsQuery } from '$app/pages/settings/bank-accounts/common/queries';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { useTaxRatesQuery } from '$app/common/queries/tax-rates';
+import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useCurrentCompany } from '../useCurrentCompany';
 import { useHasPermission } from '../permissions/useHasPermission';
-import { proPlan } from 'common/guards/guards/pro-plan';
-import { useEnabled } from 'common/guards/guards/enabled';
-import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { useEnabled } from '$app/common/guards/guards/enabled';
+import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 
 interface EntityAction {
   key: string;

@@ -8,19 +8,19 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button } from '@invoiceninja/forms';
+import { Button } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { Task } from 'common/interfaces/task';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankTaskQuery } from 'common/queries/tasks';
-import { Modal } from 'components/Modal';
-import { TaskDetails } from 'pages/tasks/common/components/TaskDetails';
-import { TaskTable } from 'pages/tasks/common/components/TaskTable';
-import { isOverlapping } from 'pages/tasks/common/helpers/is-overlapping';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Task } from '$app/common/interfaces/task';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankTaskQuery } from '$app/common/queries/tasks';
+import { Modal } from '$app/components/Modal';
+import { TaskDetails } from '$app/pages/tasks/common/components/TaskDetails';
+import { TaskTable } from '$app/pages/tasks/common/components/TaskTable';
+import { isOverlapping } from '$app/pages/tasks/common/helpers/is-overlapping';
 import {
   Dispatch,
   FormEvent,

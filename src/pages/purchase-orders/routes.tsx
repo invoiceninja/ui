@@ -8,12 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Guard } from 'common/guards/Guard';
-import { assigned } from 'common/guards/guards/assigned';
-import { enabled } from 'common/guards/guards/enabled';
-import { or } from 'common/guards/guards/or';
-import { permission } from 'common/guards/guards/permission';
-import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { Guard } from '$app/common/guards/Guard';
+import { assigned } from '$app/common/guards/guards/assigned';
+import { enabled } from '$app/common/guards/guards/enabled';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
+import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { Outlet, Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
@@ -63,7 +63,10 @@ export const purchaseOrderRoutes = (
       path="create"
       element={
         <Guard
-          guards={[enabled(ModuleBitmask.PurchaseOrders), permission('create_purchase_order')]}
+          guards={[
+            enabled(ModuleBitmask.PurchaseOrders),
+            permission('create_purchase_order'),
+          ]}
           component={<Create />}
         />
       }

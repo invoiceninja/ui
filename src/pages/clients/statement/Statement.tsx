@@ -8,41 +8,43 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField, SelectField } from '@invoiceninja/forms';
-import { route } from 'common/helpers/route';
-import { useTitle } from 'common/hooks/useTitle';
-import { Page } from 'components/Breadcrumbs';
-import Toggle from 'components/forms/Toggle';
-import { Default } from 'components/layouts/Default';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import { route } from '$app/common/helpers/route';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Page } from '$app/components/Breadcrumbs';
+import Toggle from '$app/components/forms/Toggle';
+import { Default } from '$app/components/layouts/Default';
 import dayjs from 'dayjs';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import quarter from 'dayjs/plugin/quarterOfYear';
-import { request } from 'common/helpers/request';
-import { endpoint } from 'common/helpers';
-import { toast } from 'common/helpers/toast/toast';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { AxiosError } from 'axios';
-import { Dropdown } from 'components/dropdown/Dropdown';
-import { Icon } from 'components/icons/Icon';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { MdDownload, MdSend } from 'react-icons/md';
-import { useClientQuery } from 'common/queries/clients';
-import { Client } from 'common/interfaces/client';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { Icon } from '$app/components/icons/Icon';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { MdDownload, MdSchedule, MdSend } from 'react-icons/md';
+import { useClientQuery } from '$app/common/queries/clients';
+import { Client } from '$app/common/interfaces/client';
+import { useScheduleStatement } from '../common/hooks/useScheduleStatement';
 
 dayjs.extend(quarter);
 
 type StatementStatus = 'all' | 'paid' | 'unpaid';
 
-interface Statement {
+export interface Statement {
   client_id: string;
   end_date: string;
   show_aging_table: boolean;
   show_payments_table: boolean;
   start_date: string;
   status: StatementStatus;
+  dateRangeId: string;
 }
 
 export function Statement() {
@@ -54,6 +56,8 @@ export function Statement() {
 
   const { data: clientResponse } = useClientQuery({ id });
 
+  const scheduleStatement = useScheduleStatement();
+
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
     { name: t('client'), href: route('/clients/:id', { id }) },
@@ -62,13 +66,18 @@ export function Statement() {
 
   const dates = [
     {
-      id: 'last_7_days',
+      id: 'last7_days',
       start: dayjs().subtract(7, 'days').format('YYYY-MM-DD'),
       end: dayjs().format('YYYY-MM-DD'),
     },
     {
-      id: 'last_30_days',
+      id: 'last30_days',
       start: dayjs().subtract(1, 'month').format('YYYY-MM-DD'),
+      end: dayjs().format('YYYY-MM-DD'),
+    },
+    {
+      id: 'last365_days',
+      start: dayjs().subtract(365, 'days').format('YYYY-MM-DD'),
       end: dayjs().format('YYYY-MM-DD'),
     },
     {
@@ -112,7 +121,7 @@ export function Statement() {
   ];
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [selectRange, setSelectRange] = useState<string>('last_7_days');
+  const [selectRange, setSelectRange] = useState<string>('last7_days');
 
   const [client, setClient] = useState<Client>();
 
@@ -123,6 +132,7 @@ export function Statement() {
     show_aging_table: true,
     show_payments_table: true,
     status: 'all',
+    dateRangeId: 'last7_days',
   });
 
   const handleSelectRangeChange = (id: string) => {
@@ -134,6 +144,7 @@ export function Statement() {
         ...current,
         start_date: date.start,
         end_date: date.end,
+        dateRangeId: id,
       }));
     }
   };
@@ -231,9 +242,14 @@ export function Statement() {
           >
             {t('download')}
           </DropdownElement>
+          <DropdownElement
+            onClick={() => scheduleStatement(statement)}
+            icon={<Icon element={MdSchedule} />}
+          >
+            {t('schedule')}
+          </DropdownElement>
         </Dropdown>
       }
-      onBackClick={route('/clients/:id', { id })}
     >
       <div className="grid grid-cols-12 space-y-4 xl:space-y-0 xl:gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>

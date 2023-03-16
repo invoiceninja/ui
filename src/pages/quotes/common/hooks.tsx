@@ -9,27 +9,33 @@
  */
 
 import axios, { AxiosError } from 'axios';
-import { QuoteStatus } from 'common/enums/quote-status';
-import { date, endpoint } from 'common/helpers';
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
-import { Client } from 'common/interfaces/client';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
-import { Invitation, PurchaseOrder } from 'common/interfaces/purchase-order';
-import { Quote } from 'common/interfaces/quote';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { blankLineItem } from 'common/constants/blank-line-item';
-import { Divider } from 'components/cards/Divider';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Action } from 'components/ResourceActions';
+import { QuoteStatus } from '$app/common/enums/quote-status';
+import { date, endpoint } from '$app/common/helpers';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { Client } from '$app/common/interfaces/client';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '$app/common/interfaces/invoice-item';
+import {
+  Invitation,
+  PurchaseOrder,
+} from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Action } from '$app/components/ResourceActions';
 import { useAtom } from 'jotai';
-import { invoiceAtom } from 'pages/invoices/common/atoms';
-import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
-import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
+import { invoiceAtom } from '$app/pages/invoices/common/atoms';
+import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
+import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -37,26 +43,25 @@ import { invoiceSumAtom, quoteAtom } from './atoms';
 import { useApprove } from './hooks/useApprove';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useMarkSent } from './hooks/useMarkSent';
-import { creditAtom } from 'pages/credits/common/atoms';
-import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
-import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
-import { route } from 'common/helpers/route';
+import { creditAtom } from '$app/pages/credits/common/atoms';
+import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
+import { route } from '$app/common/helpers/route';
 import { useDispatch } from 'react-redux';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { updateRecord } from 'common/stores/slices/company-users';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
-import { Link } from '@invoiceninja/forms';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useResolveCountry } from 'common/hooks/useResolveCountry';
-import { CopyToClipboard } from 'components/CopyToClipboard';
-import { customField } from 'components/CustomField';
-import { EntityStatus } from 'components/EntityStatus';
+import { Link } from '$app/components/forms';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { EntityStatus } from '$app/components/EntityStatus';
 import { useCallback } from 'react';
-import { Icon } from 'components/icons/Icon';
+import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdCloudCircle,
@@ -71,8 +76,10 @@ import {
   MdSwitchRight,
   MdTextSnippet,
 } from 'react-icons/md';
-import { SelectOption } from 'components/datatables/Actions';
-import { useAccentColor } from 'common/hooks/useAccentColor';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { Tooltip } from '$app/components/Tooltip';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -443,48 +450,7 @@ export function useActions() {
   return actions;
 }
 
-export const quoteColumns = [
-  'status',
-  'number',
-  'client',
-  'amount',
-  'date',
-  'valid_until',
-  'archived_at',
-  // 'assigned_to',  @Todo: Need to fetch the relationship
-  'client_city',
-  'client_country',
-  'client_postal_code',
-  'client_state',
-  'contact_email',
-  'contact_name',
-  'created_at',
-  // 'created_by', @Todo: Need to resolve relationship
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'discount',
-  'documents',
-  'entity_state',
-  'exchange_rate',
-  'is_deleted',
-  'is_viewed',
-  'last_sent_date',
-  'partial',
-  'partial_due_date',
-  'po_number',
-  'private_notes',
-  // 'project', @Todo: Need to resolve relationship
-  'public_notes',
-  'tax_amount',
-  'updated_at',
-  // 'vendor', @Todo: Need to resolve relationship
-] as const;
-
-type QuoteColumns = (typeof quoteColumns)[number];
-
-export const defaultColumns: QuoteColumns[] = [
+export const defaultColumns: string[] = [
   'status',
   'number',
   'client',
@@ -493,9 +459,60 @@ export const defaultColumns: QuoteColumns[] = [
   'valid_until',
 ];
 
+export function useAllQuoteColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'quote',
+    });
+
+  const quoteColumns = [
+    'status',
+    'number',
+    'client',
+    'amount',
+    'date',
+    'valid_until',
+    'archived_at',
+    // 'assigned_to',  @Todo: Need to fetch the relationship
+    'client_city',
+    'client_country',
+    'client_postal_code',
+    'client_state',
+    'contact_email',
+    'contact_name',
+    'created_at',
+    // 'created_by', @Todo: Need to resolve relationship
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'discount',
+    'documents',
+    'entity_state',
+    'exchange_rate',
+    'is_deleted',
+    'is_viewed',
+    'last_sent_date',
+    'partial',
+    'partial_due_date',
+    'po_number',
+    'private_notes',
+    // 'project', @Todo: Need to resolve relationship
+    'public_notes',
+    'tax_amount',
+    'updated_at',
+    // 'vendor', @Todo: Need to resolve relationship
+  ] as const;
+
+  return quoteColumns;
+}
+
 export function useQuoteColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const quoteColumns = useAllQuoteColumns();
+  type QuoteColumns = (typeof quoteColumns)[number];
 
   const accentColor = useAccentColor();
   const navigate = useNavigate();
@@ -516,6 +533,11 @@ export function useQuoteColumns() {
 
     return viewed;
   }, []);
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'quote',
+    });
 
   const columns: DataTableColumnsExtended<Quote, QuoteColumns> = [
     {
@@ -638,36 +660,24 @@ export function useQuoteColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.quote1 &&
-          customField(company?.custom_fields.quote1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.quote2 &&
-          customField(company?.custom_fields.quote2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.quote3 &&
-          customField(company?.custom_fields.quote3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.quote4 &&
-          customField(company?.custom_fields.quote4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'discount',
@@ -744,13 +754,21 @@ export function useQuoteColumns() {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'tax_amount',

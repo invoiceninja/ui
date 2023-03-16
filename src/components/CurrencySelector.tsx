@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrencies } from 'common/hooks/useCurrencies';
+import { useCurrencies } from '$app/common/hooks/useCurrencies';
 import { GenericSelectorProps } from './CountrySelector';
 import { SelectField } from './forms';
 

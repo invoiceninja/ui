@@ -9,19 +9,19 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankProductQuery } from 'common/queries/products';
-import { Container } from 'components/Container';
-import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankProductQuery } from '$app/common/queries/products';
+import { Container } from '$app/components/Container';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
-import { ProductTableResource } from 'pages/invoices/common/components/ProductsTable';
+import { ProductTableResource } from '$app/pages/invoices/common/components/ProductsTable';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';

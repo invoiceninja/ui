@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useTitle } from 'common/hooks/useTitle';
-import { TabGroup } from 'components/TabGroup';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { TabGroup } from '$app/components/TabGroup';
 
 import { useTranslation } from 'react-i18next';
 import { Settings } from '../../../components/layouts/Settings';

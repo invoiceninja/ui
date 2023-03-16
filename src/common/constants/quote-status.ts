@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { QuoteStatus } from 'common/enums/quote-status';
+import { QuoteStatus } from '$app/common/enums/quote-status';
 
 export default {
   [QuoteStatus.Draft]: 'draft',

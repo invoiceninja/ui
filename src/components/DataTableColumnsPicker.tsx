@@ -8,14 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
-import { CompanyUser, ReactTableColumns } from 'common/interfaces/company-user';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { User } from 'common/interfaces/user';
-import { updateUser } from 'common/stores/slices/user';
-import { RootState } from 'common/stores/store';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import {
+  CompanyUser,
+  ReactTableColumns,
+} from '$app/common/interfaces/company-user';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { User } from '$app/common/interfaces/user';
+import { updateUser } from '$app/common/stores/slices/user';
+import { RootState } from '$app/common/stores/store';
 import { cloneDeep, set } from 'lodash';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -95,10 +98,20 @@ export function DataTableColumnsPicker(props: Props) {
       });
   };
 
-  const handleDelete = (column: string) => {
-    setCurrentColumns((current) =>
-      current.filter((columns) => !columns.includes(column))
+  const handleDelete = (columnKey: string) => {
+    const updatedCurrentColumns = currentColumns.filter(
+      (columns) => !columns.includes(columnKey)
     );
+
+    setCurrentColumns(updatedCurrentColumns);
+
+    const updatedFilteredColumns = props.columns.filter((column) =>
+      Boolean(
+        !updatedCurrentColumns.find((currentColumn) => currentColumn === column)
+      )
+    );
+
+    setFilteredColumns(updatedFilteredColumns);
   };
 
   const onDragEnd = (result: DropResult) => {
@@ -113,6 +126,8 @@ export function DataTableColumnsPicker(props: Props) {
 
   const handleReset = useCallback(() => {
     setCurrentColumns(defaultColumns);
+
+    setFilteredColumns(props.columns);
   }, []);
 
   return (

@@ -8,23 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { EntityState } from 'common/enums/entity-state';
-import { date, getEntityState } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { Product } from 'common/interfaces/product';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { customField } from 'components/CustomField';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { EntityStatus } from 'components/EntityStatus';
-import { Icon } from 'components/icons/Icon';
-import { useUpdateAtom } from 'jotai/utils';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { Link } from '$app/components/forms';
+import { EntityState } from '$app/common/enums/entity-state';
+import { date, getEntityState } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { Product } from '$app/common/interfaces/product';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -35,55 +33,72 @@ import {
 } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { productAtom } from './atoms';
-import { bulk } from 'common/queries/products';
+import { bulk } from '$app/common/queries/products';
 import { useQueryClient } from 'react-query';
-import { Divider } from 'components/cards/Divider';
-import { Tooltip } from 'components/Tooltip';
+import { Divider } from '$app/components/cards/Divider';
+import { Tooltip } from '$app/components/Tooltip';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useSetAtom } from 'jotai';
 
-export const productColumns = [
-  'product_key',
-  'description',
-  'price',
-  'quantity',
-  'archived_at',
-  // 'assigned_to', @Todo: Relationship not included.
-  'created_at',
-  // 'created_by', @Todo: Relationship not included.
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'documents',
-  'entity_state',
-  'is_deleted',
-  'notification_threshold',
-  'stock_quantity',
-  'tax_name1',
-  'tax_name2',
-  'tax_name3',
-  'tax_rate1',
-  'tax_rate2',
-  'tax_rate3',
-  'updated_at',
-] as const;
-
-type ProductColumns = (typeof productColumns)[number];
-
-export const defaultColumns: ProductColumns[] = [
+export const defaultColumns: string[] = [
   'product_key',
   'description',
   'price',
   'quantity',
 ];
 
+export function useAllProductColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'product',
+    });
+
+  const productColumns = [
+    'product_key',
+    'description',
+    'price',
+    'quantity',
+    'archived_at',
+    // 'assigned_to', @Todo: Relationship not included.
+    'created_at',
+    // 'created_by', @Todo: Relationship not included.
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'documents',
+    'entity_state',
+    'is_deleted',
+    'notification_threshold',
+    'stock_quantity',
+    'tax_name1',
+    'tax_name2',
+    'tax_name3',
+    'tax_rate1',
+    'tax_rate2',
+    'tax_rate3',
+    'updated_at',
+  ] as const;
+
+  return productColumns;
+}
+
 export function useProductColumns() {
   const { t } = useTranslation();
+
+  const productColumns = useAllProductColumns();
+  type ProductColumns = (typeof productColumns)[number];
 
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const company = useCurrentCompany();
   const currentUser = useCurrentUser();
   const formatMoney = useFormatMoney();
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'product',
+    });
 
   const columns: DataTableColumnsExtended<Product, ProductColumns> = [
     {
@@ -141,36 +156,24 @@ export function useProductColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.product1 &&
-          customField(company?.custom_fields.product1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.product2 &&
-          customField(company?.custom_fields.product2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.product3 &&
-          customField(company?.custom_fields.product3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.product4 &&
-          customField(company?.custom_fields.product4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'documents',
@@ -241,7 +244,7 @@ export function useActions() {
 
   const queryClient = useQueryClient();
 
-  const setProduct = useUpdateAtom(productAtom);
+  const setProduct = useSetAtom(productAtom);
 
   const isEditPage = location.pathname.endsWith('/edit');
 

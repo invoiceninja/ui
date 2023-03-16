@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { blankInvitation } from 'common/constants/blank-invitation';
-import { useClientResolver } from 'common/hooks/clients/useClientResolver';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useReactSettings } from 'common/hooks/useReactSettings';
-import { useTitle } from 'common/hooks/useTitle';
-import { Client } from 'common/interfaces/client';
-import { Invoice } from 'common/interfaces/invoice';
-import { InvoiceItemType } from 'common/interfaces/invoice-item';
-import { Invitation } from 'common/interfaces/purchase-order';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankInvoiceQuery } from 'common/queries/invoices';
-import { Page } from 'components/Breadcrumbs';
-import { Default } from 'components/layouts/Default';
-import { Spinner } from 'components/Spinner';
-import { TabGroup } from 'components/TabGroup';
+import { blankInvitation } from '$app/common/constants/blank-invitation';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Client } from '$app/common/interfaces/client';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import { Invitation } from '$app/common/interfaces/purchase-order';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankInvoiceQuery } from '$app/common/queries/invoices';
+import { Page } from '$app/components/Breadcrumbs';
+import { Default } from '$app/components/layouts/Default';
+import { Spinner } from '$app/components/Spinner';
+import { TabGroup } from '$app/components/TabGroup';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
 import { useEffect, useState } from 'react';
@@ -95,7 +95,10 @@ export function Create() {
     setInvoice((current) => {
       let value = current;
 
-      if (searchParams.get('action') !== 'clone') {
+      if (
+        searchParams.get('action') !== 'clone' &&
+        searchParams.get('action') !== 'invoice_project'
+      ) {
         value = undefined;
       }
 
@@ -167,7 +170,6 @@ export function Create() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/invoices"
       onSaveClick={() => save(invoice as Invoice)}
       disableSaveButton={invoice?.client_id.length === 0}
     >
@@ -177,7 +179,7 @@ export function Create() {
           onChange={(id) => handleChange('client_id', id)}
           onClearButtonClick={() => handleChange('client_id', '')}
           onContactCheckboxChange={handleInvitationChange}
-          readonly={searchParams.get('table') === 'tasks'}
+          readonly={searchParams.get('project') === 'true'}
           errorMessage={errors?.errors.client_id}
           disableWithSpinner={searchParams.get('action') === 'create'}
         />

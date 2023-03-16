@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { DesignSelector } from 'common/generic/DesignSelector';
-import { endpoint } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useHandleCustomFieldChange } from 'common/hooks/useHandleCustomFieldChange';
-import { CustomFieldsPlanAlert } from 'components/CustomFieldsPlanAlert';
-import { DocumentsTable } from 'components/DocumentsTable';
-import { MarkdownEditor } from 'components/forms/MarkdownEditor';
-import Toggle from 'components/forms/Toggle';
-import { ProjectSelector } from 'components/projects/ProjectSelector';
-import { TabGroup } from 'components/TabGroup';
-import { UserSelector } from 'components/users/UserSelector';
-import { VendorSelector } from 'components/vendors/VendorSelector';
+import { Card } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { DesignSelector } from '$app/common/generic/DesignSelector';
+import { endpoint } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useHandleCustomFieldChange } from '$app/common/hooks/useHandleCustomFieldChange';
+import { CustomFieldsPlanAlert } from '$app/components/CustomFieldsPlanAlert';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import Toggle from '$app/components/forms/Toggle';
+import { ProjectSelector } from '$app/components/projects/ProjectSelector';
+import { TabGroup } from '$app/components/TabGroup';
+import { UserSelector } from '$app/components/users/UserSelector';
+import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { useAtom } from 'jotai';
-import { Upload } from 'pages/settings/company/documents/components';
-import { Field } from 'pages/settings/custom-fields/components';
+import { Upload } from '$app/pages/settings/company/documents/components';
+import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useLocation, useParams } from 'react-router-dom';

@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from 'components/Badge';
+import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
-import { Task } from 'common/interfaces/task';
-import { StatusBadge } from 'components/StatusBadge';
+import { Task } from '$app/common/interfaces/task';
+import { StatusBadge } from '$app/components/StatusBadge';
 
 interface Props {
   entity: Task;

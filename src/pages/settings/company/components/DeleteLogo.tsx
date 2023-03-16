@@ -8,17 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { AxiosError, AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { updateRecord } from 'common/stores/slices/company-users';
-import { Button } from 'components/forms/Button';
+import { endpoint } from '$app/common/helpers';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import { Button } from '$app/components/forms/Button';
 import { useFormik } from 'formik';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Element } from '@invoiceninja/cards';
-import { request } from 'common/helpers/request';
+import { Element } from '$app/components/cards';
+import { request } from '$app/common/helpers/request';
 
 export function DeleteLogo() {
   const [t] = useTranslation();

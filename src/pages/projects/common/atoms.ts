@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Project } from 'common/interfaces/project';
+import { Project } from '$app/common/interfaces/project';
 import { atom } from 'jotai';
 
 export const projectAtom = atom<Project | undefined>(undefined);

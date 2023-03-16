@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
+import { Card, Element } from '$app/components/cards';
 import { AxiosError, AxiosResponse } from 'axios';
-import { endpoint } from 'common/helpers';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { endpoint } from '$app/common/helpers';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useFormik } from 'formik';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
@@ -19,10 +19,10 @@ import { Image } from 'react-feather';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { useLogo } from 'common/hooks/useLogo';
-import { updateRecord } from 'common/stores/slices/company-users';
+import { useLogo } from '$app/common/hooks/useLogo';
+import { updateRecord } from '$app/common/stores/slices/company-users';
 import { DeleteLogo } from './DeleteLogo';
-import { request } from 'common/helpers/request';
+import { request } from '$app/common/helpers/request';
 
 export function Logo() {
   const [t] = useTranslation();

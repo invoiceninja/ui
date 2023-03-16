@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Task } from 'common/interfaces/task';
-import { Dropdown } from 'components/dropdown/Dropdown';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { isTaskRunning } from 'pages/tasks/common/helpers/calculate-entity-state';
-import { useBulkAction } from 'pages/tasks/common/hooks/useBulk';
-import { useInvoiceTask } from 'pages/tasks/common/hooks/useInvoiceTask';
-import { useStart } from 'pages/tasks/common/hooks/useStart';
-import { useStop } from 'pages/tasks/common/hooks/useStop';
+import { Task } from '$app/common/interfaces/task';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { isTaskRunning } from '$app/pages/tasks/common/helpers/calculate-entity-state';
+import { useBulkAction } from '$app/pages/tasks/common/hooks/useBulk';
+import { useInvoiceTask } from '$app/pages/tasks/common/hooks/useInvoiceTask';
+import { useStart } from '$app/pages/tasks/common/hooks/useStart';
+import { useStop } from '$app/pages/tasks/common/hooks/useStop';
 import { useTranslation } from 'react-i18next';
-import { Icon } from 'components/icons/Icon';
+import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdControlPointDuplicate,
@@ -27,9 +27,9 @@ import {
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
-import { useUpdateAtom } from 'jotai/utils';
-import { taskAtom } from 'pages/tasks/common/atoms';
+import { taskAtom } from '$app/pages/tasks/common/atoms';
 import { useNavigate } from 'react-router-dom';
+import { useSetAtom } from 'jotai';
 
 interface Props {
   task: Task;
@@ -46,7 +46,7 @@ export function Actions(props: Props) {
   const bulk = useBulkAction();
   const invoiceTask = useInvoiceTask();
 
-  const setTask = useUpdateAtom(taskAtom);
+  const setTask = useSetAtom(taskAtom);
 
   const cloneToTask = () => {
     setTask({ ...task, id: '', documents: [], number: '' });

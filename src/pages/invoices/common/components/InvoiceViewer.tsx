@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { request } from 'common/helpers/request';
+import { request } from '$app/common/helpers/request';
 import { useEffect, useRef } from 'react';
 import { Resource } from './InvoicePreview';
 
@@ -42,7 +42,7 @@ export function InvoiceViewer(props: Props) {
       .catch((error) => console.error(error));
 
     return () => controller.abort();
-  }, [props.link, props.resource?.id]);
+  }, [props.link, props.resource]);
 
   return <iframe ref={iframeRef} width="100%" height={1500} />;
 }

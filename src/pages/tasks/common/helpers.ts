@@ -24,17 +24,57 @@ export function parseTime(timestamp: number) {
     return;
   }
 
-  return dayjs.unix(timestamp).format('hh:mm:ss');
+  return dayjs.unix(timestamp).format('HH:mm:ss');
 }
 
-export function duration(start: number, stop: number) {
-  const diff = dayjs.unix(stop).diff(dayjs.unix(start), 'seconds');
+export function duration(
+  start: number,
+  stop: number,
+  includedEndDate: boolean
+) {
+  const startDateValue = parseTimeToDate(start);
+  const endTimeValue = parseTime(stop);
 
-  if (diff < 0) {
-    return;
+  let diff = dayjs.unix(stop).diff(dayjs.unix(start), 'seconds');
+
+  if (!includedEndDate && diff < 0 && stop) {
+    const modifiedEndTimeStamp = dayjs(
+      `${startDateValue} ${endTimeValue}`,
+      'YYYY-MM-DD HH:mm:ss'
+    ).unix();
+
+    diff = dayjs.unix(modifiedEndTimeStamp).diff(dayjs.unix(start), 'seconds');
   }
 
-  return new Date(diff * 1000).toISOString().slice(11, 19);
+  if (diff < 0) {
+    return '00:00:00';
+  }
+
+  if (stop && startDateValue !== '1970-01-01') {
+    let hours = Math.floor(diff / 3600).toString();
+    diff -= Number(hours) * 3600;
+
+    let minutes = Math.floor(diff / 60).toString();
+    diff -= Number(minutes) * 60;
+
+    let seconds = diff.toString();
+
+    if (Number(hours) < 10) {
+      hours = '0' + hours.toString();
+    }
+
+    if (Number(minutes) < 10) {
+      minutes = '0' + minutes.toString();
+    }
+
+    if (Number(seconds) < 10) {
+      seconds = '0' + seconds.toString();
+    }
+
+    return hours + ':' + minutes + ':' + seconds;
+  } else {
+    return '00:00:00';
+  }
 }
 
 export function handleTaskTimeChange(
@@ -44,9 +84,9 @@ export function handleTaskTimeChange(
   position: number,
   index: number
 ) {
-  const date = parseTimeToDate(unix);
+  const date = unix ? parseTimeToDate(unix) : parseTimeToDate(dayjs().unix());
 
-  const unixTimestamp = dayjs(`${date} ${time}`, 'YYYY-MM-DD hh:mm:ss').unix();
+  const unixTimestamp = dayjs(`${date} ${time}`, 'YYYY-MM-DD HH:mm:ss').unix();
 
   const logs = parseTimeLog(log);
 
@@ -62,9 +102,9 @@ export function handleTaskDateChange(
   index: number,
   position: number
 ) {
-  const time = parseTime(unix);
+  const time = unix ? parseTime(unix) : parseTime(dayjs().unix());
 
-  const unixTimestamp = dayjs(`${value} ${time}`, 'YYYY-MM-DD hh:mm:ss').unix();
+  const unixTimestamp = dayjs(`${value} ${time}`, 'YYYY-MM-DD HH:mm:ss').unix();
 
   const logs = parseTimeLog(log);
 

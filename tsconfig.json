@@ -3,7 +3,11 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "target": "es6",
-    "lib": ["dom", "dom.iterable", "esnext"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -18,12 +22,12 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "downlevelIteration": true,
-    "baseUrl": "src",
+    "baseUrl": "./",
     "paths": {
-      "@invoiceninja/forms": ["components/forms"],
-      "@invoiceninja/cards": ["components/cards"],
-      "@invoiceninja/tables": ["components/tables"]
+      "$app": ["src"],
+      "$app/*": ["src/*"],
+      "$tests": ["tests"],
+      "$tests/*": ["tests/*"],
     },
   },
-  "include": ["src"],
 }

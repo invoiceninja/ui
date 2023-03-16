@@ -9,15 +9,15 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { InputField } from '@invoiceninja/forms';
-import { Element } from '@invoiceninja/cards';
-import { CustomField } from 'components/CustomField';
-import { TaxRateSelector } from 'components/tax-rates/TaxRateSelector';
-import Toggle from 'components/forms/Toggle';
-import { Product } from 'common/interfaces/product';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { EntityStatus } from 'components/EntityStatus';
+import { InputField } from '$app/components/forms';
+import { Element } from '$app/components/cards';
+import { CustomField } from '$app/components/CustomField';
+import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
+import Toggle from '$app/components/forms/Toggle';
+import { Product } from '$app/common/interfaces/product';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { EntityStatus } from '$app/components/EntityStatus';
 
 interface Props {
   type?: 'create' | 'edit';

@@ -9,7 +9,7 @@
  */
 
 import classNames from 'classnames';
-import { Alert } from 'components/Alert';
+import { Alert } from '$app/components/Alert';
 import { useMemo, useState } from 'react';
 import { DebounceInput } from 'react-debounce-input';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';

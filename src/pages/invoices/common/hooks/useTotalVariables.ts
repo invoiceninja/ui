@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useEffect, useState } from 'react';
 
 export function useTotalVariables() {

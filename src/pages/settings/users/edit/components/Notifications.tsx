@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { SelectField } from '@invoiceninja/forms';
-import { User } from 'common/interfaces/user';
+import { Card, Element } from '$app/components/cards';
+import { SelectField } from '$app/components/forms';
+import { User } from '$app/common/interfaces/user';
 import { cloneDeep } from 'lodash';
 import { useTranslation } from 'react-i18next';
 

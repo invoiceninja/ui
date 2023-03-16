@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from 'common/helpers/route';
-import { Payment as PaymentEntity } from 'common/interfaces/payment';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { Page } from 'components/Breadcrumbs';
-import { Container } from 'components/Container';
-import { Default } from 'components/layouts/Default';
-import { ResourceActions } from 'components/ResourceActions';
-import { Tab, Tabs } from 'components/Tabs';
+import { route } from '$app/common/helpers/route';
+import { Payment as PaymentEntity } from '$app/common/interfaces/payment';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { Page } from '$app/components/Breadcrumbs';
+import { Container } from '$app/components/Container';
+import { Default } from '$app/components/layouts/Default';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { Tab, Tabs } from '$app/components/Tabs';
 import { FormEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';

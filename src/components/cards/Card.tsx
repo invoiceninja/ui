@@ -9,14 +9,14 @@
  */
 
 import classNames from 'classnames';
-import { Spinner } from 'components/Spinner';
+import { Spinner } from '$app/components/Spinner';
 import { CSSProperties, FormEvent, ReactElement, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer } from '.';
 import { Button } from '../forms';
-import { Element } from 'components/cards/Element';
-import { Dropdown } from 'components/dropdown/Dropdown';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
+import { Element } from '$app/components/cards/Element';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 
 export interface ButtonOption {
   text: string;

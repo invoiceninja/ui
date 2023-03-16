@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputField } from '@invoiceninja/forms';
-import { trans } from 'common/helpers';
-import { ExpenseCategorySelector } from 'components/expense-categories/ExpenseCategorySelector';
-import { VendorSelector } from 'components/vendors/VendorSelector';
+import { InputField } from '$app/components/forms';
+import { trans } from '$app/common/helpers';
+import { ExpenseCategorySelector } from '$app/components/expense-categories/ExpenseCategorySelector';
+import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { BiPlusCircle } from 'react-icons/bi';
 import { MdFilterAlt } from 'react-icons/md';

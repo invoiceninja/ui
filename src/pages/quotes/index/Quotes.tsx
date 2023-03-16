@@ -8,21 +8,21 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTitle } from 'common/hooks/useTitle';
-import { Page } from 'components/Breadcrumbs';
-import { DataTable } from 'components/DataTable';
-import { Default } from 'components/layouts/Default';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Page } from '$app/components/Breadcrumbs';
+import { DataTable } from '$app/components/DataTable';
+import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import {
   defaultColumns,
-  quoteColumns,
   useActions,
+  useAllQuoteColumns,
   useQuoteColumns,
   useQuoteFilters,
 } from '../common/hooks';
-import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
-import { ImportButton } from 'components/import/ImportButton';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { ImportButton } from '$app/components/import/ImportButton';
 
 export function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -34,6 +34,8 @@ export function Quotes() {
   const columns = useQuoteColumns();
 
   const actions = useActions();
+
+  const quoteColumns = useAllQuoteColumns();
 
   const filters = useQuoteFilters();
 

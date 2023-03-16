@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ApiToken } from 'common/interfaces/api-token';
-import { useBulkAction } from 'common/queries/api-tokens';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Icon } from 'components/icons/Icon';
-import { Action } from 'components/ResourceActions';
+import { ApiToken } from '$app/common/interfaces/api-token';
+import { useBulkAction } from '$app/common/queries/api-tokens';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
 import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
 

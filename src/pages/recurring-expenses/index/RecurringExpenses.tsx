@@ -7,15 +7,15 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { useTitle } from 'common/hooks/useTitle';
-import { DataTable } from 'components/DataTable';
-import { DataTableColumnsPicker } from 'components/DataTableColumnsPicker';
-import { Default } from 'components/layouts/Default';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { DataTable } from '$app/components/DataTable';
+import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import {
   defaultColumns,
-  recurringExpenseColumns,
   useActions,
+  useAllRecurringExpenseColumns,
   useRecurringExpenseColumns,
 } from '../common/hooks';
 
@@ -31,6 +31,8 @@ export function RecurringExpenses() {
   const columns = useRecurringExpenseColumns();
 
   const actions = useActions();
+
+  const recurringExpenseColumns = useAllRecurringExpenseColumns();
 
   return (
     <Default

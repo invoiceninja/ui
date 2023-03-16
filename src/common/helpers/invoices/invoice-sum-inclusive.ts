@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import { InvoiceItemSumInclusive } from './invoice-item-sum-inclusive';
-import { Invoice } from 'common/interfaces/invoice';
+import { Invoice } from '$app/common/interfaces/invoice';
 import collect from 'collect.js';
-import { InvoiceStatus } from 'common/enums/invoice-status';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
 
 export class InvoiceSumInclusive {
   protected taxMap = collect();

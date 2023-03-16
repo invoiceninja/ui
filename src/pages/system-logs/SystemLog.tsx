@@ -8,20 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Default } from 'components/layouts/Default';
+import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
-import { request } from 'common/helpers/request';
+import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
-import { endpoint } from 'common/helpers';
-import { NonClickableElement } from 'components/cards/NonClickableElement';
-import { Spinner } from 'components/Spinner';
-import { SystemLogRecord } from 'common/interfaces/system-log';
-import { date as formatDate } from 'common/helpers';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { Card, Element } from '@invoiceninja/cards';
-import { Divider } from 'components/cards/Divider';
+import { endpoint } from '$app/common/helpers';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
+import { Spinner } from '$app/components/Spinner';
+import { SystemLogRecord } from '$app/common/interfaces/system-log';
+import { date as formatDate } from '$app/common/helpers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { Card, Element } from '$app/components/cards';
+import { Divider } from '$app/components/cards/Divider';
 import { JSONTree } from 'react-json-tree';
-import { Badge } from 'components/Badge';
+import { Badge } from '$app/components/Badge';
 
 interface Category {
   id: number;

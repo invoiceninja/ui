@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 import collect from 'collect.js';
-import { Invoice } from 'common/interfaces/invoice';
-import { InvoiceItem } from 'common/interfaces/invoice-item';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
-import { Currency } from 'common/interfaces/currency';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Currency } from '$app/common/interfaces/currency';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 
 export class InvoiceItemSum {
   public taxCollection = collect();
