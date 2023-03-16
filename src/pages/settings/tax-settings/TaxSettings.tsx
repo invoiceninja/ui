@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useTitle } from 'common/hooks/useTitle';
-import { updateChanges } from 'common/stores/slices/company-users';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -109,21 +109,21 @@ export function TaxSettings() {
           </SelectField>
         </Element>
 
-        <Element
-          leftSide={t('inclusive_taxes')}
-          leftSideHelp={
-            <span className="flex flex-col">
-              <span>{t('exclusive')}: 100 + 10% = 100 + 10</span>
+        <Element leftSide={t('inclusive_taxes')}>
+          <div className="flex items-center space-x-7">
+            <Toggle
+              onChange={(value: boolean) =>
+                handleToggleChange('settings.inclusive_taxes', value)
+              }
+              checked={companyChanges?.settings.inclusive_taxes || false}
+            />
+
+            {companyChanges?.settings.inclusive_taxes ? (
               <span>{t('inclusive')}: 100 + 10% = 90.91 + 9.09</span>
-            </span>
-          }
-        >
-          <Toggle
-            onChange={(value: boolean) =>
-              handleToggleChange('settings.inclusive_taxes', value)
-            }
-            checked={companyChanges?.settings?.inclusive_taxes || false}
-          />
+            ) : (
+              <span>{t('exclusive')}: 100 + 10% = 100 + 10</span>
+            )}
+          </div>
         </Element>
       </Card>
 

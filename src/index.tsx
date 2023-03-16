@@ -17,7 +17,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import * as Sentry from '@sentry/react';
 import { BrowserTracing } from '@sentry/tracing';
-import { ScrollToTop } from 'components/ScrollToTop';
+import { ScrollToTop } from '$app/components/ScrollToTop';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { createRoot } from 'react-dom/client';
 
@@ -40,7 +40,13 @@ i18n.use(initReactI18next).init({
 const Router =
   import.meta.env.VITE_ROUTER === 'hash' ? HashRouter : BrowserRouter;
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+    },
+  },
+});
 
 Sentry.init({
   dsn: import.meta.env.VITE_SENTRY_URL as unknown as string,

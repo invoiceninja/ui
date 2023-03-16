@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { Invoice } from 'common/interfaces/invoice';
-import { Params } from 'common/queries/common/params.interface';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { Params } from '$app/common/queries/common/params.interface';
 import { useQuery } from 'react-query';
 
 interface InvoiceParams extends Params {

@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useStaticsQuery } from 'common/queries/statics';
-import { getExchangeRate } from 'pages/payments/common/helpers/resolve-exchange-rate';
+import { useStaticsQuery } from '$app/common/queries/statics';
+import { getExchangeRate } from '$app/pages/payments/common/helpers/resolve-exchange-rate';
 import { useTranslation } from 'react-i18next';
 import { Element } from './cards';
 import { InputField, SelectField } from './forms';

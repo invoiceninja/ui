@@ -8,8 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Country } from 'common/interfaces/country';
-import { Currency } from 'common/interfaces/currency';
+import { Country } from '$app/common/interfaces/country';
+import { Currency } from '$app/common/interfaces/currency';
 import { numberFormat } from './number-format';
 
 interface FormatMoneyOptions {
@@ -58,7 +58,7 @@ export class Number {
     } else if (swapSymbol) {
       return `${formatted} ${symbol.trim()}`;
     } else if (!options?.showCurrencyCode) {
-      return `${symbol}${formatted}`;
+      return `${symbol} ${formatted}`;
     }
 
     return this.formatValue(formatted, currency);

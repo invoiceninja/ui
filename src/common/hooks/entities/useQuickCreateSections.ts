@@ -8,9 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isHosted } from 'common/helpers';
+import { isHosted } from '$app/common/helpers';
 import { IconType } from 'react-icons';
-import { MdAreaChart, MdOutlineBuild, MdOutlineShoppingBag } from 'react-icons/md';
+import {
+  MdAreaChart,
+  MdOutlineBuild,
+  MdOutlineShoppingBag,
+} from 'react-icons/md';
 
 interface EntitySection {
   name: string;

@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useTitle } from 'common/hooks/useTitle';
-import { updateChanges } from 'common/stores/slices/company-users';
-import { Divider } from 'components/cards/Divider';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Divider } from '$app/components/cards/Divider';
 import { ChangeEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
@@ -139,6 +139,18 @@ export function TaskSettings() {
         </Element>
 
         <Element
+          leftSide={t('lock_invoiced_tasks')}
+          leftSideHelp={t('lock_invoiced_tasks_help')}
+        >
+          <Toggle
+            checked={companyChanges?.invoice_task_lock || false}
+            onChange={(value: boolean) =>
+              handleToggleChange('invoice_task_lock', value)
+            }
+          />
+        </Element>
+
+        <Element
           leftSide={t('add_documents_to_invoice')}
           leftSideHelp={t('add_documents_to_invoice_help')}
         >
@@ -160,6 +172,7 @@ export function TaskSettings() {
             }
           />
         </Element>
+
         <Element leftSide={t('tasks_shown_in_portal')}>
           <SelectField
             id="settings.show_all_tasks_client_portal"

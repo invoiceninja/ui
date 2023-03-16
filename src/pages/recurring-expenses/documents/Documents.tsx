@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useTitle } from 'common/hooks/useTitle';
-import { useRecurringExpenseQuery } from 'common/queries/recurring-expense';
-import { Page } from 'components/Breadcrumbs';
-import { DocumentsTable } from 'components/DocumentsTable';
-import { Default } from 'components/layouts/Default';
-import { Tab, Tabs } from 'components/Tabs';
-import { Upload } from 'pages/settings/company/documents/components';
+import { endpoint } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { useRecurringExpenseQuery } from '$app/common/queries/recurring-expense';
+import { Page } from '$app/components/Breadcrumbs';
+import { DocumentsTable } from '$app/components/DocumentsTable';
+import { Default } from '$app/components/layouts/Default';
+import { Tab, Tabs } from '$app/components/Tabs';
+import { Upload } from '$app/pages/settings/company/documents/components';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';

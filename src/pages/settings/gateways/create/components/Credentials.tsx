@@ -8,11 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { Link } from '@invoiceninja/forms';
-import { CompanyGateway } from 'common/interfaces/company-gateway';
-import { Gateway } from 'common/interfaces/statics';
-import { ValidationBag } from 'common/interfaces/validation-bag';
+import { Card, Element } from '$app/components/cards';
+import { Link } from '$app/components/forms';
+import { CompanyGateway } from '$app/common/interfaces/company-gateway';
+import { Gateway } from '$app/common/interfaces/statics';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useTranslation } from 'react-i18next';
 import { formatLabel } from '../helpers/format-label';
 import { useResolveInputField } from '../hooks/useResolveInputField';

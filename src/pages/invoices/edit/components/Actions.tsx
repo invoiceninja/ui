@@ -8,24 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InvoiceStatus } from 'common/enums/invoice-status';
-import { route } from 'common/helpers/route';
-import { Credit } from 'common/interfaces/credit';
-import { Invoice } from 'common/interfaces/invoice';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { Quote } from 'common/interfaces/quote';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
-import { Divider } from 'components/cards/Divider';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Icon } from 'components/icons/Icon';
+import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { route } from '$app/common/helpers/route';
+import { Credit } from '$app/common/interfaces/credit';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
 import { useAtom } from 'jotai';
-import { creditAtom } from 'pages/credits/common/atoms';
-import { invoiceAtom } from 'pages/invoices/common/atoms';
-import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
-import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
-import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
-import { quoteAtom } from 'pages/quotes/common/atoms';
-import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
+import { creditAtom } from '$app/pages/credits/common/atoms';
+import { invoiceAtom } from '$app/pages/invoices/common/atoms';
+import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
+import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
+import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
+import { quoteAtom } from '$app/pages/quotes/common/atoms';
+import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { BiPlusCircle } from 'react-icons/bi';
 import {
@@ -72,19 +72,19 @@ export function useActions() {
   const cloneToInvoice = (invoice: Invoice) => {
     setInvoice({ ...invoice, number: '', documents: [] });
 
-    navigate('/invoices/create');
+    navigate('/invoices/create?action=clone');
   };
 
   const cloneToQuote = (invoice: Invoice) => {
     setQuote({ ...(invoice as unknown as Quote), number: '', documents: [] });
 
-    navigate('/quotes/create');
+    navigate('/quotes/create?action=clone');
   };
 
   const cloneToCredit = (invoice: Invoice) => {
     setCredit({ ...(invoice as unknown as Credit), number: '', documents: [] });
 
-    navigate('/credits/create');
+    navigate('/credits/create?action=clone');
   };
 
   const cloneToRecurringInvoice = (invoice: Invoice) => {
@@ -94,7 +94,7 @@ export function useActions() {
       documents: [],
     });
 
-    navigate('/recurring_invoices/create');
+    navigate('/recurring_invoices/create?action=clone');
   };
 
   const cloneToPurchaseOrder = (invoice: Invoice) => {
@@ -104,7 +104,7 @@ export function useActions() {
       documents: [],
     });
 
-    navigate('/purchase_orders/create');
+    navigate('/purchase_orders/create?action=clone');
   };
 
   return [

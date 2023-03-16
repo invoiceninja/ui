@@ -8,17 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { Button, InputField } from '@invoiceninja/forms';
+import { Card, Element } from '$app/components/cards';
+import { Button, InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { Invoice } from 'common/interfaces/invoice';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { usePaymentQuery } from 'common/queries/payments';
-import { Alert } from 'components/Alert';
-import { DebouncedCombobox, Record } from 'components/forms/DebouncedCombobox';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { Invoice } from '$app/common/interfaces/invoice';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { usePaymentQuery } from '$app/common/queries/payments';
+import { Alert } from '$app/components/Alert';
+import {
+  DebouncedCombobox,
+  Record,
+} from '$app/components/forms/DebouncedCombobox';
 import { useFormik } from 'formik';
 import { useEffect, useState } from 'react';
 import { X } from 'react-feather';
@@ -28,7 +31,7 @@ import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 
 export function Apply() {
   const queryClient = useQueryClient();
@@ -102,14 +105,34 @@ export function Apply() {
       <Element leftSide={t('amount')}>
         <InputField
           disabled
-          value={formatMoney((payment?.data.data.amount - payment?.data.data.refunded), payment?.data.data.client.country_id, payment?.data.data.client.settings.currency_id)}
+          value={formatMoney(
+            payment?.data.data.amount - payment?.data.data.refunded,
+            payment?.data.data.client.country_id,
+            payment?.data.data.client.settings.currency_id
+          )}
         />
       </Element>
       <Element leftSide={t('applied')}>
-        <InputField disabled value={formatMoney(payment?.data.data.applied, payment?.data.data.client.country_id, payment?.data.data.client.settings.currency_id)} />
+        <InputField
+          disabled
+          value={formatMoney(
+            payment?.data.data.applied,
+            payment?.data.data.client.country_id,
+            payment?.data.data.client.settings.currency_id
+          )}
+        />
       </Element>
       <Element leftSide={t('unapplied')}>
-        <InputField disabled value={formatMoney(((payment?.data.data.amount - payment?.data.data.refunded) - payment?.data.data.applied), payment?.data.data.client.country_id, payment?.data.data.client.settings.currency_id)} />
+        <InputField
+          disabled
+          value={formatMoney(
+            payment?.data.data.amount -
+              payment?.data.data.refunded -
+              payment?.data.data.applied,
+            payment?.data.data.client.country_id,
+            payment?.data.data.client.settings.currency_id
+          )}
+        />
       </Element>
       <Element leftSide={t('invoices')}>
         <DebouncedCombobox
@@ -130,7 +153,7 @@ export function Apply() {
         )}
       </Element>
       {formik.values.invoices.map(
-        (record: { _id: string; amount: number; number: string; }, index) => (
+        (record: { _id: string; amount: number; number: string }, index) => (
           <Element key={index} leftSide={t('applied')}>
             <div className="flex items-center space-x-2">
               <InputField

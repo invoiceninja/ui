@@ -8,16 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date, trans } from 'common/helpers';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { ActivityRecord } from 'common/interfaces/activity-record';
-import { route } from 'common/helpers/route';
-import { NonClickableElement } from 'components/cards/NonClickableElement';
+import { date, trans } from '$app/common/helpers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { ActivityRecord } from '$app/common/interfaces/activity-record';
+import { route } from '$app/common/helpers/route';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import reactStringReplace from 'react-string-replace';
-import { Link } from '@invoiceninja/forms';
+import { Link } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export function useGenerateActivityElement() {
   const { dateFormat } = useCurrentCompanyDateFormats();

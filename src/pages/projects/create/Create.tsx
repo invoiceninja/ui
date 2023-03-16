@@ -8,26 +8,28 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import { endpoint, isProduction } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useClientResolver } from 'common/hooks/clients/useClientResolver';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useTitle } from 'common/hooks/useTitle';
-import { Project } from 'common/interfaces/project';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { useBlankProjectQuery } from 'common/queries/projects';
-import { ClientSelector } from 'components/clients/ClientSelector';
-import { Container } from 'components/Container';
-import { DebouncedCombobox } from 'components/forms/DebouncedCombobox';
-import { Default } from 'components/layouts/Default';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Project } from '$app/common/interfaces/project';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useBlankProjectQuery } from '$app/common/queries/projects';
+import { ClientSelector } from '$app/components/clients/ClientSelector';
+import { Container } from '$app/components/Container';
+import { DebouncedCombobox } from '$app/components/forms/DebouncedCombobox';
+import { Default } from '$app/components/layouts/Default';
 import { useAtom } from 'jotai';
+import { cloneDeep } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectAtom } from '../common/atoms';
 
@@ -35,13 +37,12 @@ export function Create() {
   const { documentTitle } = useTitle('new_project');
 
   const [t] = useTranslation();
+  const queryClient = useQueryClient();
 
   const pages = [
     { name: t('projects'), href: '/projects' },
     { name: t('new_project'), href: '/projects/create' },
   ];
-
-  const { data: blankProject } = useBlankProjectQuery();
 
   const [searchParams] = useSearchParams();
   const [project, setProject] = useAtom(projectAtom);
@@ -55,19 +56,37 @@ export function Create() {
     setProject((project) => project && { ...project, [property]: value });
   };
 
-  useEffect(() => {
-    if (blankProject && !project) {
-      setProject({
-        ...blankProject,
-        task_rate: company?.settings.default_task_rate || 0,
-        client_id: searchParams.get('client') || '',
-      });
-    }
+  const { data } = useBlankProjectQuery({
+    enabled: typeof project === 'undefined',
+  });
 
-    return () => {
-      isProduction() && setProject(undefined);
-    };
-  }, [blankProject]);
+  useEffect(() => {
+    setProject((current) => {
+      let value = current;
+
+      if (searchParams.get('action') !== 'clone') {
+        value = undefined;
+      }
+
+      if (
+        typeof data !== 'undefined' &&
+        typeof value === 'undefined' &&
+        searchParams.get('action') !== 'clone'
+      ) {
+        const _project = cloneDeep(data);
+
+        _project.task_rate = company?.settings.default_task_rate || 0;
+
+        if (searchParams.get('client')) {
+          _project.client_id = searchParams.get('client')!;
+        }
+
+        value = _project;
+      }
+
+      return value;
+    });
+  }, [data]);
 
   useEffect(() => {
     if (project?.client_id && project.client_id.length > 1) {
@@ -87,6 +106,8 @@ export function Create() {
     request('POST', endpoint('/api/v1/projects'), project)
       .then((response) => {
         toast.success('created_project');
+
+        queryClient.invalidateQueries('/api/v1/projects');
 
         navigate(route('/projects/:id/edit', { id: response.data.data.id }));
       })
@@ -115,6 +136,7 @@ export function Create() {
               value={project?.name}
               onValueChange={(value) => handleChange('name', value)}
               errorMessage={errors?.errors.name}
+              cypressRef="name"
             />
           </Element>
 

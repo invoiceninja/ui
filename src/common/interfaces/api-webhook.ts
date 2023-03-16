@@ -8,12 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+export interface ApiWebHookHeader {
+  [key: string]: string;
+}
+
 export interface ApiWebhook {
   id: string;
   company_id: string;
   event_id: string;
   format: string;
-  headers: Record<string, string>[];
+  headers: ApiWebHookHeader;
   rest_method: string;
   target_url: string;
   user_id: string;

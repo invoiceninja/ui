@@ -8,32 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
+import { Link } from '$app/components/forms';
 import { AxiosError } from 'axios';
-import purchaseOrderStatus from 'common/constants/purchase-order-status';
-import { PurchaseOrderStatus } from 'common/enums/purchase-order-status';
-import { date, endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { PurchaseOrder } from 'common/interfaces/purchase-order';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { CopyToClipboard } from 'components/CopyToClipboard';
-import { customField } from 'components/CustomField';
-import { SelectOption } from 'components/datatables/Actions';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { EntityStatus } from 'components/EntityStatus';
-import { Icon } from 'components/icons/Icon';
-import { Action } from 'components/ResourceActions';
-import { StatusBadge } from 'components/StatusBadge';
+import purchaseOrderStatus from '$app/common/constants/purchase-order-status';
+import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
+import { date, endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
+import { Action } from '$app/components/ResourceActions';
+import { StatusBadge } from '$app/components/StatusBadge';
 import { useAtom } from 'jotai';
-import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
   MdArchive,
@@ -51,8 +50,9 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import { purchaseOrderAtom } from './atoms';
 import { useBulk, useMarkSent } from './queries';
-import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
-import { Divider } from 'components/cards/Divider';
+import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
+import { Divider } from '$app/components/cards/Divider';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -87,34 +87,7 @@ export function useCreate(props: CreateProps) {
   };
 }
 
-export const purchaseOrderColumns = [
-  'status',
-  'number',
-  'vendor',
-  'expense',
-  'amount',
-  'date',
-  'due_date',
-  'archived_at',
-  // 'assigned_to', @Todo: Need to resolve relationship
-  // 'client', @Todo: Need to resolve relationship (client+po?)
-  'contact_email',
-  'contact_name',
-  'created_at',
-  // 'created_by', @Todo: Need to resolve relationship
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'discount',
-  'documents',
-  'entity_state',
-  'exchange_rate',
-] as const;
-
-type PurchaseOrderColumns = typeof purchaseOrderColumns[number];
-
-export const defaultColumns: PurchaseOrderColumns[] = [
+export const defaultColumns: string[] = [
   'status',
   'number',
   'vendor',
@@ -124,6 +97,40 @@ export const defaultColumns: PurchaseOrderColumns[] = [
   'due_date',
 ];
 
+export function useAllPurchaseOrderColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'invoice',
+    });
+
+  const purchaseOrderColumns = [
+    'status',
+    'number',
+    'vendor',
+    'expense',
+    'amount',
+    'date',
+    'due_date',
+    'archived_at',
+    // 'assigned_to', @Todo: Need to resolve relationship
+    // 'client', @Todo: Need to resolve relationship (client+po?)
+    'contact_email',
+    'contact_name',
+    'created_at',
+    // 'created_by', @Todo: Need to resolve relationship
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'discount',
+    'documents',
+    'entity_state',
+    'exchange_rate',
+  ] as const;
+
+  return purchaseOrderColumns;
+}
+
 export function usePurchaseOrderColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -132,6 +139,14 @@ export function usePurchaseOrderColumns() {
   const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
+
+  const purchaseOrderColumns = useAllPurchaseOrderColumns();
+  type PurchaseOrderColumns = (typeof purchaseOrderColumns)[number];
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'invoice',
+    });
 
   const columns: DataTableColumnsExtended<PurchaseOrder, PurchaseOrderColumns> =
     [
@@ -245,36 +260,24 @@ export function usePurchaseOrderColumns() {
         format: (value) => date(value, dateFormat),
       },
       {
-        column: 'custom1',
+        column: firstCustom,
         id: 'custom_value1',
-        label:
-          (company?.custom_fields.invoice1 &&
-            customField(company?.custom_fields.invoice1).label()) ||
-          t('first_custom'),
+        label: firstCustom,
       },
       {
-        column: 'custom2',
+        column: secondCustom,
         id: 'custom_value2',
-        label:
-          (company?.custom_fields.invoice2 &&
-            customField(company?.custom_fields.invoice2).label()) ||
-          t('second_custom'),
+        label: secondCustom,
       },
       {
-        column: 'custom3',
+        column: thirdCustom,
         id: 'custom_value3',
-        label:
-          (company?.custom_fields.invoice3 &&
-            customField(company?.custom_fields.invoice3).label()) ||
-          t('third_custom'),
+        label: thirdCustom,
       },
       {
-        column: 'custom4',
+        column: fourthCustom,
         id: 'custom_value4',
-        label:
-          (company?.custom_fields.invoice4 &&
-            customField(company?.custom_fields.invoice4).label()) ||
-          t('forth_custom'),
+        label: fourthCustom,
       },
       {
         column: 'discount',
@@ -376,7 +379,7 @@ export function useActions() {
   const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
     setPurchaseOrder({ ...purchaseOrder, number: '', documents: [] });
 
-    navigate('/purchase_orders/create');
+    navigate('/purchase_orders/create?action=clone');
   };
 
   const actions: Action<PurchaseOrder>[] = [

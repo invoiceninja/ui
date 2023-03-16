@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { SelectOption } from 'components/datatables/Actions';
+import { SelectOption } from '$app/components/datatables/Actions';
 import { useTranslation } from 'react-i18next';
 
 export function useInvoiceFilters() {
@@ -37,7 +37,7 @@ export function useInvoiceFilters() {
       label: t('overdue'),
       value: 'overdue',
       color: 'white',
-      backgroundColor: '#93C5FD',
+      backgroundColor: '#CA8A04',
     },
   ];
 

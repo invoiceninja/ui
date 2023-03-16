@@ -8,20 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from 'common/hooks/useAccentColor';
-import { ClientContact } from 'common/interfaces/client-contact';
-import { useClientQuery } from 'common/queries/clients';
-import { InfoCard } from 'components/InfoCard';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
+import { Client } from '$app/common/interfaces/client';
+import { ClientContact } from '$app/common/interfaces/client-contact';
+import { InfoCard } from '$app/components/InfoCard';
 import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router-dom';
-import React from 'react';
-import { CopyToClipboard } from 'components/CopyToClipboard';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
 
-export function Contacts() {
+interface Props {
+  client: Client;
+}
+
+export function Contacts(props: Props) {
   const [t] = useTranslation();
-  const { id } = useParams();
-  const { data: client } = useClientQuery({ id });
+
   const accentColor = useAccentColor();
+
+  const { client } = props;
 
   return (
     <>
@@ -31,7 +34,7 @@ export function Contacts() {
             title={t('contacts')}
             value={
               <div className="space-y-2">
-                {client.data.data.contacts.map(
+                {client.contacts.map(
                   (contact: ClientContact, index: number) => (
                     <div key={index}>
                       <p

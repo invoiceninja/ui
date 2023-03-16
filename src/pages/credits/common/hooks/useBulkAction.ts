@@ -9,14 +9,17 @@
  */
 
 import { AxiosError } from 'axios';
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { toast } from 'common/helpers/toast/toast';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 
 export function useBulkAction() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (id: string, action: 'archive' | 'restore' | 'delete') => {
     toast.processing();
@@ -35,6 +38,9 @@ export function useBulkAction() {
         queryClient.invalidateQueries('/api/v1/credits');
 
         queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }));
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
       });
   };
 }

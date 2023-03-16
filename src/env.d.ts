@@ -10,6 +10,7 @@ interface ImportMetaEnv extends Readonly<Record<string, string>> {
   readonly VITE_DEMO_ENDPOINT: string;
   readonly VITE_DEMO_EMAIL: string;
   readonly VITE_DEMO_PASSWORD: string;
+  readonly VITE_IS_PRODUCTION: string;
 }
 
 interface ImportMeta {

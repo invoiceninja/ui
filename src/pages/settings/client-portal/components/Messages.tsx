@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '@invoiceninja/cards';
-import { InputField } from '@invoiceninja/forms';
-import { useCompanyChanges } from 'common/hooks/useCompanyChanges';
-import { useHandleCurrentCompanyChangeProperty } from 'pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 
 export function Messages() {

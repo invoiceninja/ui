@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useClientResolver } from 'common/hooks/clients/useClientResolver';
-import { useVendorResolver } from 'common/hooks/vendors/useVendorResolver';
-import { Client } from 'common/interfaces/client';
-import { Vendor } from 'common/interfaces/vendor';
+import { useClientResolver } from '$app/common/hooks/clients/useClientResolver';
+import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
+import { Client } from '$app/common/interfaces/client';
+import { Vendor } from '$app/common/interfaces/vendor';
 
 import {
   MailerResource,
   MailerResourceType,
-} from 'pages/invoices/email/components/Mailer';
+} from '$app/pages/invoices/email/components/Mailer';
 import { useEffect, useState } from 'react';
 
 interface Props {

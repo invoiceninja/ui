@@ -8,14 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import frequency from 'common/constants/frequency';
-import { date } from 'common/helpers';
-import { route } from 'common/helpers/route';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
-import { DataTable, DataTableColumns } from 'components/DataTable';
-import { StatusBadge } from 'components/StatusBadge';
+import { Link } from '$app/components/forms';
+import frequency from '$app/common/constants/frequency';
+import { date } from '$app/common/helpers';
+import { route } from '$app/common/helpers/route';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { DataTable, DataTableColumns } from '$app/components/DataTable';
+import { StatusBadge } from '$app/components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';

@@ -8,32 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '@invoiceninja/forms';
-import { date, endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { Task } from 'common/interfaces/task';
-import { customField } from 'components/CustomField';
-import { SelectOption } from 'components/datatables/Actions';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Icon } from 'components/icons/Icon';
+import { Link } from '$app/components/forms';
+import { date, endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { Task } from '$app/common/interfaces/task';
+import { Divider } from '$app/components/cards/Divider';
+import { SelectOption } from '$app/components/datatables/Actions';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { Tooltip } from '$app/components/Tooltip';
 import dayjs from 'dayjs';
 import { useUpdateAtom } from 'jotai/utils';
-import { DataTableColumnsExtended } from 'pages/invoices/common/hooks/useInvoiceColumns';
+import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
   MdControlPointDuplicate,
+  MdEdit,
   MdNotStarted,
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { taskAtom } from './atoms';
 import { TaskStatus } from './components/TaskStatus';
 import {
@@ -44,37 +46,9 @@ import { calculateTime, parseTimeLog } from './helpers/calculate-time';
 import { useInvoiceTask } from './hooks/useInvoiceTask';
 import { useStart } from './hooks/useStart';
 import { useStop } from './hooks/useStop';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 
-export const taskColumns = [
-  'status',
-  'number',
-  'client',
-  //   'project',  @Todo: Need to fetch relationship
-  'description',
-  'duration',
-  'entity_state',
-  'archived_at',
-  //   'assigned_to', @Todo: Need to fetch relationship
-  'calculated_rate',
-  'created_at',
-  //   'created_by', @Todo: Need to fetch relationship
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'date',
-  'documents',
-  //   'invoice', @Todo: Need to fetch the relationship
-  'is_deleted',
-  'is_invoiced',
-  'is_running',
-  'rate',
-  'updated_at',
-] as const;
-
-type TaskColumns = typeof taskColumns[number];
-
-export const defaultColumns: TaskColumns[] = [
+export const defaultColumns: string[] = [
   'status',
   'number',
   'client',
@@ -82,6 +56,42 @@ export const defaultColumns: TaskColumns[] = [
   'duration',
   'entity_state',
 ];
+
+export function useAllTaskColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'task',
+    });
+
+  const taskColumns = [
+    'status',
+    'number',
+    'client',
+    //   'project',  @Todo: Need to fetch relationship
+    'description',
+    'duration',
+    'entity_state',
+    'archived_at',
+    //   'assigned_to', @Todo: Need to fetch relationship
+    'calculated_rate',
+    'created_at',
+    //   'created_by', @Todo: Need to fetch relationship
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'date',
+    'documents',
+    //   'invoice', @Todo: Need to fetch the relationship
+    'is_deleted',
+    'is_invoiced',
+    'is_running',
+    'rate',
+    'updated_at',
+  ] as const;
+
+  return taskColumns;
+}
 
 export function useTaskColumns() {
   const { t } = useTranslation();
@@ -102,6 +112,14 @@ export function useTaskColumns() {
 
     return dayjs.unix(startTime).format(dateFormat);
   };
+
+  const taskColumns = useAllTaskColumns();
+  type TaskColumns = (typeof taskColumns)[number];
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'task',
+    });
 
   const columns: DataTableColumnsExtended<Task, TaskColumns> = [
     {
@@ -133,7 +151,11 @@ export function useTaskColumns() {
       column: 'description',
       id: 'description',
       label: t('description'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'duration',
@@ -171,36 +193,24 @@ export function useTaskColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.task1 &&
-          customField(company?.custom_fields.task1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.task2 &&
-          customField(company?.custom_fields.task2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.task3 &&
-          customField(company?.custom_fields.task3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.task4 &&
-          customField(company?.custom_fields.task4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'date',
@@ -306,6 +316,10 @@ export function useActions() {
 
   const navigate = useNavigate();
 
+  const location = useLocation();
+
+  const company = useCurrentCompany();
+
   const start = useStart();
 
   const stop = useStop();
@@ -317,12 +331,28 @@ export function useActions() {
   const cloneToTask = (task: Task) => {
     setTask({ ...task, id: '', documents: [], number: '' });
 
-    navigate('/tasks/create');
+    navigate('/tasks/create?action=clone');
   };
 
   const actions = [
     (task: Task) =>
-      !isTaskRunning(task) && (
+      !location.pathname.endsWith('/edit') &&
+      (!task.invoice_id || !company?.invoice_task_lock) && (
+        <DropdownElement
+          onClick={() => navigate(route('/tasks/:id/edit', { id: task.id }))}
+          icon={<Icon element={MdEdit} />}
+        >
+          {t('edit')}
+        </DropdownElement>
+      ),
+    (task: Task) =>
+      !location.pathname.endsWith('/edit') &&
+      (!task.invoice_id || !company?.invoice_task_lock) && (
+        <Divider withoutPadding />
+      ),
+    (task: Task) =>
+      !isTaskRunning(task) &&
+      !task.invoice_id && (
         <DropdownElement
           onClick={() => start(task)}
           icon={<Icon element={MdNotStarted} />}
@@ -331,7 +361,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (task: Task) =>
-      isTaskRunning(task) && (
+      isTaskRunning(task) &&
+      !task.invoice_id && (
         <DropdownElement
           onClick={() => stop(task)}
           icon={<Icon element={MdStopCircle} />}

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { RecurringExpensesFrequency } from 'common/enums/recurring-expense-frequency';
+import { RecurringExpensesFrequency } from '$app/common/enums/recurring-expense-frequency';
 
 export default {
   [RecurringExpensesFrequency.FREQUENCY_ANNUALLY]: 'freq_annually',

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useCountries } from 'common/hooks/useCountries';
+import { useCountries } from '$app/common/hooks/useCountries';
 import { SelectField } from './forms';
 
 export interface GenericSelectorProps<T = string> {

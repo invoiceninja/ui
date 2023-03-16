@@ -8,12 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint } from 'common/helpers';
-import { request } from 'common/helpers/request';
-import { GenericManyResponse } from 'common/interfaces/generic-many-response';
-import { Task } from 'common/interfaces/task';
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
+import { Task } from '$app/common/interfaces/task';
 import { useQuery } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
+import { GenericQueryOptions } from './invoices';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface TaskParams {
   id?: string;
@@ -31,11 +34,16 @@ export function useTaskQuery(params: TaskParams) {
   );
 }
 
-export function useBlankTaskQuery() {
-  return useQuery<Task>(route('/api/v1/tasks/create'), () =>
-    request('GET', endpoint('/api/v1/tasks/create')).then(
-      (response) => response.data.data
-    )
+export function useBlankTaskQuery(options?: GenericQueryOptions) {
+  const hasPermission = useHasPermission();
+
+  return useQuery(
+    route('/api/v1/tasks/create'),
+    () =>
+      request('GET', endpoint('/api/v1/tasks/create')).then(
+        (response: GenericSingleResourceResponse<Task>) => response.data.data
+      ),
+    { ...options, staleTime: Infinity, enabled: hasPermission('create_task') }
   );
 }
 

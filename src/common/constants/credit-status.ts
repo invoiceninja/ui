@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { CreditStatus } from 'common/enums/credit-status';
+import { CreditStatus } from '$app/common/enums/credit-status';
 
 export default {
   [CreditStatus.Draft]: 'draft',

@@ -9,14 +9,17 @@
  */
 
 import { AxiosError } from 'axios';
-import { request } from 'common/helpers/request';
+import { request } from '$app/common/helpers/request';
 import { useQuery, useQueryClient } from 'react-query';
-import { route } from 'common/helpers/route';
+import { route } from '$app/common/helpers/route';
 import { endpoint } from '../helpers';
-import { Payment } from 'common/interfaces/payment';
+import { Payment } from '$app/common/interfaces/payment';
 import { Params } from './common/params.interface';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { toast } from 'common/helpers/toast/toast';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
 
 interface PaymentParams {
   id: string | undefined;
@@ -67,15 +70,18 @@ export function usePaymentsQuery(params: PaymentsParams) {
 }
 
 export function useBlankPaymentQuery() {
+  const hasPermission = useHasPermission();
+
   return useQuery(
     route('/api/v1/payments/create'),
     () => request('GET', endpoint('/api/v1/payments/create')),
-    { staleTime: Infinity }
+    { staleTime: Infinity, enabled: hasPermission('create_payment') }
   );
 }
 
 export function useBulk() {
   const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return (id: string, action: 'archive' | 'restore' | 'delete' | 'email') => {
     toast.processing();
@@ -88,6 +94,9 @@ export function useBulk() {
         const translationKeyword = action === 'email' ? 'emaile' : action;
 
         toast.success(`${translationKeyword}d_payment`);
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
 
         queryClient.invalidateQueries(route('/api/v1/payments/:id', { id }));
       })

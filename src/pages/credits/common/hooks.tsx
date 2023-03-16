@@ -9,40 +9,46 @@
  */
 
 import axios, { AxiosError } from 'axios';
-import { blankLineItem } from 'common/constants/blank-line-item';
-import { CreditStatus } from 'common/enums/credit-status';
-import { date, endpoint } from 'common/helpers';
-import { InvoiceSum } from 'common/helpers/invoices/invoice-sum';
-import { request } from 'common/helpers/request';
-import { route } from 'common/helpers/route';
-import { toast } from 'common/helpers/toast/toast';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { useInjectCompanyChanges } from 'common/hooks/useInjectCompanyChanges';
-import { useResolveCurrency } from 'common/hooks/useResolveCurrency';
-import { Client } from 'common/interfaces/client';
-import { Credit } from 'common/interfaces/credit';
-import { GenericSingleResourceResponse } from 'common/interfaces/generic-api-response';
-import { InvoiceItem, InvoiceItemType } from 'common/interfaces/invoice-item';
-import { Invitation, PurchaseOrder } from 'common/interfaces/purchase-order';
-import { Quote } from 'common/interfaces/quote';
-import { RecurringInvoice } from 'common/interfaces/recurring-invoice';
-import { ValidationBag } from 'common/interfaces/validation-bag';
-import { updateRecord } from 'common/stores/slices/company-users';
-import { Divider } from 'components/cards/Divider';
-import { DropdownElement } from 'components/dropdown/DropdownElement';
-import { Action } from 'components/ResourceActions';
+import { blankLineItem } from '$app/common/constants/blank-line-item';
+import { CreditStatus } from '$app/common/enums/credit-status';
+import { date, endpoint } from '$app/common/helpers';
+import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
+import { Client } from '$app/common/interfaces/client';
+import { Credit } from '$app/common/interfaces/credit';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '$app/common/interfaces/invoice-item';
+import {
+  Invitation,
+  PurchaseOrder,
+} from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import { Divider } from '$app/components/cards/Divider';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Action } from '$app/components/ResourceActions';
 import { useAtom } from 'jotai';
-import { invoiceAtom } from 'pages/invoices/common/atoms';
-import { openClientPortal } from 'pages/invoices/common/helpers/open-client-portal';
-import { useDownloadPdf } from 'pages/invoices/common/hooks/useDownloadPdf';
+import { invoiceAtom } from '$app/pages/invoices/common/atoms';
+import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
+import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import {
   DataTableColumnsExtended,
   resourceViewedAt,
-} from 'pages/invoices/common/hooks/useInvoiceColumns';
-import { purchaseOrderAtom } from 'pages/purchase-orders/common/atoms';
-import { quoteAtom } from 'pages/quotes/common/atoms';
-import { recurringInvoiceAtom } from 'pages/recurring-invoices/common/atoms';
+} from '$app/pages/invoices/common/hooks/useInvoiceColumns';
+import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
+import { quoteAtom } from '$app/pages/quotes/common/atoms';
+import { recurringInvoiceAtom } from '$app/pages/recurring-invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
@@ -51,14 +57,13 @@ import { creditAtom, invoiceSumAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useMarkSent } from './hooks/useMarkSent';
 import { CreditStatus as CreditStatusBadge } from '../common/components/CreditStatus';
-import { Link } from '@invoiceninja/forms';
-import { useFormatMoney } from 'common/hooks/money/useFormatMoney';
-import { useCurrentCompanyDateFormats } from 'common/hooks/useCurrentCompanyDateFormats';
-import { useResolveCountry } from 'common/hooks/useResolveCountry';
-import { CopyToClipboard } from 'components/CopyToClipboard';
-import { customField } from 'components/CustomField';
-import { EntityStatus } from 'components/EntityStatus';
-import { Icon } from 'components/icons/Icon';
+import { Link } from '$app/components/forms';
+import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
+import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Icon } from '$app/components/icons/Icon';
 import {
   MdArchive,
   MdCloudCircle,
@@ -71,6 +76,8 @@ import {
   MdPictureAsPdf,
   MdRestore,
 } from 'react-icons/md';
+import { Tooltip } from '$app/components/Tooltip';
+import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -273,19 +280,19 @@ export function useActions() {
   const cloneToCredit = (credit: Credit) => {
     setCredit({ ...credit, number: '', documents: [] });
 
-    navigate('/credits/create');
+    navigate('/credits/create?action=clone');
   };
 
   const cloneToInvoice = (credit: Credit) => {
     setInvoice({ ...credit, number: '', documents: [] });
 
-    navigate('/invoices/create');
+    navigate('/invoices/create?action=clone');
   };
 
   const cloneToQuote = (credit: Credit) => {
     setQuote({ ...(credit as Quote), number: '', documents: [] });
 
-    navigate('/quotes/create');
+    navigate('/quotes/create?action=clone');
   };
 
   const cloneToRecurringInvoice = (credit: Credit) => {
@@ -295,7 +302,7 @@ export function useActions() {
       documents: [],
     });
 
-    navigate('/recurring_invoices/create');
+    navigate('/recurring_invoices/create?action=clone');
   };
 
   const cloneToPurchaseOrder = (credit: Credit) => {
@@ -305,7 +312,7 @@ export function useActions() {
       documents: [],
     });
 
-    navigate('/purchase_orders/create');
+    navigate('/purchase_orders/create?action=clone');
   };
 
   const actions: Action<Credit>[] = [
@@ -442,49 +449,7 @@ export function useActions() {
   return actions;
 }
 
-export const creditColumns = [
-  'status',
-  'number',
-  'client',
-  'amount',
-  'date',
-  'remaining',
-  'archived_at',
-  // 'assigned_to', @Todo: Need to resolve relationship
-  'client_city',
-  'client_country',
-  'client_postal_code',
-  'client_state',
-  'contact_email',
-  'contact_name',
-  'created_at',
-  // 'created_by', @Todo: Need to resolve relationship
-  'custom1',
-  'custom2',
-  'custom3',
-  'custom4',
-  'discount',
-  'documents',
-  'entity_state',
-  'exchange_rate',
-  'is_deleted',
-  'is_viewed',
-  'last_sent_date',
-  'partial',
-  'partial_due_date',
-  'po_number',
-  'private_notes',
-  // 'project', @Todo: Need to fetch the relationship
-  'public_notes',
-  'tax_amount',
-  'updated_at',
-  'valid_until',
-  // 'vendor', @Todo: Need to fetch the relationship
-] as const;
-
-type CreditColumns = typeof creditColumns[number];
-
-export const defaultColumns: CreditColumns[] = [
+export const defaultColumns: string[] = [
   'status',
   'number',
   'client',
@@ -493,14 +458,71 @@ export const defaultColumns: CreditColumns[] = [
   'remaining',
 ];
 
+export function useAllCreditColumns() {
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'credit',
+    });
+
+  const creditColumns = [
+    'status',
+    'number',
+    'client',
+    'amount',
+    'date',
+    'remaining',
+    'archived_at',
+    // 'assigned_to', @Todo: Need to resolve relationship
+    'client_city',
+    'client_country',
+    'client_postal_code',
+    'client_state',
+    'contact_email',
+    'contact_name',
+    'created_at',
+    // 'created_by', @Todo: Need to resolve relationship
+    firstCustom,
+    secondCustom,
+    thirdCustom,
+    fourthCustom,
+    'discount',
+    'documents',
+    'entity_state',
+    'exchange_rate',
+    'is_deleted',
+    'is_viewed',
+    'last_sent_date',
+    'partial',
+    'partial_due_date',
+    'po_number',
+    'private_notes',
+    // 'project', @Todo: Need to fetch the relationship
+    'public_notes',
+    'tax_amount',
+    'updated_at',
+    'valid_until',
+    // 'vendor', @Todo: Need to fetch the relationship
+  ] as const;
+
+  return creditColumns;
+}
+
 export function useCreditColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const creditColumns = useAllCreditColumns();
+  type CreditColumns = (typeof creditColumns)[number];
 
   const currentUser = useCurrentUser();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
+
+  const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
+    useEntityCustomFields({
+      entity: 'credit',
+    });
 
   const columns: DataTableColumnsExtended<Credit, CreditColumns> = [
     {
@@ -614,36 +636,24 @@ export function useCreditColumns() {
       format: (value) => date(value, dateFormat),
     },
     {
-      column: 'custom1',
+      column: firstCustom,
       id: 'custom_value1',
-      label:
-        (company?.custom_fields.credit1 &&
-          customField(company?.custom_fields.credit1).label()) ||
-        t('first_custom'),
+      label: firstCustom,
     },
     {
-      column: 'custom2',
+      column: secondCustom,
       id: 'custom_value2',
-      label:
-        (company?.custom_fields.credit2 &&
-          customField(company?.custom_fields.credit2).label()) ||
-        t('second_custom'),
+      label: secondCustom,
     },
     {
-      column: 'custom3',
+      column: thirdCustom,
       id: 'custom_value3',
-      label:
-        (company?.custom_fields.credit3 &&
-          customField(company?.custom_fields.credit3).label()) ||
-        t('third_custom'),
+      label: thirdCustom,
     },
     {
-      column: 'custom4',
+      column: fourthCustom,
       id: 'custom_value4',
-      label:
-        (company?.custom_fields.credit4 &&
-          customField(company?.custom_fields.credit4).label()) ||
-        t('forth_custom'),
+      label: fourthCustom,
     },
     {
       column: 'discount',
@@ -720,13 +730,21 @@ export function useCreditColumns() {
       column: 'private_notes',
       id: 'private_notes',
       label: t('private_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'public_notes',
       id: 'public_notes',
       label: t('public_notes'),
-      format: (value) => <span className="truncate">{value}</span>,
+      format: (value) => (
+        <Tooltip size="regular" truncate message={value as string}>
+          <span>{value}</span>
+        </Tooltip>
+      ),
     },
     {
       column: 'tax_amount',

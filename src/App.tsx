@@ -8,13 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isHosted } from 'common/helpers';
-import { useCurrentAccount } from 'common/hooks/useCurrentAccount';
-import { useCurrentCompany } from 'common/hooks/useCurrentCompany';
-import { useCurrentUser } from 'common/hooks/useCurrentUser';
-import { useResolveLanguage } from 'common/hooks/useResolveLanguage';
-import { AccountWarningsModal } from 'components/AccountWarningsModal';
-import { VerifyModal } from 'components/VerifyModal';
+import { isHosted } from '$app/common/helpers';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
+import { AccountWarningsModal } from '$app/components/AccountWarningsModal';
+import { VerifyModal } from '$app/components/VerifyModal';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';

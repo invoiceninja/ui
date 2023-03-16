@@ -10,6 +10,7 @@
 
 import classNames from 'classnames';
 import { ReactElement, useEffect, useRef, useState } from 'react';
+import Tippy from '@tippyjs/react/headless';
 
 interface Props {
   children: ReactElement;
@@ -45,39 +46,45 @@ export function Tooltip(props: Props) {
 
   return (
     <div
-      className={classNames(`group ${props.className}`, {
+      className={classNames(props.className, {
         'max-w-sm': props.size === undefined || props.size === 'small',
         'max-w-md': props.size === 'regular',
         'max-w-xl': props.size === 'large',
       })}
     >
-      <div
-        ref={parentChildrenElement}
-        className={classNames('cursor-pointer', {
-          'truncate w-full': props.truncate,
-        })}
+      <Tippy
+        placement="top-start"
+        interactive={true}
+        render={() => (
+          <div className="flex flex-col items-center whitespace-normal">
+            <span
+              className={classNames(
+                'relative p-2 text-xs text-center text-white rounded-md bg-gray-500 break-all',
+                {
+                  'leading-1': includeLeading,
+                  'leading-none': !includeLeading,
+                }
+              )}
+              style={{ width: messageWidth }}
+            >
+              {props.message}
+            </span>
+
+            <div className="w-3 h-3 -mt-2 rotate-45 opacity-90 bg-gray-500"></div>
+          </div>
+        )}
       >
-        {props.children}
-      </div>
-
-      <div className="flex absolute z-50">
-        <div className="absolute bottom-0 flex-col items-center hidden mb-6 group-hover:flex">
-          <span
-            className={classNames(
-              'relative p-2 text-xs text-center text-white rounded-md bg-gray-500 whitespace-normal',
-              {
-                'leading-1': includeLeading,
-                'leading-none': !includeLeading,
-              }
-            )}
-            style={{ width: messageWidth }}
+        {
+          <div
+            ref={parentChildrenElement}
+            className={classNames('cursor-pointer', {
+              'truncate w-full': props.truncate,
+            })}
           >
-            {props.message}
-          </span>
-
-          <div className="w-3 h-3 -mt-2 rotate-45 opacity-90 bg-gray-500"></div>
-        </div>
-      </div>
+            {props.children}
+          </div>
+        }
+      </Tippy>
     </div>
   );
 }

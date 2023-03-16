@@ -8,13 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useAccentColor } from 'common/hooks/useAccentColor';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
   label?: string | null;
   checked?: boolean;
   onValueChange?: (value: string, checked?: boolean) => unknown;
+  cypressRef?: string;
 }
 
 export function Checkbox(props: Props) {
@@ -38,6 +39,7 @@ export function Checkbox(props: Props) {
           }}
           checked={props.checked}
           disabled={props.disabled}
+          data-cy={props.cypressRef}
         />
       </div>
       <div className="ml-3 text-sm">

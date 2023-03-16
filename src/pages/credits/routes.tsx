@@ -8,10 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Guard } from 'common/guards/Guard';
-import { enabled } from 'common/guards/guards/enabled';
-import { permission } from 'common/guards/guards/permission';
-import { ModuleBitmask } from 'pages/settings/account-management/component';
+import { Guard } from '$app/common/guards/Guard';
+import { assigned } from '$app/common/guards/guards/assigned';
+import { enabled } from '$app/common/guards/guards/enabled';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
+import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
 import { Create } from './create/Create';
 import { Edit } from './edit/Edit';
@@ -26,8 +28,12 @@ export const creditRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Credits),
-            () => permission('view_credit'),
+            enabled(ModuleBitmask.Credits),
+            or(
+              permission('view_credit'),
+              permission('create_credit'),
+              permission('edit_credit')
+            ),
           ]}
           component={<Credits />}
         />
@@ -37,10 +43,7 @@ export const creditRoutes = (
       path="create"
       element={
         <Guard
-          guards={[
-            () => enabled(ModuleBitmask.Credits),
-            () => permission('create_credit'),
-          ]}
+          guards={[enabled(ModuleBitmask.Credits), permission('create_credit')]}
           component={<Create />}
         />
       }
@@ -50,8 +53,12 @@ export const creditRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Credits),
-            () => permission('edit_credit'),
+            enabled(ModuleBitmask.Credits),
+            or(
+              permission('edit_credit'),
+              permission('view_credit'),
+              assigned('/api/v1/credits/:id')
+            ),
           ]}
           component={<Edit />}
         />
@@ -62,8 +69,12 @@ export const creditRoutes = (
       element={
         <Guard
           guards={[
-            () => enabled(ModuleBitmask.Credits),
-            () => permission('view_credit'),
+            enabled(ModuleBitmask.Credits),
+            or(
+              permission('view_credit'),
+              permission('edit_credit'),
+              assigned('/api/v1/credits/:id')
+            ),
           ]}
           component={<Pdf />}
         />
