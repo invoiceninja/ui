@@ -22,7 +22,6 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Icon } from '$app/components/icons/Icon';
-import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,6 +38,7 @@ import { useQueryClient } from 'react-query';
 import { Divider } from '$app/components/cards/Divider';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useSetAtom } from 'jotai';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -244,7 +244,7 @@ export function useActions() {
 
   const queryClient = useQueryClient();
 
-  const setProduct = useUpdateAtom(productAtom);
+  const setProduct = useSetAtom(productAtom);
 
   const isEditPage = location.pathname.endsWith('/edit');
 

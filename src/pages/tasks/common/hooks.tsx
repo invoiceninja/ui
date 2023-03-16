@@ -24,7 +24,6 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { Tooltip } from '$app/components/Tooltip';
 import dayjs from 'dayjs';
-import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
@@ -47,6 +46,7 @@ import { useInvoiceTask } from './hooks/useInvoiceTask';
 import { useStart } from './hooks/useStart';
 import { useStop } from './hooks/useStop';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useSetAtom } from 'jotai';
 
 export const defaultColumns: string[] = [
   'status',
@@ -326,7 +326,7 @@ export function useActions() {
 
   const invoiceTask = useInvoiceTask();
 
-  const setTask = useUpdateAtom(taskAtom);
+  const setTask = useSetAtom(taskAtom);
 
   const cloneToTask = (task: Task) => {
     setTask({ ...task, id: '', documents: [], number: '' });
