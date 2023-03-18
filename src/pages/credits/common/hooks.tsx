@@ -284,7 +284,7 @@ export function useActions() {
   };
 
   const cloneToInvoice = (credit: Credit) => {
-    setInvoice({ ...credit, number: '', documents: [] });
+    setInvoice({ ...credit, number: '', documents: [], due_date: '' });
 
     navigate('/invoices/create?action=clone');
   };

@@ -285,6 +285,7 @@ export function useActions() {
       ...(recurringInvoice as unknown as Invoice),
       documents: [],
       number: '',
+      due_date: '',
     });
 
     navigate('/invoices/create?action=clone');
