@@ -42,7 +42,7 @@ export function Quotes() {
   return (
     <DataTable
       resource="quote"
-      endpoint={`/api/v1/quotes?client_id=${id}`}
+      endpoint={route('/api/v1/quotes?client_id=:id&sort=id|desc', { id })}
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/quotes/bulk"

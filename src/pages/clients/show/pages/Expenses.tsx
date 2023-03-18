@@ -28,9 +28,12 @@ export function Expenses() {
   return (
     <DataTable
       resource="expense"
-      endpoint={route('/api/v1/expenses?include=client,vendor&client_id=:id', {
-        id,
-      })}
+      endpoint={route(
+        '/api/v1/expenses?include=client,vendor&client_id=:id&sort=id|desc',
+        {
+          id,
+        }
+      )}
       columns={columns}
       customFilters={filters}
       customFilterQueryKey="client_status"

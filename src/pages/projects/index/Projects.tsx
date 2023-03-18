@@ -41,7 +41,7 @@ export function Projects() {
     >
       <DataTable
         resource="project"
-        endpoint="/api/v1/projects"
+        endpoint="/api/v1/projects?sort=id|desc"
         columns={columns}
         customActions={actions}
         linkToCreate="/projects/create"

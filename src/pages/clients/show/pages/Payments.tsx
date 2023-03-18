@@ -54,7 +54,7 @@ export function Payments() {
   return (
     <DataTable
       resource="payment"
-      endpoint={`/api/v1/payments?client_id=${id}`}
+      endpoint={route('/api/v1/payments?client_id=:id&sort=id|desc', { id })}
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/payments/bulk"

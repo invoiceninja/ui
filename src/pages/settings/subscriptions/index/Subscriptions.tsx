@@ -34,7 +34,7 @@ export function Subscriptions() {
     >
       <DataTable
         resource="subscription"
-        endpoint="/api/v1/subscriptions"
+        endpoint="/api/v1/subscriptions?sort=id|desc"
         columns={columns}
         linkToCreate="/settings/subscriptions/create"
         linkToEdit="/settings/subscriptions/:id/edit"

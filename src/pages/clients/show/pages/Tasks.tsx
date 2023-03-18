@@ -25,9 +25,12 @@ export function Tasks() {
   return (
     <DataTable
       resource="task"
-      endpoint={route('/api/v1/tasks?include=status,client&client_id=:id', {
-        id,
-      })}
+      endpoint={route(
+        '/api/v1/tasks?include=status,client&client_id=:id&sort=id|desc',
+        {
+          id,
+        }
+      )}
       columns={columns}
       customFilters={filters}
       customFilterQueryKey="client_status"

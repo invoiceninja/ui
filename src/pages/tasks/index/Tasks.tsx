@@ -45,7 +45,7 @@ export function Tasks() {
         resource="task"
         columns={columns}
         customActions={actions}
-        endpoint="/api/v1/tasks?include=status,client"
+        endpoint="/api/v1/tasks?include=status,client&sort=id|desc"
         bulkRoute="/api/v1/tasks/bulk"
         linkToCreate="/tasks/create"
         customFilters={filters}
