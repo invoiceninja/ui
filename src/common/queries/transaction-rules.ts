@@ -27,7 +27,12 @@ export function useBlankTransactionRuleQuery() {
   );
 }
 
-export function useTransactionRuleQuery(params: { id: string | undefined }) {
+interface Params {
+  id: string | undefined;
+  enabled?: boolean;
+}
+
+export function useTransactionRuleQuery(params: Params) {
   return useQuery<TransactionRule>(
     route('/api/v1/bank_transaction_rules/:id', { id: params.id }),
     () =>
@@ -38,6 +43,6 @@ export function useTransactionRuleQuery(params: { id: string | undefined }) {
         (response: GenericSingleResourceResponse<TransactionRule>) =>
           response.data.data
       ),
-    { staleTime: Infinity }
+    { enabled: params.enabled ?? true, staleTime: Infinity }
   );
 }
