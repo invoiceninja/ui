@@ -35,7 +35,6 @@ import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { useAtomValue, useUpdateAtom } from 'jotai/utils';
 import { Icon } from '$app/components/icons/Icon';
 import {
   MdControlPointDuplicate,
@@ -46,6 +45,7 @@ import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { RecurringExpenseStatus as RecurringExpenseStatusBadge } from './components/RecurringExpenseStatus';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useAtomValue, useSetAtom } from 'jotai';
 
 export const defaultColumns: string[] = [
   'status',
@@ -426,9 +426,9 @@ export function useActions() {
 
   const navigate = useNavigate();
 
-  const setExpense = useUpdateAtom(expenseAtom);
+  const setExpense = useSetAtom(expenseAtom);
 
-  const setRecurringExpense = useUpdateAtom(recurringExpenseAtom);
+  const setRecurringExpense = useSetAtom(recurringExpenseAtom);
 
   const toggleStartStop = useToggleStartStop();
 

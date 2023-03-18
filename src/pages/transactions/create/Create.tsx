@@ -122,7 +122,6 @@ export function Create() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/transactions"
       disableSaveButton={!transaction || isFormBusy}
       onSaveClick={onSave}
     >

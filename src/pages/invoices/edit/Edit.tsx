@@ -107,7 +107,6 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/invoices"
       onSaveClick={() => invoice && save(invoice)}
       disableSaveButton={
         invoice &&

@@ -25,7 +25,7 @@ import toast from 'react-hot-toast';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
-import { useUpdateAtom } from 'jotai/utils';
+import { useSetAtom } from 'jotai';
 
 export function useInvoiceProject() {
   const navigate = useNavigate();
@@ -34,7 +34,7 @@ export function useInvoiceProject() {
   const { dateFormat } = useCurrentCompanyDateFormats();
   const { data } = useBlankInvoiceQuery();
 
-  const setInvoice = useUpdateAtom(invoiceAtom);
+  const setInvoice = useSetAtom(invoiceAtom);
 
   const calculateTaskHours = (timeLog: string) => {
     const parsedTimeLogs = parseTimeLog(timeLog);

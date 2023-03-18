@@ -145,7 +145,6 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick={route('/clients/:id', { id })}
       onSaveClick={onSave}
       navigationTopRight={
         client && (

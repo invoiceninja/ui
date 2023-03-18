@@ -26,7 +26,6 @@ import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
 import { StatusBadge } from '$app/components/StatusBadge';
 import { Tooltip } from '$app/components/Tooltip';
-import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { recurringExpenseAtom } from '$app/pages/recurring-expenses/common/atoms';
 import { Dispatch, SetStateAction } from 'react';
@@ -36,15 +35,15 @@ import { useNavigate } from 'react-router-dom';
 import { expenseAtom } from './atoms';
 import { ExpenseStatus } from './components/ExpenseStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useSetAtom } from 'jotai';
 
 export function useActions() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
 
-  const setExpense = useUpdateAtom(expenseAtom);
-
-  const setRecurringExpense = useUpdateAtom(recurringExpenseAtom);
+  const setExpense = useSetAtom(expenseAtom);
+  const setRecurringExpense = useSetAtom(recurringExpenseAtom);
 
   const cloneToExpense = (expense: Expense) => {
     setExpense({ ...expense, documents: [], number: '' });

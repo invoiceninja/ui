@@ -10,7 +10,10 @@
 
 import { Button, InputField, SelectField } from '$app/components/forms';
 import { defaultRule } from '$app/common/constants/rules';
-import { Rule, TransactionRule } from '$app/common/interfaces/transaction-rules';
+import {
+  Rule,
+  TransactionRule,
+} from '$app/common/interfaces/transaction-rules';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction, useEffect, useState } from 'react';

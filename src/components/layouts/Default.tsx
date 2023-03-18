@@ -53,7 +53,6 @@ interface Props extends CommonProps {
   title?: string | null;
   onSaveClick?: any;
   onCancelClick?: any;
-  onBackClick?: string;
   breadcrumbs?: Page[];
   topRight?: ReactNode;
   docsLink?: string;
@@ -416,15 +415,9 @@ export function Default(props: Props) {
                   </Button>
                 )}
 
-                {(props.onBackClick && (
-                  <Button to={props.onBackClick} type="secondary">
-                    {props.backButtonLabel ?? t('back')}
-                  </Button>
-                )) || (
-                  <Button onClick={() => navigate(-1)} type="secondary">
-                    {t('back')}
-                  </Button>
-                )}
+                <Button onClick={() => navigate(-1)} type="secondary">
+                  {t('back')}
+                </Button>
 
                 {props.onSaveClick && (
                   <Button

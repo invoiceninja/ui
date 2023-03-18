@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Default } from '$app/components/layouts/Default';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
@@ -24,10 +23,7 @@ export function Pdf() {
   const url = useGeneratePdfUrl({ resourceType: 'purchase_order' });
 
   return (
-    <Default
-      title={documentTitle}
-      onBackClick={route('/purchase_orders/:id/edit', { id })}
-    >
+    <Default title={documentTitle}>
       {purchaseOrder && (
         <InvoiceViewer link={url(purchaseOrder) as string} method="GET" />
       )}

@@ -40,8 +40,8 @@ import {
   Thead,
   Tr,
 } from './tables';
-import { atomWithStorage, useUpdateAtom } from 'jotai/utils';
-import { useAtom } from 'jotai';
+import { atomWithStorage } from 'jotai/utils';
+import { useAtom, useSetAtom } from 'jotai';
 import { Icon } from './icons/Icon';
 import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
@@ -85,7 +85,7 @@ export function DataTable<T extends object>(props: Props<T>) {
     new URL(endpoint(props.endpoint))
   );
 
-  const setInvalidationQueryAtom = useUpdateAtom(invalidationQueryAtom);
+  const setInvalidationQueryAtom = useSetAtom(invalidationQueryAtom);
   setInvalidationQueryAtom(props.endpoint);
 
   const queryClient = useQueryClient();

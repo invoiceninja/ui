@@ -31,7 +31,7 @@ export function Alert(props: Props) {
         hidden: !visible,
       })}
     >
-      <div className="ml-3">
+      <div className="mx-4">
         <div
           className={classNames('text-sm', {
             'text-red-700': props.type === 'danger',
@@ -39,10 +39,11 @@ export function Alert(props: Props) {
             'text-green-700': props.type === 'success',
           })}
         >
-          <div className="flex items-center justify-between">
-            <span>{props.children}</span>
+          <div className="flex items-center justify-between space-x-2">
+            <div className="w-full">{props.children}</div>
+
             {!props.disableClosing && (
-              <button type="button" className="px-4">
+              <button type="button">
                 <X onClick={() => setVisible(false)} />
               </button>
             )}

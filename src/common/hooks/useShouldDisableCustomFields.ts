@@ -10,8 +10,14 @@
 
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { isHosted } from '$app/common/helpers';
+import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
 export function useShouldDisableCustomFields() {
-  return !proPlan() && !enterprisePlan() && isHosted();
+  const { isAdmin } = useAdmin();
+
+  if ((proPlan() || enterprisePlan()) && isAdmin) {
+    return false;
+  }
+
+  return true;
 }
