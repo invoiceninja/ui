@@ -51,7 +51,7 @@ import { useBulk, useMarkSent } from './queries';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { Divider } from '$app/components/cards/Divider';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
-import { PurchaseOrderStatus as PurchaseOrderBadge } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
+import { PurchaseOrderStatus as PurchaseOrderStatusBadge } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -159,7 +159,7 @@ export function usePurchaseOrderColumns() {
               id: purchaseOrder.id,
             })}
           >
-            <PurchaseOrderBadge entity={purchaseOrder} />
+            <PurchaseOrderStatusBadge entity={purchaseOrder} />
           </Link>
         ),
       },

@@ -33,7 +33,7 @@ export function QuoteStatus(props: Props) {
     balance,
   } = props.entity;
 
-  const checkInvoiceInvitationsViewedDate = () => {
+  const checkQuoteInvitationsViewedDate = () => {
     return invitations.some((invitation) => invitation.viewed_date);
   };
 
@@ -42,7 +42,7 @@ export function QuoteStatus(props: Props) {
     status_id === QuoteStatusEnum.Approved ||
     status_id === QuoteStatusEnum.Converted;
   const isUnpaid = !isApproved;
-  const isViewed = checkInvoiceInvitationsViewedDate();
+  const isViewed = checkQuoteInvitationsViewedDate();
 
   const isPastDue = () => {
     const date =

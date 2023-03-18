@@ -20,17 +20,15 @@ interface Props {
 export function PurchaseOrderStatus(props: Props) {
   const [t] = useTranslation();
 
-  const { status_id, archived_at, is_deleted } = props.entity;
+  const { status_id, archived_at, is_deleted, invitations } = props.entity;
 
-  const checkInvoiceInvitationsViewedDate = () => {
-    return props.entity.invitations.some(
-      (invitation) => invitation.viewed_date
-    );
+  const checkPurchaseOrderInvitationsViewedDate = () => {
+    return invitations.some((invitation) => invitation.viewed_date);
   };
 
   const isDraft = status_id === PurchaseOrderStatusEnum.Draft;
   const isSent = !isDraft;
-  const isViewed = checkInvoiceInvitationsViewedDate();
+  const isViewed = checkPurchaseOrderInvitationsViewedDate();
   const isCancelled = status_id === PurchaseOrderStatusEnum.Cancelled;
   const isAccepted = status_id === PurchaseOrderStatusEnum.Accepted;
 

@@ -20,13 +20,11 @@ interface Props {
 export function PaymentStatus(props: Props) {
   const [t] = useTranslation();
 
-  const { status_id, applied, amount } = props.entity;
+  const { status_id, applied, amount, is_deleted, archived_at } = props.entity;
 
-  if (props.entity.is_deleted)
-    return <Badge variant="red">{t('deleted')}</Badge>;
+  if (is_deleted) return <Badge variant="red">{t('deleted')}</Badge>;
 
-  if (props.entity.archived_at)
-    return <Badge variant="orange">{t('archived')}</Badge>;
+  if (archived_at) return <Badge variant="orange">{t('archived')}</Badge>;
 
   if (applied < amount) {
     if (applied === 0) {
