@@ -42,6 +42,8 @@ export function TransactionMatchDetails(props: Props) {
 
   const queryClient = useQueryClient();
 
+  const { transactionRule } = props;
+
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
   const [isTransactionConverted, setIsTransactionConverted] =
@@ -247,16 +249,18 @@ export function TransactionMatchDetails(props: Props) {
   }, []);
 
   useEffect(() => {
-    if (props.transactionRule) {
-      if (props.transactionRule.category_id) {
-        setExpenseCategoryIds([props.transactionRule.category_id]);
+    if (transactionRule) {
+      const { category_id, vendor_id } = transactionRule;
+
+      if (category_id) {
+        setExpenseCategoryIds([category_id]);
       }
 
-      if (props.transactionRule.vendor_id) {
-        setVendorIds([props.transactionRule.vendor_id]);
+      if (vendor_id) {
+        setVendorIds([vendor_id]);
       }
     }
-  }, [props.transactionRule]);
+  }, [transactionRule]);
 
   return (
     <div className="flex flex-col flex-1">
