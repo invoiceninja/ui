@@ -12,6 +12,7 @@ import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { Task } from '$app/common/interfaces/task';
 import { StatusBadge } from '$app/components/StatusBadge';
+import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 
 interface Props {
   entity: Task;
@@ -20,7 +21,18 @@ interface Props {
 export function TaskStatus(props: Props) {
   const [t] = useTranslation();
 
-  const { is_running, invoice_id, archived_at, is_deleted } = props.entity;
+  const { invoice_id, archived_at, is_deleted, time_log } = props.entity;
+
+  const isRunning = () => {
+    const timeLogs = parseTimeLog(time_log);
+    const parsedTimeLogLength = timeLogs.length;
+
+    if (!parsedTimeLogLength) return false;
+
+    const lastParsedTimeLog = timeLogs[parsedTimeLogLength - 1];
+
+    return lastParsedTimeLog[1] === 0;
+  };
 
   if (is_deleted) return <Badge variant="red">{t('deleted')}</Badge>;
 
@@ -28,7 +40,7 @@ export function TaskStatus(props: Props) {
 
   if (invoice_id) return <Badge variant="green">{t('invoiced')}</Badge>;
 
-  if (is_running) return <Badge variant="light-blue">{t('running')}</Badge>;
+  if (isRunning()) return <Badge variant="light-blue">{t('running')}</Badge>;
 
   return <StatusBadge for={{}} code={props.entity.status?.name || 'logged'} />;
 }
