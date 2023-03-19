@@ -246,7 +246,7 @@ export function useActions() {
 
   const setProduct = useSetAtom(productAtom);
 
-  const isEditPage = location.pathname.endsWith('/edit');
+  const isEditPage = !location.pathname.endsWith('/products');
 
   const cloneToProduct = (product: Product) => {
     setProduct({ ...product, id: '', documents: [] });
