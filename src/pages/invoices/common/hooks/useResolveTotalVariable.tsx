@@ -122,14 +122,13 @@ export function useResolveTotalVariable(props: Props) {
 
     if (variable == '$taxes' && invoiceSum) {
       return (
-        <Element leftSide={`${resolveTranslation(variable, '$')}:`}>
+        <>
           {invoiceSum?.getTaxMap().map((item, index) => (
-            <div key={index} className="flex space-x-6">
-              <span>{item.name}</span>
+            <Element key={index} leftSide={item.name}>
               <span>{formatMoney(item.total)}</span>
-            </div>
+            </Element>
           ))}
-        </Element>
+        </>
       );
     }
 
