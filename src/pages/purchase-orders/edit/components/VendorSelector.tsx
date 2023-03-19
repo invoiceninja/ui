@@ -45,7 +45,9 @@ export function VendorSelector(props: Props) {
       (i) => i.vendor_contact_id === id
     );
 
-    return Boolean(potential);
+    const contact = vendor?.contacts.find((contact) => contact.id === id);
+
+    return Boolean(potential) || Boolean(contact?.send_email);
   };
 
   return (
