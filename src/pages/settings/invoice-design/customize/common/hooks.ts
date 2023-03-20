@@ -50,5 +50,24 @@ export function useDesignUtilities() {
     }
   };
 
-  return { handleDesignChange, handleDesignPropertyChange };
+  const handleDesignBlockChange = (
+    property: keyof Design['design'],
+    value: string
+  ) => {
+    if (payload && payload.design) {
+      setPayload({
+        ...payload,
+        design: {
+          ...payload.design,
+          design: { ...payload.design.design, [property]: value },
+        },
+      });
+    }
+  };
+
+  return {
+    handleDesignChange,
+    handleDesignPropertyChange,
+    handleDesignBlockChange,
+  };
 }

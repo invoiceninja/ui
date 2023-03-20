@@ -18,11 +18,11 @@ import {
 } from '$app/pages/settings/invoice-design/customize/common/hooks';
 import { useTranslation } from 'react-i18next';
 
-interface Props {
+export interface CustomizeChildProps {
   payload: Payload;
 }
 
-export function Settings({ payload }: Props) {
+export function Settings({ payload }: CustomizeChildProps) {
   const { t } = useTranslation();
   const { data: designs } = useDesignsQuery();
   const { handleDesignChange, handleDesignPropertyChange } =

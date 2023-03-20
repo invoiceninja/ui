@@ -14,9 +14,11 @@ import { useDesignsQuery } from '$app/common/queries/designs';
 import { Default } from '$app/components/layouts/Default';
 import { TabGroup } from '$app/components/TabGroup';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
-import {
-  payloadAtom,
-} from '$app/pages/settings/invoice-design/customize/common/hooks';
+import { payloadAtom } from '$app/pages/settings/invoice-design/customize/common/hooks';
+import { Body } from '$app/pages/settings/invoice-design/customize/components/Body';
+import { Footer } from '$app/pages/settings/invoice-design/customize/components/Footer';
+import { Header } from '$app/pages/settings/invoice-design/customize/components/Header';
+import { Includes } from '$app/pages/settings/invoice-design/customize/components/Includes';
 import { Settings } from '$app/pages/settings/invoice-design/customize/components/Settings';
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
@@ -54,10 +56,34 @@ export function Customize() {
     <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-12 lg:col-span-5">
-          <TabGroup tabs={[t('settings'), t('body')]}>
-            <Settings payload={payload} />
+          <TabGroup
+            tabs={[
+              t('settings'),
+              t('body'),
+              t('header'),
+              t('footer'),
+              t('includes'),
+            ]}
+          >
+            <div>
+              <Settings payload={payload} />
+            </div>
 
-            <div>Body</div>
+            <div>
+              <Body payload={payload} />
+            </div>
+
+            <div>
+              <Header payload={payload} />
+            </div>
+
+            <div>
+              <Footer payload={payload} />
+            </div>
+
+            <div>
+              <Includes payload={payload} />
+            </div>
           </TabGroup>
         </div>
 
