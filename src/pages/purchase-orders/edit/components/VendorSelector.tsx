@@ -41,13 +41,13 @@ export function VendorSelector(props: Props) {
   }, [props.resource?.vendor_id]);
 
   const isChecked = (id: string) => {
+    console.log(props.resource?.invitations);
+
     const potential = props.resource?.invitations.find(
       (i) => i.vendor_contact_id === id
     );
 
-    const contact = vendor?.contacts.find((contact) => contact.id === id);
-
-    return Boolean(potential) || Boolean(contact?.send_email);
+    return Boolean(potential);
   };
 
   return (
