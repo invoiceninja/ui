@@ -34,7 +34,7 @@ export function Schedules() {
     >
       <DataTable
         resource="schedule"
-        endpoint="/api/v1/task_schedulers"
+        endpoint="/api/v1/task_schedulers?sort=id|desc"
         columns={columns}
         linkToCreate="/settings/schedules/create"
         linkToEdit="/settings/schedules/:id/edit"

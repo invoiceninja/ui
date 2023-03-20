@@ -41,7 +41,7 @@ export function Invoices() {
     <Default title={documentTitle} breadcrumbs={pages} docsLink="docs/invoices">
       <DataTable
         resource="invoice"
-        endpoint="/api/v1/invoices?include=client&without_deleted_clients=true"
+        endpoint="/api/v1/invoices?include=client&without_deleted_clients=true&sort=id|desc"
         columns={columns}
         bulkRoute="/api/v1/invoices/bulk"
         linkToCreate="/invoices/create"

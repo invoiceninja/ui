@@ -84,7 +84,7 @@ export function Transactions() {
       >
         <DataTable
           resource="transaction"
-          endpoint="/api/v1/bank_transactions"
+          endpoint="/api/v1/bank_transactions?sort=id|desc"
           columns={columns}
           linkToCreate="/transactions/create"
           linkToEdit="/transactions/:id/edit"

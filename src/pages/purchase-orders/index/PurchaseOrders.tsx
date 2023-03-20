@@ -43,7 +43,7 @@ export function PurchaseOrders() {
     <Default title={documentTitle} breadcrumbs={pages}>
       <DataTable
         resource="purchase_order"
-        endpoint="/api/v1/purchase_orders?include=vendor,expense"
+        endpoint="/api/v1/purchase_orders?include=vendor,expense&sort=id|desc"
         bulkRoute="/api/v1/purchase_orders/bulk"
         linkToCreate="/purchase_orders/create"
         linkToEdit="/purchase_orders/:id/edit"

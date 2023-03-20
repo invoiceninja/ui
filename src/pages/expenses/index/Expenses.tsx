@@ -41,7 +41,7 @@ export function Expenses() {
     <Default title={t('expenses')} breadcrumbs={pages} docsLink="docs/expenses">
       <DataTable
         resource="expense"
-        endpoint="/api/v1/expenses?include=client,vendor"
+        endpoint="/api/v1/expenses?include=client,vendor&sort=id|desc"
         columns={columns}
         bulkRoute="/api/v1/expenses/bulk"
         linkToCreate="/expenses/create"
