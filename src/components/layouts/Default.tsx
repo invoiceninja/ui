@@ -315,7 +315,7 @@ export function Default(props: Props) {
       href: '/reports',
       icon: PieChart,
       current: location.pathname.startsWith('/reports'),
-      visible: companyUser?.is_admin || companyUser?.is_owner || false,
+      visible: hasPermission('view_reports'),
     },
     {
       name: t('transactions'),
