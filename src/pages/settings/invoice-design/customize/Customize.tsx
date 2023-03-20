@@ -8,58 +8,132 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useEffect } from 'react';
+import { endpoint } from '$app/common/helpers';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { Design } from '$app/common/interfaces/design';
+import { useDesignsQuery } from '$app/common/queries/designs';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { Default } from '$app/components/layouts/Default';
+import { TabGroup } from '$app/components/TabGroup';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, ClickableElement, Element } from '../../../../components/cards';
-import { InputField, SelectField } from '../../../../components/forms';
-import Toggle from '../../../../components/forms/Toggle';
-import { Default } from '../../../../components/layouts/Default';
-import { Tabs } from './components';
+
+export interface Payload {
+  design: Design | null;
+  entity_id: string;
+  entity_type: 'invoice';
+}
 
 export function Customize() {
   const [t] = useTranslation();
 
-  useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'customize_and_preview'
-    )}`;
+  const { documentTitle } = useTitle('customize_and_preview');
+  const { data: designs } = useDesignsQuery();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('invoice_design'), href: '/settings/invoice_design' },
+    { name: t('customize_and_preview'), href: '/settings/design/customize' },
+  ];
+
+  const [payload, setPayload] = useState<Payload | null>({
+    design: null,
+    entity_id: '',
+    entity_type: 'invoice',
   });
 
+  useEffect(() => {
+    if (designs) {
+      setPayload(
+        (current) =>
+          current && { ...current, design: { ...designs[0], id: '-1' } }
+      );
+    }
+  }, [designs]);
+
+  useEffect(() => {
+    if (payload?.design) {
+    }
+  }, [payload?.design]);
+
+  const handleDesignChange = useCallback(
+    (id: string) => {
+      const design = designs?.find((design) => design.id === id);
+
+      if (design) {
+        setPayload(
+          (current) =>
+            current && { ...current, design: { ...design, id: '-1' } }
+        );
+      }
+    },
+    [designs]
+  );
+
+  const handleDesignPropertyChange = useCallback(
+    (property: keyof Design, value: string | number) => {
+      setPayload(
+        (current) =>
+          current &&
+          current.design && {
+            ...current,
+            design: { ...current.design, [property]: value },
+          }
+      );
+    },
+    [designs]
+  );
+
   return (
-    <Default title={t('invoice_design')}>
+    <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-12 lg:col-span-5">
-          <Tabs />
-
-          <div className="my-4">
+          <TabGroup tabs={[t('settings'), t('body')]}>
             <Card>
               <Element leftSide={t('name')}>
-                <InputField id="name" />
+                <InputField
+                  onValueChange={(value) =>
+                    handleDesignPropertyChange('name', value)
+                  }
+                  debounceTimeout={500}
+                />
               </Element>
+
               <Element leftSide={t('design')}>
-                <SelectField>
-                  <option value="clean">Clean</option>
+                <SelectField
+                  defaultValue={payload?.design?.id || ''}
+                  onValueChange={(value) => handleDesignChange(value)}
+                >
+                  {designs &&
+                    designs.map((design) => (
+                      <option key={design.id} value={design.id}>
+                        {design.name}
+                      </option>
+                    ))}
                 </SelectField>
               </Element>
-              <Element
-                leftSide={t('html_mode')}
-                leftSideHelp="Preview updates faster but with less accuracy."
-              >
-                <Toggle />
+
+              <Element leftSide={t('html_mode')}>
+                <Toggle checked={false} />
               </Element>
-              <ClickableElement href="https://invoiceninja.github.io/docs/custom-fields/">
-                {t('view_docs')}
-              </ClickableElement>
             </Card>
-          </div>
+
+            <div>Body</div>
+          </TabGroup>
         </div>
 
         <div className="col-span-12 lg:col-span-7">
-          <iframe
-            src="http://www.africau.edu/images/default/sample.pdf"
-            frameBorder={0}
-            style={{ minWidth: '100%', minHeight: '85vh' }}
-          ></iframe>
+          {payload?.design && (
+            <InvoiceViewer
+              link={endpoint('/api/v1/preview')}
+              resource={payload}
+              method="POST"
+              withToast
+            />
+          )}
         </div>
       </div>
     </Default>
