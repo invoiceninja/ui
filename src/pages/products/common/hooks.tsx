@@ -31,7 +31,7 @@ import {
   MdDelete,
   MdRestore,
 } from 'react-icons/md';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { productAtom } from './atoms';
 import { bulk } from '$app/common/queries/products';
 import { useQueryClient } from 'react-query';
@@ -236,17 +236,17 @@ export function useProductColumns() {
 }
 
 export function useActions() {
+  const { id } = useParams();
+
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-
   const location = useLocation();
-
   const queryClient = useQueryClient();
 
   const setProduct = useSetAtom(productAtom);
 
-  const isEditPage = location.pathname.endsWith('/edit');
+  const isEditPage = location.pathname.includes(id!);
 
   const cloneToProduct = (product: Product) => {
     setProduct({ ...product, id: '', documents: [] });
