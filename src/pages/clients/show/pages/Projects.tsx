@@ -57,7 +57,7 @@ export function Projects() {
   return (
     <DataTable
       resource="project"
-      endpoint={`/api/v1/projects?client_id=${id}`}
+      endpoint={route('/api/v1/projects?client_id=:id&sort=id|desc', { id })}
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/projects/bulk"

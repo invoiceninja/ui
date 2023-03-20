@@ -17,7 +17,7 @@ export function TaxRates() {
   return (
     <DataTable
       resource="tax_rate"
-      endpoint="/api/v1/tax_rates"
+      endpoint="/api/v1/tax_rates?sort=id|desc"
       columns={columns}
       linkToCreate="/settings/tax_rates/create"
       linkToEdit="/settings/tax_rates/:id/edit"

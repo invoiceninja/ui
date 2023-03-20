@@ -403,7 +403,7 @@ export function Default(props: Props) {
                   >
                     <span>
                       {isSelfHosted() && isOwner
-                        ? t('upgrade')
+                        ? t('purchase_white_label')
                         : t('unlock_pro')}
                     </span>
                   </button>

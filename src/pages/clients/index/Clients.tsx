@@ -57,7 +57,7 @@ export function Clients() {
     <Default breadcrumbs={pages} title={t('clients')} docsLink="docs/clients">
       <DataTable
         resource="client"
-        endpoint="/api/v1/clients"
+        endpoint="/api/v1/clients?sort=id|desc"
         columns={columns}
         linkToCreate="/clients/create"
         linkToEdit="/clients/:id/edit"

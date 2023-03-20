@@ -47,7 +47,7 @@ export function TaskStatuses() {
     <DataTable
       resource="task_status"
       columns={columns}
-      endpoint="/api/v1/task_statuses"
+      endpoint="/api/v1/task_statuses?sort=id|desc"
       linkToCreate="/settings/task_statuses/create"
       linkToEdit="/settings/task_statuses/:id/edit"
       withResourcefulActions

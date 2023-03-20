@@ -51,7 +51,7 @@ export function Users() {
       <DataTable
         resource="user"
         columns={columns}
-        endpoint={route('/api/v1/users?without=:userId', {
+        endpoint={route('/api/v1/users?without=:userId&sort=id|desc', {
           userId: currentUser?.id,
         })}
         linkToCreate="/settings/users/create"

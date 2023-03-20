@@ -39,7 +39,7 @@ export function TransactionRules() {
       <DataTable
         resource="transaction_rule"
         columns={columns}
-        endpoint="/api/v1/bank_transaction_rules?include=vendor,expense_category"
+        endpoint="/api/v1/bank_transaction_rules?include=vendor,expense_category&sort=id|desc"
         linkToCreate="/settings/bank_accounts/transaction_rules/create"
         linkToEdit="/settings/bank_accounts/transaction_rules/:id/edit"
         withResourcefulActions

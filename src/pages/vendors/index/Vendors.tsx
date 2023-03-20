@@ -37,7 +37,7 @@ export function Vendors() {
       <DataTable
         resource="vendor"
         columns={columns}
-        endpoint="/api/v1/vendors"
+        endpoint="/api/v1/vendors?sort=id|desc"
         linkToCreate="/vendors/create"
         linkToEdit="/vendors/:id/edit"
         withResourcefulActions

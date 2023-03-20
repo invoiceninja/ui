@@ -29,7 +29,7 @@ export function PurchaseOrders() {
     <DataTable
       resource="purchase_order"
       endpoint={route(
-        '/api/v1/purchase_orders?include=vendor,expense&vendor_id=:id',
+        '/api/v1/purchase_orders?include=vendor,expense&vendor_id=:id&sort=id|desc',
         {
           id,
         }

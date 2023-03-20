@@ -36,7 +36,7 @@ export function Credits() {
     <Default title={t('credits')} breadcrumbs={pages} docsLink="docs/credits/">
       <DataTable
         resource="credit"
-        endpoint="/api/v1/credits?include=client"
+        endpoint="/api/v1/credits?include=client&sort=id|desc"
         bulkRoute="/api/v1/credits/bulk"
         columns={columns}
         linkToCreate="/credits/create"

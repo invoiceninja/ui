@@ -70,7 +70,7 @@ export function useActions() {
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const cloneToInvoice = (invoice: Invoice) => {
-    setInvoice({ ...invoice, number: '', documents: [] });
+    setInvoice({ ...invoice, number: '', documents: [], due_date: '' });
 
     navigate('/invoices/create?action=clone');
   };

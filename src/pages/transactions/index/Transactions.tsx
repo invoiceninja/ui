@@ -14,7 +14,7 @@ import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { useTransactionColumns } from '../common/hooks/useTransactionColumns';
 import { ImportButton } from '$app/components/import/ImportButton';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Details } from '../components/Details';
 import { Slider } from '$app/components/cards/Slider';
 import { Transaction } from '$app/common/interfaces/transactions';
@@ -35,11 +35,9 @@ export function Transactions() {
 
   const [sliderTitle, setSliderTitle] = useState<string>();
 
-  const [isTransactionSliderVisible, setIsTransactionSliderVisible] =
-    useState<boolean>(false);
-
   const getSelectedTransaction = (transaction: Transaction) => {
     setTransactionId(transaction.id);
+
     if (transaction.description) {
       let cutDescription = transaction.description;
       if (transaction.description.length > 35) {
@@ -51,29 +49,17 @@ export function Transactions() {
     }
   };
 
-  useEffect(() => {
-    if (transactionId) {
-      setIsTransactionSliderVisible(true);
-    }
-  }, [transactionId]);
-
-  const handleSliderClose = () => {
-    setTransactionId('');
-    setIsTransactionSliderVisible(false);
-  };
-
   return (
     <>
       <Slider
         title={sliderTitle}
-        visible={isTransactionSliderVisible}
-        onClose={handleSliderClose}
+        visible={Boolean(transactionId)}
+        onClose={() => setTransactionId('')}
         size="large"
       >
         <Details
           transactionId={transactionId}
           setTransactionId={setTransactionId}
-          setSliderVisible={setIsTransactionSliderVisible}
         />
       </Slider>
 
@@ -84,7 +70,7 @@ export function Transactions() {
       >
         <DataTable
           resource="transaction"
-          endpoint="/api/v1/bank_transactions"
+          endpoint="/api/v1/bank_transactions?sort=id|desc"
           columns={columns}
           linkToCreate="/transactions/create"
           linkToEdit="/transactions/:id/edit"

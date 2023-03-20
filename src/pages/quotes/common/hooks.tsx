@@ -308,7 +308,7 @@ export function useActions() {
   };
 
   const cloneToInvoice = (quote: Quote) => {
-    setInvoice({ ...quote, number: '', documents: [] });
+    setInvoice({ ...quote, number: '', documents: [], due_date: '' });
     navigate('/invoices/create?action=clone');
   };
 

@@ -57,7 +57,7 @@ export function Credits() {
   return (
     <DataTable
       resource="credit"
-      endpoint={`/api/v1/credits?client_id=${id}`}
+      endpoint={route('/api/v1/credits?client_id=:id&sort=id|desc', { id })}
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/credits/bulk"

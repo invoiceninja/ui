@@ -40,7 +40,7 @@ export function Products() {
       <DataTable
         resource="product"
         columns={columns}
-        endpoint="/api/v1/products?include=company"
+        endpoint="/api/v1/products?include=company&sort=id|desc"
         bulkRoute="/api/v1/products/bulk"
         linkToCreate="/products/create"
         linkToEdit="/products/:id/edit"
