@@ -41,8 +41,6 @@ export function VendorSelector(props: Props) {
   }, [props.resource?.vendor_id]);
 
   const isChecked = (id: string) => {
-    console.log(props.resource?.invitations);
-
     const potential = props.resource?.invitations.find(
       (i) => i.vendor_contact_id === id
     );
