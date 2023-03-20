@@ -10,17 +10,19 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { Design } from '$app/common/interfaces/design';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { useQuery } from 'react-query';
-import { Params } from './common/params.interface';
+import { AxiosResponse } from 'axios';
 
-export function useDesignsQuery(params: Params) {
-  return useQuery(['/api/v1/designs', params], () =>
-    request(
-      'GET',
-      endpoint('/api/v1/designs?per_page=:perPage&page=:currentPage', {
-        perPage: params.perPage,
-        currentPage: params.currentPage,
-      })
-    )
+export function useDesignsQuery() {
+  return useQuery<Design[]>(
+    ['/api/v1/designs'],
+    () =>
+      request('GET', endpoint('/api/v1/designs')).then(
+        (response: AxiosResponse<GenericManyResponse<Design>>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
   );
 }
