@@ -32,11 +32,7 @@ export function GeneralSettings() {
 
   const [updatingRecords, setUpdatingRecords] = useAtom(updatingRecordsAtom);
 
-  const { data: designs } = useDesignsQuery({
-    currentPage: 1,
-    perPage: 50,
-    sort: 'id|asc',
-  });
+  const { data: designs } = useDesignsQuery();
 
   const fonts = [
     { value: 'ABeeZee', label: 'ABeeZee' },
@@ -868,7 +864,7 @@ export function GeneralSettings() {
             onChange={handleChange}
           >
             {designs &&
-              designs.data.data.map((design: Design) => (
+              designs.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -897,7 +893,7 @@ export function GeneralSettings() {
             onChange={handleChange}
           >
             {designs &&
-              designs.data.data.map((design: Design) => (
+              designs.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -926,7 +922,7 @@ export function GeneralSettings() {
             onChange={handleChange}
           >
             {designs &&
-              designs.data.data.map((design: Design) => (
+              designs.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -955,7 +951,7 @@ export function GeneralSettings() {
             onChange={handleChange}
           >
             {designs &&
-              designs.data.data.map((design: Design) => (
+              designs.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
