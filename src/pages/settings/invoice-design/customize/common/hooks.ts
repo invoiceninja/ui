@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Design } from '$app/common/interfaces/design';
+import { Design, Parts } from '$app/common/interfaces/design';
 import { useDesignsQuery } from '$app/common/queries/designs';
 import { atom, useAtom } from 'jotai';
 
@@ -40,7 +40,7 @@ export function useDesignUtilities() {
 
   const handleDesignPropertyChange = (
     property: keyof Design,
-    value: string | number
+    value: string | number | Parts
   ) => {
     if (payload && payload.design) {
       setPayload({

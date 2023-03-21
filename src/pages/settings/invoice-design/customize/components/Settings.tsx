@@ -8,14 +8,23 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { trans } from '$app/common/helpers';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Parts } from '$app/common/interfaces/design';
 import { useDesignsQuery } from '$app/common/queries/designs';
 import { Card, ClickableElement, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import {
+  Button,
+  InputField,
+  SelectField,
+} from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
+import { Modal } from '$app/components/Modal';
 import {
   Payload,
   useDesignUtilities,
 } from '$app/pages/settings/invoice-design/customize/common/hooks';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface CustomizeChildProps {
@@ -28,8 +37,49 @@ export function Settings({ payload }: CustomizeChildProps) {
   const { handleDesignChange, handleDesignPropertyChange } =
     useDesignUtilities();
 
+  const [importContent, setImportContent] = useState('');
+  const [isImportVisible, setIsImportVisible] = useState(false);
+
+  const handleImport = () => {
+    try {
+      const parts: Parts = JSON.parse(importContent);
+
+      handleDesignPropertyChange('design', parts);
+
+      setImportContent('');
+      setIsImportVisible(false);
+    } catch (error) {
+      console.error(error);
+
+      toast.error();
+    }
+  };
+
+  const handleExport = () => {
+    if (payload.design) {
+      navigator.clipboard.writeText(JSON.stringify(payload.design.design));
+
+      toast.success(
+        trans('copied_to_clipboard', { value: t('design').toLowerCase() })
+      );
+    }
+  };
+
   return (
     <div className="space-y-4">
+      <Modal
+        title={t('import_design')}
+        visible={isImportVisible}
+        onClose={setIsImportVisible}
+      >
+        <InputField
+          element="textarea"
+          onValueChange={(value) => setImportContent(value)}
+        />
+
+        <Button onClick={handleImport}>{t('import')}</Button>
+      </Modal>
+
       <Card>
         <Element leftSide={t('name')}>
           <InputField
@@ -61,9 +111,14 @@ export function Settings({ payload }: CustomizeChildProps) {
         <ClickableElement href="https://invoiceninja.github.io/docs/custom-fields/">
           {t('view_docs')}
         </ClickableElement>
-        
-        <ClickableElement>{t('import')}</ClickableElement>
-        <ClickableElement>{t('export')}</ClickableElement>
+
+        <ClickableElement onClick={() => setIsImportVisible(true)}>
+          {t('import')}
+        </ClickableElement>
+
+        <ClickableElement onClick={handleExport}>
+          {t('export')}
+        </ClickableElement>
       </Card>
     </div>
   );
