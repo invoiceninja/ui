@@ -9,7 +9,7 @@
  */
 
 import { useDesignsQuery } from '$app/common/queries/designs';
-import { Card, Element } from '$app/components/cards';
+import { Card, ClickableElement, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import {
@@ -29,31 +29,42 @@ export function Settings({ payload }: CustomizeChildProps) {
     useDesignUtilities();
 
   return (
-    <Card>
-      <Element leftSide={t('name')}>
-        <InputField
-          onValueChange={(value) => handleDesignPropertyChange('name', value)}
-          debounceTimeout={500}
-        />
-      </Element>
+    <div className="space-y-4">
+      <Card>
+        <Element leftSide={t('name')}>
+          <InputField
+            onValueChange={(value) => handleDesignPropertyChange('name', value)}
+            debounceTimeout={500}
+          />
+        </Element>
 
-      <Element leftSide={t('design')}>
-        <SelectField
-          defaultValue={payload?.design?.id || ''}
-          onValueChange={(value) => handleDesignChange(value)}
-        >
-          {designs &&
-            designs.map((design) => (
-              <option key={design.id} value={design.id}>
-                {design.name}
-              </option>
-            ))}
-        </SelectField>
-      </Element>
+        <Element leftSide={t('design')}>
+          <SelectField
+            defaultValue={payload?.design?.id || ''}
+            onValueChange={(value) => handleDesignChange(value)}
+          >
+            {designs &&
+              designs.map((design) => (
+                <option key={design.id} value={design.id}>
+                  {design.name}
+                </option>
+              ))}
+          </SelectField>
+        </Element>
 
-      <Element leftSide={t('html_mode')}>
-        <Toggle checked={false} />
-      </Element>
-    </Card>
+        <Element leftSide={t('html_mode')}>
+          <Toggle checked={false} />
+        </Element>
+      </Card>
+
+      <Card>
+        <ClickableElement href="https://invoiceninja.github.io/docs/custom-fields/">
+          {t('view_docs')}
+        </ClickableElement>
+        
+        <ClickableElement>{t('import')}</ClickableElement>
+        <ClickableElement>{t('export')}</ClickableElement>
+      </Card>
+    </div>
   );
 }
