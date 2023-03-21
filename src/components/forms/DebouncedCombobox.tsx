@@ -146,10 +146,12 @@ export function DebouncedCombobox(props: Props) {
       record.label.toLowerCase().includes(query.toLowerCase())
     );
 
-    if (!filteredList.length || !query) {
+    if (!filteredList.length && query) {
       await debouncedSearch(query);
-    } else {
+    } else if (filteredList.length && query) {
       setFilteredRecords(filteredList);
+    } else {
+      setFilteredRecords(records);
     }
   };
 
