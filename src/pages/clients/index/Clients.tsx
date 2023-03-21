@@ -54,7 +54,12 @@ export function Clients() {
   const handlePurgeClient = usePurgeClient(purgeClientId);
 
   return (
-    <Default breadcrumbs={pages} title={t('clients')} docsLink="docs/clients">
+    <Default
+      breadcrumbs={pages}
+      title={t('clients')}
+      docsLink="docs/clients"
+      withoutBackButton
+    >
       <DataTable
         resource="client"
         endpoint="/api/v1/clients?sort=id|desc"

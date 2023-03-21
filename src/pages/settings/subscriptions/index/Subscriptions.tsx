@@ -31,6 +31,7 @@ export function Subscriptions() {
       title={documentTitle}
       docsLink="docs/advanced-settings/#subscriptions"
       breadcrumbs={pages}
+      withoutBackButton
     >
       <DataTable
         resource="subscription"

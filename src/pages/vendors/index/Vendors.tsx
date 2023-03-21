@@ -33,7 +33,7 @@ export function Vendors() {
   const vendorColumns = useAllVendorColumns();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
         resource="vendor"
         columns={columns}

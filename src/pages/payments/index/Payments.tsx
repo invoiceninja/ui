@@ -42,6 +42,7 @@ export function Payments() {
       title={t('payments')}
       breadcrumbs={pages}
       docsLink="docs/payments/"
+      withoutBackButton
     >
       <DataTable
         resource="payment"
