@@ -48,6 +48,7 @@ export function TaskStatuses() {
       resource="task_status"
       columns={columns}
       endpoint="/api/v1/task_statuses?sort=id|desc"
+      bulkRoute="/api/v1/task_statuses/bulk"
       linkToCreate="/settings/task_statuses/create"
       linkToEdit="/settings/task_statuses/:id/edit"
       withResourcefulActions
