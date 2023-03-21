@@ -8,18 +8,20 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+export interface Parts {
+  includes: string;
+  header: string;
+  body: string;
+  product: string;
+  task: string;
+  footer: string;
+}
+
 export interface Design {
   id: string;
   is_custom: boolean;
   name: string;
-  design: {
-    includes: string;
-    header: string;
-    body: string;
-    product: string;
-    task: string;
-    footer: string;
-  };
+  design: Parts;
   created_at: number;
   is_active: boolean;
   is_deleted: boolean;
