@@ -142,14 +142,14 @@ export function DebouncedCombobox(props: Props) {
   const debouncedSearch = debounce(async (query) => await request(query), 300);
 
   const searchRecords = async (query: string) => {
-    const filteredRecords = records.filter((record) =>
+    const filteredList = records.filter((record) =>
       record.label.toLowerCase().includes(query.toLowerCase())
     );
 
-    if (!filteredRecords.length || !query) {
+    if (!filteredList.length || !query) {
       await debouncedSearch(query);
     } else {
-      setFilteredRecords(filteredRecords);
+      setFilteredRecords(filteredList);
     }
   };
 
