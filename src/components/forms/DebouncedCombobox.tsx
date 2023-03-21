@@ -139,7 +139,19 @@ export function DebouncedCombobox(props: Props) {
     setIsInitial(false);
   };
 
-  const debouncedSearch = debounce(async (query) => await request(query), 1500);
+  const debouncedSearch = debounce(async (query) => await request(query), 300);
+
+  const searchRecords = async (query: string) => {
+    const filteredRecords = records.filter((record) =>
+      record.label.toLowerCase().includes(query.toLowerCase())
+    );
+
+    if (!filteredRecords.length || !query) {
+      await debouncedSearch(query);
+    } else {
+      setFilteredRecords(filteredRecords);
+    }
+  };
 
   const filter = () => {
     setFilteredRecords(
@@ -162,7 +174,7 @@ export function DebouncedCombobox(props: Props) {
       if (props.clearInputAfterSelection) {
         setSelectedOption({ record: internalRecord, withoutEvents: true });
 
-        debouncedSearch('');
+        searchRecords('');
       }
     }
   }, [selectedOption]);
@@ -278,7 +290,7 @@ export function DebouncedCombobox(props: Props) {
               autoComplete="off"
               placeholder={props.placeholder || ''}
               className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-              onChange={(event) => debouncedSearch(event.target.value)}
+              onChange={(event) => searchRecords(event.target.value)}
               displayValue={(record: Record) => record.label}
               onClick={() => openDropdownButton.current?.click()}
               onFocus={props.onInputFocus}
@@ -297,7 +309,7 @@ export function DebouncedCombobox(props: Props) {
                         withoutEvents: true,
                       });
 
-                      debouncedSearch('');
+                      searchRecords('');
 
                       props.onClearButtonClick();
                     }}
