@@ -35,6 +35,7 @@ export function Subscriptions() {
       <DataTable
         resource="subscription"
         endpoint="/api/v1/subscriptions?sort=id|desc"
+        bulkRoute="/api/v1/subscriptions/bulk"
         columns={columns}
         linkToCreate="/settings/subscriptions/create"
         linkToEdit="/settings/subscriptions/:id/edit"

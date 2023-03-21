@@ -43,6 +43,7 @@ export function ExpenseCategories() {
   return (
     <DataTable
       endpoint="/api/v1/expense_categories?sort=id|desc"
+      bulkRoute="/api/v1/expense_categories/bulk"
       resource="expense_category"
       columns={columns}
       linkToCreate="/settings/expense_categories/create"
