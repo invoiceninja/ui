@@ -86,6 +86,7 @@ export function Settings({ payload }: CustomizeChildProps) {
       <Card>
         <Element leftSide={t('name')}>
           <InputField
+            value={payload.design?.name}
             onValueChange={(value) => handleDesignPropertyChange('name', value)}
             debounceTimeout={500}
           />
