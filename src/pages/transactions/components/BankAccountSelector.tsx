@@ -46,7 +46,6 @@ export function BankAccountSelector(props: BankAccountSelectorProps) {
         disabled={props.readonly}
         clearButton={props.clearButton}
         onClearButtonClick={props.onClearButtonClick}
-        errorMessage={props.errorMessage}
         queryAdditional
         actionLabel={t('new_bank_account')}
         onActionClick={() => setIsModalOpen(true)}
