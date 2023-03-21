@@ -38,6 +38,7 @@ export function Vendors() {
         resource="vendor"
         columns={columns}
         endpoint="/api/v1/vendors?sort=id|desc"
+        bulkRoute="/api/v1/vendors/bulk"
         linkToCreate="/vendors/create"
         linkToEdit="/vendors/:id/edit"
         withResourcefulActions

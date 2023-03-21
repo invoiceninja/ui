@@ -316,7 +316,7 @@ export function Default(props: Props) {
       href: '/reports',
       icon: PieChart,
       current: location.pathname.startsWith('/reports'),
-      visible: companyUser?.is_admin || companyUser?.is_owner || false,
+      visible: hasPermission('view_reports'),
     },
     {
       name: t('transactions'),
@@ -404,7 +404,7 @@ export function Default(props: Props) {
                   >
                     <span>
                       {isSelfHosted() && isOwner
-                        ? t('purchase_white_label')
+                        ? t('white_label_button')
                         : t('unlock_pro')}
                     </span>
                   </button>

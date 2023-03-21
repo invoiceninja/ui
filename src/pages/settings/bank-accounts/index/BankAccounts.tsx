@@ -67,6 +67,7 @@ export function BankAccounts() {
         resource="bank_account"
         columns={columns}
         endpoint="/api/v1/bank_integrations?sort=id|desc"
+        bulkRoute="/api/v1/bank_integrations/bulk"
         linkToCreate="/settings/bank_accounts/create"
         linkToEdit="/settings/bank_accounts/:id/edit"
         withResourcefulActions

@@ -18,6 +18,7 @@ export function TaxRates() {
     <DataTable
       resource="tax_rate"
       endpoint="/api/v1/tax_rates?sort=id|desc"
+      bulkRoute="/api/v1/tax_rates/bulk"
       columns={columns}
       linkToCreate="/settings/tax_rates/create"
       linkToEdit="/settings/tax_rates/:id/edit"
