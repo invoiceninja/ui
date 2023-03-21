@@ -13,11 +13,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { Parts } from '$app/common/interfaces/design';
 import { useDesignsQuery } from '$app/common/queries/designs';
 import { Card, ClickableElement, Element } from '$app/components/cards';
-import {
-  Button,
-  InputField,
-  SelectField,
-} from '$app/components/forms';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
 import {
@@ -44,8 +40,15 @@ export function Settings({ payload }: CustomizeChildProps) {
     try {
       const parts: Parts = JSON.parse(importContent);
 
-      handleDesignPropertyChange('design', parts);
+      if (!Object.hasOwn(parts, 'product')) {
+        parts.product = '';
+      }
 
+      if (!Object.hasOwn(parts, 'task')) {
+        parts.task = '';
+      }
+
+      handleDesignPropertyChange('design', parts);
       setImportContent('');
       setIsImportVisible(false);
     } catch (error) {
