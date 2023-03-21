@@ -19,7 +19,7 @@ import { Settings } from '$app/components/layouts/Settings';
 import { TabGroup } from '$app/components/TabGroup';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from '../create/components/Credentials';
 import { LimitsAndFees } from '../create/components/LimitsAndFees';
@@ -29,8 +29,6 @@ import { useHandleUpdate } from './hooks/useHandleUpdate';
 
 export function Edit() {
   const [t] = useTranslation();
-
-  const navigate = useNavigate();
 
   const { id } = useParams();
 
@@ -96,12 +94,7 @@ export function Edit() {
   }, [gateway]);
 
   return (
-    <Settings
-      title={documentTitle}
-      breadcrumbs={pages}
-      onSaveClick={onSave}
-      onCancelClick={() => navigate('/settings/online_payments')}
-    >
+    <Settings title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
       <TabGroup tabs={tabs}>
         <div>
           {companyGateway && (
