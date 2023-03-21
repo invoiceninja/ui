@@ -71,6 +71,7 @@ export function Transactions() {
         <DataTable
           resource="transaction"
           endpoint="/api/v1/bank_transactions?sort=id|desc"
+          bulkRoute="/api/v1/bank_transactions/bulk"
           columns={columns}
           linkToCreate="/transactions/create"
           linkToEdit="/transactions/:id/edit"
