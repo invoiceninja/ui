@@ -139,19 +139,17 @@ export function DebouncedCombobox(props: Props) {
     setIsInitial(false);
   };
 
-  const debouncedSearch = debounce(async (query) => await request(query), 300);
+  const debouncedSearch = debounce(async (query) => await request(query), 700);
 
   const searchRecords = async (query: string) => {
     const filteredList = records.filter((record) =>
       record.label.toLowerCase().includes(query.toLowerCase())
     );
 
-    if (!filteredList.length && query) {
+    if (!filteredList.length || !query) {
       await debouncedSearch(query);
-    } else if (filteredList.length && query) {
-      setFilteredRecords(filteredList);
     } else {
-      setFilteredRecords(records);
+      setFilteredRecords(filteredList);
     }
   };
 
