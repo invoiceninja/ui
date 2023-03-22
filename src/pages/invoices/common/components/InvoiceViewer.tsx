@@ -50,7 +50,10 @@ export function InvoiceViewer(props: Props) {
       })
       .catch((error) => console.error(error));
 
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      toast.dismiss();
+    };
   }, [props.link, props.resource]);
 
   return <iframe ref={iframeRef} width="100%" height={1500} />;
