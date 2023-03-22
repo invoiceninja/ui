@@ -14,6 +14,9 @@ import { Design } from '$app/common/interfaces/design';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { useQuery } from 'react-query';
 import { AxiosResponse } from 'axios';
+import { GenericQueryOptions } from '$app/common/queries/invoices';
+import { route } from '$app/common/helpers/route';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 export function useDesignsQuery() {
   return useQuery<Design[]>(
@@ -24,5 +27,23 @@ export function useDesignsQuery() {
           response.data.data
       ),
     { staleTime: Infinity }
+  );
+}
+
+interface DesignQueryOptions extends GenericQueryOptions {
+  id: string | undefined;
+}
+
+export function useDesignQuery(params: DesignQueryOptions) {
+  return useQuery<Design>(
+    route('/api/v1/designs/:id', { id: params.id }),
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/designs/:id?include=client', { id: params.id })
+      ).then(
+        (response: GenericSingleResourceResponse<Design>) => response.data.data
+      ),
+    { staleTime: Infinity, ...params }
   );
 }
