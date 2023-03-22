@@ -62,10 +62,15 @@ export function DebouncedCombobox(props: Props) {
   const [isInitial, setIsInitial] = useState(true);
   const [t] = useTranslation();
   const [records, setRecords] = useState<Record[]>([internalRecord]);
+  const [initialRecords, setInitialRecords] = useState<Record[]>([
+    internalRecord,
+  ]);
   const [filteredRecords, setFilteredRecords] = useState<Record[]>([
     internalRecord,
   ]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTermWithNoRecords, setSearchTermWithNoRecords] =
+    useState<string>('');
 
   const [selectedOption, setSelectedOption] = useState({
     record: records[0],
@@ -134,6 +139,16 @@ export function DebouncedCombobox(props: Props) {
       setSelectedOption({ record, withoutEvents: isInitial });
     }
 
+    if (isInitial) {
+      setInitialRecords(() => [...array]);
+    }
+
+    if (!array.length) {
+      setSearchTermWithNoRecords(query);
+    } else {
+      setSearchTermWithNoRecords('');
+    }
+
     setRecords(() => [...array]);
     setIsLoading(false);
     setIsInitial(false);
@@ -146,7 +161,18 @@ export function DebouncedCombobox(props: Props) {
       record.label.toLowerCase().includes(query.toLowerCase())
     );
 
-    if (!filteredList.length || !query) {
+    if (!query && initialRecords) {
+      setFilteredRecords(initialRecords);
+      setRecords(initialRecords);
+      return;
+    }
+
+    if (
+      !filteredList.length &&
+      ((searchTermWithNoRecords &&
+        !query.startsWith(searchTermWithNoRecords)) ||
+        !searchTermWithNoRecords)
+    ) {
       await debouncedSearch(query);
     } else {
       setFilteredRecords(filteredList);
