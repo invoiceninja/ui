@@ -17,7 +17,7 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 interface Props {
   user: User;
   setUser: React.Dispatch<React.SetStateAction<User | undefined>>;
-  errors: ValidationBag | undefined;
+  errors?: ValidationBag;
 }
 
 export function Details(props: Props) {
