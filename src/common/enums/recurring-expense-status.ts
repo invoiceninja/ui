@@ -9,7 +9,9 @@
  */
 
 export const enum RecurringExpenseStatus {
-  DRAFT = '1',
-  ACTIVE = '2',
-  PAUSED = '3',
+  Draft = '1',
+  Active = '2',
+  Paused = '3',
+  Completed = '4',
+  Pending = '-1',
 }

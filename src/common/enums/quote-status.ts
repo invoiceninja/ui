@@ -9,9 +9,10 @@
  */
 
 export const enum QuoteStatus {
+  Viewed = '-2',
+  Expired = '-1',
   Draft = '1',
   Sent = '2',
   Approved = '3',
   Converted = '4',
-  Expired = '-1',
 }
