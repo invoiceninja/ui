@@ -40,7 +40,7 @@ export function Tasks() {
   const taskColumns = useAllTaskColumns();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
         resource="task"
         columns={columns}

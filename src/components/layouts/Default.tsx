@@ -60,6 +60,7 @@ interface Props extends CommonProps {
   saveButtonLabel?: string | null;
   backButtonLabel?: string;
   disableSaveButton?: boolean;
+  withoutBackButton?: boolean;
 }
 
 export function Default(props: Props) {
@@ -415,9 +416,11 @@ export function Default(props: Props) {
                   </Button>
                 )}
 
-                <Button onClick={() => navigate(-1)} type="secondary">
-                  {t('back')}
-                </Button>
+                {!props.withoutBackButton && (
+                  <Button onClick={() => navigate(-1)} type="secondary">
+                    {t('back')}
+                  </Button>
+                )}
 
                 {props.onSaveClick && (
                   <Button

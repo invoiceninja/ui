@@ -36,7 +36,12 @@ export function Products() {
   const actions = useActions();
 
   return (
-    <Default title={t('products')} breadcrumbs={pages} docsLink="docs/products">
+    <Default
+      title={t('products')}
+      breadcrumbs={pages}
+      docsLink="docs/products"
+      withoutBackButton
+    >
       <DataTable
         resource="product"
         columns={columns}

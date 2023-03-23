@@ -20,7 +20,6 @@ import {
 import { Settings } from '$app/components/layouts/Settings';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from './components/Credentials';
 import { LimitsAndFees } from './components/LimitsAndFees';
@@ -33,8 +32,6 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 
 export function Create() {
   const [t] = useTranslation();
-
-  const navigate = useNavigate();
 
   const { documentTitle } = useTitle('online_payments');
 
@@ -152,7 +149,6 @@ export function Create() {
       title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={onSave}
-      onCancelClick={() => navigate('/settings/online_payments')}
       disableSaveButton={!gateway}
     >
       <TabGroup tabs={tabs}>

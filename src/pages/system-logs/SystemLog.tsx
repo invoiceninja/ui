@@ -143,7 +143,7 @@ export function SystemLog() {
   };
 
   return (
-    <Default title={t('system_logs')} breadcrumbs={pages}>
+    <Default title={t('system_logs')} breadcrumbs={pages} withoutBackButton>
       {isLoading && (
         <NonClickableElement>
           <Spinner />

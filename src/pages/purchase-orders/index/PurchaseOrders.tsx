@@ -40,7 +40,7 @@ export function PurchaseOrders() {
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
         resource="purchase_order"
         endpoint="/api/v1/purchase_orders?include=vendor,expense&sort=id|desc"
