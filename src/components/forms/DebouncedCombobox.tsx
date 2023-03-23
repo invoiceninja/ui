@@ -143,7 +143,11 @@ export function DebouncedCombobox(props: Props) {
       setInitialRecords(() => [...array]);
     }
 
-    if (!array.length) {
+    const recordsWithoutInternal = [...array].filter(
+      (record) => !record.internal
+    );
+
+    if (!recordsWithoutInternal.length) {
       setSearchTermWithNoRecords(query);
     } else {
       setSearchTermWithNoRecords('');
@@ -157,8 +161,10 @@ export function DebouncedCombobox(props: Props) {
   const debouncedSearch = debounce(async (query) => await request(query), 700);
 
   const searchRecords = async (query: string) => {
-    const filteredList = records.filter((record) =>
-      record.label.toLowerCase().includes(query.toLowerCase())
+    const filteredList = records.filter(
+      (record) =>
+        record.label.toLowerCase().includes(query.toLowerCase()) &&
+        !record.internal
     );
 
     if (!query && initialRecords) {
@@ -320,6 +326,7 @@ export function DebouncedCombobox(props: Props) {
               displayValue={(record: Record) => record.label}
               onClick={() => openDropdownButton.current?.click()}
               onFocus={props.onInputFocus}
+              readOnly={isLoading}
             />
 
             {props.clearButton &&
