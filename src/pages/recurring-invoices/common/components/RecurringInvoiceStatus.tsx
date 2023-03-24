@@ -11,6 +11,7 @@
 import { Badge } from '$app/components/Badge';
 import { useTranslation } from 'react-i18next';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { RecurringInvoiceStatus as RecurringInvoiceStatusEnum } from '$app/common/enums/recurring-invoice-status';
 
 interface Props {
   entity: RecurringInvoice;
@@ -19,35 +20,44 @@ interface Props {
 export function RecurringInvoiceStatus(props: Props) {
   const [t] = useTranslation();
 
-  if (props.entity.is_deleted)
-    return <Badge variant="red">{t('deleted')}</Badge>;
+  const {
+    status_id,
+    is_deleted,
+    archived_at,
+    last_sent_date,
+    remaining_cycles,
+  } = props.entity;
 
-  if (props.entity.archived_at)
-    return <Badge variant="orange">{t('archived')}</Badge>;
+  const isDraft = status_id === RecurringInvoiceStatusEnum.DRAFT;
+  const isDeleted = Boolean(is_deleted);
+  const isArchived = Boolean(archived_at);
+  const isPending =
+    status_id === RecurringInvoiceStatusEnum.ACTIVE && !last_sent_date;
+  const remainingCycles =
+    remaining_cycles === -1 ? 'endless' : remaining_cycles;
 
-  const next_send_date = new Date(props.entity.next_send_date);
-  const today = new Date();
+  if (isDeleted) return <Badge variant="red">{t('deleted')}</Badge>;
 
-  if (props.entity.status_id == '2' && next_send_date > today)
-    return <Badge variant="generic">{t('pending')}</Badge>;
+  if (isArchived) return <Badge variant="orange">{t('archived')}</Badge>;
 
-  switch (props.entity.status_id) {
-    case '1':
-      return <Badge variant="generic">{t('draft')}</Badge>;
-    case '2':
-      return <Badge variant="green">{t('active')}</Badge>;
-    case '3':
-      return <Badge variant="dark-blue">{t('partial')}</Badge>;
-    case '4':
-      return <Badge variant="green">{t('completed')}</Badge>;
-    case '5':
-      return <Badge variant="black">{t('cancelled')}</Badge>;
-    case '6':
-      return <Badge variant="light-blue">{t('sent')}</Badge>;
+  if (!isDraft && remainingCycles === 0) {
+    return <Badge variant="light-blue">{t('completed')}</Badge>;
+  }
 
-    default:
-      return <Badge variant="light-blue">{t('sent')}</Badge>;
-      break;
+  if (isPending) {
+    return <Badge variant="dark-blue">{t('pending')}</Badge>;
+  }
+
+  if (isDraft) {
+    return <Badge variant="generic">{t('draft')}</Badge>;
+  }
+
+  if (status_id === RecurringInvoiceStatusEnum.ACTIVE) {
+    return <Badge variant="green">{t('active')}</Badge>;
+  }
+
+  if (status_id === RecurringInvoiceStatusEnum.PAUSED) {
+    return <Badge variant="orange">{t('paused')}</Badge>;
   }
 
   return <></>;

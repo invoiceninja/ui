@@ -29,6 +29,7 @@ interface Props {
   docsLink?: string;
   navigationTopRight?: ReactNode;
   disableSaveButton?: boolean;
+  withoutBackButton?: boolean;
 }
 
 export function Settings(props: Props) {
@@ -53,6 +54,7 @@ export function Settings(props: Props) {
       docsLink={props.docsLink}
       navigationTopRight={props.navigationTopRight}
       disableSaveButton={props.disableSaveButton}
+      withoutBackButton={props.withoutBackButton}
     >
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 lg:col-span-3">

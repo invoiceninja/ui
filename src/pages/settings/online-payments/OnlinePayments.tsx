@@ -62,6 +62,7 @@ export function OnlinePayments() {
       docsLink="docs/basic-settings/#online_payments"
       onSaveClick={onSave}
       onCancelClick={onCancel}
+      withoutBackButton
     >
       <Card title={t('settings')}>
         <Element leftSide={t('auto_bill_standard_invoices')}>

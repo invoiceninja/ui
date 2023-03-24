@@ -269,6 +269,7 @@ export function Kanban() {
           </Inline>
         </Link>
       }
+      withoutBackButton
     >
       <Slider
         title={

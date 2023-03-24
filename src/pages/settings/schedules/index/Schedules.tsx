@@ -31,6 +31,7 @@ export function Schedules() {
       title={documentTitle}
       docsLink="docs/advanced-settings/#schedules"
       breadcrumbs={pages}
+      withoutBackButton
     >
       <DataTable
         resource="schedule"

@@ -50,7 +50,7 @@ export function Edit() {
 
   return (
     <Card title={t('edit_project')}>
-      <Element leftSide={t('project_name')}>
+      <Element leftSide={t('project_name')} required>
         <InputField
           value={project?.name}
           onValueChange={(value) => handleChange('name', value)}
@@ -66,7 +66,7 @@ export function Edit() {
         />
       </Element>
 
-      <Element leftSide={t('client')}>
+      <Element leftSide={t('client')} required>
         <ClientSelector
           value={project?.client_id}
           onChange={(id) => handleChange('client_id', id)}
