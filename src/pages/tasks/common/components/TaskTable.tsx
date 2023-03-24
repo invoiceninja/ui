@@ -24,7 +24,7 @@ import {
   parseTime,
   parseTimeToDate,
 } from '../helpers';
-import { parseTimeLog } from '../helpers/calculate-time';
+import { parseTimeLog, TimeLogsType } from '../helpers/calculate-time';
 
 interface Props {
   task: Task;
@@ -34,6 +34,7 @@ interface Props {
 export enum LogPosition {
   Start = 0,
   End = 1,
+  Description = 2,
 }
 
 export function TaskTable(props: Props) {
@@ -55,13 +56,13 @@ export function TaskTable(props: Props) {
       startTime = last[1] + 1;
     }
 
-    logs.push([startTime, 0]);
+    logs.push([startTime, 0, '']);
 
     handleChange('time_log', JSON.stringify(logs));
   };
 
   const deleteTableRow = (index: number) => {
-    const logs: number[][] = parseTimeLog(task.time_log);
+    const logs: TimeLogsType = parseTimeLog(task.time_log);
 
     logs.splice(index, 1);
 
@@ -109,6 +110,18 @@ export function TaskTable(props: Props) {
     );
   };
 
+  const handleDescriptionChange = (
+    value: string,
+    index: number,
+    logPosition: number
+  ) => {
+    const logs = parseTimeLog(task.time_log);
+
+    logs[index][logPosition] = value;
+
+    handleChange('time_log', JSON.stringify(logs));
+  };
+
   useEffect(() => {
     if (typeof lastChangedIndex === 'number') {
       const parsedTimeLog = parseTimeLog(task.time_log);
@@ -133,12 +146,15 @@ export function TaskTable(props: Props) {
         <Th>{t('start_time')}</Th>
         {company?.show_task_end_date && <Th>{t('end_date')}</Th>}
         <Th>{t('end_time')}</Th>
+        {company?.settings.show_task_item_description && (
+          <Th>{t('description')}</Th>
+        )}
         <Th>{t('duration')}</Th>
       </Thead>
       <Tbody>
         {task.time_log &&
-          (JSON.parse(task.time_log) as number[][]).map(
-            ([start, stop], index) => (
+          (JSON.parse(task.time_log) as TimeLogsType).map(
+            ([start, stop, description], index) => (
               <Tr key={index}>
                 <Td>
                   <InputField
@@ -180,6 +196,20 @@ export function TaskTable(props: Props) {
                     step="1"
                   />
                 </Td>
+                {company?.settings.show_task_item_description && (
+                  <Td>
+                    <InputField
+                      value={description}
+                      onValueChange={(value) =>
+                        handleDescriptionChange(
+                          value,
+                          index,
+                          LogPosition.Description
+                        )
+                      }
+                    />
+                  </Td>
+                )}
                 <Td width="15%">
                   <div className="flex items-center space-x-4">
                     <InputField
