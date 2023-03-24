@@ -8,10 +8,10 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export const enum CreditStatus {
-  Viewed = '-1',
-  Draft = '1',
-  Sent = '2',
-  Partial = '3',
-  Applied = '4',
+export const enum ExpenseStatus {
+  Logged = '1',
+  Pending = '2',
+  Invoiced = '3',
+  Unpaid = '4',
+  Paid = '5',
 }

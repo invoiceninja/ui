@@ -38,7 +38,12 @@ export function Expenses() {
   const expenseColumns = useAllExpenseColumns();
 
   return (
-    <Default title={t('expenses')} breadcrumbs={pages} docsLink="docs/expenses">
+    <Default
+      title={t('expenses')}
+      breadcrumbs={pages}
+      docsLink="docs/expenses"
+      withoutBackButton
+    >
       <DataTable
         resource="expense"
         endpoint="/api/v1/expenses?include=client,vendor&sort=id|desc"

@@ -9,6 +9,7 @@
  */
 
 export const enum PurchaseOrderStatus {
+  Viewed = '-1',
   Draft = '1',
   Sent = '2',
   Accepted = '3',
