@@ -140,12 +140,10 @@ export function DebouncedCombobox(props: Props) {
     }
 
     if (isInitial) {
-      setInitialRecords(() => [...array]);
+      setInitialRecords(array);
     }
 
-    const recordsWithoutInternal = [...array].filter(
-      (record) => !record.internal
-    );
+    const recordsWithoutInternal = array.filter((record) => !record.internal);
 
     if (!recordsWithoutInternal.length) {
       setSearchTermWithNoRecords(query);
@@ -167,7 +165,7 @@ export function DebouncedCombobox(props: Props) {
         !record.internal
     );
 
-    if (!query && initialRecords) {
+    if (!query) {
       setFilteredRecords(initialRecords);
       setRecords(initialRecords);
       return;
