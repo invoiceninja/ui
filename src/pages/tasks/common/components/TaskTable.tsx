@@ -228,6 +228,7 @@ export function TaskTable(props: Props) {
                     <Td colSpan={company?.show_task_end_date ? 5 : 4}>
                       <InputField
                         element="textarea"
+                        textareaRows={2}
                         value={description}
                         onValueChange={(value) =>
                           handleDescriptionChange(
