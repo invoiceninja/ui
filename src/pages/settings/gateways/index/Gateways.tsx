@@ -39,7 +39,8 @@ export function Gateways() {
     <DataTable
       columns={columns}
       resource="company_gateway"
-      endpoint="/api/v1/company_gateways"
+      endpoint="/api/v1/company_gateways?sort=id|desc"
+      bulkRoute="/api/v1/company_gateways/bulk"
       linkToCreate="/settings/gateways/create"
       linkToEdit="/settings/gateways/:id/edit"
       withResourcefulActions

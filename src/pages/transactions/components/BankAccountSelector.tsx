@@ -10,7 +10,10 @@
 
 import { BankAccount } from '$app/common/interfaces/bank-accounts';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
-import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import {
+  DebouncedCombobox,
+  Record,
+} from '$app/components/forms/DebouncedCombobox';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CreateBankAccountModal } from './CreateBankAccountModal';
@@ -43,6 +46,7 @@ export function BankAccountSelector(props: BankAccountSelectorProps) {
         disabled={props.readonly}
         clearButton={props.clearButton}
         onClearButtonClick={props.onClearButtonClick}
+        errorMessage={props.errorMessage}
         queryAdditional
         actionLabel={t('new_bank_account')}
         onActionClick={() => setIsModalOpen(true)}

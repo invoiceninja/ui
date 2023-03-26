@@ -52,6 +52,7 @@ export function EmailSettings() {
       onSaveClick={onSave}
       onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
+      withoutBackButton
     >
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 

@@ -31,10 +31,12 @@ export function Subscriptions() {
       title={documentTitle}
       docsLink="docs/advanced-settings/#subscriptions"
       breadcrumbs={pages}
+      withoutBackButton
     >
       <DataTable
         resource="subscription"
-        endpoint="/api/v1/subscriptions"
+        endpoint="/api/v1/subscriptions?sort=id|desc"
+        bulkRoute="/api/v1/subscriptions/bulk"
         columns={columns}
         linkToCreate="/settings/subscriptions/create"
         linkToEdit="/settings/subscriptions/:id/edit"

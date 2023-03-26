@@ -99,7 +99,6 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/quotes"
       onSaveClick={() => quote && save(quote)}
       navigationTopRight={
         quote && (

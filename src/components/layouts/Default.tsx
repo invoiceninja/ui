@@ -53,7 +53,6 @@ interface Props extends CommonProps {
   title?: string | null;
   onSaveClick?: any;
   onCancelClick?: any;
-  onBackClick?: string;
   breadcrumbs?: Page[];
   topRight?: ReactNode;
   docsLink?: string;
@@ -61,6 +60,7 @@ interface Props extends CommonProps {
   saveButtonLabel?: string | null;
   backButtonLabel?: string;
   disableSaveButton?: boolean;
+  withoutBackButton?: boolean;
 }
 
 export function Default(props: Props) {
@@ -316,7 +316,7 @@ export function Default(props: Props) {
       href: '/reports',
       icon: PieChart,
       current: location.pathname.startsWith('/reports'),
-      visible: companyUser?.is_admin || companyUser?.is_owner || false,
+      visible: hasPermission('view_reports'),
     },
     {
       name: t('transactions'),
@@ -404,7 +404,7 @@ export function Default(props: Props) {
                   >
                     <span>
                       {isSelfHosted() && isOwner
-                        ? t('upgrade')
+                        ? t('white_label_button')
                         : t('unlock_pro')}
                     </span>
                   </button>
@@ -416,11 +416,7 @@ export function Default(props: Props) {
                   </Button>
                 )}
 
-                {(props.onBackClick && (
-                  <Button to={props.onBackClick} type="secondary">
-                    {props.backButtonLabel ?? t('back')}
-                  </Button>
-                )) || (
+                {!props.withoutBackButton && (
                   <Button onClick={() => navigate(-1)} type="secondary">
                     {t('back')}
                   </Button>

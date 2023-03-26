@@ -38,10 +38,12 @@ export function Projects() {
       title={t('projects')}
       breadcrumbs={pages}
       docsLink="docs/projects/"
+      withoutBackButton
     >
       <DataTable
         resource="project"
-        endpoint="/api/v1/projects"
+        endpoint="/api/v1/projects?sort=id|desc"
+        bulkRoute="/api/v1/projects/bulk"
         columns={columns}
         customActions={actions}
         linkToCreate="/projects/create"

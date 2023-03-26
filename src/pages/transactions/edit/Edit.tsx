@@ -130,7 +130,6 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/transactions"
       disableSaveButton={!transaction || isFormBusy}
       onSaveClick={onSave}
       navigationTopRight={

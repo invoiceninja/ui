@@ -12,7 +12,10 @@ import { Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
 import { transactionTypes } from '$app/common/constants/transactions';
 import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
-import { ApiTransactionType, TransactionType } from '$app/common/enums/transactions';
+import {
+  ApiTransactionType,
+  TransactionType,
+} from '$app/common/enums/transactions';
 import { BankAccountSelector } from '../components/BankAccountSelector';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';

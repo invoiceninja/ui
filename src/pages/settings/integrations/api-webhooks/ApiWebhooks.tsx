@@ -52,7 +52,8 @@ export function ApiWebhooks() {
       <DataTable
         resource="webhook"
         columns={columns}
-        endpoint="/api/v1/webhooks"
+        endpoint="/api/v1/webhooks?sort=id|desc"
+        bulkRoute="/api/v1/webhooks/bulk"
         linkToCreate="/settings/integrations/api_webhooks/create"
         linkToEdit="/settings/integrations/api_webhooks/:id/edit"
         withResourcefulActions

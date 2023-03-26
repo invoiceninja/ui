@@ -99,7 +99,6 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/credits"
       onSaveClick={() => credit && save(credit)}
       navigationTopRight={
         credit && (

@@ -47,11 +47,12 @@ export function Users() {
       title={t('user_details')}
       breadcrumbs={pages}
       docsLink="/docs/advanced-settings/#user_management"
+      withoutBackButton
     >
       <DataTable
         resource="user"
         columns={columns}
-        endpoint={route('/api/v1/users?without=:userId', {
+        endpoint={route('/api/v1/users?without=:userId&sort=id|desc', {
           userId: currentUser?.id,
         })}
         linkToCreate="/settings/users/create"

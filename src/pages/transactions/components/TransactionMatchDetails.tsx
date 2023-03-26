@@ -23,6 +23,7 @@ import { MdContentCopy, MdLink } from 'react-icons/md';
 import { useTranslation } from 'react-i18next';
 import { TabGroup } from '$app/components/TabGroup';
 import { Transaction } from '$app/common/interfaces/transactions';
+import { TransactionRule } from '$app/common/interfaces/transaction-rules';
 
 export interface TransactionDetails {
   base_type: string;
@@ -33,12 +34,15 @@ export interface TransactionDetails {
 interface Props {
   transactionDetails: TransactionDetails;
   isCreditTransactionType: boolean;
+  transactionRule: TransactionRule | undefined;
 }
 
 export function TransactionMatchDetails(props: Props) {
   const [t] = useTranslation();
 
   const queryClient = useQueryClient();
+
+  const { transactionRule } = props;
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
@@ -243,6 +247,20 @@ export function TransactionMatchDetails(props: Props) {
       setIsTransactionConverted(true);
     };
   }, []);
+
+  useEffect(() => {
+    if (transactionRule) {
+      const { category_id, vendor_id } = transactionRule;
+
+      if (category_id) {
+        setExpenseCategoryIds([category_id]);
+      }
+
+      if (vendor_id) {
+        setVendorIds([vendor_id]);
+      }
+    }
+  }, [transactionRule]);
 
   return (
     <div className="flex flex-col flex-1">

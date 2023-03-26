@@ -114,7 +114,6 @@ export function Create() {
   return (
     <Default
       title={documentTitle}
-      onBackClick={route('/tasks')}
       onSaveClick={() => task && handleSave(task)}
       breadcrumbs={pages}
     >

@@ -15,7 +15,10 @@ import { Product } from '$app/common/interfaces/product';
 import { Subscription } from '$app/common/interfaces/subscription';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
-import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import {
+  DebouncedCombobox,
+  Record,
+} from '$app/components/forms/DebouncedCombobox';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { useTranslation } from 'react-i18next';
 import { MultipleProductSelector } from './MultipleProductSelector';

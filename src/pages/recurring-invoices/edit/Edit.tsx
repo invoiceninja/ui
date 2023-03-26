@@ -103,7 +103,6 @@ export function Edit() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/recurring_invoices"
       onSaveClick={() => recurringInvoice && save(recurringInvoice)}
       navigationTopRight={
         recurringInvoice && (

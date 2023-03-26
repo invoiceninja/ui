@@ -31,10 +31,12 @@ export function Schedules() {
       title={documentTitle}
       docsLink="docs/advanced-settings/#schedules"
       breadcrumbs={pages}
+      withoutBackButton
     >
       <DataTable
         resource="schedule"
-        endpoint="/api/v1/task_schedulers"
+        endpoint="/api/v1/task_schedulers?sort=id|desc"
+        bulkRoute="/api/v1/task_schedulers/bulk"
         columns={columns}
         linkToCreate="/settings/schedules/create"
         linkToEdit="/settings/schedules/:id/edit"

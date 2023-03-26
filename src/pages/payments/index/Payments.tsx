@@ -42,11 +42,12 @@ export function Payments() {
       title={t('payments')}
       breadcrumbs={pages}
       docsLink="docs/payments/"
+      withoutBackButton
     >
       <DataTable
         resource="payment"
         columns={columns}
-        endpoint="/api/v1/payments?include=client,invoices"
+        endpoint="/api/v1/payments?include=client,invoices&sort=id|desc"
         linkToCreate="/payments/create"
         bulkRoute="/api/v1/payments/bulk"
         linkToEdit="/payments/:id/edit"

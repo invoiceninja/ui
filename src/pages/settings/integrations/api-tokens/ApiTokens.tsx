@@ -60,7 +60,8 @@ export function ApiTokens() {
       <DataTable
         resource="token"
         columns={columns}
-        endpoint="/api/v1/tokens"
+        endpoint="/api/v1/tokens?sort=id|desc"
+        bulkRoute="/api/v1/tokens/bulk"
         linkToCreate="/settings/integrations/api_tokens/create"
         linkToEdit="/settings/integrations/api_tokens/:id/edit"
         withResourcefulActions

@@ -36,11 +36,16 @@ export function Products() {
   const actions = useActions();
 
   return (
-    <Default title={t('products')} breadcrumbs={pages} docsLink="docs/products">
+    <Default
+      title={t('products')}
+      breadcrumbs={pages}
+      docsLink="docs/products"
+      withoutBackButton
+    >
       <DataTable
         resource="product"
         columns={columns}
-        endpoint="/api/v1/products?include=company"
+        endpoint="/api/v1/products?include=company&sort=id|desc"
         bulkRoute="/api/v1/products/bulk"
         linkToCreate="/products/create"
         linkToEdit="/products/:id/edit"

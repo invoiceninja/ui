@@ -28,10 +28,12 @@ import { Divider } from '$app/components/cards/Divider';
 import { Container } from '$app/components/Container';
 import { ConvertCurrency } from '$app/components/ConvertCurrency';
 import { CustomField } from '$app/components/CustomField';
-import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import {
+  DebouncedCombobox,
+  Record,
+} from '$app/components/forms/DebouncedCombobox';
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { ValidationAlert } from '$app/components/ValidationAlert';
 import { FormEvent, useEffect, useState } from 'react';
 import { X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
@@ -198,8 +200,6 @@ export function Create() {
       disableSaveButton={!payment}
     >
       <Container>
-        {errors && <ValidationAlert errors={errors} />}
-
         <Card title={t('enter_payment')}>
           <Element leftSide={t('client')}>
             <DebouncedCombobox

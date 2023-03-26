@@ -24,7 +24,7 @@ export function RecurringExpenses() {
     <DataTable
       resource="recurring_expense"
       endpoint={route(
-        '/api/v1/recurring_expenses?include=client,vendor&client_id=:id',
+        '/api/v1/recurring_expenses?include=client,vendor&client_id=:id&sort=id|desc',
         { id }
       )}
       columns={columns}

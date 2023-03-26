@@ -250,7 +250,6 @@ export function Statement() {
           </DropdownElement>
         </Dropdown>
       }
-      onBackClick={route('/clients/:id', { id })}
     >
       <div className="grid grid-cols-12 space-y-4 xl:space-y-0 xl:gap-4">
         <Card className="col-span-12 xl:col-span-4 h-max" withContainer>

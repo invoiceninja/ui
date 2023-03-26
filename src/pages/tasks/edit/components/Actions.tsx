@@ -27,9 +27,9 @@ import {
   MdStopCircle,
   MdTextSnippet,
 } from 'react-icons/md';
-import { useUpdateAtom } from 'jotai/utils';
 import { taskAtom } from '$app/pages/tasks/common/atoms';
 import { useNavigate } from 'react-router-dom';
+import { useSetAtom } from 'jotai';
 
 interface Props {
   task: Task;
@@ -46,7 +46,7 @@ export function Actions(props: Props) {
   const bulk = useBulkAction();
   const invoiceTask = useInvoiceTask();
 
-  const setTask = useUpdateAtom(taskAtom);
+  const setTask = useSetAtom(taskAtom);
 
   const cloneToTask = () => {
     setTask({ ...task, id: '', documents: [], number: '' });

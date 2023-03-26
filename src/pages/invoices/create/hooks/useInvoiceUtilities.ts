@@ -12,7 +12,10 @@ import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
-import { InvoiceItem, InvoiceItemType } from '$app/common/interfaces/invoice-item';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '$app/common/interfaces/invoice-item';
 import { Invitation } from '$app/common/interfaces/purchase-order';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { useAtom } from 'jotai';

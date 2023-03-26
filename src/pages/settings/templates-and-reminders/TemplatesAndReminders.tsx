@@ -114,6 +114,7 @@ export function TemplatesAndReminders() {
       onSaveClick={handleSave}
       onCancelClick={handleCancel}
       disableSaveButton={showPlanAlert}
+      withoutBackButton
     >
       {showPlanAlert && <AdvancedSettingsPlanAlert />}
 

@@ -58,7 +58,7 @@ export class Number {
     } else if (swapSymbol) {
       return `${formatted} ${symbol.trim()}`;
     } else if (!options?.showCurrencyCode) {
-      return `${symbol}${formatted}`;
+      return `${symbol} ${formatted}`;
     }
 
     return this.formatValue(formatted, currency);

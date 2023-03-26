@@ -131,7 +131,7 @@ export function Create() {
     >
       <Container>
         <Card title={documentTitle}>
-          <Element leftSide={t('project_name')}>
+          <Element leftSide={t('project_name')} required>
             <InputField
               value={project?.name}
               onValueChange={(value) => handleChange('name', value)}
@@ -140,7 +140,7 @@ export function Create() {
             />
           </Element>
 
-          <Element leftSide={t('client')}>
+          <Element leftSide={t('client')} required>
             <ClientSelector
               value={project?.client_id}
               onChange={(client) => handleChange('client_id', client.id)}

@@ -18,8 +18,14 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Client } from '$app/common/interfaces/client';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { InvoiceItem, InvoiceItemType } from '$app/common/interfaces/invoice-item';
-import { Invitation, PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '$app/common/interfaces/invoice-item';
+import {
+  Invitation,
+  PurchaseOrder,
+} from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
@@ -302,7 +308,7 @@ export function useActions() {
   };
 
   const cloneToInvoice = (quote: Quote) => {
-    setInvoice({ ...quote, number: '', documents: [] });
+    setInvoice({ ...quote, number: '', documents: [], due_date: '' });
     navigate('/invoices/create?action=clone');
   };
 

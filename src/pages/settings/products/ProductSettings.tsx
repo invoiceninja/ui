@@ -67,6 +67,7 @@ export function ProductSettings() {
       title={t('product_settings')}
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#product_settings"
+      withoutBackButton
     >
       <Card title={t('Settings')}>
         <Element

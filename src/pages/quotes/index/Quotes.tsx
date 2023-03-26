@@ -40,11 +40,11 @@ export function Quotes() {
   const filters = useQuoteFilters();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
         resource="quote"
         columns={columns}
-        endpoint="/api/v1/quotes?include=client"
+        endpoint="/api/v1/quotes?include=client&sort=id|desc"
         linkToEdit="/quotes/:id/edit"
         linkToCreate="/quotes/create"
         bulkRoute="/api/v1/quotes/bulk"

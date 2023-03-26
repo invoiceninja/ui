@@ -8,15 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useUpdateAtom } from 'jotai/utils';
 import { Statement } from '$app/pages/clients/statement/Statement';
 import { scheduleParametersAtom } from '$app/pages/settings/schedules/common/components/EmailStatement';
+import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 
 export function useScheduleStatement() {
   const navigate = useNavigate();
 
-  const setScheduleParameters = useUpdateAtom(scheduleParametersAtom);
+  const setScheduleParameters = useSetAtom(scheduleParametersAtom);
 
   return (statement: Statement) => {
     setScheduleParameters({

@@ -22,7 +22,6 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Icon } from '$app/components/icons/Icon';
-import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -32,13 +31,14 @@ import {
   MdDelete,
   MdRestore,
 } from 'react-icons/md';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { productAtom } from './atoms';
 import { bulk } from '$app/common/queries/products';
 import { useQueryClient } from 'react-query';
 import { Divider } from '$app/components/cards/Divider';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useSetAtom } from 'jotai';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -236,17 +236,17 @@ export function useProductColumns() {
 }
 
 export function useActions() {
+  const { id } = useParams();
+
   const [t] = useTranslation();
 
   const navigate = useNavigate();
-
   const location = useLocation();
-
   const queryClient = useQueryClient();
 
-  const setProduct = useUpdateAtom(productAtom);
+  const setProduct = useSetAtom(productAtom);
 
-  const isEditPage = location.pathname.endsWith('/edit');
+  const isEditPage = location.pathname.includes(id!);
 
   const cloneToProduct = (product: Product) => {
     setProduct({ ...product, id: '', documents: [] });

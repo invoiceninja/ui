@@ -33,11 +33,12 @@ export function Vendors() {
   const vendorColumns = useAllVendorColumns();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
         resource="vendor"
         columns={columns}
-        endpoint="/api/v1/vendors"
+        endpoint="/api/v1/vendors?sort=id|desc"
+        bulkRoute="/api/v1/vendors/bulk"
         linkToCreate="/vendors/create"
         linkToEdit="/vendors/:id/edit"
         withResourcefulActions

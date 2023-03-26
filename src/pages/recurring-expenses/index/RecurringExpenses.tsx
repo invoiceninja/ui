@@ -39,10 +39,11 @@ export function RecurringExpenses() {
       title={t('recurring_expenses')}
       breadcrumbs={pages}
       docsLink="docs/recurring-expenses"
+      withoutBackButton
     >
       <DataTable
         resource="recurring_expense"
-        endpoint="/api/v1/recurring_expenses?include=client,vendor"
+        endpoint="/api/v1/recurring_expenses?include=client,vendor&sort=id|desc"
         columns={columns}
         bulkRoute="/api/v1/recurring_expenses/bulk"
         linkToCreate="/recurring_expenses/create"

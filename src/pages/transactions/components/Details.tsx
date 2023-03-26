@@ -31,11 +31,11 @@ import { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTransactionQuery } from '../common/queries';
 import { TransactionMatchDetails } from './TransactionMatchDetails';
+import { useTransactionRuleQuery } from '$app/common/queries/transaction-rules';
 
 interface Props {
   transactionId: string;
   setTransactionId: Dispatch<SetStateAction<string>>;
-  setSliderVisible?: Dispatch<SetStateAction<boolean>>;
 }
 
 export function Details(props: Props) {
@@ -47,12 +47,19 @@ export function Details(props: Props) {
 
   const { data: transaction } = useTransactionQuery({
     id: props.transactionId,
-    enabled: !!props.transactionId,
+    enabled: Boolean(props.transactionId),
   });
 
   const { data: bankAccountResponse } = useBankAccountQuery({
     id: transaction?.bank_integration_id || '',
-    enabled: !!transaction,
+    enabled: Boolean(transaction),
+  });
+
+  const isMatched = TransactionStatus.Matched === transaction?.status_id;
+
+  const { data: bankTransactionRuleResponse } = useTransactionRuleQuery({
+    id: transaction?.bank_transaction_rule_id || '',
+    enabled: Boolean(transaction) && isMatched,
   });
 
   const [matchedInvoices, setMatchedInvoices] = useState<Invoice[]>();
@@ -232,6 +239,7 @@ export function Details(props: Props) {
             status_id: transaction?.status_id || '',
           }}
           isCreditTransactionType={isCreditTransactionType}
+          transactionRule={bankTransactionRuleResponse}
         />
       )}
     </div>

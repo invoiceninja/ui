@@ -33,10 +33,15 @@ export function Credits() {
   const creditColumns = useAllCreditColumns();
 
   return (
-    <Default title={t('credits')} breadcrumbs={pages} docsLink="docs/credits/">
+    <Default
+      title={t('credits')}
+      breadcrumbs={pages}
+      docsLink="docs/credits/"
+      withoutBackButton
+    >
       <DataTable
         resource="credit"
-        endpoint="/api/v1/credits?include=client"
+        endpoint="/api/v1/credits?include=client&sort=id|desc"
         bulkRoute="/api/v1/credits/bulk"
         columns={columns}
         linkToCreate="/credits/create"

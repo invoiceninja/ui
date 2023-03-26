@@ -11,7 +11,10 @@
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import {
+  Invitation,
+  PurchaseOrder,
+} from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
 import { Default } from '$app/components/layouts/Default';
@@ -37,12 +40,16 @@ import { useHandleDeleteLineItem } from '../edit/hooks/useHandleDeleteLineItem';
 import { useHandleInvitationChange } from '../edit/hooks/useHandleInvitationChange';
 import { useHandleLineItemPropertyChange } from '../edit/hooks/useHandleLineItemPropertyChange';
 import { useHandleProductChange } from '../edit/hooks/useHandleProductChange';
+import { blankInvitation } from '$app/common/constants/blank-invitation';
+import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 
 export function Create() {
   const { documentTitle } = useTitle('new_purchase_order');
   const { t } = useTranslation();
 
   const reactSettings = useReactSettings();
+
+  const vendorResolver = useVendorResolver();
 
   const [searchParams] = useSearchParams();
 
@@ -126,11 +133,31 @@ export function Create() {
 
   const onSave = useCreate({ setErrors });
 
+  useEffect(() => {
+    purchaseOrder &&
+      purchaseOrder.vendor_id &&
+      vendorResolver.find(purchaseOrder.vendor_id).then((vendor) => {
+        const invitations: Invitation[] = [];
+
+        vendor.contacts.map((contact) => {
+          if (contact.send_email) {
+            const invitation = cloneDeep(
+              blankInvitation
+            ) as unknown as Invitation;
+
+            invitation.vendor_contact_id = contact.id;
+            invitations.push(invitation);
+          }
+        });
+
+        handleChange('invitations', invitations);
+      });
+  }, [purchaseOrder?.vendor_id]);
+
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/purchase_orders"
       onSaveClick={() => purchaseOrder && onSave(purchaseOrder)}
     >
       <div className="grid grid-cols-12 gap-4">

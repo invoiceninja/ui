@@ -10,7 +10,10 @@
 
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
 import { User } from '$app/common/interfaces/user';
-import { DebouncedCombobox, Record } from '$app/components/forms/DebouncedCombobox';
+import {
+  DebouncedCombobox,
+  Record,
+} from '$app/components/forms/DebouncedCombobox';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 

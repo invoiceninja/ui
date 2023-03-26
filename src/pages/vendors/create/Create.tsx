@@ -135,7 +135,6 @@ export function Create() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      onBackClick="/vendors"
       onSaveClick={vendor && handleSave}
     >
       {vendor && <Form vendor={vendor} setVendor={setVendor} errors={errors} />}

@@ -10,7 +10,7 @@
 
 import { Link } from '$app/components/forms';
 import { EntityState } from '$app/common/enums/entity-state';
-import { date, getEntityState } from '$app/common/helpers';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -22,7 +22,6 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Icon } from '$app/components/icons/Icon';
 import { Tooltip } from '$app/components/Tooltip';
-import { useUpdateAtom } from 'jotai/utils';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
 import {
@@ -30,11 +29,20 @@ import {
   MdControlPointDuplicate,
   MdDelete,
   MdRestore,
+  MdTextSnippet,
 } from 'react-icons/md';
+import { useQueryClient } from 'react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { projectAtom } from './atoms';
 import { useBulkAction } from './hooks/useBulkAction';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useInvoiceProject } from '$app/pages/projects/common/hooks/useInvoiceProject';
+import { toast } from '$app/common/helpers/toast/toast';
+import { request } from '$app/common/helpers/request';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Task } from '$app/common/interfaces/task';
+import { AxiosError } from 'axios';
+import { useSetAtom } from 'jotai';
 
 export const defaultColumns: string[] = [
   'name',
@@ -229,16 +237,18 @@ export function useProjectColumns() {
 
 export function useActions() {
   const [t] = useTranslation();
-
   const location = useLocation();
-
   const navigate = useNavigate();
+
+  const queryClient = useQueryClient();
 
   const bulk = useBulkAction();
 
+  const invoiceProject = useInvoiceProject();
+
   const isEditPage = location.pathname.endsWith('/edit');
 
-  const setProject = useUpdateAtom(projectAtom);
+  const setProject = useSetAtom(projectAtom);
 
   const cloneToProject = (project: Project) => {
     setProject({ ...project, id: '', documents: [], number: '' });
@@ -246,7 +256,49 @@ export function useActions() {
     navigate('/projects/create?action=clone');
   };
 
+  const handleInvoiceProject = (project: Project) => {
+    toast.processing();
+
+    queryClient.fetchQuery(
+      route('/api/v1/tasks?project_tasks=:projectId&per_page=100', {
+        projectId: project.id,
+      }),
+      () =>
+        request(
+          'GET',
+          endpoint('/api/v1/tasks?project_tasks=:projectId&per_page=100', {
+            projectId: project.id,
+          })
+        )
+          .then((response: GenericSingleResourceResponse<Task[]>) => {
+            toast.dismiss();
+
+            const unInvoicedTasks = response.data.data.filter(
+              (task) => !task.invoice_id
+            );
+
+            if (!response.data.data.length) {
+              return toast.error('no_assigned_tasks');
+            }
+
+            invoiceProject(unInvoicedTasks);
+          })
+          .catch((error: AxiosError) => {
+            toast.error();
+            console.error(error);
+          })
+    );
+  };
+
   const actions = [
+    (project: Project) => (
+      <DropdownElement
+        onClick={() => handleInvoiceProject(project)}
+        icon={<Icon element={MdTextSnippet} />}
+      >
+        {t('invoice_project')}
+      </DropdownElement>
+    ),
     (project: Project) => (
       <DropdownElement
         onClick={() => cloneToProject(project)}
