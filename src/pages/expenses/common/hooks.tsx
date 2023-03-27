@@ -112,7 +112,7 @@ export function useAllExpenseColumns() {
     //   'assigned_to', @Todo: Need to resolve relationship
     //   'category', @Todo: Need to resolve relationship
     'created_at',
-    'created_by',
+    //'created_by', @Todo: Need to resolve relationship
     firstCustom,
     secondCustom,
     thirdCustom,
