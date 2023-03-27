@@ -80,8 +80,6 @@ export function Product() {
           toast.success('updated_product');
 
           queryClient.invalidateQueries('/api/v1/products');
-
-          queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
