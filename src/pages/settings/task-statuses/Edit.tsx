@@ -29,10 +29,11 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
-import { useHandleChange } from './common/hooks';
-import { Archive } from './components/edit/Archive';
-import { Delete } from './components/edit/Delete';
-import { Restore } from './components/edit/Restore';
+import {
+  useActions,
+  useHandleChange,
+} from '$app/pages/settings/task-statuses/common/hooks';
+import { ResourceActions } from '$app/components/ResourceActions';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -40,6 +41,8 @@ export function Edit() {
   const { id } = useParams();
 
   const queryClient = useQueryClient();
+
+  const actions = useActions();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -112,7 +115,18 @@ export function Edit() {
   }, [taskStatus]);
 
   return (
-    <Settings title={t('task_statuses')}>
+    <Settings
+      title={t('task_statuses')}
+      navigationTopRight={
+        taskStatus && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={taskStatus}
+            actions={actions}
+          />
+        )
+      }
+    >
       {!taskStatus && (
         <div className="flex justify-center">
           <Spinner />
@@ -160,10 +174,6 @@ export function Edit() {
               />
             </CardContainer>
           </Card>
-
-          <Archive />
-          <Restore />
-          <Delete />
         </Container>
       )}
     </Settings>
