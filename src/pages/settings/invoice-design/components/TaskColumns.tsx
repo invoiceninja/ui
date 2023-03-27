@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 
@@ -30,9 +31,16 @@ export function TaskColumns() {
   ];
 
   return (
-    <SortableVariableList
-      for="task_columns"
-      defaultVariables={defaultVariables}
-    />
+    <Card
+      title={t('task_columns')}
+      padding="small"
+      isCollapsed={true}
+      collapsable
+    >
+      <SortableVariableList
+        for="task_columns"
+        defaultVariables={defaultVariables}
+      />
+    </Card>
   );
 }

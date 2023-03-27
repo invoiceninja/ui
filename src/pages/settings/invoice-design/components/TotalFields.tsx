@@ -7,6 +7,7 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
+import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 
@@ -29,9 +30,16 @@ export function TotalFields() {
   ];
 
   return (
-    <SortableVariableList
-      for="total_columns"
-      defaultVariables={defaultVariables}
-    />
+    <Card
+      title={t('total_fields')}
+      padding="small"
+      isCollapsed={true}
+      collapsable
+    >
+      <SortableVariableList
+        for="total_columns"
+        defaultVariables={defaultVariables}
+      />
+    </Card>
   );
 }

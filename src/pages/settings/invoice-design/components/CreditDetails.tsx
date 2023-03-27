@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
 
@@ -28,9 +29,16 @@ export function CreditDetails() {
   ];
 
   return (
-    <SortableVariableList
-      for="credit_details"
-      defaultVariables={defaultVariables}
-    />
+    <Card
+      title={t('credit_details')}
+      padding="small"
+      isCollapsed={true}
+      collapsable
+    >
+      <SortableVariableList
+        for="credit_details"
+        defaultVariables={defaultVariables}
+      />
+    </Card>
   );
 }
