@@ -101,6 +101,20 @@ export function TaskSettings() {
           />
         </Element>
 
+        <Element
+          leftSide={t('show_task_item_description')}
+          leftSideHelp={t('show_task_item_description_help')}
+        >
+          <Toggle
+            checked={
+              companyChanges?.settings.show_task_item_description || false
+            }
+            onChange={(value: boolean) =>
+              handleToggleChange('settings.show_task_item_description', value)
+            }
+          />
+        </Element>
+
         <Divider />
 
         <Element

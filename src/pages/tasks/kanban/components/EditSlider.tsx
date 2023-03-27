@@ -32,7 +32,10 @@ import {
   parseTime,
   parseTimeToDate,
 } from '$app/pages/tasks/common/helpers';
-import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
+import {
+  parseTimeLog,
+  TimeLogsType,
+} from '$app/pages/tasks/common/helpers/calculate-time';
 import { useSave } from '$app/pages/tasks/common/hooks';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -46,7 +49,7 @@ export function EditSlider() {
   const [isTimeModalVisible, setIsTimeModalVisible] = useState(false);
 
   const [timeLogIndex, setTimeLogIndex] = useState<number>();
-  const [timeLog, setTimeLog] = useState<number[][]>([]);
+  const [timeLog, setTimeLog] = useState<TimeLogsType>([]);
 
   const handleChange = (property: keyof Task, value: Task[typeof property]) => {
     setTask((current) => current && { ...current, [property]: value });
