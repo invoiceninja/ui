@@ -8,15 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosResponse } from 'axios';
+import { AxiosError, AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { Params } from './common/params.interface';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { TaxRate } from '$app/common/interfaces/tax-rate';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function useTaxRatesQuery(params: Params) {
   return useQuery(
@@ -66,4 +67,29 @@ export function useBlankTaxRateQuery() {
       ),
     { staleTime: Infinity, enabled: isAdmin }
   );
+}
+
+export function useBulkAction() {
+  const queryClient = useQueryClient();
+
+  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/tax_rates/bulk'), {
+      action,
+      ids: [id],
+    })
+      .then(() => {
+        toast.success(`${action}d_tax_rate`);
+
+        queryClient.invalidateQueries('/api/v1/tax_rates');
+
+        queryClient.invalidateQueries(route('/api/v1/tax_rates/:id', { id }));
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+
+        toast.error();
+      });
+  };
 }

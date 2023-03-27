@@ -8,16 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import {
-  ActionCard,
-  Card,
-  CardContainer,
-  Element,
-} from '$app/components/cards';
-import { Button, InputField } from '$app/components/forms';
+import { Card, CardContainer, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
-import { bulk, useTaxRateQuery } from '$app/common/queries/tax-rates';
+import { useTaxRateQuery } from '$app/common/queries/tax-rates';
 import { Badge } from '$app/components/Badge';
 import { Container } from '$app/components/Container';
 import { Settings } from '$app/components/layouts/Settings';
@@ -32,6 +27,8 @@ import { Breadcrumbs } from '$app/components/Breadcrumbs';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { useActions } from '$app/pages/settings/tax-rates/common/hooks/useActions';
+import { ResourceActions } from '$app/components/ResourceActions';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -49,6 +46,8 @@ export function Edit() {
   const { data } = useTaxRateQuery({ id });
   const [errors, setErrors] = useState<Record<string, any>>({});
   const queryClient = useQueryClient();
+
+  const actions = useActions();
 
   useEffect(() => {
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${
@@ -90,59 +89,19 @@ export function Edit() {
     },
   });
 
-  const archive = () => {
-    toast.loading(t('processing'));
-
-    bulk([data?.data.data.id], 'archive')
-      .then(() => {
-        toast.dismiss();
-        toast.success(t('archived_tax_rate'));
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      })
-      .finally(() => invalidatePaymentTermCache());
-  };
-
-  const restore = () => {
-    toast.loading(t('processing'));
-
-    bulk([data?.data.data.id], 'restore')
-      .then(() => {
-        toast.dismiss();
-        toast.success(t('restored_tax_rate'));
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      })
-      .finally(() => invalidatePaymentTermCache());
-  };
-
-  const destroy = () => {
-    toast.loading(t('processing'));
-
-    bulk([data?.data.data.id], 'delete')
-      .then(() => {
-        toast.dismiss();
-        toast.success(t('deleted_tax_rate'));
-      })
-      .catch((error) => {
-        console.error(error);
-
-        toast.dismiss();
-        toast.success(t('error_title'));
-      })
-      .finally(() => invalidatePaymentTermCache());
-  };
-
   return (
-    <Settings title={t('tax_rates')}>
+    <Settings
+      title={t('tax_rates')}
+      navigationTopRight={
+        data && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={data.data.data}
+            actions={actions}
+          />
+        )
+      }
+    >
       {!data && (
         <div className="flex justify-center">
           <Spinner />
@@ -193,24 +152,6 @@ export function Edit() {
               />
             </CardContainer>
           </Card>
-
-          {!data.data.data.archived_at && !data.data.data.is_deleted ? (
-            <ActionCard label={t('archive')} help="">
-              <Button onClick={archive}>{t('archive')}</Button>
-            </ActionCard>
-          ) : null}
-
-          {data.data.data.archived_at || data.data.data.is_deleted ? (
-            <ActionCard label={t('restore')} help="">
-              <Button onClick={restore}>{t('restore')}</Button>
-            </ActionCard>
-          ) : null}
-
-          {!data.data.data.is_deleted && (
-            <ActionCard label={t('delete')} help="">
-              <Button onClick={destroy}>{t('delete')}</Button>
-            </ActionCard>
-          )}
         </Container>
       )}
     </Settings>
