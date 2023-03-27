@@ -8,15 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { TaskStatus } from '$app/common/interfaces/task-status';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function useBlankTaskStatusQuery() {
   const hasPermission = useHasPermission();
@@ -51,12 +52,29 @@ export function useTaskStatusQuery(params: { id: string | undefined }) {
   );
 }
 
-export function bulk(
-  id: string[],
-  action: 'archive' | 'restore' | 'delete'
-): Promise<AxiosResponse> {
-  return request('POST', endpoint('/api/v1/task_statuses/bulk'), {
-    action,
-    ids: id,
-  });
+export function useBulkAction() {
+  const queryClient = useQueryClient();
+
+  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/task_statuses/bulk'), {
+      action,
+      ids: [id],
+    })
+      .then(() => {
+        toast.success(`${action}d_task_status`);
+
+        queryClient.invalidateQueries('/api/v1/task_statuses');
+
+        queryClient.invalidateQueries(
+          route('/api/v1/task_statuses/:id', { id })
+        );
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+
+        toast.error();
+      });
+  };
 }

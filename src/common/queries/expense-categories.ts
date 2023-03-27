@@ -8,15 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosResponse } from 'axios';
+import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { Params } from './common/params.interface';
 import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { toast } from '$app/common/helpers/toast/toast';
 
 interface ExpenseCategoriesParams extends Params {
   enabled?: boolean;
@@ -62,14 +63,31 @@ export function useExpenseCategoryQuery(props: Props) {
   );
 }
 
-export function bulk(
-  id: string[],
-  action: 'archive' | 'restore' | 'delete'
-): Promise<AxiosResponse> {
-  return request('POST', endpoint('/api/v1/expense_categories/bulk'), {
-    action,
-    ids: id,
-  });
+export function useBulkAction() {
+  const queryClient = useQueryClient();
+
+  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/expense_categories/bulk'), {
+      action,
+      ids: [id],
+    })
+      .then(() => {
+        toast.success(`${action}d_expense_category`);
+
+        queryClient.invalidateQueries('/api/v1/expense_categories');
+
+        queryClient.invalidateQueries(
+          route('/api/v1/expense_categories/:id', { id })
+        );
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+
+        toast.error();
+      });
+  };
 }
 
 export function useBlankExpenseCategoryQuery() {
