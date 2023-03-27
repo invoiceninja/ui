@@ -9,7 +9,9 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Card } from '$app/components/cards';
+import { Card, Element } from '$app/components/cards';
+import { InputField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
 import { TabGroup } from '$app/components/TabGroup';
 import {
@@ -26,6 +28,7 @@ import {
   TotalFields,
   VendorDetails,
 } from '$app/pages/settings/invoice-design/components';
+import Editor from '@monaco-editor/react';
 import { useTranslation } from 'react-i18next';
 
 export function Customize() {
@@ -52,26 +55,107 @@ export function Customize() {
               <CompanyAddress />
               <InvoiceDetails />
               <QuoteDetails />
-
               <CreditDetails />
-
               <VendorDetails />
-
               <PurchaseOrderDetails />
-
               <ProductColumns />
-
               <TaskColumns />
-
               <TotalFields />
             </div>
 
-            <div>Template</div>
+            <div className="space-y-2">
+              <Card
+                title={t('general_settings')}
+                padding="small"
+                isCollapsed={false}
+                collapsable
+              >
+                <Element leftSide={t('name')}>
+                  <InputField />
+                </Element>
+
+                <Element leftSide={t('design')}>
+                  <InputField />
+                </Element>
+
+                <Element leftSide={t('html_mode')}>
+                  <Toggle />
+                </Element>
+              </Card>
+
+              <Card
+                title={t('body')}
+                padding="small"
+                isCollapsed={true}
+                collapsable
+              >
+                <Editor
+                  height="20rem"
+                  defaultLanguage="html"
+                  options={{
+                    minimap: {
+                      enabled: false,
+                    },
+                  }}
+                />
+              </Card>
+
+              <Card
+                title={t('header')}
+                padding="small"
+                isCollapsed={true}
+                collapsable
+              >
+                <Editor
+                  height="20rem"
+                  defaultLanguage="html"
+                  options={{
+                    minimap: {
+                      enabled: false,
+                    },
+                  }}
+                />
+              </Card>
+
+              <Card
+                title={t('footer')}
+                padding="small"
+                isCollapsed={true}
+                collapsable
+              >
+                <Editor
+                  height="20rem"
+                  defaultLanguage="html"
+                  options={{
+                    minimap: {
+                      enabled: false,
+                    },
+                  }}
+                />
+              </Card>
+
+              <Card
+                title={t('includes')}
+                padding="small"
+                isCollapsed={true}
+                collapsable
+              >
+                <Editor
+                  height="20rem"
+                  defaultLanguage="html"
+                  options={{
+                    minimap: {
+                      enabled: false,
+                    },
+                  }}
+                />
+              </Card>
+            </div>
           </TabGroup>
         </div>
 
         <div className="border-2 rounded p-4 h-96 flex justify-center items-center">
-          <p className="text-gray-600 uppercase text-sm">Preview goes here</p>
+          <p className="text-gray-600 uppercase text-sm">Preview</p>
         </div>
       </div>
     </Default>
