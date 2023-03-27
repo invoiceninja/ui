@@ -388,6 +388,6 @@ test('client documents uploading', async ({ page }) => {
   await expect(page.getByText('Successfully uploaded document')).toBeVisible();
 
   await expect(
-    tableBody.getByText('test-image.png', { exact: true }).first()
+    page.getByText('test-image.png', { exact: true }).first()
   ).toBeVisible();
 });
