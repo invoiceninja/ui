@@ -73,7 +73,7 @@ export function Card(props: Props) {
           <div
             className={classNames('border-b border-gray-200', {
               'bg-white sticky top-0': props.withScrollableBody,
-              'px-4 py-3': padding == 'small',
+              'px-4 sm:px-6 py-3': padding == 'small',
               'px-4 sm:px-6 py-5': padding == 'regular',
             })}
             onClick={() => setIsCollpased(!isCollapsed)}
