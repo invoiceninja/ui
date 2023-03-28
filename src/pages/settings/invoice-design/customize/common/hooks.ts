@@ -8,20 +8,27 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Settings } from '$app/common/interfaces/company.interface';
 import { Design, Parts } from '$app/common/interfaces/design';
 import { useDesignsQuery } from '$app/common/queries/designs';
 import { atom, useAtom } from 'jotai';
 
 export interface Payload {
-  design: Design | null;
-  entity_id: string;
+  client_id: string;
   entity_type: 'invoice';
+  group_id: string;
+  settings: Settings | null;
+  design: Design | null;
+  settings_type: 'company';
 }
 
 export const payloadAtom = atom<Payload>({
-  design: null,
-  entity_id: '',
+  client_id: '-1',
   entity_type: 'invoice',
+  group_id: '-1',
+  settings: null,
+  design: null,
+  settings_type: 'company',
 });
 
 export function useDesignUtilities() {
