@@ -14,6 +14,20 @@ import { useDesignsQuery } from '$app/common/queries/designs';
 import { Card } from '$app/components/cards';
 import { Default } from '$app/components/layouts/Default';
 import { TabGroup } from '$app/components/TabGroup';
+import {
+  ClientDetails,
+  CompanyAddress,
+  CompanyDetails,
+  CreditDetails,
+  GeneralSettings,
+  InvoiceDetails,
+  ProductColumns,
+  PurchaseOrderDetails,
+  QuoteDetails,
+  TaskColumns,
+  TotalFields,
+  VendorDetails,
+} from '$app/pages/settings/invoice-design/components';
 import { payloadAtom } from '$app/pages/settings/invoice-design/customize/common/hooks';
 import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
 import { Body } from '$app/pages/settings/invoice-design/customize/components/Body';
@@ -58,38 +72,21 @@ export function Customize() {
     <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-12 lg:col-span-5">
-          {/* <TabGroup
-            tabs={[
-              t('settings'),
-              t('body'),
-              t('header'),
-              t('footer'),
-              t('includes'),
-            ]}
-          >
-            <div>
-              <Settings payload={payload} />
-            </div>
-
-            <div>
-              <Body payload={payload} />
-            </div>
-
-            <div>
-              <Header payload={payload} />
-            </div>
-
-            <div>
-              <Footer payload={payload} />
-            </div>
-
-            <div>
-              <Includes payload={payload} />
-            </div>
-          </TabGroup> */}
-
           <TabGroup tabs={[t('settings'), t('design'), t('variables')]}>
-            <div></div>
+            <div className="space-y-4">
+              <GeneralSettings />
+              <ClientDetails />
+              <CompanyDetails />
+              <CompanyAddress />
+              <InvoiceDetails />
+              <QuoteDetails />
+              <CreditDetails />
+              <VendorDetails />
+              <PurchaseOrderDetails />
+              <ProductColumns />
+              <TaskColumns />
+              <TotalFields />
+            </div>
 
             <div className="space-y-4">
               <Settings payload={payload} />

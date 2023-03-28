@@ -20,7 +20,7 @@ import { range } from 'lodash';
 import { ChangeEvent, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, ClickableElement, Element } from '../../../../components/cards';
+import { Card, Element } from '../../../../components/cards';
 import { Radio, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 import { updatingRecords as updatingRecordsAtom } from '../common/atoms';
@@ -849,13 +849,7 @@ export function GeneralSettings() {
   }, []);
 
   return (
-    <Card title={t('general_settings')}>
-      <ClickableElement to="/settings/invoice_design/customize">
-        {t('customize_and_preview')}
-      </ClickableElement>
-
-      <Divider />
-
+    <Card title={t('general_settings')} padding="small" collapsed={false}>
       <Element leftSide={t('invoice_design')}>
         <div className="flex flex-col space-y-3">
           <SelectField

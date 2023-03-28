@@ -95,7 +95,7 @@ export function SortableVariableList(props: Props) {
   };
 
   return (
-    <Card title={t(props.for)}>
+    <>
       <Element leftSide={t('fields')}>
         <SelectField onChange={handleSelectChange}>
           <option></option>
@@ -149,6 +149,6 @@ export function SortableVariableList(props: Props) {
           </Droppable>
         </DragDropContext>
       </Element>
-    </Card>
+    </>
   );
 }

@@ -77,11 +77,15 @@ export function Card(props: Props) {
               'px-4 sm:px-6 py-3': padding == 'small',
               'px-4 sm:px-6 py-5': padding == 'regular',
             })}
-            onClick={() => setIsCollpased(!isCollapsed)}
+            onClick={() =>
+              typeof props.collapsed !== 'undefined' &&
+              setIsCollpased(!isCollapsed)
+            }
           >
             <div
               className={classNames('flex items-center justify-between', {
-                'cursor-pointer select-none': typeof props.collapsed,
+                'cursor-pointer select-none':
+                  typeof props.collapsed !== 'undefined',
               })}
             >
               <div>
