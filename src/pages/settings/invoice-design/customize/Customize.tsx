@@ -16,11 +16,6 @@ import { Default } from '$app/components/layouts/Default';
 import { TabGroup } from '$app/components/TabGroup';
 import { payloadAtom } from '$app/pages/settings/invoice-design/customize/common/hooks';
 import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
-import { Body } from '$app/pages/settings/invoice-design/customize/components/Body';
-import { Footer } from '$app/pages/settings/invoice-design/customize/components/Footer';
-import { Header } from '$app/pages/settings/invoice-design/customize/components/Header';
-import { Includes } from '$app/pages/settings/invoice-design/customize/components/Includes';
-import { Settings } from '$app/pages/settings/invoice-design/customize/components/Settings';
 import { Variable } from '$app/pages/settings/templates-and-reminders/common/components/Variable';
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
@@ -58,7 +53,7 @@ export function Customize() {
     <Default title={documentTitle} breadcrumbs={pages}>
       <div className="grid grid-cols-12 gap-6">
         <div className="col-span-12 lg:col-span-5">
-          <TabGroup
+          {/* <TabGroup
             tabs={[
               t('settings'),
               t('body'),
@@ -86,40 +81,64 @@ export function Customize() {
             <div>
               <Includes payload={payload} />
             </div>
-          </TabGroup>
+          </TabGroup> */}
 
-          <TabGroup
-            tabs={[t('invoice'), t('client'), t('contact'), t('company')]}
-          >
-            <div>
-              <Card className="text-sm px-4">
-                {variables.invoice.map((variable, index) => (
-                  <Variable key={index}>{variable}</Variable>
-                ))}
+          <TabGroup tabs={[t('settings'), t('design'), t('variables')]}>
+            <div></div>
+
+            <div>Design</div>
+
+            <div className="space-y-4">
+              <Card
+                title={t('invoice')}
+                padding="small"
+                className="text-sm"
+                collapsed={false}
+              >
+                <div className="px-2">
+                  {variables.invoice.map((variable, index) => (
+                    <Variable key={index}>{variable}</Variable>
+                  ))}
+                </div>
               </Card>
-            </div>
 
-            <div>
-              <Card className="text-sm px-4">
-                {variables.client.map((variable, index) => (
-                  <Variable key={index}>{variable}</Variable>
-                ))}
+              <Card
+                title={t('client')}
+                padding="small"
+                className="text-sm"
+                collapsed={true}
+              >
+                <div className="px-2">
+                  {variables.client.map((variable, index) => (
+                    <Variable key={index}>{variable}</Variable>
+                  ))}
+                </div>
               </Card>
-            </div>
 
-            <div>
-              <Card className="text-sm px-4">
-                {variables.contact.map((variable, index) => (
-                  <Variable key={index}>{variable}</Variable>
-                ))}
+              <Card
+                title={t('contact')}
+                padding="small"
+                className="text-sm"
+                collapsed={true}
+              >
+                <div className="px-2">
+                  {variables.contact.map((variable, index) => (
+                    <Variable key={index}>{variable}</Variable>
+                  ))}
+                </div>
               </Card>
-            </div>
 
-            <div>
-              <Card className="text-sm px-4">
-                {variables.company.map((variable, index) => (
-                  <Variable key={index}>{variable}</Variable>
-                ))}
+              <Card
+                title={t('company')}
+                padding="small"
+                className="text-sm"
+                collapsed={true}
+              >
+                <div className="px-2">
+                  {variables.company.map((variable, index) => (
+                    <Variable key={index}>{variable}</Variable>
+                  ))}
+                </div>
               </Card>
             </div>
           </TabGroup>
