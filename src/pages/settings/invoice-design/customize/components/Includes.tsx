@@ -13,11 +13,13 @@ import { useDesignUtilities } from '$app/pages/settings/invoice-design/customize
 import { CustomizeChildProps } from '$app/pages/settings/invoice-design/customize/components/Settings';
 import Editor from '@monaco-editor/react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
 
 export function Includes({ payload }: CustomizeChildProps) {
   const [value, setValue] = useState(payload.design?.design.includes);
 
+  const { t } = useTranslation();
   const { handleDesignBlockChange } = useDesignUtilities();
 
   useDebounce(() => value && handleDesignBlockChange('includes', value), 500, [
@@ -25,7 +27,12 @@ export function Includes({ payload }: CustomizeChildProps) {
   ]);
 
   return (
-    <Card>
+    <Card
+      title={t('includes')}
+      className="text-sm"
+      padding="small"
+      collapsed={true}
+    >
       <Editor
         height="40rem"
         defaultLanguage="html"

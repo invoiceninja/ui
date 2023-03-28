@@ -51,6 +51,7 @@ interface Props {
   withoutBodyPadding?: boolean;
   padding?: 'small' | 'regular';
   collapsed?: boolean;
+  childrenClassName?: string;
 }
 
 export function Card(props: Props) {
@@ -80,7 +81,7 @@ export function Card(props: Props) {
           >
             <div
               className={classNames('flex items-center justify-between', {
-                'cursor-pointer': typeof props.collapsed,
+                'cursor-pointer select-none': typeof props.collapsed,
               })}
             >
               <div>
@@ -103,7 +104,7 @@ export function Card(props: Props) {
               {typeof props.collapsed !== 'undefined' && isCollapsed && (
                 <ChevronDown />
               )}
-              
+
               {typeof props.collapsed !== 'undefined' && !isCollapsed && (
                 <ChevronUp />
               )}
@@ -112,7 +113,7 @@ export function Card(props: Props) {
         )}
 
         <div
-          className={classNames({
+          className={classNames(props.childrenClassName, {
             hidden: isCollapsed,
             'py-0': props.withoutBodyPadding,
             'py-4': padding == 'regular',

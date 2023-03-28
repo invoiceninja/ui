@@ -13,6 +13,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { Parts } from '$app/common/interfaces/design';
 import { useDesignsQuery } from '$app/common/queries/designs';
 import { Card, ClickableElement, Element } from '$app/components/cards';
+import { Divider } from '$app/components/cards/Divider';
 import { Button, InputField, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
@@ -83,7 +84,12 @@ export function Settings({ payload }: CustomizeChildProps) {
         <Button onClick={handleImport}>{t('import')}</Button>
       </Modal>
 
-      <Card>
+      <Card
+        title={t('settings')}
+        className="text-sm"
+        padding="small"
+        collapsed={false}
+      >
         <Element leftSide={t('name')}>
           <InputField
             value={payload.design?.name}
@@ -109,9 +115,9 @@ export function Settings({ payload }: CustomizeChildProps) {
         <Element leftSide={t('html_mode')}>
           <Toggle checked={false} />
         </Element>
-      </Card>
 
-      <Card>
+        <Divider />
+
         <ClickableElement href="https://invoiceninja.github.io/docs/custom-fields/">
           {t('view_docs')}
         </ClickableElement>

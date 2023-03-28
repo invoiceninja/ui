@@ -13,11 +13,13 @@ import { useDesignUtilities } from '$app/pages/settings/invoice-design/customize
 import { CustomizeChildProps } from '$app/pages/settings/invoice-design/customize/components/Settings';
 import Editor from '@monaco-editor/react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
 
 export function Body({ payload }: CustomizeChildProps) {
   const [value, setValue] = useState(payload.design?.design.body);
 
+  const { t } = useTranslation();
   const { handleDesignBlockChange } = useDesignUtilities();
 
   useDebounce(() => value && handleDesignBlockChange('body', value), 500, [
@@ -25,9 +27,14 @@ export function Body({ payload }: CustomizeChildProps) {
   ]);
 
   return (
-    <Card>
+    <Card
+      title={t('body')}
+      className="text-sm"
+      padding="small"
+      collapsed={true}
+    >
       <Editor
-        height="40rem"
+        height="25rem"
         defaultLanguage="html"
         value={payload.design?.design.body}
         options={{
