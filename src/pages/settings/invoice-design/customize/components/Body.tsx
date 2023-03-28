@@ -29,7 +29,6 @@ export function Body({ payload }: CustomizeChildProps) {
   return (
     <Card
       title={t('body')}
-      className="text-sm"
       padding="small"
       collapsed={true}
     >

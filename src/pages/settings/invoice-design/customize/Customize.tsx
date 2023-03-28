@@ -100,7 +100,6 @@ export function Customize() {
               <Card
                 title={t('invoice')}
                 padding="small"
-                className="text-sm"
                 childrenClassName="px-2"
                 collapsed={false}
               >
@@ -114,7 +113,6 @@ export function Customize() {
               <Card
                 title={t('client')}
                 padding="small"
-                className="text-sm"
                 childrenClassName="px-2"
                 collapsed={true}
               >
@@ -128,7 +126,6 @@ export function Customize() {
               <Card
                 title={t('contact')}
                 padding="small"
-                className="text-sm"
                 childrenClassName="px-2"
                 collapsed={true}
               >
@@ -142,7 +139,6 @@ export function Customize() {
               <Card
                 title={t('company')}
                 padding="small"
-                className="text-sm"
                 childrenClassName="px-2"
                 collapsed={true}
               >

@@ -29,7 +29,6 @@ export function Footer({ payload }: CustomizeChildProps) {
   return (
     <Card
       title={t('footer')}
-      className="text-sm"
       padding="small"
       collapsed={true}
     >

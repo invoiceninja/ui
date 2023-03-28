@@ -86,7 +86,6 @@ export function Settings({ payload }: CustomizeChildProps) {
 
       <Card
         title={t('settings')}
-        className="text-sm"
         padding="small"
         collapsed={false}
       >

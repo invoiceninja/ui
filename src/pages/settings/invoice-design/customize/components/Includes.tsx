@@ -29,7 +29,6 @@ export function Includes({ payload }: CustomizeChildProps) {
   return (
     <Card
       title={t('includes')}
-      className="text-sm"
       padding="small"
       collapsed={true}
     >

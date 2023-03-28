@@ -29,7 +29,6 @@ export function Header({ payload }: CustomizeChildProps) {
   return (
     <Card
       title={t('header')}
-      className="text-sm"
       padding="small"
       collapsed={true}
     >
