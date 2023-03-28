@@ -103,6 +103,12 @@ export function useSettingsRoutes() {
       enabled: isAdmin || isOwner || false,
     },
     {
+      name: t('customize_and_preview'),
+      href: '/settings/invoice_design/customize',
+      current: location.pathname.startsWith('/settings/invoice_design/customize'),
+      enabled: isAdmin || isOwner || false,
+    },
+    {
       name: t('generated_numbers'),
       href: '/settings/generated_numbers',
       current: location.pathname.startsWith('/settings/generated_numbers'),
