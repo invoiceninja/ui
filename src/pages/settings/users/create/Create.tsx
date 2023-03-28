@@ -15,6 +15,7 @@ import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { User } from '$app/common/interfaces/user';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { defaultHeaders } from '$app/common/queries/common/headers';
 import { useBlankUserQuery } from '$app/common/queries/users';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
@@ -43,6 +44,7 @@ export function Create() {
 
   const { data: response } = useBlankUserQuery();
   const [user, setUser] = useState<User>();
+  const [errors, setErrors] = useState<ValidationBag>();
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState(false);
 
@@ -93,9 +95,22 @@ export function Create() {
         );
       })
       .catch((error) => {
-        error.response?.status === 412
-          ? toast.error('password_error_incorrect')
-          : toast.error();
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+        } else if (error.response?.status === 422) {
+          const errorMessages = error.response.data;
+
+          if (errorMessages.errors.id) {
+            toast.error(errorMessages.errors.id);
+          } else {
+            toast.dismiss();
+          }
+
+          setErrors(errorMessages);
+        } else {
+          toast.error();
+          console.log(error);
+        }
       });
   };
 
@@ -119,7 +134,9 @@ export function Create() {
       />
 
       <TabGroup tabs={tabs}>
-        <div>{user && <Details user={user} setUser={setUser} />}</div>
+        <div>
+          {user && <Details user={user} setUser={setUser} errors={errors} />}
+        </div>
         <div>{user && <Notifications user={user} setUser={setUser} />}</div>
         <div>{user && <Permissions user={user} setUser={setUser} />}</div>
       </TabGroup>

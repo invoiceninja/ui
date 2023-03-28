@@ -45,6 +45,7 @@ export function InvoiceDesign() {
       onSaveClick={onSave}
       onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
+      withoutBackButton
     >
       <Tabs tabs={tabs} className="mt-6" />
 

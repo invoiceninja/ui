@@ -38,7 +38,12 @@ export function Invoices() {
   const pages = [{ name: t('invoices'), href: '/invoices' }];
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} docsLink="docs/invoices">
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      docsLink="docs/invoices"
+      withoutBackButton
+    >
       <DataTable
         resource="invoice"
         endpoint="/api/v1/invoices?include=client&without_deleted_clients=true&sort=id|desc"

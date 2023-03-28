@@ -400,6 +400,7 @@ export function Reports() {
       onSaveClick={handleExport}
       saveButtonLabel={t('export')}
       disableSaveButton={isPendingExport}
+      withoutBackButton
     >
       <div className="grid grid-cols-12 gap-4">
         <Card className="col-span-6 h-max">

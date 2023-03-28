@@ -8,8 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Badge } from '$app/components/Badge';
-import { useTranslation } from 'react-i18next';
 import { StatusBadge } from '$app/components/StatusBadge';
 import recurringExpenseStatus from '$app/common/constants/recurring-expense';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
@@ -19,12 +17,7 @@ interface Props {
 }
 
 export function RecurringExpenseStatus(props: Props) {
-  const [t] = useTranslation();
-
   const { recurringExpense } = props;
-
-  if (recurringExpense.remaining_cycles === 0)
-    return <Badge variant="green">{t('completed')}</Badge>;
 
   return (
     <StatusBadge

@@ -66,6 +66,7 @@ export function TaskSettings() {
       title={t('task_settings')}
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#task_settings"
+      withoutBackButton
     >
       <Card title={t('settings')}>
         <Element leftSide={t('default_task_rate')}>
@@ -96,6 +97,20 @@ export function TaskSettings() {
             checked={companyChanges?.show_task_end_date || false}
             onChange={(value: boolean) =>
               handleToggleChange('show_task_end_date', value)
+            }
+          />
+        </Element>
+
+        <Element
+          leftSide={t('show_task_item_description')}
+          leftSideHelp={t('show_task_item_description_help')}
+        >
+          <Toggle
+            checked={
+              companyChanges?.settings.show_task_item_description || false
+            }
+            onChange={(value: boolean) =>
+              handleToggleChange('settings.show_task_item_description', value)
             }
           />
         </Element>

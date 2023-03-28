@@ -31,7 +31,12 @@ export interface ResourceItem {
   amount: number;
   date: string;
   should_be_invoiced: boolean;
+  invoice_id: string;
   payment_date: string;
+  transaction_reference: string;
+  payment_type_id: string;
+  archived_at: number;
+  is_deleted: boolean;
 }
 
 export interface SearchInput {
@@ -145,7 +150,10 @@ export function ListBox(props: Props) {
       date: resourceItem.date,
       clientId: resourceItem.client_id,
       should_be_invoiced: resourceItem.should_be_invoiced,
+      invoice_id: resourceItem.invoice_id,
       payment_date: resourceItem.payment_date,
+      transaction_reference: resourceItem.transaction_reference,
+      payment_type_id: resourceItem.payment_type_id,
     }));
   };
 

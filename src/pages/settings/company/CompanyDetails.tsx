@@ -43,6 +43,7 @@ export function CompanyDetails() {
       title={t('company_details')}
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#company_details"
+      withoutBackButton
     >
       <Tabs tabs={tabs} className="mt-6" />
       <div className="my-4">
