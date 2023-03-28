@@ -8,12 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { endpoint } from '$app/common/helpers';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useDesignsQuery } from '$app/common/queries/designs';
 import { Card } from '$app/components/cards';
 import { Default } from '$app/components/layouts/Default';
 import { TabGroup } from '$app/components/TabGroup';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
 import {
   ClientDetails,
   CompanyAddress,
@@ -153,14 +155,14 @@ export function Customize() {
         </div>
 
         <div className="col-span-12 lg:col-span-7">
-          {/* {payload?.design && (
+          {payload?.design && (
             <InvoiceViewer
-              link={endpoint('/api/v1/preview')}
+              link={endpoint('/api/v1/live_design')}
               resource={payload}
               method="POST"
               withToast
             />
-          )} */}
+          )}
         </div>
       </div>
     </Default>
