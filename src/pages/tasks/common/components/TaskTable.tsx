@@ -13,7 +13,7 @@ import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Task } from '$app/common/interfaces/task';
 import dayjs from 'dayjs';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import {
@@ -243,9 +243,9 @@ export function TaskTable(props: Props) {
                     <Td>
                       <Checkbox
                         checked={billable || false}
-                        onChange={(event: ChangeEvent<HTMLInputElement>) =>
+                        onValueChange={(value, checked) =>
                           handleBillableChange(
-                            event.target.checked,
+                            checked || false,
                             index,
                             LogPosition.Billable
                           )
