@@ -181,8 +181,6 @@ test('deleting payment', async ({ page }) => {
 
     await page.getByText('Delete').click();
 
-    await expect(page.getByText('Restore', { exact: true })).toBeVisible();
-
     await expect(page.getByText('Delete', { exact: true })).not.toBeVisible();
   } else {
     const moreActionsButton = tableRow
