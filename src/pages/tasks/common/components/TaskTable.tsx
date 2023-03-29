@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputField } from '$app/components/forms';
+import { Checkbox, InputField } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Task } from '$app/common/interfaces/task';
@@ -35,6 +35,7 @@ export enum LogPosition {
   Start = 0,
   End = 1,
   Description = 2,
+  Billable = 3,
 }
 
 export function TaskTable(props: Props) {
@@ -56,7 +57,7 @@ export function TaskTable(props: Props) {
       startTime = last[1] + 1;
     }
 
-    logs.push([startTime, 0, '']);
+    logs.push([startTime, 0, '', false]);
 
     handleChange('time_log', JSON.stringify(logs));
   };
@@ -122,6 +123,32 @@ export function TaskTable(props: Props) {
     handleChange('time_log', JSON.stringify(logs));
   };
 
+  const handleBillableChange = (
+    value: boolean,
+    index: number,
+    logPosition: number
+  ) => {
+    const logs = parseTimeLog(task.time_log);
+
+    logs[index][logPosition] = value;
+
+    handleChange('time_log', JSON.stringify(logs));
+  };
+
+  const getDescriptionColSpan = () => {
+    let colSpan = 4;
+
+    if (company?.show_task_end_date) {
+      colSpan += 1;
+    }
+
+    if (company?.settings.allow_billable_task_items) {
+      colSpan += 1;
+    }
+
+    return colSpan;
+  };
+
   useEffect(() => {
     if (typeof lastChangedIndex === 'number') {
       const parsedTimeLog = parseTimeLog(task.time_log);
@@ -147,12 +174,15 @@ export function TaskTable(props: Props) {
         {company?.show_task_end_date && <Th>{t('end_date')}</Th>}
         <Th>{t('end_time')}</Th>
         <Th>{t('duration')}</Th>
+        {company?.settings.allow_billable_task_items && (
+          <Th>{t('billable')}</Th>
+        )}
         <Th></Th>
       </Thead>
       <Tbody>
         {task.time_log &&
           (JSON.parse(task.time_log) as TimeLogsType).map(
-            ([start, stop, description], index) => (
+            ([start, stop, description, billable], index) => (
               <>
                 <Tr>
                   <Td>
@@ -209,6 +239,21 @@ export function TaskTable(props: Props) {
                     />
                   </Td>
 
+                  {company?.settings.allow_billable_task_items && (
+                    <Td>
+                      <Checkbox
+                        checked={billable || false}
+                        onValueChange={(value, checked) =>
+                          handleBillableChange(
+                            checked || false,
+                            index,
+                            LogPosition.Billable
+                          )
+                        }
+                      />
+                    </Td>
+                  )}
+
                   <Td
                     rowSpan={
                       company?.settings.show_task_item_description ? 2 : 1
@@ -225,7 +270,7 @@ export function TaskTable(props: Props) {
 
                 {company?.settings.show_task_item_description && (
                   <Tr>
-                    <Td colSpan={company?.show_task_end_date ? 5 : 4}>
+                    <Td colSpan={getDescriptionColSpan()}>
                       <InputField
                         element="textarea"
                         textareaRows={2}

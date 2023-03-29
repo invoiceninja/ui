@@ -115,6 +115,20 @@ export function TaskSettings() {
           />
         </Element>
 
+        <Element
+          leftSide={t('allow_billable_task_items')}
+          leftSideHelp={t('allow_billable_task_items_help')}
+        >
+          <Toggle
+            checked={
+              companyChanges?.settings.allow_billable_task_items || false
+            }
+            onChange={(value: boolean) =>
+              handleToggleChange('settings.allow_billable_task_items', value)
+            }
+          />
+        </Element>
+
         <Divider />
 
         <Element
