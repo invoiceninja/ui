@@ -160,6 +160,13 @@ export function DataTable<T extends object>(props: Props<T>) {
     },
   ];
 
+  const isRestoreAvailable = (isDeleted: boolean) => {
+    return (
+      (props.resource === 'payment' && !isDeleted) ||
+      props.resource !== 'payment'
+    );
+  };
+
   const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {
     toast.processing();
 
@@ -365,7 +372,10 @@ export function DataTable<T extends object>(props: Props<T>) {
                             )
                         )}
 
-                      {props.customActions && <Divider withoutPadding />}
+                      {props.customActions &&
+                        isRestoreAvailable(resource.is_deleted) && (
+                          <Divider withoutPadding />
+                        )}
 
                       {resource?.archived_at === 0 && (
                         <DropdownElement
@@ -376,14 +386,15 @@ export function DataTable<T extends object>(props: Props<T>) {
                         </DropdownElement>
                       )}
 
-                      {resource?.archived_at > 0 && (
-                        <DropdownElement
-                          onClick={() => bulk('restore', resource.id)}
-                          icon={<Icon element={MdRestore} />}
-                        >
-                          {t('restore')}
-                        </DropdownElement>
-                      )}
+                      {resource?.archived_at > 0 &&
+                        isRestoreAvailable(resource.is_deleted) && (
+                          <DropdownElement
+                            onClick={() => bulk('restore', resource.id)}
+                            icon={<Icon element={MdRestore} />}
+                          >
+                            {t('restore')}
+                          </DropdownElement>
+                        )}
 
                       {!resource?.is_deleted && (
                         <DropdownElement
