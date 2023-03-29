@@ -63,6 +63,7 @@ export interface Settings {
   language_id: string;
   show_currency_code: boolean;
   show_task_item_description: boolean;
+  allow_billable_task_items: boolean;
   show_email_footer: boolean;
   company_gateway_ids: string;
   currency_id: string;
