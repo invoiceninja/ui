@@ -20,10 +20,24 @@ export function Customize() {
   const [t] = useTranslation();
 
   useEffect(() => {
+<<<<<<< Updated upstream
     document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
       'customize_and_preview'
     )}`;
   });
+=======
+    if (designs && company?.settings) {
+      setPayload(
+        (current) =>
+          current && {
+            ...current,
+            design: designs[0].design,
+            settings: company.settings,
+          }
+      );
+    }
+  }, [designs]);
+>>>>>>> Stashed changes
 
   return (
     <Default title={t('invoice_design')}>
