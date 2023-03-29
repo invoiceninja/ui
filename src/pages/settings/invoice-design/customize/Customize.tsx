@@ -68,7 +68,7 @@ export function Customize() {
           }
       );
     }
-  }, [designs]);
+  }, [designs, company?.settings]);
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
