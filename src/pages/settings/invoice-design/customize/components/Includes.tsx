@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
 
 export function Includes({ payload }: CustomizeChildProps) {
-  const [value, setValue] = useState(payload.design?.design.includes);
+  const [value, setValue] = useState(payload.design?.includes);
 
   const { t } = useTranslation();
   const { handleDesignBlockChange } = useDesignUtilities();
@@ -35,7 +35,7 @@ export function Includes({ payload }: CustomizeChildProps) {
       <Editor
         height="40rem"
         defaultLanguage="html"
-        value={payload.design?.design.includes}
+        value={payload.design?.includes}
         options={{
           minimap: {
             enabled: false,

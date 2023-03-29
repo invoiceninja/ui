@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
 
 export function Header({ payload }: CustomizeChildProps) {
-  const [value, setValue] = useState(payload.design?.design.header);
+  const [value, setValue] = useState(payload.design?.header);
 
   const { t } = useTranslation();
   const { handleDesignBlockChange } = useDesignUtilities();
@@ -35,7 +35,7 @@ export function Header({ payload }: CustomizeChildProps) {
       <Editor
         height="40rem"
         defaultLanguage="html"
-        value={payload.design?.design.header}
+        value={payload.design?.header}
         options={{
           minimap: {
             enabled: false,

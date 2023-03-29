@@ -91,7 +91,7 @@ export function Settings({ payload }: CustomizeChildProps) {
       >
         <Element leftSide={t('name')}>
           <InputField
-            value={payload.design?.name}
+            // value={payload.design?.name}
             onValueChange={(value) => handleDesignPropertyChange('name', value)}
             debounceTimeout={500}
           />
@@ -99,7 +99,7 @@ export function Settings({ payload }: CustomizeChildProps) {
 
         <Element leftSide={t('design')}>
           <SelectField
-            defaultValue={payload?.design?.id || ''}
+            // defaultValue={payload?.design?.id || ''}
             onValueChange={(value) => handleDesignChange(value)}
           >
             {designs &&

@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
 
 export function Footer({ payload }: CustomizeChildProps) {
-  const [value, setValue] = useState(payload.design?.design.footer);
+  const [value, setValue] = useState(payload.design?.footer);
 
   const { t } = useTranslation();
   const { handleDesignBlockChange } = useDesignUtilities();
@@ -35,7 +35,7 @@ export function Footer({ payload }: CustomizeChildProps) {
       <Editor
         height="40rem"
         defaultLanguage="html"
-        value={payload.design?.design.footer}
+        value={payload.design?.footer}
         options={{
           minimap: {
             enabled: false,

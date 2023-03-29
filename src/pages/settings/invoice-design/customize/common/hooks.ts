@@ -18,7 +18,7 @@ export interface Payload {
   entity_type: 'invoice';
   group_id: string;
   settings: Settings | null;
-  design: Design | null;
+  design: Parts | null;
   settings_type: 'company';
 }
 
@@ -39,9 +39,7 @@ export function useDesignUtilities() {
     const design = designs?.find((design) => design.id === id);
 
     if (design) {
-      setPayload(
-        (current) => current && { ...current, design: { ...design, id: '-1' } }
-      );
+      setPayload((current) => current && { ...current, design: design.design });
     }
   };
 
@@ -66,7 +64,7 @@ export function useDesignUtilities() {
         ...payload,
         design: {
           ...payload.design,
-          design: { ...payload.design.design, [property]: value },
+          [property]: value,
         },
       });
     }

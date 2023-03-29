@@ -63,7 +63,7 @@ export function Customize() {
         (current) =>
           current && {
             ...current,
-            design: { ...designs[0], id: '-1' },
+            design: designs[0].design,
             settings: company.settings,
           }
       );
