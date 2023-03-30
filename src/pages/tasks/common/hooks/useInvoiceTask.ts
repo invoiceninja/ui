@@ -80,6 +80,7 @@ export function useInvoiceTask() {
         project = response.data.data;
       })
       .catch((error: AxiosError) => {
+        toast.error();
         console.error(error);
       });
 
@@ -117,19 +118,17 @@ export function useInvoiceTask() {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 
-        const taskQuantity = calculateTaskHours(task.time_log);
-
         logs.forEach(([start, stop]) => {
-          const unixStart = dayjs.unix(start);
-          const unixStop = dayjs.unix(stop);
-
-          const hours = company.invoice_task_hours
-            ? (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
-            : null;
-
           let hoursDescription = '';
 
-          if (hours) {
+          if (company.invoice_task_hours) {
+            const unixStart = dayjs.unix(start);
+            const unixStop = dayjs.unix(stop);
+
+            const hours = (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(
+              4
+            );
+
             hoursDescription = `• ${hours} ${t('hours')}`;
           }
 
@@ -139,6 +138,8 @@ export function useInvoiceTask() {
               .format('hh:mm:ss A')} ${hoursDescription} <br />`
           );
         });
+
+        const taskQuantity = calculateTaskHours(task.time_log);
 
         const item: InvoiceItem = {
           ...blankLineItem(),
@@ -151,10 +152,10 @@ export function useInvoiceTask() {
         let projectDescription = '';
 
         if (company.invoice_task_project && task.project_id) {
-          const projectResponse = await fetchProjectDetails(task.project_id);
+          const project = await fetchProjectDetails(task.project_id);
 
-          if (projectResponse) {
-            projectDescription = `## ${projectResponse.name}`;
+          if (project) {
+            projectDescription = `## ${project.name}`;
           }
         }
 
