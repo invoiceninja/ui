@@ -10,6 +10,7 @@
 
 import { Card } from '$app/components/cards';
 import { useDesignUtilities } from '$app/pages/settings/invoice-design/customize/common/hooks';
+import { defaultEditorDebounceTime } from '$app/pages/settings/invoice-design/customize/components/Body';
 import { CustomizeChildProps } from '$app/pages/settings/invoice-design/customize/components/Settings';
 import Editor from '@monaco-editor/react';
 import { useState } from 'react';
@@ -22,7 +23,7 @@ export function Includes({ payload }: CustomizeChildProps) {
   const { t } = useTranslation();
   const { handleDesignBlockChange } = useDesignUtilities();
 
-  useDebounce(() => value && handleDesignBlockChange('includes', value), 500, [
+  useDebounce(() => value && handleDesignBlockChange('includes', value), defaultEditorDebounceTime, [
     value,
   ]);
 

@@ -16,22 +16,22 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
 
+export const defaultEditorDebounceTime = 1000;
+
 export function Body({ payload }: CustomizeChildProps) {
   const [value, setValue] = useState(payload.design?.body);
 
   const { t } = useTranslation();
   const { handleDesignBlockChange } = useDesignUtilities();
 
-  useDebounce(() => value && handleDesignBlockChange('body', value), 500, [
-    value,
-  ]);
+  useDebounce(
+    () => value && handleDesignBlockChange('body', value),
+    defaultEditorDebounceTime,
+    [value]
+  );
 
   return (
-    <Card
-      title={t('body')}
-      padding="small"
-      collapsed={true}
-    >
+    <Card title={t('body')} padding="small" collapsed={true}>
       <Editor
         height="25rem"
         defaultLanguage="html"
