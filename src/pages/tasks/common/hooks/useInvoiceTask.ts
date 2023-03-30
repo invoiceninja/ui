@@ -43,7 +43,7 @@ export function useInvoiceTask() {
 
     if (parsedTimeLogs.length) {
       parsedTimeLogs.forEach(([start, stop, , billable]) => {
-        if (billable) {
+        if (billable || !company?.settings.allow_billable_task_items) {
           const unixStart = dayjs.unix(start);
           const unixStop = dayjs.unix(stop);
 
@@ -88,7 +88,7 @@ export function useInvoiceTask() {
         const parsed: string[] = [];
 
         logs.forEach(([start, stop, , billable]) => {
-          if (billable) {
+          if (billable || !company?.settings.allow_billable_task_items) {
             parsed.push(
               `${dayjs.unix(start).format(`${dateFormat} hh:mm:ss A`)} - ${dayjs
                 .unix(stop)

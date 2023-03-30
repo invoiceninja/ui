@@ -57,7 +57,7 @@ export function TaskTable(props: Props) {
       startTime = last[1] + 1;
     }
 
-    logs.push([startTime, 0, '', false]);
+    logs.push([startTime, 0, '', true]);
 
     handleChange('time_log', JSON.stringify(logs));
   };
