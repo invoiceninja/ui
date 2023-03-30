@@ -71,6 +71,7 @@ interface Props<T> {
   leftSideChevrons?: ReactNode;
   staleTime?: number;
   onTableRowClick?: (resource: T) => unknown;
+  restoreCondition?: (resource: T) => boolean;
   beforeFilter?: ReactNode;
 }
 
@@ -159,13 +160,6 @@ export function DataTable<T extends object>(props: Props<T>) {
       backgroundColor: '#c95f53',
     },
   ];
-
-  const isRestoreAvailable = (isDeleted: boolean) => {
-    return (
-      (props.resource === 'payment' && !isDeleted) ||
-      props.resource !== 'payment'
-    );
-  };
 
   const bulk = (action: 'archive' | 'restore' | 'delete', id?: string) => {
     toast.processing();
@@ -373,7 +367,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                         )}
 
                       {props.customActions &&
-                        isRestoreAvailable(resource.is_deleted) && (
+                        (props.restoreCondition?.(resource) ||
+                          !props.restoreCondition) && (
                           <Divider withoutPadding />
                         )}
 
@@ -387,7 +382,8 @@ export function DataTable<T extends object>(props: Props<T>) {
                       )}
 
                       {resource?.archived_at > 0 &&
-                        isRestoreAvailable(resource.is_deleted) && (
+                        (props.restoreCondition?.(resource) ||
+                          !props.restoreCondition) && (
                           <DropdownElement
                             onClick={() => bulk('restore', resource.id)}
                             icon={<Icon element={MdRestore} />}

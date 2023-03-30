@@ -18,6 +18,7 @@ import { StatusBadge } from '$app/components/StatusBadge';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';
+import { Payment } from '$app/common/interfaces/payment';
 
 export function Payments() {
   const [t] = useTranslation();
@@ -59,6 +60,7 @@ export function Payments() {
       withResourcefulActions
       bulkRoute="/api/v1/payments/bulk"
       linkToCreate={route('/payments/create?client=:id', { id: id })}
+      restoreCondition={(resource: Payment) => !resource.is_deleted}
       staleTime={dataTableStaleTime}
     />
   );

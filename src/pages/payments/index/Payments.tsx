@@ -21,6 +21,7 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useActions } from '../common/hooks/useActions';
 import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
+import { Payment } from '$app/common/interfaces/payment';
 
 export function Payments() {
   useTitle('payments');
@@ -56,6 +57,7 @@ export function Payments() {
         customFilters={filters}
         customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
+        restoreCondition={(resource: Payment) => !resource.is_deleted}
         leftSideChevrons={
           <DataTableColumnsPicker
             columns={paymentColumns as unknown as string[]}
