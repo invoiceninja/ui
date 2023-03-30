@@ -72,9 +72,13 @@ export function Customize() {
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-12 lg:col-span-5">
-          <TabGroup tabs={[t('settings'), t('design'), t('variables')]}>
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="w-full lg:w-1/2">
+          <TabGroup
+            tabs={[t('settings'), t('design'), t('variables')]}
+            withScrollableContent
+            childrenClassName="max-h-[75vh]"
+          >
             <div className="space-y-4">
               <GeneralSettings />
               <ClientDetails />
@@ -154,7 +158,7 @@ export function Customize() {
           </TabGroup>
         </div>
 
-        <div className="col-span-12 lg:col-span-7">
+        <div className="w-full lg:w-1/2 max-h-[82.5vh] overflow-y-scroll">
           {payload?.design && (
             <InvoiceViewer
               link={endpoint('/api/v1/live_design')}
