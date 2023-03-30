@@ -20,6 +20,7 @@ interface Props {
   method: 'GET' | 'POST';
   onLink?: (url: string) => unknown;
   withToast?: boolean;
+  height?: number;
 }
 
 export function InvoiceViewer(props: Props) {
@@ -56,5 +57,5 @@ export function InvoiceViewer(props: Props) {
     };
   }, [props.link, props.resource]);
 
-  return <iframe ref={iframeRef} width="100%" height={1500} />;
+  return <iframe ref={iframeRef} width="100%" height={props.height || 1500} />;
 }
