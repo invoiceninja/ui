@@ -70,7 +70,6 @@ export function Customize() {
         (current) =>
           current && {
             ...current,
-            design: current.design ?? designs[0].design,
             settings: company.settings,
           }
       );
@@ -86,10 +85,10 @@ export function Customize() {
   useEffect(() => {
     return () => {
       discardChanges();
-      
+
       setPayload((current) => ({
         ...current,
-        design: null,
+        design: undefined,
         settings: null,
       }));
     };
@@ -184,14 +183,12 @@ export function Customize() {
         </div>
 
         <div className="w-full lg:w-1/2 max-h-[82.5vh] overflow-y-scroll">
-          {payload?.design && (
-            <InvoiceViewer
-              link={endpoint('/api/v1/live_design')}
-              resource={payload}
-              method="POST"
-              withToast
-            />
-          )}
+          <InvoiceViewer
+            link={endpoint('/api/v1/live_design')}
+            resource={payload}
+            method="POST"
+            withToast
+          />
         </div>
       </div>
     </Default>

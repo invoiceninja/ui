@@ -18,7 +18,7 @@ export interface Payload {
   entity_type: 'invoice';
   group_id: string;
   settings: Settings | null;
-  design: Parts | null;
+  design?: Parts;
   settings_type: 'company';
 }
 
@@ -27,7 +27,6 @@ export const payloadAtom = atom<Payload>({
   entity_type: 'invoice',
   group_id: '-1',
   settings: null,
-  design: null,
   settings_type: 'company',
 });
 

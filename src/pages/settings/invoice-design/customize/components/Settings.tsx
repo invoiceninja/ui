@@ -8,13 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { trans } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
 import { Parts } from '$app/common/interfaces/design';
 import { useDesignsQuery } from '$app/common/queries/designs';
 import { Card, ClickableElement, Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, InputField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
 import {
@@ -85,26 +86,18 @@ export function Settings({ payload }: CustomizeChildProps) {
       </Modal>
 
       <Card title={t('settings')} padding="small" collapsed={false}>
-        <Element leftSide={t('name')}>
+        {/* <Element leftSide={t('name')}>
           <InputField
             // value={payload.design?.name}
             onValueChange={(value) => handleDesignPropertyChange('name', value)}
             debounceTimeout={500}
           />
-        </Element>
+        </Element> */}
 
         <Element leftSide={t('design')}>
-          <SelectField
-            defaultValue={payload?.settings?.invoice_design_id || 'VolejRejNm'}
-            onValueChange={(value) => handleDesignChange(value)}
-          >
-            {designs &&
-              designs.map((design) => (
-                <option key={design.id} value={design.id}>
-                  {design.name}
-                </option>
-              ))}
-          </SelectField>
+          <DesignSelector
+            onChange={(design) => handleDesignChange(design.id)}
+          />
         </Element>
 
         <Element leftSide={t('html_mode')}>
