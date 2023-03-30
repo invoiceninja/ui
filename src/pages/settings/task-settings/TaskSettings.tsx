@@ -168,6 +168,30 @@ export function TaskSettings() {
         </Element>
 
         <Element
+          leftSide={t('invoice_task_hours')}
+          leftSideHelp={t('invoice_task_hours_help')}
+        >
+          <Toggle
+            checked={companyChanges?.invoice_task_hours || false}
+            onChange={(value: boolean) =>
+              handleToggleChange('invoice_task_hours', value)
+            }
+          />
+        </Element>
+
+        <Element
+          leftSide={t('invoice_task_project')}
+          leftSideHelp={t('invoice_task_project_help')}
+        >
+          <Toggle
+            checked={companyChanges?.invoice_task_project || false}
+            onChange={(value: boolean) =>
+              handleToggleChange('invoice_task_project', value)
+            }
+          />
+        </Element>
+
+        <Element
           leftSide={t('lock_invoiced_tasks')}
           leftSideHelp={t('lock_invoiced_tasks_help')}
         >
