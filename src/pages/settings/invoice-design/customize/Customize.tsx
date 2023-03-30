@@ -16,6 +16,7 @@ import { Card } from '$app/components/cards';
 import { Default } from '$app/components/layouts/Default';
 import { TabGroup } from '$app/components/TabGroup';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { useDiscardChanges } from '$app/pages/settings/common/hooks/useDiscardChanges';
 import {
   ClientDetails,
   CompanyAddress,
@@ -30,7 +31,10 @@ import {
   TotalFields,
   VendorDetails,
 } from '$app/pages/settings/invoice-design/components';
-import { payloadAtom } from '$app/pages/settings/invoice-design/customize/common/hooks';
+import {
+  payloadAtom,
+  useDesignUtilities,
+} from '$app/pages/settings/invoice-design/customize/common/hooks';
 import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
 import { Body } from '$app/pages/settings/invoice-design/customize/components/Body';
 import { Footer } from '$app/pages/settings/invoice-design/customize/components/Footer';
@@ -56,6 +60,9 @@ export function Customize() {
   ];
 
   const company = useInjectCompanyChanges();
+  const discardChanges = useDiscardChanges();
+
+  const { handleDesignChange } = useDesignUtilities();
 
   useEffect(() => {
     if (designs && company?.settings) {
@@ -63,12 +70,30 @@ export function Customize() {
         (current) =>
           current && {
             ...current,
-            design: designs[0].design,
+            design: current.design ?? designs[0].design,
             settings: company.settings,
           }
       );
     }
   }, [designs, company?.settings]);
+
+  useEffect(() => {
+    if (company?.settings.invoice_design_id) {
+      handleDesignChange(company.settings.invoice_design_id);
+    }
+  }, [company?.settings.invoice_design_id]);
+
+  useEffect(() => {
+    return () => {
+      discardChanges();
+      
+      setPayload((current) => ({
+        ...current,
+        design: null,
+        settings: null,
+      }));
+    };
+  }, []);
 
   return (
     <Default title={documentTitle} breadcrumbs={pages}>
