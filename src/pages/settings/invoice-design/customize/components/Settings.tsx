@@ -61,7 +61,7 @@ export function Settings({ payload }: CustomizeChildProps) {
 
   const handleExport = () => {
     if (payload.design) {
-      navigator.clipboard.writeText(JSON.stringify(payload.design.design));
+      navigator.clipboard.writeText(JSON.stringify(payload.design));
 
       toast.success(
         trans('copied_to_clipboard', { value: t('design').toLowerCase() })
@@ -84,11 +84,7 @@ export function Settings({ payload }: CustomizeChildProps) {
         <Button onClick={handleImport}>{t('import')}</Button>
       </Modal>
 
-      <Card
-        title={t('settings')}
-        padding="small"
-        collapsed={false}
-      >
+      <Card title={t('settings')} padding="small" collapsed={false}>
         <Element leftSide={t('name')}>
           <InputField
             // value={payload.design?.name}
@@ -99,7 +95,7 @@ export function Settings({ payload }: CustomizeChildProps) {
 
         <Element leftSide={t('design')}>
           <SelectField
-            // defaultValue={payload?.design?.id || ''}
+            defaultValue={payload?.settings?.invoice_design_id || 'VolejRejNm'}
             onValueChange={(value) => handleDesignChange(value)}
           >
             {designs &&
