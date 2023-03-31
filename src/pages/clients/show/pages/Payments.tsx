@@ -60,7 +60,7 @@ export function Payments() {
       withResourcefulActions
       bulkRoute="/api/v1/payments/bulk"
       linkToCreate={route('/payments/create?client=:id', { id: id })}
-      restoreCondition={(resource: Payment) => !resource.is_deleted}
+      showRestore={(resource: Payment) => !resource.is_deleted}
       staleTime={dataTableStaleTime}
     />
   );

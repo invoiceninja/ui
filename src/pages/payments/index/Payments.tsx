@@ -57,7 +57,7 @@ export function Payments() {
         customFilters={filters}
         customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
-        restoreCondition={(resource: Payment) => !resource.is_deleted}
+        showRestore={(resource: Payment) => !resource.is_deleted}
         leftSideChevrons={
           <DataTableColumnsPicker
             columns={paymentColumns as unknown as string[]}
