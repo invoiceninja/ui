@@ -78,7 +78,13 @@ export function Customize() {
 
   useEffect(() => {
     if (company?.settings.invoice_design_id) {
-      handleDesignChange(company.settings.invoice_design_id);
+      const design = designs?.find(
+        (d) => d.id === company?.settings.invoice_design_id
+      );
+
+      if (design) {
+        handleDesignChange(design);
+      }
     }
   }, [company?.settings.invoice_design_id]);
 
