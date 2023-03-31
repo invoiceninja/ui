@@ -242,9 +242,7 @@ export function TaskTable(props: Props) {
                   {company?.settings.allow_billable_task_items && (
                     <Td>
                       <Checkbox
-                        checked={
-                          billable || false || typeof billable === 'undefined'
-                        }
+                        checked={billable || typeof billable === 'undefined'}
                         onValueChange={(value, checked) =>
                           handleBillableChange(
                             checked || false,
