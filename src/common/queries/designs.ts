@@ -47,3 +47,17 @@ export function useDesignQuery(params: DesignQueryOptions) {
     { staleTime: Infinity, ...params }
   );
 }
+
+export function useBlankDesignQuery(options?: GenericQueryOptions) {
+  return useQuery<Design>(
+    route('/api/v1/designs/create'),
+    () =>
+      request('GET', endpoint('/api/v1/designs/create')).then(
+        (response: GenericSingleResourceResponse<Design>) => response.data.data
+      ),
+    {
+      ...options,
+      staleTime: Infinity,
+    }
+  );
+}
