@@ -10,7 +10,6 @@
 
 import { Settings } from '$app/common/interfaces/company.interface';
 import { Design, Parts } from '$app/common/interfaces/design';
-import { useDesignsQuery } from '$app/common/queries/designs';
 import { atom, useAtom } from 'jotai';
 
 export interface Payload {
@@ -31,12 +30,9 @@ export const payloadAtom = atom<Payload>({
 });
 
 export function useDesignUtilities() {
-  const { data: designs } = useDesignsQuery();
   const [payload, setPayload] = useAtom(payloadAtom);
 
-  const handleDesignChange = (id: string) => {
-    const design = designs?.find((design) => design.id === id);
-
+  const handleDesignChange = (design: Design) => {
     if (design) {
       setPayload((current) => current && { ...current, design: design.design });
     }

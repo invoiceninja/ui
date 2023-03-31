@@ -96,7 +96,7 @@ export function Settings({ payload }: CustomizeChildProps) {
 
         <Element leftSide={t('design')}>
           <DesignSelector
-            onChange={(design) => handleDesignChange(design.id)}
+            onChange={(design) => handleDesignChange(design)}
           />
         </Element>
 
