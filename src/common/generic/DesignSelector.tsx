@@ -24,6 +24,7 @@ import { Modal } from '$app/components/Modal';
 import { AxiosError } from 'axios';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useQueryClient } from 'react-query';
 
 export function DesignSelector(props: GenericSelectorProps<Design>) {
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -32,6 +33,8 @@ export function DesignSelector(props: GenericSelectorProps<Design>) {
 
   const { t } = useTranslation();
   const { data } = useBlankDesignQuery({ enabled: isModalVisible });
+
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     if (data) {
@@ -55,6 +58,8 @@ export function DesignSelector(props: GenericSelectorProps<Design>) {
               },
             })
           );
+
+          queryClient.invalidateQueries('/api/v1/designs');
 
           setDesign(null);
           setIsModalVisible(false);
