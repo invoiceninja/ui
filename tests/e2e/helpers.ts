@@ -21,10 +21,17 @@ export async function login(
 }
 
 export function permissions(page: Page) {
-  const clear = async () => {
+  const clear = async (username?: string) => {
     await page.getByRole('link', { name: 'Settings' }).click();
     await page.getByRole('link', { name: 'User Management' }).click();
-    await page.getByRole('link', { name: 'Permissions Example' }).click();
+    await page.locator('#filter').fill(username || 'Permissions');
+    await page.waitForTimeout(200);
+    await page
+      .getByRole('link', {
+        name: username ? username + ' Example' : 'Permissions Example',
+        exact: true,
+      })
+      .click();
     await page.getByLabel('Current password*').fill('password');
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Permissions' }).click();

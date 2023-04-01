@@ -18,11 +18,11 @@ test("can't view invoices without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('Invoices');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   await expect(page.locator('.flex-grow > .flex-1').first()).not.toContainText(
     'Invoices'
@@ -33,12 +33,12 @@ test('can view invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('Invoices');
   await set('view_invoice');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   await page.getByRole('link', { name: 'Invoices', exact: true }).click();
 
@@ -88,12 +88,12 @@ test("can't create an invoice", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('Invoices');
   await set('view_invoice');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   await page.getByRole('link', { name: 'Invoices', exact: true }).click();
   await page.getByText('New Invoice').click();
@@ -111,12 +111,12 @@ test('can create an invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('Invoices');
   await set('create_invoice');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   await page.getByRole('link', { name: 'Invoices', exact: true }).click();
   await page.getByText('New Invoice').click();
@@ -132,12 +132,12 @@ test('can view assigned invoice with create_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_invoice');
+  await clear('Invoices');
+  await set('create_invoice', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   await page.getByRole('link', { name: 'Invoices' }).click();
 
@@ -154,12 +154,12 @@ test('deleting invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_invoice');
+  await clear('Invoices');
+  await set('create_invoice', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -201,12 +201,12 @@ test('archiving invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_invoice');
+  await clear('Invoices');
+  await set('create_invoice', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -249,12 +249,12 @@ test('cloning invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_invoice');
+  await clear('Invoices');
+  await set('create_invoice', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -303,12 +303,12 @@ test('invoice documents preview', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_invoice');
+  await clear('Invoices');
+  await set('create_invoice', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -358,12 +358,12 @@ test('invoice documents uploading', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_invoice');
+  await clear('Invoices');
+  await set('create_invoice', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
