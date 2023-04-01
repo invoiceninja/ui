@@ -60,27 +60,11 @@ export const paymentRoutes = (
         />
       }
     >
+      <Route path="edit" element={<Edit />} />
       <Route path="documents" element={<Documents />} />
       <Route path="payment_fields" element={<PaymentFields />} />
       <Route path="apply" element={<Apply />} />
       <Route path="refund" element={<Refund />} />
-    </Route>
-    <Route path=":id/edit" element={<Payment />}>
-      <Route
-        path=""
-        element={
-          <Guard
-            guards={[
-              or(
-                permission('edit_payment'),
-                permission('view_payment'),
-                assigned('/api/v1/payments/:id')
-              ),
-            ]}
-            component={<Edit />}
-          />
-        }
-      />
     </Route>
   </Route>
 );

@@ -27,9 +27,11 @@ import { useTranslation } from 'react-i18next';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { productAtom } from '../common/atoms';
 import { CreateProduct } from '../common/components/CreateProduct';
+import { useQueryClient } from 'react-query';
 
 export function Create() {
   const [t] = useTranslation();
+  const queryClient = useQueryClient();
 
   const [product, setProduct] = useAtom(productAtom);
   const navigate = useNavigate();
@@ -56,6 +58,8 @@ export function Create() {
       request('POST', endpoint('/api/v1/products'), product)
         .then(
           (response: GenericSingleResourceResponse<ProductTableResource>) => {
+            queryClient.invalidateQueries('/api/v1/products');
+
             toast.success('created_product');
 
             navigate(
