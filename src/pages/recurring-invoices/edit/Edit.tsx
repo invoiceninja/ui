@@ -41,7 +41,7 @@ import {
 import { useRecurringInvoiceQuery } from '../common/queries';
 import { Icon } from '$app/components/icons/Icon';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { MdSend } from 'react-icons/md';
+import { MdNotStarted, MdSend } from 'react-icons/md';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 
 export function Edit() {
@@ -51,6 +51,8 @@ export function Edit() {
   const { data } = useRecurringInvoiceQuery({ id: id! });
 
   const reactSettings = useReactSettings();
+
+  const [saveOptions, setSaveOptions] = useState<SaveOption[]>();
 
   const pages: Page[] = [
     { name: t('recurring_invoices'), href: '/recurring_invoices' },
@@ -96,24 +98,49 @@ export function Edit() {
     }
   }, [data]);
 
-  useEffect(() => {
-    recurringInvoice && calculateInvoiceSum(recurringInvoice);
-  }, [recurringInvoice]);
-
   const actions = useActions();
   const save = useSave({ setErrors });
 
-  const saveOptions: SaveOption[] | undefined =
-    recurringInvoice?.status_id === RecurringInvoiceStatus.DRAFT
-      ? [
-          {
-            onClick: () =>
-              save(recurringInvoice as RecurringInvoice, 'send_now'),
-            label: `${t('save')} & ${t('send')}`,
-            icon: <Icon element={MdSend} />,
-          },
-        ]
-      : undefined;
+  const initializeSaveOptions = (recurringInvoice: RecurringInvoice) => {
+    let currentSaveOptions: SaveOption[] | undefined;
+
+    if (recurringInvoice?.status_id === RecurringInvoiceStatus.DRAFT) {
+      const sendNowOption = {
+        onClick: () => save(recurringInvoice as RecurringInvoice, 'send_now'),
+        label: t('send_now'),
+        icon: <Icon element={MdSend} />,
+      };
+
+      currentSaveOptions = [sendNowOption];
+    }
+
+    if (
+      recurringInvoice.status_id === RecurringInvoiceStatus.DRAFT ||
+      recurringInvoice.status_id === RecurringInvoiceStatus.PAUSED
+    ) {
+      const startOption = {
+        onClick: () => save(recurringInvoice as RecurringInvoice, 'start'),
+        label: t('start'),
+        icon: <Icon element={MdNotStarted} />,
+      };
+
+      if (currentSaveOptions) {
+        currentSaveOptions = [...currentSaveOptions, startOption];
+      } else {
+        currentSaveOptions = [startOption];
+      }
+    }
+
+    setSaveOptions(currentSaveOptions);
+  };
+
+  useEffect(() => {
+    recurringInvoice && calculateInvoiceSum(recurringInvoice);
+
+    if (recurringInvoice) {
+      initializeSaveOptions(recurringInvoice);
+    }
+  }, [recurringInvoice]);
 
   return (
     <Default

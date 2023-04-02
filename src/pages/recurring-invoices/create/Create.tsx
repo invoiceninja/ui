@@ -151,12 +151,12 @@ export function Create() {
   const saveOptions: SaveOption[] = [
     {
       onClick: () => save(recurringInvoice as RecurringInvoice, 'send_now'),
-      label: `${t('save')} & ${t('send')}`,
+      label: t('send_now'),
       icon: <Icon element={MdSend} />,
     },
     {
       onClick: () => save(recurringInvoice as RecurringInvoice, 'start'),
-      label: `${t('save')} & ${t('start')}`,
+      label: t('start'),
       icon: <Icon element={MdNotStarted} />,
     },
   ];
@@ -166,7 +166,6 @@ export function Create() {
       title={documentTitle}
       breadcrumbs={pages}
       disableSaveButton={!recurringInvoice?.client_id}
-      saveButtonLabel={t('save_draft')}
       onSaveClick={() => save(recurringInvoice as RecurringInvoice)}
       additionalSaveOptions={saveOptions}
     >

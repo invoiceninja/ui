@@ -200,7 +200,10 @@ export function useSave(props: RecurringInvoiceSaveProps) {
   const { setErrors } = props;
   const queryClient = useQueryClient();
 
-  return (recurringInvoice: RecurringInvoice, queryAction?: 'send_now') => {
+  return (
+    recurringInvoice: RecurringInvoice,
+    queryAction?: 'send_now' | 'start'
+  ) => {
     toast.processing();
     setErrors(undefined);
 
