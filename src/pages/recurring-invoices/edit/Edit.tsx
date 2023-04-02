@@ -16,7 +16,7 @@ import { Client } from '$app/common/interfaces/client';
 import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
+import { Default, SaveOption } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Spinner } from '$app/components/Spinner';
 import { useAtom } from 'jotai';
@@ -39,6 +39,10 @@ import {
   useSave,
 } from '../common/hooks';
 import { useRecurringInvoiceQuery } from '../common/queries';
+import { Icon } from '$app/components/icons/Icon';
+import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { MdSend } from 'react-icons/md';
+import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 
 export function Edit() {
   const { t } = useTranslation();
@@ -99,11 +103,24 @@ export function Edit() {
   const actions = useActions();
   const save = useSave({ setErrors });
 
+  const saveOptions: SaveOption[] | undefined =
+    recurringInvoice?.status_id === RecurringInvoiceStatus.DRAFT
+      ? [
+          {
+            onClick: () =>
+              save(recurringInvoice as RecurringInvoice, 'send_now'),
+            label: `${t('save')} & ${t('send')}`,
+            icon: <Icon element={MdSend} />,
+          },
+        ]
+      : undefined;
+
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
       onSaveClick={() => recurringInvoice && save(recurringInvoice)}
+      additionalSaveOptions={saveOptions}
       navigationTopRight={
         recurringInvoice && (
           <ResourceActions

@@ -200,13 +200,19 @@ export function useSave(props: RecurringInvoiceSaveProps) {
   const { setErrors } = props;
   const queryClient = useQueryClient();
 
-  return (recurringInvoice: RecurringInvoice) => {
+  return (recurringInvoice: RecurringInvoice, queryAction?: 'send_now') => {
     toast.processing();
     setErrors(undefined);
 
+    let endpointUrl = '/api/v1/recurring_invoices/:id';
+
+    if (queryAction) {
+      endpointUrl = '/api/v1/recurring_invoices/:id?' + queryAction + '=true';
+    }
+
     request(
       'PUT',
-      endpoint('/api/v1/recurring_invoices/:id', { id: recurringInvoice.id }),
+      endpoint(endpointUrl, { id: recurringInvoice.id }),
       recurringInvoice
     )
       .then(() => {
@@ -443,11 +449,20 @@ export function useActions() {
 export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
   const navigate = useNavigate();
 
-  return (recurringInvoice: RecurringInvoice) => {
+  return (
+    recurringInvoice: RecurringInvoice,
+    queryAction?: 'start' | 'send_now'
+  ) => {
     setErrors(undefined);
     toast.processing();
 
-    request('POST', endpoint('/api/v1/recurring_invoices'), recurringInvoice)
+    let endpointUrl = '/api/v1/recurring_invoices';
+
+    if (queryAction) {
+      endpointUrl = '/api/v1/recurring_invoices?' + queryAction + '=true';
+    }
+
+    request('POST', endpoint(endpointUrl), recurringInvoice)
       .then((response: GenericSingleResourceResponse<RecurringInvoice>) => {
         toast.success('created_recurring_invoice');
 
