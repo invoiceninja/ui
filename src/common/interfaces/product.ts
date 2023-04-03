@@ -18,6 +18,8 @@ export interface Product {
   cost: number;
   price: number;
   quantity: number;
+  max_quantity: number;
+  product_image: string;
   tax_name1: string;
   tax_rate1: number;
   tax_name2: string;
