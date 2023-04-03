@@ -106,7 +106,7 @@ export function ClientSelector(props: Props) {
             <div>
               <p className="text-sm text-gray-700">{contact.email}</p>
 
-              <Link to={resource.invitations[0]?.link} external>
+              <Link to={resource.invitations[0].link} external>
                 {t('view_in_portal')}
               </Link>
             </div>
