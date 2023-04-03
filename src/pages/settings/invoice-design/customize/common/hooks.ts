@@ -94,7 +94,7 @@ export function useUpdateDesign() {
 
     request('PUT', endpoint('/api/v1/designs/:id', { id: design.id }), design)
       .then(() => {
-        toast.success('created_design');
+        toast.success('updated_design');
 
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {
