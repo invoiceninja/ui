@@ -11,10 +11,12 @@
 import { Design } from '$app/common/interfaces/design';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button, InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { useHandleDesignSave } from '$app/pages/settings/invoice-design/customize/common/hooks';
+import {
+  useDesignActions,
+  useHandleDesignSave,
+} from '$app/pages/settings/invoice-design/customize/common/hooks';
 import { atom, useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
@@ -33,6 +35,7 @@ export function EditModal({ design, setDesign }: Props) {
   const [validationBag] = useAtom(validationBagAtom);
 
   const handleUpdate = useHandleDesignSave();
+  const actions = useDesignActions();
 
   return (
     <Modal title={t('edit_design')} visible={isVisible} onClose={setIsVisible}>
@@ -49,8 +52,7 @@ export function EditModal({ design, setDesign }: Props) {
         </Button>
 
         <Dropdown label={t('more_actions')}>
-          <DropdownElement>{t('delete')}</DropdownElement>
-          <DropdownElement>{t('restore')}</DropdownElement>
+          {actions.map((action) => design && action(design))}
         </Dropdown>
       </div>
     </Modal>

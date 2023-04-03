@@ -14,12 +14,15 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { Settings } from '$app/common/interfaces/company.interface';
 import { Design, Parts } from '$app/common/interfaces/design';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import {
   isModalVisibleAtom,
   validationBagAtom,
 } from '$app/pages/settings/invoice-design/customize/components/EditModal';
+import { designAtom } from '$app/pages/settings/invoice-design/customize/components/Settings';
 import { AxiosError } from 'axios';
 import { atom, useAtom } from 'jotai';
+import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 
 export type DesignType = 'stock' | 'custom';
@@ -31,7 +34,7 @@ export interface Payload {
   settings: Settings | null;
   design?: Parts;
   settings_type: 'company';
-  design_type: DesignType;
+  internal_design_type: DesignType;
 }
 
 export const payloadAtom = atom<Payload>({
@@ -40,7 +43,7 @@ export const payloadAtom = atom<Payload>({
   group_id: '-1',
   settings: null,
   settings_type: 'company',
-  design_type: 'stock',
+  internal_design_type: 'stock',
 });
 
 export function useDesignUtilities() {
@@ -50,7 +53,7 @@ export function useDesignUtilities() {
     if (design) {
       setPayload(
         (current) =>
-          current && { ...current, design: design.design, design_type: type }
+          current && { ...current, design: design.design, internal_design_type: type }
       );
     }
   };
@@ -100,10 +103,10 @@ export function useHandleDesignSave() {
     toast.processing();
     setValidationBag(null);
 
-    console.log(payload.design_type);
+    console.log(payload.internal_design_type);
 
     const body =
-      payload.design_type === 'stock'
+      payload.internal_design_type === 'stock'
         ? design
         : { ...design, design: payload.design };
 
@@ -132,4 +135,74 @@ export function useHandleDesignSave() {
         toast.error();
       });
   };
+}
+
+export function useDesignActions() {
+  const { t } = useTranslation();
+  
+  const [design] = useAtom(designAtom);
+  const [, setIsModalVisible] = useAtom(isModalVisibleAtom)
+
+  const queryClient = useQueryClient();
+
+  const restore = () => {
+    request('POST', endpoint('/api/v1/designs/bulk'), {
+      action: 'restore',
+      ids: [design?.id],
+    })
+      .then(() => {
+        toast.success('restored_design');
+        window.dispatchEvent(
+          new CustomEvent('invalidate.combobox.queries', {
+            detail: {
+              url: endpoint('/api/v1/designs'),
+            },
+          })
+        );
+
+        queryClient.invalidateQueries('/api/v1/designs');
+
+        setIsModalVisible(false)
+      })
+      .catch((error) => {
+        toast.error();
+        console.error(error);
+      });
+  };
+
+  const destroy = () => {
+    request('POST', endpoint('/api/v1/designs/bulk'), {
+      action: 'delete',
+      ids: [design?.id],
+    })
+      .then(() => {
+        toast.success('deleted_design');
+        window.dispatchEvent(
+          new CustomEvent('invalidate.combobox.queries', {
+            detail: {
+              url: endpoint('/api/v1/designs'),
+            },
+          })
+        );
+
+        queryClient.invalidateQueries('/api/v1/designs');
+
+        setIsModalVisible(false);
+      })
+      .catch((error) => {
+        toast.error();
+        console.error(error);
+      });
+  };
+
+  return [
+    (design: Design) =>
+      design.is_deleted && (
+        <DropdownElement onClick={restore}>{t('restore')}</DropdownElement>
+      ),
+    (design: Design) =>
+      !design.is_deleted && (
+        <DropdownElement onClick={destroy}>{t('delete')}</DropdownElement>
+      ),
+  ];
 }
