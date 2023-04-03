@@ -115,9 +115,9 @@ export function Settings({ payload }: CustomizeChildProps) {
           </div>
         </Element>
 
-        <Element leftSide={t('html_mode')}>
+        {/* <Element leftSide={t('html_mode')}>
           <Toggle checked={false} />
-        </Element>
+        </Element> */}
 
         <Divider />
 
