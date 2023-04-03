@@ -44,7 +44,7 @@ export function ProductForm(props: Props) {
         </Element>
       )}
 
-      <Element leftSide={t('product')} required>
+      <Element leftSide={t('item')} required>
         <InputField
           required
           value={props.product.product_key}
@@ -53,7 +53,7 @@ export function ProductForm(props: Props) {
         />
       </Element>
 
-      <Element leftSide={t('notes')}>
+      <Element leftSide={t('description')}>
         <InputField
           element="textarea"
           value={props.product.notes}
