@@ -11,8 +11,7 @@
 import { DesignSelector } from '$app/common/generic/DesignSelector';
 import { trans } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Parts } from '$app/common/interfaces/design';
-import { useDesignsQuery } from '$app/common/queries/designs';
+import { Design, Parts } from '$app/common/interfaces/design';
 import { Card, ClickableElement, Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Button, InputField } from '$app/components/forms';
@@ -22,6 +21,11 @@ import {
   Payload,
   useDesignUtilities,
 } from '$app/pages/settings/invoice-design/customize/common/hooks';
+import {
+  EditModal,
+  isModalVisibleAtom,
+} from '$app/pages/settings/invoice-design/customize/components/EditModal';
+import { useAtom } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -31,7 +35,6 @@ export interface CustomizeChildProps {
 
 export function Settings({ payload }: CustomizeChildProps) {
   const { t } = useTranslation();
-  const { data: designs } = useDesignsQuery();
   const { handleDesignChange, handleDesignPropertyChange } =
     useDesignUtilities();
 
@@ -70,6 +73,9 @@ export function Settings({ payload }: CustomizeChildProps) {
     }
   };
 
+  const [design, setDesign] = useState<Design | null>(null);
+  const [, setIsEditDesignModalVisible] = useAtom(isModalVisibleAtom);
+
   return (
     <div className="space-y-4">
       <Modal
@@ -85,19 +91,28 @@ export function Settings({ payload }: CustomizeChildProps) {
         <Button onClick={handleImport}>{t('import')}</Button>
       </Modal>
 
-      <Card title={t('settings')} padding="small" collapsed={false}>
-        {/* <Element leftSide={t('name')}>
-          <InputField
-            // value={payload.design?.name}
-            onValueChange={(value) => handleDesignPropertyChange('name', value)}
-            debounceTimeout={500}
-          />
-        </Element> */}
+      <EditModal design={design} setDesign={setDesign} />
 
+      <Card title={t('settings')} padding="small" collapsed={false}>
         <Element leftSide={t('design')}>
-          <DesignSelector
-            onChange={(design) => handleDesignChange(design)}
-          />
+          <div className="space-y-2">
+            <DesignSelector
+              onChange={(design) => {
+                handleDesignChange(design);
+                setDesign(design);
+              }}
+            />
+
+            {design?.is_custom && (
+              <Button
+                behavior="button"
+                type="minimal"
+                onClick={() => setIsEditDesignModalVisible(true)}
+              >
+                {t('edit')}
+              </Button>
+            )}
+          </div>
         </Element>
 
         <Element leftSide={t('html_mode')}>
