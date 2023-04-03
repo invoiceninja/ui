@@ -17,6 +17,7 @@ import { Default } from '$app/components/layouts/Default';
 import { TabGroup } from '$app/components/TabGroup';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
 import { useDiscardChanges } from '$app/pages/settings/common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 import {
   ClientDetails,
   CompanyAddress,
@@ -34,13 +35,17 @@ import {
 import {
   payloadAtom,
   useDesignUtilities,
+  useHandleDesignSave,
 } from '$app/pages/settings/invoice-design/customize/common/hooks';
 import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
 import { Body } from '$app/pages/settings/invoice-design/customize/components/Body';
 import { Footer } from '$app/pages/settings/invoice-design/customize/components/Footer';
 import { Header } from '$app/pages/settings/invoice-design/customize/components/Header';
 import { Includes } from '$app/pages/settings/invoice-design/customize/components/Includes';
-import { Settings } from '$app/pages/settings/invoice-design/customize/components/Settings';
+import {
+  designAtom,
+  Settings,
+} from '$app/pages/settings/invoice-design/customize/components/Settings';
 import { Variable } from '$app/pages/settings/templates-and-reminders/common/components/Variable';
 import { useAtom } from 'jotai';
 import { useEffect } from 'react';
@@ -49,6 +54,7 @@ import { useTranslation } from 'react-i18next';
 export function Customize() {
   const [t] = useTranslation();
   const [payload, setPayload] = useAtom(payloadAtom);
+  const [design] = useAtom(designAtom);
 
   const { documentTitle } = useTitle('customize_and_preview');
   const { data: designs } = useDesignsQuery();
@@ -83,7 +89,7 @@ export function Customize() {
       );
 
       if (design) {
-        handleDesignChange(design);
+        handleDesignChange(design, design.is_custom ? 'custom' : 'stock');
       }
     }
   }, [company?.settings.invoice_design_id]);
@@ -100,8 +106,19 @@ export function Customize() {
     };
   }, []);
 
+  const handleCompanySave = useHandleCompanySave();
+  const handleDesignSave = useHandleDesignSave();
+
+  const handleSave = () => {
+    handleCompanySave();
+
+    if (design) {
+      handleDesignSave(design);
+    }
+  };
+
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default title={documentTitle} breadcrumbs={pages} onSaveClick={handleSave}>
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="w-full lg:w-1/2">
           <TabGroup

@@ -22,6 +22,8 @@ import { AxiosError } from 'axios';
 import { atom, useAtom } from 'jotai';
 import { useQueryClient } from 'react-query';
 
+export type DesignType = 'stock' | 'custom';
+
 export interface Payload {
   client_id: string;
   entity_type: 'invoice';
@@ -29,6 +31,7 @@ export interface Payload {
   settings: Settings | null;
   design?: Parts;
   settings_type: 'company';
+  design_type: DesignType;
 }
 
 export const payloadAtom = atom<Payload>({
@@ -37,14 +40,18 @@ export const payloadAtom = atom<Payload>({
   group_id: '-1',
   settings: null,
   settings_type: 'company',
+  design_type: 'stock',
 });
 
 export function useDesignUtilities() {
   const [payload, setPayload] = useAtom(payloadAtom);
 
-  const handleDesignChange = (design: Design) => {
+  const handleDesignChange = (design: Design, type: DesignType) => {
     if (design) {
-      setPayload((current) => current && { ...current, design: design.design });
+      setPayload(
+        (current) =>
+          current && { ...current, design: design.design, design_type: type }
+      );
     }
   };
 
@@ -82,9 +89,10 @@ export function useDesignUtilities() {
   };
 }
 
-export function useUpdateDesign() {
+export function useHandleDesignSave() {
   const [, setValidationBag] = useAtom(validationBagAtom);
   const [, setIsVisible] = useAtom(isModalVisibleAtom);
+  const [payload] = useAtom(payloadAtom);
 
   const queryClient = useQueryClient();
 
@@ -92,7 +100,14 @@ export function useUpdateDesign() {
     toast.processing();
     setValidationBag(null);
 
-    request('PUT', endpoint('/api/v1/designs/:id', { id: design.id }), design)
+    console.log(payload.design_type);
+
+    const body =
+      payload.design_type === 'stock'
+        ? design
+        : { ...design, design: payload.design };
+
+    request('PUT', endpoint('/api/v1/designs/:id', { id: design.id }), body)
       .then(() => {
         toast.success('updated_design');
 

@@ -15,7 +15,6 @@ import { Design, Parts } from '$app/common/interfaces/design';
 import { Card, ClickableElement, Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { Button, InputField } from '$app/components/forms';
-import Toggle from '$app/components/forms/Toggle';
 import { Modal } from '$app/components/Modal';
 import {
   Payload,
@@ -25,13 +24,15 @@ import {
   EditModal,
   isModalVisibleAtom,
 } from '$app/pages/settings/invoice-design/customize/components/EditModal';
-import { useAtom } from 'jotai';
+import { atom, useAtom } from 'jotai';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface CustomizeChildProps {
   payload: Payload;
 }
+
+export const designAtom = atom<Design | null>(null);
 
 export function Settings({ payload }: CustomizeChildProps) {
   const { t } = useTranslation();
@@ -73,7 +74,7 @@ export function Settings({ payload }: CustomizeChildProps) {
     }
   };
 
-  const [design, setDesign] = useState<Design | null>(null);
+  const [design, setDesign] = useAtom(designAtom);
   const [, setIsEditDesignModalVisible] = useAtom(isModalVisibleAtom);
 
   return (
@@ -98,7 +99,11 @@ export function Settings({ payload }: CustomizeChildProps) {
           <div className="space-y-2">
             <DesignSelector
               onChange={(design) => {
-                handleDesignChange(design);
+                handleDesignChange(
+                  design,
+                  design.is_custom ? 'custom' : 'stock'
+                );
+
                 setDesign(design);
               }}
             />

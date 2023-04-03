@@ -14,7 +14,7 @@ import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Button, InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { useUpdateDesign } from '$app/pages/settings/invoice-design/customize/common/hooks';
+import { useHandleDesignSave } from '$app/pages/settings/invoice-design/customize/common/hooks';
 import { atom, useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
 
@@ -32,7 +32,7 @@ export function EditModal({ design, setDesign }: Props) {
   const [isVisible, setIsVisible] = useAtom(isModalVisibleAtom);
   const [validationBag] = useAtom(validationBagAtom);
 
-  const handleUpdate = useUpdateDesign();
+  const handleUpdate = useHandleDesignSave();
 
   return (
     <Modal title={t('edit_design')} visible={isVisible} onClose={setIsVisible}>
