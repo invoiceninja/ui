@@ -97,12 +97,6 @@ export function useSettingsRoutes() {
 
   const advanced: SettingsRoute[] = [
     {
-      name: t('invoice_design'),
-      href: '/settings/invoice_design',
-      current: location.pathname.startsWith('/settings/invoice_design'),
-      enabled: isAdmin || isOwner || false,
-    },
-    {
       name: t('customize_and_preview'),
       href: '/settings/invoice_design/customize',
       current: location.pathname.startsWith('/settings/invoice_design/customize'),

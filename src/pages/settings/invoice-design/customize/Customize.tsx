@@ -61,7 +61,6 @@ export function Customize() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('invoice_design'), href: '/settings/invoice_design' },
     { name: t('customize_and_preview'), href: '/settings/design/customize' },
   ];
 
