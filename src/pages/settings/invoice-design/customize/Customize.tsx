@@ -54,7 +54,7 @@ import { useTranslation } from 'react-i18next';
 export function Customize() {
   const [t] = useTranslation();
   const [payload, setPayload] = useAtom(payloadAtom);
-  const [design] = useAtom(designAtom);
+  const [design, setDesign] = useAtom(designAtom);
 
   const { documentTitle } = useTitle('customize_and_preview');
   const { data: designs } = useDesignsQuery();
@@ -107,6 +107,8 @@ export function Customize() {
   }, []);
 
   const handleCompanySave = useHandleCompanySave();
+  const handleCompanyCancel = useDiscardChanges();
+
   const handleDesignSave = useHandleDesignSave();
 
   const handleSave = () => {
@@ -117,8 +119,18 @@ export function Customize() {
     }
   };
 
+  const handleCancel = () => {
+    handleCompanyCancel();
+    setDesign(null);
+  };
+
   return (
-    <Default title={documentTitle} breadcrumbs={pages} onSaveClick={handleSave}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onSaveClick={handleSave}
+      onCancelClick={handleCancel}
+    >
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="w-full lg:w-1/2">
           <TabGroup
