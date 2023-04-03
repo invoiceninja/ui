@@ -42,13 +42,18 @@ export function useInvoiceTask() {
     let hoursSum = 0;
 
     if (parsedTimeLogs.length) {
-      parsedTimeLogs.forEach(([start, stop]) => {
-        const unixStart = dayjs.unix(start);
-        const unixStop = dayjs.unix(stop);
+      parsedTimeLogs.forEach(([start, stop, , billable]) => {
+        if (
+          billable ||
+          !company?.settings.allow_billable_task_items ||
+          typeof billable === 'undefined'
+        ) {
+          const unixStart = dayjs.unix(start);
+          const unixStop = dayjs.unix(stop);
 
-        hoursSum += Number(
-          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
-        );
+          hoursSum += unixStop.diff(unixStart, 'seconds') / 3600;
+          hoursSum = Number(hoursSum.toFixed(4));
+        }
       });
     }
 
@@ -86,12 +91,18 @@ export function useInvoiceTask() {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 
-        logs.forEach(([start, stop]) => {
-          parsed.push(
-            `${dayjs.unix(start).format(`${dateFormat} hh:mm:ss A`)} - ${dayjs
-              .unix(stop)
-              .format('hh:mm:ss A')} <br />`
-          );
+        logs.forEach(([start, stop, , billable]) => {
+          if (
+            billable ||
+            !company?.settings.allow_billable_task_items ||
+            typeof billable === 'undefined'
+          ) {
+            parsed.push(
+              `${dayjs.unix(start).format(`${dateFormat} hh:mm:ss A`)} - ${dayjs
+                .unix(stop)
+                .format('hh:mm:ss A')} <br />`
+            );
+          }
         });
 
         const taskQuantity = calculateTaskHours(task.time_log);
@@ -104,16 +115,18 @@ export function useInvoiceTask() {
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
         };
 
-        item.notes = [
-          task.description,
-          '<div class="task-time-details">',
-          ...parsed,
-          '</div>',
-        ]
-          .join('\n')
-          .trim();
+        if (parsed.length) {
+          item.notes = [
+            task.description,
+            '<div class="task-time-details">',
+            ...parsed,
+            '</div>',
+          ]
+            .join('\n')
+            .trim();
+        }
 
-        invoice.line_items = [item];
+        invoice.line_items = parsed.length ? [item] : [];
       });
 
       setInvoice(invoice);

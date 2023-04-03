@@ -57,7 +57,7 @@ export function TaskTable(props: Props) {
       startTime = last[1] + 1;
     }
 
-    logs.push([startTime, 0, '', false]);
+    logs.push([startTime, 0, '', true]);
 
     handleChange('time_log', JSON.stringify(logs));
   };
@@ -242,7 +242,7 @@ export function TaskTable(props: Props) {
                   {company?.settings.allow_billable_task_items && (
                     <Td>
                       <Checkbox
-                        checked={billable || false}
+                        checked={billable || typeof billable === 'undefined'}
                         onValueChange={(value, checked) =>
                           handleBillableChange(
                             checked || false,

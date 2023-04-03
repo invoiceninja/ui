@@ -11,15 +11,14 @@
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { Invoice } from '$app/common/interfaces/invoice';
-import { Dropdown } from '$app/components/dropdown/Dropdown';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Button } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { Icon } from '$app/components/icons/Icon';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { Dispatch, SetStateAction, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdDownload, MdSend } from 'react-icons/md';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 interface Props {
   blobUrl: string;
@@ -31,6 +30,7 @@ interface Props {
 
 export function Actions(props: Props) {
   const [t] = useTranslation();
+  const navigate = useNavigate();
 
   const { id } = useParams();
 
@@ -62,7 +62,7 @@ export function Actions(props: Props) {
   }, []);
 
   return (
-    <>
+    <div className="flex space-x-3">
       <span className="inline-flex items-center">
         <Toggle
           label={t('delivery_note')}
@@ -71,21 +71,27 @@ export function Actions(props: Props) {
         />
       </span>
 
-      <Dropdown label={t('more_actions')}>
-        <DropdownElement
-          to={route('/invoices/:id/email', { id })}
-          icon={<Icon element={MdSend} />}
-        >
-          {t('email_invoice')}
-        </DropdownElement>
+      <Button
+        className="flex items-center space-x-1"
+        onClick={() =>
+          navigate(
+            route('/invoices/:id/email', {
+              id: invoice.id,
+            })
+          )
+        }
+      >
+        <Icon element={MdSend} color="white" />
+        <span>{t('email_invoice')}</span>
+      </Button>
 
-        <DropdownElement
-          onClick={() => downloadPdf(invoice)}
-          icon={<Icon element={MdDownload} />}
-        >
-          {t('download')}
-        </DropdownElement>
-      </Dropdown>
-    </>
+      <Button
+        className="flex items-center space-x-1"
+        onClick={() => downloadPdf(invoice)}
+      >
+        <Icon element={MdDownload} color="white" />
+        <span>{t('download')}</span>
+      </Button>
+    </div>
   );
 }
