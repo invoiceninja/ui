@@ -115,24 +115,28 @@ export function OnlinePayments() {
         </Element>
 
         {paymentTerms && (
-          <Element leftSide={t('payment_terms')}>
-            <SelectField
-              value={company?.settings?.payment_terms}
-              id="settings.payment_terms"
-              onChange={handleChange}
-            >
-              <option value=""></option>
-              {paymentTerms.map((type: PaymentTerm) => (
-                <option key={type.id} value={type.num_days}>
-                  {type.name}
-                </option>
-              ))}
-            </SelectField>
+          <>
+            <Element leftSide={t('payment_terms')}>
+              <SelectField
+                value={company?.settings?.payment_terms}
+                id="settings.payment_terms"
+                onChange={handleChange}
+              >
+                <option value=""></option>
+                {paymentTerms.map((type: PaymentTerm) => (
+                  <option key={type.id} value={type.num_days}>
+                    {type.name}
+                  </option>
+                ))}
+              </SelectField>
+            </Element>
 
-            <Link to="/settings/payment_terms" className="block mt-2">
-              {t('configure_payment_terms')}
-            </Link>
-          </Element>
+            <Element className="py-0 sm:py-0">
+              <Link to="/settings/payment_terms">
+                {t('configure_payment_terms')}
+              </Link>
+            </Element>
+          </>
         )}
 
         <Element leftSide={t('enable_applying_payments')}>

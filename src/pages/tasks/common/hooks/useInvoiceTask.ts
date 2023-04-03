@@ -51,13 +51,18 @@ export function useInvoiceTask() {
     let hoursSum = 0;
 
     if (parsedTimeLogs.length) {
-      parsedTimeLogs.forEach(([start, stop]) => {
-        const unixStart = dayjs.unix(start);
-        const unixStop = dayjs.unix(stop);
+      parsedTimeLogs.forEach(([start, stop, , billable]) => {
+        if (
+          billable ||
+          !company?.settings.allow_billable_task_items ||
+          typeof billable === 'undefined'
+        ) {
+          const unixStart = dayjs.unix(start);
+          const unixStop = dayjs.unix(stop);
 
-        hoursSum += Number(
-          (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(4)
-        );
+          hoursSum += unixStop.diff(unixStart, 'seconds') / 3600;
+          hoursSum = Number(hoursSum.toFixed(4));
+        }
       });
     }
 
@@ -118,25 +123,31 @@ export function useInvoiceTask() {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 
-        logs.forEach(([start, stop]) => {
-          let hoursDescription = '';
+        logs.forEach(([start, stop, , billable]) => {
+          if (
+            billable ||
+            !company?.settings.allow_billable_task_items ||
+            typeof billable === 'undefined'
+          ) {
+            let hoursDescription = '';
 
-          if (company.invoice_task_hours) {
-            const unixStart = dayjs.unix(start);
-            const unixStop = dayjs.unix(stop);
+            if (company.invoice_task_hours) {
+              const unixStart = dayjs.unix(start);
+              const unixStop = dayjs.unix(stop);
 
-            const hours = (unixStop.diff(unixStart, 'seconds') / 3600).toFixed(
-              4
+              const hours = (
+                unixStop.diff(unixStart, 'seconds') / 3600
+              ).toFixed(4);
+
+              hoursDescription = `• ${hours} ${t('hours')}`;
+            }
+
+            parsed.push(
+              `${dayjs.unix(start).format(`${dateFormat} hh:mm:ss A`)} - ${dayjs
+                .unix(stop)
+                .format('hh:mm:ss A')} ${hoursDescription} <br />`
             );
-
-            hoursDescription = `• ${hours} ${t('hours')}`;
           }
-
-          parsed.push(
-            `${dayjs.unix(start).format(`${dateFormat} hh:mm:ss A`)} - ${dayjs
-              .unix(stop)
-              .format('hh:mm:ss A')} ${hoursDescription} <br />`
-          );
         });
 
         const taskQuantity = calculateTaskHours(task.time_log);
@@ -159,17 +170,19 @@ export function useInvoiceTask() {
           }
         }
 
-        item.notes = [
-          projectDescription,
-          task.description,
-          '<div class="task-time-details">',
-          ...parsed,
-          '</div>',
-        ]
-          .join('\n')
-          .trim();
+        if (parsed.length) {
+          item.notes = [
+            projectDescription,
+            task.description,
+            '<div class="task-time-details">',
+            ...parsed,
+            '</div>',
+          ]
+            .join('\n')
+            .trim();
+        }
 
-        invoice.line_items = [item];
+        invoice.line_items = parsed.length ? [item] : [];
 
         setInvoice(invoice);
 
