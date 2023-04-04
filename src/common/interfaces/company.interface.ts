@@ -261,4 +261,5 @@ export interface Settings {
   vendor_portal_enable_uploads: boolean;
   company_logo_size: string;
   show_paid_stamp: boolean;
+  show_shipping_address: boolean;
 }

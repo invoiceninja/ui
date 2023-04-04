@@ -1137,6 +1137,13 @@ export function GeneralSettings() {
         />
       </Element>
 
+      <Element leftSide={t('show_shipping_address')}>
+        <Toggle
+          onValueChange={(value) => handleValueChange('show_shipping_address', value)}
+          checked={company?.settings.show_shipping_address}
+        />
+      </Element>
+
       <Divider />
 
       <Element leftSide={t('empty_columns')}>
