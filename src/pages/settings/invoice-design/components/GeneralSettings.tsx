@@ -1015,10 +1015,10 @@ export function GeneralSettings() {
       <Element leftSide={t('font_size')}>
         <SelectField
           id="settings.font_size"
-          value={company?.settings?.font_size || 7}
+          value={company?.settings?.font_size || 16}
           onChange={handleChange}
         >
-          {range(5, 17).map((number) => (
+          {range(6, 41, 2).map((number) => (
             <option key={number} value={number}>
               {number}
             </option>
