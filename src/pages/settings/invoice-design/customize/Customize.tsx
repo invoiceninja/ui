@@ -32,6 +32,7 @@ import {
   TotalFields,
   VendorDetails,
 } from '$app/pages/settings/invoice-design/components';
+import { ProductQuoteColumns } from '$app/pages/settings/invoice-design/components/ProductQuoteColumns';
 import {
   payloadAtom,
   useDesignUtilities,
@@ -148,6 +149,7 @@ export function Customize() {
               <VendorDetails />
               <PurchaseOrderDetails />
               <ProductColumns />
+              <ProductQuoteColumns />
               <TaskColumns />
               <TotalFields />
             </div>

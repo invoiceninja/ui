@@ -7,9 +7,13 @@
  *
  * @license https://www.elastic.co/licensing/elastic-license
  */
-import { Card } from '$app/components/cards';
+import { Card, Element } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
+import { Divider } from '$app/components/cards/Divider';
+import Toggle from '$app/components/forms/Toggle';
+import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 export function ProductColumns() {
   const [t] = useTranslation();
@@ -30,12 +34,34 @@ export function ProductColumns() {
     { value: '$product.tax_amount', label: t('tax_amount') },
   ];
 
+  const company = useCompanyChanges();
+  const handleValueChange = useHandleSettingsValueChange();
+
   return (
-    <Card title={t('product_columns')} padding="small" collapsed={true}>
+    <Card
+      title={
+        company?.settings.sync_invoice_quote_columns
+          ? t('product_columns')
+          : t('invoice_product_columns')
+      }
+      padding="small"
+      collapsed={true}
+    >
       <SortableVariableList
         for="product_columns"
         defaultVariables={defaultVariables}
       />
+
+      <Divider />
+
+      <Element leftSide={t('share_invoice_quote_columns')}>
+        <Toggle
+          checked={company?.settings.sync_invoice_quote_columns}
+          onValueChange={(value) =>
+            handleValueChange('sync_invoice_quote_columns', value)
+          }
+        />
+      </Element>
     </Card>
   );
 }

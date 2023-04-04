@@ -21,10 +21,10 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 import { updatingRecords as updatingRecordsAtom } from '../common/atoms';
-import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
 import { Card, Element } from '$app/components/cards';
 import { InputField, Radio, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
+import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
 
 export function GeneralSettings() {
   const [t] = useTranslation();
@@ -846,21 +846,7 @@ export function GeneralSettings() {
       })
     );
 
-  const handleValueChange = <
-    T extends keyof CompanySettings,
-    R extends CompanySettings[T]
-  >(
-    property: T,
-    value: R
-  ) => {
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: `settings.${property}`,
-        value,
-      })
-    );
-  };
+  const handleValueChange = useHandleSettingsValueChange();
 
   useEffect(() => {
     setUpdatingRecords(undefined);
@@ -1139,7 +1125,9 @@ export function GeneralSettings() {
 
       <Element leftSide={t('show_shipping_address')}>
         <Toggle
-          onValueChange={(value) => handleValueChange('show_shipping_address', value)}
+          onValueChange={(value) =>
+            handleValueChange('show_shipping_address', value)
+          }
           checked={company?.settings.show_shipping_address}
         />
       </Element>
