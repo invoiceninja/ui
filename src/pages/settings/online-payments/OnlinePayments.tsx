@@ -194,6 +194,31 @@ export function OnlinePayments() {
             />
           </Element>
         )}
+
+        <Element leftSide={t('client_initiated_payments')}>
+          <Toggle
+            label={t('client_initiated_payments_help')}
+            id="client_initiated_payments"
+            checked={company?.settings.client_initiated_payments || false}
+            onChange={(value) =>
+              handleChangeProperty('settings.client_initiated_payments', value)
+            }
+          />
+        </Element>
+
+        {company?.settings.client_initiated_payments && (
+          <Element leftSide={t('minimum_payment_amount')}>
+            <InputField
+              value={company?.settings.client_initiated_payments_minimum}
+              onValueChange={(value) =>
+                handleChangeProperty(
+                  'settings.client_initiated_payments_minimum',
+                  value
+                )
+              }
+            />
+          </Element>
+        )}
       </Card>
 
       <Gateways />
