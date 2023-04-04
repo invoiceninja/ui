@@ -450,8 +450,8 @@ export function useActions() {
 
   const actions: Action<RecurringExpense>[] = [
     (recurringExpense) =>
-      (recurringExpense.status_id === RecurringExpenseStatus.DRAFT ||
-        recurringExpense.status_id === RecurringExpenseStatus.PAUSED) && (
+      (recurringExpense.status_id === RecurringExpenseStatus.Draft ||
+        recurringExpense.status_id === RecurringExpenseStatus.Paused) && (
         <DropdownElement
           onClick={() => toggleStartStop(recurringExpense, 'start')}
           icon={<Icon element={MdNotStarted} />}
@@ -460,7 +460,7 @@ export function useActions() {
         </DropdownElement>
       ),
     (recurringExpense) =>
-      recurringExpense.status_id === RecurringExpenseStatus.ACTIVE && (
+      recurringExpense.status_id === RecurringExpenseStatus.Active && (
         <DropdownElement
           onClick={() => toggleStartStop(recurringExpense, 'stop')}
           icon={<Icon element={MdStopCircle} />}

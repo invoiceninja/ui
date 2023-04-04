@@ -11,7 +11,9 @@
 import { RecurringExpenseStatus } from '$app/common/enums/recurring-expense-status';
 
 export default {
-  [RecurringExpenseStatus.ACTIVE]: 'active',
-  [RecurringExpenseStatus.DRAFT]: 'draft',
-  [RecurringExpenseStatus.PAUSED]: 'paused',
+  [RecurringExpenseStatus.Active]: 'active',
+  [RecurringExpenseStatus.Draft]: 'draft',
+  [RecurringExpenseStatus.Paused]: 'paused',
+  [RecurringExpenseStatus.Pending]: 'pending',
+  [RecurringExpenseStatus.Completed]: 'completed',
 };

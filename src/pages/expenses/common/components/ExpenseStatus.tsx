@@ -20,11 +20,36 @@ interface Props {
 export function ExpenseStatus(props: Props) {
   const [t] = useTranslation();
 
-  if (props.entity.should_be_invoiced && !props.entity.payment_date)
-    return <Badge variant="dark-blue">{t('pending')}</Badge>;
+  const {
+    invoice_id,
+    should_be_invoiced,
+    payment_date,
+    payment_type_id,
+    transaction_reference,
+    archived_at,
+    is_deleted,
+  } = props.entity;
 
-  if (props.entity.payment_date)
-    return <Badge variant="light-blue">{t('paid')}</Badge>;
+  const isInvoiced = Boolean(invoice_id);
+
+  const isPaid = payment_date || payment_type_id || transaction_reference;
+
+  if (is_deleted) {
+    return <Badge variant="red">{t('deleted')}</Badge>;
+  }
+
+  if (archived_at) {
+    return <Badge variant="orange">{t('archived')}</Badge>;
+  }
+
+  if (isInvoiced) {
+    return <Badge variant="dark-blue">{t('invoiced')}</Badge>;
+  }
+
+  if (should_be_invoiced)
+    return <Badge variant="light-blue">{t('pending')}</Badge>;
+
+  if (isPaid) return <Badge variant="green">{t('paid')}</Badge>;
 
   return <Badge variant="generic">{t('logged')}</Badge>;
 }

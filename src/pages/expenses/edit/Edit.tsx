@@ -30,7 +30,7 @@ import { useSave } from './hooks/useSave';
 export function Edit() {
   const [t] = useTranslation();
 
-  const { documentTitle } = useTitle('expense');
+  const { documentTitle } = useTitle('edit_expense');
 
   const { id } = useParams();
 

@@ -24,6 +24,10 @@ export function useInvoiceDesignTabs() {
       href: route('/settings/invoice_design'),
     },
     {
+      name: t('total_fields'),
+      href: route('/settings/invoice_design/total_fields'),
+    },
+    {
       name: t('client_details'),
       href: route('/settings/invoice_design/client_details'),
     },
@@ -62,10 +66,6 @@ export function useInvoiceDesignTabs() {
     {
       name: t('task_columns'),
       href: route('/settings/invoice_design/task_columns'),
-    },
-    {
-      name: t('total_fields'),
-      href: route('/settings/invoice_design/total_fields'),
     },
   ];
 

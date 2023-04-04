@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { InputField } from '$app/components/forms';
+import { Checkbox, InputField } from '$app/components/forms';
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Task } from '$app/common/interfaces/task';
@@ -24,7 +24,7 @@ import {
   parseTime,
   parseTimeToDate,
 } from '../helpers';
-import { parseTimeLog } from '../helpers/calculate-time';
+import { parseTimeLog, TimeLogsType } from '../helpers/calculate-time';
 
 interface Props {
   task: Task;
@@ -34,6 +34,8 @@ interface Props {
 export enum LogPosition {
   Start = 0,
   End = 1,
+  Description = 2,
+  Billable = 3,
 }
 
 export function TaskTable(props: Props) {
@@ -55,13 +57,13 @@ export function TaskTable(props: Props) {
       startTime = last[1] + 1;
     }
 
-    logs.push([startTime, 0]);
+    logs.push([startTime, 0, '', true]);
 
     handleChange('time_log', JSON.stringify(logs));
   };
 
   const deleteTableRow = (index: number) => {
-    const logs: number[][] = parseTimeLog(task.time_log);
+    const logs: TimeLogsType = parseTimeLog(task.time_log);
 
     logs.splice(index, 1);
 
@@ -109,6 +111,44 @@ export function TaskTable(props: Props) {
     );
   };
 
+  const handleDescriptionChange = (
+    value: string,
+    index: number,
+    logPosition: number
+  ) => {
+    const logs = parseTimeLog(task.time_log);
+
+    logs[index][logPosition] = value;
+
+    handleChange('time_log', JSON.stringify(logs));
+  };
+
+  const handleBillableChange = (
+    value: boolean,
+    index: number,
+    logPosition: number
+  ) => {
+    const logs = parseTimeLog(task.time_log);
+
+    logs[index][logPosition] = value;
+
+    handleChange('time_log', JSON.stringify(logs));
+  };
+
+  const getDescriptionColSpan = () => {
+    let colSpan = 4;
+
+    if (company?.show_task_end_date) {
+      colSpan += 1;
+    }
+
+    if (company?.settings.allow_billable_task_items) {
+      colSpan += 1;
+    }
+
+    return colSpan;
+  };
+
   useEffect(() => {
     if (typeof lastChangedIndex === 'number') {
       const parsedTimeLog = parseTimeLog(task.time_log);
@@ -134,54 +174,62 @@ export function TaskTable(props: Props) {
         {company?.show_task_end_date && <Th>{t('end_date')}</Th>}
         <Th>{t('end_time')}</Th>
         <Th>{t('duration')}</Th>
+        {company?.settings.allow_billable_task_items && (
+          <Th>{t('billable')}</Th>
+        )}
+        <Th></Th>
       </Thead>
       <Tbody>
         {task.time_log &&
-          (JSON.parse(task.time_log) as number[][]).map(
-            ([start, stop], index) => (
-              <Tr key={index}>
-                <Td>
-                  <InputField
-                    type="date"
-                    value={parseTimeToDate(start)}
-                    onValueChange={(value) =>
-                      handleDateChange(start, value, index, LogPosition.Start)
-                    }
-                  />
-                </Td>
-                <Td>
-                  <InputField
-                    type="time"
-                    value={parseTime(start)}
-                    onValueChange={(value) =>
-                      handleTimeChange(start, value, LogPosition.Start, index)
-                    }
-                    step="1"
-                  />
-                </Td>
-                {company?.show_task_end_date && (
+          (JSON.parse(task.time_log) as TimeLogsType).map(
+            ([start, stop, description, billable], index) => (
+              <>
+                <Tr>
                   <Td>
                     <InputField
                       type="date"
-                      value={parseTimeToDate(stop)}
+                      value={parseTimeToDate(start)}
                       onValueChange={(value) =>
-                        handleDateChange(stop, value, index, LogPosition.End)
+                        handleDateChange(start, value, index, LogPosition.Start)
                       }
                     />
                   </Td>
-                )}
-                <Td>
-                  <InputField
-                    type="time"
-                    value={parseTime(stop || 0)}
-                    onValueChange={(value) =>
-                      handleTimeChange(stop, value, LogPosition.End, index)
-                    }
-                    step="1"
-                  />
-                </Td>
-                <Td width="15%">
-                  <div className="flex items-center space-x-4">
+
+                  <Td>
+                    <InputField
+                      type="time"
+                      value={parseTime(start)}
+                      onValueChange={(value) =>
+                        handleTimeChange(start, value, LogPosition.Start, index)
+                      }
+                      step="1"
+                    />
+                  </Td>
+
+                  {company?.show_task_end_date && (
+                    <Td>
+                      <InputField
+                        type="date"
+                        value={parseTimeToDate(stop)}
+                        onValueChange={(value) =>
+                          handleDateChange(stop, value, index, LogPosition.End)
+                        }
+                      />
+                    </Td>
+                  )}
+
+                  <Td>
+                    <InputField
+                      type="time"
+                      value={parseTime(stop || 0)}
+                      onValueChange={(value) =>
+                        handleTimeChange(stop, value, LogPosition.End, index)
+                      }
+                      step="1"
+                    />
+                  </Td>
+
+                  <Td>
                     <InputField
                       debounceTimeout={1000}
                       value={duration(start, stop, company?.show_task_end_date)}
@@ -189,16 +237,56 @@ export function TaskTable(props: Props) {
                         handleDurationChange(value, start, index)
                       }
                     />
+                  </Td>
 
+                  {company?.settings.allow_billable_task_items && (
+                    <Td>
+                      <Checkbox
+                        checked={billable || typeof billable === 'undefined'}
+                        onValueChange={(value, checked) =>
+                          handleBillableChange(
+                            checked || false,
+                            index,
+                            LogPosition.Billable
+                          )
+                        }
+                      />
+                    </Td>
+                  )}
+
+                  <Td
+                    rowSpan={
+                      company?.settings.show_task_item_description ? 2 : 1
+                    }
+                  >
                     <button
                       className="ml-2 text-gray-600 hover:text-red-600"
                       onClick={() => deleteTableRow(index)}
                     >
                       <Trash2 size={18} />
                     </button>
-                  </div>
-                </Td>
-              </Tr>
+                  </Td>
+                </Tr>
+
+                {company?.settings.show_task_item_description && (
+                  <Tr>
+                    <Td colSpan={getDescriptionColSpan()}>
+                      <InputField
+                        element="textarea"
+                        textareaRows={2}
+                        value={description}
+                        onValueChange={(value) =>
+                          handleDescriptionChange(
+                            value,
+                            index,
+                            LogPosition.Description
+                          )
+                        }
+                      />
+                    </Td>
+                  </Tr>
+                )}
+              </>
             )
           )}
 

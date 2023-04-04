@@ -62,10 +62,15 @@ export function DebouncedCombobox(props: Props) {
   const [isInitial, setIsInitial] = useState(true);
   const [t] = useTranslation();
   const [records, setRecords] = useState<Record[]>([internalRecord]);
+  const [initialRecords, setInitialRecords] = useState<Record[]>([
+    internalRecord,
+  ]);
   const [filteredRecords, setFilteredRecords] = useState<Record[]>([
     internalRecord,
   ]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchTermWithNoRecords, setSearchTermWithNoRecords] =
+    useState<string>('');
 
   const [selectedOption, setSelectedOption] = useState({
     record: records[0],
@@ -134,12 +139,49 @@ export function DebouncedCombobox(props: Props) {
       setSelectedOption({ record, withoutEvents: isInitial });
     }
 
+    if (isInitial) {
+      setInitialRecords(array);
+    }
+
+    const recordsWithoutInternal = array.filter((record) => !record.internal);
+
+    if (!recordsWithoutInternal.length) {
+      setSearchTermWithNoRecords(query);
+    } else {
+      setSearchTermWithNoRecords('');
+    }
+
     setRecords(() => [...array]);
     setIsLoading(false);
     setIsInitial(false);
   };
 
-  const debouncedSearch = debounce(async (query) => await request(query), 1500);
+  const debouncedSearch = debounce(async (query) => await request(query), 700);
+
+  const searchRecords = async (query: string) => {
+    const filteredList = records.filter(
+      (record) =>
+        record.label.toLowerCase().includes(query.toLowerCase()) &&
+        !record.internal
+    );
+
+    if (!query) {
+      setFilteredRecords(initialRecords);
+      setRecords(initialRecords);
+      return;
+    }
+
+    if (
+      !filteredList.length &&
+      ((searchTermWithNoRecords &&
+        !query.startsWith(searchTermWithNoRecords)) ||
+        !searchTermWithNoRecords)
+    ) {
+      await debouncedSearch(query);
+    } else {
+      setFilteredRecords(filteredList);
+    }
+  };
 
   const filter = () => {
     setFilteredRecords(
@@ -162,7 +204,7 @@ export function DebouncedCombobox(props: Props) {
       if (props.clearInputAfterSelection) {
         setSelectedOption({ record: internalRecord, withoutEvents: true });
 
-        debouncedSearch('');
+        searchRecords('');
       }
     }
   }, [selectedOption]);
@@ -278,10 +320,11 @@ export function DebouncedCombobox(props: Props) {
               autoComplete="off"
               placeholder={props.placeholder || ''}
               className="w-full border-none py-2 pl-3 pr-10 text-sm leading-5 text-gray-900 focus:ring-0"
-              onChange={(event) => debouncedSearch(event.target.value)}
+              onChange={(event) => searchRecords(event.target.value)}
               displayValue={(record: Record) => record.label}
               onClick={() => openDropdownButton.current?.click()}
               onFocus={props.onInputFocus}
+              readOnly={isLoading}
             />
 
             {props.clearButton &&
@@ -297,7 +340,7 @@ export function DebouncedCombobox(props: Props) {
                         withoutEvents: true,
                       });
 
-                      debouncedSearch('');
+                      searchRecords('');
 
                       props.onClearButtonClick();
                     }}

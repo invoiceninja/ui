@@ -25,9 +25,8 @@ import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
-import { Archive } from './components/edit/Archive';
-import { Delete } from './components/edit/Delete';
-import { Restore } from './components/edit/Restore';
+import { useActions } from '$app/pages/settings/expense-categories/common/hooks/useActions';
+import { ResourceActions } from '$app/components/ResourceActions';
 
 interface ExpenseCategoryInput {
   name: string;
@@ -40,6 +39,8 @@ export function Edit() {
   const { id } = useParams();
 
   const queryClient = useQueryClient();
+
+  const actions = useActions();
 
   const { data } = useExpenseCategoryQuery({ id });
 
@@ -115,7 +116,19 @@ export function Edit() {
   }, [data]);
 
   return (
-    <Settings title={t('expense_categories')} breadcrumbs={pages}>
+    <Settings
+      title={t('expense_categories')}
+      breadcrumbs={pages}
+      navigationTopRight={
+        expenseCategory && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={expenseCategory}
+            actions={actions}
+          />
+        )
+      }
+    >
       {!data && (
         <div className="flex justify-center">
           <Spinner />
@@ -161,10 +174,6 @@ export function Edit() {
               />
             </CardContainer>
           </Card>
-
-          <Archive />
-          <Restore />
-          <Delete />
         </Container>
       )}
     </Settings>

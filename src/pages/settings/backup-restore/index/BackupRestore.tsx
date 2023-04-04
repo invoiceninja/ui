@@ -28,7 +28,7 @@ export function BackupRestore() {
   ];
 
   return (
-    <Settings title={t('backup_restore')} breadcrumbs={pages}>
+    <Settings title={t('backup_restore')} breadcrumbs={pages} withoutBackButton>
       <Tabs tabs={tabs} className="mt-6" />
 
       <div className="my-4">

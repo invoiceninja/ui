@@ -40,7 +40,7 @@ export function Quotes() {
   const filters = useQuoteFilters();
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
       <DataTable
         resource="quote"
         columns={columns}

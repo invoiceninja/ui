@@ -43,6 +43,7 @@ export function Dashboard() {
           <SwitchToFlutter />
         )
       }
+      withoutBackButton
     >
       {isAdmin && <Totals />}
 

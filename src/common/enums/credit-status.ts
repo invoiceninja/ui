@@ -9,6 +9,7 @@
  */
 
 export const enum CreditStatus {
+  Viewed = '-1',
   Draft = '1',
   Sent = '2',
   Partial = '3',

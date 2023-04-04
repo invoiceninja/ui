@@ -10,18 +10,19 @@
 
 import dayjs from 'dayjs';
 
+export type TimeLogType = [number, number, string, boolean];
+export type TimeLogsType = TimeLogType[];
+
 export function parseTimeLog(log: string) {
   if (log === '' || log === '[]') {
     return [];
   }
 
-  const numbers: number[][] = [];
-  const parsed: number[][] = JSON.parse(log);
+  const defaultRow: TimeLogsType = [[0, 0, '', true]];
+  const parsed: TimeLogsType = JSON.parse(log);
 
-  if (parsed.length === 0) {
-    numbers.push([0, 0]);
-
-    return numbers;
+  if (!parsed.length) {
+    return defaultRow;
   }
 
   return parsed;

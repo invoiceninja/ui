@@ -24,7 +24,8 @@ export function useHandleSend() {
     entityId: string,
     subject: string,
     template: string,
-    redirectUrl: string
+    redirectUrl: string,
+    ccEmail: string
   ) => {
     const toastId = toast.loading(t('processing'));
 
@@ -34,6 +35,7 @@ export function useHandleSend() {
       entity_id: entityId,
       subject,
       template,
+      cc_email: ccEmail,
     })
       .then(() => {
         toast.success(t(`emailed_${entity}`), { id: toastId });
