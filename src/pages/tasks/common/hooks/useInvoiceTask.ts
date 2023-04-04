@@ -11,7 +11,7 @@
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Task } from '$app/common/interfaces/task';
 import { useBlankInvoiceQuery } from '$app/common/queries/invoices';
-import { generatePath, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { parseTimeLog } from '../helpers/calculate-time';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
@@ -26,22 +26,18 @@ import { useAtom } from 'jotai';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { useTranslation } from 'react-i18next';
-import { request } from '$app/common/helpers/request';
-import { endpoint } from '$app/common/helpers';
-import { AxiosError } from 'axios';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useQueryClient } from 'react-query';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Project } from '$app/common/interfaces/project';
+import { useFetchProjectQuery } from '$app/common/queries/projects';
 
 export function useInvoiceTask() {
   const [t] = useTranslation();
   const navigate = useNavigate();
   const company = useCurrentCompany();
-  const queryClient = useQueryClient();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
   const { data } = useBlankInvoiceQuery();
+
+  const fetchProjectDetails = useFetchProjectQuery();
 
   const [, setInvoice] = useAtom(invoiceAtom);
 
@@ -67,29 +63,6 @@ export function useInvoiceTask() {
     }
 
     return hoursSum;
-  };
-
-  const fetchProjectDetails = async (projectId: string) => {
-    let project: Project | undefined;
-
-    await queryClient
-      .fetchQuery(generatePath('/api/v1/projects/:id', { id: projectId }), () =>
-        request(
-          'GET',
-          endpoint('/api/v1/projects/:id', {
-            id: projectId,
-          })
-        )
-      )
-      .then((response: GenericSingleResourceResponse<Project>) => {
-        project = response.data.data;
-      })
-      .catch((error: AxiosError) => {
-        toast.error();
-        console.error(error);
-      });
-
-    return project;
   };
 
   return async (tasks: Task[]) => {
