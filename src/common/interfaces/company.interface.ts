@@ -261,4 +261,6 @@ export interface Settings {
   qr_iban: string;
   besr_id: string;
   vendor_portal_enable_uploads: boolean;
+  client_initiated_payments: boolean;
+  client_initiated_payments_minimum: number;
 }
