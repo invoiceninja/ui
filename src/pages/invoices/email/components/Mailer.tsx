@@ -28,7 +28,7 @@ import { useGeneratePdfUrl } from '$app/pages/invoices/common/hooks/useGenerateP
 import { MailerComponent } from '$app/pages/purchase-orders/email/Email';
 import { forwardRef, RefObject, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { isHosted } from '$app/common/helpers';
+import { isHosted, isSelfHosted } from '$app/common/helpers';
 
 export type MailerResourceType =
   | 'invoice'
@@ -55,12 +55,17 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
   const [templateId, setTemplateId] = useState(props.defaultEmail);
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
+  const [ccEmail, setCcEmail] = useState('');
+
+  const isCcEmailAvailable =
+    isSelfHosted() || (isHosted() && (proPlan() || enterprisePlan()));
 
   const company = useCurrentCompany();
 
   const handleTemplateChange = (id: string) => {
     setSubject('');
     setBody('');
+    setCcEmail('');
     setTemplateId(id);
   };
 
@@ -69,7 +74,8 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
     props.resourceType,
     props.resource?.id || '',
     subject,
-    templateId
+    templateId,
+    ccEmail
   );
 
   const pdfUrl = useGeneratePdfUrl({
@@ -89,12 +95,13 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
             props.resource?.id || '',
             subject,
             templateId,
-            props.redirectUrl
+            props.redirectUrl,
+            ccEmail
           );
         },
       };
     },
-    [body, subject, templateId]
+    [body, subject, templateId, ccEmail]
   );
 
   return (
@@ -143,6 +150,14 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
         </Card>
 
         <Card withContainer>
+          {isCcEmailAvailable && (
+            <InputField
+              label={t('cc_email')}
+              value={ccEmail || template?.cc_email}
+              onValueChange={(value) => setCcEmail(value)}
+            />
+          )}
+
           <InputField
             label={t('subject')}
             value={subject || template?.raw_subject}
