@@ -9,8 +9,11 @@
  */
 
 import { route } from '$app/common/helpers/route';
+import { Settings } from '$app/common/interfaces/company.interface';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 export function useInvoiceDesignTabs() {
   const [t] = useTranslation();
@@ -67,4 +70,21 @@ export function useInvoiceDesignTabs() {
   ];
 
   return tabs;
+}
+
+export function useHandleSettingsValueChange() {
+  const dispatch = useDispatch();
+
+  return <T extends keyof Settings, R extends Settings[T]>(
+    property: T,
+    value: R
+  ) => {
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: `settings.${property}`,
+        value,
+      })
+    );
+  };
 }
