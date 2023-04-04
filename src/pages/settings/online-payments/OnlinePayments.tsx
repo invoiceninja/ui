@@ -77,17 +77,25 @@ export function OnlinePayments() {
           />
         </Element>
 
-        <Element leftSide={t('auto_bill')}>
+        <Element leftSide={`${t('auto_bill')} ${t('recurring_invoices')}`}>
           <SelectField
             value={company?.settings?.auto_bill}
             onChange={handleChange}
             id="settings.auto_bill"
           >
             <option defaultChecked></option>
-            <option value="always">{t('enabled')}</option>
-            <option value="optout">{t('optout')}</option>
-            <option value="optin">{t('optin')}</option>
-            <option value="off">{t('disabled')}</option>
+            <option value="always">
+              {t('enabled')} ({t('auto_bill_help_always')})
+            </option>
+            <option value="optout">
+              {t('optout')} ({t('auto_bill_help_optout')})
+            </option>
+            <option value="optin">
+              {t('optin')} ({t('auto_bill_help_optin')})
+            </option>
+            <option value="off">
+              {t('disabled')} ({t('auto_bill_help_off')})
+            </option>
           </SelectField>
         </Element>
 
@@ -116,7 +124,7 @@ export function OnlinePayments() {
 
         {paymentTerms && (
           <>
-            <Element leftSide={t('payment_terms')}>
+            <Element leftSide={t('payment_type')}>
               <SelectField
                 value={company?.settings?.payment_terms}
                 id="settings.payment_terms"
