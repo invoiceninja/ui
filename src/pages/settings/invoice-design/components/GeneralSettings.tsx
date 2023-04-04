@@ -17,13 +17,14 @@ import { Divider } from '$app/components/cards/Divider';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { useAtom } from 'jotai';
 import { range } from 'lodash';
-import { ChangeEvent, useEffect } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, Element } from '../../../../components/cards';
-import { Radio, SelectField } from '../../../../components/forms';
-import Toggle from '../../../../components/forms/Toggle';
 import { updatingRecords as updatingRecordsAtom } from '../common/atoms';
+import { Settings as CompanySettings } from '$app/common/interfaces/company.interface';
+import { Card, Element } from '$app/components/cards';
+import { InputField, Radio, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
 
 export function GeneralSettings() {
   const [t] = useTranslation();
@@ -826,6 +827,7 @@ export function GeneralSettings() {
         }
       }
     }
+
     dispatch(
       updateChanges({
         object: 'company',
@@ -844,9 +846,37 @@ export function GeneralSettings() {
       })
     );
 
+  const handleValueChange = <
+    T extends keyof CompanySettings,
+    R extends CompanySettings[T]
+  >(
+    property: T,
+    value: R
+  ) => {
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: `settings.${property}`,
+        value,
+      })
+    );
+  };
+
   useEffect(() => {
     setUpdatingRecords(undefined);
   }, []);
+
+  const [logoSizeType, setLogoSizeType] = useState<'%' | 'px'>('%');
+
+  useEffect(() => {
+    if (company?.settings) {
+      const value = company?.settings.company_logo_size
+        .replaceAll('%', '')
+        .replaceAll('px', '');
+
+      handleValueChange('company_logo_size', `${value}${logoSizeType}`);
+    }
+  }, [logoSizeType]);
 
   return (
     <Card title={t('general_settings')} padding="small" collapsed={false}>
@@ -1010,7 +1040,35 @@ export function GeneralSettings() {
         </SelectField>
       </Element>
 
-      <div className="pt-4 border-b"></div>
+      <Element leftSide={t('logo_size')}>
+        <div className="w-full inline-flex items-center space-x-2">
+          <div className="w-full">
+            <InputField
+              value={company?.settings.company_logo_size
+                .replaceAll('px', '')
+                .replaceAll('%', '')}
+              onValueChange={(value) =>
+                handleValueChange(
+                  'company_logo_size',
+                  `${value}${logoSizeType}`
+                )
+              }
+            />
+          </div>
+
+          <div className="w-1/3">
+            <SelectField
+              value={logoSizeType}
+              onValueChange={(value) => setLogoSizeType(value as 'px' | '%')}
+            >
+              <option value="%">{t('percent')}</option>
+              <option value="px">{t('pixels')}</option>
+            </SelectField>
+          </div>
+        </div>
+      </Element>
+
+      <Divider />
 
       <Element leftSide={t('primary_font')}>
         <SelectField
