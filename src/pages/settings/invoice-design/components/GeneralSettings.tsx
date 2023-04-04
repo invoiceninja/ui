@@ -1130,6 +1130,15 @@ export function GeneralSettings() {
 
       <Divider />
 
+      <Element leftSide={t('show_paid_stamp')}>
+        <Toggle
+          onValueChange={(value) => handleValueChange('show_paid_stamp', value)}
+          checked={company?.settings.show_paid_stamp}
+        />
+      </Element>
+
+      <Divider />
+
       <Element leftSide={t('empty_columns')}>
         <Radio
           name="empty_columns"
