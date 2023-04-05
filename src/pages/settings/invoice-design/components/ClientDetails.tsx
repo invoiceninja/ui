@@ -11,9 +11,11 @@
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
+import { useCustomField } from '$app/components/CustomField';
 
 export function ClientDetails() {
   const [t] = useTranslation();
+  const customField = useCustomField();
 
   const defaultVariables = [
     { value: '$client.name', label: t('client_name') },
@@ -27,11 +29,22 @@ export function ClientDetails() {
     { value: '$client.city_state_postal', label: t('city_state_postal') },
     { value: '$client.postal_city_state', label: t('postal_city_state') },
     { value: '$client.country', label: t('country') },
-    { value: '$client.custom1', label: t('custom1') },
-    { value: '$client.custom2', label: t('custom2') },
-    { value: '$client.custom3', label: t('custom3') },
-    { value: '$client.custom4', label: t('custom4') },
-
+    {
+      value: '$client.custom1',
+      label: customField('client1').label() || t('custom1'),
+    },
+    {
+      value: '$client.custom2',
+      label: customField('client2').label() || t('custom2'),
+    },
+    {
+      value: '$client.custom3',
+      label: customField('client3').label() || t('custom3'),
+    },
+    {
+      value: '$client.custom4',
+      label: customField('client4').label() || t('custom4'),
+    },
     { value: '$contact.full_name', label: t('contact_full_name') },
     { value: '$contact.email', label: t('contact_email') },
     { value: '$contact.phone', label: t('contact_phone') },

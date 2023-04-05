@@ -11,9 +11,11 @@
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
+import { useCustomField } from '$app/components/CustomField';
 
 export function InvoiceDetails() {
   const [t] = useTranslation();
+  const customField = useCustomField();
 
   const defaultVariables = [
     { value: '$invoice.number', label: t('invoice_number') },
@@ -23,10 +25,22 @@ export function InvoiceDetails() {
     { value: '$invoice.amount', label: t('invoice_amount') },
     { value: '$invoice.balance', label: t('invoice_balance') },
     { value: '$invoice.balance_due', label: t('balance_due') },
-    { value: '$invoice.custom1', label: t('custom1') },
-    { value: '$invoice.custom2', label: t('custom2') },
-    { value: '$invoice.custom3', label: t('custom3') },
-    { value: '$invoice.custom4', label: t('custom4') },
+    {
+      value: '$invoice.custom1',
+      label: customField('invoice1').label() || t('custom1'),
+    },
+    {
+      value: '$invoice.custom2',
+      label: customField('invoice2').label() || t('custom2'),
+    },
+    {
+      value: '$invoice.custom3',
+      label: customField('invoice3').label() || t('custom3'),
+    },
+    {
+      value: '$invoice.custom4',
+      label: customField('invoice4').label() || t('custom4'),
+    },
     { value: '$invoice.project', label: t('project') },
     { value: '$client.balance', label: t('client_balance') },
   ];

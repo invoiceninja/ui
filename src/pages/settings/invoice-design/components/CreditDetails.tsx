@@ -11,9 +11,11 @@
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
+import { useCustomField } from '$app/components/CustomField';
 
 export function CreditDetails() {
   const [t] = useTranslation();
+  const customField = useCustomField();
 
   const defaultVariables = [
     { value: '$credit.number', label: t('credit_number') },
@@ -21,10 +23,22 @@ export function CreditDetails() {
     { value: '$credit.date', label: t('credit_date') },
     { value: '$credit.valid_until', label: t('valid_until') },
     { value: '$credit.total', label: t('credit_total') },
-    { value: '$credit.custom1', label: t('custom1') },
-    { value: '$credit.custom2', label: t('custom2') },
-    { value: '$credit.custom3', label: t('custom3') },
-    { value: '$credit.custom4', label: t('custom4') },
+    {
+      value: '$credit.custom1',
+      label: customField('credit1').label() || t('custom1'),
+    },
+    {
+      value: '$credit.custom2',
+      label: customField('credit2').label() || t('custom2'),
+    },
+    {
+      value: '$credit.custom3',
+      label: customField('credit3').label() || t('custom3'),
+    },
+    {
+      value: '$credit.custom4',
+      label: customField('credit4').label() || t('custom4'),
+    },
     { value: '$client.balance', label: t('client_balance') },
   ];
 

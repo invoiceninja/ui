@@ -13,10 +13,14 @@ import { SortableVariableList } from './SortableVariableList';
 import { Divider } from '$app/components/cards/Divider';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCustomField } from '$app/components/CustomField';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export function ProductColumns() {
   const [t] = useTranslation();
+  const company = useCurrentCompany();
+  const handleValueChange = useHandleSettingsValueChange();
+  const customField = useCustomField();
 
   const defaultVariables = [
     { value: '$product.item', label: t('item') },
@@ -26,16 +30,33 @@ export function ProductColumns() {
     { value: '$product.tax', label: t('tax') },
     { value: '$product.discount', label: t('discount') },
     { value: '$product.line_total', label: t('line_total') },
-    { value: '$product.product1', label: t('custom1') },
-    { value: '$product.product2', label: t('custom2') },
-    { value: '$product.product3', label: t('custom3') },
-    { value: '$product.product4', label: t('custom4') },
+    {
+      value: '$product.product1',
+      label: company?.custom_fields?.product1
+        ? customField('product1').label()
+        : t('custom1'),
+    },
+    {
+      value: '$product.product2',
+      label: company?.custom_fields?.product2
+        ? customField('product2').label()
+        : t('custom2'),
+    },
+    {
+      value: '$product.product3',
+      label: company?.custom_fields?.product3
+        ? customField('product3').label()
+        : t('custom3'),
+    },
+    {
+      value: '$product.product4',
+      label: company?.custom_fields?.product4
+        ? customField('product4').label()
+        : t('custom4'),
+    },
     { value: '$product.gross_line_total', label: t('gross_line_total') },
     { value: '$product.tax_amount', label: t('tax_amount') },
   ];
-
-  const company = useCompanyChanges();
-  const handleValueChange = useHandleSettingsValueChange();
 
   return (
     <Card

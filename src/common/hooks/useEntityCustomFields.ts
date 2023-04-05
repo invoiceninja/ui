@@ -13,6 +13,7 @@ import { useTranslation } from 'react-i18next';
 import { useCurrentCompany } from './useCurrentCompany';
 
 export type Entity =
+  | 'company'
   | 'client'
   | 'product'
   | 'invoice'
@@ -23,7 +24,7 @@ export type Entity =
   | 'expense'
   | 'quote'
   | 'credit';
-  
+
 interface Params {
   entity: Entity;
 }

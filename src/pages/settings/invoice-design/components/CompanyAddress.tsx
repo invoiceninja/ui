@@ -11,9 +11,11 @@
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
+import { useCustomField } from '$app/components/CustomField';
 
 export function CompanyAddress() {
   const [t] = useTranslation();
+  const customField = useCustomField();
 
   const defaultVariables = [
     { value: '$company.name', label: t('company_name') },
@@ -27,10 +29,22 @@ export function CompanyAddress() {
     { value: '$company.city_state_postal', label: t('city_state_postal') },
     { value: '$company.postal_city_state', label: t('postal_city_state') },
     { value: '$company.country', label: t('country') },
-    { value: '$company.custom1', label: t('custom1') },
-    { value: '$company.custom2', label: t('custom2') },
-    { value: '$company.custom3', label: t('custom3') },
-    { value: '$company.custom4', label: t('custom4') },
+    {
+      value: '$company.custom1',
+      label: customField('company1').label() || t('custom1'),
+    },
+    {
+      value: '$company.custom2',
+      label: customField('company2').label() || t('custom2'),
+    },
+    {
+      value: '$company.custom3',
+      label: customField('company3').label() || t('custom3'),
+    },
+    {
+      value: '$company.custom4',
+      label: customField('company4').label() || t('custom4'),
+    },
   ];
 
   return (
