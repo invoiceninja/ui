@@ -14,6 +14,8 @@ import {
   InputCustomField,
   Props as InputCustomFieldProps,
 } from './forms/InputCustomField';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Entity } from '$app/common/hooks/useEntityCustomFields';
 
 interface Props extends InputCustomFieldProps {
   fieldOnly?: boolean;
@@ -26,6 +28,22 @@ export function customField(value: string) {
   return {
     label: () => field,
     type: () => type,
+  };
+}
+
+type CustomFields = `${Entity}1` | `${Entity}2` | `${Entity}3` | `${Entity}4`;
+
+export function useCustomField() {
+  const company = useCurrentCompany();
+
+  return (field: CustomFields) => {
+    console.log(company.custom_fields);
+
+    if (company && company.custom_fields[field]) {
+      return customField(company.custom_fields[field]);
+    }
+
+    return customField('');
   };
 }
 
