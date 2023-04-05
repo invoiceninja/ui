@@ -21,10 +21,10 @@ export async function login(
 }
 
 export function permissions(page: Page) {
-  const clear = async (email?: string) => {
+  const clear = async (email = "permissions@example.com") => {
     await page.getByRole('link', { name: 'Settings' }).click();
     await page.getByRole('link', { name: 'User Management' }).click();
-    await page.locator('#filter').fill(email || 'permissions@example.com');
+    await page.locator('#filter').fill(email);
 
     await page.waitForTimeout(1100);
 
