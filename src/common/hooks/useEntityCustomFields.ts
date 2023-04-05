@@ -15,6 +15,7 @@ import { useCurrentCompany } from './useCurrentCompany';
 export type Entity =
   | 'company'
   | 'client'
+  | 'contact'
   | 'product'
   | 'invoice'
   | 'payment'

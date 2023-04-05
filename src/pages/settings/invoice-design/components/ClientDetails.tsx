@@ -48,10 +48,22 @@ export function ClientDetails() {
     { value: '$contact.full_name', label: t('contact_full_name') },
     { value: '$contact.email', label: t('contact_email') },
     { value: '$contact.phone', label: t('contact_phone') },
-    { value: '$contact.custom1', label: t('contact_custom_value1') },
-    { value: '$contact.custom2', label: t('contact_custom_value2') },
-    { value: '$contact.custom3', label: t('contact_custom_value3') },
-    { value: '$contact.custom4', label: t('contact_custom_value4') },
+    {
+      value: '$contact.custom1',
+      label: customField('contact1').label() || t('contact_custom_value1'),
+    },
+    {
+      value: '$contact.custom2',
+      label: customField('contact2').label() || t('contact_custom_value2'),
+    },
+    {
+      value: '$contact.custom3',
+      label: customField('contact3').label() || t('contact_custom_value3'),
+    },
+    {
+      value: '$contact.custom4',
+      label: customField('contact4').label() || t('contact_custom_value4'),
+    },
   ];
 
   return (
