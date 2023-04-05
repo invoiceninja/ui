@@ -21,10 +21,17 @@ export async function login(
 }
 
 export function permissions(page: Page) {
-  const clear = async () => {
+  const clear = async (email = "permissions@example.com") => {
     await page.getByRole('link', { name: 'Settings' }).click();
     await page.getByRole('link', { name: 'User Management' }).click();
-    await page.getByRole('link', { name: 'Permissions Example' }).click();
+    await page.locator('#filter').fill(email);
+
+    await page.waitForTimeout(1100);
+
+    const tableBody = page.locator('tbody').first();
+
+    await tableBody.getByRole('link').first().click();
+
     await page.getByLabel('Current password*').fill('password');
     await page.getByRole('button', { name: 'Continue' }).click();
     await page.getByRole('button', { name: 'Permissions' }).click();

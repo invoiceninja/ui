@@ -48,44 +48,13 @@ export function InvoiceTotals(props: Props) {
 
   return (
     <Card className="col-span-12 xl:col-span-4 h-max">
-      {variables.map((variable, index) => (
-        <Fragment key={index}>{resolveVariable(variable)}</Fragment>
-      ))}
-
-      {company && company?.custom_fields?.surcharge1 && (
-        <CustomSurchargeField
-          field="surcharge1"
-          defaultValue={resource?.custom_surcharge1}
-          value={resource?.custom_surcharge1.toString() || ''}
-          onValueChange={(value) => handleChange('custom_surcharge1', value)}
-        />
-      )}
-
-      {company && company?.custom_fields?.surcharge2 && (
-        <CustomSurchargeField
-          field="surcharge2"
-          defaultValue={resource?.custom_surcharge2}
-          value={resource?.custom_surcharge2.toString() || ''}
-          onValueChange={(value) => handleChange('custom_surcharge2', value)}
-        />
-      )}
-
-      {company && company?.custom_fields?.surcharge3 && (
-        <CustomSurchargeField
-          field="surcharge3"
-          defaultValue={resource?.custom_surcharge3}
-          value={resource?.custom_surcharge3.toString() || ''}
-          onValueChange={(value) => handleChange('custom_surcharge3', value)}
-        />
-      )}
-
-      {company && company?.custom_fields?.surcharge4 && (
-        <CustomSurchargeField
-          field="surcharge4"
-          defaultValue={resource?.custom_surcharge4}
-          value={resource?.custom_surcharge4.toString() || ''}
-          onValueChange={(value) => handleChange('custom_surcharge4', value)}
-        />
+      {variables.map(
+        (variable, index) =>
+          (variable === '$subtotal' ||
+            variable === '$paid_to_date' ||
+            variable === '$taxes') && (
+            <Fragment key={index}>{resolveVariable(variable)}</Fragment>
+          )
       )}
 
       {company && company.enabled_tax_rates > 0 && (
@@ -173,6 +142,51 @@ export function InvoiceTotals(props: Props) {
             onInputFocus={() => setCurrentTaxRateInput(3)}
           />
         </Element>
+      )}
+
+      {variables.map(
+        (variable, index) =>
+          variable !== '$subtotal' &&
+          variable !== '$paid_to_date' &&
+          variable !== '$taxes' && (
+            <Fragment key={index}>{resolveVariable(variable)}</Fragment>
+          )
+      )}
+
+      {company && company?.custom_fields?.surcharge1 && (
+        <CustomSurchargeField
+          field="surcharge1"
+          defaultValue={resource?.custom_surcharge1}
+          value={resource?.custom_surcharge1.toString() || ''}
+          onValueChange={(value) => handleChange('custom_surcharge1', value)}
+        />
+      )}
+
+      {company && company?.custom_fields?.surcharge2 && (
+        <CustomSurchargeField
+          field="surcharge2"
+          defaultValue={resource?.custom_surcharge2}
+          value={resource?.custom_surcharge2.toString() || ''}
+          onValueChange={(value) => handleChange('custom_surcharge2', value)}
+        />
+      )}
+
+      {company && company?.custom_fields?.surcharge3 && (
+        <CustomSurchargeField
+          field="surcharge3"
+          defaultValue={resource?.custom_surcharge3}
+          value={resource?.custom_surcharge3.toString() || ''}
+          onValueChange={(value) => handleChange('custom_surcharge3', value)}
+        />
+      )}
+
+      {company && company?.custom_fields?.surcharge4 && (
+        <CustomSurchargeField
+          field="surcharge4"
+          defaultValue={resource?.custom_surcharge4}
+          value={resource?.custom_surcharge4.toString() || ''}
+          onValueChange={(value) => handleChange('custom_surcharge4', value)}
+        />
       )}
     </Card>
   );

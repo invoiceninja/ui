@@ -19,6 +19,7 @@ export interface EmailTemplate {
   wrapper: string;
   raw_body: string;
   raw_subject: string;
+  cc_email: string;
 }
 
 export function useResolveTemplate(
@@ -26,7 +27,8 @@ export function useResolveTemplate(
   entity: string,
   entityId: string,
   subject: string,
-  templateId: string
+  templateId: string,
+  ccEmail: string
 ) {
   const queryClient = useQueryClient();
   const [template, setTemplate] = useState<EmailTemplate>();
@@ -39,11 +41,12 @@ export function useResolveTemplate(
         entity_id: entityId,
         subject,
         template: templateId,
+        cc_email: ccEmail,
       })
         .then((response) => setTemplate(response.data))
         .catch((error) => console.error(error))
     );
-  }, [body, entity, entityId, subject, templateId]);
+  }, [body, entity, entityId, subject, templateId, ccEmail]);
 
   return template;
 }

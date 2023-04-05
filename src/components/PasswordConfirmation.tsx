@@ -9,7 +9,7 @@
  */
 import { ChangeEvent, FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, InputField } from './forms';
 import { Modal } from './Modal';
 
@@ -22,6 +22,7 @@ interface Props {
 export function PasswordConfirmation(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [isModalOpen, setIsModalOpen] = useState(props.show ?? false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -42,7 +43,11 @@ export function PasswordConfirmation(props: Props) {
 
   return (
     <Modal
-      onClose={() => navigate('/settings/users')}
+      onClose={() =>
+        location.pathname.startsWith('/settings/users')
+          ? navigate('/settings/users')
+          : props.onClose(false)
+      }
       visible={isModalOpen}
       title={t('confirmation')}
       text={t('please_enter_your_password')}
