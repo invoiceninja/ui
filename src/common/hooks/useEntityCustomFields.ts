@@ -12,18 +12,20 @@ import { customField } from '$app/components/CustomField';
 import { useTranslation } from 'react-i18next';
 import { useCurrentCompany } from './useCurrentCompany';
 
+export type Entity =
+  | 'client'
+  | 'product'
+  | 'invoice'
+  | 'payment'
+  | 'project'
+  | 'task'
+  | 'vendor'
+  | 'expense'
+  | 'quote'
+  | 'credit';
+  
 interface Params {
-  entity:
-    | 'client'
-    | 'product'
-    | 'invoice'
-    | 'payment'
-    | 'project'
-    | 'task'
-    | 'vendor'
-    | 'expense'
-    | 'quote'
-    | 'credit';
+  entity: Entity;
 }
 
 export function useEntityCustomFields(params: Params) {
