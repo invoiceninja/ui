@@ -18,7 +18,7 @@ test("can't view invoices without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
-  await clear('Invoices');
+  await clear('invoices@example.com');
   await save();
   await logout(page);
 
@@ -33,7 +33,7 @@ test('can view invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('Invoices');
+  await clear('invoices@example.com');
   await set('view_invoice');
   await save();
   await logout(page);
@@ -88,7 +88,7 @@ test("can't create an invoice", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('Invoices');
+  await clear('invoices@example.com');
   await set('view_invoice');
   await save();
   await logout(page);
@@ -111,7 +111,7 @@ test('can create an invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('Invoices');
+  await clear('invoices@example.com');
   await set('create_invoice');
   await save();
   await logout(page);
@@ -132,7 +132,7 @@ test('can view assigned invoice with create_invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('Invoices');
+  await clear('invoices@example.com');
   await set('create_invoice', 'view_client');
   await save();
   await logout(page);
@@ -154,7 +154,7 @@ test('deleting invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('Invoices');
+  await clear('invoices@example.com');
   await set('create_invoice', 'view_client');
   await save();
   await logout(page);
@@ -201,7 +201,7 @@ test('archiving invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('Invoices');
+  await clear('invoices@example.com');
   await set('create_invoice', 'view_client');
   await save();
   await logout(page);
@@ -249,7 +249,7 @@ test('cloning invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('Invoices');
+  await clear('invoices@example.com');
   await set('create_invoice', 'view_client');
   await save();
   await logout(page);
@@ -303,7 +303,7 @@ test('invoice documents preview', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('Invoices');
+  await clear('invoices@example.com');
   await set('create_invoice', 'view_client');
   await save();
   await logout(page);
@@ -358,7 +358,7 @@ test('invoice documents uploading', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear('Invoices');
+  await clear('invoices@example.com');
   await set('create_invoice', 'view_client');
   await save();
   await logout(page);
