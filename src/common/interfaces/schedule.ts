@@ -14,6 +14,8 @@ export interface Parameters {
   show_aging_table: boolean;
   status: string;
   clients: string[];
+  entity: string;
+  entity_id: string;
 }
 
 export interface Schedule {

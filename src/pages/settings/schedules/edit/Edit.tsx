@@ -27,6 +27,7 @@ import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ScheduleForm } from '../common/components/ScheduleForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
+import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
 
 export function Edit() {
   const { documentTitle } = useTitle('edit_schedule');
@@ -53,6 +54,8 @@ export function Edit() {
 
   const handleChange = useHandleChange({ setErrors, setSchedule, schedule });
 
+  const formatSchedulePayload = useFormatSchedulePayload();
+
   useEffect(() => {
     if (scheduleResponse) {
       setSchedule(scheduleResponse);
@@ -67,7 +70,13 @@ export function Edit() {
       setErrors(undefined);
       toast.processing();
 
-      request('PUT', endpoint('/api/v1/task_schedulers/:id', { id }), schedule)
+      const formattedSchedule = formatSchedulePayload(schedule!);
+
+      request(
+        'PUT',
+        endpoint('/api/v1/task_schedulers/:id', { id }),
+        formattedSchedule
+      )
         .then(() => {
           toast.success('updated_schedule');
 

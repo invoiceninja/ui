@@ -28,6 +28,8 @@ export function useScheduleStatement() {
         statement.dateRangeId === 'custom'
           ? 'last7_days'
           : statement.dateRangeId,
+      entity: 'invoice',
+      entity_id: '',
     });
 
     navigate('/settings/schedules/create?template=email_statement');
