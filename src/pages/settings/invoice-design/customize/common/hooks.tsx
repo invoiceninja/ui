@@ -103,8 +103,6 @@ export function useHandleDesignSave() {
     toast.processing();
     setValidationBag(null);
 
-    console.log(payload.internal_design_type);
-
     const body =
       payload.internal_design_type === 'stock'
         ? design

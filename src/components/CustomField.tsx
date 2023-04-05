@@ -37,8 +37,6 @@ export function useCustomField() {
   const company = useCurrentCompany();
 
   return (field: CustomFields) => {
-    console.log(company.custom_fields);
-
     if (company && company.custom_fields[field]) {
       return customField(company.custom_fields[field]);
     }
