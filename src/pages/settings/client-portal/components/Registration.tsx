@@ -14,10 +14,12 @@ import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/commo
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
+import { SelectField } from '$app/components/forms';
 
 interface Field {
   key: string;
   required: boolean;
+  visible: boolean;
 }
 
 export function Registration() {
@@ -49,15 +51,27 @@ export function Registration() {
     { field: 'vat_number', label: t('vat_number') },
   ];
 
-  const isRequired = (property: string) => {
+  const getFieldValue = (property: string) => {
     const fields: Field[] = cloneDeep(
       company?.client_registration_fields || []
     );
 
-    return Boolean(fields.find((field) => field.key === property)?.required);
+    const field = fields.find((field) => field.key === property);
+
+    let fieldValue = 'hidden';
+
+    if (field?.required && field?.visible) {
+      fieldValue = 'required';
+    }
+
+    if (!field?.required && field?.visible) {
+      fieldValue = 'optional';
+    }
+
+    return fieldValue;
   };
 
-  const handleRegistrationToggle = (property: string, value: boolean) => {
+  const handleChangeFieldValue = (property: string, value: string) => {
     let existingFields: Field[] = cloneDeep(
       company?.client_registration_fields || []
     );
@@ -66,10 +80,25 @@ export function Registration() {
     const index = fields.findIndex((field) => field.field === property);
 
     if (index >= 0) {
+      let fieldValues = {
+        visible: false,
+        required: false,
+      };
+
+      if (value === 'optional') {
+        fieldValues = { ...fieldValues, visible: true };
+      }
+
+      if (value === 'required') {
+        fieldValues = { visible: true, required: true };
+      }
+
       if (alreadyAdded) {
         const updatedFields = existingFields.map((field) => ({
           ...field,
-          required: field.key === property ? value : field.required,
+          required:
+            field.key === property ? fieldValues.required : field.required,
+          visible: field.key === property ? fieldValues.visible : field.visible,
         }));
 
         handleChange('client_registration_fields', updatedFields);
@@ -78,7 +107,7 @@ export function Registration() {
 
         existingFields = [
           ...existingFields,
-          { key: foundField.field, required: value },
+          { key: foundField.field, ...fieldValues },
         ];
 
         handleChange('client_registration_fields', existingFields);
@@ -104,13 +133,18 @@ export function Registration() {
 
       {fields.map((field) => (
         <Element key={field.field} leftSide={field.label}>
-          <Toggle
-            checked={isRequired(field.field)}
-            id={field.field}
+          <SelectField
+            value={getFieldValue(field.field)}
             onValueChange={(value) =>
-              handleRegistrationToggle(field.field, value)
+              handleChangeFieldValue(field.field, value)
             }
-          />
+          >
+            <option value="hidden" defaultChecked>
+              {t('hidden')}
+            </option>
+            <option value="optional">{t('optional')}</option>
+            <option value="required">{t('required')}</option>
+          </SelectField>
         </Element>
       ))}
     </Card>
