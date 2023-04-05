@@ -253,6 +253,15 @@ export function DebouncedCombobox(props: Props) {
               ]
             : [...current];
         });
+      } else {
+        setSelectedOption({
+          record: {
+            label: '',
+            value: '',
+            internal: true,
+          },
+          withoutEvents: true,
+        });
       }
 
       filter();
