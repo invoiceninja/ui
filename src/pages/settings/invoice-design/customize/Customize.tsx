@@ -134,7 +134,7 @@ export function Customize() {
       <div className="flex flex-col lg:flex-row gap-4">
         <div className="w-full lg:w-1/2">
           <TabGroup
-            tabs={[t('settings'), t('design'), t('variables')]}
+            tabs={[t('settings')]}
             withScrollableContent
             childrenClassName="max-h-[75vh]"
           >
