@@ -207,11 +207,9 @@ export function useSave(props: RecurringInvoiceSaveProps) {
     toast.processing();
     setErrors(undefined);
 
-    let endpointUrl = '/api/v1/recurring_invoices/:id';
-
-    if (queryAction) {
-      endpointUrl = `/api/v1/recurring_invoices/:id?${queryAction}=true`;
-    }
+    const endpointUrl = queryAction
+      ? `/api/v1/recurring_invoices/:id?${queryAction}=true`
+      : '/api/v1/recurring_invoices/:id';
 
     request(
       'PUT',
@@ -459,11 +457,9 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
     setErrors(undefined);
     toast.processing();
 
-    let endpointUrl = '/api/v1/recurring_invoices';
-
-    if (queryAction) {
-      endpointUrl = `/api/v1/recurring_invoices?${queryAction}=true`;
-    }
+    const endpointUrl = queryAction
+      ? `/api/v1/recurring_invoices?${queryAction}=true`
+      : '/api/v1/recurring_invoices';
 
     request('POST', endpoint(endpointUrl), recurringInvoice)
       .then((response: GenericSingleResourceResponse<RecurringInvoice>) => {
