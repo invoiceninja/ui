@@ -118,6 +118,7 @@ export interface Settings {
   postmark_secret: string;
   mailgun_secret: string;
   mailgun_domain: string;
+  mailgun_endpoint: string;
   purchase_order_number_pattern: string;
   purchase_order_number_counter: number;
   shared_invoice_quote_counter: boolean;
