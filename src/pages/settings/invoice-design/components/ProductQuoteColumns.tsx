@@ -27,6 +27,8 @@ export function ProductQuoteColumns() {
     { value: '$product.line_total', label: t('line_total') },
     { value: '$product.quantity', label: t('quantity') },
     { value: '$product.unit_cost', label: t('unit_cost') },
+    { value: '$product.discount', label: t('discount') },
+    { value: '$product.tax', label: t('tax') },
   ];
 
   const company = useCompanyChanges();
