@@ -9,18 +9,32 @@
  */
 
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCustomField } from '$app/components/CustomField';
 import { Card } from '$app/components/cards';
 import { SortableVariableList } from '$app/pages/settings/invoice-design/components/SortableVariableList';
 import { useTranslation } from 'react-i18next';
 
 export function ProductQuoteColumns() {
   const [t] = useTranslation();
+  const customField = useCustomField();
 
   const defaultVariables = [
-    { value: '$product.product1', label: t('custom1') },
-    { value: '$product.product2', label: t('custom2') },
-    { value: '$product.product3', label: t('custom3') },
-    { value: '$product.product4', label: t('custom4') },
+    {
+      value: '$product.product1',
+      label: customField('product1').label() || t('custom1'),
+    },
+    {
+      value: '$product.product2',
+      label: customField('product2').label() || t('custom2'),
+    },
+    {
+      value: '$product.product3',
+      label: customField('product3').label() || t('custom3'),
+    },
+    {
+      value: '$product.product4',
+      label: customField('product3').label() || t('custom4'),
+    },
     { value: '$product.description', label: t('description') },
     { value: '$product.gross_line_total', label: t('gross_line_total') },
     { value: '$product.item', label: t('item') },
