@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ReactNode, useState } from 'react';
+import { FormEvent, ReactElement, ReactNode, useState } from 'react';
 import {
   Home,
   Menu as MenuIcon,
@@ -48,6 +48,14 @@ import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHo
 import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
 import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { useEnabled } from '$app/common/guards/guards/enabled';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+
+export interface SaveOption {
+  label: string;
+  onClick: (event: FormEvent<HTMLFormElement>) => unknown;
+  icon?: ReactElement;
+}
 
 interface Props extends CommonProps {
   title?: string | null;
@@ -61,6 +69,7 @@ interface Props extends CommonProps {
   backButtonLabel?: string;
   disableSaveButton?: boolean;
   withoutBackButton?: boolean;
+  additionalSaveOptions?: SaveOption[];
 }
 
 export function Default(props: Props) {
@@ -423,13 +432,47 @@ export function Default(props: Props) {
                 )}
 
                 {props.onSaveClick && (
-                  <Button
-                    disabled={props.disableSaveButton}
-                    disableWithoutIcon
-                    onClick={props.onSaveClick}
-                  >
-                    {props.saveButtonLabel ?? t('save')}
-                  </Button>
+                  <div>
+                    {props.onSaveClick && !props.additionalSaveOptions && (
+                      <Button
+                        onClick={props.onSaveClick}
+                        disabled={props.disableSaveButton}
+                        disableWithoutIcon
+                      >
+                        {props.saveButtonLabel ?? t('save')}
+                      </Button>
+                    )}
+
+                    {props.onSaveClick && props.additionalSaveOptions && (
+                      <div className="flex">
+                        <Button
+                          className="rounded-br-none rounded-tr-none px-3"
+                          onClick={props.onSaveClick}
+                          disabled={props.disableSaveButton}
+                          disableWithoutIcon
+                        >
+                          {props.saveButtonLabel ?? t('save')}
+                        </Button>
+
+                        <Dropdown
+                          className="rounded-bl-none rounded-tl-none h-full px-1 border-gray-200 border-l-1 border-y-0 border-r-0"
+                          cardActions
+                          disabled={props.disableSaveButton}
+                        >
+                          {props.additionalSaveOptions.map((option, index) => (
+                            <DropdownElement
+                              key={index}
+                              icon={option.icon}
+                              disabled={props.disableSaveButton}
+                              onClick={option.onClick}
+                            >
+                              {option.label}
+                            </DropdownElement>
+                          ))}
+                        </Dropdown>
+                      </div>
+                    )}
+                  </div>
                 )}
 
                 <div className="space-x-3 items-center hidden lg:flex">
