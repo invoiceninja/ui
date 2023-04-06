@@ -13,6 +13,7 @@ import { Dispatch, SetStateAction } from 'react';
 import { Schedule } from '$app/common/interfaces/schedule';
 import { cloneDeep, set } from 'lodash';
 import { useBlankScheduleQuery } from '$app/common/queries/schedules';
+import { Frequency } from '$app/common/enums/frequency';
 
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
@@ -34,8 +35,8 @@ export function useHandleChange(params: Params) {
       setSchedule(() => ({
         ...blankSchedule,
         template: value as string,
-        frequency_id: schedule.frequency_id,
-        remaining_cycles: schedule.remaining_cycles,
+        frequency_id: Frequency.Monthly,
+        remaining_cycles: -1,
         parameters: {
           clients: [],
           date_range: 'last7_days',
