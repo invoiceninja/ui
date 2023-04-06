@@ -62,8 +62,6 @@ export function Edit() {
     }
   }, [scheduleResponse]);
 
-  console.log(schedule);
-
   const handleSave = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
