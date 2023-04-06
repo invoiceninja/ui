@@ -11,7 +11,6 @@
 export interface LoginValidation {
   email?: string[];
   password?: string[];
-  secret?: string[];
   one_time_password?: string[];
 }
 

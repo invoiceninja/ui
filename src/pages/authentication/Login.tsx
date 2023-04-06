@@ -36,6 +36,8 @@ export function Login() {
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [t] = useTranslation();
 
+  const [secret, setSecret] = useState<string>('');
+
   const login = useLogin();
 
   const form = useFormik({
@@ -43,7 +45,6 @@ export function Login() {
       email: '',
       password: '',
       one_time_password: '',
-      secret: '',
     },
     onSubmit: (values: LoginForm) => {
       setMessage(undefined);
@@ -51,8 +52,8 @@ export function Login() {
       setIsFormBusy(true);
 
       request('POST', endpoint('/api/v1/login'), values, {
-        ...(values.secret && {
-          headers: { 'X-API-SECRET': values.secret },
+        ...(secret && {
+          headers: { 'X-API-SECRET': secret },
         }),
       })
         .then((response) => login(response))
@@ -111,10 +112,9 @@ export function Login() {
               <InputField
                 type="password"
                 label={t('secret')}
-                id="secret"
                 placeholder={t('plaid_optional')}
-                onChange={form.handleChange}
-                errorMessage={errors?.secret}
+                value={secret}
+                onValueChange={(value) => setSecret(value)}
               />
             )}
 
