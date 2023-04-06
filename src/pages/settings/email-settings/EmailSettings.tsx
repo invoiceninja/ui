@@ -142,6 +142,20 @@ export function EmailSettings() {
                 }
               />
             </Element>
+
+            <Element leftSide={t('endpoint')}>
+              <SelectField
+                value={company?.settings.mailgun_endpoint}
+                onValueChange={(value) =>
+                  handleChange('settings.mailgun_endpoint', value)
+                }
+              >
+                <option value="api.mailgun.net" defaultChecked>
+                  api.mailgun.net
+                </option>
+                <option value="api.eu.mailgun.net">api.eu.mailgun.net</option>
+              </SelectField>
+            </Element>
           </>
         )}
 
