@@ -31,7 +31,7 @@ export function useHandleChange(params: Params) {
 
     const schedule = cloneDeep(params.schedule);
 
-    if (property === 'template' && schedule && blankSchedule) {
+    if (property === 'template' && blankSchedule) {
       setSchedule(() => ({
         ...blankSchedule,
         template: value as string,
