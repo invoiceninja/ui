@@ -11,11 +11,14 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Project } from '$app/common/interfaces/project';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { GenericQueryOptions } from './invoices';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { generatePath } from 'react-router-dom';
+import { AxiosError } from 'axios';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function useBlankProjectQuery(options?: GenericQueryOptions) {
   const hasPermission = useHasPermission();
@@ -43,4 +46,31 @@ export function useProjectQuery(params: { id: string | undefined }) {
       ),
     { staleTime: Infinity }
   );
+}
+
+export function useFetchProjectQuery() {
+  const queryClient = useQueryClient();
+
+  return async (projectId: string) => {
+    let project: Project | undefined;
+
+    await queryClient
+      .fetchQuery(generatePath('/api/v1/projects/:id', { id: projectId }), () =>
+        request(
+          'GET',
+          endpoint('/api/v1/projects/:id', {
+            id: projectId,
+          })
+        )
+      )
+      .then((response: GenericSingleResourceResponse<Project>) => {
+        project = response.data.data;
+      })
+      .catch((error: AxiosError) => {
+        toast.error();
+        console.error(error);
+      });
+
+    return project;
+  };
 }
