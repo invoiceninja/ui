@@ -11,7 +11,7 @@
 import { useState } from 'react';
 import { useFormik } from 'formik';
 import { LoginForm } from '../../common/dtos/authentication';
-import { endpoint, isHosted } from '../../common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '../../common/helpers';
 import { AxiosError } from 'axios';
 import { LoginValidation } from './common/ValidationInterface';
 import { useTranslation } from 'react-i18next';
@@ -43,13 +43,18 @@ export function Login() {
       email: '',
       password: '',
       one_time_password: '',
+      secret: '',
     },
     onSubmit: (values: LoginForm) => {
       setMessage(undefined);
       setErrors(undefined);
       setIsFormBusy(true);
 
-      request('POST', endpoint('/api/v1/login'), values)
+      request('POST', endpoint('/api/v1/login'), values, {
+        ...(values.secret && {
+          headers: { 'X-API-SECRET': values.secret },
+        }),
+      })
         .then((response) => login(response))
         .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
           return error.response?.status === 422
@@ -101,6 +106,17 @@ export function Login() {
               placeholder={t('plaid_optional')}
               errorMessage={errors?.one_time_password}
             />
+
+            {isSelfHosted() && (
+              <InputField
+                type="password"
+                label={t('secret')}
+                id="secret"
+                placeholder={t('plaid_optional')}
+                onChange={form.handleChange}
+                errorMessage={errors?.secret}
+              />
+            )}
 
             {message && (
               <Alert className="mt-4" type="danger">
