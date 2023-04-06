@@ -210,7 +210,7 @@ export function useSave(props: RecurringInvoiceSaveProps) {
     let endpointUrl = '/api/v1/recurring_invoices/:id';
 
     if (queryAction) {
-      endpointUrl = '/api/v1/recurring_invoices/:id?' + queryAction + '=true';
+      endpointUrl = `/api/v1/recurring_invoices/:id?${queryAction}=true`;
     }
 
     request(
@@ -462,7 +462,7 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
     let endpointUrl = '/api/v1/recurring_invoices';
 
     if (queryAction) {
-      endpointUrl = '/api/v1/recurring_invoices?' + queryAction + '=true';
+      endpointUrl = `/api/v1/recurring_invoices?${queryAction}=true`;
     }
 
     request('POST', endpoint(endpointUrl), recurringInvoice)
