@@ -11,7 +11,7 @@
 import { useState } from 'react';
 import { useFormik } from 'formik';
 import { LoginForm } from '../../common/dtos/authentication';
-import { endpoint, isHosted } from '../../common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '../../common/helpers';
 import { AxiosError } from 'axios';
 import { LoginValidation } from './common/ValidationInterface';
 import { useTranslation } from 'react-i18next';
@@ -36,6 +36,8 @@ export function Login() {
   const [isFormBusy, setIsFormBusy] = useState(false);
   const [t] = useTranslation();
 
+  const [secret, setSecret] = useState<string>('');
+
   const login = useLogin();
 
   const form = useFormik({
@@ -49,7 +51,11 @@ export function Login() {
       setErrors(undefined);
       setIsFormBusy(true);
 
-      request('POST', endpoint('/api/v1/login'), values)
+      request('POST', endpoint('/api/v1/login'), values, {
+        ...(secret && {
+          headers: { 'X-API-SECRET': secret },
+        }),
+      })
         .then((response) => login(response))
         .catch((error: AxiosError<GenericValidationBag<LoginValidation>>) => {
           return error.response?.status === 422
@@ -101,6 +107,16 @@ export function Login() {
               placeholder={t('plaid_optional')}
               errorMessage={errors?.one_time_password}
             />
+
+            {isSelfHosted() && (
+              <InputField
+                type="password"
+                label={t('secret')}
+                placeholder={t('plaid_optional')}
+                value={secret}
+                onValueChange={(value) => setSecret(value)}
+              />
+            )}
 
             {message && (
               <Alert className="mt-4" type="danger">
