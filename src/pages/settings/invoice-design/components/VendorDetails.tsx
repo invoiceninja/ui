@@ -8,11 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
+import { useCustomField } from '$app/components/CustomField';
 
 export function VendorDetails() {
   const [t] = useTranslation();
+  const customField = useCustomField();
 
   const defaultVariables = [
     { value: '$vendor.name', label: t('vendor_name') },
@@ -25,10 +28,22 @@ export function VendorDetails() {
     { value: '$vendor.address2', label: t('address2') },
     { value: '$vendor.city_state_postal', label: t('city_state_postal') },
     { value: '$vendor.country', label: t('country') },
-    { value: '$vendor.custom1', label: t('custom1') },
-    { value: '$vendor.custom2', label: t('custom2') },
-    { value: '$vendor.custom3', label: t('custom3') },
-    { value: '$vendor.custom4', label: t('custom4') },
+    {
+      value: '$vendor.custom1',
+      label: customField('vendor1').label() || t('custom1'),
+    },
+    {
+      value: '$vendor.custom2',
+      label: customField('vendor2').label() || t('custom2'),
+    },
+    {
+      value: '$vendor.custom3',
+      label: customField('vendor3').label() || t('custom3'),
+    },
+    {
+      value: '$vendor.custom4',
+      label: customField('vendor4').label() || t('custom4'),
+    },
 
     { value: '$contact.full_name', label: t('contact_full_name') },
     { value: '$contact.email', label: t('contact_email') },
@@ -40,9 +55,11 @@ export function VendorDetails() {
   ];
 
   return (
-    <SortableVariableList
-      for="vendor_details"
-      defaultVariables={defaultVariables}
-    />
+    <Card title={t('vendor_details')} padding="small" collapsed={true}>
+      <SortableVariableList
+        for="vendor_details"
+        defaultVariables={defaultVariables}
+      />
+    </Card>
   );
 }

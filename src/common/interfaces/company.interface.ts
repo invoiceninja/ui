@@ -263,6 +263,10 @@ export interface Settings {
   qr_iban: string;
   besr_id: string;
   vendor_portal_enable_uploads: boolean;
+  company_logo_size: string;
+  show_paid_stamp: boolean;
+  show_shipping_address: boolean;
+  sync_invoice_quote_columns: boolean;
   client_initiated_payments: boolean;
   client_initiated_payments_minimum: number;
 }
