@@ -19,11 +19,11 @@ test("can't view clients without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('clients@example.com');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'clients@example.com', 'password');
 
   await expect(page.locator('.flex-grow > .flex-1').first()).not.toContainText(
     'Clients'
@@ -34,12 +34,12 @@ test('can view client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('clients@example.com');
   await set('view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'clients@example.com', 'password');
 
   await page.getByRole('link', { name: 'Clients', exact: true }).click();
 
@@ -94,12 +94,12 @@ test("can't create a client", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('clients@example.com');
   await set('view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'clients@example.com', 'password');
 
   await page.getByRole('link', { name: 'Clients', exact: true }).click();
   await page.getByText('New Client').click();
@@ -115,12 +115,12 @@ test('can create a client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('clients@example.com');
   await set('create_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'clients@example.com', 'password');
 
   await page.getByRole('link', { name: 'Clients', exact: true }).click();
 
@@ -155,12 +155,12 @@ test('can view assigned client with create_client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('clients@example.com');
   await set('create_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'clients@example.com', 'password');
 
   await page.getByRole('link', { name: 'Clients' }).click();
 
@@ -173,12 +173,12 @@ test('deleting client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('clients@example.com');
   await set('create_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'clients@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -224,12 +224,12 @@ test('archiving client', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('clients@example.com');
   await set('create_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'clients@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -274,12 +274,12 @@ test('client documents preview', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('clients@example.com');
   await set('create_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'clients@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -333,12 +333,12 @@ test('client documents uploading', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('clients@example.com');
   await set('create_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'clients@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
