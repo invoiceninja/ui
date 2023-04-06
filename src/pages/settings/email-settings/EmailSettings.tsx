@@ -10,7 +10,7 @@
 
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import { trans } from '$app/common/helpers';
+import { isHosted, trans } from '$app/common/helpers';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -105,8 +105,8 @@ export function EmailSettings() {
             <option defaultChecked value="default">
               {t('default')}
             </option>
-            <option value="gmail">Gmail</option>
-            <option value="microsoft">Microsoft</option>
+            {isHosted() && <option value="gmail">Gmail</option>}
+            {isHosted() && <option value="microsoft">Microsoft</option>}
             <option value="client_postmark">Postmark</option>
             <option value="client_mailgun">Mailgun</option>
           </SelectField>
