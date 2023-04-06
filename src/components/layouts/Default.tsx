@@ -42,7 +42,7 @@ import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
-import { isSelfHosted } from '$app/common/helpers';
+import { isDemo, isSelfHosted } from '$app/common/helpers';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
@@ -70,7 +70,7 @@ export function Default(props: Props) {
     .VITE_WHITELABEL_INVOICE_URL as unknown as string;
 
   const shouldShowUnlockButton =
-    useUnlockButtonForHosted() || useUnlockButtonForSelfHosted();
+    !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 
   const isMiniSidebar = useSelector(
     (state: RootState) => state.settings.isMiniSidebar

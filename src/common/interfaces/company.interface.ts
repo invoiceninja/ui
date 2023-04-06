@@ -33,6 +33,8 @@ export interface Company {
   enabled_expense_tax_rates: number;
   stock_notification: boolean;
   invoice_task_lock: boolean;
+  invoice_task_hours: boolean;
+  invoice_task_project: boolean;
   track_inventory: boolean;
   stop_on_unpaid_recurring: boolean;
   enabled_modules: number;
@@ -63,6 +65,7 @@ export interface Settings {
   language_id: string;
   show_currency_code: boolean;
   show_task_item_description: boolean;
+  allow_billable_task_items: boolean;
   show_email_footer: boolean;
   company_gateway_ids: string;
   currency_id: string;
@@ -260,4 +263,6 @@ export interface Settings {
   qr_iban: string;
   besr_id: string;
   vendor_portal_enable_uploads: boolean;
+  client_initiated_payments: boolean;
+  client_initiated_payments_minimum: number;
 }

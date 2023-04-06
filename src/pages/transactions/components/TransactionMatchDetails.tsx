@@ -24,6 +24,8 @@ import { useTranslation } from 'react-i18next';
 import { TabGroup } from '$app/components/TabGroup';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { TransactionRule } from '$app/common/interfaces/transaction-rules';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 
 export interface TransactionDetails {
   base_type: string;
@@ -43,6 +45,8 @@ export function TransactionMatchDetails(props: Props) {
   const queryClient = useQueryClient();
 
   const { transactionRule } = props;
+
+  const invalidationQuery = useAtomValue(invalidationQueryAtom);
 
   const [isFormBusy, setIsFormBusy] = useState<boolean>(false);
 
@@ -83,7 +87,7 @@ export function TransactionMatchDetails(props: Props) {
         ],
       })
         .then(() => {
-          queryClient.invalidateQueries('/api/v1/bank_transactions');
+          queryClient.invalidateQueries(invalidationQuery);
           queryClient.invalidateQueries('/api/v1/invoices');
           queryClient.invalidateQueries(
             route('/api/v1/bank_transactions/:id', {
@@ -120,7 +124,7 @@ export function TransactionMatchDetails(props: Props) {
         ],
       })
         .then(() => {
-          queryClient.invalidateQueries('/api/v1/bank_transactions');
+          queryClient.invalidateQueries(invalidationQuery);
           queryClient.invalidateQueries('/api/v1/invoices');
           queryClient.invalidateQueries('/api/v1/payments');
           queryClient.invalidateQueries(
@@ -159,7 +163,7 @@ export function TransactionMatchDetails(props: Props) {
         ],
       })
         .then((response: GenericSingleResourceResponse<Transaction[]>) => {
-          queryClient.invalidateQueries('/api/v1/bank_transactions');
+          queryClient.invalidateQueries(invalidationQuery);
 
           queryClient.invalidateQueries(
             route('/api/v1/bank_transactions/:id', {
@@ -202,7 +206,7 @@ export function TransactionMatchDetails(props: Props) {
         ],
       })
         .then((response: GenericSingleResourceResponse<Transaction[]>) => {
-          queryClient.invalidateQueries('/api/v1/bank_transactions');
+          queryClient.invalidateQueries(invalidationQuery);
 
           queryClient.invalidateQueries('/api/v1/expenses');
 

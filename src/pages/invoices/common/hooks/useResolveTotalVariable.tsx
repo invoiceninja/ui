@@ -112,7 +112,7 @@ export function useResolveTotalVariable(props: Props) {
       );
     }
 
-    if (variable == '$balance' && invoiceSum) {
+    if (variable == '$balance_due' && invoiceSum) {
       return (
         <Element leftSide={resolveTranslation(variable, '$')}>
           {formatMoney(invoiceSum.invoice.balance)}
