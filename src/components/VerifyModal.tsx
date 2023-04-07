@@ -59,9 +59,7 @@ export function VerifyModal(props: Props) {
 
         <span className="text-base">
           {props.type === 'email' ? (
-            <span>
-              <strong>{user?.email}</strong>
-            </span>
+            <strong>{user?.email}</strong>
           ) : (
             user?.phone
           )}
