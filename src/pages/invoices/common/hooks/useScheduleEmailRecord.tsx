@@ -13,17 +13,15 @@ import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 
 interface Props {
-  entity: string;
+  entity: 'invoice' | 'credit' | 'quote' | 'purchase_order';
 }
 
-export function useScheduleEmailRecord(props: Props) {
+export function useScheduleEmailRecord({ entity }: Props) {
   const navigate = useNavigate();
-
-  const { entity } = props;
 
   const setScheduleParameters = useSetAtom(scheduleParametersAtom);
 
-  return (entity_id: string) => {
+  return (entityId: string) => {
     setScheduleParameters({
       clients: [],
       show_aging_table: false,
@@ -31,7 +29,7 @@ export function useScheduleEmailRecord(props: Props) {
       status: 'all',
       date_range: 'last7_days',
       entity,
-      entity_id,
+      entity_id: entityId,
     });
 
     navigate('/settings/schedules/create?template=email_record');

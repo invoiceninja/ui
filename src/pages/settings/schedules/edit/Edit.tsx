@@ -65,12 +65,12 @@ export function Edit() {
   const handleSave = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!isFormBusy) {
+    if (!isFormBusy && schedule) {
       setIsFormBusy(true);
       setErrors(undefined);
       toast.processing();
 
-      const formattedSchedule = formatSchedulePayload(schedule!);
+      const formattedSchedule = formatSchedulePayload(schedule);
 
       request(
         'PUT',

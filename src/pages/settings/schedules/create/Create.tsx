@@ -60,7 +60,7 @@ export function Create() {
 
   const handleChange = useHandleChange({ setErrors, setSchedule, schedule });
 
-  const formatSchedulePayment = useFormatSchedulePayload();
+  const formatSchedulePayload = useFormatSchedulePayload();
 
   useEffect(() => {
     if (blankSchedule) {
@@ -94,12 +94,12 @@ export function Create() {
   const handleSave = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!isFormBusy) {
+    if (!isFormBusy && schedule) {
       setIsFormBusy(true);
       setErrors(undefined);
       toast.processing();
 
-      const formattedSchedule = formatSchedulePayment(schedule!);
+      const formattedSchedule = formatSchedulePayload(schedule);
 
       request('POST', endpoint('/api/v1/task_schedulers'), formattedSchedule)
         .then((response: GenericSingleResourceResponse<Schedule>) => {
