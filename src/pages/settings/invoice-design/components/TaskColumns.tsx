@@ -8,11 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
 import { SortableVariableList } from './SortableVariableList';
+import { useCustomField } from '$app/components/CustomField';
 
 export function TaskColumns() {
   const [t] = useTranslation();
+  const customField = useCustomField();
 
   const defaultVariables = [
     { value: '$task.service', label: t('service') },
@@ -22,17 +25,31 @@ export function TaskColumns() {
     { value: '$task.tax', label: t('tax') },
     { value: '$task.discount', label: t('discount') },
     { value: '$task.line_total', label: t('line_total') },
-    { value: '$task.task1', label: t('custom1') },
-    { value: '$task.task2', label: t('custom2') },
-    { value: '$task.task3', label: t('custom3') },
-    { value: '$task.task4', label: t('custom4') },
+    {
+      value: '$task.task1',
+      label: customField('task1').label() || t('custom1'),
+    },
+    {
+      value: '$task.task2',
+      label: customField('task2').label() || t('custom2'),
+    },
+    {
+      value: '$task.task3',
+      label: customField('task3').label() || t('custom3'),
+    },
+    {
+      value: '$task.task4',
+      label: customField('task4').label() || t('custom4'),
+    },
     { value: '$task.gross_line_total', label: t('gross_line_total') },
   ];
 
   return (
-    <SortableVariableList
-      for="task_columns"
-      defaultVariables={defaultVariables}
-    />
+    <Card title={t('task_columns')} padding="small" collapsed={true}>
+      <SortableVariableList
+        for="task_columns"
+        defaultVariables={defaultVariables}
+      />
+    </Card>
   );
 }

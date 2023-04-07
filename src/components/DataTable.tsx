@@ -71,6 +71,7 @@ interface Props<T> {
   leftSideChevrons?: ReactNode;
   staleTime?: number;
   onTableRowClick?: (resource: T) => unknown;
+  showRestore?: (resource: T) => boolean;
   beforeFilter?: ReactNode;
 }
 
@@ -365,7 +366,11 @@ export function DataTable<T extends object>(props: Props<T>) {
                             )
                         )}
 
-                      {props.customActions && <Divider withoutPadding />}
+                      {props.customActions &&
+                        (props.showRestore?.(resource) ||
+                          !props.showRestore) && (
+                          <Divider withoutPadding />
+                        )}
 
                       {resource?.archived_at === 0 && (
                         <DropdownElement
@@ -376,14 +381,16 @@ export function DataTable<T extends object>(props: Props<T>) {
                         </DropdownElement>
                       )}
 
-                      {resource?.archived_at > 0 && (
-                        <DropdownElement
-                          onClick={() => bulk('restore', resource.id)}
-                          icon={<Icon element={MdRestore} />}
-                        >
-                          {t('restore')}
-                        </DropdownElement>
-                      )}
+                      {resource?.archived_at > 0 &&
+                        (props.showRestore?.(resource) ||
+                          !props.showRestore) && (
+                          <DropdownElement
+                            onClick={() => bulk('restore', resource.id)}
+                            icon={<Icon element={MdRestore} />}
+                          >
+                            {t('restore')}
+                          </DropdownElement>
+                        )}
 
                       {!resource?.is_deleted && (
                         <DropdownElement

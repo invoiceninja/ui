@@ -14,14 +14,13 @@ import paymentType from '$app/common/constants/payment-type';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Payment } from '$app/common/interfaces/payment';
-import { usePaymentQuery } from '$app/common/queries/payments';
 import { Divider } from '$app/components/cards/Divider';
 import { ConvertCurrency } from '$app/components/ConvertCurrency';
 import { CustomField } from '$app/components/CustomField';
 import Toggle from '$app/components/forms/Toggle';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useOutletContext, useParams } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { PaymentOverview } from './PaymentOverview';
 import { ClientCard } from '$app/pages/clients/show/components/ClientCard';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -37,25 +36,13 @@ export function Edit() {
   const { documentTitle } = useTitle('edit_payment');
   const [t] = useTranslation();
 
-  const context: Context = useOutletContext();
+  const context = useOutletContext<Context>();
 
   const { setPayment, payment, errors } = context;
 
   const [convertCurrency, setConvertCurrency] = useState(false);
 
-  const { id } = useParams();
-  const { data } = usePaymentQuery({ id });
-
   const company = useCurrentCompany();
-
-  useEffect(() => {
-    if (data?.data.data) {
-      const payment: Payment = { ...data.data.data, invoices: [], credits: [] };
-      delete payment.documents;
-
-      setPayment(payment);
-    }
-  }, [data]);
 
   const handleChange = <
     TField extends keyof Payment,
@@ -70,7 +57,7 @@ export function Edit() {
   return (
     <Card title={documentTitle}>
       {payment?.client && <ClientCard client={payment.client} />}
-      {payment && <PaymentOverview payment={data?.data.data} />}
+      {payment && <PaymentOverview payment={payment} />}
 
       <Divider />
 

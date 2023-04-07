@@ -8,58 +8,223 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { endpoint } from '$app/common/helpers';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useTitle } from '$app/common/hooks/useTitle';
+import { useDesignsQuery } from '$app/common/queries/designs';
+import { Card } from '$app/components/cards';
+import { Default } from '$app/components/layouts/Default';
+import { TabGroup } from '$app/components/TabGroup';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { useDiscardChanges } from '$app/pages/settings/common/hooks/useDiscardChanges';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
+import {
+  ClientDetails,
+  CompanyAddress,
+  CompanyDetails,
+  CreditDetails,
+  GeneralSettings,
+  InvoiceDetails,
+  ProductColumns,
+  PurchaseOrderDetails,
+  QuoteDetails,
+  TaskColumns,
+  TotalFields,
+  VendorDetails,
+} from '$app/pages/settings/invoice-design/components';
+import { ProductQuoteColumns } from '$app/pages/settings/invoice-design/components/ProductQuoteColumns';
+import {
+  payloadAtom,
+  useDesignUtilities,
+  useHandleDesignSave,
+} from '$app/pages/settings/invoice-design/customize/common/hooks';
+import { variables } from '$app/pages/settings/invoice-design/customize/common/variables';
+import { Body } from '$app/pages/settings/invoice-design/customize/components/Body';
+import { Footer } from '$app/pages/settings/invoice-design/customize/components/Footer';
+import { Header } from '$app/pages/settings/invoice-design/customize/components/Header';
+import { Includes } from '$app/pages/settings/invoice-design/customize/components/Includes';
+import {
+  designAtom,
+  Settings,
+} from '$app/pages/settings/invoice-design/customize/components/Settings';
+import { Variable } from '$app/pages/settings/templates-and-reminders/common/components/Variable';
+import { useAtom } from 'jotai';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Card, ClickableElement, Element } from '../../../../components/cards';
-import { InputField, SelectField } from '../../../../components/forms';
-import Toggle from '../../../../components/forms/Toggle';
-import { Default } from '../../../../components/layouts/Default';
-import { Tabs } from './components';
 
 export function Customize() {
   const [t] = useTranslation();
+  const [payload, setPayload] = useAtom(payloadAtom);
+  const [design, setDesign] = useAtom(designAtom);
+
+  const { documentTitle } = useTitle('customize_and_preview');
+  const { data: designs } = useDesignsQuery();
+
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('customize_and_preview'), href: '/settings/design/customize' },
+  ];
+
+  const company = useInjectCompanyChanges();
+  const discardChanges = useDiscardChanges();
+
+  const { handleDesignChange } = useDesignUtilities();
 
   useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${t(
-      'customize_and_preview'
-    )}`;
-  });
+    if (designs && company?.settings) {
+      setPayload(
+        (current) =>
+          current && {
+            ...current,
+            settings: company.settings,
+          }
+      );
+    }
+  }, [designs, company?.settings]);
+
+  useEffect(() => {
+    if (company?.settings.invoice_design_id) {
+      const design = designs?.find(
+        (d) => d.id === company?.settings.invoice_design_id
+      );
+
+      if (design) {
+        handleDesignChange(design, design.is_custom ? 'custom' : 'stock');
+      }
+    }
+  }, [company?.settings.invoice_design_id]);
+
+  useEffect(() => {
+    return () => {
+      discardChanges();
+
+      setPayload((current) => ({
+        ...current,
+        design: undefined,
+        settings: null,
+      }));
+    };
+  }, []);
+
+  const handleCompanySave = useHandleCompanySave();
+  const handleCompanyCancel = useDiscardChanges();
+
+  const handleDesignSave = useHandleDesignSave();
+
+  const handleSave = () => {
+    handleCompanySave();
+
+    if (design) {
+      handleDesignSave(design);
+    }
+  };
+
+  const handleCancel = () => {
+    handleCompanyCancel();
+    setDesign(null);
+  };
 
   return (
-    <Default title={t('invoice_design')}>
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-12 lg:col-span-5">
-          <Tabs />
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onSaveClick={handleSave}
+      onCancelClick={handleCancel}
+    >
+      <div className="flex flex-col lg:flex-row gap-4">
+        <div className="w-full lg:w-1/2">
+          <TabGroup
+            tabs={[t('settings')]}
+            withScrollableContent
+            childrenClassName="max-h-[75vh]"
+          >
+            <div className="space-y-4">
+              <GeneralSettings />
+              <ClientDetails />
+              <CompanyDetails />
+              <CompanyAddress />
+              <InvoiceDetails />
+              <QuoteDetails />
+              <CreditDetails />
+              <VendorDetails />
+              <PurchaseOrderDetails />
+              <ProductColumns />
+              <ProductQuoteColumns />
+              <TaskColumns />
+              <TotalFields />
+            </div>
 
-          <div className="my-4">
-            <Card>
-              <Element leftSide={t('name')}>
-                <InputField id="name" />
-              </Element>
-              <Element leftSide={t('design')}>
-                <SelectField>
-                  <option value="clean">Clean</option>
-                </SelectField>
-              </Element>
-              <Element
-                leftSide={t('html_mode')}
-                leftSideHelp="Preview updates faster but with less accuracy."
+            <div className="space-y-4">
+              <Settings payload={payload} />
+              <Body payload={payload} />
+              <Header payload={payload} />
+              <Footer payload={payload} />
+              <Includes payload={payload} />
+            </div>
+
+            <div className="space-y-4">
+              <Card
+                title={t('invoice')}
+                padding="small"
+                childrenClassName="px-2"
+                collapsed={false}
               >
-                <Toggle />
-              </Element>
-              <ClickableElement href="https://invoiceninja.github.io/docs/custom-fields/">
-                {t('view_docs')}
-              </ClickableElement>
-            </Card>
-          </div>
+                <div className="px-2">
+                  {variables.invoice.map((variable, index) => (
+                    <Variable key={index}>{variable}</Variable>
+                  ))}
+                </div>
+              </Card>
+
+              <Card
+                title={t('client')}
+                padding="small"
+                childrenClassName="px-2"
+                collapsed={true}
+              >
+                <div className="px-2">
+                  {variables.client.map((variable, index) => (
+                    <Variable key={index}>{variable}</Variable>
+                  ))}
+                </div>
+              </Card>
+
+              <Card
+                title={t('contact')}
+                padding="small"
+                childrenClassName="px-2"
+                collapsed={true}
+              >
+                <div className="px-2">
+                  {variables.contact.map((variable, index) => (
+                    <Variable key={index}>{variable}</Variable>
+                  ))}
+                </div>
+              </Card>
+
+              <Card
+                title={t('company')}
+                padding="small"
+                childrenClassName="px-2"
+                collapsed={true}
+              >
+                <div className="px-2">
+                  {variables.company.map((variable, index) => (
+                    <Variable key={index}>{variable}</Variable>
+                  ))}
+                </div>
+              </Card>
+            </div>
+          </TabGroup>
         </div>
 
-        <div className="col-span-12 lg:col-span-7">
-          <iframe
-            src="http://www.africau.edu/images/default/sample.pdf"
-            frameBorder={0}
-            style={{ minWidth: '100%', minHeight: '85vh' }}
-          ></iframe>
+        <div className="w-full lg:w-1/2 max-h-[82.5vh] overflow-y-scroll">
+          <InvoiceViewer
+            link={endpoint('/api/v1/live_design')}
+            resource={payload}
+            method="POST"
+            withToast
+          />
         </div>
       </div>
     </Default>

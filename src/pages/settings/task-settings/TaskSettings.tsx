@@ -115,6 +115,20 @@ export function TaskSettings() {
           />
         </Element>
 
+        <Element
+          leftSide={t('allow_billable_task_items')}
+          leftSideHelp={t('allow_billable_task_items_help')}
+        >
+          <Toggle
+            checked={
+              companyChanges?.settings.allow_billable_task_items || false
+            }
+            onChange={(value: boolean) =>
+              handleToggleChange('settings.allow_billable_task_items', value)
+            }
+          />
+        </Element>
+
         <Divider />
 
         <Element
@@ -149,6 +163,30 @@ export function TaskSettings() {
             checked={companyChanges?.invoice_task_timelog || false}
             onChange={(value: boolean) =>
               handleToggleChange('invoice_task_timelog', value)
+            }
+          />
+        </Element>
+
+        <Element
+          leftSide={t('invoice_task_hours')}
+          leftSideHelp={t('invoice_task_hours_help')}
+        >
+          <Toggle
+            checked={companyChanges?.invoice_task_hours || false}
+            onChange={(value: boolean) =>
+              handleToggleChange('invoice_task_hours', value)
+            }
+          />
+        </Element>
+
+        <Element
+          leftSide={t('invoice_task_project')}
+          leftSideHelp={t('invoice_task_project_help')}
+        >
+          <Toggle
+            checked={companyChanges?.invoice_task_project || false}
+            onChange={(value: boolean) =>
+              handleToggleChange('invoice_task_project', value)
             }
           />
         </Element>

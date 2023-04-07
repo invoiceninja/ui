@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { Button, SelectField } from '$app/components/forms';
 import { arrayMoveImmutable } from 'array-move';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
@@ -95,7 +95,7 @@ export function SortableVariableList(props: Props) {
   };
 
   return (
-    <Card title={t(props.for)}>
+    <>
       <Element leftSide={t('fields')}>
         <SelectField onChange={handleSelectChange}>
           <option></option>
@@ -149,6 +149,6 @@ export function SortableVariableList(props: Props) {
           </Droppable>
         </DragDropContext>
       </Element>
-    </Card>
+    </>
   );
 }

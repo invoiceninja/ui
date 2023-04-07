@@ -10,17 +10,54 @@
 
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { Design } from '$app/common/interfaces/design';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { useQuery } from 'react-query';
-import { Params } from './common/params.interface';
+import { AxiosResponse } from 'axios';
+import { GenericQueryOptions } from '$app/common/queries/invoices';
+import { route } from '$app/common/helpers/route';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
-export function useDesignsQuery(params: Params) {
-  return useQuery(['/api/v1/designs', params], () =>
-    request(
-      'GET',
-      endpoint('/api/v1/designs?per_page=:perPage&page=:currentPage', {
-        perPage: params.perPage,
-        currentPage: params.currentPage,
-      })
-    )
+export function useDesignsQuery() {
+  return useQuery<Design[]>(
+    ['/api/v1/designs'],
+    () =>
+      request('GET', endpoint('/api/v1/designs')).then(
+        (response: AxiosResponse<GenericManyResponse<Design>>) =>
+          response.data.data
+      ),
+    { staleTime: Infinity }
+  );
+}
+
+interface DesignQueryOptions extends GenericQueryOptions {
+  id: string | undefined;
+}
+
+export function useDesignQuery(params: DesignQueryOptions) {
+  return useQuery<Design>(
+    route('/api/v1/designs/:id', { id: params.id }),
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/designs/:id?include=client', { id: params.id })
+      ).then(
+        (response: GenericSingleResourceResponse<Design>) => response.data.data
+      ),
+    { staleTime: Infinity, ...params }
+  );
+}
+
+export function useBlankDesignQuery(options?: GenericQueryOptions) {
+  return useQuery<Design>(
+    route('/api/v1/designs/create'),
+    () =>
+      request('GET', endpoint('/api/v1/designs/create')).then(
+        (response: GenericSingleResourceResponse<Design>) => response.data.data
+      ),
+    {
+      ...options,
+      staleTime: Infinity,
+    }
   );
 }
