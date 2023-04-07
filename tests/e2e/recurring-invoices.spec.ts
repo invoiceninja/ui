@@ -18,11 +18,11 @@ test("can't view recurring invoices without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('invoices@example.com');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   await expect(page.locator('.flex-grow > .flex-1').first()).not.toContainText(
     'Recurring Invoices'
@@ -33,12 +33,12 @@ test('can view recurring invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('invoices@example.com');
   await set('view_recurring_invoice');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   await page
     .getByRole('link', { name: 'Recurring Invoices', exact: true })
@@ -90,12 +90,12 @@ test("can't create a recurring invoice", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('invoices@example.com');
   await set('view_recurring_invoice');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   await page
     .getByRole('link', { name: 'Recurring Invoices', exact: true })
@@ -113,12 +113,12 @@ test('can create a recurring invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('invoices@example.com');
   await set('create_recurring_invoice');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   await page
     .getByRole('link', { name: 'Recurring Invoices', exact: true })
@@ -138,12 +138,12 @@ test('can view assigned recurring invoice with create_recurring_invoice', async 
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_recurring_invoice');
+  await clear('invoices@example.com');
+  await set('create_recurring_invoice', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   await page.getByRole('link', { name: 'Recurring Invoices' }).click();
 
@@ -162,12 +162,12 @@ test('deleting recurring invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_recurring_invoice');
+  await clear('invoices@example.com');
+  await set('create_recurring_invoice', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -215,12 +215,12 @@ test('archiving recurring invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_recurring_invoice');
+  await clear('invoices@example.com');
+  await set('create_recurring_invoice', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -269,12 +269,12 @@ test('cloning recurring invoice', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_recurring_invoice');
+  await clear('invoices@example.com');
+  await set('create_recurring_invoice', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -327,12 +327,12 @@ test('recurring invoice documents preview', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_recurring_invoice');
+  await clear('invoices@example.com');
+  await set('create_recurring_invoice', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -384,12 +384,12 @@ test('recurring invoice documents uploading', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_recurring_invoice');
+  await clear('invoices@example.com');
+  await set('create_recurring_invoice', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'invoices@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
