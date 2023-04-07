@@ -72,6 +72,7 @@ import {
   MdMarkEmailRead,
   MdPictureAsPdf,
   MdRestore,
+  MdSchedule,
   MdSend,
   MdSwitchRight,
   MdTextSnippet,
@@ -80,6 +81,7 @@ import { SelectOption } from '$app/components/datatables/Actions';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -274,6 +276,7 @@ export function useActions() {
   const markSent = useMarkSent();
   const approve = useApprove();
   const bulk = useBulkAction();
+  const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
 
   const cloneToQuote = (quote: Quote) => {
     setQuote({ ...quote, number: '', documents: [] });
@@ -329,6 +332,16 @@ export function useActions() {
         {t('download_pdf')}
       </DropdownElement>
     ),
+    (quote) =>
+      quote.status_id !== QuoteStatus.Converted &&
+      quote.status_id !== QuoteStatus.Approved && (
+        <DropdownElement
+          onClick={() => scheduleEmailRecord(quote.id)}
+          icon={<Icon element={MdSchedule} />}
+        >
+          {t('schedule')}
+        </DropdownElement>
+      ),
     (quote) => (
       <DropdownElement
         to={route('/quotes/:id/email', { id: quote.id })}

@@ -75,9 +75,11 @@ import {
   MdMarkEmailRead,
   MdPictureAsPdf,
   MdRestore,
+  MdSchedule,
 } from 'react-icons/md';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -276,6 +278,7 @@ export function useActions() {
   const downloadPdf = useDownloadPdf({ resource: 'credit' });
   const markSent = useMarkSent();
   const bulk = useBulkAction();
+  const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
 
   const cloneToCredit = (credit: Credit) => {
     setCredit({ ...credit, number: '', documents: [] });
@@ -330,6 +333,14 @@ export function useActions() {
         icon={<Icon element={MdDownload} />}
       >
         {t('download_pdf')}
+      </DropdownElement>
+    ),
+    (credit) => (
+      <DropdownElement
+        onClick={() => scheduleEmailRecord(credit.id)}
+        icon={<Icon element={MdSchedule} />}
+      >
+        {t('schedule')}
       </DropdownElement>
     ),
     (credit) => (

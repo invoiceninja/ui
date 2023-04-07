@@ -39,6 +39,7 @@ import {
   MdPaid,
   MdPictureAsPdf,
   MdRestore,
+  MdSchedule,
   MdSend,
 } from 'react-icons/md';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -48,6 +49,7 @@ import { useHandleDelete } from '../hooks/useHandleDelete';
 import { useHandleRestore } from '../hooks/useHandleRestore';
 import { useMarkPaid } from '../hooks/useMarkPaid';
 import { useMarkSent } from '../hooks/useMarkSent';
+import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 
 export function useActions() {
   const { t } = useTranslation();
@@ -57,6 +59,7 @@ export function useActions() {
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
+  const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
 
   const archive = useHandleArchive();
   const restore = useHandleRestore();
@@ -124,6 +127,15 @@ export function useActions() {
         {t('view_pdf')}
       </DropdownElement>
     ),
+    (invoice: Invoice) =>
+      invoice.status_id !== InvoiceStatus.Paid && (
+        <DropdownElement
+          onClick={() => scheduleEmailRecord(invoice.id)}
+          icon={<Icon element={MdSchedule} />}
+        >
+          {t('schedule')}
+        </DropdownElement>
+      ),
     (invoice: Invoice) => (
       <DropdownElement
         to={route('/invoices/:id/pdf?delivery_note=true', { id: invoice.id })}
