@@ -18,7 +18,7 @@ export function useTotalVariables() {
   useEffect(() => {
     // We need to clone the product columns to local object,
     // because by default it's frozen.
-    let variables: string[] = ['$net_subtotal'];
+    let variables: string[] = ['$subtotal'];
     // clone(company?.settings.pdf_variables.total_columns) || [];
 
     // In case we have `$line_taxes` or `$total_taxes` we want to remove them
@@ -57,7 +57,7 @@ export function useTotalVariables() {
 
     variables.push('$total');
     variables.push('$paid_to_date');
-    variables.push('$balance');
+    variables.push('$balance_due');
     variables.push('$taxes');
 
     setColumns(variables);

@@ -13,8 +13,10 @@ import { request } from '$app/common/helpers/request';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { GenericQueryOptions } from '$app/common/queries/invoices';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
+import { AxiosError } from 'axios';
 
 interface RecurringInvoiceQueryParams {
   id: string;
@@ -47,4 +49,29 @@ export function useBlankRecurringInvoiceQuery(options?: GenericQueryOptions) {
       ),
     { ...options, staleTime: Infinity }
   );
+}
+
+export function useBulkAction() {
+  const queryClient = useQueryClient();
+
+  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/recurring_invoices/bulk'), {
+      action,
+      ids: [id],
+    })
+      .then(() => {
+        toast.success(`${action}d_recurring_invoice`);
+
+        queryClient.invalidateQueries(
+          route('/api/v1/recurring_invoices/:id', { id })
+        );
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+
+        toast.error();
+      });
+  };
 }

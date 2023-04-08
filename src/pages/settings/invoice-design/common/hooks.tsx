@@ -9,8 +9,11 @@
  */
 
 import { route } from '$app/common/helpers/route';
+import { Settings } from '$app/common/interfaces/company.interface';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 import { Tab } from '$app/components/Tabs';
 import { useTranslation } from 'react-i18next';
+import { useDispatch } from 'react-redux';
 
 export function useInvoiceDesignTabs() {
   const [t] = useTranslation();
@@ -19,6 +22,10 @@ export function useInvoiceDesignTabs() {
     {
       name: t('general_settings'),
       href: route('/settings/invoice_design'),
+    },
+    {
+      name: t('total_fields'),
+      href: route('/settings/invoice_design/total_fields'),
     },
     {
       name: t('client_details'),
@@ -60,11 +67,24 @@ export function useInvoiceDesignTabs() {
       name: t('task_columns'),
       href: route('/settings/invoice_design/task_columns'),
     },
-    {
-      name: t('total_fields'),
-      href: route('/settings/invoice_design/total_fields'),
-    },
   ];
 
   return tabs;
+}
+
+export function useHandleSettingsValueChange() {
+  const dispatch = useDispatch();
+
+  return <T extends keyof Settings, R extends Settings[T]>(
+    property: T,
+    value: R
+  ) => {
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: `settings.${property}`,
+        value,
+      })
+    );
+  };
 }

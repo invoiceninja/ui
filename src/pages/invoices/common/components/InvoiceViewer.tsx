@@ -9,20 +9,28 @@
  */
 
 import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { Payload } from '$app/pages/settings/invoice-design/customize/common/hooks';
 import { useEffect, useRef } from 'react';
 import { Resource } from './InvoicePreview';
 
 interface Props {
   link: string;
-  resource?: Resource;
+  resource?: Resource | Payload;
   method: 'GET' | 'POST';
   onLink?: (url: string) => unknown;
+  withToast?: boolean;
+  height?: number;
 }
 
 export function InvoiceViewer(props: Props) {
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
+    if (props.withToast) {
+      toast.processing();
+    }
+
     const controller = new AbortController();
 
     request(props.method, props.link, props.resource, {
@@ -38,11 +46,16 @@ export function InvoiceViewer(props: Props) {
 
           props.onLink && props.onLink(url);
         }
+
+        toast.dismiss();
       })
       .catch((error) => console.error(error));
 
-    return () => controller.abort();
+    return () => {
+      controller.abort();
+      toast.dismiss();
+    };
   }, [props.link, props.resource]);
 
-  return <iframe ref={iframeRef} width="100%" height={1500} />;
+  return <iframe ref={iframeRef} width="100%" height={props.height || 1500} />;
 }

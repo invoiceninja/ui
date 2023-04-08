@@ -11,12 +11,13 @@
 import { route } from '$app/common/helpers/route';
 import { Payment as PaymentEntity } from '$app/common/interfaces/payment';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { usePaymentQuery } from '$app/common/queries/payments';
 import { Page } from '$app/components/Breadcrumbs';
 import { Container } from '$app/components/Container';
 import { Default } from '$app/components/layouts/Default';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { Tab, Tabs } from '$app/components/Tabs';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks/useActions';
@@ -26,6 +27,8 @@ export function Payment() {
   const [t] = useTranslation();
 
   const { id } = useParams();
+
+  const { data } = usePaymentQuery({ id });
 
   const [paymentValue, setPaymentValue] = useState<PaymentEntity>();
 
@@ -57,6 +60,19 @@ export function Payment() {
   const onSave = useSave(setErrors);
 
   const actions = useActions();
+
+  useEffect(() => {
+    if (data) {
+      const paymentResponse: PaymentEntity = {
+        ...data.data.data,
+        invoices: [],
+        credits: [],
+      };
+      delete paymentResponse.documents;
+
+      setPaymentValue(paymentResponse);
+    }
+  }, [data]);
 
   return (
     <Default
