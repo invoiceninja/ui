@@ -9,7 +9,7 @@ const createPayment = async (page: Page) => {
 
   await page.waitForTimeout(200);
 
-  await page.locator('#headlessui-combobox-input-\\:rg\\:').click();
+  await page.locator('[role="combobox"]').first().click();
 
   await page.getByRole('option').first().click();
 
@@ -20,11 +20,11 @@ test("can't view payments without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('payments@example.com');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'payments@example.com', 'password');
 
   await expect(page.locator('.flex-grow > .flex-1').first()).not.toContainText(
     'Payments'
@@ -35,12 +35,14 @@ test('can view payment', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('payments@example.com');
   await set('view_payment');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'payments@example.com', 'password');
+
+  await page.waitForTimeout(500);
 
   await page.getByRole('link', { name: 'Payments', exact: true }).click();
 
@@ -86,12 +88,12 @@ test("can't create a payment", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('payments@example.com');
   await set('view_payment');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'payments@example.com', 'password');
 
   await page.getByRole('link', { name: 'Payments', exact: true }).click();
   await page.getByText('Enter Payment').click();
@@ -107,12 +109,12 @@ test('can create a payment', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('payments@example.com');
   await set('create_payment');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'payments@example.com', 'password');
 
   await page.getByRole('link', { name: 'Payments', exact: true }).click();
   await page.getByText('Enter Payment').click();
@@ -128,12 +130,12 @@ test('can view assigned payment with create_payment', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_payment');
+  await clear('payments@example.com');
+  await set('create_payment', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'payments@example.com', 'password');
 
   await page.getByRole('link', { name: 'Payments' }).click();
 
@@ -150,12 +152,12 @@ test('deleting payment', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_payment');
+  await clear('payments@example.com');
+  await set('create_payment', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'payments@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -199,12 +201,12 @@ test('archiving payment', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_payment');
+  await clear('payments@example.com');
+  await set('create_payment', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'payments@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -249,12 +251,12 @@ test('payment documents preview', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_payment');
+  await clear('payments@example.com');
+  await set('create_payment', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'payments@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -304,12 +306,12 @@ test('payment documents uploading', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_payment');
+  await clear('payments@example.com');
+  await set('create_payment', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'payments@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
