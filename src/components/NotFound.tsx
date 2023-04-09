@@ -15,8 +15,8 @@ export function NotFound() {
   const [t] = useTranslation();
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen space-y-10 py-16 px-5">
-      <div className="flex flex-col flex-1 justify-center items-center space-y-7">
+    <div className="flex flex-col items-center h-screen py-16 px-5">
+      <div className="flex flex-1 items-center">
         <h1 className="text-2xl md:text-4xl font-bold text-center">
           {t('api_404')}
         </h1>
