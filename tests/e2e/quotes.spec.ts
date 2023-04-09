@@ -15,11 +15,11 @@ test("can't view quotes without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('quotes@example.com');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'quotes@example.com', 'password');
 
   await expect(page.locator('.flex-grow > .flex-1').first()).not.toContainText(
     'Quotes'
@@ -30,12 +30,12 @@ test('can view quote', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('quotes@example.com');
   await set('view_quote');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'quotes@example.com', 'password');
 
   await page.getByRole('link', { name: 'Quotes', exact: true }).click();
 
@@ -85,12 +85,12 @@ test("can't create a quote", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('quotes@example.com');
   await set('view_quote');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'quotes@example.com', 'password');
 
   await page.getByRole('link', { name: 'Quotes', exact: true }).click();
   await page.getByText('New Quote').click();
@@ -106,12 +106,12 @@ test('can create a quote', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('quotes@example.com');
   await set('create_quote');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'quotes@example.com', 'password');
 
   await page.getByRole('link', { name: 'Quotes', exact: true }).click();
   await page.getByText('New Quote').click();
@@ -127,12 +127,12 @@ test('can view assigned quote with create_quote', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_quote');
+  await clear('quotes@example.com');
+  await set('create_quote', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'quotes@example.com', 'password');
 
   await page.getByRole('link', { name: 'Quotes' }).click();
 
@@ -145,12 +145,12 @@ test('deleting quote', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_quote');
+  await clear('quotes@example.com');
+  await set('create_quote', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'quotes@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -194,12 +194,12 @@ test('archiving quote', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_quote');
+  await clear('quotes@example.com');
+  await set('create_quote', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'quotes@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -244,12 +244,12 @@ test('cloning quote', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_quote');
+  await clear('quotes@example.com');
+  await set('create_quote', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'quotes@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -298,12 +298,12 @@ test('quote documents preview', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_quote');
+  await clear('quotes@example.com');
+  await set('create_quote', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'quotes@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -353,12 +353,12 @@ test('quote documents uploading', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
-  await set('create_quote');
+  await clear('quotes@example.com');
+  await set('create_quote', 'view_client');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'quotes@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
