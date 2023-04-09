@@ -10,8 +10,7 @@
 
 import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
-import { Dropdown } from '$app/components/dropdown/Dropdown';
-import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Button } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
@@ -19,12 +18,13 @@ import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceView
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { useGeneratePdfUrl } from '$app/pages/invoices/common/hooks/useGeneratePdfUrl';
 import { useTranslation } from 'react-i18next';
-import { MdCreditCard, MdDownload } from 'react-icons/md';
-import { useParams } from 'react-router-dom';
+import { MdDownload, MdSend } from 'react-icons/md';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useCreditQuery } from '../common/queries';
 
 export function Pdf() {
   const [t] = useTranslation();
+  const navigate = useNavigate();
 
   const { documentTitle } = useTitle('view_pdf');
   const { id } = useParams();
@@ -41,23 +41,29 @@ export function Pdf() {
       title={documentTitle}
       navigationTopRight={
         credit && (
-          <Dropdown label={t('more_actions')}>
-            <DropdownElement
-              onClick={() => downloadPdf(credit)}
-              icon={<Icon element={MdDownload} />}
+          <div className="flex space-x-3">
+            <Button
+              className="flex items-center space-x-1"
+              onClick={() =>
+                navigate(
+                  route('/credits/:id/email', {
+                    id: credit.id,
+                  })
+                )
+              }
             >
-              {t('download')}
-            </DropdownElement>
+              <Icon element={MdSend} color="white" />
+              <span>{t('email_credit')}</span>
+            </Button>
 
-            <DropdownElement
-              to={route('/credits/:id/email', {
-                id: credit.id,
-              })}
-              icon={<Icon element={MdCreditCard} />}
+            <Button
+              className="flex items-center space-x-1"
+              onClick={() => downloadPdf(credit)}
             >
-              {t('email_credit')}
-            </DropdownElement>
-          </Dropdown>
+              <Icon element={MdDownload} color="white" />
+              <span>{t('download')}</span>
+            </Button>
+          </div>
         )
       }
     >

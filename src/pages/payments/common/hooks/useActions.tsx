@@ -26,13 +26,15 @@ import {
   MdSend,
   MdSettingsBackupRestore,
 } from 'react-icons/md';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 
 export function useActions() {
+  const { id } = useParams();
+
   const [t] = useTranslation();
   const location = useLocation();
 
-  const isEditPage = location.pathname.endsWith('/edit');
+  const isEditPage = location.pathname.includes(id!);
 
   const bulk = useBulk();
 
@@ -65,7 +67,11 @@ export function useActions() {
         {t('email_payment')}
       </DropdownElement>
     ),
-    () => isEditPage && <Divider withoutPadding />,
+    (payment: Payment) =>
+      isEditPage &&
+      getEntityState(payment) !== EntityState.Deleted && (
+        <Divider withoutPadding />
+      ),
     (payment: Payment) =>
       getEntityState(payment) === EntityState.Active &&
       isEditPage && (
@@ -77,8 +83,8 @@ export function useActions() {
         </DropdownElement>
       ),
     (payment: Payment) =>
-      (getEntityState(payment) === EntityState.Archived ||
-        getEntityState(payment) === EntityState.Deleted) &&
+      getEntityState(payment) === EntityState.Archived &&
+      getEntityState(payment) !== EntityState.Deleted &&
       isEditPage && (
         <DropdownElement
           onClick={() => bulk(payment.id, 'restore')}

@@ -44,7 +44,7 @@ export function ProductForm(props: Props) {
         </Element>
       )}
 
-      <Element leftSide={t('product')} required>
+      <Element leftSide={t('item')} required>
         <InputField
           required
           value={props.product.product_key}
@@ -53,7 +53,7 @@ export function ProductForm(props: Props) {
         />
       </Element>
 
-      <Element leftSide={t('notes')}>
+      <Element leftSide={t('description')}>
         <InputField
           element="textarea"
           value={props.product.notes}
@@ -89,6 +89,22 @@ export function ProductForm(props: Props) {
           />
         </Element>
       )}
+
+      <Element leftSide={t('max_quantity')}>
+        <InputField
+          value={props.product.max_quantity}
+          onValueChange={(value) => handleChange('max_quantity', value)}
+          errorMessage={errors?.errors.max_quantity}
+        />
+      </Element>
+
+      <Element leftSide={t('image_url')}>
+        <InputField
+          value={props.product.product_image}
+          onValueChange={(value) => handleChange('product_image', value)}
+          errorMessage={errors?.errors.product_image}
+        />
+      </Element>
 
       {company?.track_inventory && (
         <>

@@ -10,7 +10,7 @@
 
 import dayjs from 'dayjs';
 
-export type TimeLogType = [number, number, string];
+export type TimeLogType = [number, number, string, boolean];
 export type TimeLogsType = TimeLogType[];
 
 export function parseTimeLog(log: string) {
@@ -18,7 +18,7 @@ export function parseTimeLog(log: string) {
     return [];
   }
 
-  const defaultRow: TimeLogsType = [[0, 0, '']];
+  const defaultRow: TimeLogsType = [[0, 0, '', true]];
   const parsed: TimeLogsType = JSON.parse(log);
 
   if (!parsed.length) {

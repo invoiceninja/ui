@@ -77,17 +77,25 @@ export function OnlinePayments() {
           />
         </Element>
 
-        <Element leftSide={t('auto_bill')}>
+        <Element leftSide={`${t('auto_bill')} ${t('recurring_invoices')}`}>
           <SelectField
             value={company?.settings?.auto_bill}
             onChange={handleChange}
             id="settings.auto_bill"
           >
             <option defaultChecked></option>
-            <option value="always">{t('enabled')}</option>
-            <option value="optout">{t('optout')}</option>
-            <option value="optin">{t('optin')}</option>
-            <option value="off">{t('disabled')}</option>
+            <option value="always">
+              {t('enabled')} ({t('auto_bill_help_always')})
+            </option>
+            <option value="optout">
+              {t('optout')} ({t('auto_bill_help_optout')})
+            </option>
+            <option value="optin">
+              {t('optin')} ({t('auto_bill_help_optin')})
+            </option>
+            <option value="off">
+              {t('disabled')} ({t('auto_bill_help_off')})
+            </option>
           </SelectField>
         </Element>
 
@@ -115,24 +123,28 @@ export function OnlinePayments() {
         </Element>
 
         {paymentTerms && (
-          <Element leftSide={t('payment_terms')}>
-            <SelectField
-              value={company?.settings?.payment_terms}
-              id="settings.payment_terms"
-              onChange={handleChange}
-            >
-              <option value=""></option>
-              {paymentTerms.map((type: PaymentTerm) => (
-                <option key={type.id} value={type.num_days}>
-                  {type.name}
-                </option>
-              ))}
-            </SelectField>
+          <>
+            <Element leftSide={t('payment_type')}>
+              <SelectField
+                value={company?.settings?.payment_terms}
+                id="settings.payment_terms"
+                onChange={handleChange}
+              >
+                <option value=""></option>
+                {paymentTerms.map((type: PaymentTerm) => (
+                  <option key={type.id} value={type.num_days}>
+                    {type.name}
+                  </option>
+                ))}
+              </SelectField>
+            </Element>
 
-            <Link to="/settings/payment_terms" className="block mt-2">
-              {t('configure_payment_terms')}
-            </Link>
-          </Element>
+            <Element className="py-0 sm:py-0">
+              <Link to="/settings/payment_terms">
+                {t('configure_payment_terms')}
+              </Link>
+            </Element>
+          </>
         )}
 
         <Element leftSide={t('enable_applying_payments')}>
@@ -184,6 +196,31 @@ export function OnlinePayments() {
               onValueChange={(value) =>
                 handleChangeProperty(
                   'settings.client_portal_under_payment_minimum',
+                  value
+                )
+              }
+            />
+          </Element>
+        )}
+
+        <Element leftSide={t('client_initiated_payments')}>
+          <Toggle
+            label={t('client_initiated_payments_help')}
+            id="client_initiated_payments"
+            checked={company?.settings.client_initiated_payments || false}
+            onChange={(value) =>
+              handleChangeProperty('settings.client_initiated_payments', value)
+            }
+          />
+        </Element>
+
+        {company?.settings.client_initiated_payments && (
+          <Element leftSide={t('minimum_payment_amount')}>
+            <InputField
+              value={company?.settings.client_initiated_payments_minimum}
+              onValueChange={(value) =>
+                handleChangeProperty(
+                  'settings.client_initiated_payments_minimum',
                   value
                 )
               }

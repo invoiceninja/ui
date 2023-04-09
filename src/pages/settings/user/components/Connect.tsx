@@ -8,6 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
@@ -41,6 +44,22 @@ export function Connect() {
     );
   };
 
+  const handleDisconnectMailer = () => {
+    toast.processing();
+
+    request(
+      'POST',
+      endpoint('/api/v1/users/:id/disconnect_mailer', { id: user!.id })
+    )
+      .then((response) => {
+        toast.success(response.data.message);
+      })
+      .catch((error) => {
+        toast.error();
+        console.error(error);
+      });
+  };
+
   return (
     <Card title={t('oneclick_login')}>
       {!user?.oauth_provider_id && (
@@ -58,7 +77,9 @@ export function Connect() {
       {user?.oauth_provider_id === 'google' && (
         <>
           <Element leftSide="Google">
-            <Button type="minimal">{t('disconnect_google')}</Button>
+            <Button type="minimal" onClick={handleDisconnectMailer}>
+              {t('disconnect_google')}
+            </Button>
           </Element>
 
           <Element leftSide="Gmail">
@@ -70,7 +91,9 @@ export function Connect() {
       {user?.oauth_provider_id === 'microsoft' && (
         <>
           <Element leftSide="Microsoft">
-            <Button type="minimal">{t('disconnect_microsoft')}</Button>
+            <Button type="minimal" onClick={handleDisconnectMailer}>
+              {t('disconnect_microsoft')}
+            </Button>
           </Element>
 
           <Element leftSide="Email">

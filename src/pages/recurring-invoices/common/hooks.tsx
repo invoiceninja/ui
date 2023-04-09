@@ -11,7 +11,7 @@
 import { AxiosError } from 'axios';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 import { RecurringInvoiceStatus as RecurringInvoiceStatusBadge } from '../common/components/RecurringInvoiceStatus';
-import { date, endpoint } from '$app/common/helpers';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -38,7 +38,7 @@ import { useAtom, useAtomValue } from 'jotai';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { invoiceSumAtom, recurringInvoiceAtom } from './atoms';
 import { quoteAtom } from '$app/pages/quotes/common/atoms';
 import { Quote } from '$app/common/interfaces/quote';
@@ -57,14 +57,19 @@ import { EntityStatus } from '$app/components/EntityStatus';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { Icon } from '$app/components/icons/Icon';
 import {
+  MdArchive,
   MdControlPointDuplicate,
+  MdDelete,
   MdNotStarted,
   MdPictureAsPdf,
+  MdRestore,
   MdStopCircle,
 } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useBulkAction } from '$app/pages/recurring-invoices/common/queries';
+import { EntityState } from '$app/common/enums/entity-state';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -195,13 +200,20 @@ export function useSave(props: RecurringInvoiceSaveProps) {
   const { setErrors } = props;
   const queryClient = useQueryClient();
 
-  return (recurringInvoice: RecurringInvoice) => {
+  return (
+    recurringInvoice: RecurringInvoice,
+    queryAction?: 'send_now' | 'start'
+  ) => {
     toast.processing();
     setErrors(undefined);
 
+    const endpointUrl = queryAction
+      ? `/api/v1/recurring_invoices/:id?${queryAction}=true`
+      : '/api/v1/recurring_invoices/:id';
+
     request(
       'PUT',
-      endpoint('/api/v1/recurring_invoices/:id', { id: recurringInvoice.id }),
+      endpoint(endpointUrl, { id: recurringInvoice.id }),
       recurringInvoice
     )
       .then(() => {
@@ -263,6 +275,7 @@ export function useToggleStartStop() {
 }
 
 export function useActions() {
+  const location = useLocation();
   const [, setRecurringInvoice] = useAtom(recurringInvoiceAtom);
   const [, setInvoice] = useAtom(invoiceAtom);
   const [, setQuote] = useAtom(quoteAtom);
@@ -270,6 +283,10 @@ export function useActions() {
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const { t } = useTranslation();
+
+  const bulk = useBulkAction();
+
+  const isEditPage = location.pathname.endsWith('/edit');
 
   const navigate = useNavigate();
   const toggleStartStop = useToggleStartStop();
@@ -392,6 +409,39 @@ export function useActions() {
         {t('clone_to_purchase_order')}
       </DropdownElement>
     ),
+    () => isEditPage && <Divider withoutPadding />,
+    (recurringInvoice) =>
+      isEditPage &&
+      getEntityState(recurringInvoice) === EntityState.Active && (
+        <DropdownElement
+          onClick={() => bulk(recurringInvoice.id, 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (recurringInvoice) =>
+      isEditPage &&
+      (getEntityState(recurringInvoice) === EntityState.Archived ||
+        getEntityState(recurringInvoice) === EntityState.Deleted) && (
+        <DropdownElement
+          onClick={() => bulk(recurringInvoice.id, 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (recurringInvoice) =>
+      isEditPage &&
+      (getEntityState(recurringInvoice) === EntityState.Active ||
+        getEntityState(recurringInvoice) === EntityState.Archived) && (
+        <DropdownElement
+          onClick={() => bulk(recurringInvoice.id, 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
   ];
 
   return actions;
@@ -400,11 +450,18 @@ export function useActions() {
 export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
   const navigate = useNavigate();
 
-  return (recurringInvoice: RecurringInvoice) => {
+  return (
+    recurringInvoice: RecurringInvoice,
+    queryAction?: 'start' | 'send_now'
+  ) => {
     setErrors(undefined);
     toast.processing();
 
-    request('POST', endpoint('/api/v1/recurring_invoices'), recurringInvoice)
+    const endpointUrl = queryAction
+      ? `/api/v1/recurring_invoices?${queryAction}=true`
+      : '/api/v1/recurring_invoices';
+
+    request('POST', endpoint(endpointUrl), recurringInvoice)
       .then((response: GenericSingleResourceResponse<RecurringInvoice>) => {
         toast.success('created_recurring_invoice');
 
