@@ -36,7 +36,7 @@ import { QuoteFooter } from '../common/components/QuoteFooter';
 import { useActions, useQuoteUtilities, useSave } from '../common/hooks';
 import { useQuoteQuery } from '../common/queries';
 
-export function Edit() {
+export default function Edit() {
   const { documentTitle } = useTitle('edit_quote');
   const { t } = useTranslation();
   const { id } = useParams();
