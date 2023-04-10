@@ -36,7 +36,7 @@ import { CreditFooter } from '../common/components/CreditFooter';
 import { useActions, useCreditUtilities, useSave } from '../common/hooks';
 import { useCreditQuery } from '../common/queries';
 
-export function Edit() {
+export default function Edit() {
   const { documentTitle } = useTitle('edit_credit');
   const { t } = useTranslation();
   const { id } = useParams();

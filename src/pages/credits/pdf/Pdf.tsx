@@ -22,7 +22,7 @@ import { MdDownload, MdSend } from 'react-icons/md';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useCreditQuery } from '../common/queries';
 
-export function Pdf() {
+export default function Pdf() {
   const [t] = useTranslation();
   const navigate = useNavigate();
 
