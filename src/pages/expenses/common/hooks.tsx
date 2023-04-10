@@ -10,7 +10,7 @@
 
 import { Link } from '$app/components/forms';
 import paymentType from '$app/common/constants/payment-type';
-import { date } from '$app/common/helpers';
+import { date, getEntityState } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
@@ -30,20 +30,32 @@ import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useIn
 import { recurringExpenseAtom } from '$app/pages/recurring-expenses/common/atoms';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
-import { MdControlPointDuplicate } from 'react-icons/md';
-import { useNavigate } from 'react-router-dom';
+import {
+  MdArchive,
+  MdControlPointDuplicate,
+  MdDelete,
+  MdRestore,
+} from 'react-icons/md';
+import { useNavigate, useParams } from 'react-router-dom';
 import { expenseAtom } from './atoms';
 import { ExpenseStatus } from './components/ExpenseStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useSetAtom } from 'jotai';
+import { useBulk } from '$app/common/queries/expenses';
+import { Divider } from '$app/components/cards/Divider';
+import { EntityState } from '$app/common/enums/entity-state';
 
 export function useActions() {
   const [t] = useTranslation();
+  const { id } = useParams();
 
   const navigate = useNavigate();
+  const bulk = useBulk();
 
   const setExpense = useSetAtom(expenseAtom);
   const setRecurringExpense = useSetAtom(recurringExpenseAtom);
+
+  const isEditPage = location.pathname.includes(id!);
 
   const cloneToExpense = (expense: Expense) => {
     setExpense({ ...expense, documents: [], number: '' });
@@ -78,6 +90,39 @@ export function useActions() {
         {t('clone_to_recurring')}
       </DropdownElement>
     ),
+    () => isEditPage && <Divider withoutPadding />,
+    (expense) =>
+      getEntityState(expense) === EntityState.Active &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => bulk(expense.id, 'archive')}
+          icon={<Icon element={MdArchive} />}
+        >
+          {t('archive')}
+        </DropdownElement>
+      ),
+    (expense) =>
+      (getEntityState(expense) === EntityState.Archived ||
+        getEntityState(expense) === EntityState.Deleted) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => bulk(expense.id, 'restore')}
+          icon={<Icon element={MdRestore} />}
+        >
+          {t('restore')}
+        </DropdownElement>
+      ),
+    (expense) =>
+      (getEntityState(expense) === EntityState.Active ||
+        getEntityState(expense) === EntityState.Archived) &&
+      isEditPage && (
+        <DropdownElement
+          onClick={() => bulk(expense.id, 'delete')}
+          icon={<Icon element={MdDelete} />}
+        >
+          {t('delete')}
+        </DropdownElement>
+      ),
   ];
 
   return actions;
