@@ -28,7 +28,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
 
-export function Refund() {
+export default function Refund() {
   const { id } = useParams();
   const { data: payment } = usePaymentQuery({ id });
 
