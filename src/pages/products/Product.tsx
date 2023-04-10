@@ -27,7 +27,7 @@ import { useQueryClient } from 'react-query';
 import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 
-export function Product() {
+export default function Product() {
   const [t] = useTranslation();
 
   const { id } = useParams();
