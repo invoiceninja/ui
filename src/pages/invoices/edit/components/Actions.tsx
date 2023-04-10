@@ -38,6 +38,7 @@ import {
   MdMarkEmailRead,
   MdPaid,
   MdPictureAsPdf,
+  MdPrint,
   MdRestore,
   MdSchedule,
   MdSend,
@@ -50,6 +51,9 @@ import { useHandleRestore } from '../hooks/useHandleRestore';
 import { useMarkPaid } from '../hooks/useMarkPaid';
 import { useMarkSent } from '../hooks/useMarkSent';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
+import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
+import { getEntityState } from '$app/common/helpers';
+import { EntityState } from '$app/common/enums/entity-state';
 
 export function useActions() {
   const { t } = useTranslation();
@@ -57,6 +61,7 @@ export function useActions() {
   const location = useLocation();
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
+  const printPdf = usePrintPdf({ entity: 'invoice' });
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'invoice' });
@@ -134,6 +139,15 @@ export function useActions() {
           icon={<Icon element={MdSchedule} />}
         >
           {t('schedule')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      getEntityState(invoice) !== EntityState.Deleted && (
+        <DropdownElement
+          onClick={() => printPdf(invoice)}
+          icon={<Icon element={MdPrint} />}
+        >
+          {t('print_pdf')}
         </DropdownElement>
       ),
     (invoice: Invoice) => (

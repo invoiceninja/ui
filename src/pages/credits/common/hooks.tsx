@@ -11,7 +11,7 @@
 import axios, { AxiosError } from 'axios';
 import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { CreditStatus } from '$app/common/enums/credit-status';
-import { date, endpoint } from '$app/common/helpers';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
@@ -74,12 +74,15 @@ import {
   MdDownload,
   MdMarkEmailRead,
   MdPictureAsPdf,
+  MdPrint,
   MdRestore,
   MdSchedule,
 } from 'react-icons/md';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
+import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
+import { EntityState } from '$app/common/enums/entity-state';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -276,6 +279,7 @@ export function useActions() {
   const location = useLocation();
 
   const downloadPdf = useDownloadPdf({ resource: 'credit' });
+  const printPdf = usePrintPdf({ entity: 'credit' });
   const markSent = useMarkSent();
   const bulk = useBulkAction();
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
@@ -327,6 +331,15 @@ export function useActions() {
         {t('view_pdf')}
       </DropdownElement>
     ),
+    (credit) =>
+      getEntityState(credit) !== EntityState.Deleted && (
+        <DropdownElement
+          onClick={() => printPdf(credit)}
+          icon={<Icon element={MdPrint} />}
+        >
+          {t('print_pdf')}
+        </DropdownElement>
+      ),
     (credit) => (
       <DropdownElement
         onClick={() => downloadPdf(credit)}

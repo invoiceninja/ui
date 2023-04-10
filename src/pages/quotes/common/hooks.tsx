@@ -10,7 +10,7 @@
 
 import axios, { AxiosError } from 'axios';
 import { QuoteStatus } from '$app/common/enums/quote-status';
-import { date, endpoint } from '$app/common/helpers';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -71,6 +71,7 @@ import {
   MdDownload,
   MdMarkEmailRead,
   MdPictureAsPdf,
+  MdPrint,
   MdRestore,
   MdSchedule,
   MdSend,
@@ -82,6 +83,8 @@ import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
+import { EntityState } from '$app/common/enums/entity-state';
+import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -273,6 +276,7 @@ export function useActions() {
   const location = useLocation();
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'quote' });
+  const printPdf = usePrintPdf({ entity: 'quote' });
   const markSent = useMarkSent();
   const approve = useApprove();
   const bulk = useBulkAction();
@@ -324,6 +328,15 @@ export function useActions() {
         {t('view_pdf')}
       </DropdownElement>
     ),
+    (quote) =>
+      getEntityState(quote) !== EntityState.Deleted && (
+        <DropdownElement
+          onClick={() => printPdf(quote)}
+          icon={<Icon element={MdPrint} />}
+        >
+          {t('print_pdf')}
+        </DropdownElement>
+      ),
     (quote) => (
       <DropdownElement
         onClick={() => downloadPdf(quote)}
