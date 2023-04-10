@@ -21,6 +21,10 @@ export function usePrintPdf({ entity }: Props) {
   const queryClient = useQueryClient();
 
   return (resourceIds: string[]) => {
+    if (!resourceIds.length) {
+      return;
+    }
+
     toast.processing();
 
     queryClient.fetchQuery(endpoint(`/api/v1/${entity}s/bulk`), () =>
