@@ -44,7 +44,7 @@ export function TaxRateSelector(props: Props) {
         onChange={(record: Record<TaxRate>) =>
           props.onChange && props.onChange(record)
         }
-        value="rate"
+        value={(record: TaxRate) => `${record?.name}|${record?.rate}`}
         defaultValue={props.defaultValue}
         clearButton={props.clearButton}
         onClearButtonClick={props.onClearButtonClick}
