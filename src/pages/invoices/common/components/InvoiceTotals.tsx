@@ -60,7 +60,7 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 0 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_rate1}
+            defaultValue={`${resource?.tax_name1}|${resource?.tax_rate1}`}
             clearButton={Boolean(resource?.tax_rate1)}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name1', value.resource?.name);
@@ -89,7 +89,7 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 1 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_rate2}
+            defaultValue={`${resource?.tax_name2}|${resource?.tax_rate2}`}
             clearButton={Boolean(resource?.tax_rate2)}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name2', value.resource?.name);
@@ -118,7 +118,7 @@ export function InvoiceTotals(props: Props) {
       {company && company.enabled_tax_rates > 2 && (
         <Element leftSide={t('tax')}>
           <TaxRateSelector
-            defaultValue={resource?.tax_rate3}
+            defaultValue={`${resource?.tax_name3}|${resource?.tax_rate3}`}
             clearButton={Boolean(resource?.tax_rate3)}
             onChange={(value: Record<TaxRate>) => {
               handleChange('tax_name3', value.resource?.name);
