@@ -30,6 +30,7 @@ import { purchaseOrderRoutes } from '$app/pages/purchase-orders/routes';
 import { reportRoutes } from '$app/pages/reports/routes';
 import { transactionRoutes } from '$app/pages/transactions/routes';
 import { recurringExpenseRoutes } from '$app/pages/recurring-expenses/routes';
+import { NotFound } from '$app/components/NotFound';
 
 export const routes = (
   <Routes>
@@ -55,5 +56,6 @@ export const routes = (
       {settingsRoutes}
       {systemlogRoutes}
     </Route>
+    <Route path="*" element={<NotFound />} />
   </Routes>
 );
