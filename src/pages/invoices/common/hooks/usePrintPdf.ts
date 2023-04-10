@@ -11,29 +11,23 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Invoice } from '$app/common/interfaces/invoice';
-import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
-import { Quote } from '$app/common/interfaces/quote';
-import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { useQueryClient } from 'react-query';
 
 interface Props {
   entity: 'invoice' | 'quote' | 'credit' | 'purchase_order';
 }
 
-type Resource = Invoice | RecurringInvoice | Quote | PurchaseOrder;
-
 export function usePrintPdf({ entity }: Props) {
   const queryClient = useQueryClient();
 
-  return (resource: Resource) => {
+  return (resourceIds: string[]) => {
     toast.processing();
 
     queryClient.fetchQuery(endpoint(`/api/v1/${entity}s/bulk`), () =>
       request(
         'POST',
         endpoint(`/api/v1/${entity}s/bulk`),
-        { action: 'bulk_print', ids: [resource.id] },
+        { action: 'bulk_print', ids: resourceIds },
         { responseType: 'arraybuffer' }
       )
         .then((response) => {
