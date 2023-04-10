@@ -22,7 +22,7 @@ import { ExpenseCategory } from '$app/common/interfaces/expense-category';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { Payment } from '$app/common/interfaces/payment';
 import { useExpenseCategoryQuery } from '$app/common/queries/expense-categories';
-import { useExpenseQuery } from '$app/common/queries/expenses';
+import { useExpensesQuery } from '$app/common/queries/expenses';
 import { usePaymentQuery } from '$app/common/queries/payments';
 import { useVendorQuery } from '$app/common/queries/vendor';
 import { useInvoicesQuery } from '$app/pages/invoices/common/queries';
@@ -32,6 +32,7 @@ import { useTranslation } from 'react-i18next';
 import { useTransactionQuery } from '../common/queries';
 import { TransactionMatchDetails } from './TransactionMatchDetails';
 import { useTransactionRuleQuery } from '$app/common/queries/transaction-rules';
+import { Expense } from '$app/common/interfaces/expense';
 
 interface Props {
   transactionId: string;
@@ -69,6 +70,8 @@ export function Details(props: Props) {
   const [matchedExpenseCategory, setMatchedExpenseCategory] =
     useState<ExpenseCategory>();
 
+  const [matchedExpenses, setMatchedExpenses] = useState<Expense[]>();
+
   const isCreditTransactionType =
     transaction?.base_type === ApiTransactionType.Credit;
 
@@ -92,8 +95,7 @@ export function Details(props: Props) {
     enabled: !isCreditTransactionType && shouldEnableQueries,
   });
 
-  const { data: expenseResponse } = useExpenseQuery({
-    id: transaction?.expense_id || '',
+  const { data: expensesResponse } = useExpensesQuery({
     enabled: !isCreditTransactionType && shouldEnableQueries,
   });
 
@@ -105,9 +107,16 @@ export function Details(props: Props) {
   useEffect(() => {
     if (transaction) {
       const filteredMatchedInvoices = invoicesResponse?.filter(({ id }) =>
-        transaction?.invoice_ids?.includes(id)
+        transaction.invoice_ids?.includes(id)
       );
+
       setMatchedInvoices(filteredMatchedInvoices);
+
+      const filteredMatchedExpenses = expensesResponse?.filter(({ id }) =>
+        transaction.expense_id?.includes(id)
+      );
+
+      setMatchedExpenses(filteredMatchedExpenses);
 
       setMatchedExpenseCategory(expenseCategoryResponse?.data.data);
 
@@ -118,6 +127,7 @@ export function Details(props: Props) {
     expenseCategoryResponse,
     paymentResponse,
     props.transactionId,
+    expensesResponse,
   ]);
 
   return (
@@ -216,20 +226,21 @@ export function Details(props: Props) {
             </Element>
           )}
 
-          {transaction?.expense_id && (
+          {matchedExpenses?.map(({ id, number, date }) => (
             <Element
+              key={id}
               leftSide={t('expense')}
               className="hover:bg-gray-100 cursor-pointer"
             >
               <Link
                 to={route('/expenses/:id/edit', {
-                  id: expenseResponse?.id,
+                  id,
                 })}
               >
-                {expenseResponse?.number}
+                {number || date}
               </Link>
             </Element>
-          )}
+          ))}
         </>
       ) : (
         <TransactionMatchDetails
