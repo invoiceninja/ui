@@ -14,7 +14,7 @@ import { UploadImport } from '$app/components/import/UploadImport';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 
-export function Import() {
+export default function Import() {
   const { t } = useTranslation();
   const { documentTitle } = useTitle('import');
 
