@@ -10,8 +10,6 @@
 
 import { Route, Routes } from 'react-router';
 import { PrivateRoute } from '../components/PrivateRoute';
-import { Index } from '../pages/Index';
-import { Dashboard } from '../pages/dashboard/Dashboard';
 import { invoiceRoutes } from '$app/pages/invoices/routes';
 import { clientRoutes } from '$app/pages/clients/routes';
 import { productRoutes } from '$app/pages/products/routes';
@@ -30,7 +28,11 @@ import { purchaseOrderRoutes } from '$app/pages/purchase-orders/routes';
 import { reportRoutes } from '$app/pages/reports/routes';
 import { transactionRoutes } from '$app/pages/transactions/routes';
 import { recurringExpenseRoutes } from '$app/pages/recurring-expenses/routes';
-import { NotFound } from '$app/components/NotFound';
+import { lazy } from 'react';
+import { Index } from '$app/pages/Index';
+
+const Dashboard = lazy(() => import('$app/pages/dashboard/Dashboard'));
+const NotFound = lazy(() => import('$app/components/NotFound'));
 
 export const routes = (
   <Routes>
