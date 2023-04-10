@@ -30,7 +30,7 @@ export interface Record<T = any> {
 
 interface Props {
   endpoint: string;
-  value?: string;
+  value?: string | ((resource: any) => string);
   label: string;
   placeholder?: string;
   className?: string;
@@ -119,7 +119,10 @@ export function DebouncedCombobox(props: Props) {
 
     response?.data?.data?.map((resource: any) =>
       array.push({
-        value: resource[props.value ?? 'id'],
+        value:
+          typeof props.value === 'function'
+            ? props.value(resource)
+            : resource[props.value ?? 'id'],
         label: props.formatLabel
           ? props.formatLabel(resource)
           : resource[props.label],
@@ -243,7 +246,10 @@ export function DebouncedCombobox(props: Props) {
             ? [
                 ...current,
                 {
-                  value: resource.data.data[props.value ?? 'id'],
+                  value:
+                    typeof props.value === 'function'
+                      ? props.value(resource.data.data)
+                      : resource.data.data[props.value ?? 'id'],
                   label: props.formatLabel
                     ? props.formatLabel(resource.data.data)
                     : resource.data.data[props.label],
