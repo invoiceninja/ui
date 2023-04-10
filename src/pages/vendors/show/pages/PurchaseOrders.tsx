@@ -18,7 +18,7 @@ import { useParams } from 'react-router-dom';
 
 const dataTableStaleTime = 50;
 
-export function PurchaseOrders() {
+export default function PurchaseOrders() {
   const { id } = useParams();
 
   const columns = usePurchaseOrderColumns();

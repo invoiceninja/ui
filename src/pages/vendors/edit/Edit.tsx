@@ -28,7 +28,7 @@ import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Form } from './components/Form';
 
-export function Edit() {
+export default function Edit() {
   const { documentTitle } = useTitle('edit_vendor');
 
   const [t] = useTranslation();
