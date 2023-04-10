@@ -279,7 +279,7 @@ const ranges: Range[] = [
   { identifier: 'custom', label: 'custom' },
 ];
 
-export function Reports() {
+export default function Reports() {
   const { documentTitle } = useTitle('reports');
   const { t } = useTranslation();
 
