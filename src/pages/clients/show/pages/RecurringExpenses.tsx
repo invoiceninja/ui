@@ -15,7 +15,7 @@ import { useParams } from 'react-router-dom';
 
 export const dataTableStaleTime = 50;
 
-export function RecurringExpenses() {
+export default function RecurringExpenses() {
   const { id } = useParams();
 
   const columns = useRecurringExpenseColumns();
