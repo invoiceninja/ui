@@ -78,7 +78,7 @@ interface Board {
 
 type SliderType = 'view' | 'edit';
 
-export function Kanban() {
+export default function Kanban() {
   const { documentTitle } = useTitle('kanban');
   const [t] = useTranslation();
 
