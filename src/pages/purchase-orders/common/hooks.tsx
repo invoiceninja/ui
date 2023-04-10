@@ -11,7 +11,7 @@
 import { Link } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { PurchaseOrderStatus } from '$app/common/enums/purchase-order-status';
-import { date, endpoint } from '$app/common/helpers';
+import { date, endpoint, getEntityState } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -41,6 +41,7 @@ import {
   MdMarkEmailRead,
   MdPageview,
   MdPictureAsPdf,
+  MdPrint,
   MdRestore,
   MdSend,
   MdSwitchRight,
@@ -52,6 +53,8 @@ import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client
 import { Divider } from '$app/components/cards/Divider';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { PurchaseOrderStatus as PurchaseOrderStatusBadge } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
+import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
+import { EntityState } from '$app/common/enums/entity-state';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -370,6 +373,7 @@ export function useActions() {
   const markSent = useMarkSent();
 
   const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
+  const printPdf = usePrintPdf({ entity: 'purchase_order' });
 
   const isEditPage = location.pathname.endsWith('/edit');
 
@@ -404,6 +408,15 @@ export function useActions() {
         {t('view_pdf')}
       </DropdownElement>
     ),
+    (purchaseOrder) =>
+      getEntityState(purchaseOrder) !== EntityState.Deleted && (
+        <DropdownElement
+          onClick={() => printPdf(purchaseOrder)}
+          icon={<Icon element={MdPrint} />}
+        >
+          {t('print_pdf')}
+        </DropdownElement>
+      ),
     (purchaseOrder) => (
       <DropdownElement
         onClick={() => downloadPdf(purchaseOrder)}

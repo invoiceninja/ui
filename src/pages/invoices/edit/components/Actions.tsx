@@ -38,6 +38,7 @@ import {
   MdMarkEmailRead,
   MdPaid,
   MdPictureAsPdf,
+  MdPrint,
   MdRestore,
   MdSend,
 } from 'react-icons/md';
@@ -48,6 +49,9 @@ import { useHandleDelete } from '../hooks/useHandleDelete';
 import { useHandleRestore } from '../hooks/useHandleRestore';
 import { useMarkPaid } from '../hooks/useMarkPaid';
 import { useMarkSent } from '../hooks/useMarkSent';
+import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
+import { getEntityState } from '$app/common/helpers';
+import { EntityState } from '$app/common/enums/entity-state';
 
 export function useActions() {
   const { t } = useTranslation();
@@ -55,6 +59,7 @@ export function useActions() {
   const location = useLocation();
   const navigate = useNavigate();
   const downloadPdf = useDownloadPdf({ resource: 'invoice' });
+  const printPdf = usePrintPdf({ entity: 'invoice' });
   const markSent = useMarkSent();
   const markPaid = useMarkPaid();
 
@@ -124,6 +129,15 @@ export function useActions() {
         {t('view_pdf')}
       </DropdownElement>
     ),
+    (invoice: Invoice) =>
+      getEntityState(invoice) !== EntityState.Deleted && (
+        <DropdownElement
+          onClick={() => printPdf(invoice)}
+          icon={<Icon element={MdPrint} />}
+        >
+          {t('print_pdf')}
+        </DropdownElement>
+      ),
     (invoice: Invoice) => (
       <DropdownElement
         to={route('/invoices/:id/pdf?delivery_note=true', { id: invoice.id })}
