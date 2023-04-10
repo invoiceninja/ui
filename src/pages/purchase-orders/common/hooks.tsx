@@ -415,21 +415,21 @@ export function useActions() {
       </DropdownElement>
     ),
     (purchaseOrder) =>
-      purchaseOrder.status_id !== PurchaseOrderStatus.Accepted && (
-        <DropdownElement
-          onClick={() => scheduleEmailRecord(purchaseOrder.id)}
-          icon={<Icon element={MdSchedule} />}
-        >
-          {t('schedule')}
-        </DropdownElement>
-      ),
-    (purchaseOrder) =>
       getEntityState(purchaseOrder) !== EntityState.Deleted && (
         <DropdownElement
           onClick={() => printPdf(purchaseOrder)}
           icon={<Icon element={MdPrint} />}
         >
           {t('print_pdf')}
+        </DropdownElement>
+      ),
+    (purchaseOrder) =>
+      purchaseOrder.status_id !== PurchaseOrderStatus.Accepted && (
+        <DropdownElement
+          onClick={() => scheduleEmailRecord(purchaseOrder.id)}
+          icon={<Icon element={MdSchedule} />}
+        >
+          {t('schedule')}
         </DropdownElement>
       ),
     (purchaseOrder) => (

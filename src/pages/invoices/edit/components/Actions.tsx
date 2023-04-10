@@ -133,21 +133,21 @@ export function useActions() {
       </DropdownElement>
     ),
     (invoice: Invoice) =>
-      invoice.status_id !== InvoiceStatus.Paid && (
-        <DropdownElement
-          onClick={() => scheduleEmailRecord(invoice.id)}
-          icon={<Icon element={MdSchedule} />}
-        >
-          {t('schedule')}
-        </DropdownElement>
-      ),
-    (invoice: Invoice) =>
       getEntityState(invoice) !== EntityState.Deleted && (
         <DropdownElement
           onClick={() => printPdf(invoice)}
           icon={<Icon element={MdPrint} />}
         >
           {t('print_pdf')}
+        </DropdownElement>
+      ),
+    (invoice: Invoice) =>
+      invoice.status_id !== InvoiceStatus.Paid && (
+        <DropdownElement
+          onClick={() => scheduleEmailRecord(invoice.id)}
+          icon={<Icon element={MdSchedule} />}
+        >
+          {t('schedule')}
         </DropdownElement>
       ),
     (invoice: Invoice) => (
