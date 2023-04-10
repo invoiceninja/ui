@@ -15,10 +15,18 @@ import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
-import { Create } from './create/Create';
-import { Documents } from './documents/Documents';
-import { Edit } from './edit/Edit';
-import { RecurringExpenses } from './index/RecurringExpenses';
+import { lazy } from 'react';
+
+const RecurringExpenses = lazy(
+  () => import('$app/pages/recurring-expenses/index/RecurringExpenses')
+);
+const Create = lazy(
+  () => import('$app/pages/recurring-expenses/create/Create')
+);
+const Edit = lazy(() => import('$app/pages/recurring-expenses/edit/Edit'));
+const Documents = lazy(
+  () => import('$app/pages/recurring-expenses/documents/Documents')
+);
 
 export const recurringExpenseRoutes = (
   <Route path="/recurring_expenses">

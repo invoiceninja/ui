@@ -34,7 +34,7 @@ import { Details } from '../components/Details';
 import { Notes } from '../components/Notes';
 import { TaxSettings } from '../components/Taxes';
 
-export function Edit() {
+export default function Edit() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('recurring_expense');
