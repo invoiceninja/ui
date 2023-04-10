@@ -20,7 +20,7 @@ import {
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 
-export function Projects() {
+export default function Projects() {
   useTitle('projects');
 
   const [t] = useTranslation();

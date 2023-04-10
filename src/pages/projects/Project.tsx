@@ -28,7 +28,7 @@ import { useQueryClient } from 'react-query';
 import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks';
 
-export function Project() {
+export default function Project() {
   const { documentTitle, setDocumentTitle } = useTitle('project');
   const { id } = useParams();
   const { data } = useProjectQuery({ id });

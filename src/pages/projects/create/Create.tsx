@@ -33,7 +33,7 @@ import { useQueryClient } from 'react-query';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { projectAtom } from '../common/atoms';
 
-export function Create() {
+export default function Create() {
   const { documentTitle } = useTitle('new_project');
 
   const [t] = useTranslation();
