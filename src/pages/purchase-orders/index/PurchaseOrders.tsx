@@ -22,7 +22,7 @@ import {
   usePurchaseOrderFilters,
 } from '../common/hooks';
 
-export function PurchaseOrders() {
+export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
 
   const [t] = useTranslation();
