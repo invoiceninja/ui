@@ -11,7 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import Logo from '../resources/images/invoiceninja-logo@dark.png';
 
-export function NotFound() {
+export default function NotFound() {
   const [t] = useTranslation();
 
   return (
