@@ -135,7 +135,7 @@ export function useActions() {
     (invoice: Invoice) =>
       getEntityState(invoice) !== EntityState.Deleted && (
         <DropdownElement
-          onClick={() => printPdf(invoice)}
+          onClick={() => printPdf([invoice.id])}
           icon={<Icon element={MdPrint} />}
         >
           {t('print_pdf')}

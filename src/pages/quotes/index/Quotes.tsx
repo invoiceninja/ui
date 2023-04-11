@@ -10,7 +10,7 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable } from '$app/components/DataTable';
+import { CustomBulkAction, DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
@@ -23,6 +23,10 @@ import {
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
+import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { MdPrint } from 'react-icons/md';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -35,9 +39,22 @@ export default function Quotes() {
 
   const actions = useActions();
 
+  const printPdf = usePrintPdf({ entity: 'quote' });
+
   const quoteColumns = useAllQuoteColumns();
 
   const filters = useQuoteFilters();
+
+  const customBulkActions: CustomBulkAction[] = [
+    (selectedIds) => (
+      <DropdownElement
+        onClick={() => printPdf(selectedIds)}
+        icon={<Icon element={MdPrint} />}
+      >
+        {t('print_pdf')}
+      </DropdownElement>
+    ),
+  ];
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
@@ -49,6 +66,7 @@ export default function Quotes() {
         linkToCreate="/quotes/create"
         bulkRoute="/api/v1/quotes/bulk"
         customActions={actions}
+        customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterQueryKey="client_status"
         customFilterPlaceholder="status"

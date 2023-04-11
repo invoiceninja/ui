@@ -334,7 +334,7 @@ export function useActions() {
     (credit) =>
       getEntityState(credit) !== EntityState.Deleted && (
         <DropdownElement
-          onClick={() => printPdf(credit)}
+          onClick={() => printPdf([credit.id])}
           icon={<Icon element={MdPrint} />}
         >
           {t('print_pdf')}

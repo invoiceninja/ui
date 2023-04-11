@@ -9,10 +9,14 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
-import { DataTable } from '$app/components/DataTable';
+import { CustomBulkAction, DataTable } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
 import { Default } from '$app/components/layouts/Default';
+import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useTranslation } from 'react-i18next';
+import { MdPrint } from 'react-icons/md';
 import {
   defaultColumns,
   useActions,
@@ -30,7 +34,20 @@ export default function Credits() {
   const actions = useActions();
   const columns = useCreditColumns();
 
+  const printPdf = usePrintPdf({ entity: 'credit' });
+
   const creditColumns = useAllCreditColumns();
+
+  const customBulkActions: CustomBulkAction[] = [
+    (selectedIds) => (
+      <DropdownElement
+        onClick={() => printPdf(selectedIds)}
+        icon={<Icon element={MdPrint} />}
+      >
+        {t('print_pdf')}
+      </DropdownElement>
+    ),
+  ];
 
   return (
     <Default
@@ -47,6 +64,7 @@ export default function Credits() {
         linkToCreate="/credits/create"
         linkToEdit="/credits/:id/edit"
         customActions={actions}
+        customBulkActions={customBulkActions}
         withResourcefulActions
         leftSideChevrons={
           <DataTableColumnsPicker
