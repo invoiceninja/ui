@@ -15,11 +15,13 @@ import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { Outlet, Route } from 'react-router-dom';
-import { Create } from './create/Create';
-import { Edit } from './edit/Edit';
-import { Email } from './email/Email';
-import { PurchaseOrders } from './index/PurchaseOrders';
-import { Pdf } from './pdf/Pdf';
+import { lazy } from 'react';
+
+const PurchaseOrders = lazy(() => import('./index/PurchaseOrders'));
+const Edit = lazy(() => import('./edit/Edit'));
+const Email = lazy(() => import('./email/Email'));
+const Pdf = lazy(() => import('./pdf/Pdf'));
+const Create = lazy(() => import('./create/Create'));
 
 export const purchaseOrderRoutes = (
   <Route path="/purchase_orders">

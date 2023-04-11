@@ -45,7 +45,7 @@ export function TaxRateSelector(props: Props) {
           props.onChange && props.onChange(record)
         }
         value="rate"
-        defaultValue={props.defaultValue}
+        defaultValue={props.defaultValue === 0 ? null : props.defaultValue}
         clearButton={props.clearButton}
         onClearButtonClick={props.onClearButtonClick}
         actionLabel={t('create_tax_rate')}

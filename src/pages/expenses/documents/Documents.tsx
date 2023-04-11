@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 
-export function Documents() {
+export default function Documents() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('documents');

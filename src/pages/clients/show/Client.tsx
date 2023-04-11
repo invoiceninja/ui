@@ -31,7 +31,7 @@ import { useActions } from '../common/hooks/useActions';
 import { MergeClientModal } from '../common/components/MergeClientModal';
 import { Button } from '$app/components/forms';
 
-export function Client() {
+export default function Client() {
   const { documentTitle, setDocumentTitle } = useTitle('view_client');
   const { id } = useParams();
   const { data: client, isLoading } = useClientQuery({ id });

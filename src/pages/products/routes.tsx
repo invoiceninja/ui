@@ -13,14 +13,18 @@ import { assigned } from '$app/common/guards/guards/assigned';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
-import { Create } from './create/Create';
-import { Documents } from './documents/Documents';
-import { Edit } from './edit/Edit';
-import { ProductFields } from './edit/ProductFields';
-import { Import } from './import/Import';
-import { Products } from './index/Products';
-import { Product } from './Product';
-import { Show } from './show/Show';
+import { lazy } from 'react';
+
+const Product = lazy(() => import('$app/pages/products/Product'));
+const Import = lazy(() => import('$app/pages/products/import/Import'));
+const Products = lazy(() => import('$app/pages/products/index/Products'));
+const Create = lazy(() => import('$app/pages/products/create/Create'));
+const Edit = lazy(() => import('$app/pages/products/edit/Edit'));
+const Show = lazy(() => import('$app/pages/products/show/Show'));
+const Documents = lazy(() => import('$app/pages/products/documents/Documents'));
+const ProductFields = lazy(
+  () => import('$app/pages/products/edit/ProductFields')
+);
 
 export const productRoutes = (
   <Route path="products">

@@ -52,6 +52,8 @@ export type DataTableColumns<T = any> = {
   format?: (field: string | number, resource: T) => unknown;
 }[];
 
+export type CustomBulkAction = (selectedIds: string[]) => ReactNode;
+
 interface Props<T> {
   resource: string;
   columns: DataTableColumns;
@@ -61,6 +63,7 @@ interface Props<T> {
   withResourcefulActions?: ReactNode[] | boolean;
   bulkRoute?: string;
   customActions?: any;
+  customBulkActions?: CustomBulkAction[];
   customFilters?: SelectOption[];
   customFilterQueryKey?: string;
   customFilterPlaceholder?: string;
@@ -214,6 +217,15 @@ export function DataTable<T extends object>(props: Props<T>) {
           beforeFilter={props.beforeFilter}
         >
           <Dropdown label={t('more_actions')}>
+            {props.customBulkActions &&
+              props.customBulkActions.map(
+                (bulkAction: CustomBulkAction, index: number) => (
+                  <div key={index}>{bulkAction(selected)}</div>
+                )
+              )}
+
+            {props.customBulkActions && <Divider withoutPadding />}
+
             <DropdownElement
               onClick={() => bulk('archive')}
               icon={<Icon element={MdArchive} />}
@@ -368,9 +380,7 @@ export function DataTable<T extends object>(props: Props<T>) {
 
                       {props.customActions &&
                         (props.showRestore?.(resource) ||
-                          !props.showRestore) && (
-                          <Divider withoutPadding />
-                        )}
+                          !props.showRestore) && <Divider withoutPadding />}
 
                       {resource?.archived_at === 0 && (
                         <DropdownElement

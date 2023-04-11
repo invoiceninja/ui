@@ -19,7 +19,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { useCreditQuery } from '../common/queries';
 
-export function Email() {
+export default function Email() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('email_credit');

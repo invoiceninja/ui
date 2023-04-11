@@ -29,7 +29,7 @@ import { productAtom } from '../common/atoms';
 import { CreateProduct } from '../common/components/CreateProduct';
 import { useQueryClient } from 'react-query';
 
-export function Create() {
+export default function Create() {
   const [t] = useTranslation();
   const queryClient = useQueryClient();
 

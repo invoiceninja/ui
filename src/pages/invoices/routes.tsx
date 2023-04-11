@@ -10,17 +10,19 @@
 
 import { Guard } from '$app/common/guards/Guard';
 import { permission } from '$app/common/guards/guards/permission';
-import { Import } from '$app/pages/invoices/import/Import';
 import { Route } from 'react-router-dom';
-import { Email } from './email/Email';
-import { Invoices } from './index/Invoices';
-import { Pdf } from './pdf/Pdf';
-import { Create } from './create/Create';
-import { Edit } from './edit/Edit';
 import { enabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { or } from '$app/common/guards/guards/or';
 import { assigned } from '$app/common/guards/guards/assigned';
+import { lazy } from 'react';
+
+const Invoices = lazy(() => import('$app/pages/invoices/index/Invoices'));
+const Import = lazy(() => import('$app/pages/invoices/import/Import'));
+const Create = lazy(() => import('$app/pages/invoices/create/Create'));
+const Edit = lazy(() => import('$app/pages/invoices/edit/Edit'));
+const Pdf = lazy(() => import('$app/pages/invoices/pdf/Pdf'));
+const Email = lazy(() => import('$app/pages/invoices/email/Email'));
 
 export const invoiceRoutes = (
   <Route path="/invoices">

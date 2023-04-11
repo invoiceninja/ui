@@ -22,7 +22,7 @@ export interface MailerComponent {
   sendEmail: () => unknown;
 }
 
-export function Email() {
+export default function Email() {
   const [t] = useTranslation();
 
   const mailerRef = useRef<MailerComponent>(null);

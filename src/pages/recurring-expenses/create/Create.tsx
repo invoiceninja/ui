@@ -32,7 +32,7 @@ import { useHandleChange } from '../common/hooks';
 import { RecurringExpensesFrequency } from '$app/common/enums/recurring-expense-frequency';
 import { cloneDeep } from 'lodash';
 
-export function Create() {
+export default function Create() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();

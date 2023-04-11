@@ -15,11 +15,13 @@ import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
-import { Create } from './create/Create';
-import { Documents } from './documents/Documents';
-import { Edit } from './edit/Edit';
-import { Projects } from './index/Projects';
-import { Project } from './Project';
+import { lazy } from 'react';
+
+const Projects = lazy(() => import('$app/pages/projects/index/Projects'));
+const Create = lazy(() => import('$app/pages/projects/create/Create'));
+const Project = lazy(() => import('$app/pages/projects/Project'));
+const Edit = lazy(() => import('$app/pages/projects/edit/Edit'));
+const Documents = lazy(() => import('$app/pages/projects/documents/Documents'));
 
 export const projectRoutes = (
   <Route>

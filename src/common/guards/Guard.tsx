@@ -12,6 +12,7 @@ import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { CompanyUser } from '$app/common/interfaces/company-user';
 import { User } from '$app/common/interfaces/user';
+import { Fallback } from '$app/components/Fallback';
 import { Default } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { Unauthorized } from '$app/pages/errors/401';
@@ -78,5 +79,5 @@ export function Guard(props: Props) {
     return <Unauthorized />;
   }
 
-  return props.component;
+  return <Fallback>{props.component}</Fallback>;
 }

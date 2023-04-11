@@ -22,7 +22,7 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 
-export function Expenses() {
+export default function Expenses() {
   useTitle('expenses');
 
   const [t] = useTranslation();

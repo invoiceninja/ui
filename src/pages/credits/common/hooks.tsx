@@ -76,9 +76,11 @@ import {
   MdPictureAsPdf,
   MdPrint,
   MdRestore,
+  MdSchedule,
 } from 'react-icons/md';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
 
@@ -280,6 +282,7 @@ export function useActions() {
   const printPdf = usePrintPdf({ entity: 'credit' });
   const markSent = useMarkSent();
   const bulk = useBulkAction();
+  const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'credit' });
 
   const cloneToCredit = (credit: Credit) => {
     setCredit({ ...credit, number: '', documents: [] });
@@ -331,7 +334,7 @@ export function useActions() {
     (credit) =>
       getEntityState(credit) !== EntityState.Deleted && (
         <DropdownElement
-          onClick={() => printPdf(credit)}
+          onClick={() => printPdf([credit.id])}
           icon={<Icon element={MdPrint} />}
         >
           {t('print_pdf')}
@@ -343,6 +346,14 @@ export function useActions() {
         icon={<Icon element={MdDownload} />}
       >
         {t('download_pdf')}
+      </DropdownElement>
+    ),
+    (credit) => (
+      <DropdownElement
+        onClick={() => scheduleEmailRecord(credit.id)}
+        icon={<Icon element={MdSchedule} />}
+      >
+        {t('schedule')}
       </DropdownElement>
     ),
     (credit) => (

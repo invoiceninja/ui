@@ -37,7 +37,7 @@ import { useBlankRecurringInvoiceQuery } from '../common/queries';
 import { Icon } from '$app/components/icons/Icon';
 import { MdNotStarted, MdSend } from 'react-icons/md';
 
-export function Create() {
+export default function Create() {
   const { documentTitle } = useTitle('new_recurring_invoice');
   const { t } = useTranslation();
 

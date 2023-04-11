@@ -41,7 +41,7 @@ import { useInvoiceUtilities } from '../create/hooks/useInvoiceUtilities';
 import { useActions } from './components/Actions';
 import { useHandleSave } from './hooks/useInvoiceSave';
 
-export function Edit() {
+export default function Edit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const [searchParams] = useSearchParams();

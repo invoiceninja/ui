@@ -34,7 +34,7 @@ import { CreditFooter } from '../common/components/CreditFooter';
 import { useCreate, useCreditUtilities } from '../common/hooks';
 import { useBlankCreditQuery } from '../common/queries';
 
-export function Create() {
+export default function Create() {
   const { documentTitle } = useTitle('new_credit');
   const { t } = useTranslation();
 

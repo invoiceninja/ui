@@ -32,7 +32,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { route } from '$app/common/helpers/route';
 import { useQueryClient } from 'react-query';
 
-export function Create() {
+export default function Create() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();

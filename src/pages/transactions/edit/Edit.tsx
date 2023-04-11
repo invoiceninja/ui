@@ -31,7 +31,7 @@ import { useQueryClient } from 'react-query';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks/useActions';
 
-export function Edit() {
+export default function Edit() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();

@@ -33,7 +33,7 @@ import { v4 } from 'uuid';
 import { useNavigate } from 'react-router-dom';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 
-export function Apply() {
+export default function Apply() {
   const queryClient = useQueryClient();
   const { id } = useParams();
   const [t] = useTranslation();

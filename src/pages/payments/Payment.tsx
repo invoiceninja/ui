@@ -23,7 +23,7 @@ import { Outlet, useParams } from 'react-router-dom';
 import { useActions } from './common/hooks/useActions';
 import { useSave } from './edit/hooks/useSave';
 
-export function Payment() {
+export default function Payment() {
   const [t] = useTranslation();
 
   const { id } = useParams();
