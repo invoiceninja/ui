@@ -31,7 +31,7 @@ import { TaskTable } from '../common/components/TaskTable';
 import { isOverlapping } from '../common/helpers/is-overlapping';
 import { useStart } from '../common/hooks/useStart';
 
-export function Create() {
+export default function Create() {
   const [t] = useTranslation();
   const { documentTitle } = useTitle('new_task');
 

@@ -11,11 +11,15 @@
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Expense } from '$app/common/interfaces/expense';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Params } from './common/params.interface';
 import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { toast } from '$app/common/helpers/toast/toast';
+import { AxiosError } from 'axios';
 
 interface BlankQueryParams {
   enabled?: boolean;
@@ -80,4 +84,30 @@ export function useExpensesQuery(params: ExpensesParams) {
       ),
     { enabled: params.enabled ?? true, staleTime: Infinity }
   );
+}
+
+export function useBulk() {
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+
+  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/expenses/bulk'), {
+      action,
+      ids: [id],
+    })
+      .then(() => {
+        toast.success(`${action}d_expense`);
+
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
+
+        queryClient.invalidateQueries(route('/api/v1/expenses/:id', { id }));
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+        toast.error();
+      });
+  };
 }

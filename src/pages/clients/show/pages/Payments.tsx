@@ -20,7 +20,7 @@ import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';
 import { Payment } from '$app/common/interfaces/payment';
 
-export function Payments() {
+export default function Payments() {
   const [t] = useTranslation();
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();

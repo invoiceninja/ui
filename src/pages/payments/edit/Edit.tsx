@@ -32,7 +32,7 @@ interface Context {
   setPayment: Dispatch<SetStateAction<Payment | undefined>>;
 }
 
-export function Edit() {
+export default function Edit() {
   const { documentTitle } = useTitle('edit_payment');
   const [t] = useTranslation();
 

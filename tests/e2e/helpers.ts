@@ -44,6 +44,8 @@ export function permissions(page: Page) {
   const save = async () => {
     await page.getByRole('button', { name: 'Save' }).click();
     await page.getByText('Successfully updated user').isVisible();
+
+    await page.waitForTimeout(500);
   };
 
   const set = async (...permissions: TPermissions[]) => {

@@ -20,7 +20,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';
 
-export function Credits() {
+export default function Credits() {
   const [t] = useTranslation();
   const { id } = useParams();
   const { dateFormat } = useCurrentCompanyDateFormats();

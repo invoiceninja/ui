@@ -10,13 +10,20 @@
 
 import classNames from 'classnames';
 import { Spinner } from '$app/components/Spinner';
-import { CSSProperties, FormEvent, ReactElement, ReactNode } from 'react';
+import {
+  CSSProperties,
+  FormEvent,
+  ReactElement,
+  ReactNode,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { CardContainer } from '.';
 import { Button } from '../forms';
 import { Element } from '$app/components/cards/Element';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { ChevronDown, ChevronUp } from 'react-feather';
 
 export interface ButtonOption {
   text: string;
@@ -43,12 +50,16 @@ interface Props {
   isLoading?: boolean;
   withoutBodyPadding?: boolean;
   padding?: 'small' | 'regular';
+  collapsed?: boolean;
+  childrenClassName?: string;
 }
 
 export function Card(props: Props) {
   const [t] = useTranslation();
 
   const { padding = 'regular' } = props;
+
+  const [isCollapsed, setIsCollpased] = useState(props.collapsed);
 
   return (
     <div
@@ -63,28 +74,51 @@ export function Card(props: Props) {
           <div
             className={classNames('border-b border-gray-200', {
               'bg-white sticky top-0': props.withScrollableBody,
-              'px-4 py-3': padding == 'small',
+              'px-4 sm:px-6 py-3': padding == 'small',
               'px-4 sm:px-6 py-5': padding == 'regular',
             })}
+            onClick={() =>
+              typeof props.collapsed !== 'undefined' &&
+              setIsCollpased(!isCollapsed)
+            }
           >
-            <h3
-              className={classNames('leading-6 font-medium text-gray-900', {
-                'text-lg': padding == 'regular',
-                'text-md': padding == 'small',
+            <div
+              className={classNames('flex items-center justify-between', {
+                'cursor-pointer select-none':
+                  typeof props.collapsed !== 'undefined',
               })}
             >
-              {props.title}
-            </h3>
-            {props.description && (
-              <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                {props.description}
-              </p>
-            )}
+              <div>
+                <h3
+                  className={classNames('leading-6 font-medium text-gray-900', {
+                    'text-lg': padding == 'regular',
+                    'text-md': padding == 'small',
+                  })}
+                >
+                  {props.title}
+                </h3>
+
+                {props.description && (
+                  <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                    {props.description}
+                  </p>
+                )}
+              </div>
+
+              {typeof props.collapsed !== 'undefined' && isCollapsed && (
+                <ChevronDown />
+              )}
+
+              {typeof props.collapsed !== 'undefined' && !isCollapsed && (
+                <ChevronUp />
+              )}
+            </div>
           </div>
         )}
 
         <div
-          className={classNames({
+          className={classNames(props.childrenClassName, {
+            hidden: isCollapsed,
             'py-0': props.withoutBodyPadding,
             'py-4': padding == 'regular',
             'py-2': padding == 'small',

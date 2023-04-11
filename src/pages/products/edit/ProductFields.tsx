@@ -22,7 +22,7 @@ import { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
-export function ProductFields() {
+export default function ProductFields() {
   const [t] = useTranslation();
 
   const dispatch = useDispatch();

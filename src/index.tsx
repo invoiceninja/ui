@@ -23,6 +23,7 @@ import { createRoot } from 'react-dom/client';
 
 import './resources/css/app.css';
 import en from './resources/lang/en/en.json';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 i18n.use(initReactI18next).init({
   resources: {
@@ -56,15 +57,19 @@ Sentry.init({
 
 const container = document.getElementById('root') as HTMLElement;
 
+const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
 createRoot(container).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
-        <Router>
-          <ScrollToTop>
-            <App />
-          </ScrollToTop>
-        </Router>
+        <GoogleOAuthProvider clientId={googleClientId}>
+          <Router>
+            <ScrollToTop>
+              <App />
+            </ScrollToTop>
+          </Router>
+        </GoogleOAuthProvider>
       </Provider>
     </QueryClientProvider>
   </React.StrictMode>

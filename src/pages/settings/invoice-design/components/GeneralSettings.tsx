@@ -17,13 +17,14 @@ import { Divider } from '$app/components/cards/Divider';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
 import { useAtom } from 'jotai';
 import { range } from 'lodash';
-import { ChangeEvent, useEffect } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Card, ClickableElement, Element } from '../../../../components/cards';
-import { Radio, SelectField } from '../../../../components/forms';
-import Toggle from '../../../../components/forms/Toggle';
 import { updatingRecords as updatingRecordsAtom } from '../common/atoms';
+import { Card, Element } from '$app/components/cards';
+import { InputField, Radio, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
+import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
 
 export function GeneralSettings() {
   const [t] = useTranslation();
@@ -32,11 +33,7 @@ export function GeneralSettings() {
 
   const [updatingRecords, setUpdatingRecords] = useAtom(updatingRecordsAtom);
 
-  const { data: designs } = useDesignsQuery({
-    currentPage: 1,
-    perPage: 50,
-    sort: 'id|asc',
-  });
+  const { data: designs } = useDesignsQuery();
 
   const fonts = [
     { value: 'ABeeZee', label: 'ABeeZee' },
@@ -830,6 +827,7 @@ export function GeneralSettings() {
         }
       }
     }
+
     dispatch(
       updateChanges({
         object: 'company',
@@ -848,18 +846,26 @@ export function GeneralSettings() {
       })
     );
 
+  const handleValueChange = useHandleSettingsValueChange();
+
   useEffect(() => {
     setUpdatingRecords(undefined);
   }, []);
 
+  const [logoSizeType, setLogoSizeType] = useState<'%' | 'px'>('%');
+
+  useEffect(() => {
+    if (company?.settings) {
+      const value = company?.settings.company_logo_size
+        .replaceAll('%', '')
+        .replaceAll('px', '');
+
+      handleValueChange('company_logo_size', `${value}${logoSizeType}`);
+    }
+  }, [logoSizeType]);
+
   return (
-    <Card title={t('general_settings')}>
-      <ClickableElement to="/settings/invoice_design/customize">
-        {t('customize_and_preview')}
-      </ClickableElement>
-
-      <Divider />
-
+    <Card title={t('general_settings')} padding="small" collapsed={false}>
       <Element leftSide={t('invoice_design')}>
         <div className="flex flex-col space-y-3">
           <SelectField
@@ -868,7 +874,7 @@ export function GeneralSettings() {
             onChange={handleChange}
           >
             {designs &&
-              designs.data.data.map((design: Design) => (
+              designs.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -897,7 +903,7 @@ export function GeneralSettings() {
             onChange={handleChange}
           >
             {designs &&
-              designs.data.data.map((design: Design) => (
+              designs.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -926,7 +932,7 @@ export function GeneralSettings() {
             onChange={handleChange}
           >
             {designs &&
-              designs.data.data.map((design: Design) => (
+              designs.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -955,7 +961,7 @@ export function GeneralSettings() {
             onChange={handleChange}
           >
             {designs &&
-              designs.data.data.map((design: Design) => (
+              designs.map((design: Design) => (
                 <option key={design.id} value={design.id}>
                   {design.name}
                 </option>
@@ -1009,10 +1015,10 @@ export function GeneralSettings() {
       <Element leftSide={t('font_size')}>
         <SelectField
           id="settings.font_size"
-          value={company?.settings?.font_size || 7}
+          value={company?.settings?.font_size || 16}
           onChange={handleChange}
         >
-          {range(5, 17).map((number) => (
+          {range(6, 41, 2).map((number) => (
             <option key={number} value={number}>
               {number}
             </option>
@@ -1020,7 +1026,35 @@ export function GeneralSettings() {
         </SelectField>
       </Element>
 
-      <div className="pt-4 border-b"></div>
+      <Element leftSide={t('logo_size')}>
+        <div className="w-full inline-flex items-center space-x-2">
+          <div className="w-full">
+            <InputField
+              value={company?.settings.company_logo_size
+                .replaceAll('px', '')
+                .replaceAll('%', '')}
+              onValueChange={(value) =>
+                handleValueChange(
+                  'company_logo_size',
+                  `${value}${logoSizeType}`
+                )
+              }
+            />
+          </div>
+
+          <div className="w-1/3">
+            <SelectField
+              value={logoSizeType}
+              onValueChange={(value) => setLogoSizeType(value as 'px' | '%')}
+            >
+              <option value="%">{t('percent')}</option>
+              <option value="px">{t('pixels')}</option>
+            </SelectField>
+          </div>
+        </div>
+      </Element>
+
+      <Divider />
 
       <Element leftSide={t('primary_font')}>
         <SelectField
@@ -1077,6 +1111,24 @@ export function GeneralSettings() {
               })
             )
           }
+        />
+      </Element>
+
+      <Divider />
+
+      <Element leftSide={t('show_paid_stamp')}>
+        <Toggle
+          onValueChange={(value) => handleValueChange('show_paid_stamp', value)}
+          checked={company?.settings.show_paid_stamp}
+        />
+      </Element>
+
+      <Element leftSide={t('show_shipping_address')}>
+        <Toggle
+          onValueChange={(value) =>
+            handleValueChange('show_shipping_address', value)
+          }
+          checked={company?.settings.show_shipping_address}
         />
       </Element>
 

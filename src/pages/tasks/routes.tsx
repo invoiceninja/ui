@@ -15,10 +15,12 @@ import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { Route } from 'react-router-dom';
-import { Create } from './create/Create';
-import { Edit } from './edit/Edit';
-import { Tasks } from './index/Tasks';
-import { Kanban } from './kanban/Kanban';
+import { lazy } from 'react';
+
+const Tasks = lazy(() => import('$app/pages/tasks/index/Tasks'));
+const Kanban = lazy(() => import('$app/pages/tasks/kanban/Kanban'));
+const Create = lazy(() => import('$app/pages/tasks/create/Create'));
+const Edit = lazy(() => import('$app/pages/tasks/edit/Edit'));
 
 export const taskRoutes = (
   <Route path="/tasks">

@@ -13,14 +13,18 @@ import { assigned } from '$app/common/guards/guards/assigned';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
-import { Apply } from './apply/Apply';
-import { Create } from './create/Create';
-import { Documents } from './documents/Documents';
-import { Edit } from './edit/Edit';
-import { PaymentFields } from './edit/PaymentFields';
-import { Payments } from './index/Payments';
-import { Payment } from './Payment';
-import { Refund } from './refund/Refund';
+import { lazy } from 'react';
+
+const Payment = lazy(() => import('$app/pages/payments/Payment'));
+const Payments = lazy(() => import('$app/pages/payments/index/Payments'));
+const Create = lazy(() => import('$app/pages/payments/create/Create'));
+const Edit = lazy(() => import('$app/pages/payments/edit/Edit'));
+const Documents = lazy(() => import('$app/pages/payments/documents/Documents'));
+const PaymentFields = lazy(
+  () => import('$app/pages/payments/edit/PaymentFields')
+);
+const Apply = lazy(() => import('$app/pages/payments/apply/Apply'));
+const Refund = lazy(() => import('$app/pages/payments/refund/Refund'));
 
 export const paymentRoutes = (
   <Route path="/payments">

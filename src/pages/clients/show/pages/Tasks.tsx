@@ -15,7 +15,7 @@ import { useParams } from 'react-router-dom';
 
 export const dataTableStaleTime = 50;
 
-export function Tasks() {
+export default function Tasks() {
   const { id } = useParams();
 
   const columns = useTaskColumns();

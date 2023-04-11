@@ -23,7 +23,7 @@ import { useActions } from '../common/hooks/useActions';
 import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
 import { Payment } from '$app/common/interfaces/payment';
 
-export function Payments() {
+export default function Payments() {
   useTitle('payments');
 
   const [t] = useTranslation();

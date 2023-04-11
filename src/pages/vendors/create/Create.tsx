@@ -29,7 +29,7 @@ import { useNavigate } from 'react-router-dom';
 import { Form } from '../edit/components/Form';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 
-export function Create() {
+export default function Create() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('create_vendor');

@@ -94,7 +94,7 @@ export function useMarkSent() {
       purchaseOrder
     )
       .then(() => {
-        toast.success('notification_purchase_order_sent');
+        toast.success('marked_purchase_order_as_sent');
 
         queryClient.invalidateQueries(
           route('/api/v1/purchase_orders/:id', { id: purchaseOrder.id })

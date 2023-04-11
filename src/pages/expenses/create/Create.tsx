@@ -31,7 +31,7 @@ import { expenseAtom } from '../common/atoms';
 import { useHandleChange } from '../common/hooks';
 import { cloneDeep } from 'lodash';
 
-export function Create() {
+export default function Create() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();

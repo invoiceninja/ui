@@ -23,7 +23,7 @@ import { Default } from '../../components/layouts/Default';
 import { ExpiredQuotes } from './components/ExpiredQuotes';
 import { UpcomingQuotes } from './components/UpcomingQuotes';
 
-export function Dashboard() {
+export default function Dashboard() {
   const [t] = useTranslation();
 
   useTitle('dashboard');

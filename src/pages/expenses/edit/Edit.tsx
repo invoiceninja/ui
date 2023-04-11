@@ -27,7 +27,7 @@ import { Notes } from '../create/components/Notes';
 import { TaxSettings } from '../create/components/Taxes';
 import { useSave } from './hooks/useSave';
 
-export function Edit() {
+export default function Edit() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('edit_expense');

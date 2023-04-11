@@ -118,6 +118,7 @@ export interface Settings {
   postmark_secret: string;
   mailgun_secret: string;
   mailgun_domain: string;
+  mailgun_endpoint: string;
   purchase_order_number_pattern: string;
   purchase_order_number_counter: number;
   shared_invoice_quote_counter: boolean;
@@ -263,6 +264,10 @@ export interface Settings {
   qr_iban: string;
   besr_id: string;
   vendor_portal_enable_uploads: boolean;
+  company_logo_size: string;
+  show_paid_stamp: boolean;
+  show_shipping_address: boolean;
+  sync_invoice_quote_columns: boolean;
   client_initiated_payments: boolean;
   client_initiated_payments_minimum: number;
 }
