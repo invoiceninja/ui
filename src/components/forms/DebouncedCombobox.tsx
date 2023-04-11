@@ -38,7 +38,7 @@ interface Props {
   formatLabel?: (resource: any) => any;
   onActionClick?: () => any;
   actionLabel?: string | null;
-  defaultValue?: string | number | boolean;
+  defaultValue?: string | number | boolean | null;
   disabled?: boolean;
   clearButton?: any;
   onClearButtonClick?: any;
