@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AxiosError } from 'axios';
 import { Frequency } from '$app/common/enums/frequency';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -23,6 +22,8 @@ import { useBlankScheduleQuery } from '$app/common/queries/schedules';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { Settings } from '$app/components/layouts/Settings';
 import { Spinner } from '$app/components/Spinner';
+import { useFormatSchedulePayload } from '$app/pages/settings/schedules/common/hooks/useFormatSchedulePayload';
+import { AxiosError } from 'axios';
 import { useAtom } from 'jotai';
 import { FormEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -59,6 +60,8 @@ export function Create() {
 
   const handleChange = useHandleChange({ setErrors, setSchedule, schedule });
 
+  const formatSchedulePayload = useFormatSchedulePayload();
+
   useEffect(() => {
     if (blankSchedule) {
       setSchedule(() => {
@@ -80,6 +83,8 @@ export function Create() {
             show_aging_table: false,
             show_payments_table: false,
             status: 'all',
+            entity: 'invoice',
+            entity_id: '',
           },
         };
       });
@@ -89,12 +94,14 @@ export function Create() {
   const handleSave = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!isFormBusy) {
+    if (!isFormBusy && schedule) {
       setIsFormBusy(true);
       setErrors(undefined);
       toast.processing();
 
-      request('POST', endpoint('/api/v1/task_schedulers'), schedule)
+      const formattedSchedule = formatSchedulePayload(schedule);
+
+      request('POST', endpoint('/api/v1/task_schedulers'), formattedSchedule)
         .then((response: GenericSingleResourceResponse<Schedule>) => {
           toast.success('created_schedule');
 

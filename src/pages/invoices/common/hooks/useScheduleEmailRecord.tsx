@@ -8,30 +8,30 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Statement } from '$app/pages/clients/statement/Statement';
 import { scheduleParametersAtom } from '$app/pages/settings/schedules/common/components/EmailStatement';
 import { useSetAtom } from 'jotai';
 import { useNavigate } from 'react-router-dom';
 
-export function useScheduleStatement() {
+interface Props {
+  entity: 'invoice' | 'credit' | 'quote' | 'purchase_order';
+}
+
+export function useScheduleEmailRecord({ entity }: Props) {
   const navigate = useNavigate();
 
   const setScheduleParameters = useSetAtom(scheduleParametersAtom);
 
-  return (statement: Statement) => {
+  return (entityId: string) => {
     setScheduleParameters({
-      clients: [statement.client_id],
-      show_aging_table: statement.show_aging_table,
-      show_payments_table: statement.show_payments_table,
-      status: statement.status,
-      date_range:
-        statement.dateRangeId === 'custom'
-          ? 'last7_days'
-          : statement.dateRangeId,
-      entity: 'invoice',
-      entity_id: '',
+      clients: [],
+      show_aging_table: false,
+      show_payments_table: false,
+      status: 'all',
+      date_range: 'last7_days',
+      entity,
+      entity_id: entityId,
     });
 
-    navigate('/settings/schedules/create?template=email_statement');
+    navigate('/settings/schedules/create?template=email_record');
   };
 }

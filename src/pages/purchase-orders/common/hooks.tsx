@@ -43,6 +43,7 @@ import {
   MdPictureAsPdf,
   MdPrint,
   MdRestore,
+  MdSchedule,
   MdSend,
   MdSwitchRight,
 } from 'react-icons/md';
@@ -53,6 +54,7 @@ import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client
 import { Divider } from '$app/components/cards/Divider';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { PurchaseOrderStatus as PurchaseOrderStatusBadge } from '$app/pages/purchase-orders/common/components/PurchaseOrderStatus';
+import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
 
@@ -373,6 +375,10 @@ export function useActions() {
   const markSent = useMarkSent();
 
   const downloadPdf = useDownloadPdf({ resource: 'purchase_order' });
+
+  const scheduleEmailRecord = useScheduleEmailRecord({
+    entity: 'purchase_order',
+  });
   const printPdf = usePrintPdf({ entity: 'purchase_order' });
 
   const isEditPage = location.pathname.endsWith('/edit');
@@ -417,6 +423,15 @@ export function useActions() {
           {t('print_pdf')}
         </DropdownElement>
       ),
+    (purchaseOrder) =>
+      purchaseOrder.status_id !== PurchaseOrderStatus.Accepted && (
+        <DropdownElement
+          onClick={() => scheduleEmailRecord(purchaseOrder.id)}
+          icon={<Icon element={MdSchedule} />}
+        >
+          {t('schedule')}
+        </DropdownElement>
+      ),
     (purchaseOrder) => (
       <DropdownElement
         onClick={() => downloadPdf(purchaseOrder)}
@@ -426,7 +441,7 @@ export function useActions() {
       </DropdownElement>
     ),
     (purchaseOrder) =>
-      purchaseOrder.status_id !== PurchaseOrderStatus.Sent && (
+      purchaseOrder.status_id !== PurchaseOrderStatus.Accepted && (
         <DropdownElement
           onClick={() => markSent(purchaseOrder)}
           icon={<Icon element={MdMarkEmailRead} />}
