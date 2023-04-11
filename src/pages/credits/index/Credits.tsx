@@ -20,7 +20,7 @@ import {
   useCreditColumns,
 } from '../common/hooks';
 
-export function Credits() {
+export default function Credits() {
   useTitle('credits');
 
   const [t] = useTranslation();

@@ -45,7 +45,7 @@ export type ChangeHandler = <T extends keyof Invoice>(
   value: Invoice[typeof property]
 ) => void;
 
-export function Create() {
+export default function Create() {
   const { t } = useTranslation();
   const { documentTitle } = useTitle('new_invoice');
 

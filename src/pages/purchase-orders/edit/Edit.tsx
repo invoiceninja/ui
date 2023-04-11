@@ -39,7 +39,7 @@ import { useHandleLineItemPropertyChange } from './hooks/useHandleLineItemProper
 import { useHandleProductChange } from './hooks/useHandleProductChange';
 import { useSave } from './hooks/useSave';
 
-export function Edit() {
+export default function Edit() {
   const { documentTitle } = useTitle('edit_purchase_order');
   const { t } = useTranslation();
   const { id } = useParams();

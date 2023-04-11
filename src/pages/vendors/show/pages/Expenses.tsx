@@ -18,7 +18,7 @@ import { useParams } from 'react-router-dom';
 
 const dataTableStaleTime = 50;
 
-export function Expenses() {
+export default function Expenses() {
   const { id } = useParams();
 
   const columns = useExpenseColumns();

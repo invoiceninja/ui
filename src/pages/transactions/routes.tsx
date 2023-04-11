@@ -13,12 +13,16 @@ import { assigned } from '$app/common/guards/guards/assigned';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
-import {
-  CreateTransaction,
-  EditTransaction,
-  Transactions,
-  Import,
-} from './index';
+import { lazy } from 'react';
+
+const Transactions = lazy(
+  () => import('$app/pages/transactions/index/Transactions')
+);
+const CreateTransaction = lazy(
+  () => import('$app/pages/transactions/create/Create')
+);
+const Import = lazy(() => import('$app/pages/transactions/import/Import'));
+const EditTransaction = lazy(() => import('$app/pages/transactions/edit/Edit'));
 
 export const transactionRoutes = (
   <Route path="transactions">

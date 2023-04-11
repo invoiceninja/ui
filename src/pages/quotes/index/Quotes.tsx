@@ -24,7 +24,7 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 
-export function Quotes() {
+export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
 
   const [t] = useTranslation();

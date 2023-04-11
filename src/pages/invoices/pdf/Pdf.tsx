@@ -19,7 +19,7 @@ import { InvoiceViewer } from '../common/components/InvoiceViewer';
 import { useGeneratePdfUrl } from '../common/hooks/useGeneratePdfUrl';
 import { Actions } from './components/Actions';
 
-export function Pdf() {
+export default function Pdf() {
   const { id } = useParams();
   const { data } = useInvoiceQuery({ id });
 

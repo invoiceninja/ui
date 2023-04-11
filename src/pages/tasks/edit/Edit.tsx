@@ -29,7 +29,7 @@ import { TaskTable } from '../common/components/TaskTable';
 import { isOverlapping } from '../common/helpers/is-overlapping';
 import { Actions } from './components/Actions';
 
-export function Edit() {
+export default function Edit() {
   const { documentTitle } = useTitle('edit_task');
   const { id } = useParams();
   const { data } = useTaskQuery({ id });

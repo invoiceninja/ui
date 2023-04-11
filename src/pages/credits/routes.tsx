@@ -14,12 +14,14 @@ import { enabled } from '$app/common/guards/guards/enabled';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
+import { lazy } from 'react';
 import { Route } from 'react-router-dom';
-import { Create } from './create/Create';
-import { Edit } from './edit/Edit';
-import { Email } from './email/Email';
-import { Credits } from './index/Credits';
-import { Pdf } from './pdf/Pdf';
+
+const Credits = lazy(() => import('$app/pages/credits/index/Credits'));
+const Create = lazy(() => import('$app/pages/credits/create/Create'));
+const Edit = lazy(() => import('$app/pages/credits/edit/Edit'));
+const Pdf = lazy(() => import('$app/pages/credits/pdf/Pdf'));
+const Email = lazy(() => import('$app/pages/credits/email/Email'));
 
 export const creditRoutes = (
   <Route path="/credits">

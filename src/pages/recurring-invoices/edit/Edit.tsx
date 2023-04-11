@@ -44,7 +44,7 @@ import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { MdNotStarted, MdSend } from 'react-icons/md';
 import { RecurringInvoiceStatus } from '$app/common/enums/recurring-invoice-status';
 
-export function Edit() {
+export default function Edit() {
   const { t } = useTranslation();
   const { id } = useParams();
   const { documentTitle } = useTitle('edit_recurring_invoice');

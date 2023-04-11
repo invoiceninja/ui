@@ -16,7 +16,7 @@ import { Upload } from '$app/pages/settings/company/documents/components';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 
-export function Documents() {
+export default function Documents() {
   const { id } = useParams();
   const { data: product } = useProductQuery({ id });
 

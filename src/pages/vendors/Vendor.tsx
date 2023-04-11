@@ -23,7 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { Actions } from './components/Actions';
 
-export function Vendor() {
+export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
   const { id } = useParams();
   const { data: vendor } = useVendorQuery({ id });

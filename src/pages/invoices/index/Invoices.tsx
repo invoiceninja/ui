@@ -22,7 +22,7 @@ import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useInvoiceFilters } from '../common/hooks/useInvoiceFilters';
 import { ImportButton } from '$app/components/import/ImportButton';
 
-export function Invoices() {
+export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
 
   const [t] = useTranslation();

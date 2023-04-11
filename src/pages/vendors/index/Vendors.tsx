@@ -21,7 +21,7 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
 
-export function Vendors() {
+export default function Vendors() {
   const { documentTitle } = useTitle('vendors');
 
   const [t] = useTranslation();

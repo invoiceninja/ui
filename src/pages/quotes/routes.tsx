@@ -11,16 +11,18 @@
 import { Guard } from '$app/common/guards/Guard';
 import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
-import { Create } from './create/Create';
-import { Edit } from './edit/Edit';
-import { Email } from './email/Email';
-import { Quotes } from './index/Quotes';
-import { Pdf } from './pdf/Pdf';
-import { Import } from '$app/pages/quotes/import/Import';
 import { enabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { or } from '$app/common/guards/guards/or';
 import { assigned } from '$app/common/guards/guards/assigned';
+import { lazy } from 'react';
+
+const Quotes = lazy(() => import('$app/pages/quotes/index/Quotes'));
+const Import = lazy(() => import('$app/pages/quotes/import/Import'));
+const Edit = lazy(() => import('$app/pages/quotes/edit/Edit'));
+const Create = lazy(() => import('$app/pages/quotes/create/Create'));
+const Pdf = lazy(() => import('$app/pages/quotes/pdf/Pdf'));
+const Email = lazy(() => import('$app/pages/quotes/email/Email'));
 
 export const quoteRoutes = (
   <Route path="/quotes">
