@@ -46,7 +46,7 @@ export function EmailRecord(props: Props) {
           onValueChange={(value) =>
             handleChange('parameters.entity' as keyof Schedule, value)
           }
-          errorMessage={errors?.errors.entity}
+          errorMessage={errors?.errors['parameters.entity']}
         >
           <option value="invoice" defaultChecked>
             {t('invoice')}
@@ -82,7 +82,7 @@ export function EmailRecord(props: Props) {
               handleChange('parameters.entity_id' as keyof Schedule, '')
             }
             queryAdditional
-            errorMessage={errors?.errors.entity_id}
+            errorMessage={errors?.errors['parameters.entity_id']}
           />
         </Element>
       )}
@@ -112,7 +112,7 @@ export function EmailRecord(props: Props) {
               handleChange('parameters.entity_id' as keyof Schedule, '')
             }
             queryAdditional
-            errorMessage={errors?.errors.entity_id}
+            errorMessage={errors?.errors['parameters.entity_id']}
           />
         </Element>
       )}
@@ -142,7 +142,7 @@ export function EmailRecord(props: Props) {
               handleChange('parameters.entity_id' as keyof Schedule, '')
             }
             queryAdditional
-            errorMessage={errors?.errors.entity_id}
+            errorMessage={errors?.errors['parameters.entity_id']}
           />
         </Element>
       )}
@@ -172,7 +172,7 @@ export function EmailRecord(props: Props) {
               handleChange('parameters.entity_id' as keyof Schedule, '')
             }
             queryAdditional
-            errorMessage={errors?.errors.entity_id}
+            errorMessage={errors?.errors['parameters.entity_id']}
           />
         </Element>
       )}

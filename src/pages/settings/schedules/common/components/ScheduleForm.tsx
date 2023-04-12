@@ -40,14 +40,6 @@ export function ScheduleForm(props: Props) {
 
   return (
     <Card title={page === 'edit' ? t('edit_schedule') : t('new_schedule')}>
-      <Element leftSide={t('name')} required>
-        <InputField
-          value={schedule.name}
-          onValueChange={(value) => handleChange('name', value)}
-          errorMessage={errors?.errors.name}
-        />
-      </Element>
-
       <Element leftSide={t('template')} required>
         <SelectField
           value={schedule.template}
