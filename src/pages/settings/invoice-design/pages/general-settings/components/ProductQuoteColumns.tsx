@@ -11,8 +11,8 @@
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { useCustomField } from '$app/components/CustomField';
 import { Card } from '$app/components/cards';
-import { SortableVariableList } from '$app/pages/settings/invoice-design/components/SortableVariableList';
 import { useTranslation } from 'react-i18next';
+import { SortableVariableList } from './SortableVariableList';
 
 export function ProductQuoteColumns() {
   const [t] = useTranslation();

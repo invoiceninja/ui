@@ -12,6 +12,7 @@ import { useTitle } from '$app/common/hooks/useTitle';
 import { Tab, Tabs } from '$app/components/Tabs';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
+import { Outlet } from 'react-router-dom';
 
 export default function InvoiceDesign() {
   const { documentTitle } = useTitle('invoice_design');
@@ -28,6 +29,8 @@ export default function InvoiceDesign() {
   return (
     <Default title={documentTitle}>
       <Tabs tabs={tabs} />
+
+      <Outlet />
     </Default>
   );
 }

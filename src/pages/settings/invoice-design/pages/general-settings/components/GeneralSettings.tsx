@@ -20,7 +20,7 @@ import { range } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { updatingRecords as updatingRecordsAtom } from '../common/atoms';
+import { updatingRecords as updatingRecordsAtom } from '../../../common/atoms';
 import { Card, Element } from '$app/components/cards';
 import { InputField, Radio, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
