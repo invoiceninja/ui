@@ -9,11 +9,25 @@
  */
 
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Tab, Tabs } from '$app/components/Tabs';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 
 export default function InvoiceDesign() {
   const { documentTitle } = useTitle('invoice_design');
+  const { t } = useTranslation();
 
-  return <Default title={documentTitle}></Default>;
+  const tabs: Tab[] = [
+    { name: t('general_settings'), href: '/settings/invoice_design' },
+    {
+      name: t('custom_designs'),
+      href: '/settings/invoice_design/custom_designs',
+    },
+  ];
+
+  return (
+    <Default title={documentTitle}>
+      <Tabs tabs={tabs} />
+    </Default>
+  );
 }

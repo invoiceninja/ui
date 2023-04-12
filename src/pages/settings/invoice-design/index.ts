@@ -23,5 +23,3 @@ export { TotalFields } from './components/index';
 export { VendorDetails } from './components/index';
 export { PurchaseOrderDetails } from './components/index';
 export { Customize } from './customize/Customize';
-
-export const InvoiceDesign = lazy(() => import('./InvoiceDesign'));
