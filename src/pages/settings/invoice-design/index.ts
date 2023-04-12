@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { lazy } from 'react';
+
 export { CompanyDetails as InvoiceCompanyDetails } from './components/index';
 export { ClientDetails } from './components/index';
 export { CompanyAddress } from './components/index';
@@ -21,3 +23,5 @@ export { TotalFields } from './components/index';
 export { VendorDetails } from './components/index';
 export { PurchaseOrderDetails } from './components/index';
 export { Customize } from './customize/Customize';
+
+export const InvoiceDesign = lazy(() => import('./InvoiceDesign'));

@@ -75,7 +75,10 @@ export const settingsRoutes = (
         <Route path="" element={<Settings.CompanyBackup />} />
         <Route path="restore" element={<Settings.CompanyRestore />} />
       </Route>
-      <Route path="invoice_design/customize" element={<Settings.Customize />} />
+      <Route path="invoice_design">
+        <Route path="" element={<Settings.InvoiceDesign />} />
+        <Route path="customize" element={<Settings.Customize />} />
+      </Route>
       <Route path="custom_fields">
         <Route path="" element={<Settings.CustomFields />} />
         <Route path="company" element={<Settings.CompanyCustomFields />} />
