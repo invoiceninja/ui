@@ -12,8 +12,8 @@ import { lazy } from 'react';
 import { Route } from 'react-router-dom';
 
 const InvoiceDesign = lazy(() => import('./InvoiceDesign'));
-const GeneralSettings = lazy(() => import('./pages/GeneralSettings'));
-const CustomDesigns = lazy(() => import('./pages/CustomDesigns'));
+const GeneralSettings = lazy(() => import('./pages/general-settings/GeneralSettings'));
+const CustomDesigns = lazy(() => import('./pages/custom-designs/CustomDesigns'));
 
 export const invoiceDesignRoutes = (
   <Route path="invoice_design" element={<InvoiceDesign />}>
