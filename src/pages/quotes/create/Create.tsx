@@ -34,7 +34,7 @@ import { QuoteFooter } from '../common/components/QuoteFooter';
 import { useCreate, useQuoteUtilities } from '../common/hooks';
 import { useBlankQuoteQuery } from '../common/queries';
 
-export function Create() {
+export default function Create() {
   const { documentTitle } = useTitle('new_quote');
   const { t } = useTranslation();
 

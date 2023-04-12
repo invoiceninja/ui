@@ -47,7 +47,7 @@ export interface Statement {
   dateRangeId: string;
 }
 
-export function Statement() {
+export default function Statement() {
   const { documentTitle } = useTitle('statement');
   const { t } = useTranslation();
   const { id } = useParams();

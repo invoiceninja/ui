@@ -11,19 +11,21 @@
 import { Guard } from '$app/common/guards/Guard';
 import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
-import { Create } from './create/Create';
-import { Edit } from './edit/Edit';
-import { Vendors } from './index/Vendors';
-import { Documents } from './show/pages/Documents';
-import { Expenses } from './show/pages/Expenses';
-import { PurchaseOrders } from './show/pages/PurchaseOrders';
-import { RecurringExpenses } from './show/pages/RecurringExpenses';
-import { Vendor } from './Vendor';
-import { Import } from '$app/pages/vendors/import/Import';
 import { enabled } from '$app/common/guards/guards/enabled';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { or } from '$app/common/guards/guards/or';
 import { assigned } from '$app/common/guards/guards/assigned';
+import { lazy } from 'react';
+
+const Vendors = lazy(() => import('$app/pages/vendors/index/Vendors'));
+const Import = lazy(() => import('$app/pages/vendors/import/Import'));
+const Vendor = lazy(() => import('$app/pages/vendors/Vendor'));
+const PurchaseOrders = lazy(() => import('$app/pages/vendors/show/pages/PurchaseOrders'));
+const Expenses = lazy(() => import('$app/pages/vendors/show/pages/Expenses'));
+const RecurringExpenses = lazy(() => import('$app/pages/vendors/show/pages/RecurringExpenses'));
+const Documents = lazy(() => import('$app/pages/vendors/show/pages/Documents'));
+const Edit = lazy(() => import('$app/pages/vendors/edit/Edit'));
+const Create = lazy(() => import('$app/pages/vendors/create/Create')); 
 
 export const vendorRoutes = (
   <Route path="vendors">

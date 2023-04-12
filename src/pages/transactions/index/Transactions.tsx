@@ -20,7 +20,7 @@ import { Slider } from '$app/components/cards/Slider';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { useTransactionFilters } from '../common/hooks/useTransactionFilters';
 
-export function Transactions() {
+export default function Transactions() {
   useTitle('transactions');
 
   const [t] = useTranslation();

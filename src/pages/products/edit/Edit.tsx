@@ -26,7 +26,7 @@ interface Context {
   setProduct: Dispatch<SetStateAction<Product | undefined>>;
 }
 
-export function Edit() {
+export default function Edit() {
   const [t] = useTranslation();
 
   const { id } = useParams();

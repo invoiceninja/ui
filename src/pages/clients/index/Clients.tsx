@@ -26,7 +26,7 @@ import { useState } from 'react';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { usePurgeClient } from '../common/hooks/usePurgeClient';
 
-export function Clients() {
+export default function Clients() {
   useTitle('clients');
 
   const [t] = useTranslation();

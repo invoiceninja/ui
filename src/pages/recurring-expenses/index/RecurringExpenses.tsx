@@ -19,7 +19,7 @@ import {
   useRecurringExpenseColumns,
 } from '../common/hooks';
 
-export function RecurringExpenses() {
+export default function RecurringExpenses() {
   useTitle('recurring_expenses');
 
   const [t] = useTranslation();

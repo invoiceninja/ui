@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-export { InvoiceDesign } from './InvoiceDesign';
 export { CompanyDetails as InvoiceCompanyDetails } from './components/index';
 export { ClientDetails } from './components/index';
 export { CompanyAddress } from './components/index';

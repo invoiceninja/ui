@@ -19,7 +19,7 @@ import { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 
-export function Email() {
+export default function Email() {
   const [t] = useTranslation();
 
   const { documentTitle } = useTitle('email_invoice');

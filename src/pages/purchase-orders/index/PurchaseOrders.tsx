@@ -10,10 +10,14 @@
 
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Page } from '$app/components/Breadcrumbs';
-import { DataTable } from '$app/components/DataTable';
+import { CustomBulkAction, DataTable } from '$app/components/DataTable';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
 import { Default } from '$app/components/layouts/Default';
+import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { useTranslation } from 'react-i18next';
+import { MdPrint } from 'react-icons/md';
 import {
   defaultColumns,
   useActions,
@@ -22,7 +26,7 @@ import {
   usePurchaseOrderFilters,
 } from '../common/hooks';
 
-export function PurchaseOrders() {
+export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
 
   const [t] = useTranslation();
@@ -35,9 +39,22 @@ export function PurchaseOrders() {
 
   const filters = usePurchaseOrderFilters();
 
+  const printPdf = usePrintPdf({ entity: 'purchase_order' });
+
   const actions = useActions();
 
   const purchaseOrderColumns = useAllPurchaseOrderColumns();
+
+  const customBulkActions: CustomBulkAction[] = [
+    (selectedIds) => (
+      <DropdownElement
+        onClick={() => printPdf(selectedIds)}
+        icon={<Icon element={MdPrint} />}
+      >
+        {t('print_pdf')}
+      </DropdownElement>
+    ),
+  ];
 
   return (
     <Default title={documentTitle} breadcrumbs={pages} withoutBackButton>
@@ -49,6 +66,7 @@ export function PurchaseOrders() {
         linkToEdit="/purchase_orders/:id/edit"
         columns={columns}
         customActions={actions}
+        customBulkActions={customBulkActions}
         customFilters={filters}
         customFilterQueryKey="client_status"
         customFilterPlaceholder="status"

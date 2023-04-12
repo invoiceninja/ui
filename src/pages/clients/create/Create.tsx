@@ -29,7 +29,7 @@ import { Address } from '../edit/components/Address';
 import { Contacts } from '../edit/components/Contacts';
 import { Details } from '../edit/components/Details';
 
-export function Create() {
+export default function Create() {
   const [t] = useTranslation();
   const navigate = useNavigate();
 

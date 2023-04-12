@@ -17,7 +17,7 @@ import { InvoiceItemType } from '$app/common/interfaces/invoice-item';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Page } from '$app/components/Breadcrumbs';
-import { Default } from '$app/components/layouts/Default';
+import { Default, SaveOption } from '$app/components/layouts/Default';
 import { Spinner } from '$app/components/Spinner';
 import { useAtom } from 'jotai';
 import { cloneDeep } from 'lodash';
@@ -34,8 +34,10 @@ import { InvoiceDetails } from '../common/components/InvoiceDetails';
 import { InvoiceFooter } from '../common/components/InvoiceFooter';
 import { useCreate, useRecurringInvoiceUtilities } from '../common/hooks';
 import { useBlankRecurringInvoiceQuery } from '../common/queries';
+import { Icon } from '$app/components/icons/Icon';
+import { MdNotStarted, MdSend } from 'react-icons/md';
 
-export function Create() {
+export default function Create() {
   const { documentTitle } = useTitle('new_recurring_invoice');
   const { t } = useTranslation();
 
@@ -146,12 +148,26 @@ export function Create() {
 
   const save = useCreate({ setErrors });
 
+  const saveOptions: SaveOption[] = [
+    {
+      onClick: () => save(recurringInvoice as RecurringInvoice, 'send_now'),
+      label: t('send_now'),
+      icon: <Icon element={MdSend} />,
+    },
+    {
+      onClick: () => save(recurringInvoice as RecurringInvoice, 'start'),
+      label: t('start'),
+      icon: <Icon element={MdNotStarted} />,
+    },
+  ];
+
   return (
     <Default
       title={documentTitle}
       breadcrumbs={pages}
+      disableSaveButton={!recurringInvoice?.client_id}
       onSaveClick={() => save(recurringInvoice as RecurringInvoice)}
-      disableSaveButton={recurringInvoice?.client_id.length === 0}
+      additionalSaveOptions={saveOptions}
     >
       <div className="grid grid-cols-12 gap-4">
         <ClientSelector

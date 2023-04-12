@@ -40,7 +40,7 @@ import { Address } from './components/Address';
 import { Contacts } from './components/Contacts';
 import { Details } from './components/Details';
 
-export function Edit() {
+export default function Edit() {
   const { documentTitle, setDocumentTitle } = useTitle('edit_client');
   const { id } = useParams();
 

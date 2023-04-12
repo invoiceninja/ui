@@ -26,7 +26,7 @@ interface Context {
   setProject: Dispatch<SetStateAction<Project | undefined>>;
 }
 
-export function Edit() {
+export default function Edit() {
   const [t] = useTranslation();
 
   const { id } = useParams();

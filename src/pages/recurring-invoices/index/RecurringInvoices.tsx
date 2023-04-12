@@ -22,7 +22,7 @@ import {
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 
-export function RecurringInvoices() {
+export default function RecurringInvoices() {
   useTitle('recurring_invoices');
 
   const [t] = useTranslation();

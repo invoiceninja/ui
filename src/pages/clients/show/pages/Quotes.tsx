@@ -17,7 +17,7 @@ import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';
 
-export function Quotes() {
+export default function Quotes() {
   const [t] = useTranslation();
   const { id } = useParams();
 

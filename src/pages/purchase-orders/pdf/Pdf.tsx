@@ -15,7 +15,7 @@ import { useGeneratePdfUrl } from '$app/pages/invoices/common/hooks/useGenerateP
 import { useParams } from 'react-router-dom';
 import { usePurchaseOrderQuery } from '../common/queries';
 
-export function Pdf() {
+export default function Pdf() {
   const { documentTitle } = useTitle('view_pdf');
   const { id } = useParams();
   const { data: purchaseOrder } = usePurchaseOrderQuery({ id });

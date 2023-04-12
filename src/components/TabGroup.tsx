@@ -19,6 +19,8 @@ interface Props {
   defaultTabIndex?: number;
   height?: 'full';
   width?: 'full';
+  childrenClassName?: string;
+  withScrollableContent?: boolean;
 }
 
 export function TabGroup(props: Props) {
@@ -54,9 +56,10 @@ export function TabGroup(props: Props) {
       </div>
 
       <div
-        className={classNames({
+        className={classNames(props.childrenClassName, {
           'flex flex-1': props.height === 'full',
           'my-4': props.height !== 'full',
+          'overflow-y-scroll px-[5px]': props.withScrollableContent,
         })}
       >
         {[...props.children].map(

@@ -9,7 +9,9 @@
  */
 
 import { Route } from 'react-router-dom';
-import { Reports } from './index/Reports';
+import { lazy } from 'react';
+
+const Reports = lazy(() => import('$app/pages/reports/index/Reports'));
 
 export const reportRoutes = (
   <Route>

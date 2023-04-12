@@ -18,7 +18,7 @@ import { useParams } from 'react-router-dom';
 
 export const dataTableStaleTime = 50;
 
-export function Invoices() {
+export default function Invoices() {
   const [t] = useTranslation();
   const { id } = useParams();
 

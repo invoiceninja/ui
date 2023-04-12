@@ -19,11 +19,11 @@ test("can't view products without permission", async ({ page }) => {
   const { clear, save } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('products@example.com');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'products@example.com', 'password');
 
   await expect(page.locator('.flex-grow > .flex-1').first()).not.toContainText(
     'Products'
@@ -34,12 +34,12 @@ test('can view product', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('products@example.com');
   await set('view_product');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'products@example.com', 'password');
 
   await page.getByRole('link', { name: 'Products', exact: true }).click();
 
@@ -85,12 +85,12 @@ test("can't create a product", async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('products@example.com');
   await set('view_product');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'products@example.com', 'password');
 
   await page.getByRole('link', { name: 'Products', exact: true }).click();
   await page.getByText('New Product').click();
@@ -106,12 +106,12 @@ test('can create a product', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('products@example.com');
   await set('create_product');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'products@example.com', 'password');
 
   await page.getByRole('link', { name: 'Products', exact: true }).click();
 
@@ -126,12 +126,12 @@ test('can view assigned product with create_product', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('products@example.com');
   await set('create_product');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'products@example.com', 'password');
 
   await page.getByRole('link', { name: 'Products' }).click();
 
@@ -146,12 +146,12 @@ test('deleting product', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('products@example.com');
   await set('create_product');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'products@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -196,12 +196,12 @@ test('archiving product', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('products@example.com');
   await set('create_product');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'products@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -246,12 +246,12 @@ test('cloning product', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('products@example.com');
   await set('create_product');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'products@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -314,12 +314,12 @@ test('documents preview', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('products@example.com');
   await set('create_product');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'products@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 
@@ -376,12 +376,12 @@ test('documents upload', async ({ page }) => {
   const { clear, save, set } = permissions(page);
 
   await login(page);
-  await clear();
+  await clear('products@example.com');
   await set('create_product');
   await save();
   await logout(page);
 
-  await login(page, 'permissions@example.com', 'password');
+  await login(page, 'products@example.com', 'password');
 
   const tableBody = page.locator('tbody').first();
 

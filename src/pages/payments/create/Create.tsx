@@ -55,7 +55,7 @@ interface Paymentable {
   invoice_id: string;
 }
 
-export function Create() {
+export default function Create() {
   const { documentTitle } = useTitle('create_payment');
 
   const [t] = useTranslation();

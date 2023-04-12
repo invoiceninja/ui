@@ -211,7 +211,8 @@ export function ListBox(props: Props) {
           (resourceItem: ResourceItem) =>
             (isItemChecked(resourceItem.id) ||
               !props.selectedIds?.length ||
-              isInvoicesDataKey) && (
+              isInvoicesDataKey ||
+              isExpensesDataKey) && (
               <ListBoxItem
                 key={resourceItem.id}
                 isItemChecked={isItemChecked(resourceItem.id)}

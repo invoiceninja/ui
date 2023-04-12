@@ -21,7 +21,7 @@ import { Field } from '$app/pages/settings/custom-fields/components';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
 
-export function PaymentFields() {
+export default function PaymentFields() {
   const [t] = useTranslation();
 
   const dispatch = useDispatch();

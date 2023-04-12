@@ -13,21 +13,23 @@ import { assigned } from '$app/common/guards/guards/assigned';
 import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
-import { Create } from './create/Create';
-import { Edit } from './edit/Edit';
-import { Import } from './import/Import';
-import { Clients } from './index/Clients';
-import { Client } from './show/Client';
-import { Credits } from './show/pages/Credits';
-import { Expenses } from './show/pages/Expenses';
-import { Invoices } from './show/pages/Invoices';
-import { Payments } from './show/pages/Payments';
-import { Projects } from './show/pages/Projects';
-import { Quotes } from './show/pages/Quotes';
-import { RecurringExpenses } from './show/pages/RecurringExpenses';
-import { RecurringInvoices } from './show/pages/RecurringInvoices';
-import { Tasks } from './show/pages/Tasks';
-import { Statement } from './statement/Statement';
+import { lazy } from 'react';
+
+const Clients = lazy(() => import('$app/pages/clients/index/Clients'));
+const Import = lazy(() => import('$app/pages/clients/import/Import'));
+const Create = lazy(() => import('$app/pages/clients/create/Create'));
+const Edit = lazy(() => import('$app/pages/clients/edit/Edit'));
+const Client = lazy(() => import('$app/pages/clients/show/Client'));
+const Quotes = lazy(() => import('$app/pages/clients/show/pages/Quotes'));
+const Payments = lazy(() => import('$app/pages/clients/show/pages/Payments'));
+const RecurringInvoices = lazy(() => import('$app/pages/clients/show/pages/RecurringInvoices'));
+const Credits = lazy(() => import('$app/pages/clients/show/pages/Credits'));
+const Projects = lazy(() => import('$app/pages/clients/show/pages/Projects'));
+const Tasks = lazy(() => import('$app/pages/clients/show/pages/Tasks'));
+const Expenses = lazy(() => import('$app/pages/clients/show/pages/Expenses'));
+const RecurringExpenses = lazy(() => import('$app/pages/clients/show/pages/RecurringExpenses'));
+const Statement = lazy(() => import('$app/pages/clients/statement/Statement'));
+const Invoices = lazy(() => import('$app/pages/clients/show/pages/Invoices'));
 
 export const clientRoutes = (
   <Route path="clients">
