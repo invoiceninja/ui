@@ -28,11 +28,9 @@ export function useScheduleColumns() {
           )}`;
         }
 
-        if (schedule.template === Templates.EMAIL_STATEMENT) {
-          return `${t(schedule.template as string)}: ${t(
-            schedule.parameters.date_range
-          )}`;
-        }
+        return `${t(schedule.template as string)}: ${t(
+          schedule.parameters.date_range
+        )}`;
       },
     },
     {
