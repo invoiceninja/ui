@@ -167,7 +167,7 @@ interface SaveButton {
 
 export const saveBtnAtom = atom<SaveButton | null>(null);
 
-export function useSaveBtn(options?: SaveButton) {
+export function useSaveBtn(options?: SaveButton, deps: unknown[] = []) {
   const [saveBtn, setSaveBtn] = useAtom(saveBtnAtom);
 
   useEffect(() => {
@@ -178,7 +178,7 @@ export function useSaveBtn(options?: SaveButton) {
     return () => {
       setSaveBtn(null);
     };
-  }, []);
+  }, deps);
 
   return saveBtn;
 }
