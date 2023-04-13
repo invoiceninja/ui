@@ -434,8 +434,6 @@ export function Default(props: Props) {
                   </Button>
                 )}
 
-                {console.log('SaveBtn', saveBtn)}
-
                 {(props.onSaveClick || saveBtn) && (
                   <div>
                     {(props.onSaveClick || saveBtn?.onClick) &&
