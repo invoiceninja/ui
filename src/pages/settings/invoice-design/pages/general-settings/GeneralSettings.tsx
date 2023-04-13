@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Settings } from '$app/common/interfaces/company.interface';
+import { useEffect, useState } from 'react';
 import { ClientDetails } from './components/ClientDetails';
 import { CompanyAddress } from './components/CompanyAddress';
 import { CompanyDetails } from './components/CompanyDetails';
@@ -21,8 +23,37 @@ import { QuoteDetails } from './components/QuoteDetails';
 import { TaskColumns } from './components/TaskColumns';
 import { TotalFields } from './components/TotalFields';
 import { VendorDetails } from './components/VendorDetails';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { endpoint } from '$app/common/helpers';
+
+export interface Payload {
+  client_id: string;
+  entity_type: 'invoice';
+  group_id: string;
+  settings: Settings | null;
+  settings_type: 'company';
+}
 
 export default function GeneralSettings() {
+  const company = useInjectCompanyChanges();
+
+  const [payload, setPayload] = useState<Payload>({
+    client_id: '-1',
+    entity_type: 'invoice',
+    group_id: '-1',
+    settings: null,
+    settings_type: 'company',
+  });
+
+  useEffect(() => {
+    if (company?.settings) {
+      setPayload(
+        (current) => current && { ...current, settings: company.settings }
+      );
+    }
+  }, [company?.settings]);
+
   return (
     <div className="flex flex-col lg:flex-row gap-4 my-2">
       <div className="w-full lg:w-1/2 overflow-y-auto">
@@ -43,14 +74,14 @@ export default function GeneralSettings() {
         </div>
       </div>
 
-      {/* <div className="w-full lg:w-1/2 max-h-[82.5vh] overflow-y-scroll"> */}
-        {/* <InvoiceViewer
+      <div className="w-full lg:w-1/2 max-h-[82.5vh] overflow-y-scroll">
+        <InvoiceViewer
           link={endpoint('/api/v1/live_design')}
-          // resource={payload}
+          resource={payload}
           method="POST"
           withToast
-        /> */}
-      {/* </div> */}
+        />
+      </div>
     </div>
   );
 }

@@ -10,9 +10,9 @@
 
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Payload } from '$app/pages/settings/invoice-design/customize/common/hooks';
 import { useEffect, useRef } from 'react';
 import { Resource } from './InvoicePreview';
+import { Payload } from '$app/pages/settings/invoice-design/pages/general-settings/GeneralSettings';
 
 interface Props {
   link: string;
