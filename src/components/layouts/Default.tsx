@@ -50,7 +50,8 @@ import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { atom, useAtom } from 'jotai';
+import { useAtom } from 'jotai';
+import { useSaveBtn } from '$app/components/layouts/common/hooks';
 
 export interface SaveOption {
   label: string;
@@ -72,14 +73,6 @@ interface Props extends CommonProps {
   withoutBackButton?: boolean;
   additionalSaveOptions?: SaveOption[];
 }
-
-interface SaveButton {
-  onClick: () => unknown;
-  label?: string;
-  disableSaveButton?: boolean;
-}
-
-export const saveBtnAtom = atom<SaveButton | null>(null);
 
 export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -372,14 +365,7 @@ export function Default(props: Props) {
   ];
 
   const { isOwner } = useAdmin();
-
-  const [saveBtn, setSaveBtn] = useAtom(saveBtnAtom);
-
-  useEffect(() => {
-    return () => {
-      setSaveBtn(null);
-    };
-  }, []);
+  const saveBtn = useSaveBtn();
 
   return (
     <>

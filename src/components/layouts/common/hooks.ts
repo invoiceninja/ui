@@ -9,6 +9,8 @@
  */
 
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { atom, useAtom } from 'jotai';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
@@ -155,4 +157,28 @@ export function useSettingsRoutes() {
   ];
 
   return { basic, advanced };
+}
+
+interface SaveButton {
+  onClick: () => unknown;
+  label?: string;
+  disableSaveButton?: boolean;
+}
+
+export const saveBtnAtom = atom<SaveButton | null>(null);
+
+export function useSaveBtn(options?: SaveButton) {
+  const [saveBtn, setSaveBtn] = useAtom(saveBtnAtom);
+
+  useEffect(() => {
+    if (options) {
+      setSaveBtn(options);
+    }
+
+    return () => {
+      setSaveBtn(null);
+    };
+  }, []);
+
+  return saveBtn;
 }
