@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { FormEvent, ReactElement, ReactNode, useEffect, useState } from 'react';
+import { FormEvent, ReactElement, ReactNode, useState } from 'react';
 import {
   Home,
   Menu as MenuIcon,
@@ -50,7 +50,6 @@ import { useCurrentCompanyUser } from '$app/common/hooks/useCurrentCompanyUser';
 import { useEnabled } from '$app/common/guards/guards/enabled';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import { useAtom } from 'jotai';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 
 export interface SaveOption {
