@@ -12,6 +12,7 @@ export async function login(
   email = 'user@example.com',
   password = 'password'
 ) {
+  await page.waitForTimeout(500);
   await page.goto('/login');
   await page.getByLabel('Email address').fill(email);
   await page.getByLabel('Password').fill(password);
@@ -21,7 +22,7 @@ export async function login(
 }
 
 export function permissions(page: Page) {
-  const clear = async (email = "permissions@example.com") => {
+  const clear = async (email = 'permissions@example.com') => {
     await page.getByRole('link', { name: 'Settings' }).click();
     await page.getByRole('link', { name: 'User Management' }).click();
     await page.locator('#filter').fill(email);
