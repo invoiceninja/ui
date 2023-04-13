@@ -19,7 +19,7 @@ import { resolveColumnWidth } from '../helpers/resolve-column-width';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
@@ -47,6 +47,8 @@ export function ProductsTable(props: Props) {
 
   const { resource, items, columns, relationType } = props;
 
+  //console.log(resource);
+
   const resolveTranslation = useResolveTranslation();
 
   const resolveInputField = useResolveInputField({
@@ -55,12 +57,22 @@ export function ProductsTable(props: Props) {
     onLineItemChange: props.onLineItemChange,
     onLineItemPropertyChange: props.onLineItemPropertyChange,
     relationType,
+    createItem: props.onCreateItemClick,
+    items: props.items,
   });
 
   const onDragEnd = useHandleSortingRows({
     resource: props.resource,
     onSort: props.onSort,
   });
+
+  console.log(items);
+
+  useEffect(() => {
+    if ((resource.client_id || resource.vendor_id) && !items.length) {
+      props.onCreateItemClick();
+    }
+  }, [resource.client_id, resource.vendor_id]);
 
   return (
     <Table>

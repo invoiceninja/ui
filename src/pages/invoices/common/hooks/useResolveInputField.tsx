@@ -51,7 +51,26 @@ interface Props {
     value: unknown,
     index: number
   ) => unknown;
+  createItem: () => unknown;
+  items: InvoiceItem[];
 }
+
+export const isAnyLineItemEmpty = (items: InvoiceItem[]) => {
+  let areLineItemsEmpty = false;
+
+  items.forEach((lineItem) => {
+    if (
+      !lineItem.cost &&
+      !lineItem.quantity &&
+      !lineItem.notes &&
+      !lineItem.product_key
+    ) {
+      areLineItemsEmpty = true;
+    }
+  });
+
+  return areLineItemsEmpty;
+};
 
 export function useResolveInputField(props: Props) {
   const [inputCurrencySeparators, setInputCurrencySeparators] =
@@ -69,8 +88,17 @@ export function useResolveInputField(props: Props) {
     onChange: props.onLineItemChange,
   });
 
-  const onChange = (key: keyof InvoiceItem, value: unknown, index: number) =>
+  const onChange = (key: keyof InvoiceItem, value: unknown, index: number) => {
     props.onLineItemPropertyChange(key, value, index);
+
+    const lineItemsLength = props.resource.line_items.length;
+
+    if (lineItemsLength > 0) {
+      if (!isAnyLineItemEmpty(props.items)) {
+        props.createItem();
+      }
+    }
+  };
 
   const company = useCurrentCompany();
   const resource = props.resource;
