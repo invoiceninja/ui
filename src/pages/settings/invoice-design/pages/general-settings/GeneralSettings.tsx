@@ -26,6 +26,8 @@ import { VendorDetails } from './components/VendorDetails';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
 import { endpoint } from '$app/common/helpers';
+import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 
 export interface Payload {
   client_id: string;
@@ -37,6 +39,7 @@ export interface Payload {
 
 export default function GeneralSettings() {
   const company = useInjectCompanyChanges();
+  const onSave = useHandleCompanySave();
 
   const [payload, setPayload] = useState<Payload>({
     client_id: '-1',
@@ -53,6 +56,10 @@ export default function GeneralSettings() {
       );
     }
   }, [company?.settings]);
+
+  useSaveBtn({
+    onClick: onSave,
+  }, [company]);
 
   return (
     <div className="flex flex-col lg:flex-row gap-4 my-2">
