@@ -25,10 +25,16 @@ export function useHandleProductChange(
     index: number,
     lineItem: InvoiceItem
   ) => {
+    const updatedPurchaseOrderLineItems = purchaseOrder.line_items;
+
+    updatedPurchaseOrderLineItems[index] = lineItem;
+
     const po = cloneDeep(purchaseOrder) as PurchaseOrder;
 
     po.line_items[index] = lineItem;
 
     setPurchaseOrder(await calculateInvoiceSum(po));
+
+    return updatedPurchaseOrderLineItems;
   };
 }

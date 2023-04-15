@@ -26,6 +26,12 @@ export function useHandleLineItemPropertyChange(
     value: unknown,
     index: number
   ) => {
+    const updatedPurchaseOrderLineItems = purchaseOrder.line_items;
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    updatedPurchaseOrderLineItems[index][property] = value;
+
     const po = cloneDeep(purchaseOrder) as PurchaseOrder;
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -33,5 +39,7 @@ export function useHandleLineItemPropertyChange(
     po.line_items[index][property] = value;
 
     setPurchaseOrder(await calculateInvoiceSum(po));
+
+    return updatedPurchaseOrderLineItems;
   };
 }

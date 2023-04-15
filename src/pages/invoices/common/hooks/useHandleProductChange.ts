@@ -15,7 +15,10 @@ import { ProductTableResource } from '../components/ProductsTable';
 interface Props {
   resource: ProductTableResource;
   type: 'product' | 'task';
-  onChange: (index: number, lineItem: InvoiceItem) => unknown;
+  onChange: (
+    index: number,
+    lineItem: InvoiceItem
+  ) => InvoiceItem[] | Promise<InvoiceItem[]>;
 }
 
 export function useHandleProductChange(props: Props) {

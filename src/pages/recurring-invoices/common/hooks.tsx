@@ -126,6 +126,8 @@ export function useRecurringInvoiceUtilities(
       (recurringInvoice) =>
         recurringInvoice && { ...recurringInvoice, line_items: lineItems }
     );
+
+    return lineItems;
   };
 
   const handleLineItemPropertyChange = (
@@ -143,6 +145,8 @@ export function useRecurringInvoiceUtilities(
       (recurringInvoice) =>
         recurringInvoice && { ...recurringInvoice, line_items: lineItems }
     );
+
+    return lineItems;
   };
 
   const handleCreateLineItem = () => {

@@ -15,7 +15,10 @@ import { useHandleProductChange } from './useHandleProductChange';
 import { InputField } from '$app/components/forms';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useFormatMoney } from './useFormatMoney';
-import { InvoiceItem } from '$app/common/interfaces/invoice-item';
+import {
+  InvoiceItem,
+  InvoiceItemType,
+} from '$app/common/interfaces/invoice-item';
 import { DecimalNumberInput } from '$app/components/forms/DecimalNumberInput';
 import { useGetCurrencySeparators } from '$app/common/hooks/useGetCurrencySeparators';
 import { DecimalInputSeparators } from '$app/common/interfaces/decimal-number-input-separators';
@@ -28,6 +31,7 @@ import {
   RelationType,
 } from '../components/ProductsTable';
 import { useHandleTaxRateChange } from './useHandleTaxRateChange';
+import { Product } from '$app/common/interfaces/product';
 
 const numberInputs = [
   'discount',
@@ -45,36 +49,87 @@ interface Props {
   resource: ProductTableResource;
   type: 'product' | 'task';
   relationType: RelationType;
-  onLineItemChange: (index: number, lineItem: InvoiceItem) => unknown;
+  onLineItemChange: (
+    index: number,
+    lineItem: InvoiceItem
+  ) => InvoiceItem[] | Promise<InvoiceItem[]>;
   onLineItemPropertyChange: (
     key: keyof InvoiceItem,
     value: unknown,
     index: number
-  ) => unknown;
+  ) => InvoiceItem[] | Promise<InvoiceItem[]>;
   createItem: () => unknown;
-  items: InvoiceItem[];
+  deleteLineItem: (index: number) => unknown;
 }
 
-export const isAnyLineItemEmpty = (items: InvoiceItem[]) => {
-  let areLineItemsEmpty = false;
+export const isLineItemEmpty = (lineItem: InvoiceItem) => {
+  if (
+    !lineItem.cost &&
+    !lineItem.quantity &&
+    !lineItem.notes &&
+    !lineItem.product_key
+  ) {
+    return true;
+  }
 
-  items.forEach((lineItem) => {
-    if (
-      !lineItem.cost &&
-      !lineItem.quantity &&
-      !lineItem.notes &&
-      !lineItem.product_key
-    ) {
-      areLineItemsEmpty = true;
-    }
-  });
-
-  return areLineItemsEmpty;
+  return false;
 };
 
 export function useResolveInputField(props: Props) {
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
+
+  const isAnyExceptLastLineItemEmpty = (items: InvoiceItem[]) => {
+    const filteredItems = items.filter(
+      (item, index) => index !== items.length - 1
+    );
+
+    return filteredItems.some(
+      (lineItem) =>
+        !lineItem.cost &&
+        !lineItem.quantity &&
+        !lineItem.notes &&
+        !lineItem.product_key
+    );
+  };
+
+  const cleanLineItemsList = (lineItems: InvoiceItem[]) => {
+    let typeId = InvoiceItemType.Product;
+
+    if (props.type === 'task') {
+      typeId = InvoiceItemType.Task;
+    }
+
+    const typeFilteredLineItems = lineItems.filter(
+      ({ type_id }) => type_id === typeId
+    );
+
+    const lineItemsLength = typeFilteredLineItems.length;
+
+    const lastLineItem = typeFilteredLineItems[lineItemsLength - 1];
+
+    if (lineItemsLength > 0) {
+      if (
+        !isAnyExceptLastLineItemEmpty(typeFilteredLineItems) &&
+        !isLineItemEmpty(lastLineItem)
+      ) {
+        props.createItem();
+      }
+
+      if (
+        isAnyExceptLastLineItemEmpty(typeFilteredLineItems) &&
+        isLineItemEmpty(lastLineItem)
+      ) {
+        const lastLineItemIndex = lineItems.indexOf(
+          typeFilteredLineItems[lineItemsLength - 1]
+        );
+
+        if (lastLineItemIndex > -1) {
+          props.deleteLineItem(lastLineItemIndex);
+        }
+      }
+    }
+  };
 
   const handleProductChange = useHandleProductChange({
     resource: props.resource,
@@ -88,16 +143,28 @@ export function useResolveInputField(props: Props) {
     onChange: props.onLineItemChange,
   });
 
-  const onChange = (key: keyof InvoiceItem, value: unknown, index: number) => {
-    props.onLineItemPropertyChange(key, value, index);
+  const onChange = async (
+    key: keyof InvoiceItem,
+    value: unknown,
+    index: number
+  ) => {
+    const updatedLineItemsList = await props.onLineItemPropertyChange(
+      key,
+      value,
+      index
+    );
 
-    const lineItemsLength = props.resource.line_items.length;
+    cleanLineItemsList(updatedLineItemsList);
+  };
 
-    if (lineItemsLength > 0) {
-      if (!isAnyLineItemEmpty(props.items)) {
-        props.createItem();
-      }
-    }
+  const onProductChange = async (
+    index: number,
+    value: string,
+    product: Product
+  ) => {
+    const updatedLineItems = await handleProductChange(index, value, product);
+
+    cleanLineItemsList(updatedLineItems);
   };
 
   const company = useCurrentCompany();
@@ -123,12 +190,12 @@ export function useResolveInputField(props: Props) {
         <ProductSelector
           onChange={(value) =>
             value.resource &&
-            handleProductChange(index, value.label, value.resource)
+            onProductChange(index, value.label, value.resource)
           }
           className="w-auto"
           defaultValue={resource?.line_items[index][property]}
           onProductCreated={(product) =>
-            product && handleProductChange(index, product.product_key, product)
+            product && onProductChange(index, product.product_key, product)
           }
         />
       );

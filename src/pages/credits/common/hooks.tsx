@@ -132,6 +132,8 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     lineItems[index] = lineItem;
 
     setCredit((current) => current && { ...current, line_items: lineItems });
+
+    return lineItems;
   };
 
   const handleLineItemPropertyChange = (
@@ -146,6 +148,8 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     lineItems[index][key] = value;
 
     setCredit((current) => current && { ...current, line_items: lineItems });
+
+    return lineItems;
   };
 
   const handleCreateLineItem = () => {
