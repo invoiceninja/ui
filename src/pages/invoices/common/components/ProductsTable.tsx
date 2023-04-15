@@ -74,11 +74,8 @@ export function ProductsTable(props: Props) {
     return resource.line_items.indexOf(lineItem);
   };
 
-  let done = false;
-
   useEffect(() => {
-    if ((resource.client_id || resource.vendor_id) && !items.length && !done) {
-      done = true;
+    if ((resource.client_id || resource.vendor_id) && !items.length) {
       props.onCreateItemClick();
     }
   }, [resource.client_id, resource.vendor_id]);
