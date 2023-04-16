@@ -99,7 +99,9 @@ export function useSettingsRoutes() {
     {
       name: t('customize_and_preview'),
       href: '/settings/invoice_design/customize',
-      current: location.pathname.startsWith('/settings/invoice_design/customize'),
+      current: location.pathname.startsWith(
+        '/settings/invoice_design/customize'
+      ),
       enabled: isAdmin || isOwner || false,
     },
     {
@@ -150,6 +152,12 @@ export function useSettingsRoutes() {
       name: t('user_management'),
       href: '/settings/users',
       current: location.pathname.startsWith('/settings/users'),
+      enabled: isAdmin || isOwner || false,
+    },
+    {
+      name: t('system_logs'),
+      href: '/settings/system_logs',
+      current: location.pathname.startsWith('/settings/system_logs'),
       enabled: isAdmin || isOwner || false,
     },
   ];

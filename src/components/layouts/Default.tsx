@@ -20,7 +20,6 @@ import {
   Repeat,
   CreditCard,
   File,
-  ShieldOff,
   Briefcase,
   Clock,
   PieChart,
@@ -352,13 +351,6 @@ export function Default(props: Props) {
       icon: Settings,
       current: location.pathname.startsWith('/settings'),
       visible: true,
-    },
-    {
-      name: t('system_logs'),
-      href: '/system_logs',
-      icon: ShieldOff,
-      current: location.pathname.startsWith('/system_logs'),
-      visible: companyUser?.is_admin || companyUser?.is_owner || false,
     },
   ];
 

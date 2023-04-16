@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 import { request } from '$app/common/helpers/request';
 import { useQuery } from 'react-query';
@@ -22,6 +21,7 @@ import { Card, Element } from '$app/components/cards';
 import { Divider } from '$app/components/cards/Divider';
 import { JSONTree } from 'react-json-tree';
 import { Badge } from '$app/components/Badge';
+import { Settings } from '$app/components/layouts/Settings';
 
 interface Category {
   id: number;
@@ -51,7 +51,10 @@ const jsonTreeTheme = {
 
 export function SystemLog() {
   const [t] = useTranslation();
-  const pages = [{ name: t('system_logs'), href: '/system_logs' }];
+  const pages = [
+    { name: t('settings'), href: '/settings' },
+    { name: t('system_logs'), href: '/settings/system_logs' },
+  ];
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const { data, isLoading } = useQuery(
@@ -143,7 +146,7 @@ export function SystemLog() {
   };
 
   return (
-    <Default title={t('system_logs')} breadcrumbs={pages} withoutBackButton>
+    <Settings title={t('system_logs')} breadcrumbs={pages} withoutBackButton>
       {isLoading && (
         <NonClickableElement>
           <Spinner />
@@ -157,7 +160,7 @@ export function SystemLog() {
             index: number,
             { length }: { length: number }
           ) => (
-            <>
+            <div key={index}>
               <Element
                 key={index}
                 leftSide={getCategory(systemLog.category_id)}
@@ -176,10 +179,10 @@ export function SystemLog() {
               </Element>
 
               {index + 1 !== length && <Divider />}
-            </>
+            </div>
           )
         )}
       </Card>
-    </Default>
+    </Settings>
   );
 }
