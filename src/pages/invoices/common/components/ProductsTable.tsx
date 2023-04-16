@@ -75,7 +75,10 @@ export function ProductsTable(props: Props) {
   };
 
   useEffect(() => {
-    if ((resource.client_id || resource.vendor_id) && !items.length) {
+    if (
+      (resource.client_id || resource.vendor_id) &&
+      !props.resource.line_items.length
+    ) {
       props.onCreateItemClick();
     }
   }, [resource.client_id, resource.vendor_id]);
