@@ -188,6 +188,7 @@ export function useResolveInputField(props: Props) {
     if (property === 'product_key') {
       return (
         <ProductSelector
+          key={resource?.line_items[index][property]}
           onChange={(value) =>
             value.resource &&
             onProductChange(index, value.label, value.resource)
