@@ -146,7 +146,7 @@ export function SystemLog() {
   };
 
   return (
-    <Settings title={t('system_logs')} breadcrumbs={pages} withoutBackButton>
+    <Settings title={t('system_logs')} breadcrumbs={pages}>
       {isLoading && (
         <NonClickableElement>
           <Spinner />
