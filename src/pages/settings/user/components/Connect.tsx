@@ -83,7 +83,11 @@ export function Connect() {
           </Element>
 
           <Element leftSide="Gmail">
-            <Button type="minimal">{t('connect_gmail')}</Button>
+            {user?.oauth_user_token ? (
+              <Button type="minimal">{t('disconnect_gmail')}</Button>
+            ) : (
+              <Button type="minimal">{t('connect_gmail')}</Button>
+            )}
           </Element>
         </>
       )}
@@ -97,9 +101,13 @@ export function Connect() {
           </Element>
 
           <Element leftSide="Email">
-            <Button type="minimal" onClick={handleConnectEmail}>
-              {t('connect_email')}
-            </Button>
+            {user?.oauth_user_token ? (
+              <Button type="minimal">{t('disconnect_email')}</Button>
+            ) : (
+              <Button type="minimal" onClick={handleConnectEmail}>
+                {t('connect_email')}
+              </Button>
+            )}
           </Element>
         </>
       )}
