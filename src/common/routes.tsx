@@ -19,7 +19,6 @@ import { settingsRoutes } from '$app/pages/settings/routes';
 import { authenticationRoutes } from '$app/pages/authentication/routes';
 import { quoteRoutes } from '$app/pages/quotes/routes';
 import { creditRoutes } from '$app/pages/credits/routes';
-import { systemlogRoutes } from '$app/pages/system-logs/routes';
 import { projectRoutes } from '$app/pages/projects/routes';
 import { taskRoutes } from '$app/pages/tasks/routes';
 import { vendorRoutes } from '$app/pages/vendors/routes';
@@ -56,7 +55,6 @@ export const routes = (
       {reportRoutes}
       {transactionRoutes}
       {settingsRoutes}
-      {systemlogRoutes}
     </Route>
     <Route path="*" element={<NotFound />} />
   </Routes>
