@@ -25,6 +25,7 @@ import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceView
 import { toast } from '$app/common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
+import { Variables } from './components/Variables';
 
 export interface PreviewPayload {
   design: Design | null;
@@ -88,6 +89,7 @@ export default function Edit() {
           <Header />
           <Footer />
           <Includes />
+          <Variables />
         </div>
       </div>
 
