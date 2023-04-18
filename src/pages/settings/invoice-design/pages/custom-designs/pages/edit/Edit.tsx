@@ -18,6 +18,9 @@ import { Body } from './components/Body';
 import { Header } from './components/Headers';
 import { Footer } from './components/Footer';
 import { Includes } from './components/Includes';
+import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { request } from '$app/common/helpers/request';
+import { endpoint } from '$app/common/helpers';
 
 export interface Payload {
   design: Design | null;
@@ -32,7 +35,7 @@ export const payloadAtom = atom<Payload>({
 });
 
 export default function Edit() {
-  const [, setPayload] = useAtom(payloadAtom);
+  const [payload, setPayload] = useAtom(payloadAtom);
 
   const { id } = useParams();
   const { data } = useDesignQuery({ id, enabled: true });
@@ -48,6 +51,17 @@ export default function Edit() {
     return () =>
       setPayload({ design: null, entity_id: '-1', entity_type: 'invoice' });
   }, [data]);
+
+  useSaveBtn(
+    {
+      onClick() {
+        request('PUT', endpoint('/api/v1/designs/:id', { id }), payload.design)
+          .then((response) => console.log(response))
+          .catch((e) => console.error(e));
+      },
+    },
+    [payload.design]
+  );
 
   return (
     <div className="space-y-4">
