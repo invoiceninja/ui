@@ -11,8 +11,11 @@
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Divider } from '$app/components/cards/Divider';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { Icon } from '$app/components/icons/Icon';
+import { Tooltip } from '$app/components/Tooltip';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
+import { MdInfoOutline } from 'react-icons/md';
 import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
@@ -33,9 +36,36 @@ export function Settings() {
 
       <Element
         leftSide={
-          <span>
-            {t('login')} {t('url')}
-          </span>
+          <div className="flex space-x-2">
+            <span>
+              {t('login')} {t('url')}
+            </span>
+
+            <Tooltip
+              placement="top"
+              messageElement={
+                <div className="p-2 text-xs text-white rounded-md bg-gray-500 space-x-1">
+                  <span>For more instructions, please follow the</span>
+                  <a
+                    style={{ color: '#6ba8f0' }}
+                    className="underline hover:no-underline"
+                    href="https://invoiceninja.github.io/docs/hosted-custom-domain/#custom-domain-configuration"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    link
+                  </a>
+                  .
+                </div>
+              }
+            >
+              <Icon
+                element={MdInfoOutline}
+                className="cursor-pointer"
+                size={20}
+              />
+            </Tooltip>
+          </div>
         }
       >
         <CopyToClipboard text={`${company?.portal_domain}/client/login`} />

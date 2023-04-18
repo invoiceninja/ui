@@ -16,6 +16,7 @@ interface Props {
   element: IconType;
   size?: number;
   color?: string;
+  className?: string;
 }
 
 export function Icon(props: Props) {
@@ -27,6 +28,7 @@ export function Icon(props: Props) {
     return cloneElement(iconElement, {
       fontSize: props.size || 18,
       color: props.color || accentColor,
+      className: props.className || '',
     });
   }
 

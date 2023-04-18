@@ -14,8 +14,10 @@ import Tippy from '@tippyjs/react/headless';
 
 interface Props {
   children: ReactElement;
-  message: string;
+  message?: string;
+  messageElement?: ReactElement;
   className?: string;
+  placement?: 'top';
   truncate?: boolean;
   size?: 'small' | 'regular' | 'large';
 }
@@ -53,22 +55,26 @@ export function Tooltip(props: Props) {
       })}
     >
       <Tippy
-        placement="top-start"
+        placement={props.placement || 'top-start'}
         interactive={true}
         render={() => (
           <div className="flex flex-col items-center whitespace-normal">
-            <span
-              className={classNames(
-                'relative p-2 text-xs text-center text-white rounded-md bg-gray-500 break-all',
-                {
-                  'leading-1': includeLeading,
-                  'leading-none': !includeLeading,
-                }
-              )}
-              style={{ width: messageWidth }}
-            >
-              {props.message}
-            </span>
+            {props.message && (
+              <span
+                className={classNames(
+                  'relative p-2 text-xs text-center text-white rounded-md bg-gray-500 break-all',
+                  {
+                    'leading-1': includeLeading,
+                    'leading-none': !includeLeading,
+                  }
+                )}
+                style={{ width: messageWidth }}
+              >
+                {props.message}
+              </span>
+            )}
+
+            {props.messageElement}
 
             <div className="w-3 h-3 -mt-2 rotate-45 opacity-90 bg-gray-500"></div>
           </div>
