@@ -19,11 +19,13 @@ const CustomDesigns = lazy(
   () => import('./pages/custom-designs/CustomDesigns')
 );
 const Edit = lazy(() => import('./pages/custom-designs/pages/edit/Edit'));
+const Create = lazy(() => import('./pages/custom-designs/pages/create/Create'));
 
 export const invoiceDesignRoutes = (
   <Route path="invoice_design" element={<InvoiceDesign />}>
     <Route path="" element={<GeneralSettings />} />
     <Route path="custom_designs" element={<CustomDesigns />} />
     <Route path="custom_designs/:id/edit" element={<Edit />} />
+    <Route path="custom_designs/create" element={<Create />} />
   </Route>
 );
