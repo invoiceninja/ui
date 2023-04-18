@@ -8,12 +8,42 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Editor } from '../../components/Editor';
+import { Design } from '$app/common/interfaces/design';
+import { useEffect } from 'react';
+import { Editor } from './components/Editor';
+import { useDesignQuery } from '$app/common/queries/designs';
+import { useParams } from 'react-router-dom';
+import { atom, useAtom } from 'jotai';
+
+export interface Payload {
+  design: Design | null;
+  entity_id: string;
+  entity_type: 'invoice';
+}
+
+export const payloadAtom = atom<Payload>({
+  design: null,
+  entity_id: '-1',
+  entity_type: 'invoice',
+});
 
 export default function Edit() {
-  return (
-    <div>
-      <Editor />
-    </div>
-  );
+  const [payload, setPayload] = useAtom(payloadAtom);
+
+  const { id } = useParams();
+  const { data } = useDesignQuery({ id, enabled: true });
+
+  useEffect(() => {
+    if (data) {
+      setPayload((current) => ({
+        ...current,
+        design: data,
+      }));
+    }
+
+    return () =>
+      setPayload({ design: null, entity_id: '-1', entity_type: 'invoice' });
+  }, [data]);
+
+  return <div>{payload.design !== null && <Editor />}</div>;
 }
