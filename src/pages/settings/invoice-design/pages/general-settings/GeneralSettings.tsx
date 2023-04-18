@@ -62,7 +62,7 @@ export default function GeneralSettings() {
   }, [company]);
 
   return (
-    <div className="flex flex-col lg:flex-row gap-4 my-2">
+    <div className="flex flex-col lg:flex-row gap-4">
       <div className="w-full lg:w-1/2 overflow-y-auto">
         <div className="space-y-4 max-h-[80vh] pl-1 py-2 pr-2">
           <InvoiceGeneralSettings />
@@ -81,7 +81,7 @@ export default function GeneralSettings() {
         </div>
       </div>
 
-      <div className="w-full lg:w-1/2 max-h-[82.5vh] overflow-y-scroll">
+      <div className="w-full lg:w-1/2 max-h-[80vh] overflow-y-scroll">
         <InvoiceViewer
           link={endpoint('/api/v1/live_design')}
           resource={payload}

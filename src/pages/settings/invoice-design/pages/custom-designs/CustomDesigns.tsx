@@ -12,16 +12,14 @@ import { DataTable } from '$app/components/DataTable';
 
 export default function CustomDesigns() {
   return (
-    <div className="my-4">
-      <DataTable
-        endpoint="/api/v1/designs?custom=true"
-        columns={[{ id: 'name', label: 'Name' }]}
-        resource="design"
-        linkToCreate="/settings/invoice_design/custom_designs/create"
-        bulkRoute="/api/v1/designs/bulk"
-        linkToEdit="/settings/invoice_design/custom_designs/:id/edit"
-        withResourcefulActions
-      />
-    </div>
+    <DataTable
+      endpoint="/api/v1/designs?custom=true"
+      columns={[{ id: 'name', label: 'Name' }]}
+      resource="design"
+      linkToCreate="/settings/invoice_design/custom_designs/create"
+      bulkRoute="/api/v1/designs/bulk"
+      linkToEdit="/settings/invoice_design/custom_designs/:id/edit"
+      withResourcefulActions
+    />
   );
 }

@@ -30,7 +30,9 @@ export default function InvoiceDesign() {
     <Default title={documentTitle}>
       <Tabs tabs={tabs} />
 
-      <Outlet />
+      <div className="my-4">
+        <Outlet />
+      </div>
     </Default>
   );
 }
