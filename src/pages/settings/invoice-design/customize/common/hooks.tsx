@@ -15,11 +15,10 @@ import { Settings } from '$app/common/interfaces/company.interface';
 import { Design, Parts } from '$app/common/interfaces/design';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
-import {
-  isModalVisibleAtom,
-  validationBagAtom,
-} from '$app/pages/settings/invoice-design/customize/components/EditModal';
-import { designAtom } from '$app/pages/settings/invoice-design/customize/components/Settings';
+// import {
+//   isModalVisibleAtom,
+//   validationBagAtom,
+// } from '$app/pages/settings/invoice-design/customize/components/EditModal';
 import { AxiosError } from 'axios';
 import { atom, useAtom } from 'jotai';
 import { useTranslation } from 'react-i18next';
@@ -138,7 +137,6 @@ export function useHandleDesignSave() {
 export function useDesignActions() {
   const { t } = useTranslation();
   
-  const [design] = useAtom(designAtom);
   const [, setIsModalVisible] = useAtom(isModalVisibleAtom)
 
   const queryClient = useQueryClient();

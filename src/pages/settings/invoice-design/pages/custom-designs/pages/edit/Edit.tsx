@@ -10,10 +10,14 @@
 
 import { Design } from '$app/common/interfaces/design';
 import { useEffect } from 'react';
-import { Editor } from './components/Editor';
 import { useDesignQuery } from '$app/common/queries/designs';
 import { useParams } from 'react-router-dom';
 import { atom, useAtom } from 'jotai';
+import { Settings } from './components/Settings';
+import { Body } from './components/Body';
+import { Header } from './components/Headers';
+import { Footer } from './components/Footer';
+import { Includes } from './components/Includes';
 
 export interface Payload {
   design: Design | null;
@@ -28,7 +32,7 @@ export const payloadAtom = atom<Payload>({
 });
 
 export default function Edit() {
-  const [payload, setPayload] = useAtom(payloadAtom);
+  const [, setPayload] = useAtom(payloadAtom);
 
   const { id } = useParams();
   const { data } = useDesignQuery({ id, enabled: true });
@@ -45,5 +49,13 @@ export default function Edit() {
       setPayload({ design: null, entity_id: '-1', entity_type: 'invoice' });
   }, [data]);
 
-  return <div>{payload.design !== null && <Editor />}</div>;
+  return (
+    <div className="space-y-4">
+      <Settings />
+      <Body />
+      <Header />
+      <Footer />
+      <Includes />
+    </div>
+  );
 }
