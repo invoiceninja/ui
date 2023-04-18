@@ -29,7 +29,7 @@ import { endpoint } from '$app/common/helpers';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { useHandleCompanySave } from '$app/pages/settings/common/hooks/useHandleCompanySave';
 
-export interface Payload {
+export interface GeneralSettingsPayload {
   client_id: string;
   entity_type: 'invoice';
   group_id: string;
@@ -41,7 +41,7 @@ export default function GeneralSettings() {
   const company = useInjectCompanyChanges();
   const onSave = useHandleCompanySave();
 
-  const [payload, setPayload] = useState<Payload>({
+  const [payload, setPayload] = useState<GeneralSettingsPayload>({
     client_id: '-1',
     entity_type: 'invoice',
     group_id: '-1',

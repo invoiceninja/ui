@@ -9,12 +9,12 @@
  */
 
 import { Card } from '$app/components/cards';
-import { useDesignUtilities } from '$app/pages/settings/invoice-design/customize/common/hooks';
 import { CustomizeChildProps } from '$app/pages/settings/invoice-design/customize/components/Settings';
 import Editor from '@monaco-editor/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDebounce } from 'react-use';
+import { useDesignUtilities } from '../common/hooks';
 
 export const defaultEditorDebounceTime = 1000;
 

@@ -36,7 +36,7 @@ export function useDesignUtilities() {
         ...payload,
         design: {
           ...payload.design,
-          [property]: value,
+          design: { ...payload.design.design, [property]: value },
         },
       });
     }

@@ -21,14 +21,18 @@ import { Includes } from './components/Includes';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
+import { InvoiceViewer } from '$app/pages/invoices/common/components/InvoiceViewer';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useQueryClient } from 'react-query';
+import { route } from '$app/common/helpers/route';
 
-export interface Payload {
+export interface PreviewPayload {
   design: Design | null;
   entity_id: string;
   entity_type: 'invoice';
 }
 
-export const payloadAtom = atom<Payload>({
+export const payloadAtom = atom<PreviewPayload>({
   design: null,
   entity_id: '-1',
   entity_type: 'invoice',
@@ -52,24 +56,49 @@ export default function Edit() {
       setPayload({ design: null, entity_id: '-1', entity_type: 'invoice' });
   }, [data]);
 
+  const queryClient = useQueryClient();
+
   useSaveBtn(
     {
       onClick() {
+        toast.processing();
+
         request('PUT', endpoint('/api/v1/designs/:id', { id }), payload.design)
-          .then((response) => console.log(response))
-          .catch((e) => console.error(e));
+          .then(() => {
+            queryClient.invalidateQueries('/api/v1/designs');
+            queryClient.invalidateQueries(route('/api/v1/designs/:id', { id }));
+            
+            toast.success('updated_design');
+          })
+          .catch((e) => {
+            console.error(e);
+            toast.error();
+          });
       },
     },
     [payload.design]
   );
 
   return (
-    <div className="space-y-4">
-      <Settings />
-      <Body />
-      <Header />
-      <Footer />
-      <Includes />
+    <div className="flex flex-col lg:flex-row gap-4">
+      <div className="w-full lg:w-1/2 overflow-y-auto">
+        <div className="space-y-4 max-h-[80vh] pl-1 py-2 pr-2">
+          <Settings />
+          <Body />
+          <Header />
+          <Footer />
+          <Includes />
+        </div>
+      </div>
+
+      <div className="w-full lg:w-1/2 max-h-[80vh] overflow-y-scroll">
+        <InvoiceViewer
+          link={endpoint('/api/v1/preview')}
+          resource={payload}
+          method="POST"
+          withToast
+        />
+      </div>
     </div>
   );
 }
