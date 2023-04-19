@@ -27,15 +27,26 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate, useParams } from 'react-router-dom';
+import { useCompanyGatewayQuery } from '$app/common/queries/company-gateways';
+import { Gateway } from '$app/common/interfaces/statics';
 
 export default function Refund() {
   const { id } = useParams();
   const { data: payment } = usePaymentQuery({ id });
 
+  const { data: companyGateway } = useCompanyGatewayQuery({
+    id: payment?.data.data.company_gateway_id,
+    queryParams: 'include=gateway',
+    enabled: Boolean(payment?.data.data.company_gateway_id),
+  });
+
   const [t] = useTranslation();
   const [errors, setErrors] = useState<ValidationBag>();
   const [invoices, setInvoices] = useState<string[]>([]);
   const [email, setEmail] = useState(false);
+  const [shouldShowGatewayRefund, setShouldShowGatewayRefund] =
+    useState<boolean>(false);
+  const [refundGateway, setRefundGateway] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -52,11 +63,13 @@ export default function Refund() {
       const toastId = toast.loading(t('processing'));
       setErrors(undefined);
 
-      request(
-        'POST',
-        endpoint('/api/v1/payments/refund?&email_receipt=:email', { email }),
-        values
-      )
+      let endPointUrl = '/api/v1/payments/refund?&email_receipt=:email';
+
+      if (refundGateway) {
+        endPointUrl += '&gateway_refund=true';
+      }
+
+      request('POST', endpoint(endPointUrl, { email }), values)
         .then(() => {
           toast.success(t('refunded_payment'), { id: toastId });
           navigate('/payments');
@@ -112,6 +125,18 @@ export default function Refund() {
       );
     });
   }, [formik.values.invoices]);
+
+  useEffect(() => {
+    if (companyGateway) {
+      const gateway: Gateway = companyGateway.data.data.gateway;
+
+      const showGatewayRefund = Object.values(gateway.options).some(
+        (option) => option.refund
+      );
+
+      setShouldShowGatewayRefund(showGatewayRefund);
+    }
+  }, [companyGateway]);
 
   return (
     <Card
@@ -229,7 +254,7 @@ export default function Refund() {
 
       <Divider />
 
-      <Element leftSide={t('send_email')}>
+      <Element leftSide={t('send_email')} leftSideHelp={t('email_receipt')}>
         <Toggle
           checked={email}
           onChange={() => {
@@ -237,6 +262,18 @@ export default function Refund() {
           }}
         />
       </Element>
+
+      {shouldShowGatewayRefund && (
+        <Element
+          leftSide={t('gateway_refund')}
+          leftSideHelp={t('gateway_refund_help')}
+        >
+          <Toggle
+            checked={refundGateway}
+            onChange={(value) => setRefundGateway(value)}
+          />
+        </Element>
+      )}
 
       {errors?.errors.id && <Alert type="danger">{errors.errors.id}</Alert>}
     </Card>
