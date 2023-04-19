@@ -12,6 +12,7 @@ import { CSSProperties } from 'react';
 
 interface Props {
   name: string;
+  style?: CSSProperties;
 }
 
 const imageStyle: CSSProperties = { width: 30, height: 30 };
@@ -51,6 +52,15 @@ export function GatewayTypeIcon(props: Props) {
           src="/gateway-card-images/paypal.png"
           alt="Paypal"
           style={{ width: 40, height: 40 }}
+        />
+      );
+
+    case 'PayPal_Express':
+      return (
+        <img
+          src="/gateway-card-images/paypal.png"
+          alt="Paypal"
+          style={props.style || { width: 40, height: 40 }}
         />
       );
 

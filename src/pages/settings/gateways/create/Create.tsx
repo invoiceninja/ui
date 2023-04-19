@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
+import { Button, Link, SelectField } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
@@ -18,7 +18,7 @@ import {
   useCompanyGatewaysQuery,
 } from '$app/common/queries/company-gateways';
 import { Settings } from '$app/components/layouts/Settings';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, CSSProperties, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from './components/Credentials';
@@ -29,6 +29,9 @@ import { useHandleCreate } from './hooks/useHandleCreate';
 import { blankFeesAndLimitsRecord } from './hooks/useHandleMethodToggle';
 import { TabGroup } from '$app/components/TabGroup';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeIcon';
+
+const imageStyle: CSSProperties = { width: 30, height: 30 };
 
 export function Create() {
   const [t] = useTranslation();
@@ -144,6 +147,8 @@ export function Create() {
     }
   }, [gateway]);
 
+  console.log(filteredGateways);
+
   return (
     <Settings
       title={documentTitle}
@@ -212,6 +217,35 @@ export function Create() {
           )}
         </div>
       </TabGroup>
+
+      <div className="flex flex-col scroll-auto">
+        <Card className="px-5">
+          <div className="flex items-center justify-between h-full">
+            <GatewayTypeIcon name="PayPal_Express" style={{ height: 100 }} />
+
+            <div className="flex flex-col flex-1 items-start px-5">
+              <span className="text-sm">
+                PayPal is an online payment platform that facilitates payments
+                between individuals and businesses. In addition to online
+                payments, PayPal offers a debit card for payments, credit card
+                readers for use in businesses, and lines of credit. PayPal is
+                considered a very secure method of sending payments online.
+              </span>
+
+              <Link
+                external
+                to="https://www.paypal.com/us/cgi-bin/webscr?cmd=_login-api-run"
+              >
+                https://www.paypal.com/us/cgi-bin/webscr?cmd=_login-api-run
+              </Link>
+            </div>
+
+            <div className="flex items-center">
+              <Button>Set Up</Button>
+            </div>
+          </div>
+        </Card>
+      </div>
     </Settings>
   );
 }
