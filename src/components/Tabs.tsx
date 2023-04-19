@@ -8,23 +8,31 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from '$app/common/helpers/route';
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { MouseEvent, useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, Params, useLocation, useParams } from 'react-router-dom';
 
 interface Props {
   className?: string;
   tabs: Tab[];
 }
 
-export type Tab = { name: string; href: string };
+export type Tab = { name: string; href: string; matcher?: Matcher[] };
+export type Matcher = (params: Readonly<Params<string>>) => string;
 
 export function Tabs(props: Props) {
   const accentColor = useAccentColor();
   const location = useLocation();
+  const params = useParams();
 
-  const isActive = (link: string) => {
-    return location.pathname === link;
+  const isActive = (tab: Tab) => {
+    return (
+      location.pathname === tab.href ||
+      tab.matcher?.some(
+        (matcher) => matcher(params) === route(location.pathname, params)
+      )
+    );
   };
 
   const tabBar = useRef<HTMLDivElement>(null);
@@ -76,11 +84,11 @@ export function Tabs(props: Props) {
                 to={tab.href}
                 onClick={(event) => handleScroll(event)}
                 style={{
-                  borderColor: isActive(tab.href) ? accentColor : 'transparent',
-                  color: isActive(tab.href) ? accentColor : '#6B7280',
+                  borderColor: isActive(tab) ? accentColor : 'transparent',
+                  color: isActive(tab) ? accentColor : '#6B7280',
                 }}
                 className="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm"
-                aria-current={isActive(tab.href) ? 'page' : undefined}
+                aria-current={isActive(tab) ? 'page' : undefined}
               >
                 {tab.name}
               </Link>
