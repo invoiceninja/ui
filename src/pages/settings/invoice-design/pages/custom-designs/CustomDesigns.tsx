@@ -9,12 +9,25 @@
  */
 
 import { DataTable } from '$app/components/DataTable';
+import { EntityStatus } from '$app/components/EntityStatus';
+import { Inline } from '$app/components/Inline';
 
 export default function CustomDesigns() {
   return (
     <DataTable
       endpoint="/api/v1/designs?custom=true"
-      columns={[{ id: 'name', label: 'Name' }]}
+      columns={[
+        {
+          id: 'name',
+          label: 'Name',
+          format: (field, resource) => (
+            <Inline>
+              <EntityStatus entity={resource} />
+              <p>{field}</p>
+            </Inline>
+          ),
+        },
+      ]}
       resource="design"
       linkToCreate="/settings/invoice_design/custom_designs/create"
       bulkRoute="/api/v1/designs/bulk"
