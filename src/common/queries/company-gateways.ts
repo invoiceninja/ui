@@ -24,17 +24,27 @@ export function useCompanyGatewaysQuery() {
   );
 }
 
-export function useCompanyGatewayQuery(params: { id: string | undefined }) {
+interface Params {
+  id: string | undefined;
+  queryParams?: string;
+  enabled?: boolean;
+}
+
+export function useCompanyGatewayQuery(params: Params) {
   const { isAdmin } = useAdmin();
 
   return useQuery(
-    route('/api/v1/company_gateways/:id', { id: params.id }),
+    route(`/api/v1/company_gateways/:id?${params.queryParams || ''}`, {
+      id: params.id,
+    }),
     () =>
       request(
         'GET',
-        endpoint('/api/v1/company_gateways/:id', { id: params.id })
+        endpoint(`/api/v1/company_gateways/:id?${params.queryParams || ''}`, {
+          id: params.id,
+        })
       ),
-    { staleTime: Infinity, enabled: isAdmin }
+    { staleTime: Infinity, enabled: (params.enabled ?? true) && isAdmin }
   );
 }
 
