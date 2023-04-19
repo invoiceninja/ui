@@ -56,6 +56,7 @@ export function Settings() {
         <Element leftSide={t('design')}>
           <DesignSelector
             onChange={(design) => handlePropertyChange('design', design.design)}
+            actionVisibility={false}
           />
         </Element>
 

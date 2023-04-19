@@ -89,6 +89,7 @@ export default function Create() {
         <Element leftSide={t('design')}>
           <DesignSelector
             onChange={(design) => handleChange('design', design.design)}
+            actionVisibility={false}
           />
         </Element>
       </Card>
