@@ -198,6 +198,8 @@ export function useResolveInputField(props: Props) {
           onProductCreated={(product) =>
             product && onProductChange(index, product.product_key, product)
           }
+          clearButton
+          onClearButtonClick={() => handleProductChange(index, '')}
         />
       );
     }
