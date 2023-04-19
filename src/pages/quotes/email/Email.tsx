@@ -55,7 +55,7 @@ export default function Email() {
           resourceType="quote"
           list={list}
           defaultEmail="email_template_quote"
-          redirectUrl="/quotes"
+          redirectUrl={route('/clients/:id/quotes', { id: quote.client_id })}
         />
       )}
     </Default>
