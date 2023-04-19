@@ -11,6 +11,8 @@
 import { Schedule } from '$app/common/interfaces/schedule';
 import { DataTableColumns } from '$app/components/DataTable';
 import { useTranslation } from 'react-i18next';
+import frequencies from '$app/common/constants/frequency';
+import { Templates } from '$app/pages/settings/schedules/common/components/ScheduleForm';
 
 export function useScheduleColumns() {
   const [t] = useTranslation();
@@ -19,15 +21,26 @@ export function useScheduleColumns() {
     {
       id: 'name',
       label: t('name'),
-    },
-    {
-      id: 'template',
-      label: t('template'),
-      format: (value) => t(value as string),
+      format: (value, schedule) => {
+        if (schedule.template === Templates.EMAIL_RECORD) {
+          return `${t(schedule.template as string)}: ${t(
+            schedule.parameters.entity
+          )}`;
+        }
+
+        return `${t(schedule.template as string)}: ${t(
+          schedule.parameters.date_range
+        )}`;
+      },
     },
     {
       id: 'next_run',
       label: t('next_run'),
+    },
+    {
+      id: 'frequency_id',
+      label: t('frequency'),
+      format: (value) => t(frequencies[value as keyof typeof frequencies]),
     },
   ];
 

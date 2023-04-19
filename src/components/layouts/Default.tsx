@@ -20,7 +20,6 @@ import {
   Repeat,
   CreditCard,
   File,
-  ShieldOff,
   Briefcase,
   Clock,
   PieChart,
@@ -157,10 +156,10 @@ export function Default(props: Props) {
       icon: Repeat,
       current: location.pathname.startsWith('/recurring_invoices'),
       visible:
-        (enabled(ModuleBitmask.RecurringInvoices) &&
-          hasPermission('view_recurring_invoice')) ||
-        hasPermission('create_recurring_invoice') ||
-        hasPermission('edit_recurring_invoice'),
+        enabled(ModuleBitmask.RecurringInvoices) &&
+        (hasPermission('view_recurring_invoice') ||
+          hasPermission('create_recurring_invoice') ||
+          hasPermission('edit_recurring_invoice')),
       rightButton: {
         icon: PlusCircle,
         to: '/recurring_invoices/create',
@@ -352,13 +351,6 @@ export function Default(props: Props) {
       icon: Settings,
       current: location.pathname.startsWith('/settings'),
       visible: true,
-    },
-    {
-      name: t('system_logs'),
-      href: '/system_logs',
-      icon: ShieldOff,
-      current: location.pathname.startsWith('/system_logs'),
-      visible: companyUser?.is_admin || companyUser?.is_owner || false,
     },
   ];
 

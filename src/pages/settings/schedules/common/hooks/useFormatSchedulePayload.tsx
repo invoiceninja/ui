@@ -13,14 +13,13 @@ import { Templates } from '$app/pages/settings/schedules/common/components/Sched
 
 const TemplateProperties = {
   EMAIL_STATEMENT: [
-    'name',
     'template',
     'next_run',
     'frequency_id',
     'remaining_cycles',
     'parameters',
   ],
-  EMAIL_RECORD: ['name', 'template', 'next_run', 'parameters'],
+  EMAIL_RECORD: ['template', 'next_run', 'parameters'],
 };
 
 const TemplateParametersProperties = {
