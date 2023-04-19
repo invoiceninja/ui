@@ -84,13 +84,7 @@ export function useResolveInputField(props: Props) {
       (item, index) => index !== items.length - 1
     );
 
-    return filteredItems.some(
-      (lineItem) =>
-        !lineItem.cost &&
-        !lineItem.quantity &&
-        !lineItem.notes &&
-        !lineItem.product_key
-    );
+    return filteredItems.some((lineItem) => isLineItemEmpty(lineItem));
   };
 
   const cleanLineItemsList = (lineItems: InvoiceItem[]) => {
