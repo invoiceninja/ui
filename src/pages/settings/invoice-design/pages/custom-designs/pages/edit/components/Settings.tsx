@@ -29,11 +29,11 @@ export function Settings() {
 
   const handleExport = useCallback(() => {
     if (payload.design) {
-      navigator.clipboard.writeText(JSON.stringify(payload.design));
+      navigator.clipboard.writeText(JSON.stringify(payload.design.design));
 
       toast.success(
         trans('copied_to_clipboard', {
-          value: t('payload.design').toLowerCase(),
+          value: t('design').toLowerCase(),
         })
       );
     }
@@ -43,7 +43,7 @@ export function Settings() {
 
   return (
     <>
-      <Import onImport={(parts) => console.log(parts)} />
+      <Import onImport={(parts) => handlePropertyChange('design', parts)} />
 
       <Card title={t('settings')} padding="small" collapsed={false}>
         <Element leftSide={t('name')}>
