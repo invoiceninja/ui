@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { route } from '$app/common/helpers/route';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { Tab, Tabs } from '$app/components/Tabs';
 import { Default } from '$app/components/layouts/Default';
@@ -23,6 +24,11 @@ export default function InvoiceDesign() {
     {
       name: t('custom_designs'),
       href: '/settings/invoice_design/custom_designs',
+      matcher: [
+        () => '/settings/invoice_design/custom_designs/create',
+        (params) =>
+          route('/settings/invoice_design/custom_designs/:id/edit', params),
+      ],
     },
   ];
 
