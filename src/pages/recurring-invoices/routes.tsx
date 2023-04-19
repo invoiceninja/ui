@@ -17,6 +17,7 @@ import { ModuleBitmask } from '$app/pages/settings/account-management/component'
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
 
+const Import = lazy(() => import('$app/pages/recurring-invoices/import/Import'));
 const RecurringInvoices = lazy(
   () => import('$app/pages/recurring-invoices/index/RecurringInvoices')
 );
@@ -84,5 +85,17 @@ export const recurringInvoiceRoutes = (
         }
       />
     </Route>
+    <Route
+      path="import"
+      element={
+        <Guard
+          guards={[
+            enabled(ModuleBitmask.Invoices),
+            or(permission('create_recurring_invoice'), permission('edit_recurring_invoice')),
+          ]}
+          component={<Import />}
+        />
+      }
+    />
   </Route>
 );
