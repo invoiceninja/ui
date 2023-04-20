@@ -93,6 +93,7 @@ export function useResolveInputField(props: Props) {
     if (property === 'product_key') {
       return (
         <ProductSelector
+          key={resource?.line_items[index][property]}
           onChange={(value) =>
             value.resource &&
             handleProductChange(index, value.label, value.resource)
@@ -102,6 +103,8 @@ export function useResolveInputField(props: Props) {
           onProductCreated={(product) =>
             product && handleProductChange(index, product.product_key, product)
           }
+          clearButton
+          onClearButtonClick={() => handleProductChange(index, '')}
         />
       );
     }

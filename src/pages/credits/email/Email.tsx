@@ -55,7 +55,7 @@ export default function Email() {
           resourceType="credit"
           list={list}
           defaultEmail="email_template_credit"
-          redirectUrl="/credits"
+          redirectUrl={route('/clients/:id/credits', { id: credit.client_id })}
         />
       )}
     </Default>

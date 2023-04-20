@@ -21,7 +21,7 @@ export function useUserDetailsTabs() {
       href: '/settings/user_details/password',
     },
     {
-      name: t('connect'),
+      name: t('oauth_mail'),
       href: '/settings/user_details/connect',
     },
     {

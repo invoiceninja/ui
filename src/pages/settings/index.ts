@@ -29,6 +29,7 @@ export * from './bank-accounts';
 export * from './subscriptions/index';
 export * from './schedules';
 export * from './backup-restore';
+export * from './system-logs/SystemLog';
 
 export * from './group-settings/GroupSettings';
 export * from './users';
