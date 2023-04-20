@@ -15,21 +15,25 @@ import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
 
 export default function Import() {
-    const { t } = useTranslation();
-    const { documentTitle } = useTitle('import');
+  const { t } = useTranslation();
+  const { documentTitle } = useTitle('import');
 
-    const pages: Page[] = [
-        { name: t('recurring_invoices'), href: '/recurring_invoices' },
-        { name: t('import'), href: '/recurring_invoices/import' },
-    ];
+  const pages: Page[] = [
+    { name: t('recurring_invoices'), href: '/recurring_invoices' },
+    { name: t('import'), href: '/recurring_invoices/import' },
+  ];
 
-    return (
-        <Default title={documentTitle} breadcrumbs={pages}>
-            <div className="grid grid-cols-12">
-                <div className="col-span-12 xl:col-span-10">
-                    <UploadImport entity="recurring_invoice" onSuccess={false} type="csv" />
-                </div>
-            </div>
-        </Default>
-    );
+  return (
+    <Default title={documentTitle} breadcrumbs={pages}>
+      <div className="grid grid-cols-12">
+        <div className="col-span-12 xl:col-span-10">
+          <UploadImport
+            entity="recurring_invoice"
+            onSuccess={false}
+            type="csv"
+          />
+        </div>
+      </div>
+    </Default>
+  );
 }
