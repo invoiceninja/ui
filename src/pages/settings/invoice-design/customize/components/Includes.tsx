@@ -23,16 +23,14 @@ export function Includes({ payload }: CustomizeChildProps) {
   const { t } = useTranslation();
   const { handleDesignBlockChange } = useDesignUtilities();
 
-  useDebounce(() => value && handleDesignBlockChange('includes', value), defaultEditorDebounceTime, [
-    value,
-  ]);
+  useDebounce(
+    () => value && handleDesignBlockChange('includes', value),
+    defaultEditorDebounceTime,
+    [value]
+  );
 
   return (
-    <Card
-      title={t('includes')}
-      padding="small"
-      collapsed={true}
-    >
+    <Card title={t('includes')} padding="small" collapsed={true}>
       <Editor
         height="40rem"
         defaultLanguage="html"

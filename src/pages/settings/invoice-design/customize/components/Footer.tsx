@@ -23,16 +23,14 @@ export function Footer({ payload }: CustomizeChildProps) {
   const { t } = useTranslation();
   const { handleDesignBlockChange } = useDesignUtilities();
 
-  useDebounce(() => value && handleDesignBlockChange('footer', value), defaultEditorDebounceTime, [
-    value,
-  ]);
+  useDebounce(
+    () => value && handleDesignBlockChange('footer', value),
+    defaultEditorDebounceTime,
+    [value]
+  );
 
   return (
-    <Card
-      title={t('footer')}
-      padding="small"
-      collapsed={true}
-    >
+    <Card title={t('footer')} padding="small" collapsed={true}>
       <Editor
         height="40rem"
         defaultLanguage="html"

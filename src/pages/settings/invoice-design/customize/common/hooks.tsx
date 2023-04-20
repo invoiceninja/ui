@@ -53,7 +53,11 @@ export function useDesignUtilities() {
     if (design) {
       setPayload(
         (current) =>
-          current && { ...current, design: design.design, internal_design_type: type }
+          current && {
+            ...current,
+            design: design.design,
+            internal_design_type: type,
+          }
       );
     }
   };
@@ -137,9 +141,9 @@ export function useHandleDesignSave() {
 
 export function useDesignActions() {
   const { t } = useTranslation();
-  
+
   const [design] = useAtom(designAtom);
-  const [, setIsModalVisible] = useAtom(isModalVisibleAtom)
+  const [, setIsModalVisible] = useAtom(isModalVisibleAtom);
 
   const queryClient = useQueryClient();
 
@@ -160,7 +164,7 @@ export function useDesignActions() {
 
         queryClient.invalidateQueries('/api/v1/designs');
 
-        setIsModalVisible(false)
+        setIsModalVisible(false);
       })
       .catch((error) => {
         toast.error();

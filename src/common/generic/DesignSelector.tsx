@@ -128,8 +128,7 @@ export function DesignSelector(props: GenericSelectorProps<Design>) {
         defaultValue={props.value}
         onChange={(design: Record<Design>) => {
           design.resource && props.onChange(design.resource);
-        }
-        }
+        }}
         actionLabel={t('new_design')}
         onActionClick={() => setIsModalVisible(true)}
       />
