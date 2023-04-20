@@ -8,51 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
-import creditStatus from '$app/common/constants/credit-status';
-import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Credit } from '$app/common/interfaces/credit';
-import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { StatusBadge } from '$app/components/StatusBadge';
-import { useTranslation } from 'react-i18next';
+import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';
+import { useCreditColumns } from '$app/pages/credits/common/hooks';
 
 export default function Credits() {
-  const [t] = useTranslation();
   const { id } = useParams();
-  const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const columns: DataTableColumns<Credit> = [
-    {
-      id: 'number',
-      label: t('number'),
-      format: (value, credit) => (
-        <Link to={route('/credits/:id/edit', { id: credit.id })}>{value}</Link>
-      ),
-    },
-    {
-      id: 'status_id',
-      label: t('status'),
-      format: (value) => <StatusBadge for={creditStatus} code={value} />,
-    },
-    {
-      id: 'amount',
-      label: t('amount'),
-      format: (value) => value.toString().toUpperCase(),
-    },
-    {
-      id: 'date',
-      label: t('date'),
-      format: (value) => date(value, dateFormat),
-    },
-    {
-      id: 'amount',
-      label: t('remaining'),
-    },
-  ];
+  const columns = useCreditColumns();
 
   return (
     <DataTable
