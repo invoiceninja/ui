@@ -8,40 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
-import invoiceStatus from '$app/common/constants/invoice-status';
 import { route } from '$app/common/helpers/route';
-import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { StatusBadge } from '$app/components/StatusBadge';
-import { useTranslation } from 'react-i18next';
+import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
+import { useInvoiceColumns } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 
 export const dataTableStaleTime = 50;
 
 export default function Invoices() {
-  const [t] = useTranslation();
   const { id } = useParams();
 
-  const columns: DataTableColumns = [
-    {
-      id: 'number',
-      label: t('invoice_number'),
-      format: (value, resource) => (
-        <Link to={route('/invoices/:id/edit', { id: resource.id })}>
-          {value}
-        </Link>
-      ),
-    },
-    { id: 'date', label: t('date') },
-    { id: 'amount', label: t('amount') },
-    { id: 'balance', label: t('balance') },
-    { id: 'due_date', label: t('due_date') },
-    {
-      id: 'status_id',
-      label: t('status'),
-      format: (value) => <StatusBadge for={invoiceStatus} code={value} />,
-    },
-  ];
+  const columns = useInvoiceColumns();
 
   return (
     <DataTable

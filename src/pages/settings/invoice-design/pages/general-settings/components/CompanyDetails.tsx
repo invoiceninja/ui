@@ -15,7 +15,7 @@ import { useCustomField } from '$app/components/CustomField';
 
 export function CompanyDetails() {
   const [t] = useTranslation();
-  const customField = useCustomField()
+  const customField = useCustomField();
 
   const defaultVariables = [
     { value: '$company.name', label: t('company_name') },

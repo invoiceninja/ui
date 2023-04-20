@@ -14,6 +14,7 @@ import { Outlet, Route } from 'react-router-dom';
 import { plan } from '$app/common/guards/guards/plan';
 import * as Settings from './index';
 import { isDemo } from '$app/common/helpers';
+import { invoiceDesignRoutes } from '$app/pages/settings/invoice-design/routes';
 
 export const settingsRoutes = (
   <Route path="/settings">
@@ -75,7 +76,6 @@ export const settingsRoutes = (
         <Route path="" element={<Settings.CompanyBackup />} />
         <Route path="restore" element={<Settings.CompanyRestore />} />
       </Route>
-      <Route path="invoice_design/customize" element={<Settings.Customize />} />
       <Route path="custom_fields">
         <Route path="" element={<Settings.CustomFields />} />
         <Route path="company" element={<Settings.CompanyCustomFields />} />
@@ -204,5 +204,6 @@ export const settingsRoutes = (
         <Route path=":id/edit" element={<Settings.EditTransactionRule />} />
       </Route>
     </Route>
+    {invoiceDesignRoutes}
   </Route>
 );

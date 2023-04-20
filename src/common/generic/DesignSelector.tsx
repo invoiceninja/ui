@@ -26,7 +26,13 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 
-export function DesignSelector(props: GenericSelectorProps<Design>) {
+interface Props extends GenericSelectorProps<Design> {
+  actionVisibility?: boolean;
+}
+
+export function DesignSelector(props: Props) {
+  const defaultProps: Props = { actionVisibility: true, ...props };
+
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [design, setDesign] = useState<Design | null>(null);
   const [errors, setErrors] = useState<ValidationBag | null>(null);
@@ -77,6 +83,12 @@ export function DesignSelector(props: GenericSelectorProps<Design>) {
     }
   };
 
+  const actionProps: { onActionClick?: () => void } = {};
+
+  if (defaultProps.actionVisibility !== false) {
+    actionProps.onActionClick = () => setIsModalVisible(true);
+  }
+
   return (
     <>
       <Modal
@@ -122,16 +134,15 @@ export function DesignSelector(props: GenericSelectorProps<Design>) {
 
       <DebouncedCombobox
         {...props}
+        {...actionProps}
         value="id"
         endpoint="/api/v1/designs"
         label="name"
         defaultValue={props.value}
         onChange={(design: Record<Design>) => {
           design.resource && props.onChange(design.resource);
-        }
-        }
+        }}
         actionLabel={t('new_design')}
-        onActionClick={() => setIsModalVisible(true)}
       />
     </>
   );

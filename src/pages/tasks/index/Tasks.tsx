@@ -24,7 +24,7 @@ import {
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Inline } from '$app/components/Inline';
 
-export  default function Tasks() {
+export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
 
   const [t] = useTranslation();

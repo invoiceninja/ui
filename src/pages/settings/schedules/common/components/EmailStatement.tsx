@@ -130,6 +130,18 @@ export function EmailStatement(props: Props) {
         />
       </Element>
 
+      <Element leftSide={t('show_credits_table')}>
+        <Toggle
+          checked={schedule.parameters.show_credits_table}
+          onValueChange={(value) =>
+            handleChange(
+              'parameters.show_credits_table' as keyof Schedule,
+              value
+            )
+          }
+        />
+      </Element>
+
       <Element leftSide={t('client')}>
         <ClientSelector
           onChange={(client) =>
