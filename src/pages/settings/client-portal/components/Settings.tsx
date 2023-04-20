@@ -38,9 +38,11 @@ export function Settings() {
             {t('login')} {t('url')}
           </span>
         }
-        leftSideHelp={
-          isHosted() &&
-          company.portal_mode === 'domain' && (
+      >
+        <div className="flex flex-col space-y-1">
+          <CopyToClipboard text={`${company?.portal_domain}/client/login`} />
+
+          {isHosted() && company.portal_mode === 'domain' && (
             <div>
               <span>{t('app_help_link')}</span>
               <Link
@@ -51,10 +53,8 @@ export function Settings() {
               </Link>
               .
             </div>
-          )
-        }
-      >
-        <CopyToClipboard text={`${company?.portal_domain}/client/login`} />
+          )}
+        </div>
       </Element>
 
       <Divider />
