@@ -143,7 +143,7 @@ export function useQuickCreateActions() {
       visible: Boolean(!gateways?.length),
     },
     {
-      key: 'connect_bank',
+      key: 'add_bank_account',
       url: '/settings/bank_accounts/create',
       section: 'settings',
       visible: enterprisePlan() && Boolean(!bankAccounts?.length),

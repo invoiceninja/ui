@@ -81,6 +81,7 @@ export function Create() {
             clients: [],
             date_range: 'last7_days',
             show_aging_table: false,
+            show_credits_table: false,
             show_payments_table: false,
             status: 'all',
             entity: 'invoice',

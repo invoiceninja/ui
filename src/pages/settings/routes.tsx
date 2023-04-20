@@ -161,6 +161,9 @@ export const settingsRoutes = (
           }
         />
       </Route>
+      <Route path="/settings/system_logs">
+        <Route path="" element={<Settings.SystemLog />} />
+      </Route>
       <Route path="payment_terms">
         <Route path="" element={<Settings.PaymentTerms />} />
         <Route path=":id/edit" element={<Settings.EditPaymentTerm />} />

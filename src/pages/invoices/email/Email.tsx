@@ -58,7 +58,7 @@ export default function Email() {
           resourceType="invoice"
           list={list}
           defaultEmail="email_template_invoice"
-          redirectUrl="/invoices"
+          redirectUrl={route('/clients/:id', { id: invoice.client_id })}
         />
       )}
     </Default>

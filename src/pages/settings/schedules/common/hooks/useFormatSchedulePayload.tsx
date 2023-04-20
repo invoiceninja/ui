@@ -27,6 +27,7 @@ const TemplateParametersProperties = {
     'date_range',
     'status',
     'show_aging_table',
+    'show_credits_table',
     'show_payments_table',
     'clients',
   ],
