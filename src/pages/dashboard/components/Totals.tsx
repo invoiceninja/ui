@@ -136,7 +136,7 @@ export function Totals() {
       <div className="flex justify-end space-x-2">
         {currencies && (
           <SelectField
-            className="w-24"
+            className="w-20"
             defaultValue={currencies[0]}
             onValueChange={(value) => setCurrency(parseInt(value))}
           >
