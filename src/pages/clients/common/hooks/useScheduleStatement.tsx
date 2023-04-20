@@ -22,6 +22,7 @@ export function useScheduleStatement() {
     setScheduleParameters({
       clients: [statement.client_id],
       show_aging_table: statement.show_aging_table,
+      show_credits_table: statement.show_credits_table,
       show_payments_table: statement.show_payments_table,
       status: statement.status,
       date_range:
