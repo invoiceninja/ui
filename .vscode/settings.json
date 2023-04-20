@@ -1,3 +1,3 @@
 {
-    "typescript.preferences.importModuleSpecifier": "non-relative"
+    "typescript.preferences.importModuleSpecifier": "shortest"
 }
