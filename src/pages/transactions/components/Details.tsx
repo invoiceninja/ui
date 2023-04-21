@@ -33,6 +33,8 @@ import { useTransactionQuery } from '../common/queries';
 import { TransactionMatchDetails } from './TransactionMatchDetails';
 import { useTransactionRuleQuery } from '$app/common/queries/transaction-rules';
 import { Expense } from '$app/common/interfaces/expense';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { date as formatDate } from '$app/common/helpers';
 
 interface Props {
   transactionId: string;
@@ -45,6 +47,8 @@ export function Details(props: Props) {
   const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const { data: transaction } = useTransactionQuery({
     id: props.transactionId,
@@ -147,7 +151,9 @@ export function Details(props: Props) {
           )}
         </Element>
 
-        <Element leftSide={t('date')}>{transaction?.date}</Element>
+        <Element leftSide={t('date')}>
+          {formatDate(transaction?.date || '', dateFormat)}
+        </Element>
 
         <Element
           leftSide={t('bank_account')}
@@ -237,7 +243,7 @@ export function Details(props: Props) {
                   id,
                 })}
               >
-                {number || date}
+                {number || formatDate(date, dateFormat)}
               </Link>
             </Element>
           ))}

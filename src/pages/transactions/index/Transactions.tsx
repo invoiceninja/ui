@@ -19,6 +19,8 @@ import { Details } from '../components/Details';
 import { Slider } from '$app/components/cards/Slider';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { useTransactionFilters } from '../common/hooks/useTransactionFilters';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { date as formatDate } from '$app/common/helpers';
 
 export default function Transactions() {
   useTitle('transactions');
@@ -28,6 +30,8 @@ export default function Transactions() {
   const columns = useTransactionColumns();
 
   const filters = useTransactionFilters();
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const pages = [{ name: t('transactions'), href: '/transactions' }];
 
@@ -45,7 +49,7 @@ export default function Transactions() {
       }
       setSliderTitle(cutDescription);
     } else {
-      setSliderTitle(transaction.date);
+      setSliderTitle(formatDate(transaction.date, dateFormat));
     }
   };
 

@@ -41,10 +41,14 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
+import { date as formatDate } from '$app/common/helpers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 export function EditSlider() {
   const [t] = useTranslation();
   const [task, setTask] = useAtom(currentTaskAtom);
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const [isTimeModalVisible, setIsTimeModalVisible] = useState(false);
 
@@ -261,7 +265,7 @@ export function EditSlider() {
                 }}
               >
                 <div>
-                  <p>{date}</p>
+                  <p>{formatDate(date, dateFormat)}</p>
 
                   <small>
                     {start} - {end}
