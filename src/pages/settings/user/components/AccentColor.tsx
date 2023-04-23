@@ -15,10 +15,12 @@ import { updateChanges } from '$app/common/stores/slices/user';
 import { RootState } from '../../../../common/stores/store';
 import colors from '$app/common/constants/colors';
 import { ColorPicker } from '$app/components/forms/ColorPicker';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export function AccentColor() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
+  const reactSettings = useReactSettings();
 
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
@@ -33,6 +35,20 @@ export function AccentColor() {
             dispatch(
               updateChanges({
                 property: 'company_user.settings.accent_color',
+                value: color,
+              })
+            )
+          }
+        />
+      </Element>
+
+      <Element leftSide={t('sidebar_active_background_color')}>
+        <ColorPicker
+          value={reactSettings.sidebar_background || colors.ninjaGray}
+          onValueChange={(color) =>
+            dispatch(
+              updateChanges({
+                property: 'company_user.react_settings.sidebar_background',
                 value: color,
               })
             )
