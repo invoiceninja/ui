@@ -10,6 +10,7 @@
 
 export default {
   accent: '#117DC0',
+  ninjaGray: '#454544',
   primary: '#2F7DC3',
   secondary: '#7081e0',
 };

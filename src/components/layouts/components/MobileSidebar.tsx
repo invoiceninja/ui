@@ -14,6 +14,9 @@ import { Fragment } from 'react';
 import { X } from 'react-feather';
 import { NavigationItem } from './DesktopSidebar';
 import { SidebarItem } from './SidebarItem';
+import classNames from 'classnames';
+import colors from '$app/common/constants/colors';
+import { useSidebarBackgroundColor } from '$app/common/hooks/useSidebarBackgroundColor';
 
 interface Props {
   navigation: NavigationItem[];
@@ -22,6 +25,8 @@ interface Props {
 }
 
 export function MobileSidebar(props: Props) {
+  const sideBarColor = useSidebarBackgroundColor();
+
   return (
     <Transition.Root show={props.sidebarOpen} as={Fragment}>
       <Dialog
@@ -49,7 +54,17 @@ export function MobileSidebar(props: Props) {
           leaveFrom="translate-x-0"
           leaveTo="-translate-x-full"
         >
-          <div className="relative flex-1 flex flex-col max-w-xs w-full pb-4 bg-ninja-gray dark:bg-gray-900">
+          <div
+            className={classNames(
+              'relative flex-1 flex flex-col max-w-xs w-full pb-4',
+              {
+                'dark:bg-gray-900': colors.ninjaGray === sideBarColor,
+              }
+            )}
+            style={{
+              backgroundColor: sideBarColor,
+            }}
+          >
             <Transition.Child
               as={Fragment}
               enter="ease-in-out duration-300"

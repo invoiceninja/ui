@@ -9,12 +9,15 @@
  */
 
 import { useLogo } from '$app/common/hooks/useLogo';
+import { useSidebarBackgroundColor } from '$app/common/hooks/useSidebarBackgroundColor';
 import { RootState } from '$app/common/stores/store';
 import { CompanySwitcher } from '$app/components/CompanySwitcher';
 import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
 import { Icon } from 'react-feather';
 import { useSelector } from 'react-redux';
 import { SidebarItem } from './SidebarItem';
+import colors from '$app/common/constants/colors';
+import classNames from 'classnames';
 
 export interface NavigationItem {
   name: string;
@@ -42,13 +45,24 @@ export function DesktopSidebar(props: Props) {
 
   const logo = useLogo();
 
+  const sideBarColor = useSidebarBackgroundColor();
+
   return (
     <div
       className={`hidden md:flex z-10 ${
         isMiniSidebar ? 'md:w-16' : 'md:w-64'
       } md:flex-col md:fixed md:inset-y-0`}
     >
-      <div className="flex flex-col flex-grow border-gray-100 bg-ninja-gray dark:bg-gray-800 dark:border-transparent overflow-y-auto border-r">
+      <div
+        className={classNames(
+          'flex flex-col flex-grow border-gray-100 overflow-y-auto border-r',
+          {
+            'dark:bg-gray-800 dark:border-transparent':
+              colors.ninjaGray === sideBarColor,
+          }
+        )}
+        style={{ backgroundColor: sideBarColor }}
+      >
         <div className="flex items-center flex-shrink-0 px-4 bg-white h-16">
           {isMiniSidebar ? (
             <img className="w-8" src={logo} alt="Company logo" />
