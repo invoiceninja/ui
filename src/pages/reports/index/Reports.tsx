@@ -24,6 +24,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Identifier =
+  | 'activity'
   | 'client'
   | 'contact'
   | 'credit'
@@ -67,6 +68,19 @@ interface Payload {
 }
 
 const reports: Report[] = [
+  {
+    identifier: 'activity',
+    label: 'activity',
+    endpoint: '/api/v1/reports/activities',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
   {
     identifier: 'client',
     label: 'client',
