@@ -26,7 +26,7 @@ export function useHandleLineItemPropertyChange(
     value: unknown,
     index: number
   ) => {
-    const po = cloneDeep(purchaseOrder);
+    const po = cloneDeep(purchaseOrder) as PurchaseOrder;
 
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
