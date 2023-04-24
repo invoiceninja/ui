@@ -23,9 +23,8 @@ import { Default } from '$app/components/layouts/Default';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
-import Select, { MultiValue, SingleValue, StylesConfig } from 'react-select';
+import Select, { MultiValue, StylesConfig } from 'react-select';
 import { SelectOption } from '$app/components/datatables/Actions';
-import { values } from 'lodash';
 
 type Identifier =
   | 'client'
