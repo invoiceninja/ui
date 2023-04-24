@@ -23,6 +23,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useParams } from 'react-router-dom';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from './common/hooks/useActions';
+import { Inline } from '$app/components/Inline';
 
 export default function Vendor() {
   const { documentTitle, setDocumentTitle } = useTitle('view_vendor');
@@ -71,7 +72,7 @@ export default function Vendor() {
       title={documentTitle}
       breadcrumbs={pages}
       navigationTopRight={
-        <div className="flex space-x-3">
+        <Inline>
           <Button to={route('/vendors/:id/edit', { id })}>
             {t('edit_vendor')}
           </Button>
@@ -83,7 +84,7 @@ export default function Vendor() {
               actions={actions}
             />
           )}
-        </div>
+        </Inline>
       }
     >
       <div className="grid grid-cols-12 space-y-4 lg:space-y-0 lg:gap-4">
