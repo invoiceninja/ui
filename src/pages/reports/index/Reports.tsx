@@ -22,6 +22,12 @@ import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ReportViewer } from '../common/components/ReportViewer';
+import { usePrintPdf } from '../common/hooks/usePrintPdf';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { DropdownElement } from '$app/components/dropdown/DropdownElement';
+import { Icon } from '$app/components/icons/Icon';
+import { MdDownload, MdPrint } from 'react-icons/md';
 
 type Identifier =
   | 'client'
@@ -40,7 +46,7 @@ type Identifier =
   | 'task'
   | 'profitloss';
 
-interface Report {
+export interface Report {
   identifier: Identifier;
   label: string;
   endpoint: string;
@@ -287,6 +293,8 @@ export default function Reports() {
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
 
+  const printPdf = usePrintPdf({ endpoint: report.endpoint });
+
   const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
 
   const handleReportChange = (identifier: Identifier) => {
@@ -335,7 +343,7 @@ export default function Reports() {
     }));
   };
 
-  const handleExport = () => {
+  const handleExport = (exportType: string) => {
     toast.processing();
 
     setIsPendingExport(true);
@@ -356,12 +364,12 @@ export default function Reports() {
           return toast.success();
         }
 
-        const blob = new Blob([response.data], { type: 'text/csv' });
+        const blob = new Blob([response.data], { type: `text/${exportType}` });
         const url = URL.createObjectURL(blob);
 
         const link = document.createElement('a');
 
-        link.download = `${report.identifier}.csv`;
+        link.download = `${report.identifier}.${exportType}`;
         link.href = url;
         link.target = '_blank';
 
@@ -396,120 +404,153 @@ export default function Reports() {
   return (
     <Default
       title={documentTitle}
+      onSaveClick={() => console.log('ok')}
+      saveButtonLabel={t('report_templates')}
       breadcrumbs={pages}
-      onSaveClick={handleExport}
-      saveButtonLabel={t('export')}
-      disableSaveButton={isPendingExport}
       withoutBackButton
+      navigationTopRight={
+        <Dropdown label={t('more_actions')}>
+          <DropdownElement
+            onClick={() => !isPendingExport && handleExport('xlsx')}
+            icon={<Icon element={MdDownload} />}
+          >
+            {t('export_as_xlsx')}
+          </DropdownElement>
+
+          <DropdownElement
+            onClick={() => !isPendingExport && handleExport('csv')}
+            icon={<Icon element={MdDownload} />}
+          >
+            {t('export_as_csv')}
+          </DropdownElement>
+
+          <DropdownElement
+            onClick={() => printPdf(report)}
+            icon={<Icon element={MdPrint} />}
+          >
+            {t('print_pdf')}
+          </DropdownElement>
+        </Dropdown>
+      }
     >
-      <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-6 h-max">
-          <Element leftSide={t('report')}>
-            <SelectField
-              onValueChange={(value) => handleReportChange(value as Identifier)}
-              value={report.identifier}
-            >
-              {reports.map((report, i) => (
-                <option value={report.identifier} key={i}>
-                  {t(report.label)}
-                </option>
-              ))}
-            </SelectField>
-          </Element>
-
-          <Element leftSide={t('send_email')}>
-            <Toggle
-              checked={report.payload.send_email}
-              onValueChange={handleSendEmailChange}
-            />
-          </Element>
-
-          {report.identifier === 'profitloss' && (
-            <>
-              <Element leftSide={t('expense_paid_report')}>
-                <Toggle
-                  checked={report.payload.is_expense_billed}
-                  onValueChange={(value) =>
-                    handlePayloadChange('is_expense_billed', value)
-                  }
-                />
-              </Element>
-
-              <Element leftSide={t('cash_vs_accrual')}>
-                <Toggle
-                  checked={report.payload.is_income_billed}
-                  onValueChange={(value) =>
-                    handlePayloadChange('is_income_billed', value)
-                  }
-                />
-              </Element>
-
-              <Element leftSide={t('include_tax')}>
-                <Toggle
-                  checked={report.payload.include_tax}
-                  onValueChange={(value) =>
-                    handlePayloadChange('include_tax', value)
-                  }
-                />
-              </Element>
-            </>
-          )}
-        </Card>
-
-        <Card className="col-span-6 h-max">
-          <Element leftSide={t('range')}>
-            <SelectField
-              onValueChange={(value) => handleRangeChange(value)}
-              value={report.payload.date_range}
-            >
-              {ranges.map((range, i) => (
-                <option value={range.identifier} key={i}>
-                  {t(range.label)}
-                </option>
-              ))}
-            </SelectField>
-          </Element>
-
-          {report.payload.date_range === 'custom' && (
-            <Element leftSide={t('start_date')}>
-              <InputField
-                type="date"
-                value={report.payload.start_date}
+      <div className="flex flex-col space-y-10">
+        <div className="grid grid-cols-12 gap-4">
+          <Card className="col-span-6 h-max">
+            <Element leftSide={t('report')}>
+              <SelectField
                 onValueChange={(value) =>
-                  handleCustomDateChange('start_date', value)
+                  handleReportChange(value as Identifier)
                 }
-                errorMessage={errors?.errors?.start_date}
-              />
+                value={report.identifier}
+              >
+                {reports.map((report, i) => (
+                  <option value={report.identifier} key={i}>
+                    {t(report.label)}
+                  </option>
+                ))}
+              </SelectField>
             </Element>
-          )}
 
-          {report.payload.date_range === 'custom' && (
-            <Element leftSide={t('end_date')}>
-              <InputField
-                type="date"
-                value={report.payload.end_date}
-                onValueChange={(value) =>
-                  handleCustomDateChange('end_date', value)
-                }
-                errorMessage={errors?.errors?.end_date}
+            <Element leftSide={t('send_email')}>
+              <Toggle
+                checked={report.payload.send_email}
+                onValueChange={handleSendEmailChange}
               />
             </Element>
-          )}
 
-          {report.identifier === 'product_sales' && (
-            <Element leftSide={t('client')}>
-              <ClientSelector
-                value={report.payload.client_id}
-                onChange={(client) =>
-                  handlePayloadChange('client_id', client.id)
-                }
-                clearButton
-                onClearButtonClick={() => handlePayloadChange('client_id', '')}
-                withoutAction={true}
-              />
+            {report.identifier === 'profitloss' && (
+              <>
+                <Element leftSide={t('expense_paid_report')}>
+                  <Toggle
+                    checked={report.payload.is_expense_billed}
+                    onValueChange={(value) =>
+                      handlePayloadChange('is_expense_billed', value)
+                    }
+                  />
+                </Element>
+
+                <Element leftSide={t('cash_vs_accrual')}>
+                  <Toggle
+                    checked={report.payload.is_income_billed}
+                    onValueChange={(value) =>
+                      handlePayloadChange('is_income_billed', value)
+                    }
+                  />
+                </Element>
+
+                <Element leftSide={t('include_tax')}>
+                  <Toggle
+                    checked={report.payload.include_tax}
+                    onValueChange={(value) =>
+                      handlePayloadChange('include_tax', value)
+                    }
+                  />
+                </Element>
+              </>
+            )}
+          </Card>
+
+          <Card className="col-span-6 h-max">
+            <Element leftSide={t('range')}>
+              <SelectField
+                onValueChange={(value) => handleRangeChange(value)}
+                value={report.payload.date_range}
+              >
+                {ranges.map((range, i) => (
+                  <option value={range.identifier} key={i}>
+                    {t(range.label)}
+                  </option>
+                ))}
+              </SelectField>
             </Element>
-          )}
-        </Card>
+
+            {report.payload.date_range === 'custom' && (
+              <Element leftSide={t('start_date')}>
+                <InputField
+                  type="date"
+                  value={report.payload.start_date}
+                  onValueChange={(value) =>
+                    handleCustomDateChange('start_date', value)
+                  }
+                  errorMessage={errors?.errors?.start_date}
+                />
+              </Element>
+            )}
+
+            {report.payload.date_range === 'custom' && (
+              <Element leftSide={t('end_date')}>
+                <InputField
+                  type="date"
+                  value={report.payload.end_date}
+                  onValueChange={(value) =>
+                    handleCustomDateChange('end_date', value)
+                  }
+                  errorMessage={errors?.errors?.end_date}
+                />
+              </Element>
+            )}
+
+            {report.identifier === 'product_sales' && (
+              <Element leftSide={t('client')}>
+                <ClientSelector
+                  value={report.payload.client_id}
+                  onChange={(client) =>
+                    handlePayloadChange('client_id', client.id)
+                  }
+                  clearButton
+                  onClearButtonClick={() =>
+                    handlePayloadChange('client_id', '')
+                  }
+                  withoutAction={true}
+                />
+              </Element>
+            )}
+          </Card>
+        </div>
+
+        <div>
+          <ReportViewer endpoint={report.endpoint} report={report} />
+        </div>
       </div>
     </Default>
   );
