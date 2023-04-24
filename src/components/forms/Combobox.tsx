@@ -8,11 +8,15 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { request } from '$app/common/helpers/request';
+import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
+import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Check, ChevronDown } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { useQuery } from 'react-query';
 
 interface Entry<T = any> {
   id: number | string;
@@ -21,12 +25,13 @@ interface Entry<T = any> {
   resource: T | null;
 }
 
-interface ComboboxStaticProps<T = unknown> {
+interface ComboboxStaticProps<T = any> {
   value: string | number | boolean | null;
   entries: Entry<T>[];
+  onChange: (entry: Entry<T>) => unknown;
 }
 
-export function Combobox({ entries }: ComboboxStaticProps) {
+export function ComboboxStatic({ entries }: ComboboxStaticProps) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
   const [query, setQuery] = useState('');
@@ -122,4 +127,53 @@ export function Combobox({ entries }: ComboboxStaticProps) {
       </div>
     </HeadlessCombobox>
   );
+}
+
+interface ComboboxAsyncProps<T> {
+  endpoint: string;
+  value: string | number | boolean | null;
+  entryOptions: {
+    id: string;
+    label: string;
+    value: string;
+  };
+  staleTime?: number;
+  onChange: (entry: Entry<T>) => unknown;
+}
+
+export function ComboboxAsync<T = any>({
+  value,
+  endpoint,
+  entryOptions,
+  staleTime,
+  onChange,
+}: ComboboxAsyncProps<T>) {
+  const [entries, setEntries] = useState<Entry<T>[]>([]);
+  const url = useMemo(() => new URL(endpoint), [endpoint]);
+
+  useQuery(
+    [url.pathname],
+    () =>
+      request('GET', url.href).then(
+        (response: AxiosResponse<GenericManyResponse<any>>) => {
+          const data: Entry<T>[] = [];
+
+          response.data.data.map((entry) =>
+            data.push({
+              id: entry[entryOptions.id],
+              label: entry[entryOptions.label],
+              value: entry[entryOptions.value],
+              resource: entry,
+            })
+          );
+
+          setEntries([...data]);
+        }
+      ),
+    {
+      staleTime: staleTime ?? Infinity,
+    }
+  );
+
+  return <ComboboxStatic entries={entries} value={value} onChange={onChange} />;
 }
