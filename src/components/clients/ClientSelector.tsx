@@ -17,6 +17,7 @@ import {
 import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Combobox } from '../forms/Combobox';
 
 export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   initiallyVisible?: boolean;
@@ -60,6 +61,11 @@ export function ClientSelector(props: ClientSelectorProps) {
         clearInputAfterSelection={props.clearInputAfterSelection}
         disableWithSpinner={props.disableWithSpinner}
         errorMessage={props.errorMessage}
+      />
+
+      <Combobox
+        value={props.value || null}
+        entries={[]}
       />
     </>
   );
