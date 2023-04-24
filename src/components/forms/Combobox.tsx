@@ -9,14 +9,16 @@
  */
 
 import { request } from '$app/common/helpers/request';
+import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Check, ChevronDown } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
+import { useDebounce } from 'react-use';
 
 interface Entry<T = any> {
   id: number | string;
@@ -29,9 +31,13 @@ interface ComboboxStaticProps<T = any> {
   value: string | number | boolean | null;
   entries: Entry<T>[];
   onChange: (entry: Entry<T>) => unknown;
+  onEmptyValues: (query: string) => unknown;
 }
 
-export function ComboboxStatic({ entries }: ComboboxStaticProps) {
+export function ComboboxStatic({
+  entries,
+  onEmptyValues,
+}: ComboboxStaticProps) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
   const [query, setQuery] = useState('');
@@ -45,6 +51,20 @@ export function ComboboxStatic({ entries }: ComboboxStaticProps) {
             entry.value.toString().toLowerCase().includes(query.toLowerCase())
           );
         });
+
+  useDebounce(
+    () => {
+      if (query === '' && filteredValues.length > 0) {
+        return onEmptyValues(query);
+      }
+
+      if (filteredValues.length === 0) {
+        return onEmptyValues(query);
+      }
+    },
+    1000,
+    [filteredValues]
+  );
 
   return (
     <HeadlessCombobox
@@ -75,7 +95,7 @@ export function ComboboxStatic({ entries }: ComboboxStaticProps) {
                 className={({ active }) =>
                   classNames(
                     'relative cursor-default select-none py-2 pl-3 pr-9',
-                    active ? 'bg-indigo-600 text-white' : 'text-gray-900'
+                    active ? `bg-gray-100 text-gray-900` : 'text-gray-900'
                   )
                 }
               >
@@ -94,7 +114,7 @@ export function ComboboxStatic({ entries }: ComboboxStaticProps) {
                       <span
                         className={classNames(
                           'absolute inset-y-0 right-0 flex items-center pr-4',
-                          active ? 'text-white' : 'text-indigo-600'
+                          active ? 'text-white' : 'text-gray-600'
                         )}
                       >
                         <Check className="h-5 w-5" aria-hidden="true" />
@@ -111,7 +131,7 @@ export function ComboboxStatic({ entries }: ComboboxStaticProps) {
               className={() =>
                 classNames('relative cursor-default select-none py-2 pl-3 pr-9')
               }
-              value={{ id: null, label: null, value: null, resource: null }}
+              value={null}
               disabled
             >
               {() => (
@@ -149,9 +169,9 @@ export function ComboboxAsync<T = any>({
   onChange,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
-  const url = useMemo(() => new URL(endpoint), [endpoint]);
+  const [url, setUrl] = useState(new URL(endpoint));
 
-  useQuery(
+  const { refetch } = useQuery(
     [url.pathname],
     () =>
       request('GET', url.href).then(
@@ -175,5 +195,22 @@ export function ComboboxAsync<T = any>({
     }
   );
 
-  return <ComboboxStatic entries={entries} value={value} onChange={onChange} />;
+  const onEmptyValues = (query: string) => {
+    setUrl((current) => {
+      current.searchParams.set('filter', query);
+
+      return url;
+    });
+
+    refetch();
+  };
+
+  return (
+    <ComboboxStatic
+      entries={entries}
+      value={value}
+      onChange={onChange}
+      onEmptyValues={onEmptyValues}
+    />
+  );
 }
