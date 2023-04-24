@@ -13,7 +13,7 @@
 import { resolveProperty } from '$app/pages/invoices/common/helpers/resolve-property';
 import { useHandleProductChange } from './useHandleProductChange';
 import { InputField } from '$app/components/forms';
-import { ChangeEvent, useEffect, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import { useFormatMoney } from './useFormatMoney';
 import {
   InvoiceItem,
@@ -49,15 +49,12 @@ interface Props {
   resource: ProductTableResource;
   type: 'product' | 'task';
   relationType: RelationType;
-  onLineItemChange: (
-    index: number,
-    lineItem: InvoiceItem
-  ) => InvoiceItem[] | Promise<InvoiceItem[]>;
+  onLineItemChange: (index: number, lineItem: InvoiceItem) => unknown;
   onLineItemPropertyChange: (
     key: keyof InvoiceItem,
     value: unknown,
     index: number
-  ) => InvoiceItem[] | Promise<InvoiceItem[]>;
+  ) => unknown;
   createItem: () => unknown;
   deleteLineItem: (index: number) => unknown;
 }
@@ -87,43 +84,46 @@ export function useResolveInputField(props: Props) {
     return filteredItems.some((lineItem) => isLineItemEmpty(lineItem));
   };
 
-  const cleanLineItemsList = (lineItems: InvoiceItem[]) => {
-    let typeId = InvoiceItemType.Product;
+  const cleanLineItemsList = useCallback(
+    (lineItems: InvoiceItem[]) => {
+      let typeId = InvoiceItemType.Product;
 
-    if (props.type === 'task') {
-      typeId = InvoiceItemType.Task;
-    }
-
-    const typeFilteredLineItems = lineItems.filter(
-      ({ type_id }) => type_id === typeId
-    );
-
-    const lineItemsLength = typeFilteredLineItems.length;
-
-    const lastLineItem = typeFilteredLineItems[lineItemsLength - 1];
-
-    if (lineItemsLength > 0) {
-      if (
-        !isAnyExceptLastLineItemEmpty(typeFilteredLineItems) &&
-        !isLineItemEmpty(lastLineItem)
-      ) {
-        props.createItem();
+      if (props.type === 'task') {
+        typeId = InvoiceItemType.Task;
       }
 
-      if (
-        isAnyExceptLastLineItemEmpty(typeFilteredLineItems) &&
-        isLineItemEmpty(lastLineItem)
-      ) {
-        const lastLineItemIndex = lineItems.indexOf(
-          typeFilteredLineItems[lineItemsLength - 1]
-        );
+      const typeFilteredLineItems = lineItems.filter(
+        ({ type_id }) => type_id === typeId
+      );
 
-        if (lastLineItemIndex > -1) {
-          props.deleteLineItem(lastLineItemIndex);
+      const lineItemsLength = typeFilteredLineItems.length;
+
+      const lastLineItem = typeFilteredLineItems[lineItemsLength - 1];
+
+      if (lineItemsLength > 0) {
+        if (
+          !isAnyExceptLastLineItemEmpty(typeFilteredLineItems) &&
+          !isLineItemEmpty(lastLineItem)
+        ) {
+          props.createItem();
+        }
+
+        if (
+          isAnyExceptLastLineItemEmpty(typeFilteredLineItems) &&
+          isLineItemEmpty(lastLineItem)
+        ) {
+          const lastLineItemIndex = lineItems.indexOf(
+            typeFilteredLineItems[lineItemsLength - 1]
+          );
+
+          if (lastLineItemIndex > -1) {
+            props.deleteLineItem(lastLineItemIndex);
+          }
         }
       }
-    }
-  };
+    },
+    [props.resource.line_items]
+  );
 
   const handleProductChange = useHandleProductChange({
     resource: props.resource,
@@ -139,16 +139,10 @@ export function useResolveInputField(props: Props) {
 
   const onChange = async (
     key: keyof InvoiceItem,
-    value: unknown,
+    value: string | number | boolean,
     index: number
   ) => {
-    const updatedLineItemsList = await props.onLineItemPropertyChange(
-      key,
-      value,
-      index
-    );
-
-    cleanLineItemsList(updatedLineItemsList);
+    await props.onLineItemPropertyChange(key, value, index);
   };
 
   const onProductChange = async (
@@ -156,9 +150,7 @@ export function useResolveInputField(props: Props) {
     value: string,
     product: Product
   ) => {
-    const updatedLineItems = await handleProductChange(index, value, product);
-
-    cleanLineItemsList(updatedLineItems);
+    await handleProductChange(index, value, product);
   };
 
   const company = useCurrentCompany();
@@ -175,6 +167,10 @@ export function useResolveInputField(props: Props) {
     resource[props.relationType] &&
       getCurrency(resource[props.relationType], props.relationType);
   }, [resource?.[props.relationType]]);
+
+  useEffect(() => {
+    cleanLineItemsList(resource?.line_items);
+  }, [resource?.line_items]);
 
   return (key: string, index: number) => {
     const property = resolveProperty(key);

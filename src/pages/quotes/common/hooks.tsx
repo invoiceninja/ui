@@ -134,8 +134,6 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     lineItems[index] = lineItem;
 
     setQuote((current) => current && { ...current, line_items: lineItems });
-
-    return lineItems;
   };
 
   const handleLineItemPropertyChange = (
@@ -150,8 +148,6 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     lineItems[index][key] = value;
 
     setQuote((current) => current && { ...current, line_items: lineItems });
-
-    return lineItems;
   };
 
   const handleCreateLineItem = () => {

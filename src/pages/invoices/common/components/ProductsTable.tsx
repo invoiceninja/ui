@@ -34,16 +34,13 @@ interface Props {
   items: InvoiceItem[];
   columns: string[];
   relationType: RelationType;
-  onLineItemChange: (
-    index: number,
-    lineItem: InvoiceItem
-  ) => InvoiceItem[] | Promise<InvoiceItem[]>;
+  onLineItemChange: (index: number, lineItem: InvoiceItem) => unknown;
   onSort: (lineItems: InvoiceItem[]) => unknown;
   onLineItemPropertyChange: (
     key: keyof InvoiceItem,
     value: unknown,
     index: number
-  ) => InvoiceItem[] | Promise<InvoiceItem[]>;
+  ) => unknown;
   onDeleteRowClick: (index: number) => unknown;
   onCreateItemClick: () => unknown;
 }

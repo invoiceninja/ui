@@ -79,8 +79,6 @@ export function useInvoiceUtilities(props: Props) {
     lineItems[index] = lineItem;
 
     setInvoice((invoice) => invoice && { ...invoice, line_items: lineItems });
-
-    return lineItems;
   };
 
   const handleLineItemPropertyChange = (
@@ -95,8 +93,6 @@ export function useInvoiceUtilities(props: Props) {
     lineItems[index][key] = value;
 
     setInvoice((invoice) => invoice && { ...invoice, line_items: lineItems });
-
-    return lineItems;
   };
 
   const handleCreateLineItem = (typeId: InvoiceItemType) => {
