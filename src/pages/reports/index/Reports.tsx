@@ -38,7 +38,13 @@ type Identifier =
   | 'product'
   | 'product_sales'
   | 'task'
-  | 'profitloss';
+  | 'profitloss'
+  | 'client_balance_report'
+  | 'client_sales_report'
+  | 'aged_receivable_detailed_report'
+  | 'aged_receivable_summary_report'
+  | 'user_sales_report'
+  | 'tax_summary_report';
 
 interface Report {
   identifier: Identifier;
@@ -248,6 +254,102 @@ const reports: Report[] = [
     identifier: 'profitloss',
     label: 'profitloss',
     endpoint: '/api/v1/reports/profitloss',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
+    },
+  },
+  {
+    identifier: 'aged_receivable_detailed_report',
+    label: 'aged_receivable_detailed_report',
+    endpoint: '/api/v1/reports/ar_detail_report',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
+    },
+  },
+  {
+    identifier: 'aged_receivable_summary_report',
+    label: 'aged_receivable_summary_report',
+    endpoint: '/api/v1/reports/ar_summary_report',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
+    },
+  },
+  {
+    identifier: 'client_balance_report',
+    label: 'client_balance_report',
+    endpoint: '/api/v1/reports/client_balance_report',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
+    },
+  },
+  {
+    identifier: 'client_sales_report',
+    label: 'client_sales_report',
+    endpoint: '/api/v1/reports/client_sales_report',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
+    },
+  },
+  {
+    identifier: 'tax_summary_report',
+    label: 'tax_summary_report',
+    endpoint: '/api/v1/reports/tax_summary_report',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
+    },
+  },
+  {
+    identifier: 'user_sales_report',
+    label: 'user_sales_report',
+    endpoint: '/api/v1/reports/user_sales_report',
     payload: {
       start_date: '',
       end_date: '',
