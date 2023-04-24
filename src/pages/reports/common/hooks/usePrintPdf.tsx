@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
@@ -30,8 +31,8 @@ export function usePrintPdf(props: Props) {
         ? { ...report.payload, client_id: client_id || null }
         : report.payload;
 
-    queryClient.fetchQuery(props.endpoint, () =>
-      request('POST', props.endpoint, updatedPayload, {
+    queryClient.fetchQuery(endpoint(props.endpoint), () =>
+      request('POST', endpoint(props.endpoint), updatedPayload, {
         responseType: 'arraybuffer',
       })
         .then((response) => {
