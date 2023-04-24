@@ -325,7 +325,7 @@ export default function Reports() {
 
   const handleStatusChange = (statuses: MultiValue<{ value: string; label: string }>) => {
 
-    let values: Array<string> = [];
+    const values: Array<string> = [];
 
     (statuses as SelectOption[]).map(
       (option: { value: string; label: string }) => values.push(option.value)
@@ -435,20 +435,6 @@ export default function Reports() {
       color: '#999999',
     }),
   };
-  // const statuses: Status[] = [
-  //   { key: 'all', label: 'all' },
-  //   { key: 'draft', label: 'draft' },
-  //   { key: 'sent',  label: 'sent'},
-  //   { key: 'viewed', label: 'viewed'},
-  //   { key: 'paid', label: 'paid'},
-  //   { key: 'unpaid', label: 'unpaid'},
-  //   { key: 'overdue', label: 'overdue'}
-  // ];
-
-  // interface Status {
-  //   key: string;
-  //   label: string;
-  // }
 
   const filters = useInvoiceFilters();
   
