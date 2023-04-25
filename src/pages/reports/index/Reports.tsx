@@ -22,6 +22,9 @@ import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
+import Select, { MultiValue, StylesConfig } from 'react-select';
+import { SelectOption } from '$app/components/datatables/Actions';
 
 type Identifier =
   | 'activity'
@@ -65,6 +68,7 @@ interface Payload {
   is_income_billed?: boolean;
   is_expense_billed?: boolean;
   include_tax?: boolean;
+  status?: string;
 }
 
 const reports: Report[] = [
@@ -157,6 +161,7 @@ const reports: Report[] = [
       date_range: 'all',
       report_keys: [],
       send_email: false,
+      status: '',
     },
   },
   {
@@ -434,6 +439,21 @@ export default function Reports() {
     }
   };
 
+  const handleStatusChange = (
+    statuses: MultiValue<{ value: string; label: string }>
+  ) => {
+    const values: Array<string> = [];
+
+    (statuses as SelectOption[]).map(
+      (option: { value: string; label: string }) => values.push(option.value)
+    );
+
+    setReport((current) => ({
+      ...current,
+      payload: { ...current.payload, status: values.join(',') },
+    }));
+  };
+
   const handleCustomDateChange = (
     key: 'start_date' | 'end_date',
     date: string
@@ -509,6 +529,30 @@ export default function Reports() {
       .finally(() => setIsPendingExport(false));
   };
 
+  const customStyles: StylesConfig<SelectOption, true> = {
+    multiValue: (styles, { data }) => {
+      return {
+        ...styles,
+        backgroundColor: data.backgroundColor,
+        color: data.color,
+        borderRadius: '3px',
+      };
+    },
+    multiValueLabel: (styles, { data }) => ({
+      ...styles,
+      color: data.color,
+    }),
+    multiValueRemove: (styles) => ({
+      ...styles,
+      ':hover': {
+        color: 'white',
+      },
+      color: '#999999',
+    }),
+  };
+
+  const filters = useInvoiceFilters();
+
   return (
     <Default
       title={documentTitle}
@@ -569,6 +613,19 @@ export default function Reports() {
                 />
               </Element>
             </>
+          )}
+
+          {report.identifier === 'invoice' && (
+            <Element leftSide={t('status')} className={'mb-50 py-50'}>
+              <Select
+                styles={customStyles}
+                defaultValue={null}
+                onChange={(options) => handleStatusChange(options)}
+                placeholder={t('status')}
+                options={filters}
+                isMulti={true}
+              />
+            </Element>
           )}
         </Card>
 
