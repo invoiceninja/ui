@@ -41,6 +41,7 @@ export type Nullable<T> = T | null;
 export function ComboboxStatic({
   value,
   entries,
+  label,
   nullable,
   onEmptyValues,
   onChange,
@@ -93,9 +94,11 @@ export function ComboboxStatic({
       value={selectedValue}
       onChange={setSelectedValue}
     >
-      <HeadlessCombobox.Label className="text-sm text-gray-500 font-medium block">
-        Assigned to
-      </HeadlessCombobox.Label>
+      {label && (
+        <HeadlessCombobox.Label className="text-sm text-gray-500 font-medium block">
+          {label}
+        </HeadlessCombobox.Label>
+      )}
       <div className="relative mt-2">
         <HeadlessCombobox.Input
           className="w-full rounded border-0 bg-white py-2 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -172,6 +175,7 @@ export function ComboboxStatic({
 interface ComboboxAsyncProps<T> {
   endpoint: string;
   value: string | number | boolean | null;
+  label?: string;
   entryOptions: {
     id: string;
     label: string;
@@ -184,6 +188,7 @@ interface ComboboxAsyncProps<T> {
 
 export function ComboboxAsync<T = any>({
   value,
+  label,
   endpoint,
   entryOptions,
   staleTime,
@@ -199,8 +204,6 @@ export function ComboboxAsync<T = any>({
       request('GET', url).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
-
-          console.log('Refetching');
 
           response.data.data.map((entry) =>
             data.push({
@@ -239,6 +242,7 @@ export function ComboboxAsync<T = any>({
     <ComboboxStatic
       entries={entries}
       value={value}
+      label={label}
       onChange={onChange}
       onEmptyValues={onEmptyValues}
       onClear={onClear}
