@@ -39,6 +39,7 @@ interface ComboboxStaticProps<T = any> {
 export type Nullable<T> = T | null;
 
 export function ComboboxStatic({
+  value,
   entries,
   nullable,
   onEmptyValues,
@@ -77,6 +78,14 @@ export function ComboboxStatic({
       onChange(selectedValue);
     }
   }, [selectedValue]);
+
+  useEffect(() => {
+    const entry = entries.find((entry) => entry.value === value);
+
+    if (entry) {
+      setSelectedValue(entry);
+    }
+  }, [value]);
 
   return (
     <HeadlessCombobox
