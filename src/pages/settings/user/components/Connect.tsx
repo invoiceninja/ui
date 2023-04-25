@@ -44,12 +44,48 @@ export function Connect() {
     );
   };
 
+  const handleConnectMailer = (mailer: 'google' | 'microsoft') => {
+    toast.processing();
+
+    request(
+      'GET',
+      endpoint(`/auth/${mailer}`),
+      {},
+      { headers: { 'X-REACT': true } }
+    )
+      .then((response) => {
+        toast.success(response.data.message);
+      })
+      .catch((error) => {
+        toast.error();
+        console.error(error);
+      });
+  };
+
   const handleDisconnectMailer = () => {
     toast.processing();
 
     request(
       'POST',
-      endpoint('/api/v1/users/:id/disconnect_mailer', { id: user!.id })
+      endpoint('/api/v1/users/:id/disconnect_mailer', { id: user!.id }),
+      {},
+      { headers: { 'X-REACT': true } }
+    )
+      .then((response) => {
+        toast.success(response.data.message);
+      })
+      .catch((error) => {
+        toast.error();
+        console.error(error);
+      });
+  };
+
+  const handleDisconnectOauth = () => {
+    toast.processing();
+
+    request(
+      'POST',
+      endpoint('/api/v1/users/:id/disconnect_oauth', { id: user!.id })
     )
       .then((response) => {
         toast.success(response.data.message);
@@ -65,11 +101,21 @@ export function Connect() {
       {!user?.oauth_provider_id && (
         <>
           <Element leftSide="Google">
-            <Button type="minimal">{t('connect_google')}</Button>
+            <Button
+              type="minimal"
+              onClick={() => handleConnectMailer('google')}
+            >
+              {t('connect_google')}
+            </Button>
           </Element>
 
           <Element leftSide="Microsoft">
-            <Button type="minimal">{t('connect_microsoft')}</Button>
+            <Button
+              type="minimal"
+              onClick={() => handleConnectMailer('microsoft')}
+            >
+              {t('connect_microsoft')}
+            </Button>
           </Element>
         </>
       )}
@@ -84,7 +130,9 @@ export function Connect() {
 
           <Element leftSide="Gmail">
             {user?.oauth_user_token ? (
-              <Button type="minimal">{t('disconnect_gmail')}</Button>
+              <Button type="minimal" onClick={handleDisconnectOauth}>
+                {t('disconnect_gmail')}
+              </Button>
             ) : (
               <Button type="minimal">{t('connect_gmail')}</Button>
             )}
@@ -102,7 +150,9 @@ export function Connect() {
 
           <Element leftSide="Email">
             {user?.oauth_user_token ? (
-              <Button type="minimal">{t('disconnect_email')}</Button>
+              <Button type="minimal" onClick={handleDisconnectOauth}>
+                {t('disconnect_email')}
+              </Button>
             ) : (
               <Button type="minimal" onClick={handleConnectEmail}>
                 {t('connect_email')}
