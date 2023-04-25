@@ -141,7 +141,7 @@ const reports: Report[] = [
       date_range: 'all',
       report_keys: [],
       send_email: false,
-      status : '',
+      status: '',
     },
   },
   {
@@ -323,19 +323,19 @@ export default function Reports() {
     }
   };
 
-  const handleStatusChange = (statuses: MultiValue<{ value: string; label: string }>) => {
-
+  const handleStatusChange = (
+    statuses: MultiValue<{ value: string; label: string }>
+  ) => {
     const values: Array<string> = [];
 
     (statuses as SelectOption[]).map(
       (option: { value: string; label: string }) => values.push(option.value)
     );
-    
+
     setReport((current) => ({
       ...current,
-      payload: { ...current.payload, status: values.join(",") },
+      payload: { ...current.payload, status: values.join(',') },
     }));
-
   };
 
   const handleCustomDateChange = (
@@ -436,7 +436,7 @@ export default function Reports() {
   };
 
   const filters = useInvoiceFilters();
-  
+
   return (
     <Default
       title={documentTitle}
@@ -500,20 +500,16 @@ export default function Reports() {
           )}
 
           {report.identifier === 'invoice' && (
-            <>
-              <Element leftSide={t('status')} className={"mb-50 py-50"}>
-
-                <Select
-                  styles={customStyles}
-                  defaultValue={null}
-                  onChange={(options) => handleStatusChange(options)}
-                  placeholder={t('status')}
-                  options={filters}
-                  isMulti={true}
-                />
-              </Element>
-
-            </>
+            <Element leftSide={t('status')} className={'mb-50 py-50'}>
+              <Select
+                styles={customStyles}
+                defaultValue={null}
+                onChange={(options) => handleStatusChange(options)}
+                placeholder={t('status')}
+                options={filters}
+                isMulti={true}
+              />
+            </Element>
           )}
         </Card>
 
