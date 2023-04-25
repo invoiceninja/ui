@@ -9,12 +9,11 @@
  */
 
 import { request } from '$app/common/helpers/request';
-import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Check, ChevronDown } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
@@ -30,13 +29,20 @@ interface Entry<T = any> {
 interface ComboboxStaticProps<T = any> {
   value: string | number | boolean | null;
   entries: Entry<T>[];
+  label?: string;
+  nullable?: boolean;
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
+  onClear?: () => unknown;
 }
+
+export type Nullable<T> = T | null;
 
 export function ComboboxStatic({
   entries,
+  nullable,
   onEmptyValues,
+  onChange,
 }: ComboboxStaticProps) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -66,12 +72,17 @@ export function ComboboxStatic({
     [filteredValues]
   );
 
+  useEffect(() => {
+    if (selectedValue) {
+      onChange(selectedValue);
+    }
+  }, [selectedValue]);
+
   return (
     <HeadlessCombobox
       as="div"
       value={selectedValue}
       onChange={setSelectedValue}
-      nullable
     >
       <HeadlessCombobox.Label className="text-sm text-gray-500 font-medium block">
         Assigned to
@@ -80,7 +91,7 @@ export function ComboboxStatic({
         <HeadlessCombobox.Input
           className="w-full rounded border-0 bg-white py-2 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           onChange={(event) => setQuery(event.target.value)}
-          displayValue={(entry: Entry) => entry?.label}
+          displayValue={(entry: Nullable<Entry>) => entry?.label ?? ''}
         />
         <HeadlessCombobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
           <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
@@ -95,7 +106,7 @@ export function ComboboxStatic({
                 className={({ active }) =>
                   classNames(
                     'relative cursor-default select-none py-2 pl-3 pr-9',
-                    active ? `bg-gray-100 text-gray-900` : 'text-gray-900'
+                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-900'
                   )
                 }
               >
@@ -136,7 +147,7 @@ export function ComboboxStatic({
             >
               {() => (
                 <>
-                  <span className={classNames('block truncate')}>
+                  <span className="block truncate">
                     {t('no_records_found')}.
                   </span>
                 </>
@@ -159,6 +170,7 @@ interface ComboboxAsyncProps<T> {
   };
   staleTime?: number;
   onChange: (entry: Entry<T>) => unknown;
+  onClear?: () => unknown;
 }
 
 export function ComboboxAsync<T = any>({
@@ -167,16 +179,19 @@ export function ComboboxAsync<T = any>({
   entryOptions,
   staleTime,
   onChange,
+  onClear,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
-  const [url, setUrl] = useState(new URL(endpoint));
+  const [url, setUrl] = useState('');
 
-  const { refetch } = useQuery(
-    [url.pathname],
+  const { data } = useQuery(
+    [url],
     () =>
-      request('GET', url.href).then(
+      request('GET', url).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
+
+          console.log('Refetching');
 
           response.data.data.map((entry) =>
             data.push({
@@ -187,7 +202,7 @@ export function ComboboxAsync<T = any>({
             })
           );
 
-          setEntries([...data]);
+          return data;
         }
       ),
     {
@@ -195,14 +210,20 @@ export function ComboboxAsync<T = any>({
     }
   );
 
+  useEffect(() => {
+    if (data) {
+      setEntries([...data]);
+    }
+  }, [data]);
+
   const onEmptyValues = (query: string) => {
-    setUrl((current) => {
-      current.searchParams.set('filter', query);
+    setUrl(() => {
+      const url = new URL(endpoint);
 
-      return url;
+      url.searchParams.set('filter', query);
+
+      return url.href;
     });
-
-    refetch();
   };
 
   return (
@@ -211,6 +232,7 @@ export function ComboboxAsync<T = any>({
       value={value}
       onChange={onChange}
       onEmptyValues={onEmptyValues}
+      onClear={onClear}
     />
   );
 }
