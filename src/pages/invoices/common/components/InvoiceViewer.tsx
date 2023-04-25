@@ -10,13 +10,14 @@
 
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { Payload } from '$app/pages/settings/invoice-design/customize/common/hooks';
 import { useEffect, useRef } from 'react';
 import { Resource } from './InvoicePreview';
+import { GeneralSettingsPayload } from '$app/pages/settings/invoice-design/pages/general-settings/GeneralSettings';
+import { PreviewPayload } from '$app/pages/settings/invoice-design/pages/custom-designs/pages/edit/Edit';
 
 interface Props {
   link: string;
-  resource?: Resource | Payload;
+  resource?: Resource | GeneralSettingsPayload | PreviewPayload;
   method: 'GET' | 'POST';
   onLink?: (url: string) => unknown;
   withToast?: boolean;

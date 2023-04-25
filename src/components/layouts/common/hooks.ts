@@ -9,6 +9,8 @@
  */
 
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { atom, useAtom } from 'jotai';
+import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 
@@ -97,12 +99,10 @@ export function useSettingsRoutes() {
 
   const advanced: SettingsRoute[] = [
     {
-      name: t('customize_and_preview'),
-      href: '/settings/invoice_design/customize',
-      current: location.pathname.startsWith(
-        '/settings/invoice_design/customize'
-      ),
-      enabled: isAdmin || isOwner || false,
+      name: t('invoice_design'),
+      href: '/settings/invoice_design',
+      current: location.pathname.endsWith('/settings/invoice_design'),
+      enabled: isAdmin || isOwner || false
     },
     {
       name: t('generated_numbers'),
@@ -163,4 +163,28 @@ export function useSettingsRoutes() {
   ];
 
   return { basic, advanced };
+}
+
+interface SaveButton {
+  onClick: () => unknown;
+  label?: string;
+  disableSaveButton?: boolean;
+}
+
+export const saveBtnAtom = atom<SaveButton | null>(null);
+
+export function useSaveBtn(options?: SaveButton, deps: unknown[] = []) {
+  const [saveBtn, setSaveBtn] = useAtom(saveBtnAtom);
+
+  useEffect(() => {
+    if (options) {
+      setSaveBtn(options);
+    }
+
+    return () => {
+      setSaveBtn(null);
+    };
+  }, deps);
+
+  return saveBtn;
 }

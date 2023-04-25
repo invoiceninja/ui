@@ -78,6 +78,7 @@ export function Notifications() {
     },
     { label: t('invoice_viewed'), field: 'invoice_viewed_all' },
     { label: t('invoice_late'), field: 'invoice_late_all' },
+    { label: t('inventory_threshold'), field: 'inventory_threshold_all' },
 
     { label: t('payment_success'), field: 'payment_success_all' },
     { label: t('payment_failure'), field: 'payment_failure_all' },

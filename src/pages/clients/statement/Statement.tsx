@@ -42,6 +42,7 @@ export interface Statement {
   end_date: string;
   show_aging_table: boolean;
   show_payments_table: boolean;
+  show_credits_table: boolean;
   start_date: string;
   status: StatementStatus;
   dateRangeId: string;
@@ -131,6 +132,7 @@ export default function Statement() {
     end_date: dayjs().format('YYYY-MM-DD'),
     show_aging_table: true,
     show_payments_table: true,
+    show_credits_table: true,
     status: 'all',
     dateRangeId: 'last7_days',
   });
@@ -308,6 +310,18 @@ export default function Statement() {
         </Card>
 
         <Card className="col-span-12 xl:col-span-4 h-max">
+          <Element leftSide={t('credits')}>
+            <Toggle
+              checked={statement.show_credits_table}
+              onValueChange={(value) =>
+                setStatement((current) => ({
+                  ...current,
+                  show_credits_table: value,
+                }))
+              }
+            />
+          </Element>
+
           <Element leftSide={t('payments')}>
             <Toggle
               checked={statement.show_payments_table}
