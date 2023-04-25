@@ -30,11 +30,15 @@ import { useAtom } from 'jotai';
 import { expenseAtom } from '../common/atoms';
 import { useHandleChange } from '../common/hooks';
 import { cloneDeep } from 'lodash';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import dayjs from 'dayjs';
 
 export default function Create() {
   const [t] = useTranslation();
 
   const navigate = useNavigate();
+
+  const company = useCurrentCompany();
 
   const { documentTitle } = useTitle('new_expense');
 
@@ -82,7 +86,14 @@ export default function Create() {
           _expense.vendor_id = searchParams.get('client') as string;
         }
 
-        value = _expense;
+        value = {
+          ..._expense,
+          payment_date: company?.mark_expenses_paid
+            ? dayjs().format('YYYY-MM-DD')
+            : '',
+          should_be_invoiced: company?.mark_expenses_invoiceable,
+          invoice_documents: company?.invoice_expense_documents,
+        };
       }
 
       return value;
