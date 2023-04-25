@@ -26,10 +26,14 @@ interface Entry<T = any> {
   resource: T | null;
 }
 
-interface ComboboxStaticProps<T = any> {
+interface InputOptions {
   value: string | number | boolean | null;
-  entries: Entry<T>[];
   label?: string;
+}
+
+interface ComboboxStaticProps<T = any> {
+  inputOptions: InputOptions;
+  entries: Entry<T>[];
   nullable?: boolean;
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
@@ -39,9 +43,8 @@ interface ComboboxStaticProps<T = any> {
 export type Nullable<T> = T | null;
 
 export function ComboboxStatic({
-  value,
+  inputOptions,
   entries,
-  label,
   nullable,
   onEmptyValues,
   onChange,
@@ -81,12 +84,12 @@ export function ComboboxStatic({
   }, [selectedValue]);
 
   useEffect(() => {
-    const entry = entries.find((entry) => entry.value === value);
+    const entry = entries.find((entry) => entry.value === inputOptions.value);
 
     if (entry) {
       setSelectedValue(entry);
     }
-  }, [value]);
+  }, [inputOptions.value]);
 
   return (
     <HeadlessCombobox
@@ -94,9 +97,9 @@ export function ComboboxStatic({
       value={selectedValue}
       onChange={setSelectedValue}
     >
-      {label && (
+      {inputOptions.label && (
         <HeadlessCombobox.Label className="text-sm text-gray-500 font-medium block">
-          {label}
+          {inputOptions.label}
         </HeadlessCombobox.Label>
       )}
       <div className="relative mt-2">
@@ -174,8 +177,7 @@ export function ComboboxStatic({
 
 interface ComboboxAsyncProps<T> {
   endpoint: string;
-  value: string | number | boolean | null;
-  label?: string;
+  inputOptions: InputOptions;
   entryOptions: {
     id: string;
     label: string;
@@ -187,9 +189,8 @@ interface ComboboxAsyncProps<T> {
 }
 
 export function ComboboxAsync<T = any>({
-  value,
-  label,
   endpoint,
+  inputOptions,
   entryOptions,
   staleTime,
   onChange,
@@ -241,8 +242,7 @@ export function ComboboxAsync<T = any>({
   return (
     <ComboboxStatic
       entries={entries}
-      value={value}
-      label={label}
+      inputOptions={inputOptions}
       onChange={onChange}
       onEmptyValues={onEmptyValues}
       onClear={onClear}
