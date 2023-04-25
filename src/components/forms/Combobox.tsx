@@ -34,6 +34,7 @@ interface InputOptions {
 interface ComboboxStaticProps<T = any> {
   inputOptions: InputOptions;
   entries: Entry<T>[];
+  readonly?: boolean;
   nullable?: boolean;
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
@@ -45,6 +46,7 @@ export type Nullable<T> = T | null;
 export function ComboboxStatic({
   inputOptions,
   entries,
+  readonly,
   nullable,
   onEmptyValues,
   onChange,
@@ -96,21 +98,26 @@ export function ComboboxStatic({
       as="div"
       value={selectedValue}
       onChange={setSelectedValue}
+      disabled={readonly}
     >
       {inputOptions.label && (
         <HeadlessCombobox.Label className="text-sm text-gray-500 font-medium block">
           {inputOptions.label}
         </HeadlessCombobox.Label>
       )}
+      
       <div className="relative mt-2">
         <HeadlessCombobox.Input
           className="w-full rounded border-0 bg-white py-2 pl-3 pr-10 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
           onChange={(event) => setQuery(event.target.value)}
           displayValue={(entry: Nullable<Entry>) => entry?.label ?? ''}
         />
-        <HeadlessCombobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
-          <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
-        </HeadlessCombobox.Button>
+
+        {!readonly && (
+          <HeadlessCombobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
+            <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+          </HeadlessCombobox.Button>
+        )}
 
         <HeadlessCombobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
           {filteredValues.length > 0 &&
@@ -183,6 +190,7 @@ interface ComboboxAsyncProps<T> {
     label: string;
     value: string;
   };
+  readonly?: boolean;
   staleTime?: number;
   onChange: (entry: Entry<T>) => unknown;
   onClear?: () => unknown;
@@ -192,6 +200,7 @@ export function ComboboxAsync<T = any>({
   endpoint,
   inputOptions,
   entryOptions,
+  readonly,
   staleTime,
   onChange,
   onClear,
@@ -243,6 +252,7 @@ export function ComboboxAsync<T = any>({
     <ComboboxStatic
       entries={entries}
       inputOptions={inputOptions}
+      readonly={readonly}
       onChange={onChange}
       onEmptyValues={onEmptyValues}
       onClear={onClear}
