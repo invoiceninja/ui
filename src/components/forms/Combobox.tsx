@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { endpoint as apiEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { AxiosResponse } from 'axios';
@@ -164,7 +166,7 @@ export function ComboboxStatic({
                     )
                   }
                 >
-                  {({ active, selected }) => (
+                  {({ selected }) => (
                     <>
                       <span
                         className={classNames(
@@ -176,12 +178,7 @@ export function ComboboxStatic({
                       </span>
 
                       {selected && (
-                        <span
-                          className={classNames(
-                            'absolute inset-y-0 right-0 flex items-center pr-4',
-                            active ? 'text-white' : 'text-gray-600'
-                          )}
-                        >
+                        <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-gray-600">
                           <Check className="h-5 w-5" aria-hidden="true" />
                         </span>
                       )}
@@ -228,6 +225,7 @@ interface ComboboxAsyncProps<T> {
   readonly?: boolean;
   staleTime?: number;
   initiallyVisible?: boolean;
+  querySpecificEntry?: string;
   onChange: (entry: Entry<T>) => unknown;
   onDismiss?: () => unknown;
 }
@@ -239,6 +237,7 @@ export function ComboboxAsync<T = any>({
   readonly,
   staleTime,
   initiallyVisible,
+  querySpecificEntry,
   onChange,
   onDismiss,
 }: ComboboxAsyncProps<T>) {
@@ -248,8 +247,10 @@ export function ComboboxAsync<T = any>({
   const { data } = useQuery(
     [url],
     () =>
-      request('GET', url).then(
+      request('GET', apiEndpoint(endpoint)).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
+          console.log('this');
+
           const data: Entry<T>[] = [];
 
           response.data.data.map((entry) =>
@@ -275,11 +276,42 @@ export function ComboboxAsync<T = any>({
     }
   }, [data]);
 
+  const { data: specificEntry } = useQuery(
+    [querySpecificEntry],
+    () =>
+      request(
+        'GET',
+        apiEndpoint(querySpecificEntry!, { id: inputOptions.value })
+      ).then((response: GenericSingleResourceResponse<any>) => ({
+        id: response.data.data[entryOptions.id],
+        label: response.data.data[entryOptions.label],
+        value: response.data.data[entryOptions.value],
+        resource: response.data.data,
+      })),
+    {
+      enabled:
+        Boolean(querySpecificEntry) &&
+        Boolean(entries.find((entry) => entry.value !== inputOptions.value)) &&
+        Boolean(inputOptions.value),
+      staleTime: staleTime ?? Infinity,
+    }
+  );
+
+  useEffect(() => {
+    const entry = entries.find((entry) => entry.value === inputOptions.value);
+
+    if (!entry && specificEntry) {
+      setEntries((entries) => [...entries, specificEntry]);
+    }
+  }, [specificEntry]);
+
   const onEmptyValues = (query: string) => {
     setUrl(() => {
-      const url = new URL(endpoint);
+      const url = new URL(apiEndpoint(endpoint));
 
-      url.searchParams.set('filter', query);
+      if (query.length > 0) {
+        url.searchParams.set('filter', query);
+      }
 
       return url.href;
     });
