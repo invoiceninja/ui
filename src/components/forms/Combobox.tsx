@@ -191,9 +191,23 @@ export function ComboboxStatic({
                   value: comboboxActionId,
                   resource: null,
                 }}
-                className="text-center border-b relative cursor-pointer select-none py-2 pl-3 pr-9 bg-gray-100 text-gray-900"
+                className={({ active }) =>
+                  classNames(
+                    'text-center border-b relative cursor-pointer select-none py-2 pl-3 pr-9',
+                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-900'
+                  )
+                }
               >
-                <span className="block truncate">{action.label}</span>
+                {({ selected }) => (
+                  <span
+                    className={classNames(
+                      'block truncate',
+                      selected && 'font-semibold'
+                    )}
+                  >
+                    {action.label}
+                  </span>
+                )}
               </HeadlessCombobox.Option>
             )}
 
