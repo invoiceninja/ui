@@ -258,11 +258,14 @@ export function ComboboxAsync<T = any>({
 
   const { data } = useQuery(
     [url],
-    () =>
-      request('GET', apiEndpoint(endpoint)).then(
-        (response: AxiosResponse<GenericManyResponse<any>>) => {
-          console.log('this');
+    () => {
+      const $url = new URL(apiEndpoint(endpoint));
 
+      $url.searchParams.set('sort', sortBy);
+      $url.searchParams.set('is_deleted', 'false');
+
+      return request('GET', $url.href).then(
+        (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
 
           response.data.data.map((entry) =>
@@ -276,7 +279,8 @@ export function ComboboxAsync<T = any>({
 
           return data;
         }
-      ),
+      );
+    },
     {
       staleTime: staleTime ?? Infinity,
     }
