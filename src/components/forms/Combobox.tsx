@@ -36,6 +36,7 @@ interface ComboboxStaticProps<T = any> {
   entries: Entry<T>[];
   readonly?: boolean;
   nullable?: boolean;
+  initiallyVisible?: boolean;
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
   onDismiss?: () => unknown;
@@ -47,6 +48,8 @@ export function ComboboxStatic({
   inputOptions,
   entries,
   readonly,
+  nullable,
+  initiallyVisible,
   onEmptyValues,
   onChange,
   onDismiss,
@@ -54,7 +57,7 @@ export function ComboboxStatic({
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
   const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(initiallyVisible || false);
 
   const filteredValues =
     query === ''
@@ -224,6 +227,7 @@ interface ComboboxAsyncProps<T> {
   };
   readonly?: boolean;
   staleTime?: number;
+  initiallyVisible?: boolean;
   onChange: (entry: Entry<T>) => unknown;
   onDismiss?: () => unknown;
 }
@@ -234,6 +238,7 @@ export function ComboboxAsync<T = any>({
   entryOptions,
   readonly,
   staleTime,
+  initiallyVisible,
   onChange,
   onDismiss,
 }: ComboboxAsyncProps<T>) {
@@ -288,6 +293,7 @@ export function ComboboxAsync<T = any>({
       onChange={onChange}
       onEmptyValues={onEmptyValues}
       onDismiss={onDismiss}
+      initiallyVisible={initiallyVisible}
     />
   );
 }
