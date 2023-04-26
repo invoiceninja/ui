@@ -99,7 +99,7 @@ export function ComboboxStatic({
     const entry = entries.find((entry) => entry.value === inputOptions.value);
 
     entry ? setSelectedValue(entry) : setSelectedValue(null);
-  }, [inputOptions.value]);
+  }, [entries, inputOptions.value]);
 
   return (
     <HeadlessCombobox
