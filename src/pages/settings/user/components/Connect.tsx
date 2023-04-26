@@ -32,7 +32,7 @@ export function Connect() {
 
     request(
       'GET',
-      endpoint(`/auth/${mailer}`),
+      endpoint('/auth/:mailer', { mailer }),
       {},
       { headers: { 'X-REACT': true } }
     )
@@ -93,8 +93,9 @@ export function Connect() {
 
     request(
       'POST',
-      endpoint(`/api/v1/oauth_login?provider=${provider}&id_token=:token`, {
+      endpoint(`/api/v1/oauth_login?provider=:provider&id_token=:token`, {
         token: localStorage.getItem('X-NINJA-TOKEN'),
+        provider,
       })
     )
       .then(() => {
