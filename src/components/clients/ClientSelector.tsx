@@ -10,14 +10,13 @@
 
 import { Client } from '$app/common/interfaces/client';
 import { GenericSelectorProps } from '$app/common/interfaces/generic-selector-props';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
+
+
 import { ClientCreate } from '$app/pages/invoices/common/components/ClientCreate';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Combobox } from '../forms/Combobox';
+import { ComboboxAsync } from '../forms/Combobox';
+import { Alert } from '../Alert';
 
 export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   initiallyVisible?: boolean;
@@ -40,7 +39,7 @@ export function ClientSelector(props: ClientSelectorProps) {
         onClientCreated={(client) => props.onChange(client)}
       />
 
-      <DebouncedCombobox
+      {/* <DebouncedCombobox
         inputLabel={props.inputLabel}
         endpoint="/api/v1/clients"
         label="display_name"
@@ -61,12 +60,36 @@ export function ClientSelector(props: ClientSelectorProps) {
         clearInputAfterSelection={props.clearInputAfterSelection}
         disableWithSpinner={props.disableWithSpinner}
         errorMessage={props.errorMessage}
+      /> */}
+
+      <ComboboxAsync<Client>
+        inputOptions={{
+          label: props.inputLabel?.toString(),
+          value: props.value || null,
+        }}
+        endpoint="/api/v1/clients"
+        readonly={props.readonly}
+        onDismiss={props.onClearButtonClick}
+        querySpecificEntry="/api/v1/clients/:id"
+        initiallyVisible={props.initiallyVisible}
+        entryOptions={{ id: 'id', label: 'display_name', value: 'id' }}
+        onChange={(value) => value.resource && props.onChange(value.resource)}
+        staleTime={props.staleTime || 500}
+        sortBy="display_name|asc"
+        exclude={props.exclude}
+        action={{
+          label: t('new_client'),
+          visible: props.withoutAction ? false : true,
+          onClick: () => setIsModalOpen(true),
+        }}
+        // clearInputAfterFirstSelection
       />
 
-      <Combobox
-        value={props.value || null}
-        entries={[]}
-      />
+      {props.errorMessage && (
+        <Alert className="mt-2" type="danger">
+          {props.errorMessage}
+        </Alert>
+      )}
     </>
   );
 }
