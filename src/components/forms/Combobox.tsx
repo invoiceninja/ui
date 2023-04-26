@@ -51,7 +51,7 @@ export function ComboboxStatic({
   entries,
   readonly,
   nullable,
-  initiallyVisible,
+  initiallyVisible = false,
   onEmptyValues,
   onChange,
   onDismiss,
@@ -59,7 +59,7 @@ export function ComboboxStatic({
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
   const [query, setQuery] = useState('');
-  const [isOpen, setIsOpen] = useState(initiallyVisible || false);
+  const [isOpen, setIsOpen] = useState(initiallyVisible);
 
   const filteredValues =
     query === ''
@@ -102,6 +102,16 @@ export function ComboboxStatic({
 
     entry ? setSelectedValue(entry) : setSelectedValue(null);
   }, [entries, inputOptions.value]);
+
+  useEffect(() => {
+    if (initiallyVisible) {
+      setIsOpen(true);
+    }
+
+    return () => {
+      setIsOpen(false);
+    };
+  }, [initiallyVisible]);
 
   return (
     <HeadlessCombobox
@@ -226,6 +236,7 @@ interface ComboboxAsyncProps<T> {
   staleTime?: number;
   initiallyVisible?: boolean;
   querySpecificEntry?: string;
+  sortBy?: string;
   onChange: (entry: Entry<T>) => unknown;
   onDismiss?: () => unknown;
 }
@@ -238,6 +249,7 @@ export function ComboboxAsync<T = any>({
   staleTime,
   initiallyVisible,
   querySpecificEntry,
+  sortBy = 'created_at|desc',
   onChange,
   onDismiss,
 }: ComboboxAsyncProps<T>) {
@@ -298,10 +310,20 @@ export function ComboboxAsync<T = any>({
   );
 
   useEffect(() => {
-    const entry = entries.find((entry) => entry.value === inputOptions.value);
+    console.log('Specific', specificEntry);
 
-    if (!entry && specificEntry) {
-      setEntries((entries) => [...entries, specificEntry]);
+    if (specificEntry) {
+      setEntries((entries) => {
+        const entry = entries.find(
+          (entry) => entry.value === inputOptions.value
+        );
+
+        if (entry) {
+          return entries;
+        }
+
+        return [...entries, specificEntry];
+      });
     }
   }, [specificEntry]);
 
@@ -316,6 +338,12 @@ export function ComboboxAsync<T = any>({
       return url.href;
     });
   };
+
+  useEffect(() => {
+    return () => {
+      setEntries([]);
+    };
+  }, []);
 
   return (
     <ComboboxStatic
