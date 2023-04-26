@@ -12,6 +12,7 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
 import { Button } from '../../../../components/forms';
@@ -21,30 +22,12 @@ export function Connect() {
 
   const user = useCurrentUser();
 
-  const microsoftClientId = import.meta.env.VITE_MICROSOFT_CLIENT_ID;
+  const handleConnectMailer = (
+    event: FormEvent<HTMLButtonElement>,
+    mailer: 'google' | 'microsoft'
+  ) => {
+    event.preventDefault();
 
-  const handleConnectEmail = () => {
-    const microsoftUrl =
-      'https://login.microsoftonline.com/common/oauth2/v2.0/authorize?';
-
-    const redirectUri = window.location.origin + '/auth/microsoft';
-
-    const scope =
-      'User.Read+email+Mail.Send+offline_access+profile+User.Read+openid';
-
-    window.open(
-      microsoftUrl +
-        'client_id=' +
-        microsoftClientId +
-        '&redirect_uri=' +
-        redirectUri +
-        '&scope=' +
-        scope +
-        '&response_type=code&react=true'
-    );
-  };
-
-  const handleConnectMailer = (mailer: 'google' | 'microsoft') => {
     toast.processing();
 
     request(
@@ -62,7 +45,9 @@ export function Connect() {
       });
   };
 
-  const handleDisconnectMailer = () => {
+  const handleDisconnectMailer = (event: FormEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+
     toast.processing();
 
     request(
@@ -80,7 +65,9 @@ export function Connect() {
       });
   };
 
-  const handleDisconnectOauth = () => {
+  const handleDisconnectOauth = (event: FormEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+
     toast.processing();
 
     request(
@@ -96,6 +83,29 @@ export function Connect() {
       });
   };
 
+  const handleConnectOauth = (
+    event: FormEvent<HTMLButtonElement>,
+    provider: 'google' | 'microsoft'
+  ) => {
+    event.preventDefault();
+
+    toast.processing();
+
+    request(
+      'POST',
+      endpoint(`/api/v1/oauth_login?provider=${provider}&id_token=:token`, {
+        token: localStorage.getItem('X-NINJA-TOKEN'),
+      })
+    )
+      .then(() => {
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error(error);
+        toast.error();
+      });
+  };
+
   return (
     <Card title={t('oneclick_login')}>
       {!user?.oauth_provider_id && (
@@ -103,7 +113,9 @@ export function Connect() {
           <Element leftSide="Google">
             <Button
               type="minimal"
-              onClick={() => handleConnectMailer('google')}
+              onClick={(event: FormEvent<HTMLButtonElement>) =>
+                handleConnectMailer(event, 'google')
+              }
             >
               {t('connect_google')}
             </Button>
@@ -112,7 +124,9 @@ export function Connect() {
           <Element leftSide="Microsoft">
             <Button
               type="minimal"
-              onClick={() => handleConnectMailer('microsoft')}
+              onClick={(event: FormEvent<HTMLButtonElement>) =>
+                handleConnectMailer(event, 'microsoft')
+              }
             >
               {t('connect_microsoft')}
             </Button>
@@ -134,7 +148,14 @@ export function Connect() {
                 {t('disconnect_gmail')}
               </Button>
             ) : (
-              <Button type="minimal">{t('connect_gmail')}</Button>
+              <Button
+                type="minimal"
+                onClick={(event: FormEvent<HTMLButtonElement>) =>
+                  handleConnectOauth(event, 'google')
+                }
+              >
+                {t('connect_gmail')}
+              </Button>
             )}
           </Element>
         </>
@@ -154,7 +175,12 @@ export function Connect() {
                 {t('disconnect_email')}
               </Button>
             ) : (
-              <Button type="minimal" onClick={handleConnectEmail}>
+              <Button
+                type="minimal"
+                onClick={(event: FormEvent<HTMLButtonElement>) =>
+                  handleConnectOauth(event, 'microsoft')
+                }
+              >
                 {t('connect_email')}
               </Button>
             )}
