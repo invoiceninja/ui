@@ -10,11 +10,13 @@
 
 import { request } from '$app/common/helpers/request';
 import { Vendor } from '$app/common/interfaces/vendor';
-import { useQuery } from 'react-query';
+import { useQuery, useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
 import { endpoint } from '../helpers';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { Params } from './common/params.interface';
+import { toast } from '../helpers/toast/toast';
+import { AxiosError } from 'axios';
 
 interface VendorParams {
   id: string | undefined;
@@ -69,4 +71,27 @@ export function useVendorsQuery(params: VendorsParams) {
       ),
     { enabled: params.enabled ?? true, staleTime: Infinity }
   );
+}
+
+export function useBulkAction() {
+  const queryClient = useQueryClient();
+
+  return (id: string, action: 'archive' | 'restore' | 'delete') => {
+    toast.processing();
+
+    request('POST', endpoint('/api/v1/vendors/bulk'), {
+      action,
+      ids: [id],
+    })
+      .then(() => {
+        toast.success(`${action}d_vendor`);
+
+        queryClient.invalidateQueries(route('/api/v1/vendors/:id', { id }));
+      })
+      .catch((error: AxiosError) => {
+        console.error(error);
+
+        toast.error();
+      });
+  };
 }
