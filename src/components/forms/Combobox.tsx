@@ -33,6 +33,12 @@ interface InputOptions {
   label?: string;
 }
 
+interface Action {
+  label: string;
+  visible: boolean;
+  onClick: () => unknown;
+}
+
 interface ComboboxStaticProps<T = any> {
   inputOptions: InputOptions;
   entries: Entry<T>[];
@@ -40,6 +46,7 @@ interface ComboboxStaticProps<T = any> {
   nullable?: boolean;
   initiallyVisible?: boolean;
   exclude?: (string | number | boolean)[];
+  action?: Action;
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
   onDismiss?: () => unknown;
@@ -47,13 +54,16 @@ interface ComboboxStaticProps<T = any> {
 
 export type Nullable<T> = T | null;
 
+const comboboxActionId = '__combobox_internal_option__';
+
 export function ComboboxStatic({
   inputOptions,
   entries,
   readonly,
   nullable,
-  exclude = [],
   initiallyVisible = false,
+  exclude = [],
+  action,
   onEmptyValues,
   onChange,
   onDismiss,
@@ -122,7 +132,11 @@ export function ComboboxStatic({
     <HeadlessCombobox
       as="div"
       value={selectedValue}
-      onChange={setSelectedValue}
+      onChange={(entry) => {
+        entry?.value === comboboxActionId
+          ? action?.onClick()
+          : setSelectedValue(entry);
+      }}
       disabled={readonly}
       ref={comboboxRef}
     >
@@ -169,6 +183,20 @@ export function ComboboxStatic({
             static
             className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
           >
+            {action && action.visible && (
+              <HeadlessCombobox.Option
+                value={{
+                  id: comboboxActionId,
+                  label: comboboxActionId,
+                  value: comboboxActionId,
+                  resource: null,
+                }}
+                className="text-center border-b relative cursor-pointer select-none py-2 pl-3 pr-9 bg-gray-100 text-gray-900"
+              >
+                <span className="block truncate">{action.label}</span>
+              </HeadlessCombobox.Option>
+            )}
+
             {filteredValues.length > 0 &&
               filteredValues.map((entry) => (
                 <HeadlessCombobox.Option
@@ -243,6 +271,7 @@ interface ComboboxAsyncProps<T> {
   querySpecificEntry?: string;
   sortBy?: string;
   exclude?: (string | number | boolean)[];
+  action?: Action;
   onChange: (entry: Entry<T>) => unknown;
   onDismiss?: () => unknown;
 }
@@ -257,6 +286,7 @@ export function ComboboxAsync<T = any>({
   querySpecificEntry,
   sortBy = 'created_at|desc',
   exclude,
+  action,
   onChange,
   onDismiss,
 }: ComboboxAsyncProps<T>) {
@@ -366,6 +396,7 @@ export function ComboboxAsync<T = any>({
       onDismiss={onDismiss}
       initiallyVisible={initiallyVisible}
       exclude={exclude}
+      action={action}
     />
   );
 }
