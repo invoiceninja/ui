@@ -39,6 +39,7 @@ interface ComboboxStaticProps<T = any> {
   readonly?: boolean;
   nullable?: boolean;
   initiallyVisible?: boolean;
+  exclude?: (string | number | boolean)[];
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
   onDismiss?: () => unknown;
@@ -51,6 +52,7 @@ export function ComboboxStatic({
   entries,
   readonly,
   nullable,
+  exclude = [],
   initiallyVisible = false,
   onEmptyValues,
   onChange,
@@ -64,12 +66,15 @@ export function ComboboxStatic({
   const filteredValues =
     query === ''
       ? entries
-      : entries.filter((entry) => {
-          return (
-            entry.label.toLowerCase().includes(query.toLowerCase()) ||
-            entry.value.toString().toLowerCase().includes(query.toLowerCase())
+      : entries
+          .filter(
+            (entry) =>
+              entry.label.toLowerCase().includes(query.toLowerCase()) ||
+              entry.value.toString().toLowerCase().includes(query.toLowerCase())
+          )
+          .filter((entry) =>
+            exclude.length > 0 ? !exclude.includes(entry.value) : true
           );
-        });
 
   const comboboxRef = useRef<HTMLDivElement>(null);
 
@@ -237,6 +242,7 @@ interface ComboboxAsyncProps<T> {
   initiallyVisible?: boolean;
   querySpecificEntry?: string;
   sortBy?: string;
+  exclude?: (string | number | boolean)[];
   onChange: (entry: Entry<T>) => unknown;
   onDismiss?: () => unknown;
 }
@@ -250,6 +256,7 @@ export function ComboboxAsync<T = any>({
   initiallyVisible,
   querySpecificEntry,
   sortBy = 'created_at|desc',
+  exclude,
   onChange,
   onDismiss,
 }: ComboboxAsyncProps<T>) {
@@ -358,6 +365,7 @@ export function ComboboxAsync<T = any>({
       onEmptyValues={onEmptyValues}
       onDismiss={onDismiss}
       initiallyVisible={initiallyVisible}
+      exclude={exclude}
     />
   );
 }
