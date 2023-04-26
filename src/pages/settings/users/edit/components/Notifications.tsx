@@ -28,6 +28,7 @@ export function Notifications(props: Props) {
     { id: 'invoice_sent', label: 'invoice_sent_notification_label' },
     { id: 'invoice_viewed', label: 'invoice_viewed' },
     { id: 'invoice_late', label: 'invoice_late' },
+    { id: 'inventory_threshold', label: 'inventory_threshold' },
     { id: 'payment_success', label: 'payment_success' },
     { id: 'payment_failure', label: 'payment_failure' },
     { id: 'purchase_order_created', label: 'purchase_order_created' },
