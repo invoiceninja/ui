@@ -14,7 +14,7 @@ import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { AxiosResponse } from 'axios';
 import classNames from 'classnames';
 import { useEffect, useRef, useState } from 'react';
-import { Check, ChevronDown } from 'react-feather';
+import { Check, ChevronDown, X } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useClickAway, useDebounce } from 'react-use';
@@ -38,7 +38,7 @@ interface ComboboxStaticProps<T = any> {
   nullable?: boolean;
   onChange: (entry: Entry<T>) => unknown;
   onEmptyValues: (query: string) => unknown;
-  onClear?: () => unknown;
+  onDismiss?: () => unknown;
 }
 
 export type Nullable<T> = T | null;
@@ -47,9 +47,9 @@ export function ComboboxStatic({
   inputOptions,
   entries,
   readonly,
-  nullable,
   onEmptyValues,
   onChange,
+  onDismiss,
 }: ComboboxStaticProps) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -95,9 +95,7 @@ export function ComboboxStatic({
   useEffect(() => {
     const entry = entries.find((entry) => entry.value === inputOptions.value);
 
-    if (entry) {
-      setSelectedValue(entry);
-    }
+    entry ? setSelectedValue(entry) : setSelectedValue(null);
   }, [inputOptions.value]);
 
   return (
@@ -123,8 +121,26 @@ export function ComboboxStatic({
         />
 
         {!readonly && (
-          <HeadlessCombobox.Button className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none">
-            <ChevronDown className="h-5 w-5 text-gray-400" aria-hidden="true" />
+          <HeadlessCombobox.Button
+            onClick={(e) => {
+              if (onDismiss) {
+                e.preventDefault();
+
+                setIsOpen(false);
+
+                return onDismiss();
+              }
+            }}
+            className="absolute inset-y-0 right-0 flex items-center rounded-r-md px-2 focus:outline-none"
+          >
+            {onDismiss && selectedValue ? (
+              <X className="h-5 w-5 text-gray-400" aria-hidden="true" />
+            ) : (
+              <ChevronDown
+                className="h-5 w-5 text-gray-400"
+                aria-hidden="true"
+              />
+            )}
           </HeadlessCombobox.Button>
         )}
 
@@ -209,7 +225,7 @@ interface ComboboxAsyncProps<T> {
   readonly?: boolean;
   staleTime?: number;
   onChange: (entry: Entry<T>) => unknown;
-  onClear?: () => unknown;
+  onDismiss?: () => unknown;
 }
 
 export function ComboboxAsync<T = any>({
@@ -219,7 +235,7 @@ export function ComboboxAsync<T = any>({
   readonly,
   staleTime,
   onChange,
-  onClear,
+  onDismiss,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState('');
@@ -271,7 +287,7 @@ export function ComboboxAsync<T = any>({
       readonly={readonly}
       onChange={onChange}
       onEmptyValues={onEmptyValues}
-      onClear={onClear}
+      onDismiss={onDismiss}
     />
   );
 }
