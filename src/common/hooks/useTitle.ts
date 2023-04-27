@@ -10,16 +10,34 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useCurrentCompany } from './useCurrentCompany';
 
 export function useTitle(title: string, translate = true) {
   const [t] = useTranslation();
+  const company = useCurrentCompany();
 
   const [documentTitle, setDocumentTitle] = useState(
     translate ? t(title) || '' : title
   );
 
+  const getAppTitle = () => {
+    let appTitle = '';
+
+    if (import.meta.env.VITE_APP_TITLE) {
+      appTitle = import.meta.env.VITE_APP_TITLE;
+    } else {
+      if (company?.settings.name) {
+        appTitle = company.settings.name;
+      } else {
+        appTitle = t('untitled');
+      }
+    }
+
+    return `${appTitle}: ${documentTitle}`;
+  };
+
   useEffect(() => {
-    document.title = `${import.meta.env.VITE_APP_TITLE}: ${documentTitle}`;
+    document.title = getAppTitle();
   }, [documentTitle]);
 
   return {

@@ -64,7 +64,7 @@ export function Card(props: Props) {
   return (
     <div
       className={classNames(
-        `bg-white shadow overflow-hidden rounded ${props.className} overflow-visible`,
+        `bg-white shadow rounded overflow-visible ${props.className}`,
         { 'overflow-y-auto': props.withScrollableBody }
       )}
       style={props.style}
