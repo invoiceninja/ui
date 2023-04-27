@@ -21,7 +21,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useClickAway, useDebounce } from 'react-use';
 
-interface Entry<T = any> {
+export interface Entry<T = any> {
   id: number | string;
   label: string;
   value: string | number | boolean;
@@ -113,7 +113,10 @@ export function ComboboxStatic({
   }, [selectedValue]);
 
   useEffect(() => {
-    const entry = entries.find((entry) => entry.value === inputOptions.value);
+    const entry = entries.find(
+      (entry) =>
+        entry.value === inputOptions.value || entry.label === inputOptions.value
+    );
 
     entry ? setSelectedValue(entry) : setSelectedValue(null);
   }, [entries, inputOptions.value]);
