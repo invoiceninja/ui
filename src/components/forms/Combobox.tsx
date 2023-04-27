@@ -10,7 +10,6 @@
 
 import { endpoint as apiEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
-import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
 import { AxiosResponse } from 'axios';
@@ -118,7 +117,16 @@ export function ComboboxStatic({
         entry.value === inputOptions.value || entry.label === inputOptions.value
     );
 
-    entry ? setSelectedValue(entry) : setSelectedValue(null);
+    entry
+      ? setSelectedValue(entry)
+      : nullable
+      ? setSelectedValue({
+          id: -1,
+          label: inputOptions.value ? inputOptions.value.toString() : '',
+          value: inputOptions.value ? inputOptions.value.toString() : '',
+          resource: null,
+        })
+      : setSelectedValue(null);
   }, [entries, inputOptions.value]);
 
   useEffect(() => {
@@ -255,15 +263,22 @@ export function ComboboxStatic({
               <HeadlessCombobox.Option
                 key="combobox-not-found"
                 className="min-w-[19rem] relative cursor-default select-none py-2 pl-3 pr-9"
-                value={null}
-                disabled
+                value={{
+                  id: -1,
+                  label: nullable ? query : null,
+                  value: nullable ? query : null,
+                  resource: null,
+                }}
               >
-                {() => (
-                  <>
-                    <span className="block truncate">
-                      {t('no_records_found')}.
-                    </span>
-                  </>
+                {nullable && query.length > 0 ? (
+                  <span className="block truncate space-x-1">
+                    <span>{t('Select')}</span>
+                    <q className="font-semibold">{query}</q>
+                  </span>
+                ) : (
+                  <span className="block truncate">
+                    {t('no_records_found')}.
+                  </span>
                 )}
               </HeadlessCombobox.Option>
             )}
@@ -289,6 +304,7 @@ interface ComboboxAsyncProps<T> {
   sortBy?: string;
   exclude?: (string | number | boolean)[];
   action?: Action;
+  nullable?: boolean;
   onChange: (entry: Entry<T>) => unknown;
   onDismiss?: () => unknown;
 }
@@ -300,10 +316,10 @@ export function ComboboxAsync<T = any>({
   readonly,
   staleTime,
   initiallyVisible,
-  querySpecificEntry,
   sortBy = 'created_at|desc',
   exclude,
   action,
+  nullable,
   onChange,
   onDismiss,
 }: ComboboxAsyncProps<T>) {
@@ -317,6 +333,10 @@ export function ComboboxAsync<T = any>({
 
       $url.searchParams.set('sort', sortBy);
       $url.searchParams.set('is_deleted', 'false');
+
+      if (inputOptions.value) {
+        $url.searchParams.set('with', inputOptions.value.toString());
+      }
 
       return request('GET', $url.href).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
@@ -346,44 +366,9 @@ export function ComboboxAsync<T = any>({
     }
   }, [data]);
 
-  const { data: specificEntry } = useQuery(
-    [querySpecificEntry],
-    () =>
-      request(
-        'GET',
-        apiEndpoint(querySpecificEntry!, { id: inputOptions.value })
-      ).then((response: GenericSingleResourceResponse<any>) => ({
-        id: response.data.data[entryOptions.id],
-        label: response.data.data[entryOptions.label],
-        value: response.data.data[entryOptions.value],
-        resource: response.data.data,
-      })),
-    {
-      enabled:
-        Boolean(querySpecificEntry) &&
-        Boolean(entries.find((entry) => entry.value !== inputOptions.value)) &&
-        Boolean(inputOptions.value),
-      staleTime: staleTime ?? Infinity,
-    }
-  );
-
   useEffect(() => {
-    console.log('Specific', specificEntry);
-
-    if (specificEntry) {
-      setEntries((entries) => {
-        const entry = entries.find(
-          (entry) => entry.value === inputOptions.value
-        );
-
-        if (entry) {
-          return entries;
-        }
-
-        return [...entries, specificEntry];
-      });
-    }
-  }, [specificEntry]);
+    return () => setEntries([]);
+  }, []);
 
   const onEmptyValues = (query: string) => {
     setUrl(() => {
@@ -397,12 +382,6 @@ export function ComboboxAsync<T = any>({
     });
   };
 
-  useEffect(() => {
-    return () => {
-      setEntries([]);
-    };
-  }, []);
-
   return (
     <ComboboxStatic
       entries={entries}
@@ -414,6 +393,7 @@ export function ComboboxAsync<T = any>({
       initiallyVisible={initiallyVisible}
       exclude={exclude}
       action={action}
+      nullable={nullable}
     />
   );
 }
