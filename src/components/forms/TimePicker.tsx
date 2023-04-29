@@ -7,9 +7,11 @@ import { useState, useRef, useEffect, KeyboardEvent, MouseEvent } from 'react';
 import { MdOutlineAvTimer } from 'react-icons/md';
 import { useClickAway } from 'react-use';
 import { Icon } from '../icons/Icon';
+import { InputLabel } from './InputLabel';
 import { TimePickerColumn } from './TimePickerColumn';
 
 interface Props extends CommonProps {
+  label?: string | null;
   required?: boolean;
   value: number;
   onValueChange?: (value: string) => unknown;
@@ -363,33 +365,42 @@ export function TimePicker(props: Props) {
           </div>
         )}
       >
-        <div className="flex items-center justify-end">
-          <input
-            type="text"
-            readOnly
-            ref={inputRef}
-            className={`w-full py-2 px-3 rounded text-sm border-gray-300 text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`}
-            value={timeValue}
-            onClick={handleClick}
-            onFocus={() => {
-              if (inputRef.current) {
-                setVisibleTimerSelection(false);
+        <div className="flex flex-col">
+          {props.label && (
+            <InputLabel className="mb-2">
+              {props.label}
+              {props.required && <span className="ml-1 text-red-600">*</span>}
+            </InputLabel>
+          )}
 
-                inputRef.current.setSelectionRange(0, 2);
-                setSelectedSection(TimeSection.HOURS);
-              }
-            }}
-            onKeyDown={handleKeyDown}
-          />
+          <div className="flex items-center justify-end">
+            <input
+              type="text"
+              readOnly
+              ref={inputRef}
+              className={`w-full py-2 px-3 rounded text-sm border-gray-300 text-gray-900 dark:bg-gray-800 dark:border-transparent dark:text-gray-100 disabled:bg-gray-100 disabled:cursor-not-allowed ${props.className}`}
+              value={timeValue}
+              onClick={handleClick}
+              onFocus={() => {
+                if (inputRef.current) {
+                  setVisibleTimerSelection(false);
 
-          <div
-            className="absolute mr-2 cursor-pointer"
-            onClick={() => {
-              setVisibleTimerSelection(!visibleTimerSelection);
-              setSelectedSection(null);
-            }}
-          >
-            <Icon element={MdOutlineAvTimer} size={20} />
+                  inputRef.current.setSelectionRange(0, 2);
+                  setSelectedSection(TimeSection.HOURS);
+                }
+              }}
+              onKeyDown={handleKeyDown}
+            />
+
+            <div
+              className="absolute mr-2 cursor-pointer"
+              onClick={() => {
+                setVisibleTimerSelection(!visibleTimerSelection);
+                setSelectedSection(null);
+              }}
+            >
+              <Icon element={MdOutlineAvTimer} size={20} />
+            </div>
           </div>
         </div>
       </Tippy>
