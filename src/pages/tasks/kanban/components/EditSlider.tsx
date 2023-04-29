@@ -113,6 +113,7 @@ export function EditSlider() {
           setIsTimeModalVisible(false);
           setTimeLogIndex(undefined);
         }}
+        overflowVisible
       >
         {timeLog[Number(timeLogIndex)] && (
           <>
