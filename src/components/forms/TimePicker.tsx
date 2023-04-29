@@ -124,7 +124,7 @@ export function TimePicker(props: Props) {
     if (!isInitial) {
       const newTimeoutId = setTimeout(() => {
         handleChangeSection();
-      }, 150);
+      }, 200);
 
       setSectionTimeoutId(newTimeoutId);
     }
