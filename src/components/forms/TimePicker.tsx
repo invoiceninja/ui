@@ -41,6 +41,11 @@ export function TimePicker(props: Props) {
     useState<boolean>(false);
   const [selectedSection, setSelectedSection] = useState<number | null>(null);
   const [timeValue, setTimeValue] = useState<string>('--:--:--');
+  const [timeValueTimeoutId, setTimeValueTimeoutId] =
+    useState<NodeJS.Timeout | null>(null);
+  const [sectionTimeoutId, setSectionTimeoutId] =
+    useState<NodeJS.Timeout | null>(null);
+  const [isInitial, setIsInitial] = useState<boolean>(true);
 
   useClickAway(containerRef, () => {
     visibleTimerSelection && setVisibleTimerSelection(false);
@@ -49,34 +54,6 @@ export function TimePicker(props: Props) {
 
   const isTwelveHourFormat = () => {
     return timeFormatId === 12;
-  };
-
-  useEffect(() => {
-    if (props.value > 0) {
-      setTimeValue(dayjs.unix(props.value).format(timeFormat));
-    } else {
-      if (isTwelveHourFormat()) {
-        setTimeValue('--:--:-- PM');
-      } else {
-        setTimeValue('--:--:--');
-      }
-    }
-  }, [props.value, timeFormatId]);
-
-  const getValueOfSection = (
-    section: TimeSection,
-    inStringFormat?: boolean
-  ) => {
-    const sectionRange = SECTION_RANGE[section];
-
-    const start = sectionRange[0];
-    const end = sectionRange[1];
-
-    const slicedValue = timeValue.slice(start, end);
-
-    return section !== TimeSection.PERIOD && !inStringFormat
-      ? parseInt(slicedValue)
-      : slicedValue;
   };
 
   const handleChangeSection = () => {
@@ -98,6 +75,60 @@ export function TimePicker(props: Props) {
   };
 
   useEffect(() => {
+    if (timeValueTimeoutId) {
+      clearTimeout(timeValueTimeoutId);
+    }
+
+    if (props.value > 0) {
+      if (!isInitial) {
+        const newTimeoutId = setTimeout(() => {
+          setTimeValue(dayjs.unix(props.value).format(timeFormat));
+        }, 100);
+
+        setTimeValueTimeoutId(newTimeoutId);
+      } else {
+        setTimeValue(dayjs.unix(props.value).format(timeFormat));
+      }
+    } else {
+      if (isTwelveHourFormat()) {
+        setTimeValue('--:--:-- PM');
+      } else {
+        setTimeValue('--:--:--');
+      }
+    }
+
+    setIsInitial(false);
+  }, [props.value]);
+
+  const getValueOfSection = (
+    section: TimeSection,
+    inStringFormat?: boolean
+  ) => {
+    const sectionRange = SECTION_RANGE[section];
+
+    const start = sectionRange[0];
+    const end = sectionRange[1];
+
+    const slicedValue = timeValue.slice(start, end);
+
+    return section !== TimeSection.PERIOD && !inStringFormat
+      ? parseInt(slicedValue)
+      : slicedValue;
+  };
+
+  useEffect(() => {
+    if (sectionTimeoutId) {
+      clearTimeout(sectionTimeoutId);
+    }
+
+    if (!isInitial) {
+      const newTimeoutId = setTimeout(() => {
+        handleChangeSection();
+      }, 150);
+
+      setSectionTimeoutId(newTimeoutId);
+    }
+
     const hours = getValueOfSection(TimeSection.HOURS, true) as string;
     const minutes = getValueOfSection(TimeSection.MINUTES, true) as string;
 
@@ -122,8 +153,6 @@ export function TimePicker(props: Props) {
 
       props.onValueChange?.(formattedCustomValue);
     }
-
-    handleChangeSection();
   }, [timeValue]);
 
   const getCharWidth = (font: string) => {
@@ -207,7 +236,7 @@ export function TimePicker(props: Props) {
 
       setTimeValue(updatedTimeValue);
 
-      return;
+      return updatedTimeValue;
     }
 
     if (
@@ -221,6 +250,8 @@ export function TimePicker(props: Props) {
         timeValue.substring(0, start) + numberValue + timeValue.substring(end);
 
       setTimeValue(updatedTimeValue);
+
+      return updatedTimeValue;
     } else {
       let numberValue = (
         parseInt(timeValue[end - 1]) * 10 +

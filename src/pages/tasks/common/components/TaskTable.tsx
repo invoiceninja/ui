@@ -153,8 +153,10 @@ export function TaskTable(props: Props) {
     if (typeof lastChangedIndex === 'number') {
       const parsedTimeLog = parseTimeLog(task.time_log);
 
-      const startTime = parsedTimeLog[lastChangedIndex][0];
-      const endTime = parsedTimeLog[lastChangedIndex][1];
+      const startTime =
+        parsedTimeLog[lastChangedIndex] && parsedTimeLog[lastChangedIndex][0];
+      const endTime =
+        parsedTimeLog[lastChangedIndex] && parsedTimeLog[lastChangedIndex][1];
 
       if (startTime && endTime && startTime > endTime) {
         parsedTimeLog[lastChangedIndex][1] = startTime;
