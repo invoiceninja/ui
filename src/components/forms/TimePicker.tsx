@@ -56,7 +56,7 @@ export function TimePicker(props: Props) {
 
   useEffect(() => {
     if (typeof props.value === 'number') {
-      setTimeValue(dayjs().format(timeFormat));
+      setTimeValue(dayjs.unix(props.value).format(timeFormat));
     } else {
       if (isTwelveHourFormat()) {
         setTimeValue('--:--:-- PM');
