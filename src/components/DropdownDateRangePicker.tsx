@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, SelectField } from '$app/components/forms';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Calendar } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 
@@ -21,14 +21,20 @@ type Props = {
 };
 
 export function DropdownDateRangePicker(props: Props) {
+  const [t] = useTranslation();
   const [isOpenModal, setisOpenModal] = useState(false);
 
-  let customStartDate: string = props.startDate;
-  let customEndDate: string = props.endDate;
   const now = new Date();
-  const [t] = useTranslation();
-
   const quarter = Math.floor(now.getMonth() / 3);
+
+  const [customStartDate, setCustomStartDate] = useState<string>();
+  const [customEndDate, setCustomEndDate] = useState<string>();
+
+  useEffect(() => {
+    setCustomStartDate(props.startDate);
+    setCustomEndDate(props.endDate);
+  }, [props.startDate, props.endDate]);
+
   return (
     <div className="  flex justify-end items-center">
       <Calendar className="mx-2" />{' '}
@@ -150,37 +156,38 @@ export function DropdownDateRangePicker(props: Props) {
         onClose={() => {
           setisOpenModal(false);
         }}
+        overflowVisible
       >
         <div className="flex justify-center flex-col my-3">
-          <p>{`${t('start')} ${t('date')}`}</p>
-          <input
+          <InputField
             type="date"
-            defaultValue={props.startDate}
-            onChange={(event) => {
-              customStartDate = event.target.value;
-            }}
-          ></input>
+            label={`${t('start')} ${t('date')}`}
+            value={customStartDate}
+            onValueChange={(value) => setCustomStartDate(value)}
+          />
 
           <br></br>
-          <p>{`${t('end')} ${t('date')}`}</p>
-          <input
+
+          <InputField
             type="date"
-            defaultValue={props.endDate}
-            onChange={(event) => {
-              customEndDate = event.target.value;
-            }}
-          ></input>
+            label={`${t('end')} ${t('date')}`}
+            value={customEndDate}
+            onValueChange={(value) => setCustomEndDate(value)}
+          />
 
           <br></br>
+
           <Button
             className="my-2"
             type="primary"
+            disableWithoutIcon
+            disabled={!customStartDate || !customEndDate}
             onClick={() => {
               props.handleDateChange(customStartDate + ',' + customEndDate);
               setisOpenModal(false);
             }}
           >
-            Ok
+            {t('ok')}
           </Button>
         </div>
       </Modal>
