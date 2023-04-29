@@ -165,7 +165,7 @@ export default function Refund() {
         <InputField
           type="date"
           value={formik.values.date}
-          onChange={formik.handleChange}
+          onValueChange={(value) => formik.setFieldValue('date', value)}
         />
       </Element>
 
