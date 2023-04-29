@@ -29,7 +29,6 @@ import {
   handleTaskDateChange,
   handleTaskDurationChange,
   handleTaskTimeChange,
-  parseTime,
   parseTimeToDate,
 } from '$app/pages/tasks/common/helpers';
 import {
@@ -43,6 +42,7 @@ import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
 import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import { TimePicker } from '$app/components/forms/TimePicker';
 
 export function EditSlider() {
   const [t] = useTranslation();
@@ -130,10 +130,9 @@ export function EditSlider() {
               }
             />
 
-            <InputField
+            <TimePicker
               label={t('start_time')}
-              type="time"
-              value={parseTime(timeLog[timeLogIndex!][LogPosition.Start])}
+              value={timeLog[timeLogIndex!][LogPosition.Start]}
               onValueChange={(value) =>
                 handleTimeChange(
                   timeLog[timeLogIndex!][LogPosition.Start],
@@ -142,7 +141,6 @@ export function EditSlider() {
                   timeLogIndex!
                 )
               }
-              step="1"
             />
 
             {company?.show_task_end_date && (
@@ -161,10 +159,9 @@ export function EditSlider() {
               />
             )}
 
-            <InputField
+            <TimePicker
               label={t('end_time')}
-              type="time"
-              value={parseTime(timeLog[timeLogIndex!][LogPosition.End])}
+              value={timeLog[timeLogIndex!][LogPosition.End]}
               onValueChange={(value) =>
                 handleTimeChange(
                   timeLog[timeLogIndex!][LogPosition.End],
@@ -173,7 +170,6 @@ export function EditSlider() {
                   LogPosition.End
                 )
               }
-              step="1"
             />
 
             <InputField
