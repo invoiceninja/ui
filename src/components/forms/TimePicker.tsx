@@ -7,6 +7,7 @@ import { useState, useRef, useEffect, KeyboardEvent, MouseEvent } from 'react';
 import { MdOutlineAvTimer } from 'react-icons/md';
 import { useClickAway } from 'react-use';
 import { Icon } from '../icons/Icon';
+import { TimePickerColumn } from './TimePickerColumn';
 
 interface Props extends CommonProps {
   id?: string;
@@ -15,12 +16,7 @@ interface Props extends CommonProps {
   onValueChange?: (value: string) => unknown;
 }
 
-enum TimeFormat {
-  HOURS_12 = 12,
-  HOURS_24 = 24,
-}
-
-enum TimeSection {
+export enum TimeSection {
   HOURS = 0,
   MINUTES = 1,
   SECONDS = 2,
@@ -51,11 +47,11 @@ export function TimePicker(props: Props) {
   });
 
   const isTwelveHourFormat = () => {
-    return timeFormatId === TimeFormat.HOURS_12;
+    return timeFormatId === 12;
   };
 
   useEffect(() => {
-    if (typeof props.value === 'number') {
+    if (props.value > 0) {
       setTimeValue(dayjs.unix(props.value).format(timeFormat));
     } else {
       if (isTwelveHourFormat()) {
@@ -82,17 +78,35 @@ export function TimePicker(props: Props) {
       : slicedValue;
   };
 
-  useEffect(() => {
-    const hours = getValueOfSection(TimeSection.HOURS);
-    const minutes = getValueOfSection(TimeSection.MINUTES);
+  const handleChangeSection = () => {
+    if (inputRef.current) {
+      const start = inputRef.current.selectionStart;
 
-    if (hours >= 0 && minutes >= 0) {
+      if (typeof start === 'number') {
+        const numberOfSections = isTwelveHourFormat() ? 4 : 3;
+
+        const currentSectionIndex = selectedSection ?? 0;
+        const nextSectionIndex = (currentSectionIndex + 1) % numberOfSections;
+        const nextStart = nextSectionIndex * 3;
+        const nextEnd = nextStart + 2;
+
+        inputRef.current.setSelectionRange(nextStart, nextEnd);
+        setSelectedSection(nextSectionIndex);
+      }
+    }
+  };
+
+  useEffect(() => {
+    const hours = getValueOfSection(TimeSection.HOURS, true) as string;
+    const minutes = getValueOfSection(TimeSection.MINUTES, true) as string;
+
+    if (parseInt(hours) >= 0 && parseInt(minutes) >= 0) {
       let customValue = `${hours}:${minutes}`;
       let customFormat = 'HH:mm';
 
-      const seconds = getValueOfSection(TimeSection.SECONDS);
+      const seconds = getValueOfSection(TimeSection.SECONDS, true) as string;
 
-      if (seconds >= 0) {
+      if (parseInt(seconds) >= 0) {
         customValue += `:${seconds}`;
         customFormat += ':ss';
       }
@@ -107,28 +121,7 @@ export function TimePicker(props: Props) {
 
       props.onValueChange?.(formattedCustomValue);
     }
-  }, [timeValue]);
 
-  const handleChangeSection = () => {
-    if (inputRef.current) {
-      const start = inputRef.current.selectionStart;
-
-      if (typeof start === 'number') {
-        const numberOfSections = TimeFormat.HOURS_12 ? 4 : 3;
-
-        const currentSectionIndex =
-          selectedSection !== null ? selectedSection : 0;
-        const nextSectionIndex = (currentSectionIndex + 1) % numberOfSections;
-        const nextStart = nextSectionIndex * 3;
-        const nextEnd = nextStart + 2;
-
-        inputRef.current.setSelectionRange(nextStart, nextEnd);
-        setSelectedSection(nextSectionIndex);
-      }
-    }
-  };
-
-  useEffect(() => {
     handleChangeSection();
   }, [timeValue]);
 
@@ -216,7 +209,11 @@ export function TimePicker(props: Props) {
       return;
     }
 
-    if (currentSectionValue === '--' || parseInt(currentSectionValue) > 9) {
+    if (
+      currentSectionValue === '--' ||
+      parseInt(currentSectionValue) > 9 ||
+      parseInt(currentSectionValue) === 0
+    ) {
       const numberValue = '0' + value;
 
       const updatedTimeValue =
@@ -234,10 +231,7 @@ export function TimePicker(props: Props) {
           numberValue = '0' + value;
         }
 
-        if (
-          timeFormatId === TimeFormat.HOURS_24 &&
-          parseInt(numberValue) > 23
-        ) {
+        if (!isTwelveHourFormat() && parseInt(numberValue) > 23) {
           numberValue = '0' + value;
         }
       }
@@ -254,6 +248,8 @@ export function TimePicker(props: Props) {
         timeValue.substring(0, start) + numberValue + timeValue.substring(end);
 
       setTimeValue(updatedTimeValue);
+
+      return updatedTimeValue;
     }
   };
 
@@ -263,31 +259,26 @@ export function TimePicker(props: Props) {
     const value = event.key.toLowerCase();
 
     if (inputRef.current) {
-      if (
-        event.code.includes('Digit') &&
-        selectedSection !== TimeSection.PERIOD
-      ) {
-        handleChange(value);
+      const isDigit = event.code.includes('Digit');
+      const isCorrectChar = value === 'a' || value === 'p';
+      const isTab = event.key === 'Tab';
+
+      let updatedTimeValue = '';
+
+      if (isDigit && selectedSection !== TimeSection.PERIOD) {
+        updatedTimeValue = handleChange(value) ?? '';
       }
 
-      if (isTwelveHourFormat() && (value === 'a' || value === 'p')) {
+      if (isTwelveHourFormat() && isCorrectChar) {
         const timePeriod = value === 'a' ? 'AM' : 'PM';
 
-        handleChange(timePeriod);
+        updatedTimeValue = handleChange(timePeriod) ?? '';
+      }
+
+      if (isTab || updatedTimeValue === timeValue) {
+        handleChangeSection();
       }
     }
-
-    if (event.key === 'Tab') {
-      handleChangeSection();
-    }
-  };
-
-  const getFormattedNumber = (value: number) => {
-    if (value < 10) {
-      return '0' + value.toString();
-    }
-
-    return value.toString();
   };
 
   return (
@@ -301,107 +292,38 @@ export function TimePicker(props: Props) {
             className={classNames(
               'box grid gap-1 rounded-sm bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-40 focus:outline-none p-1 h-64',
               {
-                'grid-cols-3': timeFormatId === TimeFormat.HOURS_24,
+                'grid-cols-3': !isTwelveHourFormat(),
                 'grid-cols-4': isTwelveHourFormat(),
               }
             )}
           >
-            <div className="overflow-scroll scrollbar-none">
-              {[...Array(timeFormatId).keys()].map((number, index) => (
-                <div
-                  key={index.toString() + 'hours'}
-                  className={classNames(
-                    'flex items-center justify-center px-3 py-2 cursor-pointer',
-                    {
-                      'bg-gray-500 text-white': isSelected(
-                        TimeSection.HOURS,
-                        getFormattedNumber(number)
-                      ),
-                      'hover:bg-gray-200': !isSelected(
-                        TimeSection.HOURS,
-                        getFormattedNumber(number)
-                      ),
-                    }
-                  )}
-                  onClick={() =>
-                    handleChange(
-                      getFormattedNumber(number),
-                      TimeSection.HOURS,
-                      true
-                    )
-                  }
-                >
-                  {getFormattedNumber(number)}
-                </div>
-              ))}
-            </div>
+            <TimePickerColumn
+              key="hoursSection"
+              handleChange={handleChange}
+              isSelected={isSelected}
+              section={TimeSection.HOURS}
+            />
 
-            <div className="overflow-scroll scrollbar-none">
-              {[...Array(60).keys()].map((number, index) => (
-                <div
-                  key={index.toString() + 'minutes'}
-                  className={classNames(
-                    'flex items-center justify-center px-3 py-2 cursor-pointer',
-                    {
-                      'bg-gray-500 text-white': isSelected(
-                        TimeSection.MINUTES,
-                        getFormattedNumber(number)
-                      ),
-                      'hover:bg-gray-200': !isSelected(
-                        TimeSection.MINUTES,
-                        getFormattedNumber(number)
-                      ),
-                    }
-                  )}
-                  onClick={() =>
-                    handleChange(
-                      getFormattedNumber(number),
-                      TimeSection.MINUTES,
-                      true
-                    )
-                  }
-                >
-                  {getFormattedNumber(number)}
-                </div>
-              ))}
-            </div>
+            <TimePickerColumn
+              key="minutesSection"
+              handleChange={handleChange}
+              isSelected={isSelected}
+              section={TimeSection.MINUTES}
+            />
 
-            <div className="overflow-scroll scrollbar-none">
-              {[...Array(60).keys()].map((number, index) => (
-                <div
-                  key={index.toString() + 'seconds'}
-                  className={classNames(
-                    'flex items-center justify-center px-3 py-2 cursor-pointer',
-                    {
-                      'bg-gray-500 text-white': isSelected(
-                        TimeSection.SECONDS,
-                        getFormattedNumber(number)
-                      ),
-                      'hover:bg-gray-200': !isSelected(
-                        TimeSection.SECONDS,
-                        getFormattedNumber(number)
-                      ),
-                    }
-                  )}
-                  onClick={() =>
-                    handleChange(
-                      getFormattedNumber(number),
-                      TimeSection.SECONDS,
-                      true
-                    )
-                  }
-                >
-                  {getFormattedNumber(number)}
-                </div>
-              ))}
-            </div>
+            <TimePickerColumn
+              key="secondsSection"
+              handleChange={handleChange}
+              isSelected={isSelected}
+              section={TimeSection.SECONDS}
+            />
 
             {isTwelveHourFormat() && (
               <div className="flex flex-col">
                 <div
                   key="am"
                   className={classNames(
-                    'flex items-center justify-center px-3 py-2 cursor-pointer',
+                    'flex items-center justify-center px-4 py-2 cursor-pointer',
                     {
                       'bg-gray-500 text-white': isSelected(
                         TimeSection.PERIOD,
@@ -421,7 +343,7 @@ export function TimePicker(props: Props) {
                 <div
                   key="pm"
                   className={classNames(
-                    'flex items-center justify-center px-3 py-2 cursor-pointer',
+                    'flex items-center justify-center px-4 py-2 cursor-pointer',
                     {
                       'bg-gray-500 text-white': isSelected(
                         TimeSection.PERIOD,
@@ -455,7 +377,7 @@ export function TimePicker(props: Props) {
                 setVisibleTimerSelection(false);
 
                 inputRef.current.setSelectionRange(0, 2);
-                setSelectedSection(0);
+                setSelectedSection(TimeSection.HOURS);
               }
             }}
             onKeyDown={handleKeyDown}
