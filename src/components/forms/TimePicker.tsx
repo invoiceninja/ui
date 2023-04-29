@@ -10,7 +10,6 @@ import { Icon } from '../icons/Icon';
 import { TimePickerColumn } from './TimePickerColumn';
 
 interface Props extends CommonProps {
-  id?: string;
   required?: boolean;
   value: number;
   onValueChange?: (value: string) => unknown;
