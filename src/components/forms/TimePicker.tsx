@@ -74,32 +74,6 @@ export function TimePicker(props: Props) {
     }
   };
 
-  useEffect(() => {
-    if (timeValueTimeoutId) {
-      clearTimeout(timeValueTimeoutId);
-    }
-
-    if (props.value > 0) {
-      if (!isInitial) {
-        const newTimeoutId = setTimeout(() => {
-          setTimeValue(dayjs.unix(props.value).format(timeFormat));
-        }, 100);
-
-        setTimeValueTimeoutId(newTimeoutId);
-      } else {
-        setTimeValue(dayjs.unix(props.value).format(timeFormat));
-      }
-    } else {
-      if (isTwelveHourFormat()) {
-        setTimeValue('--:--:-- PM');
-      } else {
-        setTimeValue('--:--:--');
-      }
-    }
-
-    setIsInitial(false);
-  }, [props.value]);
-
   const getValueOfSection = (
     section: TimeSection,
     inStringFormat?: boolean
@@ -116,52 +90,22 @@ export function TimePicker(props: Props) {
       : slicedValue;
   };
 
-  useEffect(() => {
-    if (sectionTimeoutId) {
-      clearTimeout(sectionTimeoutId);
-    }
-
-    if (!isInitial) {
-      const newTimeoutId = setTimeout(() => {
-        handleChangeSection();
-      }, 200);
-
-      setSectionTimeoutId(newTimeoutId);
-    }
-
-    const hours = getValueOfSection(TimeSection.HOURS, true) as string;
-    const minutes = getValueOfSection(TimeSection.MINUTES, true) as string;
-
-    if (parseInt(hours) >= 0 && parseInt(minutes) >= 0) {
-      let customValue = `${hours}:${minutes}`;
-      let customFormat = 'HH:mm';
-
-      const seconds = getValueOfSection(TimeSection.SECONDS, true) as string;
-
-      if (parseInt(seconds) >= 0) {
-        customValue += `:${seconds}`;
-        customFormat += ':ss';
-      }
-
-      if (isTwelveHourFormat()) {
-        customValue += ` ${getValueOfSection(TimeSection.PERIOD)}`;
-      }
-
-      const formattedCustomValue = dayjs(
-        `${new Date().toDateString()} ${customValue}`
-      ).format(customFormat);
-
-      props.onValueChange?.(formattedCustomValue);
-    }
-  }, [timeValue]);
-
   const getCharWidth = (font: string) => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
 
     if (context) {
       context.font = font;
-      return context.measureText('a').width;
+      let charForMeasuring = 'a';
+
+      const hours = getValueOfSection(TimeSection.HOURS, true) as string;
+      const minutes = getValueOfSection(TimeSection.MINUTES, true) as string;
+
+      if (parseInt(hours) >= 0 && parseInt(minutes) >= 0) {
+        charForMeasuring = '4';
+      }
+
+      return context.measureText(charForMeasuring).width;
     }
 
     return 0;
@@ -312,6 +256,71 @@ export function TimePicker(props: Props) {
       }
     }
   };
+
+  useEffect(() => {
+    if (timeValueTimeoutId) {
+      clearTimeout(timeValueTimeoutId);
+    }
+
+    if (props.value > 0) {
+      if (!isInitial) {
+        const newTimeoutId = setTimeout(() => {
+          setTimeValue(dayjs.unix(props.value).format(timeFormat));
+        }, 100);
+
+        setTimeValueTimeoutId(newTimeoutId);
+      } else {
+        setTimeValue(dayjs.unix(props.value).format(timeFormat));
+      }
+    } else {
+      if (isTwelveHourFormat()) {
+        setTimeValue('--:--:-- PM');
+      } else {
+        setTimeValue('--:--:--');
+      }
+    }
+
+    setIsInitial(false);
+  }, [props.value]);
+
+  useEffect(() => {
+    if (sectionTimeoutId) {
+      clearTimeout(sectionTimeoutId);
+    }
+
+    if (!isInitial) {
+      const newTimeoutId = setTimeout(() => {
+        handleChangeSection();
+      }, 200);
+
+      setSectionTimeoutId(newTimeoutId);
+    }
+
+    const hours = getValueOfSection(TimeSection.HOURS, true) as string;
+    const minutes = getValueOfSection(TimeSection.MINUTES, true) as string;
+
+    if (parseInt(hours) >= 0 && parseInt(minutes) >= 0) {
+      let customValue = `${hours}:${minutes}`;
+      let customFormat = 'HH:mm';
+
+      const seconds = getValueOfSection(TimeSection.SECONDS, true) as string;
+
+      if (parseInt(seconds) >= 0) {
+        customValue += `:${seconds}`;
+        customFormat += ':ss';
+      }
+
+      if (isTwelveHourFormat()) {
+        customValue += ` ${getValueOfSection(TimeSection.PERIOD)}`;
+      }
+
+      const formattedCustomValue = dayjs(
+        `${new Date().toDateString()} ${customValue}`
+      ).format(customFormat);
+
+      props.onValueChange?.(formattedCustomValue);
+    }
+  }, [timeValue]);
 
   return (
     <div ref={containerRef}>
