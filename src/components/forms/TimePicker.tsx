@@ -1,3 +1,13 @@
+/**
+ * Invoice Ninja (https://invoiceninja.com).
+ *
+ * @link https://github.com/invoiceninja/invoiceninja source repository
+ *
+ * @copyright Copyright (c) 2022. Invoice Ninja LLC (https://invoiceninja.com)
+ *
+ * @license https://www.elastic.co/licensing/elastic-license
+ */
+
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 import CommonProps from '$app/common/interfaces/common-props.interface';
 import Tippy from '@tippyjs/react/headless';
@@ -33,7 +43,7 @@ const SECTION_RANGE = [
 
 export function TimePicker(props: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
-  const containerRef = useRef<HTMLInputElement>(null);
+  const parentElementRef = useRef<HTMLInputElement>(null);
 
   const { timeFormatId, timeFormat } = useCompanyTimeFormat();
 
@@ -47,7 +57,7 @@ export function TimePicker(props: Props) {
     useState<NodeJS.Timeout | null>(null);
   const [isInitial, setIsInitial] = useState<boolean>(true);
 
-  useClickAway(containerRef, () => {
+  useClickAway(parentElementRef, () => {
     visibleTimerSelection && setVisibleTimerSelection(false);
     setSelectedSection(null);
   });
@@ -58,26 +68,19 @@ export function TimePicker(props: Props) {
 
   const handleChangeSection = () => {
     if (inputRef.current) {
-      const start = inputRef.current.selectionStart;
+      const numberOfSections = isTwelveHourFormat() ? 4 : 3;
 
-      if (typeof start === 'number') {
-        const numberOfSections = isTwelveHourFormat() ? 4 : 3;
+      const currentSectionIndex = selectedSection ?? 0;
+      const nextSectionIndex = (currentSectionIndex + 1) % numberOfSections;
+      const nextStart = nextSectionIndex * 3;
+      const nextEnd = nextStart + 2;
 
-        const currentSectionIndex = selectedSection ?? 0;
-        const nextSectionIndex = (currentSectionIndex + 1) % numberOfSections;
-        const nextStart = nextSectionIndex * 3;
-        const nextEnd = nextStart + 2;
-
-        inputRef.current.setSelectionRange(nextStart, nextEnd);
-        setSelectedSection(nextSectionIndex);
-      }
+      inputRef.current.setSelectionRange(nextStart, nextEnd);
+      setSelectedSection(nextSectionIndex);
     }
   };
 
-  const getValueOfSection = (
-    section: TimeSection,
-    inStringFormat?: boolean
-  ) => {
+  const getValueOfSection = (section: TimeSection, asString?: boolean) => {
     const sectionRange = SECTION_RANGE[section];
 
     const start = sectionRange[0];
@@ -85,7 +88,7 @@ export function TimePicker(props: Props) {
 
     const slicedValue = timeValue.slice(start, end);
 
-    return section !== TimeSection.PERIOD && !inStringFormat
+    return section !== TimeSection.PERIOD && !asString
       ? parseInt(slicedValue)
       : slicedValue;
   };
@@ -235,13 +238,13 @@ export function TimePicker(props: Props) {
     const value = event.key.toLowerCase();
 
     if (inputRef.current) {
-      const isDigit = event.code.includes('Digit');
+      const isNumber = event.code.includes('Digit');
       const isCorrectChar = value === 'a' || value === 'p';
       const isTab = event.key === 'Tab';
 
       let updatedTimeValue = '';
 
-      if (isDigit && selectedSection !== TimeSection.PERIOD) {
+      if (isNumber && selectedSection !== TimeSection.PERIOD) {
         updatedTimeValue = handleChange(value) ?? '';
       }
 
@@ -323,7 +326,7 @@ export function TimePicker(props: Props) {
   }, [timeValue]);
 
   return (
-    <div ref={containerRef}>
+    <div ref={parentElementRef}>
       <Tippy
         placement="bottom"
         interactive={true}
@@ -331,7 +334,7 @@ export function TimePicker(props: Props) {
         render={() => (
           <div
             className={classNames(
-              'box grid gap-1 rounded-sm bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-40 focus:outline-none p-1 h-64',
+              'grid gap-1 rounded-sm bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-40 focus:outline-none p-1 h-64',
               {
                 'grid-cols-3': !isTwelveHourFormat(),
                 'grid-cols-4': isTwelveHourFormat(),
@@ -360,7 +363,7 @@ export function TimePicker(props: Props) {
             />
 
             {isTwelveHourFormat() && (
-              <div className="flex flex-col">
+              <div>
                 <div
                   key="am"
                   className={classNames(
