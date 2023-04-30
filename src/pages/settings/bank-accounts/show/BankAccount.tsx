@@ -19,7 +19,7 @@ import { useBankAccountQuery } from '../common/queries';
 import { Details } from '../components/Details';
 
 export function BankAccount() {
-  useTitle('bank_account_details');
+  useTitle('bank_account');
 
   const { id } = useParams();
 
@@ -29,7 +29,7 @@ export function BankAccount() {
     { name: t('settings'), href: '/settings' },
     { name: t('bank_accounts'), href: '/settings/bank_accounts' },
     {
-      name: t('bank_account_details'),
+      name: t('bank_account'),
       href: route('/settings/bank_accounts/:id/details', { id }),
     },
   ];
@@ -44,7 +44,7 @@ export function BankAccount() {
 
   return (
     <Settings
-      title={t('bank_account_details')}
+      title={t('bank_account')}
       breadcrumbs={pages}
       docsLink="docs/basic-settings/#bank_account_details"
     >
