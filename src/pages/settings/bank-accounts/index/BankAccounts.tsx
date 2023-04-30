@@ -14,13 +14,16 @@ import { Settings } from '$app/components/layouts/Settings';
 import { useTranslation } from 'react-i18next';
 import { useBankAccountColumns } from '../common/hooks/useBankAccountColumns';
 import { Button } from '$app/components/forms';
-import { MdLink, MdRuleFolder } from 'react-icons/md';
+import { MdLink, MdRefresh, MdRuleFolder } from 'react-icons/md';
 import { endpoint, isHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { useNavigate } from 'react-router-dom';
+import { AxiosError } from 'axios';
+import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { toast } from '$app/common/helpers/toast/toast';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 
 export function BankAccounts() {
@@ -50,6 +53,16 @@ export function BankAccounts() {
     );
   };
 
+  const handleRefresh = () => {
+    request('POST', endpoint('/api/v1/bank_integrations/refresh_accounts'), {})
+      .then((response) => {
+        toast.success(response.data.message);
+      })
+      .catch((error: AxiosError<ValidationBag>) => {
+        toast.error(error.response?.data.message);
+      });
+  };
+
   return (
     <Settings
       title={t('bank_accounts')}
@@ -77,6 +90,13 @@ export function BankAccounts() {
               <Button onClick={handleConnectAccounts}>
                 <span className="mr-2">{<MdLink fontSize={20} />}</span>
                 {t('connect_accounts')}
+              </Button>
+            )}
+
+            {isHosted() && enterprisePlan() && (
+              <Button onClick={handleRefresh}>
+                <span className="mr-2">{<MdRefresh fontSize={20} />}</span>
+                {t('refresh')}
               </Button>
             )}
 
