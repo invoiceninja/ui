@@ -83,6 +83,23 @@ export function Defaults() {
             </Element>
           )}
 
+          <Element leftSide={t('expense_payment_type')}>
+            <SelectField
+              value={companyChanges?.settings?.default_expense_payment_type_id}
+              onChange={handleChange}
+              id="settings.default_expense_payment_type_id"
+            >
+              <option value="0"></option>
+              {statics?.payment_types.map(
+                (type: { id: string; name: string }) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                )
+              )}
+            </SelectField>
+          </Element>
+
           <div className="pt-6 border-b"></div>
 
           <Element className="mt-6" leftSide={t('manual_payment_email')}>
