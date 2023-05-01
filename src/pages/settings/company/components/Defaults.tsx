@@ -54,8 +54,9 @@ export function Defaults() {
               value={companyChanges?.settings?.payment_type_id}
               onChange={handleChange}
               id="settings.payment_type_id"
+              blankOptionValue="0"
+              withBlank
             >
-              <option value="0"></option>
               {statics?.payment_types.map(
                 (type: { id: string; name: string }) => (
                   <option key={type.id} value={type.id}>
@@ -72,8 +73,8 @@ export function Defaults() {
                 value={companyChanges?.settings?.valid_until}
                 id="settings.valid_until"
                 onChange={handleChange}
+                withBlank
               >
-                <option value=""></option>
                 {terms.data.data.map((type: PaymentTerm) => (
                   <option key={type.id} value={type.num_days}>
                     {type.name}
@@ -88,8 +89,9 @@ export function Defaults() {
               value={companyChanges?.settings?.default_expense_payment_type_id}
               onChange={handleChange}
               id="settings.default_expense_payment_type_id"
+              blankOptionValue="0"
+              withBlank
             >
-              <option value="0"></option>
               {statics?.payment_types.map(
                 (type: { id: string; name: string }) => (
                   <option key={type.id} value={type.id}>
