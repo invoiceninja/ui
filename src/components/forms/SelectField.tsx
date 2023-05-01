@@ -20,6 +20,7 @@ interface Props extends CommonProps {
   withBlank?: boolean;
   onValueChange?: (value: string) => unknown;
   errorMessage?: string | string[];
+  blankOptionValue?: string | number;
 }
 
 export function SelectField(props: Props) {
@@ -46,7 +47,9 @@ export function SelectField(props: Props) {
         ref={props.innerRef}
         disabled={props.disabled}
       >
-        {props.withBlank && <option value=""></option>}
+        {props.withBlank && (
+          <option value={props.blankOptionValue ?? ''}></option>
+        )}
         {props.children}
       </select>
 
