@@ -19,6 +19,7 @@ export interface Product {
   price: number;
   quantity: number;
   max_quantity: number;
+  tax_id: string;
   product_image: string;
   tax_name1: string;
   tax_rate1: number;

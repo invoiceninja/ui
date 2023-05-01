@@ -46,6 +46,7 @@ export function SelectField(props: Props) {
         value={props.value}
         ref={props.innerRef}
         disabled={props.disabled}
+        style={props.style}
       >
         {props.withBlank && (
           <option value={props.blankOptionValue ?? ''}></option>

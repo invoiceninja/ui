@@ -82,6 +82,7 @@ export function Notifications() {
 
     { label: t('payment_success'), field: 'payment_success_all' },
     { label: t('payment_failure'), field: 'payment_failure_all' },
+    { label: t('manual_payment'), field: 'payment_manual_all' },
 
     { label: t('purchase_order_created'), field: 'purchase_order_created_all' },
     { label: t('purchase_order_sent'), field: 'purchase_order_sent_all' },
