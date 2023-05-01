@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { InputField } from '$app/components/forms';
+import { InputField, SelectField } from '$app/components/forms';
 import { Element } from '$app/components/cards';
 import { CustomField } from '$app/components/CustomField';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
@@ -96,6 +96,24 @@ export function ProductForm(props: Props) {
           onValueChange={(value) => handleChange('max_quantity', value)}
           errorMessage={errors?.errors.max_quantity}
         />
+      </Element>
+
+      <Element leftSide={t('tax_category')}>
+        <SelectField
+          value={props.product.tax_id}
+          onValueChange={(value) => handleChange('tax_id', value)}
+          errorMessage={errors?.errors.tax_id}
+        >
+          <option value="1">{t('physical_goods')}</option>
+          <option value="2">{t('services')}</option>
+          <option value="3">{t('digital_products')}</option>
+          <option value="4">{t('shipping')}</option>
+          <option value="5">{t('tax_exempt')}</option>
+          <option value="6">{t('reduced_tax')}</option>
+          <option value="7">{t('override_tax')}</option>
+          <option value="8">{t('zero_rated')}</option>
+          <option value="9">{t('reverse_tax')}</option>
+        </SelectField>
       </Element>
 
       <Element leftSide={t('image_url')}>
