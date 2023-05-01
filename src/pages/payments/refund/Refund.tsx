@@ -131,7 +131,7 @@ export default function Refund() {
       const gateway: Gateway = companyGateway.data.data.gateway;
       const gatewayTypeId = payment.data.data.gateway_type_id;
 
-      const showGatewayRefund = gateway.options[gatewayTypeId].refund;
+      const showGatewayRefund = Boolean(gateway.options[gatewayTypeId]?.refund);
 
       setShouldShowGatewayRefund(showGatewayRefund);
     }
