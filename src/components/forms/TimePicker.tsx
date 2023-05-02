@@ -18,7 +18,7 @@ import { MdOutlineAvTimer } from 'react-icons/md';
 import { useClickAway } from 'react-use';
 import { Icon } from '../icons/Icon';
 import { InputLabel } from './InputLabel';
-import { TimePickerColumn } from './TimePickerColumn';
+import { TimePickerPopperSection } from './TimePickerPopperSection';
 
 interface Props extends CommonProps {
   label?: string | null;
@@ -80,7 +80,7 @@ export function TimePicker(props: Props) {
     }
   };
 
-  const getValueOfSection = (section: TimeSection, asString?: boolean) => {
+  const getSectionValue = (section: TimeSection, asString?: boolean) => {
     const sectionRange = SECTION_RANGE[section];
 
     const start = sectionRange[0];
@@ -93,22 +93,41 @@ export function TimePicker(props: Props) {
       : slicedValue;
   };
 
-  const getCharWidth = (font: string) => {
+  const getSectionsWidth = (font: string) => {
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
 
     if (context) {
       context.font = font;
-      let charForMeasuring = 'a';
 
-      const hours = getValueOfSection(TimeSection.HOURS, true) as string;
-      const minutes = getValueOfSection(TimeSection.MINUTES, true) as string;
+      const hours = getSectionValue(TimeSection.HOURS, true) as string;
+      const minutes = getSectionValue(TimeSection.MINUTES, true) as string;
+      const seconds = getSectionValue(TimeSection.SECONDS, true) as string;
+      const period = getSectionValue(TimeSection.PERIOD) as string;
+
+      const colonWidth = context.measureText(':').width;
+      const defaultWidth = context.measureText('--').width + colonWidth;
+      const periodWidth = context.measureText(period).width + colonWidth;
 
       if (parseInt(hours) >= 0 && parseInt(minutes) >= 0) {
-        charForMeasuring = '4';
+        const hoursWidth = context.measureText(hours).width + colonWidth;
+        const minutesWidth = context.measureText(minutes).width + colonWidth;
+        const secondsWidth = context.measureText(seconds).width + colonWidth;
+
+        return {
+          hoursWidth,
+          hoursAndMinutesWidth: hoursWidth + minutesWidth,
+          hoursMinutesAndSecondsWidth: hoursWidth + minutesWidth + secondsWidth,
+          fullWidth: hoursWidth + minutesWidth + secondsWidth + periodWidth,
+        };
       }
 
-      return context.measureText(charForMeasuring).width;
+      return {
+        hoursWidth: defaultWidth,
+        hoursAndMinutesWidth: defaultWidth * 2,
+        hoursMinutesAndSecondsWidth: defaultWidth * 3,
+        fullWidth: defaultWidth * 3 + periodWidth,
+      };
     }
 
     return 0;
@@ -120,35 +139,56 @@ export function TimePicker(props: Props) {
     if (inputRef.current) {
       const inputStyle = window.getComputedStyle(inputRef.current);
       const font = `${inputStyle.fontSize} ${inputStyle.fontFamily}`;
-      const charWidth = getCharWidth(font);
 
-      const bounds = inputRef.current.getBoundingClientRect();
+      const sectionsWidth = getSectionsWidth(font);
 
-      const clickX = event.pageX - bounds.left;
+      if (sectionsWidth !== 0) {
+        const {
+          hoursWidth,
+          hoursAndMinutesWidth,
+          hoursMinutesAndSecondsWidth,
+          fullWidth,
+        } = sectionsWidth;
 
-      const index = clickX / charWidth;
+        const bounds = inputRef.current.getBoundingClientRect();
+        const clickX = event.pageX - bounds.left - 11;
 
-      if (index < 3.5) {
-        inputRef.current.setSelectionRange(0, 2);
-        setSelectedSection(0);
-      } else if (index < 5.7) {
-        inputRef.current.setSelectionRange(3, 5);
-        setSelectedSection(1);
-      } else if (index < 7.7) {
-        inputRef.current.setSelectionRange(6, 8);
-        setSelectedSection(2);
-      } else if (index > 7.7 && index <= 12 && isTwelveHourFormat()) {
-        inputRef.current.setSelectionRange(9, 11);
-        setSelectedSection(3);
-      } else {
-        inputRef.current.setSelectionRange(0, 2);
-        setSelectedSection(0);
+        if (clickX < hoursWidth) {
+          inputRef.current.setSelectionRange(0, 2);
+          setSelectedSection(0);
+        } else if (clickX < hoursAndMinutesWidth) {
+          inputRef.current.setSelectionRange(3, 5);
+          setSelectedSection(1);
+        } else if (
+          clickX < hoursMinutesAndSecondsWidth &&
+          clickX > hoursAndMinutesWidth
+        ) {
+          inputRef.current.setSelectionRange(6, 8);
+          setSelectedSection(2);
+        } else if (
+          clickX > hoursMinutesAndSecondsWidth &&
+          clickX < fullWidth &&
+          isTwelveHourFormat()
+        ) {
+          inputRef.current.setSelectionRange(9, 11);
+          setSelectedSection(3);
+        } else {
+          inputRef.current.setSelectionRange(0, 2);
+          setSelectedSection(0);
+        }
       }
     }
   };
 
   const isSelected = (section: TimeSection, value: string) => {
-    return getValueOfSection(section, true) === value;
+    return getSectionValue(section, true) === value;
+  };
+
+  const updateTimeValue = (start: number, end: number, value: string) => {
+    const newTimeValue =
+      timeValue.substring(0, start) + value + timeValue.substring(end);
+
+    return newTimeValue;
   };
 
   const handleChange = (
@@ -169,8 +209,7 @@ export function TimePicker(props: Props) {
     const currentSectionValue = timeValue.slice(start, end);
 
     if (popperChange) {
-      const updatedTimeValue =
-        timeValue.substring(0, start) + value + timeValue.substring(end);
+      const updatedTimeValue = updateTimeValue(start, end, value);
 
       setTimeValue(updatedTimeValue);
 
@@ -178,8 +217,7 @@ export function TimePicker(props: Props) {
     }
 
     if (selectedSection === TimeSection.PERIOD) {
-      const updatedTimeValue =
-        timeValue.substring(0, start) + value + timeValue.substring(end);
+      const updatedTimeValue = updateTimeValue(start, end, value);
 
       setTimeValue(updatedTimeValue);
 
@@ -191,10 +229,7 @@ export function TimePicker(props: Props) {
       parseInt(currentSectionValue) > 9 ||
       parseInt(currentSectionValue) === 0
     ) {
-      const numberValue = '0' + value;
-
-      const updatedTimeValue =
-        timeValue.substring(0, start) + numberValue + timeValue.substring(end);
+      const updatedTimeValue = updateTimeValue(start, end, '0' + value);
 
       setTimeValue(updatedTimeValue);
 
@@ -223,8 +258,7 @@ export function TimePicker(props: Props) {
         numberValue = '0' + value;
       }
 
-      const updatedTimeValue =
-        timeValue.substring(0, start) + numberValue + timeValue.substring(end);
+      const updatedTimeValue = updateTimeValue(start, end, numberValue);
 
       setTimeValue(updatedTimeValue);
 
@@ -248,7 +282,11 @@ export function TimePicker(props: Props) {
         updatedTimeValue = handleChange(value) ?? '';
       }
 
-      if (isTwelveHourFormat() && isCorrectChar) {
+      if (
+        isTwelveHourFormat() &&
+        isCorrectChar &&
+        selectedSection === TimeSection.PERIOD
+      ) {
         const timePeriod = value === 'a' ? 'AM' : 'PM';
 
         updatedTimeValue = handleChange(timePeriod) ?? '';
@@ -299,14 +337,14 @@ export function TimePicker(props: Props) {
       setSectionTimeoutId(newTimeoutId);
     }
 
-    const hours = getValueOfSection(TimeSection.HOURS, true) as string;
-    const minutes = getValueOfSection(TimeSection.MINUTES, true) as string;
+    const hours = getSectionValue(TimeSection.HOURS, true) as string;
+    const minutes = getSectionValue(TimeSection.MINUTES, true) as string;
 
     if (parseInt(hours) >= 0 && parseInt(minutes) >= 0) {
       let customValue = `${hours}:${minutes}`;
       let customFormat = 'HH:mm';
 
-      const seconds = getValueOfSection(TimeSection.SECONDS, true) as string;
+      const seconds = getSectionValue(TimeSection.SECONDS, true) as string;
 
       if (parseInt(seconds) >= 0) {
         customValue += `:${seconds}`;
@@ -314,7 +352,7 @@ export function TimePicker(props: Props) {
       }
 
       if (isTwelveHourFormat()) {
-        customValue += ` ${getValueOfSection(TimeSection.PERIOD)}`;
+        customValue += ` ${getSectionValue(TimeSection.PERIOD)}`;
       }
 
       const formattedCustomValue = dayjs(
@@ -341,21 +379,21 @@ export function TimePicker(props: Props) {
               }
             )}
           >
-            <TimePickerColumn
+            <TimePickerPopperSection
               key="hoursSection"
               handleChange={handleChange}
               isSelected={isSelected}
               section={TimeSection.HOURS}
             />
 
-            <TimePickerColumn
+            <TimePickerPopperSection
               key="minutesSection"
               handleChange={handleChange}
               isSelected={isSelected}
               section={TimeSection.MINUTES}
             />
 
-            <TimePickerColumn
+            <TimePickerPopperSection
               key="secondsSection"
               handleChange={handleChange}
               isSelected={isSelected}
