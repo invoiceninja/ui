@@ -24,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 import { AxiosError } from 'axios';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
+import { Icon } from '$app/components/icons/Icon';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
 
 export function BankAccounts() {
@@ -87,26 +88,33 @@ export function BankAccounts() {
         rightSide={
           <div className="flex space-x-2">
             {isHosted() && enterprisePlan() && (
-              <Button onClick={handleConnectAccounts}>
-                <span className="mr-2">{<MdLink fontSize={20} />}</span>
+              <Button type="secondary" onClick={handleConnectAccounts}>
+                <span className="mr-2">
+                  {<Icon element={MdLink} size={20} />}
+                </span>
                 {t('connect_accounts')}
               </Button>
             )}
 
             {isHosted() && enterprisePlan() && (
-              <Button onClick={handleRefresh}>
-                <span className="mr-2">{<MdRefresh fontSize={20} />}</span>
+              <Button type="secondary" onClick={handleRefresh}>
+                <span className="mr-2">
+                  {<Icon element={MdRefresh} size={20} />}
+                </span>
                 {t('refresh')}
               </Button>
             )}
 
             {isHosted() && (proPlan() || enterprisePlan()) && (
               <Button
+                type="secondary"
                 onClick={() =>
                   navigate('/settings/bank_accounts/transaction_rules')
                 }
               >
-                <span className="mr-2">{<MdRuleFolder fontSize={20} />}</span>
+                <span className="mr-2">
+                  {<Icon element={MdRuleFolder} size={20} />}
+                </span>
                 {t('rules')}
               </Button>
             )}
