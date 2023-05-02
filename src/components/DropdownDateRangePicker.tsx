@@ -41,7 +41,7 @@ export function DropdownDateRangePicker(props: Props) {
       <SelectField
         defaultValue={props.startDate + '/' + props.startDate}
         className={
-          ' orm-select appearance-none block w-44 px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none '
+          'appearance-none block px-3 py-1.5 text-base font-normal  text-gray-700 bg-white bg-clip-padding bg-no-repeat border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none'
         }
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
           event.preventDefault();
@@ -51,6 +51,7 @@ export function DropdownDateRangePicker(props: Props) {
             props.handleDateChange(event.target.value);
           }
         }}
+        style={{ width: '9.7rem' }}
       >
         <option
           value={[
