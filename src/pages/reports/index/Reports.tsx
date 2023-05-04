@@ -351,8 +351,6 @@ export default function Reports() {
 
     const { client_id } = report.payload;
 
-    console.log('ok');
-
     const updatedPayload =
       report.identifier === 'product_sales'
         ? { ...report.payload, client_id: client_id || null }
