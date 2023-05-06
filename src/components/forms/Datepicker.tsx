@@ -32,6 +32,8 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { date as formatDate } from '$app/common/helpers';
 import { Button } from './Button';
 import { SelectField } from './SelectField';
+import { useAtomValue } from 'jotai';
+import { dayJSLocaleAtom } from '$app/App';
 
 interface Props extends CommonProps {
   required?: boolean;
@@ -100,13 +102,41 @@ export function DatePicker(props: Props) {
   const accentColor = useAccentColor();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
+  const dayJSLocale = useAtomValue(dayJSLocaleAtom);
+
   const [date, setDate] = useState<Date | null>(null);
 
   const [years, setYears] = useState<number[]>([]);
 
+  const [weekdaysShort, setWeekdaysShort] = useState({
+    Sunday: 'Su',
+    Monday: 'Mo',
+    Tuesday: 'Tu',
+    Wednesday: 'We',
+    Thursday: 'Th',
+    Friday: 'Fr',
+    Saturday: 'Sa',
+  });
+
   useEffect(() => {
     setDate(props.value ? new Date(props.value) : null);
   }, [props.value]);
+
+  const updateWeekdaysShort = () => {
+    let updatedWeekdaysShort = { ...weekdaysShort };
+
+    Array.from({ length: 7 }, (_, i) => {
+      updatedWeekdaysShort = {
+        ...updatedWeekdaysShort,
+        [dayjs().locale('en').day(i).format('dddd')]:
+          dayJSLocale?.weekdaysMin &&
+          dayJSLocale?.weekdaysMin[i].charAt(0).toUpperCase() +
+            dayJSLocale?.weekdaysMin[i].slice(1),
+      };
+    });
+
+    setWeekdaysShort(updatedWeekdaysShort);
+  };
 
   useEffect(() => {
     const currentYear = new Date().getFullYear();
@@ -117,6 +147,10 @@ export function DatePicker(props: Props) {
     }
 
     setYears(yearsList);
+
+    if (dayJSLocale) {
+      updateWeekdaysShort();
+    }
   }, []);
 
   const getFormattedValue = () => {
@@ -237,6 +271,9 @@ export function DatePicker(props: Props) {
       customInput={createElement(forwardRef(CustomInputArea))}
       minDate={props.minDate ? new Date(props.minDate) : null}
       onChange={(newDate) => handleOnValueChange(newDate)}
+      formatWeekDay={(date) =>
+        weekdaysShort[date.toString() as keyof typeof weekdaysShort]
+      }
       isClearable
       clearButtonClassName={`mr-1 after:bg-[${accentColor}] after:content-['x']`}
       todayButton={t('today')}
