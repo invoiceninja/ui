@@ -123,19 +123,21 @@ export function DatePicker(props: Props) {
   }, [props.value]);
 
   const updateWeekdaysShort = () => {
-    let updatedWeekdaysShort = { ...weekdaysShort };
+    if (dayJSLocale?.weekdaysMin) {
+      let updatedWeekdaysShort = { ...weekdaysShort };
 
-    Array.from({ length: 7 }, (_, i) => {
-      updatedWeekdaysShort = {
-        ...updatedWeekdaysShort,
-        [dayjs().locale('en').day(i).format('dddd')]:
-          dayJSLocale?.weekdaysMin &&
-          dayJSLocale?.weekdaysMin[i].charAt(0).toUpperCase() +
-            dayJSLocale?.weekdaysMin[i].slice(1),
-      };
-    });
+      Array.from({ length: 7 }, (_, i) => {
+        updatedWeekdaysShort = {
+          ...updatedWeekdaysShort,
+          [dayjs().locale('en').day(i).format('dddd')]:
+            dayJSLocale.weekdaysMin &&
+            dayJSLocale.weekdaysMin[i].charAt(0).toUpperCase() +
+              dayJSLocale.weekdaysMin[i].slice(1),
+        };
+      });
 
-    setWeekdaysShort(updatedWeekdaysShort);
+      setWeekdaysShort(updatedWeekdaysShort);
+    }
   };
 
   useEffect(() => {
@@ -271,9 +273,9 @@ export function DatePicker(props: Props) {
       customInput={createElement(forwardRef(CustomInputArea))}
       minDate={props.minDate ? new Date(props.minDate) : null}
       onChange={(newDate) => handleOnValueChange(newDate)}
-      formatWeekDay={(date) =>
-        weekdaysShort[date.toString() as keyof typeof weekdaysShort]
-      }
+      formatWeekDay={(date) => {
+        return weekdaysShort[date.toString() as keyof typeof weekdaysShort];
+      }}
       isClearable
       clearButtonClassName={`mr-1 after:bg-[${accentColor}] after:content-['x']`}
       todayButton={t('today')}
