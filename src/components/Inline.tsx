@@ -12,10 +12,13 @@ import { ReactNode } from 'react';
 
 interface Props {
   children: ReactNode;
+  className?: string;
 }
 
 export function Inline(props: Props) {
   return (
-    <div className="inline-flex items-center space-x-2">{props.children}</div>
+    <div className={`inline-flex items-center space-x-2 ${props.className}`}>
+      {props.children}
+    </div>
   );
 }

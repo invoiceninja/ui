@@ -36,7 +36,7 @@ export function Badge(props: Props) {
 
   const accentColor = useAccentColor();
 
-  const styles: React.CSSProperties = {};
+  const styles: React.CSSProperties = { ...props.style };
 
   if (props.variant === 'primary') {
     styles.backgroundColor = accentColor;

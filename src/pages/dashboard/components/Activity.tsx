@@ -31,10 +31,10 @@ export function Activity() {
 
   return (
     <Card
-      title={t('activity')}
+      title={t('recent_activity')}
       className="h-96"
-      padding="small"
       withScrollableBody
+      withoutBodyPadding
     >
       {isLoading && (
         <NonClickableElement>
