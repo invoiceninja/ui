@@ -12,6 +12,9 @@ import { isDemo, isSelfHosted } from '$app/common/helpers';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Inline } from '$app/components/Inline';
 import { SwitchToFlutter } from '$app/components/SwitchToFlutter';
 import { Activity } from '$app/pages/dashboard/components/Activity';
 import { PastDueInvoices } from '$app/pages/dashboard/components/PastDueInvoices';
@@ -19,6 +22,8 @@ import { RecentPayments } from '$app/pages/dashboard/components/RecentPayments';
 import { Totals } from '$app/pages/dashboard/components/Totals';
 import { UpcomingInvoices } from '$app/pages/dashboard/components/UpcomingInvoices';
 import { useTranslation } from 'react-i18next';
+import { BiPlus } from 'react-icons/bi';
+import { MdOutlineNotifications } from 'react-icons/md';
 import { Default } from '../../components/layouts/Default';
 import { ExpiredQuotes } from './components/ExpiredQuotes';
 import { UpcomingQuotes } from './components/UpcomingQuotes';
@@ -37,11 +42,22 @@ export default function Dashboard() {
     <Default
       title={t('dashboard')}
       navigationTopRight={
-        isSelfHosted() &&
-        !isDemo() &&
-        (user?.company_user?.is_admin || user?.company_user?.is_owner) && (
-          <SwitchToFlutter />
-        )
+        <Inline className="space-x-6">
+          <div className="bg-gray-100 dark:bg-gray-900 rounded-3xl p-1 cursor-pointer">
+            <Icon element={MdOutlineNotifications} size={27} />
+          </div>
+
+          <Button className="flex space-x-2">
+            {<Icon element={BiPlus} color="white" size={22} />}{' '}
+            <span>{t('add')}</span>
+          </Button>
+
+          {isSelfHosted() &&
+            !isDemo() &&
+            (user?.company_user?.is_admin || user?.company_user?.is_owner) && (
+              <SwitchToFlutter />
+            )}
+        </Inline>
       }
       withoutBackButton
     >
