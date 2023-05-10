@@ -45,6 +45,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import { Icon } from './icons/Icon';
 import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import CommonProps from '$app/common/interfaces/common-props.interface';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -54,7 +55,7 @@ export type DataTableColumns<T = any> = {
 
 export type CustomBulkAction = (selectedIds: string[]) => ReactNode;
 
-interface Props<T> {
+interface Props<T> extends CommonProps {
   resource: string;
   columns: DataTableColumns;
   endpoint: string;
@@ -76,6 +77,7 @@ interface Props<T> {
   onTableRowClick?: (resource: T) => unknown;
   showRestore?: (resource: T) => boolean;
   beforeFilter?: ReactNode;
+  withoutBottomBorder?: boolean;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -250,7 +252,12 @@ export function DataTable<T extends object>(props: Props<T>) {
         </Actions>
       )}
 
-      <Table withoutPadding={props.withoutPadding}>
+      <Table
+        withoutBottomBorder={props.withoutBottomBorder}
+        withoutPadding={props.withoutPadding}
+        className={props.className}
+        style={props.style}
+      >
         <Thead>
           {!props.withoutActions && (
             <Th>

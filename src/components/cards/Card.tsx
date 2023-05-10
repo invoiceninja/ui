@@ -120,8 +120,8 @@ export function Card(props: Props) {
           className={classNames(props.childrenClassName, {
             hidden: isCollapsed,
             'py-0': props.withoutBodyPadding,
-            'py-4': padding == 'regular',
-            'py-2': padding == 'small',
+            'py-4': padding === 'regular' && !props.withoutBodyPadding,
+            'py-2': padding === 'small' && !props.withoutBodyPadding,
           })}
         >
           {props.isLoading && <Element leftSide={<Spinner />} />}
