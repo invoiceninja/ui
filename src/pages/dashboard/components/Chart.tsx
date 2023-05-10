@@ -11,19 +11,17 @@
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import {
-  Area,
-  AreaChart,
-  CartesianGrid,
-  Legend,
-  Line,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
 import { date as formatDate } from '$app/common/helpers';
 import { TotalColors } from './Totals';
+import {
+  Line,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+} from 'recharts';
 
 type Props = {
   data: {
@@ -148,50 +146,44 @@ export function Chart(props: Props) {
   }, [props]);
 
   return (
-    <ResponsiveContainer width="100%" height={250}>
-      <AreaChart height={200} data={chartData}>
-        <Legend />
-        <defs>
-          <Line id="payments" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={TotalColors.Green} stopOpacity={0.8} />
-            <stop offset="95%" stopColor={TotalColors.Green} stopOpacity={0} />
-          </Line>
-          <Line id="expenses" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={TotalColors.Red} stopOpacity={0.8} />
-            <stop offset="95%" stopColor={TotalColors.Red} stopOpacity={0} />
-          </Line>
-          <Line id="invoices" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="5%" stopColor={TotalColors.Blue} stopOpacity={0.8} />
-            <stop offset="95%" stopColor={TotalColors.Blue} stopOpacity={0} />
-          </Line>
-        </defs>
-        <CartesianGrid strokeDasharray="3 3" />
+    <ResponsiveContainer width="100%" height={330}>
+      <LineChart height={200} data={chartData} margin={{ top: 9, left: 20 }}>
+        <Line
+          id="payments"
+          type="monotone"
+          name={t('payments') || ''}
+          dataKey="payments"
+          stroke={TotalColors.Green}
+          dot={false}
+          strokeWidth={2}
+        />
+
+        <Line
+          id="expenses"
+          type="monotone"
+          name={t('expenses') || ''}
+          dataKey="expenses"
+          stroke={TotalColors.Red}
+          dot={false}
+          strokeWidth={2}
+        />
+
+        <Line
+          id="invoices"
+          type="monotone"
+          name={t('invoices') || ''}
+          dataKey="invoices"
+          stroke={TotalColors.Blue}
+          dot={false}
+          strokeWidth={2}
+        />
+
+        <CartesianGrid strokeDasharray="0" vertical={false} />
         <Tooltip />
 
         <XAxis height={50} dataKey="date" />
-        <YAxis />
-        <Area
-          name={t('invoices') ?? ''}
-          dataKey="invoices"
-          stroke={TotalColors.Blue}
-          fill="url(#invoices)"
-          fillOpacity={1}
-        />
-        <Area
-          name={t('payments') ?? ''}
-          dataKey="payments"
-          stroke={TotalColors.Green}
-          fill="url(#payments)"
-          fillOpacity={1}
-        />
-        <Area
-          name={t('expenses') ?? ''}
-          dataKey="expenses"
-          stroke={TotalColors.Red}
-          fill="url(#expenses)"
-          fillOpacity={1}
-        />
-      </AreaChart>
+        <YAxis domain={[0, 1000]} interval={0} tickCount={6} />
+      </LineChart>
     </ResponsiveContainer>
   );
 }
