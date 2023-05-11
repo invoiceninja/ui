@@ -78,6 +78,7 @@ interface Props<T> extends CommonProps {
   showRestore?: (resource: T) => boolean;
   beforeFilter?: ReactNode;
   withoutBottomBorder?: boolean;
+  onVerticalOverflowChange?: (overflow: boolean) => void;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -253,9 +254,10 @@ export function DataTable<T extends object>(props: Props<T>) {
       )}
 
       <Table
-        withoutBottomBorder={props.withoutBottomBorder}
-        withoutPadding={props.withoutPadding}
         className={props.className}
+        withoutPadding={props.withoutPadding}
+        withoutBottomBorder={props.withoutBottomBorder}
+        onVerticalOverflowChange={props.onVerticalOverflowChange}
         style={props.style}
       >
         <Thead>
