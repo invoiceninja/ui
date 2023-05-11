@@ -28,7 +28,7 @@ export function ViewAll(props: Props) {
     <>
       <div
         className={classNames(
-          'z-10 absolute w-[calc(100%-26px)] h-[4.5rem] bottom-11 left-0 bg-gradient-to-t from-[#00000027] to-transparent dark:bg-transparent dark:bg-gradient',
+          'z-10 absolute w-full h-[5rem] bottom-11 left-0 bg-gradient-to-t from-white dark:from-[#00000020] to-transparent dark:bg-transparent dark:bg-gradient',
           {
             hidden: viewedAll,
           }
@@ -36,16 +36,17 @@ export function ViewAll(props: Props) {
       ></div>
 
       <div
-        className={classNames(
-          'flex items-center justify-end pt-2 pr-3 text-[#2F7DC3] opacity-80 hover:opacity-100 cursor-pointer',
-          {
-            hidden: viewedAll,
-          }
-        )}
-        onClick={() => setViewedAll(true)}
+        className={classNames('flex justify-end pt-2 pr-3', {
+          hidden: viewedAll,
+        })}
       >
-        <span className="mt-1">{`${t('view_all')}`}</span>
-        <Icon element={MdKeyboardArrowRight} size={25} />
+        <a
+          className="flex items-center mt-1 text-[#2F7DC3] opacity-80 hover:opacity-100 cursor-pointer"
+          onClick={() => setViewedAll(true)}
+        >
+          <span>{`${t('view_all')}`}</span>
+          <Icon element={MdKeyboardArrowRight} size={25} />
+        </a>
       </div>
     </>
   );
