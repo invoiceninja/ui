@@ -17,14 +17,23 @@ import { useTranslation } from 'react-i18next';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
-import React from 'react';
+import React, { useState } from 'react';
+import { ViewAll } from './ViewAll';
 
 export function Activity() {
   const [t] = useTranslation();
 
+  const [viewedAll, setViewedAll] = useState<boolean>(false);
+
   const { data, isLoading, isError } = useQuery(
     '/api/v1/activities?react',
-    () => request('GET', endpoint('/api/v1/activities?react'))
+    () =>
+      request(
+        'GET',
+        endpoint('/api/v1/activities?react&view_all=:viewedAll', {
+          viewedAll,
+        })
+      )
   );
 
   const activityElement = useGenerateActivityElement();
@@ -32,8 +41,7 @@ export function Activity() {
   return (
     <Card
       title={t('recent_activity')}
-      className="h-96"
-      withScrollableBody
+      className="h-96 relative"
       withoutBodyPadding
     >
       {isLoading && (
@@ -46,10 +54,19 @@ export function Activity() {
         <NonClickableElement>{t('error_refresh_page')}</NonClickableElement>
       )}
 
-      {data?.data.data &&
-        data.data.data.map((record: ActivityRecord, index: number) => (
-          <React.Fragment key={index}>{activityElement(record)}</React.Fragment>
-        ))}
+      <div
+        className="flex flex-col overflow-y-auto"
+        style={{ height: viewedAll ? '20rem' : '17rem' }}
+      >
+        {data?.data.data &&
+          data.data.data.map((record: ActivityRecord, index: number) => (
+            <React.Fragment key={index}>
+              {activityElement(record)}
+            </React.Fragment>
+          ))}
+      </div>
+
+      <ViewAll viewedAll={viewedAll} setViewedAll={setViewedAll} />
     </Card>
   );
 }
