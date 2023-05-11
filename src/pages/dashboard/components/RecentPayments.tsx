@@ -21,12 +21,17 @@ import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { useState } from 'react';
 import { ViewAll } from './ViewAll';
+import { useGetTableHeight } from '../hooks/useGetTableHeight';
 
 export function RecentPayments() {
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
   const [viewedAll, setViewedAll] = useState<boolean>(false);
+  const [hasVerticalOverflow, setHasVerticalOverflow] =
+    useState<boolean>(false);
+
+  const getTableHeight = useGetTableHeight();
 
   const columns: DataTableColumns<Payment> = [
     {
@@ -67,7 +72,7 @@ export function RecentPayments() {
     {
       id: 'date',
       label: t('date'),
-      format: (value) => dayjs(value).format('MMM DD'),
+      format: (value) => value && dayjs(value).format('MMM DD'),
     },
     {
       id: 'amount',
@@ -83,6 +88,10 @@ export function RecentPayments() {
       ),
     },
   ];
+
+  const handleVerticalOverflowChange = (overflow: boolean) => {
+    setHasVerticalOverflow(overflow);
+  };
 
   return (
     <Card
@@ -102,13 +111,17 @@ export function RecentPayments() {
         withoutActions
         withoutPagination
         withoutPadding
-        withoutBottomBorder={true}
+        withoutBottomBorder={hasVerticalOverflow}
+        onVerticalOverflowChange={handleVerticalOverflowChange}
         style={{
-          height: viewedAll ? '19.8rem' : '17rem',
+          height: getTableHeight(viewedAll),
         }}
       />
 
-      <ViewAll viewedAll={viewedAll} setViewedAll={setViewedAll} />
+      <ViewAll
+        viewedAll={viewedAll || !hasVerticalOverflow}
+        setViewedAll={setViewedAll}
+      />
     </Card>
   );
 }
