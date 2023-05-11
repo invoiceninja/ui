@@ -145,7 +145,7 @@ export function Totals() {
 
           <InputField
             placeholder="Search for transactions, clients, invoices"
-            className="w-64 bg-transparent border-none focus:ring-0"
+            className="w-72 bg-transparent border-none focus:ring-0"
           />
         </div>
 
@@ -201,8 +201,8 @@ export function Totals() {
       </div>
 
       <div className="grid grid-cols-12 mt-4 gap-4">
-        {totalsData[currency] && company && (
-          <Card title={t('welcome')} className="col-span-12 lg:col-span-4">
+        {company && (
+          <Card title={t('welcome')} className="col-span-12 xl:col-span-4">
             <div className="px-6 pb-8">
               <div className="flex flex-col space-y-2">
                 <span className="text-2xl">{`${user?.first_name} ${user?.last_name}`}</span>
@@ -276,7 +276,7 @@ export function Totals() {
         )}
 
         {chartData && (
-          <Card title={t('revenue')} className="lg:col-span-8 pr-4">
+          <Card title={t('revenue')} className="col-span-12 xl:col-span-8 pr-4">
             <div className="px-6 mb-5 text-2xl">
               {formatMoney(
                 totalsData[currency]?.revenue?.paid_to_date || 0,
