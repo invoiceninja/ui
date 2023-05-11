@@ -23,23 +23,23 @@ import { Totals } from '$app/pages/dashboard/components/Totals';
 import { UpcomingInvoices } from '$app/pages/dashboard/components/UpcomingInvoices';
 import { useTranslation } from 'react-i18next';
 import { BiPlus } from 'react-icons/bi';
+import { BsQuestionCircle } from 'react-icons/bs';
 import { MdOutlineNotifications } from 'react-icons/md';
 import { Default } from '../../components/layouts/Default';
 import { ExpiredQuotes } from './components/ExpiredQuotes';
 import { UpcomingQuotes } from './components/UpcomingQuotes';
 
 export default function Dashboard() {
+  useTitle('dashboard');
   const [t] = useTranslation();
 
-  useTitle('dashboard');
-
-  // const pages = [{ name: t('dashboard'), href: '/dashboard' }];
   const user = useCurrentUser();
 
   const { isAdmin } = useAdmin();
 
   return (
     <Default
+      childrenClassName="p-4 md:p-8 md:pr-20"
       title={t('dashboard')}
       navigationTopRight={
         <Inline className="space-x-6">
@@ -60,33 +60,38 @@ export default function Dashboard() {
         </Inline>
       }
       withoutBackButton
+      withoutBodyPadding
     >
       {isAdmin && <Totals />}
 
       <div className="grid grid-cols-12 gap-4 my-6">
-        <div className="col-span-12 lg:col-span-6">
+        <div className="col-span-12 xl:col-span-6">
           <Activity />
         </div>
 
-        <div className="col-span-12 lg:col-span-6">
+        <div className="col-span-12 xl:col-span-6">
           <RecentPayments />
         </div>
 
-        <div className="col-span-12 lg:col-span-6">
+        <div className="col-span-12 xl:col-span-6">
           <UpcomingInvoices />
         </div>
 
-        <div className="col-span-12 lg:col-span-6">
+        <div className="col-span-12 xl:col-span-6">
           <PastDueInvoices />
         </div>
 
-        <div className="col-span-12 lg:col-span-6">
+        <div className="col-span-12 xl:col-span-6">
           <ExpiredQuotes />
         </div>
 
-        <div className="col-span-12 lg:col-span-6">
+        <div className="col-span-12 xl:col-span-6">
           <UpcomingQuotes />
         </div>
+      </div>
+
+      <div className="fixed bottom-28 right-4 bg-gray-200 dark:bg-gray-900 rounded-3xl p-3 cursor-pointer">
+        <Icon element={BsQuestionCircle} size={27} />
       </div>
     </Default>
   );
