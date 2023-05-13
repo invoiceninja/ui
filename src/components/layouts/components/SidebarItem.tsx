@@ -43,7 +43,7 @@ export function SidebarItem(props: Props) {
         <div className="flex justify-start items-center my-2">
           <item.icon
             className={classNames(
-              'mr-3 flex-shrink-0 h-6 w-6',
+              'mr-3 flex-shrink-0 h-5 w-5',
               item.current
                 ? 'text-white'
                 : 'text-gray-300 group-hover:text-white'
