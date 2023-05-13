@@ -57,7 +57,7 @@ export function DesktopSidebar(props: Props) {
           )}
         </div>
 
-        <div className="flex-grow flex flex-col">
+        <div className="flex-grow flex flex-col mt-4">
           <nav className="flex-1 pb-4 space-y-1">
             {props.navigation.map((item, index) => (
               <SidebarItem key={index} item={item} />
