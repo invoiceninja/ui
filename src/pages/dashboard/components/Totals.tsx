@@ -29,7 +29,8 @@ import { Divider } from '$app/components/cards/Divider';
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
   expenses: { amount: string; code: string };
-  outstanding: { amount: string; code: string };
+  invoices: { invoiced_amount: string; code: string; date: string };
+  outstanding: { outstanding_count: number; amount: string; code: string };
 }
 
 interface Currency {
@@ -37,9 +38,9 @@ interface Currency {
   label: string;
 }
 
-interface ChartData {
+export interface ChartData {
   invoices: {
-    total: string;
+    invoiced_amount: string;
     date: string;
     currency: string;
   }[];
@@ -48,8 +49,8 @@ interface ChartData {
     date: string;
     currency: string;
   }[];
-  expenses: {
-    total: string;
+  outstanding: {
+    amount: string;
     date: string;
     currency: string;
   }[];
@@ -74,6 +75,7 @@ export function Totals() {
 
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [currency, setCurrency] = useState(1);
+  const [totalRevenue, setTotalRevenue] = useState(0);
 
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [chartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
@@ -121,7 +123,9 @@ export function Totals() {
 
   const getChartData = () => {
     request('POST', endpoint('/api/v1/charts/chart_summary'), body).then(
-      (response: AxiosResponse) => setChartData(response.data)
+      (response: AxiosResponse) => {
+        setChartData(response.data);
+      }
     );
   };
 
@@ -129,6 +133,22 @@ export function Totals() {
     getTotals();
     getChartData();
   }, [body]);
+
+  useEffect(() => {
+    if (totalsData && currency) {
+      const totalCurrencyData = totalsData[currency];
+
+      const invoicesTotal = totalCurrencyData?.invoices?.invoiced_amount || '0';
+      const paymentsTotal = totalCurrencyData?.revenue?.paid_to_date || '0';
+      const outstandingTotal = totalCurrencyData?.outstanding?.amount || '0';
+
+      setTotalRevenue(
+        parseFloat(invoicesTotal) +
+          parseFloat(paymentsTotal) +
+          parseFloat(outstandingTotal)
+      );
+    }
+  }, [totalsData, currency]);
 
   return (
     <>
@@ -219,7 +239,7 @@ export function Totals() {
                   <Badge style={{ backgroundColor: TotalColors.Blue }}>
                     <span className="mx-2 text-base">
                       {formatMoney(
-                        totalsData[currency]?.revenue?.paid_to_date || 0,
+                        totalsData[currency]?.invoices.invoiced_amount || 0,
                         company.settings.country_id,
                         currency.toString()
                       )}
@@ -234,7 +254,7 @@ export function Totals() {
                   <Badge style={{ backgroundColor: TotalColors.Green }}>
                     <span className="mx-2 text-base">
                       {formatMoney(
-                        totalsData[currency]?.revenue?.paid_to_date || 0,
+                        totalsData[currency]?.revenue.paid_to_date || 0,
                         company.settings.country_id,
                         currency.toString()
                       )}
@@ -261,11 +281,13 @@ export function Totals() {
 
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">
-                    {t('invoices_past_due')}
+                    {t('invoices_outstanding')}
                   </span>
 
                   <Badge variant="white">
-                    <span className="mx-2 text-base">122</span>
+                    <span className="mx-2 text-base">
+                      {totalsData[currency]?.outstanding.outstanding_count || 0}
+                    </span>
                   </Badge>
                 </div>
 
@@ -279,7 +301,7 @@ export function Totals() {
           <Card title={t('revenue')} className="col-span-12 xl:col-span-8 pr-4">
             <div className="px-6 mb-5 text-2xl">
               {formatMoney(
-                totalsData[currency]?.revenue?.paid_to_date || 0,
+                totalRevenue,
                 company.settings.country_id,
                 currency.toString()
               )}
