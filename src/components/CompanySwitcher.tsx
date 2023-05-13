@@ -117,14 +117,23 @@ export function CompanySwitcher() {
         />
       )}
 
-      <Menu as="div" className="relative inline-block text-left">
-        <div>
-          <Menu.Button className="flex items-center space-x-3 justify-center w-full rounded text-sm font-medium text-gray-700 border border-transparent">
+      <Menu as="div" className="relative inline-block text-left w-full">
+        <Menu.Button className="flex items-center justify-between w-full rounded font-medium pl-2">
+          <div className="flex items-center justify-center space-x-3">
             <img className="w-8" src={logo} alt="Company logo" />
-            <span className="text-gray-900 text-sm">{companyName}</span>
-            <ChevronDown size={18} className="text-gray-900" />
-          </Menu.Button>
-        </div>
+            <div className="flex flex-col items-between">
+              <span className="text-white text-sm text-start">
+                {companyName}
+              </span>
+              {(user?.first_name || user?.last_name) && (
+                <span className="text-white text-xs text-start">
+                  {`${user.first_name} ${user.last_name}`}
+                </span>
+              )}
+            </div>
+          </div>
+          <ChevronDown size={18} className="text-[#9CA3AF]" />
+        </Menu.Button>
 
         <Transition
           as={Fragment}
