@@ -17,7 +17,6 @@ import { Link } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { Divider } from '$app/components/cards/Divider';
 
 export function useGenerateActivityElement() {
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -171,7 +170,7 @@ export function useGenerateActivityElement() {
   };
 
   return (activity: ActivityRecord) => (
-    <div className="flex flex-col">
+    <div className="flex flex-col border border-b-gray-200 border-t-0 border-x-0 last:border-b-0">
       <div className="flex flex-col">
         <div className="flex flex-col py-2 pl-6">
           <span className="text-sm">{generate(activity)}</span>
@@ -184,8 +183,6 @@ export function useGenerateActivityElement() {
             <span className="text-gray-500 text-sm">{activity.ip}</span>
           </div>
         </div>
-
-        <Divider withoutPadding />
       </div>
     </div>
   );
