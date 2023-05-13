@@ -16,7 +16,6 @@ import {
   FileText,
   Settings,
   Users,
-  PlusCircle,
   Repeat,
   CreditCard,
   File,
@@ -114,12 +113,6 @@ export function Default(props: Props) {
         hasPermission('view_client') ||
         hasPermission('create_client') ||
         hasPermission('edit_client'),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/clients/create',
-        label: t('new_client'),
-        visible: hasPermission('create_client'),
-      },
     },
     {
       name: t('products'),
@@ -130,12 +123,6 @@ export function Default(props: Props) {
         hasPermission('view_product') ||
         hasPermission('create_product') ||
         hasPermission('edit_product'),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/products/create',
-        label: t('new_product'),
-        visible: hasPermission('create_product'),
-      },
     },
     {
       name: t('invoices'),
@@ -147,12 +134,6 @@ export function Default(props: Props) {
         (hasPermission('view_invoice') ||
           hasPermission('create_invoice') ||
           hasPermission('edit_invoice')),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/invoices/create',
-        label: t('new_invoice'),
-        visible: hasPermission('create_invoice'),
-      },
     },
     {
       name: t('recurring_invoices'),
@@ -164,12 +145,6 @@ export function Default(props: Props) {
         (hasPermission('view_recurring_invoice') ||
           hasPermission('create_recurring_invoice') ||
           hasPermission('edit_recurring_invoice')),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/recurring_invoices/create',
-        label: t('new_recurring_invoice'),
-        visible: hasPermission('create_recurring_invoice'),
-      },
     },
     {
       name: t('payments'),
@@ -180,12 +155,6 @@ export function Default(props: Props) {
         hasPermission('view_payment') ||
         hasPermission('create_payment') ||
         hasPermission('edit_payment'),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/payments/create',
-        label: t('new_payment'),
-        visible: hasPermission('create_payment'),
-      },
     },
     {
       name: t('quotes'),
@@ -197,12 +166,6 @@ export function Default(props: Props) {
         (hasPermission('view_quote') ||
           hasPermission('create_quote') ||
           hasPermission('edit_quote')),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/quotes/create',
-        label: t('new_quote'),
-        visible: hasPermission('create_quote'),
-      },
     },
     {
       name: t('credits'),
@@ -214,12 +177,6 @@ export function Default(props: Props) {
         (hasPermission('view_credit') ||
           hasPermission('create_credit') ||
           hasPermission('edit_credit')),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/credits/create',
-        label: t('new_credit'),
-        visible: hasPermission('create_credit'),
-      },
     },
     {
       name: t('projects'),
@@ -231,12 +188,6 @@ export function Default(props: Props) {
         (hasPermission('view_project') ||
           hasPermission('create_project') ||
           hasPermission('edit_project')),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/projects/create',
-        label: t('new_project'),
-        visible: hasPermission('create_project'),
-      },
     },
     {
       name: t('tasks'),
@@ -248,12 +199,6 @@ export function Default(props: Props) {
         (hasPermission('view_task') ||
           hasPermission('edit_task') ||
           hasPermission('create_task')),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/tasks/create',
-        label: t('new_task'),
-        visible: hasPermission('create_task'),
-      },
     },
     {
       name: t('vendors'),
@@ -265,12 +210,6 @@ export function Default(props: Props) {
         (hasPermission('view_vendor') ||
           hasPermission('create_vendor') ||
           hasPermission('edit_vendor')),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/vendors/create',
-        label: t('new_vendor'),
-        visible: hasPermission('create_vendor'),
-      },
     },
     {
       name: t('purchase_orders'),
@@ -282,12 +221,6 @@ export function Default(props: Props) {
         (hasPermission('view_purchase_order') ||
           hasPermission('create_purchase_order') ||
           hasPermission('edit_purchase_order')),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/purchase_orders/create',
-        label: t('new_purchase_order'),
-        visible: hasPermission('create_purchase_order'),
-      },
     },
     {
       name: t('expenses'),
@@ -299,12 +232,6 @@ export function Default(props: Props) {
         (hasPermission('view_expense') ||
           hasPermission('create_expense') ||
           hasPermission('edit_expense')),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/expenses/create',
-        label: t('new_expense'),
-        visible: hasPermission('create_expense'),
-      },
     },
     {
       name: t('recurring_expenses'),
@@ -316,12 +243,6 @@ export function Default(props: Props) {
         (hasPermission('view_recurring_expense') ||
           hasPermission('create_recurring_expense') ||
           hasPermission('edit_recurring_expense')),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/recurring_expenses/create',
-        label: t('new_recurring_expense'),
-        visible: hasPermission('create_recurring_expense'),
-      },
     },
     {
       name: t('reports'),
@@ -339,12 +260,6 @@ export function Default(props: Props) {
         hasPermission('view_bank_transaction') ||
         hasPermission('create_bank_transaction') ||
         hasPermission('edit_bank_transaction'),
-      rightButton: {
-        icon: PlusCircle,
-        to: '/transactions/create',
-        label: t('new_transaction'),
-        visible: hasPermission('create_bank_transaction'),
-      },
     },
     {
       name: t('settings'),
