@@ -19,18 +19,13 @@ import { Card } from '$app/components/cards';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { useState } from 'react';
-import { ViewAll } from './ViewAll';
-import { useGetTableHeight } from '../hooks/useGetTableHeight';
 
 export function UpcomingInvoices() {
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
-  const [viewedAll, setViewedAll] = useState<boolean>(false);
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
-
-  const getTableHeight = useGetTableHeight();
 
   const columns: DataTableColumns<Invoice> = [
     {
@@ -86,25 +81,15 @@ export function UpcomingInvoices() {
       <DataTable
         resource="invoice"
         columns={columns}
-        endpoint={route(
-          '/api/v1/invoices?include=client&upcoming=true&without_deleted_clients=true&per_page=50&page=1&sort=id|desc&view_all=:viewedAll',
-          {
-            viewedAll,
-          }
-        )}
+        endpoint="/api/v1/invoices?include=client&upcoming=true&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
         withoutActions
         withoutPagination
         withoutPadding
         withoutBottomBorder={hasVerticalOverflow}
         onVerticalOverflowChange={handleVerticalOverflowChange}
         style={{
-          height: getTableHeight(viewedAll),
+          height: '19.9rem',
         }}
-      />
-
-      <ViewAll
-        viewedAll={viewedAll || !hasVerticalOverflow}
-        setViewedAll={setViewedAll}
       />
     </Card>
   );

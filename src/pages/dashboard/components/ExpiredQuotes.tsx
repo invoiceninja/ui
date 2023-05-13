@@ -18,20 +18,15 @@ import { Quote } from '$app/common/interfaces/quote';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
-import { useGetTableHeight } from '../hooks/useGetTableHeight';
 import { useState } from 'react';
-import { ViewAll } from './ViewAll';
 
 export function ExpiredQuotes() {
   const [t] = useTranslation();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
 
-  const [viewedAll, setViewedAll] = useState<boolean>(false);
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
-
-  const getTableHeight = useGetTableHeight();
 
   const columns: DataTableColumns<Quote> = [
     {
@@ -87,25 +82,15 @@ export function ExpiredQuotes() {
       <DataTable
         resource="quote"
         columns={columns}
-        endpoint={route(
-          '/api/v1/quotes?include=client&client_status=expired&without_deleted_clients=true&per_page=50&page=1&sort=id|desc&view_all=:viewedAll',
-          {
-            viewedAll,
-          }
-        )}
+        endpoint="/api/v1/quotes?include=client&client_status=expired&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
         withoutActions
         withoutPagination
         withoutPadding
         withoutBottomBorder={hasVerticalOverflow}
         onVerticalOverflowChange={handleVerticalOverflowChange}
         style={{
-          height: getTableHeight(viewedAll),
+          height: '19.9rem',
         }}
-      />
-
-      <ViewAll
-        viewedAll={viewedAll || !hasVerticalOverflow}
-        setViewedAll={setViewedAll}
       />
     </Card>
   );

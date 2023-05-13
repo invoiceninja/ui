@@ -20,18 +20,13 @@ import { generatePath } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { useState } from 'react';
-import { ViewAll } from './ViewAll';
-import { useGetTableHeight } from '../hooks/useGetTableHeight';
 
 export function RecentPayments() {
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
-  const [viewedAll, setViewedAll] = useState<boolean>(false);
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
-
-  const getTableHeight = useGetTableHeight();
 
   const columns: DataTableColumns<Payment> = [
     {
@@ -89,8 +84,8 @@ export function RecentPayments() {
     },
   ];
 
-  const handleVerticalOverflowChange = (overflow: boolean) => {
-    setHasVerticalOverflow(overflow);
+  const handleVerticalOverflowChange = (hasOverflow: boolean) => {
+    setHasVerticalOverflow(hasOverflow);
   };
 
   return (
@@ -102,25 +97,15 @@ export function RecentPayments() {
       <DataTable
         resource="payment"
         columns={columns}
-        endpoint={route(
-          '/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&page=1&view_all=:viewedAll',
-          {
-            viewedAll,
-          }
-        )}
+        endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&page=1"
         withoutActions
         withoutPagination
         withoutPadding
         withoutBottomBorder={hasVerticalOverflow}
         onVerticalOverflowChange={handleVerticalOverflowChange}
         style={{
-          height: getTableHeight(viewedAll),
+          height: '19.9rem',
         }}
-      />
-
-      <ViewAll
-        viewedAll={viewedAll || !hasVerticalOverflow}
-        setViewedAll={setViewedAll}
       />
     </Card>
   );

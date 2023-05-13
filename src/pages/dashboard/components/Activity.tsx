@@ -17,23 +17,14 @@ import { useTranslation } from 'react-i18next';
 import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { useGenerateActivityElement } from '../hooks/useGenerateActivityElement';
-import React, { useState } from 'react';
-import { ViewAll } from './ViewAll';
+import React from 'react';
 
 export function Activity() {
   const [t] = useTranslation();
 
-  const [viewedAll, setViewedAll] = useState<boolean>(false);
-
   const { data, isLoading, isError } = useQuery(
     '/api/v1/activities?react',
-    () =>
-      request(
-        'GET',
-        endpoint('/api/v1/activities?react&view_all=:viewedAll', {
-          viewedAll,
-        })
-      )
+    () => request('GET', endpoint('/api/v1/activities?react'))
   );
 
   const activityElement = useGenerateActivityElement();
@@ -56,7 +47,7 @@ export function Activity() {
 
       <div
         className="flex flex-col overflow-y-auto"
-        style={{ height: viewedAll ? '20rem' : '17rem' }}
+        style={{ height: '19.9rem' }}
       >
         {data?.data.data &&
           data.data.data.map((record: ActivityRecord, index: number) => (
@@ -65,8 +56,6 @@ export function Activity() {
             </React.Fragment>
           ))}
       </div>
-
-      <ViewAll viewedAll={viewedAll} setViewedAll={setViewedAll} />
     </Card>
   );
 }

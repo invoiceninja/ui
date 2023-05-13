@@ -19,18 +19,13 @@ import { Card } from '$app/components/cards';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
 import { useState } from 'react';
-import { ViewAll } from './ViewAll';
-import { useGetTableHeight } from '../hooks/useGetTableHeight';
 
 export function PastDueInvoices() {
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
-  const [viewedAll, setViewedAll] = useState<boolean>(false);
   const [hasVerticalOverflow, setHasVerticalOverflow] =
     useState<boolean>(false);
-
-  const getTableHeight = useGetTableHeight();
 
   const columns: DataTableColumns<Invoice> = [
     {
@@ -93,13 +88,8 @@ export function PastDueInvoices() {
         withoutBottomBorder={hasVerticalOverflow}
         onVerticalOverflowChange={handleVerticalOverflowChange}
         style={{
-          height: getTableHeight(viewedAll),
+          height: '19.9rem',
         }}
-      />
-
-      <ViewAll
-        viewedAll={viewedAll || !hasVerticalOverflow}
-        setViewedAll={setViewedAll}
       />
     </Card>
   );
