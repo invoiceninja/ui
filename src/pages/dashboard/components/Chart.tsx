@@ -12,7 +12,7 @@ import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompan
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { date as formatDate } from '$app/common/helpers';
-import { TotalColors } from './Totals';
+import { ChartData, TotalColors } from './Totals';
 import {
   Line,
   CartesianGrid,
@@ -24,15 +24,7 @@ import {
 } from 'recharts';
 
 type Props = {
-  data: {
-    invoices: { total: string; date: string; currency: string }[];
-    payments: { total: string; date: string; currency: string }[];
-    expenses: {
-      total: string;
-      date: string;
-      currency: string;
-    }[];
-  };
+  data: ChartData;
   dates: any;
   chartSensitivity: 'day' | 'week' | 'month';
 };
@@ -60,7 +52,7 @@ export function Chart(props: Props) {
     const data: {
       date: string;
       invoices: number;
-      expenses: number;
+      outstanding: number;
       payments: number;
     }[] = [];
 
@@ -75,7 +67,7 @@ export function Chart(props: Props) {
         data.push({
           date: formatDate(date.toString(), dateFormat),
           invoices: 0,
-          expenses: 0,
+          outstanding: 0,
           payments: 0,
         });
       });
@@ -92,7 +84,7 @@ export function Chart(props: Props) {
         data.push({
           date: formatDate(date.toString(), dateFormat),
           invoices: 0,
-          expenses: 0,
+          outstanding: 0,
           payments: 0,
         });
       });
@@ -109,7 +101,7 @@ export function Chart(props: Props) {
         data.push({
           date: formatDate(date.toString(), dateFormat),
           invoices: 0,
-          expenses: 0,
+          outstanding: 0,
           payments: 0,
         });
       });
@@ -120,16 +112,16 @@ export function Chart(props: Props) {
       const record = data.findIndex((entry) => entry.date === date);
 
       if (record >= 0) {
-        data[record].invoices += parseFloat(invoice.total);
+        data[record].invoices += parseFloat(invoice.invoiced_amount);
       }
     });
 
-    props.data?.expenses.forEach((expense) => {
-      const date = formatDate(expense.date, dateFormat);
+    props.data?.outstanding.forEach((outstanding) => {
+      const date = formatDate(outstanding.date, dateFormat);
       const record = data.findIndex((entry) => entry.date === date);
 
       if (record >= 0) {
-        data[record].expenses += parseFloat(expense.total);
+        data[record].outstanding += parseFloat(outstanding.amount);
       }
     });
 
@@ -149,6 +141,16 @@ export function Chart(props: Props) {
     <ResponsiveContainer width="100%" height={330}>
       <LineChart height={200} data={chartData} margin={{ top: 9, left: 20 }}>
         <Line
+          id="invoices"
+          type="monotone"
+          name={t('invoices') || ''}
+          dataKey="invoices"
+          stroke={TotalColors.Blue}
+          dot={false}
+          strokeWidth={2}
+        />
+
+        <Line
           id="payments"
           type="monotone"
           name={t('payments') || ''}
@@ -159,21 +161,11 @@ export function Chart(props: Props) {
         />
 
         <Line
-          id="expenses"
+          id="outstanding"
           type="monotone"
-          name={t('expenses') || ''}
-          dataKey="expenses"
+          name={t('outstanding') || ''}
+          dataKey="outstanding"
           stroke={TotalColors.Red}
-          dot={false}
-          strokeWidth={2}
-        />
-
-        <Line
-          id="invoices"
-          type="monotone"
-          name={t('invoices') || ''}
-          dataKey="invoices"
-          stroke={TotalColors.Blue}
           dot={false}
           strokeWidth={2}
         />
@@ -181,8 +173,8 @@ export function Chart(props: Props) {
         <CartesianGrid strokeDasharray="0" vertical={false} />
         <Tooltip />
 
-        <XAxis height={50} dataKey="date" />
-        <YAxis domain={[0, 1000]} interval={0} tickCount={6} />
+        <XAxis dataKey="date" />
+        <YAxis interval={0} tickCount={6} />
       </LineChart>
     </ResponsiveContainer>
   );
