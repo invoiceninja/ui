@@ -35,8 +35,8 @@ export function SidebarItem(props: Props) {
       className={classNames(
         'flex items-center justify-between group px-4 text-sm font-medium',
         item.current
-          ? 'text-white border-l-4 border-transparent bg-ninja-gray-darker dark:bg-gray-700'
-          : 'text-gray-300 hover:text-white border-l-4 border-transparent hover:bg-ninja-gray-darker dark:hover:bg-gray-700'
+          ? 'text-white border-l-4 border-transparent bg-ninja-gray-lighter'
+          : 'text-gray-300 hover:text-white border-l-4 border-transparent hover:bg-ninja-gray-lighter'
       )}
     >
       <Link to={item.href} className="w-full">
