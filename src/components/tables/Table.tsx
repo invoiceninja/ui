@@ -16,6 +16,7 @@ import CommonProps from '../../common/interfaces/common-props.interface';
 interface Props extends CommonProps {
   withoutPadding?: boolean;
   withoutBottomBorder?: boolean;
+  withoutTopBorder?: boolean;
   onVerticalOverflowChange?: (overflow: boolean) => void;
 }
 
@@ -110,6 +111,7 @@ export function Table(props: Props) {
             'overflow-hidden border border-gray-200 dark:border-transparent rounded border-b border-t',
             {
               'border-b-0': props.withoutBottomBorder,
+              'border-t-0': props.withoutTopBorder,
             }
           )}
         >

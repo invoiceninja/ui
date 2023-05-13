@@ -87,7 +87,10 @@ export function UpcomingQuotes() {
         withoutPagination
         withoutPadding
         withoutBottomBorder={hasVerticalOverflow}
+        withoutTopBorder
         onVerticalOverflowChange={handleVerticalOverflowChange}
+        headerBackgroundColor="transparent"
+        thChildrenClassName="text-gray-800 dark:text-white"
         style={{
           height: '19.9rem',
         }}

@@ -78,7 +78,10 @@ interface Props<T> extends CommonProps {
   showRestore?: (resource: T) => boolean;
   beforeFilter?: ReactNode;
   withoutBottomBorder?: boolean;
+  withoutTopBorder?: boolean;
   onVerticalOverflowChange?: (overflow: boolean) => void;
+  headerBackgroundColor?: string;
+  thChildrenClassName?: string;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -257,10 +260,11 @@ export function DataTable<T extends object>(props: Props<T>) {
         className={props.className}
         withoutPadding={props.withoutPadding}
         withoutBottomBorder={props.withoutBottomBorder}
+        withoutTopBorder={props.withoutTopBorder}
         onVerticalOverflowChange={props.onVerticalOverflowChange}
         style={props.style}
       >
-        <Thead>
+        <Thead backgroundColor={props.headerBackgroundColor}>
           {!props.withoutActions && (
             <Th>
               <Checkbox
@@ -291,6 +295,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                 setSortedBy(data.field);
                 setSort(data.sort);
               }}
+              childrenClassName={props.thChildrenClassName}
             >
               {column.label}
             </Th>
