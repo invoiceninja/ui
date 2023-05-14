@@ -73,7 +73,7 @@ export function Table(props: Props) {
         setIsVerticallyOverflow(false);
       }
     }
-  }, [tableHeight, tableParentHeight]);
+  }, [numberOfCells, tableHeight, tableParentHeight]);
 
   useEffect(() => {
     if (props.style?.height && onVerticalOverflowChange) {
