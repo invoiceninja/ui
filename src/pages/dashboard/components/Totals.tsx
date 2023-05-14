@@ -40,7 +40,7 @@ interface Currency {
 
 export interface ChartData {
   invoices: {
-    invoiced_amount: string;
+    total: string;
     date: string;
     currency: string;
   }[];
@@ -50,7 +50,7 @@ export interface ChartData {
     currency: string;
   }[];
   outstanding: {
-    amount: string;
+    total: string;
     date: string;
     currency: string;
   }[];
@@ -281,7 +281,7 @@ export function Totals() {
 
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">
-                    {t('invoices_outstanding')}
+                    {t('total_invoices_outstanding')}
                   </span>
 
                   <Badge variant="white">
