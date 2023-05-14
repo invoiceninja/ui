@@ -29,6 +29,13 @@ type Props = {
   chartSensitivity: 'day' | 'week' | 'month';
 };
 
+type LineChartData = {
+  date: string;
+  invoices: number;
+  outstanding: number;
+  payments: number;
+}[];
+
 export function Chart(props: Props) {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
@@ -48,13 +55,31 @@ export function Chart(props: Props) {
     return dates;
   };
 
+  const getRecordIndex = (data: LineChartData | undefined, date: string) => {
+    let recordIndex = -1;
+
+    if (!data || !date) return recordIndex;
+
+    data.forEach((entry, index) => {
+      if (entry.date === date) {
+        recordIndex = index;
+      } else if (index + 1 <= data.length) {
+        if (
+          data[index] &&
+          data[index + 1] &&
+          new Date(date) >= new Date(data[index].date) &&
+          new Date(date) <= new Date(data[index + 1].date)
+        ) {
+          recordIndex = index;
+        }
+      }
+    });
+
+    return recordIndex;
+  };
+
   useEffect(() => {
-    const data: {
-      date: string;
-      invoices: number;
-      outstanding: number;
-      payments: number;
-    }[] = [];
+    const data: LineChartData = [];
 
     if (props.chartSensitivity === 'day') {
       const dates = generateDateRange(
@@ -109,28 +134,28 @@ export function Chart(props: Props) {
 
     props.data?.invoices.forEach((invoice) => {
       const date = formatDate(invoice.date, dateFormat);
-      const record = data.findIndex((entry) => entry.date === date);
+      const recordIndex = getRecordIndex(data, date);
 
-      if (record >= 0) {
-        data[record].invoices += parseFloat(invoice.invoiced_amount);
+      if (recordIndex >= 0) {
+        data[recordIndex].invoices += parseFloat(invoice.total);
       }
     });
 
     props.data?.outstanding.forEach((outstanding) => {
       const date = formatDate(outstanding.date, dateFormat);
-      const record = data.findIndex((entry) => entry.date === date);
+      const recordIndex = getRecordIndex(data, date);
 
-      if (record >= 0) {
-        data[record].outstanding += parseFloat(outstanding.amount);
+      if (recordIndex >= 0) {
+        data[recordIndex].outstanding += parseFloat(outstanding.total);
       }
     });
 
     props.data?.payments.forEach((payment) => {
       const date = formatDate(payment.date, dateFormat);
-      const record = data.findIndex((entry) => entry.date === date);
+      const recordIndex = getRecordIndex(data, date);
 
-      if (record >= 0) {
-        data[record].payments += parseFloat(payment.total);
+      if (recordIndex >= 0) {
+        data[recordIndex].payments += parseFloat(payment.total);
       }
     });
 
