@@ -164,7 +164,7 @@ export function Chart(props: Props) {
 
   return (
     <ResponsiveContainer width="100%" height={330}>
-      <LineChart height={200} data={chartData} margin={{ top: 9, left: 20 }}>
+      <LineChart height={200} data={chartData} margin={{ top: 17, left: 20 }}>
         <Line
           id="invoices"
           type="monotone"
