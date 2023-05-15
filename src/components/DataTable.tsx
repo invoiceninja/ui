@@ -13,6 +13,7 @@ import { endpoint, isProduction } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import React, {
   ChangeEvent,
+  CSSProperties,
   ReactElement,
   ReactNode,
   useEffect,
@@ -46,6 +47,7 @@ import { Icon } from './icons/Icon';
 import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import CommonProps from '$app/common/interfaces/common-props.interface';
+import classNames from 'classnames';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -79,9 +81,14 @@ interface Props<T> extends CommonProps {
   beforeFilter?: ReactNode;
   withoutBottomBorder?: boolean;
   withoutTopBorder?: boolean;
-  onVerticalOverflowChange?: (overflow: boolean) => void;
+  withoutLeftBorder?: boolean;
+  withoutRightBorder?: boolean;
   headerBackgroundColor?: string;
   thChildrenClassName?: string;
+  tBodyStyle?: CSSProperties;
+  thClassName?: string;
+  tdClassName?: string;
+  addRowSeparator?: boolean;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -90,6 +97,9 @@ export const datatablePerPageAtom = atomWithStorage('perPage', '10');
 
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
+
+  const [hasVerticalOverflow, setHasVerticalOverflow] =
+    useState<boolean>(false);
 
   const [apiEndpoint, setApiEndpoint] = useState(
     new URL(endpoint(props.endpoint))
@@ -112,6 +122,10 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [selected, setSelected] = useState<string[]>([]);
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
+
+  const handleVerticalOverflowChange = (hasOverflow: boolean) => {
+    setHasVerticalOverflow(hasOverflow);
+  };
 
   useEffect(() => {
     const perPageParameter = apiEndpoint.searchParams.get('perPage');
@@ -257,16 +271,20 @@ export function DataTable<T extends object>(props: Props<T>) {
       )}
 
       <Table
-        className={props.className}
+        className={classNames(props.className, {
+          'pr-0': !hasVerticalOverflow,
+        })}
         withoutPadding={props.withoutPadding}
         withoutBottomBorder={props.withoutBottomBorder}
         withoutTopBorder={props.withoutTopBorder}
-        onVerticalOverflowChange={props.onVerticalOverflowChange}
+        withoutLeftBorder={props.withoutLeftBorder}
+        withoutRightBorder={props.withoutRightBorder}
+        onVerticalOverflowChange={handleVerticalOverflowChange}
         style={props.style}
       >
         <Thead backgroundColor={props.headerBackgroundColor}>
           {!props.withoutActions && (
-            <Th>
+            <Th className={props.thClassName}>
               <Checkbox
                 innerRef={mainCheckbox}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -290,6 +308,7 @@ export function DataTable<T extends object>(props: Props<T>) {
             <Th
               id={column.id}
               key={index}
+              className={props.thClassName}
               isCurrentlyUsed={sortedBy === column.id}
               onColumnClick={(data: ColumnSortPayload) => {
                 setSortedBy(data.field);
@@ -304,9 +323,14 @@ export function DataTable<T extends object>(props: Props<T>) {
           {props.withResourcefulActions && <Th></Th>}
         </Thead>
 
-        <Tbody>
+        <Tbody style={props.tBodyStyle}>
           {isLoading && (
-            <Tr>
+            <Tr
+              className={classNames({
+                'border-b border-gray-200': props.addRowSeparator,
+                'last:border-b-0': hasVerticalOverflow,
+              })}
+            >
               <Td colSpan={100}>
                 <Spinner />
               </Td>
@@ -314,7 +338,12 @@ export function DataTable<T extends object>(props: Props<T>) {
           )}
 
           {isError && (
-            <Tr>
+            <Tr
+              className={classNames({
+                'border-b border-gray-200': props.addRowSeparator,
+                'last:border-b-0': hasVerticalOverflow,
+              })}
+            >
               <Td className="text-center" colSpan={100}>
                 {t('error_refresh_page')}
               </Td>
@@ -322,8 +351,15 @@ export function DataTable<T extends object>(props: Props<T>) {
           )}
 
           {data && data.data.data.length === 0 && (
-            <Tr>
-              <Td colSpan={100}>{t('no_records_found')}</Td>
+            <Tr
+              className={classNames({
+                'border-b border-gray-200': props.addRowSeparator,
+                'last:border-b-0': hasVerticalOverflow,
+              })}
+            >
+              <Td className={props.tdClassName} colSpan={100}>
+                {t('no_records_found')}
+              </Td>
             </Tr>
           )}
 
@@ -331,6 +367,10 @@ export function DataTable<T extends object>(props: Props<T>) {
             data?.data?.data?.map((resource: any, index: number) => (
               <Tr
                 key={index}
+                className={classNames({
+                  'border-b border-gray-200': props.addRowSeparator,
+                  'last:border-b-0': hasVerticalOverflow,
+                })}
                 onClick={() =>
                   props.onTableRowClick
                     ? props.onTableRowClick(resource)
@@ -356,7 +396,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                 )}
 
                 {props.columns.map((column, index) => (
-                  <Td key={index}>
+                  <Td key={index} className={props.tdClassName}>
                     {column.format
                       ? column.format(resource[column.id], resource)
                       : resource[column.id]}
