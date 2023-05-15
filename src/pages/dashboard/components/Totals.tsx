@@ -73,7 +73,6 @@ export function Totals() {
 
   const [currencies, setCurrencies] = useState<Currency[]>([]);
   const [currency, setCurrency] = useState(1);
-  const [totalRevenue, setTotalRevenue] = useState(0);
 
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [chartScale, setChartScale] = useState<'day' | 'week' | 'month'>('day');
@@ -131,22 +130,6 @@ export function Totals() {
     getTotals();
     getChartData();
   }, [body]);
-
-  useEffect(() => {
-    if (totalsData && currency) {
-      const totalCurrencyData = totalsData[currency];
-
-      const invoicesTotal = totalCurrencyData?.invoices?.invoiced_amount || '0';
-      const paymentsTotal = totalCurrencyData?.revenue?.paid_to_date || '0';
-      const outstandingTotal = totalCurrencyData?.outstanding?.amount || '0';
-
-      setTotalRevenue(
-        parseFloat(invoicesTotal) +
-          parseFloat(paymentsTotal) +
-          parseFloat(outstandingTotal)
-      );
-    }
-  }, [totalsData, currency]);
 
   return (
     <>
@@ -288,14 +271,6 @@ export function Totals() {
 
         {chartData && (
           <Card title={t('revenue')} className="col-span-12 xl:col-span-8 pr-4">
-            <div className="px-6 mb-5 text-2xl">
-              {formatMoney(
-                totalRevenue,
-                company.settings.country_id,
-                currency.toString()
-              )}
-            </div>
-
             <Chart
               chartSensitivity={chartScale}
               dates={{ start_date: body.start_date, end_date: body.end_date }}
