@@ -16,13 +16,13 @@ import {
   FileText,
   Settings,
   Users,
+  PlusCircle,
   Repeat,
   CreditCard,
   File,
   Briefcase,
   Clock,
   PieChart,
-  PlusCircle,
 } from 'react-feather';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
@@ -504,7 +504,7 @@ export function Default(props: Props) {
               </div>
             )}
 
-            <div className="dark:text-gray-100 p-4 md:py-8 xl:p-8">
+            <div className="p-4 md:py-8 xl:p-8 dark:text-gray-100">
               {props.children}
             </div>
           </main>
