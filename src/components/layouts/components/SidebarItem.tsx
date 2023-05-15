@@ -60,7 +60,7 @@ export function SidebarItem(props: Props) {
           title={item.rightButton.label}
           className="hover:bg-gray-200 hover:bg-opacity-10 rounded-full p-1.5"
         >
-          <item.rightButton.icon />
+          <item.rightButton.icon className="h-5 w-5" />
         </Link>
       )}
     </div>

@@ -68,10 +68,10 @@ export function Table(props: Props) {
       onVerticalOverflowChange
     ) {
       if (tableHeight > tableParentHeight) {
-        onVerticalOverflowChange?.(true);
+        onVerticalOverflowChange(true);
         setIsVerticallyOverflow(true);
       } else {
-        onVerticalOverflowChange?.(false);
+        onVerticalOverflowChange(false);
         setIsVerticallyOverflow(false);
       }
     }
@@ -79,7 +79,7 @@ export function Table(props: Props) {
 
   useEffect(() => {
     if (props.style?.height && onVerticalOverflowChange) {
-      setManualTableHeight(props.style?.height);
+      setManualTableHeight(props.style.height);
     }
   }, [props.style?.height]);
 
