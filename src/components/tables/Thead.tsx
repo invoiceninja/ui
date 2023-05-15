@@ -16,12 +16,12 @@ interface Props extends CommonProps {
 }
 
 export function Thead(props: Props) {
-  const { backgroundColor: headerBackgroundColor } = props;
+  const { backgroundColor } = props;
 
   const accentColor = useAccentColor();
 
   return (
-    <thead style={{ backgroundColor: headerBackgroundColor || accentColor }}>
+    <thead style={{ backgroundColor: backgroundColor || accentColor }}>
       <tr>{props.children}</tr>
     </thead>
   );

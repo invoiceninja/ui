@@ -132,7 +132,7 @@ export function CompanySwitcher() {
               )}
             </div>
           </div>
-          <ChevronDown size={18} className="text-[#9CA3AF]" />
+          <ChevronDown size={18} className="text-gray-300" />
         </Menu.Button>
 
         <Transition

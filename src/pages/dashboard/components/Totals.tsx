@@ -22,7 +22,6 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Badge } from '$app/components/Badge';
-import { Divider } from '$app/components/cards/Divider';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
@@ -120,9 +119,7 @@ export function Totals() {
 
   const getChartData = () => {
     request('POST', endpoint('/api/v1/charts/chart_summary'), body).then(
-      (response: AxiosResponse) => {
-        setChartData(response.data);
-      }
+      (response: AxiosResponse) => setChartData(response.data)
     );
   };
 
@@ -204,8 +201,8 @@ export function Totals() {
                 </span>
               </div>
 
-              <div className="flex flex-col mt-8 space-y-3">
-                <div className="flex justify-between items-center">
+              <div className="flex flex-col mt-8">
+                <div className="flex justify-between items-center border-b border-gray-300 py-3">
                   <span className="text-gray-600">{t('invoices')}</span>
 
                   <Badge style={{ backgroundColor: TotalColors.Blue }}>
@@ -219,9 +216,7 @@ export function Totals() {
                   </Badge>
                 </div>
 
-                <Divider withoutPadding />
-
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center border-b border-gray-300 py-3">
                   <span className="text-gray-600">{t('payments')}</span>
                   <Badge style={{ backgroundColor: TotalColors.Green }}>
                     <span className="mx-2 text-base">
@@ -234,9 +229,7 @@ export function Totals() {
                   </Badge>
                 </div>
 
-                <Divider withoutPadding />
-
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center border-b border-gray-300 py-3">
                   <span className="text-gray-600">{t('outstanding')}</span>
                   <Badge style={{ backgroundColor: TotalColors.Red }}>
                     <span className="mx-2 text-base">
@@ -249,9 +242,7 @@ export function Totals() {
                   </Badge>
                 </div>
 
-                <Divider withoutPadding />
-
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center border-b border-gray-300 py-3">
                   <span className="text-gray-600">
                     {t('total_invoices_outstanding')}
                   </span>
@@ -262,8 +253,6 @@ export function Totals() {
                     </span>
                   </Badge>
                 </div>
-
-                <Divider withoutPadding />
               </div>
             </div>
           </Card>

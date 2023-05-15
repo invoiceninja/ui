@@ -50,7 +50,7 @@ export function Button(props: Props) {
           `inline-flex items-center space-x-2 justify-center py-2 px-4 rounded text-sm text-gray-900 ${props.className}`,
           {
             'w-full': props.variant === 'block',
-            'text-white border border-gray-300': props.type === 'primary',
+            'text-white': props.type === 'primary',
             'text-gray-900 border border-gray-300': props.type === 'secondary',
             'border-gray-600': props.type == 'minimal',
           }

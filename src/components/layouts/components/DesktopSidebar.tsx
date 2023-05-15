@@ -49,9 +49,9 @@ export function DesktopSidebar(props: Props) {
       } md:flex-col md:fixed md:inset-y-0`}
     >
       <div className="flex flex-col flex-grow border-gray-100 bg-ninja-gray overflow-y-auto border-r">
-        <div className="flex items-center flex-shrink-0 pl-3 pr-6 bg-ninja-gray h-16 border border-x-0 border-t-0 border-b-gray-600">
+        <div className="flex items-center flex-shrink-0 pl-3 pr-6 bg-ninja-gray h-16 border-b border-gray-600">
           {isMiniSidebar ? (
-            <img className="h-9" src={logo} alt="Company logo" />
+            <img className="w-8" src={logo} alt="Company logo" />
           ) : (
             <CompanySwitcher />
           )}

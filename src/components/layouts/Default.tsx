@@ -50,7 +50,6 @@ import { useEnabled } from '$app/common/guards/guards/enabled';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
-import classNames from 'classnames';
 
 export interface SaveOption {
   label: string;
@@ -71,8 +70,6 @@ interface Props extends CommonProps {
   disableSaveButton?: boolean;
   withoutBackButton?: boolean;
   additionalSaveOptions?: SaveOption[];
-  childrenClassName?: string;
-  withoutBodyPadding?: boolean;
 }
 
 export function Default(props: Props) {
@@ -507,14 +504,7 @@ export function Default(props: Props) {
               </div>
             )}
 
-            <div
-              className={classNames(
-                `dark:text-gray-100 ${props.childrenClassName}`,
-                {
-                  'p-4 md:py-8 xl:p-8': !props.withoutBodyPadding,
-                }
-              )}
-            >
+            <div className="dark:text-gray-100 p-4 md:py-8 xl:p-8">
               {props.children}
             </div>
           </main>

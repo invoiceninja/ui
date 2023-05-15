@@ -56,7 +56,7 @@ export function useGenerateActivityElement() {
     const replacements = {
       client: (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
-          {activity.client?.name || contact(activity)}
+          {activity.client?.display_name}
         </Link>
       ),
       contact: (
