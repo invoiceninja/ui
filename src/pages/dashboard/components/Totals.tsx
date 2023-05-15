@@ -217,7 +217,7 @@ export function Totals() {
                 <span className="text-2xl">{`${user?.first_name} ${user?.last_name}`}</span>
 
                 <span className="text-sm text-gray-600">
-                  Here are your company’s most recent transactions:
+                  {t('recent_transactions')}
                 </span>
               </div>
 
