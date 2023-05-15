@@ -78,7 +78,7 @@ export function Table(props: Props) {
   }, [numberOfCells, tableHeight, tableParentHeight]);
 
   useEffect(() => {
-    if (props.style?.height && onVerticalOverflowChange) {
+    if (props.style?.height) {
       setManualTableHeight(props.style.height);
     }
   }, [props.style?.height]);
@@ -88,11 +88,7 @@ export function Table(props: Props) {
       setManualTableHeight('auto');
     }
 
-    if (
-      !isVerticallyOverflow &&
-      numberOfCells > 1 &&
-      onVerticalOverflowChange
-    ) {
+    if (!isVerticallyOverflow && numberOfCells > 1) {
       setManualTableHeight('auto');
     }
   }, [isVerticallyOverflow, numberOfCells]);
