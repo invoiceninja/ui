@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField, SelectField } from '$app/components/forms';
+import { Button, SelectField } from '$app/components/forms';
 import { AxiosResponse } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { Chart } from '$app/pages/dashboard/components/Chart';
@@ -21,8 +21,6 @@ import { request } from '$app/common/helpers/request';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
-import { Icon } from '$app/components/icons/Icon';
-import { MdSearch } from 'react-icons/md';
 import { Badge } from '$app/components/Badge';
 import { Divider } from '$app/components/cards/Divider';
 
@@ -159,16 +157,7 @@ export function Totals() {
       )}
 
       {/* Quick date, currency & date picker. */}
-      <div className="flex justify-between">
-        <div className="flex items-center">
-          <Icon element={MdSearch} size={24} />
-
-          <InputField
-            placeholder="Search for transactions, clients, invoices"
-            className="w-72 bg-transparent border-none focus:ring-0"
-          />
-        </div>
-
+      <div className="flex justify-end">
         <div className="flex space-x-2">
           {currencies && (
             <SelectField
