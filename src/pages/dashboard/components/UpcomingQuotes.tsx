@@ -18,15 +18,11 @@ import { Quote } from '$app/common/interfaces/quote';
 import { useTranslation } from 'react-i18next';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
-import { useState } from 'react';
 
 export function UpcomingQuotes() {
   const [t] = useTranslation();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
-
-  const [hasVerticalOverflow, setHasVerticalOverflow] =
-    useState<boolean>(false);
 
   const columns: DataTableColumns<Quote> = [
     {
@@ -69,32 +65,37 @@ export function UpcomingQuotes() {
     },
   ];
 
-  const handleVerticalOverflowChange = (overflow: boolean) => {
-    setHasVerticalOverflow(overflow);
-  };
-
   return (
     <Card
       title={t('upcoming_quotes')}
       className="h-96 relative"
       withoutBodyPadding
+      withoutHeaderBorder
     >
-      <DataTable
-        resource="quote"
-        columns={columns}
-        endpoint="/api/v1/quotes?include=client&client_status=upcoming&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
-        withoutActions
-        withoutPagination
-        withoutPadding
-        withoutBottomBorder={hasVerticalOverflow}
-        withoutTopBorder
-        onVerticalOverflowChange={handleVerticalOverflowChange}
-        headerBackgroundColor="transparent"
-        thChildrenClassName="text-gray-800 dark:text-white"
-        style={{
-          height: '19.9rem',
-        }}
-      />
+      <div className="pl-6 pr-4">
+        <DataTable
+          resource="quote"
+          columns={columns}
+          className="pr-4"
+          endpoint="/api/v1/quotes?include=client&client_status=upcoming&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
+          withoutActions
+          withoutPagination
+          withoutPadding
+          addRowSeparator
+          withoutBottomBorder
+          withoutTopBorder
+          withoutLeftBorder
+          withoutRightBorder
+          headerBackgroundColor="transparent"
+          thChildrenClassName="text-gray-500 dark:text-white"
+          tdClassName="first:pl-0 py-4"
+          thClassName="first:pl-0"
+          tBodyStyle={{ border: 0 }}
+          style={{
+            height: '19.9rem',
+          }}
+        />
+      </div>
     </Card>
   );
 }

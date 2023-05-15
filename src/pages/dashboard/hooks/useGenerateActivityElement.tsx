@@ -170,18 +170,16 @@ export function useGenerateActivityElement() {
   };
 
   return (activity: ActivityRecord) => (
-    <div className="flex flex-col border border-b-gray-200 border-t-0 border-x-0 last:border-b-0">
+    <div className="flex flex-col py-2 border border-b-gray-200 border-t-0 border-x-0 last:border-b-0">
       <div className="flex flex-col">
-        <div className="flex flex-col py-2 pl-6">
-          <span className="text-sm">{generate(activity)}</span>
+        <span className="text-sm">{generate(activity)}</span>
 
-          <div className="flex space-x-3">
-            <span className="dark:text-white text-sm">
-              {date(activity.created_at, dateFormat)}
-            </span>
+        <div className="flex space-x-3">
+          <span className="dark:text-white text-sm">
+            {date(activity.created_at, dateFormat)}
+          </span>
 
-            <span className="text-gray-500 text-sm">{activity.ip}</span>
-          </div>
+          <span className="text-gray-500 text-sm">{activity.ip}</span>
         </div>
       </div>
     </div>

@@ -17,6 +17,8 @@ interface Props extends CommonProps {
   withoutPadding?: boolean;
   withoutBottomBorder?: boolean;
   withoutTopBorder?: boolean;
+  withoutLeftBorder?: boolean;
+  withoutRightBorder?: boolean;
   onVerticalOverflowChange?: (overflow: boolean) => void;
 }
 
@@ -112,6 +114,8 @@ export function Table(props: Props) {
             {
               'border-b-0': props.withoutBottomBorder,
               'border-t-0': props.withoutTopBorder,
+              'border-l-0': props.withoutLeftBorder,
+              'border-r-0': props.withoutRightBorder,
             }
           )}
         >

@@ -18,14 +18,10 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
-import { useState } from 'react';
 
 export function PastDueInvoices() {
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
-
-  const [hasVerticalOverflow, setHasVerticalOverflow] =
-    useState<boolean>(false);
 
   const columns: DataTableColumns<Invoice> = [
     {
@@ -68,32 +64,37 @@ export function PastDueInvoices() {
     },
   ];
 
-  const handleVerticalOverflowChange = (overflow: boolean) => {
-    setHasVerticalOverflow(overflow);
-  };
-
   return (
     <Card
       title={t('past_due_invoices')}
       className="h-96 relative"
       withoutBodyPadding
+      withoutHeaderBorder
     >
-      <DataTable
-        resource="invoice"
-        columns={columns}
-        endpoint="/api/v1/invoices?include=client&overdue=true&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
-        withoutActions
-        withoutPagination
-        withoutPadding
-        withoutBottomBorder={hasVerticalOverflow}
-        withoutTopBorder
-        onVerticalOverflowChange={handleVerticalOverflowChange}
-        headerBackgroundColor="transparent"
-        thChildrenClassName="text-gray-800 dark:text-white"
-        style={{
-          height: '19.9rem',
-        }}
-      />
+      <div className="pl-6 pr-4">
+        <DataTable
+          resource="invoice"
+          columns={columns}
+          className="pr-4"
+          endpoint="/api/v1/invoices?include=client&overdue=true&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
+          withoutActions
+          withoutPagination
+          withoutPadding
+          addRowSeparator
+          withoutBottomBorder
+          withoutTopBorder
+          withoutLeftBorder
+          withoutRightBorder
+          headerBackgroundColor="transparent"
+          thChildrenClassName="text-gray-500 dark:text-white"
+          tdClassName="first:pl-0 py-4"
+          thClassName="first:pl-0"
+          tBodyStyle={{ border: 0 }}
+          style={{
+            height: '19.9rem',
+          }}
+        />
+      </div>
     </Card>
   );
 }

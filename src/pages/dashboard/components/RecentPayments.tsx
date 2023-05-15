@@ -19,14 +19,10 @@ import { Card } from '$app/components/cards';
 import { generatePath } from 'react-router-dom';
 import dayjs from 'dayjs';
 import { Badge } from '$app/components/Badge';
-import { useState } from 'react';
 
 export function RecentPayments() {
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
-
-  const [hasVerticalOverflow, setHasVerticalOverflow] =
-    useState<boolean>(false);
 
   const columns: DataTableColumns<Payment> = [
     {
@@ -84,32 +80,37 @@ export function RecentPayments() {
     },
   ];
 
-  const handleVerticalOverflowChange = (hasOverflow: boolean) => {
-    setHasVerticalOverflow(hasOverflow);
-  };
-
   return (
     <Card
       title={t('recent_payments')}
       className="h-96 relative"
       withoutBodyPadding
+      withoutHeaderBorder
     >
-      <DataTable
-        resource="payment"
-        columns={columns}
-        endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&page=1"
-        withoutActions
-        withoutPagination
-        withoutPadding
-        withoutBottomBorder={hasVerticalOverflow}
-        withoutTopBorder
-        onVerticalOverflowChange={handleVerticalOverflowChange}
-        headerBackgroundColor="transparent"
-        thChildrenClassName="text-gray-800 dark:text-white"
-        style={{
-          height: '19.9rem',
-        }}
-      />
+      <div className="pl-6 pr-4">
+        <DataTable
+          resource="payment"
+          columns={columns}
+          className="pr-4"
+          endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&page=1"
+          withoutActions
+          withoutPagination
+          withoutPadding
+          addRowSeparator
+          withoutBottomBorder
+          withoutTopBorder
+          withoutLeftBorder
+          withoutRightBorder
+          headerBackgroundColor="transparent"
+          thChildrenClassName="text-gray-500 dark:text-white"
+          tdClassName="first:pl-0 py-4"
+          thClassName="first:pl-0"
+          tBodyStyle={{ border: 0 }}
+          style={{
+            height: '19.9rem',
+          }}
+        />
+      </div>
     </Card>
   );
 }
