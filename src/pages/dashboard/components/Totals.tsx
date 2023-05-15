@@ -202,7 +202,7 @@ export function Totals() {
               </div>
 
               <div className="flex flex-col mt-8">
-                <div className="flex justify-between items-center border-b border-gray-300 py-3">
+                <div className="flex justify-between items-center border-b border-gray-200 py-3">
                   <span className="text-gray-600">{t('invoices')}</span>
 
                   <Badge style={{ backgroundColor: TotalColors.Blue }}>
@@ -216,7 +216,7 @@ export function Totals() {
                   </Badge>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-gray-300 py-3">
+                <div className="flex justify-between items-center border-b border-gray-200 py-3">
                   <span className="text-gray-600">{t('payments')}</span>
                   <Badge style={{ backgroundColor: TotalColors.Green }}>
                     <span className="mx-2 text-base">
@@ -229,7 +229,7 @@ export function Totals() {
                   </Badge>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-gray-300 py-3">
+                <div className="flex justify-between items-center border-b border-gray-200 py-3">
                   <span className="text-gray-600">{t('outstanding')}</span>
                   <Badge style={{ backgroundColor: TotalColors.Red }}>
                     <span className="mx-2 text-base">
@@ -242,7 +242,7 @@ export function Totals() {
                   </Badge>
                 </div>
 
-                <div className="flex justify-between items-center border-b border-gray-300 py-3">
+                <div className="flex justify-between items-center border-b border-gray-200 py-3">
                   <span className="text-gray-600">
                     {t('total_invoices_outstanding')}
                   </span>
