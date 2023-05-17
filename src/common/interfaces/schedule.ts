@@ -17,6 +17,7 @@ export interface Parameters {
   clients: string[];
   entity: 'invoice' | 'credit' | 'quote' | 'purchase_order';
   entity_id: string;
+  report_name: string;
 }
 
 export interface Schedule {

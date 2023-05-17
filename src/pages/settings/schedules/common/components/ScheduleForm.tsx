@@ -17,6 +17,7 @@ import frequencies from '$app/common/constants/frequency';
 import { Divider } from '$app/components/cards/Divider';
 import { EmailStatement } from './EmailStatement';
 import { EmailRecord } from '$app/pages/settings/schedules/common/components/EmailRecord';
+import { EmailReport } from './EmailReport';
 
 interface Props {
   schedule: Schedule;
@@ -31,6 +32,7 @@ interface Props {
 export enum Templates {
   EMAIL_STATEMENT = 'email_statement',
   EMAIL_RECORD = 'email_record',
+  EMAIL_REPORT = 'email_report',
 }
 
 export function ScheduleForm(props: Props) {
@@ -48,6 +50,7 @@ export function ScheduleForm(props: Props) {
         >
           <option value="email_statement">{t('email_statement')}</option>
           <option value="email_record">{t('email_record')}</option>
+          <option value="email_report">{t('email_report')}</option>
         </SelectField>
       </Element>
 
@@ -60,7 +63,7 @@ export function ScheduleForm(props: Props) {
         />
       </Element>
 
-      {schedule.template === Templates.EMAIL_STATEMENT && (
+      {schedule.template !== Templates.EMAIL_RECORD && (
         <Element leftSide={t('frequency')}>
           <SelectField
             value={schedule.frequency_id}
@@ -76,7 +79,7 @@ export function ScheduleForm(props: Props) {
         </Element>
       )}
 
-      {schedule.template === Templates.EMAIL_STATEMENT && (
+      {schedule.template !== Templates.EMAIL_RECORD && (
         <Element leftSide={t('remaining_cycles')}>
           <SelectField
             value={schedule.remaining_cycles}
@@ -108,6 +111,14 @@ export function ScheduleForm(props: Props) {
 
       {schedule.template === Templates.EMAIL_RECORD && (
         <EmailRecord
+          schedule={schedule}
+          handleChange={handleChange}
+          errors={errors}
+        />
+      )}
+
+      {schedule.template === Templates.EMAIL_REPORT && (
+        <EmailReport
           schedule={schedule}
           handleChange={handleChange}
           errors={errors}
