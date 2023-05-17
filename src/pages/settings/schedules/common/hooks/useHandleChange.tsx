@@ -14,6 +14,7 @@ import { Schedule } from '$app/common/interfaces/schedule';
 import { cloneDeep, set } from 'lodash';
 import { useBlankScheduleQuery } from '$app/common/queries/schedules';
 import { Frequency } from '$app/common/enums/frequency';
+import { blankScheduleParameters } from '../../create/Create';
 
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
@@ -37,16 +38,7 @@ export function useHandleChange(params: Params) {
         template: value as string,
         frequency_id: Frequency.Monthly,
         remaining_cycles: -1,
-        parameters: {
-          clients: [],
-          date_range: 'last7_days',
-          show_aging_table: false,
-          show_credits_table: false,
-          show_payments_table: false,
-          status: 'all',
-          entity: 'invoice',
-          entity_id: '',
-        },
+        parameters: blankScheduleParameters,
       }));
     } else {
       if (property === ('parameters.entity' as keyof Schedule)) {

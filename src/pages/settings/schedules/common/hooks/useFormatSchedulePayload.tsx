@@ -9,7 +9,6 @@
  */
 
 import { Parameters, Schedule } from '$app/common/interfaces/schedule';
-import { Templates } from '$app/pages/settings/schedules/common/components/ScheduleForm';
 
 const TemplateProperties = {
   EMAIL_STATEMENT: [
@@ -20,6 +19,13 @@ const TemplateProperties = {
     'parameters',
   ],
   EMAIL_RECORD: ['template', 'next_run', 'parameters'],
+  EMAIL_REPORT: [
+    'template',
+    'next_run',
+    'frequency_id',
+    'remaining_cycles',
+    'parameters',
+  ],
 };
 
 const TemplateParametersProperties = {
@@ -32,20 +38,22 @@ const TemplateParametersProperties = {
     'clients',
   ],
   EMAIL_RECORD: ['entity', 'entity_id'],
+  EMAIL_REPORT: ['report_name', 'date_range'],
 };
 
 export function useFormatSchedulePayload() {
   return (schedule: Schedule) => {
     let formattedSchedule = {};
 
-    let scheduleMainProperties = TemplateProperties.EMAIL_STATEMENT;
-    let scheduleParametersProperties =
-      TemplateParametersProperties.EMAIL_STATEMENT;
+    const scheduleMainProperties =
+      TemplateProperties[
+        schedule.template.toUpperCase() as keyof typeof TemplateProperties
+      ];
 
-    if (schedule?.template === Templates.EMAIL_RECORD) {
-      scheduleMainProperties = TemplateProperties.EMAIL_RECORD;
-      scheduleParametersProperties = TemplateParametersProperties.EMAIL_RECORD;
-    }
+    const scheduleParametersProperties =
+      TemplateParametersProperties[
+        schedule.template.toUpperCase() as keyof typeof TemplateParametersProperties
+      ];
 
     Object.entries(schedule.parameters).forEach(([property]) => {
       if (!scheduleParametersProperties.includes(property)) {

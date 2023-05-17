@@ -16,7 +16,7 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { Schedule } from '$app/common/interfaces/schedule';
+import { Parameters, Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useBlankScheduleQuery } from '$app/common/queries/schedules';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
@@ -32,6 +32,18 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { scheduleParametersAtom } from '../common/components/EmailStatement';
 import { ScheduleForm } from '../common/components/ScheduleForm';
 import { useHandleChange } from '../common/hooks/useHandleChange';
+
+export const blankScheduleParameters: Parameters = {
+  clients: [],
+  date_range: 'last7_days',
+  show_aging_table: false,
+  show_credits_table: false,
+  show_payments_table: false,
+  status: 'all',
+  entity: 'invoice',
+  entity_id: '',
+  report_name: 'activity',
+};
 
 export function Create() {
   const { documentTitle } = useTitle('new_schedule');
@@ -77,16 +89,7 @@ export function Create() {
           template: searchParams.get('template') || 'email_statement',
           frequency_id: Frequency.Monthly,
           remaining_cycles: -1,
-          parameters: currentParameters || {
-            clients: [],
-            date_range: 'last7_days',
-            show_aging_table: false,
-            show_credits_table: false,
-            show_payments_table: false,
-            status: 'all',
-            entity: 'invoice',
-            entity_id: '',
-          },
+          parameters: currentParameters || blankScheduleParameters,
         };
       });
     }
