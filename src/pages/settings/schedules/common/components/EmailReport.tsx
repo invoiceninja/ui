@@ -37,7 +37,7 @@ export function EmailReport(props: Props) {
 
   return (
     <>
-      <Element leftSide={t('report')}>
+      <Element leftSide={t('report')} required>
         <SelectField
           value={schedule.parameters.report_name}
           onValueChange={(value) =>
@@ -93,7 +93,7 @@ export function EmailReport(props: Props) {
         </SelectField>
       </Element>
 
-      <Element leftSide={t('date_range')}>
+      <Element leftSide={t('date_range')} required>
         <SelectField
           value={schedule.parameters.date_range}
           onValueChange={(value) =>
