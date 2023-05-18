@@ -81,16 +81,18 @@ export function UpcomingQuotes() {
           withoutActions
           withoutPagination
           withoutPadding
-          addRowSeparator
-          withoutBottomBorder
-          withoutTopBorder
-          withoutLeftBorder
-          withoutRightBorder
-          headerBackgroundColor="transparent"
-          thChildrenClassName="text-gray-500 dark:text-white"
-          tdClassName="first:pl-0 py-4"
-          thClassName="first:pl-0"
-          tBodyStyle={{ border: 0 }}
+          styleOptions={{
+            addRowSeparator: true,
+            withoutBottomBorder: true,
+            withoutTopBorder: true,
+            withoutLeftBorder: true,
+            withoutRightBorder: true,
+            headerBackgroundColor: 'transparent',
+            thChildrenClassName: 'text-gray-500 dark:text-white',
+            tdClassName: 'first:pl-0 py-4',
+            thClassName: 'first:pl-0',
+            tBodyStyle: { border: 0 },
+          }}
           style={{
             height: '19.9rem',
           }}

@@ -127,7 +127,7 @@ export function CompanySwitcher() {
               </span>
               {(user?.first_name || user?.last_name) && (
                 <span className="text-white text-xs text-start w-28 truncate">
-                  {`${user.first_name} ${user.last_name}`}
+                  {user.first_name} {user.last_name}
                 </span>
               )}
             </div>

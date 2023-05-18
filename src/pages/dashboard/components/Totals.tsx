@@ -156,7 +156,7 @@ export function Totals() {
           <div className="flex space-x-2">
             <Button
               key="day-btn"
-              type={`${chartScale === 'day' ? 'primary' : 'secondary'}`}
+              type={chartScale === 'day' ? 'primary' : 'secondary'}
               onClick={() => setChartScale('day')}
             >
               {t('day')}
@@ -164,7 +164,7 @@ export function Totals() {
 
             <Button
               key="week-btn"
-              type={`${chartScale === 'week' ? 'primary' : 'secondary'}`}
+              type={chartScale === 'week' ? 'primary' : 'secondary'}
               onClick={() => setChartScale('week')}
             >
               {t('week')}
@@ -172,7 +172,7 @@ export function Totals() {
 
             <Button
               key="month-btn"
-              type={`${chartScale === 'month' ? 'primary' : 'secondary'}`}
+              type={chartScale === 'month' ? 'primary' : 'secondary'}
               onClick={() => setChartScale('month')}
             >
               {t('month')}

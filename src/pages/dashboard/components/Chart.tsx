@@ -22,6 +22,7 @@ import {
   ResponsiveContainer,
   LineChart,
 } from 'recharts';
+import dayjs from 'dayjs';
 
 type Props = {
   data: ChartData;
@@ -56,23 +57,25 @@ export function Chart(props: Props) {
   };
 
   const getRecordIndex = (data: LineChartData | undefined, date: string) => {
-    let recordIndex = -1;
+    if (!data || !date) return -1;
 
-    if (!data || !date) return recordIndex;
+    const recordIndex = data.findIndex((entry, index) => {
+      const nextEntry = data[index + 1];
 
-    data.forEach((entry, index) => {
-      if (entry.date === date) {
-        recordIndex = index;
-      } else if (index + 1 <= data.length) {
-        if (
-          data[index] &&
-          data[index + 1] &&
-          new Date(date) >= new Date(data[index].date) &&
-          new Date(date) <= new Date(data[index + 1].date)
-        ) {
-          recordIndex = index;
-        }
+      if (nextEntry) {
+        const dateToCheck = dayjs(date);
+
+        const startDate = dayjs(entry.date);
+        const endDate = dayjs(nextEntry.date);
+
+        const isDateInRange =
+          dateToCheck.isAfter(startDate) && dateToCheck.isBefore(endDate);
+        const isEntryDateMatch = entry.date === date;
+
+        return isDateInRange || isEntryDateMatch;
       }
+
+      return false;
     });
 
     return recordIndex;

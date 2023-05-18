@@ -10,7 +10,6 @@
 
 import classNames from 'classnames';
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
 interface Props extends CommonProps {
@@ -20,10 +19,10 @@ interface Props extends CommonProps {
   withoutLeftBorder?: boolean;
   withoutRightBorder?: boolean;
   onVerticalOverflowChange?: (overflow: boolean) => void;
+  isDataLoading?: boolean;
 }
 
 export function Table(props: Props) {
-  const [t] = useTranslation();
   const { onVerticalOverflowChange } = props;
 
   const [tableParentHeight, setTableParentHeight] = useState<number>();
@@ -31,7 +30,6 @@ export function Table(props: Props) {
   const [manualTableHeight, setManualTableHeight] = useState<
     number | string | undefined
   >(props.style?.height);
-  const [numberOfCells, setNumberOfCells] = useState<number>(0);
   const [isVerticallyOverflow, setIsVerticallyOverflow] =
     useState<boolean>(true);
 
@@ -43,19 +41,6 @@ export function Table(props: Props) {
 
   const handleTableHeight = (element: HTMLTableElement | null) => {
     if (element && onVerticalOverflowChange) {
-      if (element.querySelectorAll('tbody > tr').length > 0) {
-        if (
-          element.querySelectorAll('tbody > tr > td')[0].textContent ===
-          t('no_records_found')
-        ) {
-          setNumberOfCells(-1);
-        } else {
-          setNumberOfCells(
-            element.querySelectorAll('tbody > tr > td').length ?? 0
-          );
-        }
-      }
-
       setTableHeight(element.clientHeight);
     }
   };
@@ -64,7 +49,7 @@ export function Table(props: Props) {
     if (
       typeof tableHeight === 'number' &&
       typeof tableParentHeight === 'number' &&
-      numberOfCells > 1 &&
+      !props.isDataLoading &&
       onVerticalOverflowChange
     ) {
       if (tableHeight > tableParentHeight) {
@@ -75,7 +60,7 @@ export function Table(props: Props) {
         setIsVerticallyOverflow(false);
       }
     }
-  }, [numberOfCells, tableHeight, tableParentHeight]);
+  }, [props.isDataLoading, tableHeight, tableParentHeight]);
 
   useEffect(() => {
     if (props.style?.height) {
@@ -84,14 +69,10 @@ export function Table(props: Props) {
   }, [props.style?.height]);
 
   useEffect(() => {
-    if (isVerticallyOverflow && numberOfCells === -1) {
+    if (!isVerticallyOverflow && onVerticalOverflowChange) {
       setManualTableHeight('auto');
     }
-
-    if (!isVerticallyOverflow && numberOfCells > 1) {
-      setManualTableHeight('auto');
-    }
-  }, [isVerticallyOverflow, numberOfCells]);
+  }, [isVerticallyOverflow]);
 
   return (
     <div

@@ -57,6 +57,19 @@ export type DataTableColumns<T = any> = {
 
 export type CustomBulkAction = (selectedIds: string[]) => ReactNode;
 
+interface StyleOptions {
+  withoutBottomBorder?: boolean;
+  withoutTopBorder?: boolean;
+  withoutLeftBorder?: boolean;
+  withoutRightBorder?: boolean;
+  headerBackgroundColor?: string;
+  thChildrenClassName?: string;
+  tBodyStyle?: CSSProperties;
+  thClassName?: string;
+  tdClassName?: string;
+  addRowSeparator?: boolean;
+}
+
 interface Props<T> extends CommonProps {
   resource: string;
   columns: DataTableColumns;
@@ -79,16 +92,7 @@ interface Props<T> extends CommonProps {
   onTableRowClick?: (resource: T) => unknown;
   showRestore?: (resource: T) => boolean;
   beforeFilter?: ReactNode;
-  withoutBottomBorder?: boolean;
-  withoutTopBorder?: boolean;
-  withoutLeftBorder?: boolean;
-  withoutRightBorder?: boolean;
-  headerBackgroundColor?: string;
-  thChildrenClassName?: string;
-  tBodyStyle?: CSSProperties;
-  thClassName?: string;
-  tdClassName?: string;
-  addRowSeparator?: boolean;
+  styleOptions?: StyleOptions;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -110,6 +114,8 @@ export function DataTable<T extends object>(props: Props<T>) {
 
   const queryClient = useQueryClient();
 
+  const { styleOptions } = props;
+
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -122,10 +128,6 @@ export function DataTable<T extends object>(props: Props<T>) {
   const [selected, setSelected] = useState<string[]>([]);
 
   const mainCheckbox = useRef<HTMLInputElement>(null);
-
-  const handleVerticalOverflowChange = (hasOverflow: boolean) => {
-    setHasVerticalOverflow(hasOverflow);
-  };
 
   useEffect(() => {
     const perPageParameter = apiEndpoint.searchParams.get('perPage');
@@ -275,16 +277,19 @@ export function DataTable<T extends object>(props: Props<T>) {
           'pr-0': !hasVerticalOverflow,
         })}
         withoutPadding={props.withoutPadding}
-        withoutBottomBorder={props.withoutBottomBorder}
-        withoutTopBorder={props.withoutTopBorder}
-        withoutLeftBorder={props.withoutLeftBorder}
-        withoutRightBorder={props.withoutRightBorder}
-        onVerticalOverflowChange={handleVerticalOverflowChange}
+        withoutBottomBorder={styleOptions?.withoutBottomBorder}
+        withoutTopBorder={styleOptions?.withoutTopBorder}
+        withoutLeftBorder={styleOptions?.withoutLeftBorder}
+        withoutRightBorder={styleOptions?.withoutRightBorder}
+        onVerticalOverflowChange={(hasOverflow) =>
+          setHasVerticalOverflow(hasOverflow)
+        }
+        isDataLoading={isLoading}
         style={props.style}
       >
-        <Thead backgroundColor={props.headerBackgroundColor}>
+        <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
           {!props.withoutActions && (
-            <Th className={props.thClassName}>
+            <Th className={styleOptions?.thClassName}>
               <Checkbox
                 innerRef={mainCheckbox}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -308,13 +313,13 @@ export function DataTable<T extends object>(props: Props<T>) {
             <Th
               id={column.id}
               key={index}
-              className={props.thClassName}
+              className={styleOptions?.thClassName}
               isCurrentlyUsed={sortedBy === column.id}
               onColumnClick={(data: ColumnSortPayload) => {
                 setSortedBy(data.field);
                 setSort(data.sort);
               }}
-              childrenClassName={props.thChildrenClassName}
+              childrenClassName={styleOptions?.thChildrenClassName}
             >
               {column.label}
             </Th>
@@ -323,11 +328,11 @@ export function DataTable<T extends object>(props: Props<T>) {
           {props.withResourcefulActions && <Th></Th>}
         </Thead>
 
-        <Tbody style={props.tBodyStyle}>
+        <Tbody style={styleOptions?.tBodyStyle}>
           {isLoading && (
             <Tr
               className={classNames({
-                'border-b border-gray-200': props.addRowSeparator,
+                'border-b border-gray-200': styleOptions?.addRowSeparator,
                 'last:border-b-0': hasVerticalOverflow,
               })}
             >
@@ -340,7 +345,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           {isError && (
             <Tr
               className={classNames({
-                'border-b border-gray-200': props.addRowSeparator,
+                'border-b border-gray-200': styleOptions?.addRowSeparator,
                 'last:border-b-0': hasVerticalOverflow,
               })}
             >
@@ -353,11 +358,11 @@ export function DataTable<T extends object>(props: Props<T>) {
           {data && data.data.data.length === 0 && (
             <Tr
               className={classNames({
-                'border-b border-gray-200': props.addRowSeparator,
+                'border-b border-gray-200': styleOptions?.addRowSeparator,
                 'last:border-b-0': hasVerticalOverflow,
               })}
             >
-              <Td className={props.tdClassName} colSpan={100}>
+              <Td className={styleOptions?.tdClassName} colSpan={100}>
                 {t('no_records_found')}
               </Td>
             </Tr>
@@ -368,7 +373,7 @@ export function DataTable<T extends object>(props: Props<T>) {
               <Tr
                 key={index}
                 className={classNames({
-                  'border-b border-gray-200': props.addRowSeparator,
+                  'border-b border-gray-200': styleOptions?.addRowSeparator,
                   'last:border-b-0': hasVerticalOverflow,
                 })}
                 onClick={() =>
@@ -396,7 +401,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                 )}
 
                 {props.columns.map((column, index) => (
-                  <Td key={index} className={props.tdClassName}>
+                  <Td key={index} className={styleOptions?.tdClassName}>
                     {column.format
                       ? column.format(resource[column.id], resource)
                       : resource[column.id]}
