@@ -31,6 +31,7 @@ import { TabGroup } from '$app/components/TabGroup';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeIcon';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const imageStyle: CSSProperties = { width: 30, height: 30 };
 
 export function Create() {

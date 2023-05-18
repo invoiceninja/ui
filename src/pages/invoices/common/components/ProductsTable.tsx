@@ -11,7 +11,10 @@
 import { Table, Tbody, Td, Th, Thead, Tr } from '$app/components/tables';
 import { Plus, Trash2 } from 'react-feather';
 import { useTranslation } from 'react-i18next';
-import { useResolveInputField } from '../hooks/useResolveInputField';
+import {
+  isLineItemEmpty,
+  useResolveInputField,
+} from '../hooks/useResolveInputField';
 import { useResolveTranslation } from '../hooks/useResolveTranslation';
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { useHandleSortingRows } from '../hooks/useHandleSortingRows';
@@ -19,7 +22,7 @@ import { resolveColumnWidth } from '../helpers/resolve-column-width';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
-import { Fragment } from 'react';
+import { Fragment, useEffect } from 'react';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
@@ -55,12 +58,27 @@ export function ProductsTable(props: Props) {
     onLineItemChange: props.onLineItemChange,
     onLineItemPropertyChange: props.onLineItemPropertyChange,
     relationType,
+    createItem: props.onCreateItemClick,
+    deleteLineItem: props.onDeleteRowClick,
   });
 
   const onDragEnd = useHandleSortingRows({
     resource: props.resource,
     onSort: props.onSort,
   });
+
+  const getLineItemIndex = (lineItem: InvoiceItem) => {
+    return resource.line_items.indexOf(lineItem);
+  };
+
+  useEffect(() => {
+    if (
+      (resource.client_id || resource.vendor_id) &&
+      !props.resource.line_items.length
+    ) {
+      props.onCreateItemClick();
+    }
+  }, [resource.client_id, resource.vendor_id]);
 
   return (
     <Table>
@@ -74,18 +92,18 @@ export function ProductsTable(props: Props) {
           {(provided) => (
             <Tbody {...provided.droppableProps} innerRef={provided.innerRef}>
               {resource?.[relationType] ? (
-                items.map((lineItem, lineItemIndex) => (
+                items.map((lineItem) => (
                   <Draggable
-                    key={lineItemIndex}
-                    draggableId={lineItemIndex.toString()}
-                    index={lineItemIndex}
+                    key={getLineItemIndex(lineItem)}
+                    draggableId={getLineItemIndex(lineItem).toString()}
+                    index={getLineItemIndex(lineItem)}
                   >
                     {(provided) => (
                       <Tr
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         innerRef={provided.innerRef}
-                        key={lineItemIndex}
+                        key={getLineItemIndex(lineItem)}
                       >
                         {columns.map((column, columnIndex, { length }) => (
                           <Td
@@ -93,24 +111,30 @@ export function ProductsTable(props: Props) {
                             key={columnIndex}
                           >
                             {length - 1 !== columnIndex &&
-                              resolveInputField(column, lineItemIndex)}
+                              resolveInputField(
+                                column,
+                                getLineItemIndex(lineItem)
+                              )}
 
                             {length - 1 === columnIndex && (
                               <div className="flex justify-between items-center">
-                                {resolveInputField(column, lineItemIndex)}
+                                {resolveInputField(
+                                  column,
+                                  getLineItemIndex(lineItem)
+                                )}
 
-                                {resource &&
-                                  (lineItem.product_key || lineItemIndex > 0) &&
-                                  resource.line_items.length > 0 && (
-                                    <button
-                                      className="ml-2 text-gray-600 hover:text-red-600"
-                                      onClick={() =>
-                                        props.onDeleteRowClick(lineItemIndex)
-                                      }
-                                    >
-                                      <Trash2 size={18} />
-                                    </button>
-                                  )}
+                                {resource && !isLineItemEmpty(lineItem) && (
+                                  <button
+                                    className="ml-2 text-gray-600 hover:text-red-600"
+                                    onClick={() =>
+                                      props.onDeleteRowClick(
+                                        getLineItemIndex(lineItem)
+                                      )
+                                    }
+                                  >
+                                    <Trash2 size={18} />
+                                  </button>
+                                )}
                               </div>
                             )}
                           </Td>

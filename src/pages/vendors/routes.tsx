@@ -20,12 +20,16 @@ import { lazy } from 'react';
 const Vendors = lazy(() => import('$app/pages/vendors/index/Vendors'));
 const Import = lazy(() => import('$app/pages/vendors/import/Import'));
 const Vendor = lazy(() => import('$app/pages/vendors/Vendor'));
-const PurchaseOrders = lazy(() => import('$app/pages/vendors/show/pages/PurchaseOrders'));
+const PurchaseOrders = lazy(
+  () => import('$app/pages/vendors/show/pages/PurchaseOrders')
+);
 const Expenses = lazy(() => import('$app/pages/vendors/show/pages/Expenses'));
-const RecurringExpenses = lazy(() => import('$app/pages/vendors/show/pages/RecurringExpenses'));
+const RecurringExpenses = lazy(
+  () => import('$app/pages/vendors/show/pages/RecurringExpenses')
+);
 const Documents = lazy(() => import('$app/pages/vendors/show/pages/Documents'));
 const Edit = lazy(() => import('$app/pages/vendors/edit/Edit'));
-const Create = lazy(() => import('$app/pages/vendors/create/Create')); 
+const Create = lazy(() => import('$app/pages/vendors/create/Create'));
 
 export const vendorRoutes = (
   <Route path="vendors">

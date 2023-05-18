@@ -8,41 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
-import quoteStatus from '$app/common/constants/quote-status';
 import { route } from '$app/common/helpers/route';
-import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { StatusBadge } from '$app/components/StatusBadge';
-import { useTranslation } from 'react-i18next';
+import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';
+import { useQuoteColumns } from '$app/pages/quotes/common/hooks';
 
 export default function Quotes() {
-  const [t] = useTranslation();
   const { id } = useParams();
 
-  const columns: DataTableColumns = [
-    {
-      id: 'number',
-      label: t('quote_number'),
-      format: (value, resource) => (
-        <Link to={route('/quotes/:id/edit', { id: resource.id })}>{value}</Link>
-      ),
-    },
-    { id: 'date', label: t('date') },
-    { id: 'amount', label: t('amount') },
-    { id: 'valid_until', label: t('valid_until') },
-    {
-      id: 'status_id',
-      label: t('status'),
-      format: (value) => <StatusBadge for={quoteStatus} code={value} />,
-    },
-  ];
+  const columns = useQuoteColumns();
 
   return (
     <DataTable
       resource="quote"
-      endpoint={route('/api/v1/quotes?client_id=:id&sort=id|desc', { id })}
+      endpoint={route(
+        '/api/v1/quotes?include=client&client_id=:id&sort=id|desc',
+        { id }
+      )}
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/quotes/bulk"

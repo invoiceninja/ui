@@ -27,6 +27,8 @@ import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { Form } from './components/Form';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { useActions } from '../common/hooks/useActions';
 
 export default function Edit() {
   const { documentTitle } = useTitle('edit_vendor');
@@ -43,6 +45,8 @@ export default function Edit() {
   const company = useInjectCompanyChanges();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
+
+  const actions = useActions();
 
   const pages: Page[] = [
     { name: t('vendors'), href: '/vendors' },
@@ -90,7 +94,20 @@ export default function Edit() {
   };
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages} onSaveClick={onSave}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      onSaveClick={onSave}
+      navigationTopRight={
+        vendor && (
+          <ResourceActions
+            label={t('more_actions')}
+            resource={vendor}
+            actions={actions}
+          />
+        )
+      }
+    >
       {vendor && <Form vendor={vendor} setVendor={setVendor} errors={errors} />}
     </Default>
   );

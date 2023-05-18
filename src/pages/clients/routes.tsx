@@ -22,12 +22,16 @@ const Edit = lazy(() => import('$app/pages/clients/edit/Edit'));
 const Client = lazy(() => import('$app/pages/clients/show/Client'));
 const Quotes = lazy(() => import('$app/pages/clients/show/pages/Quotes'));
 const Payments = lazy(() => import('$app/pages/clients/show/pages/Payments'));
-const RecurringInvoices = lazy(() => import('$app/pages/clients/show/pages/RecurringInvoices'));
+const RecurringInvoices = lazy(
+  () => import('$app/pages/clients/show/pages/RecurringInvoices')
+);
 const Credits = lazy(() => import('$app/pages/clients/show/pages/Credits'));
 const Projects = lazy(() => import('$app/pages/clients/show/pages/Projects'));
 const Tasks = lazy(() => import('$app/pages/clients/show/pages/Tasks'));
 const Expenses = lazy(() => import('$app/pages/clients/show/pages/Expenses'));
-const RecurringExpenses = lazy(() => import('$app/pages/clients/show/pages/RecurringExpenses'));
+const RecurringExpenses = lazy(
+  () => import('$app/pages/clients/show/pages/RecurringExpenses')
+);
 const Statement = lazy(() => import('$app/pages/clients/statement/Statement'));
 const Invoices = lazy(() => import('$app/pages/clients/show/pages/Invoices'));
 

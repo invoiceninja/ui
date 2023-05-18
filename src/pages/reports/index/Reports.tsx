@@ -22,8 +22,12 @@ import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
+import Select, { MultiValue, StylesConfig } from 'react-select';
+import { SelectOption } from '$app/components/datatables/Actions';
 
 type Identifier =
+  | 'activity'
   | 'client'
   | 'contact'
   | 'credit'
@@ -38,7 +42,13 @@ type Identifier =
   | 'product'
   | 'product_sales'
   | 'task'
-  | 'profitloss';
+  | 'profitloss'
+  | 'client_balance_report'
+  | 'client_sales_report'
+  | 'aged_receivable_detailed_report'
+  | 'aged_receivable_summary_report'
+  | 'user_sales_report'
+  | 'tax_summary_report';
 
 interface Report {
   identifier: Identifier;
@@ -58,9 +68,23 @@ interface Payload {
   is_income_billed?: boolean;
   is_expense_billed?: boolean;
   include_tax?: boolean;
+  status?: string;
 }
 
 const reports: Report[] = [
+  {
+    identifier: 'activity',
+    label: 'activity',
+    endpoint: '/api/v1/reports/activities',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+    },
+  },
   {
     identifier: 'client',
     label: 'client',
@@ -137,6 +161,7 @@ const reports: Report[] = [
       date_range: 'all',
       report_keys: [],
       send_email: false,
+      status: '',
     },
   },
   {
@@ -260,6 +285,102 @@ const reports: Report[] = [
       include_tax: false,
     },
   },
+  {
+    identifier: 'aged_receivable_detailed_report',
+    label: 'aged_receivable_detailed_report',
+    endpoint: '/api/v1/reports/ar_detail_report',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
+    },
+  },
+  {
+    identifier: 'aged_receivable_summary_report',
+    label: 'aged_receivable_summary_report',
+    endpoint: '/api/v1/reports/ar_summary_report',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
+    },
+  },
+  {
+    identifier: 'client_balance_report',
+    label: 'client_balance_report',
+    endpoint: '/api/v1/reports/client_balance_report',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
+    },
+  },
+  {
+    identifier: 'client_sales_report',
+    label: 'client_sales_report',
+    endpoint: '/api/v1/reports/client_sales_report',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
+    },
+  },
+  {
+    identifier: 'tax_summary_report',
+    label: 'tax_summary_report',
+    endpoint: '/api/v1/reports/tax_summary_report',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
+    },
+  },
+  {
+    identifier: 'user_sales_report',
+    label: 'user_sales_report',
+    endpoint: '/api/v1/reports/user_sales_report',
+    payload: {
+      start_date: '',
+      end_date: '',
+      date_key: '',
+      date_range: 'all',
+      report_keys: [],
+      send_email: false,
+      is_expense_billed: false,
+      is_income_billed: false,
+      include_tax: false,
+    },
+  },
 ];
 
 interface Range {
@@ -316,6 +437,21 @@ export default function Reports() {
         payload: { ...current.payload, date_range: range.identifier },
       }));
     }
+  };
+
+  const handleStatusChange = (
+    statuses: MultiValue<{ value: string; label: string }>
+  ) => {
+    const values: Array<string> = [];
+
+    (statuses as SelectOption[]).map(
+      (option: { value: string; label: string }) => values.push(option.value)
+    );
+
+    setReport((current) => ({
+      ...current,
+      payload: { ...current.payload, status: values.join(',') },
+    }));
   };
 
   const handleCustomDateChange = (
@@ -393,6 +529,30 @@ export default function Reports() {
       .finally(() => setIsPendingExport(false));
   };
 
+  const customStyles: StylesConfig<SelectOption, true> = {
+    multiValue: (styles, { data }) => {
+      return {
+        ...styles,
+        backgroundColor: data.backgroundColor,
+        color: data.color,
+        borderRadius: '3px',
+      };
+    },
+    multiValueLabel: (styles, { data }) => ({
+      ...styles,
+      color: data.color,
+    }),
+    multiValueRemove: (styles) => ({
+      ...styles,
+      ':hover': {
+        color: 'white',
+      },
+      color: '#999999',
+    }),
+  };
+
+  const filters = useInvoiceFilters();
+
   return (
     <Default
       title={documentTitle}
@@ -453,6 +613,19 @@ export default function Reports() {
                 />
               </Element>
             </>
+          )}
+
+          {report.identifier === 'invoice' && (
+            <Element leftSide={t('status')} className={'mb-50 py-50'}>
+              <Select
+                styles={customStyles}
+                defaultValue={null}
+                onChange={(options) => handleStatusChange(options)}
+                placeholder={t('status')}
+                options={filters}
+                isMulti={true}
+              />
+            </Element>
           )}
         </Card>
 

@@ -8,56 +8,24 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Link } from '$app/components/forms';
-import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { Project } from '$app/common/interfaces/project';
-import { DataTable, DataTableColumns } from '$app/components/DataTable';
-import { useTranslation } from 'react-i18next';
+import { DataTable } from '$app/components/DataTable';
 import { useParams } from 'react-router-dom';
 import { dataTableStaleTime } from './Invoices';
+import { useProjectColumns } from '$app/pages/projects/common/hooks';
 
 export default function Projects() {
-  const [t] = useTranslation();
   const { id } = useParams();
-  const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const columns: DataTableColumns<Project> = [
-    {
-      id: 'name',
-      label: t('name'),
-      format: (value, project) => (
-        <Link to={route('/projects/:id', { id: project.id })}>{value}</Link>
-      ),
-    },
-    {
-      id: 'task_rate',
-      label: t('task_rate'),
-    },
-    {
-      id: 'due_date',
-      label: t('due_date'),
-      format: (value) => date(value, dateFormat),
-    },
-    {
-      id: 'public_notes',
-      label: t('public_notes'),
-    },
-    {
-      id: 'private_notes',
-      label: t('private_notes'),
-    },
-    {
-      id: 'budgeted_hours',
-      label: t('budgeted_hours'),
-    },
-  ];
+  const columns = useProjectColumns();
 
   return (
     <DataTable
       resource="project"
-      endpoint={route('/api/v1/projects?client_id=:id&sort=id|desc', { id })}
+      endpoint={route(
+        '/api/v1/projects?include=client&client_id=:id&sort=id|desc',
+        { id }
+      )}
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/projects/bulk"

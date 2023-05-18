@@ -13,6 +13,8 @@ import { Page } from '$app/components/Breadcrumbs';
 import { DataTable } from '$app/components/DataTable';
 import { Default } from '$app/components/layouts/Default';
 import { useTranslation } from 'react-i18next';
+import { ImportButton } from '$app/components/import/ImportButton';
+
 import {
   defaultColumns,
   useActions,
@@ -58,6 +60,7 @@ export default function RecurringInvoices() {
         customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         withResourcefulActions
+        rightSide={<ImportButton route="/recurring_invoices/import" />}
         leftSideChevrons={
           <DataTableColumnsPicker
             columns={recurringInvoiceColumns as unknown as string[]}

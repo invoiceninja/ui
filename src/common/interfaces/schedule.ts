@@ -11,6 +11,7 @@
 export interface Parameters {
   date_range: string;
   show_payments_table: boolean;
+  show_credits_table: boolean;
   show_aging_table: boolean;
   status: string;
   clients: string[];

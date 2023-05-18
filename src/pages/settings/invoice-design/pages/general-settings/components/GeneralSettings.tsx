@@ -9,7 +9,6 @@
  */
 
 import colors from '$app/common/constants/colors';
-import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { Design } from '$app/common/interfaces/design';
 import { useDesignsQuery } from '$app/common/queries/designs';
 import { updateChanges } from '$app/common/stores/slices/company-users';
@@ -20,16 +19,17 @@ import { range } from 'lodash';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { updatingRecords as updatingRecordsAtom } from '../common/atoms';
+import { updatingRecords as updatingRecordsAtom } from '../../../common/atoms';
 import { Card, Element } from '$app/components/cards';
 import { InputField, Radio, SelectField } from '$app/components/forms';
 import Toggle from '$app/components/forms/Toggle';
 import { useHandleSettingsValueChange } from '$app/pages/settings/invoice-design/common/hooks';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 export function GeneralSettings() {
   const [t] = useTranslation();
   const dispatch = useDispatch();
-  const company = useInjectCompanyChanges();
+  const company = useCompanyChanges();
 
   const [updatingRecords, setUpdatingRecords] = useAtom(updatingRecordsAtom);
 

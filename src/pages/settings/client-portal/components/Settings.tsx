@@ -8,13 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { isHosted } from '$app/common/helpers';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Divider } from '$app/components/cards/Divider';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
-import { InputField } from '../../../../components/forms';
+import { InputField, Link } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
 
 export function Settings() {
@@ -38,7 +39,22 @@ export function Settings() {
           </span>
         }
       >
-        <CopyToClipboard text={`${company?.portal_domain}/client/login`} />
+        <div className="flex flex-col space-y-1">
+          <CopyToClipboard text={`${company?.portal_domain}/client/login`} />
+
+          {isHosted() && company.portal_mode === 'domain' && (
+            <div>
+              <span>{t('app_help_link')}</span>
+              <Link
+                external
+                to="https://invoiceninja.github.io/docs/hosted-custom-domain/#custom-domain-configuration"
+              >
+                {t('here')}
+              </Link>
+              .
+            </div>
+          )}
+        </div>
       </Element>
 
       <Divider />

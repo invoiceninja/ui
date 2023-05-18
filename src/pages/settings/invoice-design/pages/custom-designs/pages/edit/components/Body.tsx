@@ -8,34 +8,30 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Card } from '$app/components/cards';
-import { useDesignUtilities } from '$app/pages/settings/invoice-design/customize/common/hooks';
-import { CustomizeChildProps } from '$app/pages/settings/invoice-design/customize/components/Settings';
-import Editor from '@monaco-editor/react';
+import { useAtom } from 'jotai';
+import { payloadAtom } from '../Edit';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useDesignUtilities } from '../common/hooks';
 import { useDebounce } from 'react-use';
+import { Card } from '$app/components/cards';
+import Editor from '@monaco-editor/react';
 
-export const defaultEditorDebounceTime = 1000;
-
-export function Body({ payload }: CustomizeChildProps) {
-  const [value, setValue] = useState(payload.design?.body);
+export function Body() {
+  const [payload] = useAtom(payloadAtom);
+  const [value, setValue] = useState(payload.design?.design.body);
 
   const { t } = useTranslation();
-  const { handleDesignBlockChange } = useDesignUtilities();
+  const { handleBlockChange } = useDesignUtilities();
 
-  useDebounce(
-    () => value && handleDesignBlockChange('body', value),
-    defaultEditorDebounceTime,
-    [value]
-  );
+  useDebounce(() => value && handleBlockChange('body', value), 1000, [value]);
 
   return (
     <Card title={t('body')} padding="small" collapsed={true}>
       <Editor
         height="25rem"
         defaultLanguage="html"
-        value={payload.design?.body}
+        value={payload.design?.design.body}
         options={{
           minimap: {
             enabled: false,
