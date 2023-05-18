@@ -170,7 +170,7 @@ export function useGenerateActivityElement() {
   };
 
   return (activity: ActivityRecord) => (
-    <div className="flex flex-col py-2 border border-b-gray-200 border-t-0 border-x-0 last:border-b-0">
+    <div className="flex flex-col py-2 border border-b-gray-200 border-t-0 border-x-0 last:border-b-0 hover:bg-gray-50">
       <div className="flex flex-col">
         <span className="text-sm">{generate(activity)}</span>
 
