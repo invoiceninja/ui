@@ -211,7 +211,7 @@ export function HelpSidebarIcons(props: Props) {
         </div>
       </Modal>
 
-      <nav className="flex p-2 justify-around text-white">
+      <nav className="flex p-2 justify-around text-white border-t border-gray-600">
         {!isMiniSidebar && (
           <>
             {isSelfHosted() && account && !account.is_scheduler_running && (
