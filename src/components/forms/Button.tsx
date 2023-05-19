@@ -39,7 +39,11 @@ export function Button(props: Props) {
   const css: React.CSSProperties = {
     backgroundColor: props.type === 'primary' ? accentColor : 'white',
     color:
-      props.type !== 'primary' && props.type !== 'secondary' ? accentColor : '',
+      props.type === 'primary'
+        ? 'white'
+        : props.type === 'secondary'
+        ? 'text-gray-900'
+        : accentColor,
   };
 
   if (props.to) {
@@ -50,8 +54,8 @@ export function Button(props: Props) {
           `inline-flex items-center space-x-2 justify-center py-2 px-4 rounded text-sm text-gray-900 ${props.className}`,
           {
             'w-full': props.variant === 'block',
-            'text-white': props.type === 'primary',
-            'text-gray-900 border border-gray-300': props.type === 'secondary',
+            'text-white': props.type == 'primary',
+            'text-gray-900 border border-gray-300': props.type == 'secondary',
             'border-gray-600': props.type == 'minimal',
           }
         )}

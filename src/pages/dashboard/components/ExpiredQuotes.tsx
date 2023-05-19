@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { date } from '$app/common/helpers';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { route } from '$app/common/helpers/route';
 import { Link } from '$app/components/forms/Link';
@@ -16,13 +18,15 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
 import { Quote } from '$app/common/interfaces/quote';
 import { useTranslation } from 'react-i18next';
-import dayjs from 'dayjs';
-import { Badge } from '$app/components/Badge';
 
 export function ExpiredQuotes() {
   const [t] = useTranslation();
+
   const company = useCurrentCompany();
+
   const formatMoney = useFormatMoney();
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const columns: DataTableColumns<Quote> = [
     {
@@ -48,56 +52,36 @@ export function ExpiredQuotes() {
     {
       id: 'date',
       label: t('date'),
-      format: (value) => value && dayjs(value).format('MMM DD'),
+      format: (value) => date(value, dateFormat),
     },
     {
       id: 'amount',
       label: t('amount'),
-      format: (value, quote) => (
-        <Badge variant="light-blue">
-          {formatMoney(
-            value,
-            quote.client?.country_id || company.settings.country_id,
-            quote.client?.settings.currency_id || company.settings.currency_id
-          )}
-        </Badge>
-      ),
+      format: (value, quote) =>
+        formatMoney(
+          value,
+          quote.client?.country_id || company.settings.country_id,
+          quote.client?.settings.currency_id || company.settings.currency_id
+        ),
     },
   ];
 
   return (
     <Card
       title={t('expired_quotes')}
-      className="h-96 relative"
+      className="h-96"
+      padding="small"
+      withScrollableBody
       withoutBodyPadding
-      withoutHeaderBorder
     >
-      <div className="pl-6 pr-4">
-        <DataTable
-          resource="quote"
-          columns={columns}
-          className="pr-4"
-          endpoint="/api/v1/quotes?include=client&client_status=expired&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
-          withoutActions
-          withoutPagination
-          withoutPadding
-          styleOptions={{
-            addRowSeparator: true,
-            withoutBottomBorder: true,
-            withoutTopBorder: true,
-            withoutLeftBorder: true,
-            withoutRightBorder: true,
-            headerBackgroundColor: 'transparent',
-            thChildrenClassName: 'text-gray-500 dark:text-white',
-            tdClassName: 'first:pl-0 py-4',
-            thClassName: 'first:pl-0',
-            tBodyStyle: { border: 0 },
-          }}
-          style={{
-            height: '19.9rem',
-          }}
-        />
-      </div>
+      <DataTable
+        resource="quote"
+        columns={columns}
+        endpoint="/api/v1/quotes?include=client&client_status=expired&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
+        withoutActions
+        withoutPagination
+        withoutPadding
+      />
     </Card>
   );
 }

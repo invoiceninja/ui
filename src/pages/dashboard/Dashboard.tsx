@@ -24,9 +24,11 @@ import { ExpiredQuotes } from './components/ExpiredQuotes';
 import { UpcomingQuotes } from './components/UpcomingQuotes';
 
 export default function Dashboard() {
-  useTitle('dashboard');
   const [t] = useTranslation();
 
+  useTitle('dashboard');
+
+  // const pages = [{ name: t('dashboard'), href: '/dashboard' }];
   const user = useCurrentUser();
 
   const { isAdmin } = useAdmin();
@@ -46,27 +48,27 @@ export default function Dashboard() {
       {isAdmin && <Totals />}
 
       <div className="grid grid-cols-12 gap-4 my-6">
-        <div className="col-span-12 xl:col-span-6">
+        <div className="col-span-12 lg:col-span-6">
           <Activity />
         </div>
 
-        <div className="col-span-12 xl:col-span-6">
+        <div className="col-span-12 lg:col-span-6">
           <RecentPayments />
         </div>
 
-        <div className="col-span-12 xl:col-span-6">
+        <div className="col-span-12 lg:col-span-6">
           <UpcomingInvoices />
         </div>
 
-        <div className="col-span-12 xl:col-span-6">
+        <div className="col-span-12 lg:col-span-6">
           <PastDueInvoices />
         </div>
 
-        <div className="col-span-12 xl:col-span-6">
+        <div className="col-span-12 lg:col-span-6">
           <ExpiredQuotes />
         </div>
 
-        <div className="col-span-12 xl:col-span-6">
+        <div className="col-span-12 lg:col-span-6">
           <UpcomingQuotes />
         </div>
       </div>

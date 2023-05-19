@@ -21,8 +21,6 @@ import { Task } from './task';
 import { Vendor } from './vendor';
 import { PurchaseOrder } from './purchase-order';
 import { VendorContact } from './vendor-contact';
-import { Subscription } from './subscription';
-import { RecurringExpense } from './recurring-expense';
 
 interface WithHashId {
   hashed_id: string;
@@ -59,12 +57,10 @@ export interface ActivityRecord {
   expense?: Expense & WithHashId;
   invoice?: Invoice & WithHashId;
   recurring_invoice?: RecurringInvoice & WithHashId;
-  recurring_expense?: RecurringExpense & WithHashId;
   payment?: Payment & WithHashId;
   credit?: Credit & WithHashId;
   quote?: Quote & WithHashId;
   vendor?: Vendor & WithHashId;
   vendor_contact?: VendorContact & WithHashId;
   purchase_order?: PurchaseOrder & WithHashId;
-  subscription?: Subscription & WithHashId;
 }

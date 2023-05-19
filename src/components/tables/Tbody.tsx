@@ -22,7 +22,7 @@ export function Tbody(props: Props) {
   const [t] = useTranslation();
 
   return (
-    <tbody style={props.style} ref={props.innerRef}>
+    <tbody ref={props.innerRef}>
       {!props.data && props.showHelperPlaceholders && (
         <Tr>
           <Td colSpan={20}>

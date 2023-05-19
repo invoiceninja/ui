@@ -8,7 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { date } from '$app/common/helpers';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { t } from 'i18next';
 import { route } from '$app/common/helpers/route';
@@ -16,10 +18,9 @@ import { Link } from '$app/components/forms/Link';
 import { Invoice } from '$app/common/interfaces/invoice';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
-import dayjs from 'dayjs';
-import { Badge } from '$app/components/Badge';
 
 export function UpcomingInvoices() {
+  const { dateFormat } = useCurrentCompanyDateFormats();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
@@ -47,56 +48,36 @@ export function UpcomingInvoices() {
     {
       id: 'due_date',
       label: t('due_date'),
-      format: (value) => value && dayjs(value).format('MMM DD'),
+      format: (value) => date(value, dateFormat),
     },
     {
       id: 'balance',
       label: t('balance'),
-      format: (value, invoice) => (
-        <Badge variant="blue">
-          {formatMoney(
-            value,
-            invoice.client?.country_id || company.settings.country_id,
-            invoice.client?.settings.currency_id || company.settings.currency_id
-          )}
-        </Badge>
-      ),
+      format: (value, invoice) =>
+        formatMoney(
+          value,
+          invoice.client?.country_id || company.settings.country_id,
+          invoice.client?.settings.currency_id || company.settings.currency_id
+        ),
     },
   ];
 
   return (
     <Card
       title={t('upcoming_invoices')}
-      className="h-96 relative"
+      className="h-96"
+      padding="small"
+      withScrollableBody
       withoutBodyPadding
-      withoutHeaderBorder
     >
-      <div className="pl-6 pr-4">
-        <DataTable
-          resource="invoice"
-          columns={columns}
-          className="pr-4"
-          endpoint="/api/v1/invoices?include=client&upcoming=true&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
-          withoutActions
-          withoutPagination
-          withoutPadding
-          styleOptions={{
-            addRowSeparator: true,
-            withoutBottomBorder: true,
-            withoutTopBorder: true,
-            withoutLeftBorder: true,
-            withoutRightBorder: true,
-            headerBackgroundColor: 'transparent',
-            thChildrenClassName: 'text-gray-500 dark:text-white',
-            tdClassName: 'first:pl-0 py-4',
-            thClassName: 'first:pl-0',
-            tBodyStyle: { border: 0 },
-          }}
-          style={{
-            height: '19.9rem',
-          }}
-        />
-      </div>
+      <DataTable
+        resource="invoice"
+        columns={columns}
+        endpoint="/api/v1/invoices?include=client&upcoming=true&without_deleted_clients=true&per_page=50&page=1&sort=id|desc"
+        withoutActions
+        withoutPagination
+        withoutPadding
+      />
     </Card>
   );
 }

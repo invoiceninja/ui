@@ -13,7 +13,6 @@ import { endpoint, isProduction } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import React, {
   ChangeEvent,
-  CSSProperties,
   ReactElement,
   ReactNode,
   useEffect,
@@ -46,8 +45,6 @@ import { useAtom, useSetAtom } from 'jotai';
 import { Icon } from './icons/Icon';
 import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
-import CommonProps from '$app/common/interfaces/common-props.interface';
-import classNames from 'classnames';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -57,20 +54,7 @@ export type DataTableColumns<T = any> = {
 
 export type CustomBulkAction = (selectedIds: string[]) => ReactNode;
 
-interface StyleOptions {
-  withoutBottomBorder?: boolean;
-  withoutTopBorder?: boolean;
-  withoutLeftBorder?: boolean;
-  withoutRightBorder?: boolean;
-  headerBackgroundColor?: string;
-  thChildrenClassName?: string;
-  tBodyStyle?: CSSProperties;
-  thClassName?: string;
-  tdClassName?: string;
-  addRowSeparator?: boolean;
-}
-
-interface Props<T> extends CommonProps {
+interface Props<T> {
   resource: string;
   columns: DataTableColumns;
   endpoint: string;
@@ -92,7 +76,6 @@ interface Props<T> extends CommonProps {
   onTableRowClick?: (resource: T) => unknown;
   showRestore?: (resource: T) => boolean;
   beforeFilter?: ReactNode;
-  styleOptions?: StyleOptions;
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -102,9 +85,6 @@ export const datatablePerPageAtom = atomWithStorage('perPage', '10');
 export function DataTable<T extends object>(props: Props<T>) {
   const [t] = useTranslation();
 
-  const [hasVerticalOverflow, setHasVerticalOverflow] =
-    useState<boolean>(false);
-
   const [apiEndpoint, setApiEndpoint] = useState(
     new URL(endpoint(props.endpoint))
   );
@@ -113,8 +93,6 @@ export function DataTable<T extends object>(props: Props<T>) {
   setInvalidationQueryAtom(props.endpoint);
 
   const queryClient = useQueryClient();
-
-  const { styleOptions } = props;
 
   const [filter, setFilter] = useState<string>('');
   const [customFilter, setCustomFilter] = useState<string[]>([]);
@@ -272,24 +250,10 @@ export function DataTable<T extends object>(props: Props<T>) {
         </Actions>
       )}
 
-      <Table
-        className={classNames(props.className, {
-          'pr-0': !hasVerticalOverflow,
-        })}
-        withoutPadding={props.withoutPadding}
-        withoutBottomBorder={styleOptions?.withoutBottomBorder}
-        withoutTopBorder={styleOptions?.withoutTopBorder}
-        withoutLeftBorder={styleOptions?.withoutLeftBorder}
-        withoutRightBorder={styleOptions?.withoutRightBorder}
-        onVerticalOverflowChange={(hasOverflow) =>
-          setHasVerticalOverflow(hasOverflow)
-        }
-        isDataLoading={isLoading}
-        style={props.style}
-      >
-        <Thead backgroundColor={styleOptions?.headerBackgroundColor}>
+      <Table withoutPadding={props.withoutPadding}>
+        <Thead>
           {!props.withoutActions && (
-            <Th className={styleOptions?.thClassName}>
+            <Th>
               <Checkbox
                 innerRef={mainCheckbox}
                 onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -313,13 +277,11 @@ export function DataTable<T extends object>(props: Props<T>) {
             <Th
               id={column.id}
               key={index}
-              className={styleOptions?.thClassName}
               isCurrentlyUsed={sortedBy === column.id}
               onColumnClick={(data: ColumnSortPayload) => {
                 setSortedBy(data.field);
                 setSort(data.sort);
               }}
-              childrenClassName={styleOptions?.thChildrenClassName}
             >
               {column.label}
             </Th>
@@ -328,14 +290,9 @@ export function DataTable<T extends object>(props: Props<T>) {
           {props.withResourcefulActions && <Th></Th>}
         </Thead>
 
-        <Tbody style={styleOptions?.tBodyStyle}>
+        <Tbody>
           {isLoading && (
-            <Tr
-              className={classNames({
-                'border-b border-gray-200': styleOptions?.addRowSeparator,
-                'last:border-b-0': hasVerticalOverflow,
-              })}
-            >
+            <Tr>
               <Td colSpan={100}>
                 <Spinner />
               </Td>
@@ -343,12 +300,7 @@ export function DataTable<T extends object>(props: Props<T>) {
           )}
 
           {isError && (
-            <Tr
-              className={classNames({
-                'border-b border-gray-200': styleOptions?.addRowSeparator,
-                'last:border-b-0': hasVerticalOverflow,
-              })}
-            >
+            <Tr>
               <Td className="text-center" colSpan={100}>
                 {t('error_refresh_page')}
               </Td>
@@ -356,15 +308,8 @@ export function DataTable<T extends object>(props: Props<T>) {
           )}
 
           {data && data.data.data.length === 0 && (
-            <Tr
-              className={classNames({
-                'border-b border-gray-200': styleOptions?.addRowSeparator,
-                'last:border-b-0': hasVerticalOverflow,
-              })}
-            >
-              <Td className={styleOptions?.tdClassName} colSpan={100}>
-                {t('no_records_found')}
-              </Td>
+            <Tr>
+              <Td colSpan={100}>{t('no_records_found')}</Td>
             </Tr>
           )}
 
@@ -372,10 +317,6 @@ export function DataTable<T extends object>(props: Props<T>) {
             data?.data?.data?.map((resource: any, index: number) => (
               <Tr
                 key={index}
-                className={classNames({
-                  'border-b border-gray-200': styleOptions?.addRowSeparator,
-                  'last:border-b-0': hasVerticalOverflow,
-                })}
                 onClick={() =>
                   props.onTableRowClick
                     ? props.onTableRowClick(resource)
@@ -401,7 +342,7 @@ export function DataTable<T extends object>(props: Props<T>) {
                 )}
 
                 {props.columns.map((column, index) => (
-                  <Td key={index} className={styleOptions?.tdClassName}>
+                  <Td key={index}>
                     {column.format
                       ? column.format(resource[column.id], resource)
                       : resource[column.id]}

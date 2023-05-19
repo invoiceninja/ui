@@ -12,6 +12,7 @@ import { date, trans } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { ActivityRecord } from '$app/common/interfaces/activity-record';
 import { route } from '$app/common/helpers/route';
+import { NonClickableElement } from '$app/components/cards/NonClickableElement';
 import reactStringReplace from 'react-string-replace';
 import { Link } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
@@ -56,7 +57,7 @@ export function useGenerateActivityElement() {
     const replacements = {
       client: (
         <Link to={route('/clients/:id', { id: activity.client?.hashed_id })}>
-          {activity.client?.display_name}
+          {activity.client?.name}
         </Link>
       ),
       contact: (
@@ -86,24 +87,6 @@ export function useGenerateActivityElement() {
           })}
         >
           {activity?.recurring_invoice?.number}
-        </Link>
-      ),
-      recurring_expense: (
-        <Link
-          to={route('/recurring_expenses/:id/edit', {
-            id: activity.recurring_expense?.hashed_id,
-          })}
-        >
-          {activity?.recurring_expense?.number}
-        </Link>
-      ),
-      purchase_order: (
-        <Link
-          to={route('/purchase_orders/:id/edit', {
-            id: activity.purchase_order?.hashed_id,
-          })}
-        >
-          {activity?.purchase_order?.number}
         </Link>
       ),
       invoice: (
@@ -142,15 +125,6 @@ export function useGenerateActivityElement() {
           {activity?.vendor?.name}
         </Link>
       ),
-      subscription: (
-        <Link
-          to={route('/settings/subscriptions/:id/edit', {
-            id: activity.subscription?.hashed_id,
-          })}
-        >
-          {activity?.subscription?.name}
-        </Link>
-      ),
       adjustment:
         activity.payment &&
         formatMoney(
@@ -170,18 +144,12 @@ export function useGenerateActivityElement() {
   };
 
   return (activity: ActivityRecord) => (
-    <div className="flex flex-col py-2 border border-b-gray-200 border-t-0 border-x-0 last:border-b-0 hover:bg-gray-50">
-      <div className="flex flex-col">
-        <span className="text-sm">{generate(activity)}</span>
+    <NonClickableElement padding="small" className="space-x-1">
+      <span className="text-gray-500 text-xs italic">
+        {date(activity.created_at, dateFormat)} &#183;
+      </span>
 
-        <div className="flex space-x-3">
-          <span className="dark:text-white text-sm">
-            {date(activity.created_at, dateFormat)}
-          </span>
-
-          <span className="text-gray-500 text-sm">{activity.ip}</span>
-        </div>
-      </div>
-    </div>
+      <span>{generate(activity)}</span>
+    </NonClickableElement>
   );
 }
