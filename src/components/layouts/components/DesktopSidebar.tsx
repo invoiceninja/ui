@@ -48,8 +48,8 @@ export function DesktopSidebar(props: Props) {
         isMiniSidebar ? 'md:w-16' : 'md:w-64'
       } md:flex-col md:fixed md:inset-y-0`}
     >
-      <div className="flex flex-col flex-grow border-gray-100 bg-ninja-gray overflow-y-auto border-r">
-        <div className="flex items-center flex-shrink-0 pl-3 pr-6 bg-ninja-gray h-16 border-b border-gray-600">
+      <div className="flex flex-col flex-grow border-gray-100 bg-ninja-gray dark:bg-gray-800 dark:border-transparent overflow-y-auto border-r">
+        <div className="flex items-center flex-shrink-0 px-4 bg-white h-16">
           {isMiniSidebar ? (
             <img className="w-8" src={logo} alt="Company logo" />
           ) : (
@@ -57,7 +57,7 @@ export function DesktopSidebar(props: Props) {
           )}
         </div>
 
-        <div className="flex-grow flex flex-col mt-4">
+        <div className="flex-grow flex flex-col">
           <nav className="flex-1 pb-4 space-y-1">
             {props.navigation.map((item, index) => (
               <SidebarItem key={index} item={item} />

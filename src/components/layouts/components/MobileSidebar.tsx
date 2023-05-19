@@ -71,11 +71,11 @@ export function MobileSidebar(props: Props) {
               </div>
             </Transition.Child>
 
-            <div className="flex-shrink-0 flex items-center px-4 bg-ninja-gray py-3 border-b border-gray-600">
+            <div className="flex-shrink-0 flex items-center px-4 bg-white py-3">
               <CompanySwitcher />
             </div>
 
-            <div className="flex-1 h-0 overflow-y-auto mt-4">
+            <div className="flex-1 h-0 overflow-y-auto">
               <nav className="space-y-1">
                 {props.navigation.map((item, index) => (
                   <SidebarItem key={index} item={item} />

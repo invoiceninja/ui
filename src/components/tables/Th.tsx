@@ -21,7 +21,6 @@ export interface ColumnSortPayload {
 interface Props extends CommonProps {
   onColumnClick?: any;
   isCurrentlyUsed?: boolean;
-  childrenClassName?: string;
 }
 
 const defaultProps: Props = {
@@ -56,7 +55,7 @@ export function Th(props: Props) {
         }
       )}
     >
-      <div className={`flex items-center space-x-1 ${props.childrenClassName}`}>
+      <div className="flex items-center space-x-1">
         <span>{props.children}</span>
 
         {props.onColumnClick && (

@@ -127,11 +127,12 @@ export default function Refund() {
   }, [formik.values.invoices]);
 
   useEffect(() => {
-    if (companyGateway && payment) {
+    if (companyGateway) {
       const gateway: Gateway = companyGateway.data.data.gateway;
-      const gatewayTypeId = payment.data.data.gateway_type_id;
 
-      const showGatewayRefund = Boolean(gateway.options[gatewayTypeId]?.refund);
+      const showGatewayRefund = Object.values(gateway.options).some(
+        (option) => option.refund
+      );
 
       setShouldShowGatewayRefund(showGatewayRefund);
     }
