@@ -31,10 +31,10 @@ export function Activity() {
 
   return (
     <Card
-      title={t('activity')}
-      className="h-96"
-      padding="small"
-      withScrollableBody
+      title={t('recent_activity')}
+      className="h-96 relative"
+      withoutBodyPadding
+      withoutHeaderBorder
     >
       {isLoading && (
         <NonClickableElement>
@@ -46,10 +46,19 @@ export function Activity() {
         <NonClickableElement>{t('error_refresh_page')}</NonClickableElement>
       )}
 
-      {data?.data.data &&
-        data.data.data.map((record: ActivityRecord, index: number) => (
-          <React.Fragment key={index}>{activityElement(record)}</React.Fragment>
-        ))}
+      <div className="pl-6 pr-4">
+        <div
+          className="flex flex-col overflow-y-auto pr-4"
+          style={{ height: '19.9rem' }}
+        >
+          {data?.data.data &&
+            data.data.data.map((record: ActivityRecord, index: number) => (
+              <React.Fragment key={index}>
+                {activityElement(record)}
+              </React.Fragment>
+            ))}
+        </div>
+      </div>
     </Card>
   );
 }

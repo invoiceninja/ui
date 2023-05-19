@@ -22,7 +22,10 @@ export default function Quotes() {
   return (
     <DataTable
       resource="quote"
-      endpoint={route('/api/v1/quotes?client_id=:id&sort=id|desc', { id })}
+      endpoint={route(
+        '/api/v1/quotes?include=client&client_id=:id&sort=id|desc',
+        { id }
+      )}
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/quotes/bulk"
