@@ -71,6 +71,18 @@ export function RuleModal(props: Props) {
     );
   };
 
+  const handleChangeRuleField = (value: string) => {
+    handleChangeRule('search_key', value);
+
+    if (value === 'description') {
+      handleChangeRule('operator', 'contains');
+    }
+
+    if (value === 'amount') {
+      handleChangeRule('operator', '<');
+    }
+  };
+
   const handleAddRule = () => {
     if (rule) {
       const alreadyAddedRules = transactionRule.rules || [];
@@ -78,11 +90,9 @@ export function RuleModal(props: Props) {
       if (ruleIndex > -1) {
         alreadyAddedRules[ruleIndex] = rule;
         handleChange('rules', alreadyAddedRules);
-        setRule(defaultRule);
         setVisible(false);
       } else {
         handleChange('rules', [...alreadyAddedRules, rule]);
-        setRule(defaultRule);
         setVisible(false);
       }
     }
@@ -102,16 +112,13 @@ export function RuleModal(props: Props) {
     <Modal
       title={ruleIndex > -1 ? t('edit_rule') : t('add_rule')}
       visible={visible}
-      onClose={() => {
-        setRule(defaultRule);
-        setVisible(false);
-      }}
+      onClose={() => setVisible(false)}
     >
       <SelectField
         required
         label={t('field')}
         value={rule?.search_key}
-        onValueChange={(value) => handleChangeRule('search_key', value)}
+        onValueChange={(value) => handleChangeRuleField(value)}
       >
         <option defaultChecked value="description">
           {t('description')}
