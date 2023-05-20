@@ -29,6 +29,22 @@ interface Props {
   ruleIndex: number;
 }
 
+const OPERATORS = {
+  description: [
+    { value: 'contains', label: 'contains' },
+    { value: 'starts_with', label: 'starts_with' },
+    { value: 'is', label: 'is' },
+    { value: 'is_empty', label: 'is_empty' },
+  ],
+  amount: [
+    { value: '<', label: '<' },
+    { value: '<=', label: '<=' },
+    { value: '=', label: '=' },
+    { value: '>', label: '>' },
+    { value: '>=', label: '>=' },
+  ],
+};
+
 export function RuleModal(props: Props) {
   const [t] = useTranslation();
 
@@ -109,12 +125,14 @@ export function RuleModal(props: Props) {
         value={rule?.operator}
         onValueChange={(value) => handleChangeRule('operator', value)}
       >
-        <option defaultChecked value="contains">
-          {t('contains')}
-        </option>
-        <option value="starts_with">{t('starts_with')}</option>
-        <option value="is">{t('is')}</option>
-        <option value="is_empty">{t('is_empty')}</option>
+        {rule?.search_key &&
+          OPERATORS[rule.search_key as keyof typeof OPERATORS].map(
+            (operator, index) => (
+              <option key={index} value={operator.value}>
+                {t(operator.label)}
+              </option>
+            )
+          )}
       </SelectField>
 
       <InputField
