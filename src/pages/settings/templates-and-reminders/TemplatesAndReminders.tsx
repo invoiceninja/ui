@@ -33,6 +33,10 @@ import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandle
 import { Variable } from './common/components/Variable';
 import { commonVariables } from './common/constants/variables/common-variables';
 import { paymentVariables } from './common/constants/variables/payment-variables';
+import Toggle from '$app/components/forms/Toggle';
+import frequencies from '$app/common/constants/frequency';
+
+const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
 export function TemplatesAndReminders() {
   useTitle('templates_and_reminders');
@@ -59,10 +63,18 @@ export function TemplatesAndReminders() {
   const [preview, setPreview] = useState<EmailTemplate>();
   const canChangeEmailTemplate = (isHosted() && !freePlan()) || isSelfHosted();
 
+  const [reminderIndex, setReminderIndex] = useState<number>(-1);
+
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
   useEffect(() => {
     if (statics?.templates && company) {
+      if (REMINDERS.includes(templateId)) {
+        setReminderIndex(REMINDERS.indexOf(templateId) + 1);
+      } else {
+        setReminderIndex(-1);
+      }
+
       const existing = {
         subject: company.settings[
           `email_subject_${templateId}` as keyof CompanySettings
@@ -179,6 +191,138 @@ export function TemplatesAndReminders() {
           )}
         </Element>
       </Card>
+
+      {(REMINDERS.includes(templateId) ||
+        templateId === 'reminder_endless') && (
+        <Card>
+          {REMINDERS.includes(templateId) ? (
+            <>
+              <Element leftSide={t('days')}>
+                <InputField
+                  value={
+                    company?.settings[
+                      `num_days_reminder${reminderIndex}` as keyof CompanySettings
+                    ]
+                  }
+                  onValueChange={(value) =>
+                    handleChange(
+                      `settings.num_days_reminder${reminderIndex}`,
+                      value
+                    )
+                  }
+                />
+              </Element>
+
+              <Element leftSide={t('schedule')}>
+                <SelectField
+                  value={
+                    company?.settings[
+                      `schedule_reminder${reminderIndex}` as keyof CompanySettings
+                    ]
+                  }
+                  onValueChange={(value) =>
+                    handleChange(
+                      `settings.schedule_reminder${reminderIndex}`,
+                      value
+                    )
+                  }
+                >
+                  <option value="disabled" defaultChecked>
+                    {t('disabled')}
+                  </option>
+                  <option value="after_invoice_date">
+                    {t('after_invoice_date')}
+                  </option>
+                  <option value="before_due_date">
+                    {t('before_due_date')}
+                  </option>
+                  <option value="after_due_date">{t('after_due_date')}</option>
+                </SelectField>
+              </Element>
+
+              <Element leftSide={t('send_email')}>
+                <Toggle
+                  checked={
+                    Boolean(
+                      company?.settings[
+                        `enable_reminder${reminderIndex}` as keyof CompanySettings
+                      ]
+                    ) || false
+                  }
+                  onValueChange={(value) =>
+                    handleChange(
+                      `settings.enable_reminder${reminderIndex}`,
+                      value
+                    )
+                  }
+                />
+              </Element>
+
+              <Element leftSide={t('late_fee_amount')}>
+                <InputField
+                  value={
+                    company?.settings[
+                      `late_fee_amount${reminderIndex}` as keyof CompanySettings
+                    ]
+                  }
+                  onValueChange={(value) =>
+                    handleChange(
+                      `settings.late_fee_amount${reminderIndex}`,
+                      value
+                    )
+                  }
+                />
+              </Element>
+
+              <Element leftSide={t('late_fee_percent')}>
+                <InputField
+                  value={
+                    company?.settings[
+                      `late_fee_percent${reminderIndex}` as keyof CompanySettings
+                    ]
+                  }
+                  onValueChange={(value) =>
+                    handleChange(
+                      `settings.late_fee_percent${reminderIndex}`,
+                      value
+                    )
+                  }
+                />
+              </Element>
+            </>
+          ) : (
+            <>
+              <Element leftSide={t('send_email')}>
+                <Toggle
+                  checked={company?.settings.enable_reminder_endless || false}
+                  onValueChange={(value) =>
+                    handleChange('settings.enable_reminder_endless', value)
+                  }
+                />
+              </Element>
+
+              <Element leftSide={t('frequency')}>
+                <SelectField
+                  value={company?.settings.endless_reminder_frequency_id}
+                  onValueChange={(value) =>
+                    handleChange(
+                      'settings.endless_reminder_frequency_id',
+                      value
+                    )
+                  }
+                  withBlank
+                >
+                  {Object.keys(frequencies).map((frequency, index) => (
+                    <option key={index} value={frequency}>
+                      {t(frequencies[frequency as keyof typeof frequencies])}
+                    </option>
+                  ))}
+                </SelectField>
+              </Element>
+            </>
+          )}
+        </Card>
+      )}
 
       {preview && (
         <Card style={{ height: 800 }} title={preview.subject}>
