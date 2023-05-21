@@ -101,7 +101,7 @@ export function Totals() {
   };
 
   const getTotals = () => {
-    request('POST', endpoint('/api/v1/charts/totals'), body).then(
+    request('POST', endpoint('/api/v1/charts/totals_v2'), body).then(
       (response: AxiosResponse) => {
         setTotalsData(response.data);
 
@@ -118,7 +118,7 @@ export function Totals() {
   };
 
   const getChartData = () => {
-    request('POST', endpoint('/api/v1/charts/chart_summary'), body).then(
+    request('POST', endpoint('/api/v1/charts/chart_summary_v2'), body).then(
       (response: AxiosResponse) => setChartData(response.data)
     );
   };
