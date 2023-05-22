@@ -94,7 +94,7 @@ export function ProductsTable(props: Props) {
   useEffect(() => {
     if (
       (resource.client_id || resource.vendor_id) &&
-      !props.resource.line_items.length &&
+      !resource.line_items.length &&
       (shouldCreateInitialLineItem ||
         typeof shouldCreateInitialLineItem === 'undefined') &&
       !isEditPage

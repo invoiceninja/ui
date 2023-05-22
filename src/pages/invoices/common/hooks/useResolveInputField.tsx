@@ -252,8 +252,8 @@ export function useResolveInputField(props: Props) {
           }
           className="w-auto"
           defaultValue={resource?.line_items[index][property]}
-          clearButton={Boolean(resource?.line_items[index][property])}
           onClearButtonClick={() => handleTaxRateChange(property, index)}
+          clearButton={Boolean(resource?.line_items[index][property])}
         />
       );
     }
