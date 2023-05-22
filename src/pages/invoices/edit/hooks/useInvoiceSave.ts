@@ -19,6 +19,8 @@ import { updateRecord } from '$app/common/stores/slices/company-users';
 import { request } from '$app/common/helpers/request';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useSetAtom } from 'jotai';
+import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
 
 export function useHandleSave(
   setErrors: (errors: ValidationBag | undefined) => unknown
@@ -26,6 +28,8 @@ export function useHandleSave(
   const queryClient = useQueryClient();
   const dispatch = useDispatch();
   const company = useInjectCompanyChanges();
+
+  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return (invoice: Invoice) => {
     setErrors(undefined);
@@ -58,10 +62,12 @@ export function useHandleSave(
           ? toast.dismiss() && setErrors(error.response.data)
           : toast.error();
       })
-      .finally(() =>
+      .finally(() => {
+        setIsDeleteActionTriggered(undefined);
+
         queryClient.invalidateQueries(
           route('/api/v1/invoices/:id', { id: invoice.id })
-        )
-      );
+        );
+      });
   };
 }
