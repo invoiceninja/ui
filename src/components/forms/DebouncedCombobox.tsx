@@ -54,6 +54,7 @@ interface Props {
   sortBy?: string;
   staleTime?: number; // in ms
   disableWithSpinner?: boolean;
+  disableWithQueryParameter?: boolean;
 }
 
 export function DebouncedCombobox(props: Props) {
@@ -102,7 +103,11 @@ export function DebouncedCombobox(props: Props) {
       url.searchParams.set('filter', query);
     }
 
-    if (props.defaultValue && props.defaultValue.toString().length >= 1) {
+    if (
+      props.defaultValue &&
+      props.defaultValue.toString().length >= 1 &&
+      !props.disableWithQueryParameter
+    ) {
       url.searchParams.set('with', props.defaultValue.toString());
     }
 

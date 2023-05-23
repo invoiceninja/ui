@@ -119,8 +119,11 @@ export function Footer(props: PurchaseOrderCardProps) {
             <div className="col-span-12 lg:col-span-6 space-y-6">
               <DesignSelector
                 inputLabel={t('design')}
-                value={purchaseOrder.design_id}
+                value={purchaseOrder?.design_id}
                 onChange={(design) => handleChange('design_id', design.id)}
+                clearButton={Boolean(purchaseOrder?.design_id)}
+                onClearButtonClick={() => handleChange('design_id', '')}
+                disableWithQueryParameter
               />
             </div>
           </div>
