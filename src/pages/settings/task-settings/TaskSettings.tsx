@@ -65,7 +65,7 @@ export function TaskSettings() {
       onCancelClick={onCancel}
       title={t('task_settings')}
       breadcrumbs={pages}
-      docsLink="docs/basic-settings/#task_settings"
+      docsLink="en/basic-settings/#task_settings"
       withoutBackButton
     >
       <Card title={t('settings')}>

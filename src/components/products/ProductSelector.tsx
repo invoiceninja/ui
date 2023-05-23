@@ -9,19 +9,17 @@
  */
 
 import { Product } from '$app/common/interfaces/product';
-import {
-  DebouncedCombobox,
-  Record,
-} from '$app/components/forms/DebouncedCombobox';
 import { ProductCreate } from '$app/pages/invoices/common/components/ProductCreate';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ComboboxAsync, Entry } from '../forms/Combobox';
+import { Alert } from '../Alert';
 
 interface Props {
   defaultValue?: string | number | boolean;
   clearButton?: boolean;
   className?: string;
-  onChange?: (value: Record<Product>) => unknown;
+  onChange?: (value: Entry<Product>) => unknown;
   onClearButtonClick?: () => unknown;
   onProductCreated?: (product: Product) => unknown;
   onInputFocus?: () => unknown;
@@ -34,29 +32,32 @@ export function ProductSelector(props: Props) {
 
   return (
     <>
-      <DebouncedCombobox
-        endpoint="/api/v1/products?per_page=500"
-        label="product_key"
-        onChange={(record: Record<Product>) =>
-          props.onChange && props.onChange(record)
-        }
-        className={props.className}
-        onActionClick={() => setIsModalOpen(true)}
-        actionLabel={t('new_product')}
-        defaultValue={props.defaultValue}
-        clearButton={props.clearButton}
-        onClearButtonClick={props.onClearButtonClick}
-        onInputFocus={props.onInputFocus}
-        sortBy="product_key|asc"
-        withShadowRecord
-        errorMessage={props.errorMessage}
-      />
-
       <ProductCreate
         setIsModalOpen={setIsModalOpen}
         isModalOpen={isModalOpen}
         onProductCreated={props.onProductCreated}
       />
+
+      <ComboboxAsync<Product>
+        endpoint="/api/v1/products?per_page=500"
+        inputOptions={{ value: props.defaultValue ?? null }}
+        entryOptions={{ id: 'id', label: 'product_key', value: 'id' }}
+        onChange={(product) => props.onChange && props.onChange(product)}
+        action={{
+          label: t('new_product'),
+          onClick: () => setIsModalOpen(true),
+          visible: true,
+        }}
+        onDismiss={props.onClearButtonClick}
+        sortBy="product_key|asc"
+        nullable
+      />
+
+      {props.errorMessage && (
+        <Alert type="danger" className="mt-2">
+          {props.errorMessage}
+        </Alert>
+      )}
     </>
   );
 }

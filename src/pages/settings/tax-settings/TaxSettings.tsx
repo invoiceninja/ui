@@ -67,7 +67,7 @@ export function TaxSettings() {
       onCancelClick={onCancel}
       title={t('tax_settings')}
       breadcrumbs={pages}
-      docsLink="docs/basic-settings/#tax_settings"
+      docsLink="en/basic-settings/#tax_settings"
       withoutBackButton
     >
       <Card title={t('tax_settings')}>

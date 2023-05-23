@@ -110,7 +110,7 @@ export function Edit() {
     <Settings
       title={t('edit_bank_account')}
       breadcrumbs={pages}
-      docsLink="docs/basic-settings/#edit_bank_account"
+      docsLink="en/basic-settings/#edit_bank_account"
       onSaveClick={handleSave}
     >
       <Card onFormSubmit={handleSave} title={t('edit_bank_account')}>

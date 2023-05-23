@@ -28,7 +28,7 @@ export function ImportExport() {
     <Settings
       title={t('import_export')}
       breadcrumbs={pages}
-      docsLink="docs/basic-settings/#import_export"
+      docsLink="en/basic-settings/#import_export"
     >
       <Card withSaveButton saveButtonLabel={t('import')} title={t('import')}>
         <Element leftSide={t('import_type')}>

@@ -30,7 +30,7 @@ export function Products() {
     <Settings
       title={documentTitle}
       breadcrumbs={pages}
-      docsLink="docs/advanced-settings/#custom_fields"
+      docsLink="en/advanced-settings/#custom_fields"
     >
       <CustomFieldsPlanAlert />
 

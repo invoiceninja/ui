@@ -38,7 +38,7 @@ import { updateRecord } from '$app/common/stores/slices/company-users';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { openClientPortal } from '$app/pages/invoices/common/helpers/open-client-portal';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
@@ -83,6 +83,7 @@ import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
+import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 
 interface CreditUtilitiesProps {
   client?: Client;
@@ -201,6 +202,8 @@ export function useCreate(props: CreateProps) {
 
   const navigate = useNavigate();
 
+  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
+
   return (credit: Credit) => {
     toast.processing();
     setErrors(undefined);
@@ -217,7 +220,8 @@ export function useCreate(props: CreateProps) {
         error.response?.status === 422
           ? toast.dismiss() && setErrors(error.response.data)
           : toast.error();
-      });
+      })
+      .finally(() => setIsDeleteActionTriggered(undefined));
   };
 }
 
@@ -227,6 +231,8 @@ export function useSave(props: CreateProps) {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const company = useInjectCompanyChanges();
+
+  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return (credit: Credit) => {
     toast.processing();
@@ -262,7 +268,8 @@ export function useSave(props: CreateProps) {
         error.response?.status === 422
           ? toast.dismiss() && setErrors(error.response.data)
           : toast.error();
-      });
+      })
+      .finally(() => setIsDeleteActionTriggered(undefined));
   };
 }
 

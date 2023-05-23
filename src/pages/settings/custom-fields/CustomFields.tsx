@@ -40,7 +40,7 @@ export function CustomFields() {
     <Settings
       title={t('custom_fields')}
       breadcrumbs={pages}
-      docsLink="docs/advanced-settings/#custom_fields"
+      docsLink="en/advanced-settings/#custom_fields"
     >
       <Card title={t('custom_fields')}>
         {modules.map((module, index) => (
