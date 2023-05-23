@@ -148,7 +148,7 @@ export function useResolveInputField(props: Props) {
   const onProductChange = async (
     index: number,
     value: string,
-    product: Product
+    product: Product | null
   ) => {
     await handleProductChange(index, value, product);
   };
@@ -180,7 +180,6 @@ export function useResolveInputField(props: Props) {
         <ProductSelector
           key={resource?.line_items[index][property]}
           onChange={(value) =>
-            value.resource &&
             onProductChange(index, value.label, value.resource)
           }
           className="w-auto"
@@ -189,7 +188,7 @@ export function useResolveInputField(props: Props) {
             product && onProductChange(index, product.product_key, product)
           }
           clearButton
-          onClearButtonClick={() => handleProductChange(index, '')}
+          onClearButtonClick={() => handleProductChange(index, '', null)}
         />
       );
     }
