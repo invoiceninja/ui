@@ -56,7 +56,7 @@ export function ExpenseSettings() {
       onCancelClick={onCancel}
       title={t('expense_settings')}
       breadcrumbs={pages}
-      docsLink="docs/basic-settings/#expense_settings"
+      docsLink="en/basic-settings/#expense_settings"
       withoutBackButton
     >
       <Card title={t('settings')}>

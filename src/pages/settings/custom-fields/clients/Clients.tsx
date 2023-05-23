@@ -32,7 +32,7 @@ export function Clients() {
     <Settings
       title={t('custom_fields')}
       breadcrumbs={pages}
-      docsLink="docs/advanced-settings/#custom_fields"
+      docsLink="en/advanced-settings/#custom_fields"
     >
       <CustomFieldsPlanAlert />
 

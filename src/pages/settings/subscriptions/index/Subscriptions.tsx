@@ -29,7 +29,7 @@ export function Subscriptions() {
   return (
     <Settings
       title={documentTitle}
-      docsLink="docs/advanced-settings/#subscriptions"
+      docsLink="en/advanced-settings/#subscriptions"
       breadcrumbs={pages}
       withoutBackButton
     >

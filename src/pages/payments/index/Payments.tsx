@@ -42,7 +42,7 @@ export default function Payments() {
     <Default
       title={t('payments')}
       breadcrumbs={pages}
-      docsLink="docs/payments/"
+      docsLink="en/payments/"
       withoutBackButton
     >
       <DataTable

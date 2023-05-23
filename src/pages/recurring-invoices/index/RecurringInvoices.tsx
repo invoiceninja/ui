@@ -45,7 +45,7 @@ export default function RecurringInvoices() {
     <Default
       title={t('recurring_invoices')}
       breadcrumbs={pages}
-      docsLink="docs/recurring-invoices/"
+      docsLink="en/recurring-invoices/"
       withoutBackButton
     >
       <DataTable

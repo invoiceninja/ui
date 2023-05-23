@@ -40,7 +40,7 @@ export function AccountManagement() {
       onCancelClick={onCancel}
       title={t('account_management')}
       breadcrumbs={pages}
-      docsLink="docs/basic-settings/#account_management"
+      docsLink="en/basic-settings/#account_management"
       withoutBackButton
     >
       <Tabs tabs={tabs} className="mt-6" />
