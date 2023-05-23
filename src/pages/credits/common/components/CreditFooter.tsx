@@ -52,6 +52,8 @@ export function CreditFooter(props: Props) {
     queryClient.invalidateQueries(route('/api/v1/credits/:id', { id }));
   };
 
+  console.log(credit?.design_id);
+
   const tabs = [
     t('terms'),
     t('footer'),
@@ -134,8 +136,11 @@ export function CreditFooter(props: Props) {
               <div className="space-y-2">
                 <DesignSelector
                   inputLabel={t('design')}
-                  value={company?.settings?.invoice_design_id}
+                  value={credit?.design_id}
                   onChange={(design) => handleChange('design_id', design.id)}
+                  clearButton={Boolean(credit?.design_id)}
+                  onClearButtonClick={() => handleChange('design_id', '')}
+                  disableWithQueryParameter
                 />
               </div>
             </div>

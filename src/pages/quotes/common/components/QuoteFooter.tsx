@@ -135,8 +135,11 @@ export function QuoteFooter(props: Props) {
               <div className="space-y-2">
                 <DesignSelector
                   inputLabel={t('design')}
-                  value={company?.settings?.invoice_design_id}
+                  value={quote?.design_id}
                   onChange={(design) => handleChange('design_id', design.id)}
+                  clearButton={Boolean(quote?.design_id)}
+                  onClearButtonClick={() => handleChange('design_id', '')}
+                  disableWithQueryParameter
                 />
               </div>
             </div>

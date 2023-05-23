@@ -28,6 +28,7 @@ import { useQueryClient } from 'react-query';
 
 interface Props extends GenericSelectorProps<Design> {
   actionVisibility?: boolean;
+  disableWithQueryParameter?: boolean;
 }
 
 export function DesignSelector(props: Props) {
@@ -121,6 +122,7 @@ export function DesignSelector(props: Props) {
             })
           }
           inputLabel={t('design')}
+          disableWithQueryParameter={props.disableWithQueryParameter}
           errorMessage={
             errors?.errors['design.header'] ||
             errors?.errors['design.body'] ||
@@ -139,6 +141,7 @@ export function DesignSelector(props: Props) {
         endpoint="/api/v1/designs"
         label="name"
         defaultValue={props.value}
+        disableWithQueryParameter={props.disableWithQueryParameter}
         onChange={(design: Record<Design>) => {
           design.resource && props.onChange(design.resource);
         }}
