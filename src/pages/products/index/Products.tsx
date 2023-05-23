@@ -39,7 +39,7 @@ export default function Products() {
     <Default
       title={t('products')}
       breadcrumbs={pages}
-      docsLink="docs/products"
+      docsLink="en/products"
       withoutBackButton
     >
       <DataTable

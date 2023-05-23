@@ -40,7 +40,7 @@ export function GeneratedNumbers() {
   return (
     <Settings
       title={t('generated_numbers')}
-      docsLink="docs/advanced-settings/#generated_numbers"
+      docsLink="en/advanced-settings/#generated_numbers"
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}

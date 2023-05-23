@@ -124,7 +124,7 @@ export function UserDetails() {
       onCancelClick={() => dispatch(resetChanges())}
       title={t('user_details')}
       breadcrumbs={pages}
-      docsLink="docs/basic-settings/#user_details"
+      docsLink="en/basic-settings/#user_details"
       withoutBackButton
     >
       <PasswordConfirmation

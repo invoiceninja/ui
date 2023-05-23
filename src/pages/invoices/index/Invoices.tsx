@@ -58,7 +58,7 @@ export default function Invoices() {
     <Default
       title={documentTitle}
       breadcrumbs={pages}
-      docsLink="docs/invoices"
+      docsLink="en/invoices"
       withoutBackButton
     >
       <DataTable

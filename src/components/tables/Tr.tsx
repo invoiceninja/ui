@@ -21,9 +21,6 @@ export function Tr(props: Props) {
 
   return (
     <tr
-      className={classNames('bg-white dark:bg-gray-800 hover:bg-gray-50', {
-        'cursor-pointer': onClick,
-      })}
       onClick={(event) =>
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -33,6 +30,12 @@ export function Tr(props: Props) {
       }
       ref={innerRef}
       {...otherProps}
+      className={classNames(
+        `bg-white dark:bg-gray-800 hover:bg-gray-50 ${props.className}`,
+        {
+          'cursor-pointer': onClick,
+        }
+      )}
     >
       {props.children}
     </tr>

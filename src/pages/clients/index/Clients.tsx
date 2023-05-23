@@ -57,7 +57,7 @@ export default function Clients() {
     <Default
       breadcrumbs={pages}
       title={t('clients')}
-      docsLink="docs/clients"
+      docsLink="en/clients"
       withoutBackButton
     >
       <DataTable

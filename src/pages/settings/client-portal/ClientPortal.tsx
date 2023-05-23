@@ -54,7 +54,7 @@ export function ClientPortal() {
   return (
     <Settings
       title={t('client_portal')}
-      docsLink="docs/advanced-settings/#client_portal"
+      docsLink="en/advanced-settings/#client_portal"
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}

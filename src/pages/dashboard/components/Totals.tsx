@@ -17,15 +17,17 @@ import { Spinner } from '$app/components/Spinner';
 import { DropdownDateRangePicker } from '../../../components/DropdownDateRangePicker';
 import { Card } from '$app/components/cards';
 import { useTranslation } from 'react-i18next';
-import { InfoCard } from '$app/components/InfoCard';
 import { request } from '$app/common/helpers/request';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
+import { Badge } from '$app/components/Badge';
 
 interface TotalsRecord {
   revenue: { paid_to_date: string; code: string };
   expenses: { amount: string; code: string };
-  outstanding: { amount: string; code: string };
+  invoices: { invoiced_amount: string; code: string; date: string };
+  outstanding: { outstanding_count: number; amount: string; code: string };
 }
 
 interface Currency {
@@ -33,7 +35,7 @@ interface Currency {
   label: string;
 }
 
-interface ChartData {
+export interface ChartData {
   invoices: {
     total: string;
     date: string;
@@ -44,7 +46,7 @@ interface ChartData {
     date: string;
     currency: string;
   }[];
-  expenses: {
+  outstanding: {
     total: string;
     date: string;
     currency: string;
@@ -62,6 +64,8 @@ export function Totals() {
 
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
+
+  const user = useCurrentUser();
 
   const [isLoadingTotals, setIsLoadingTotals] = useState(true);
   const [totalsData, setTotalsData] = useState<TotalsRecord[]>([]);
@@ -97,7 +101,7 @@ export function Totals() {
   };
 
   const getTotals = () => {
-    request('POST', endpoint('/api/v1/charts/totals'), body).then(
+    request('POST', endpoint('/api/v1/charts/totals_v2'), body).then(
       (response: AxiosResponse) => {
         setTotalsData(response.data);
 
@@ -114,7 +118,7 @@ export function Totals() {
   };
 
   const getChartData = () => {
-    request('POST', endpoint('/api/v1/charts/chart_summary'), body).then(
+    request('POST', endpoint('/api/v1/charts/chart_summary_v2'), body).then(
       (response: AxiosResponse) => setChartData(response.data)
     );
   };
@@ -133,103 +137,137 @@ export function Totals() {
       )}
 
       {/* Quick date, currency & date picker. */}
-      <div className="flex justify-end space-x-2">
-        {currencies && (
-          <SelectField
-            className="w-20"
-            defaultValue={currencies[0]}
-            onValueChange={(value) => setCurrency(parseInt(value))}
-          >
-            {currencies.map((currency, index) => (
-              <option key={index} value={currency.value}>
-                {currency.label}
-              </option>
-            ))}
-          </SelectField>
-        )}
+      <div className="flex justify-end">
+        <div className="flex space-x-2">
+          {currencies && (
+            <SelectField
+              defaultValue={currencies[0]}
+              onValueChange={(value) => setCurrency(parseInt(value))}
+              style={{ width: '5rem' }}
+            >
+              {currencies.map((currency, index) => (
+                <option key={index} value={currency.value}>
+                  {currency.label}
+                </option>
+              ))}
+            </SelectField>
+          )}
 
-        <Button
-          key="day-btn"
-          className="mx-0.5"
-          type="secondary"
-          onClick={() => setChartScale('day')}
-        >
-          {t('day')}
-        </Button>
+          <div className="flex space-x-2">
+            <Button
+              key="day-btn"
+              type={chartScale === 'day' ? 'primary' : 'secondary'}
+              onClick={() => setChartScale('day')}
+            >
+              {t('day')}
+            </Button>
 
-        <Button
-          key="week-btn"
-          className="mx-0.5"
-          type="secondary"
-          onClick={() => setChartScale('week')}
-        >
-          {t('week')}
-        </Button>
+            <Button
+              key="week-btn"
+              type={chartScale === 'week' ? 'primary' : 'secondary'}
+              onClick={() => setChartScale('week')}
+            >
+              {t('week')}
+            </Button>
 
-        <Button
-          key="month-btn"
-          className="mx-0.5"
-          type="secondary"
-          onClick={() => setChartScale('month')}
-        >
-          {t('month')}
-        </Button>
+            <Button
+              key="month-btn"
+              type={chartScale === 'month' ? 'primary' : 'secondary'}
+              onClick={() => setChartScale('month')}
+            >
+              {t('month')}
+            </Button>
+          </div>
 
-        <div className="flex justify-center  sm:col-start-3 ">
-          <DropdownDateRangePicker
-            handleDateChange={handleDateChange}
-            startDate={body.start_date}
-            endDate={body.end_date}
-          />
+          <div className="flex justify-center sm:col-start-3 ">
+            <DropdownDateRangePicker
+              handleDateChange={handleDateChange}
+              startDate={body.start_date}
+              endDate={body.end_date}
+            />
+          </div>
         </div>
       </div>
 
-      {totalsData[currency] && company && (
-        <div className="grid grid-cols-12 gap-4 mt-4">
-          <InfoCard
-            style={{ borderColor: TotalColors.Green }}
-            className="col-span-12 lg:col-span-4 border-t-4"
-            title={`${t('total')} ${t('revenue')}`}
-            value={formatMoney(
-              totalsData[currency].revenue.paid_to_date || 0,
-              company.settings.country_id,
-              currency.toString()
-            )}
-          />
+      <div className="grid grid-cols-12 mt-4 gap-4">
+        {company && (
+          <Card title={t('account_login_text')} className="col-span-12 xl:col-span-4">
+            <div className="px-6 pb-8">
+              <div className="flex flex-col space-y-2">
+                <span className="text-2xl">{`${user?.first_name} ${user?.last_name}`}</span>
 
-          <InfoCard
-            style={{ borderColor: TotalColors.Red }}
-            className="col-span-12 lg:col-span-4 border-t-4"
-            title={`${t('total')} ${t('expenses')}`}
-            value={formatMoney(
-              totalsData[currency].expenses.amount || 0,
-              company.settings.country_id,
-              currency.toString()
-            )}
-          />
+                <span className="text-sm text-gray-600">
+                  {t('recent_transactions')}
+                </span>
+              </div>
 
-          <InfoCard
-            style={{ borderColor: TotalColors.Blue }}
-            className="col-span-12 lg:col-span-4 border-t-4"
-            title={`${t('total')} ${t('outstanding')}`}
-            value={formatMoney(
-              totalsData[currency].outstanding.amount || 0,
-              company.settings.country_id,
-              currency.toString()
-            )}
-          />
-        </div>
-      )}
+              <div className="flex flex-col mt-8">
+                <div className="flex justify-between items-center border-b border-gray-200 py-3">
+                  <span className="text-gray-600">{t('invoices')}</span>
 
-      {chartData && (
-        <Card withContainer className="mt-4">
-          <Chart
-            chartSensitivity={chartScale}
-            dates={{ start_date: body.start_date, end_date: body.end_date }}
-            data={chartData[currency]}
-          />
-        </Card>
-      )}
+                  <Badge style={{ backgroundColor: TotalColors.Blue }}>
+                    <span className="mx-2 text-base">
+                      {formatMoney(
+                        totalsData[currency]?.invoices.invoiced_amount || 0,
+                        company.settings.country_id,
+                        currency.toString()
+                      )}
+                    </span>
+                  </Badge>
+                </div>
+
+                <div className="flex justify-between items-center border-b border-gray-200 py-3">
+                  <span className="text-gray-600">{t('payments')}</span>
+                  <Badge style={{ backgroundColor: TotalColors.Green }}>
+                    <span className="mx-2 text-base">
+                      {formatMoney(
+                        totalsData[currency]?.revenue.paid_to_date || 0,
+                        company.settings.country_id,
+                        currency.toString()
+                      )}
+                    </span>
+                  </Badge>
+                </div>
+
+                <div className="flex justify-between items-center border-b border-gray-200 py-3">
+                  <span className="text-gray-600">{t('outstanding')}</span>
+                  <Badge style={{ backgroundColor: TotalColors.Red }}>
+                    <span className="mx-2 text-base">
+                      {formatMoney(
+                        totalsData[currency]?.outstanding.amount || 0,
+                        company.settings.country_id,
+                        currency.toString()
+                      )}
+                    </span>
+                  </Badge>
+                </div>
+
+                <div className="flex justify-between items-center border-b border-gray-200 py-3">
+                  <span className="text-gray-600">
+                    {t('total_invoices_outstanding')}
+                  </span>
+
+                  <Badge variant="white">
+                    <span className="mx-2 text-base">
+                      {totalsData[currency]?.outstanding.outstanding_count || 0}
+                    </span>
+                  </Badge>
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {chartData && (
+          <Card title={t('overview')} className="col-span-12 xl:col-span-8 pr-4">
+            <Chart
+              chartSensitivity={chartScale}
+              dates={{ start_date: body.start_date, end_date: body.end_date }}
+              data={chartData[currency]}
+            />
+          </Card>
+        )}
+      </div>
     </>
   );
 }

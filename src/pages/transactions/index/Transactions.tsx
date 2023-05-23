@@ -66,7 +66,7 @@ export default function Transactions() {
       <Default
         title={t('transactions')}
         breadcrumbs={pages}
-        docsLink="docs/transactions/"
+        docsLink="en/transactions/"
         withoutBackButton
       >
         <DataTable

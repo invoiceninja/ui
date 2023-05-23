@@ -20,6 +20,7 @@ interface Props extends CommonProps {
     | 'red'
     | 'generic'
     | 'light-blue'
+    | 'blue'
     | 'orange'
     | 'dark-blue'
     | 'green'
@@ -36,7 +37,7 @@ export function Badge(props: Props) {
 
   const accentColor = useAccentColor();
 
-  const styles: React.CSSProperties = {};
+  const styles: React.CSSProperties = { ...props.style };
 
   if (props.variant === 'primary') {
     styles.backgroundColor = accentColor;
@@ -52,6 +53,7 @@ export function Badge(props: Props) {
         'bg-yellow-600 text-white': props.variant === 'yellow',
         'bg-red-600 text-white': props.variant === 'red',
         'bg-blue-300 text-white': props.variant === 'light-blue',
+        'bg-blue-400 text-white': props.variant === 'blue',
         'bg-blue-700 text-white': props.variant === 'dark-blue',
         'bg-orange-500 text-white': props.variant === 'orange',
         'bg-green-500 text-white': props.variant === 'green',

@@ -11,13 +11,17 @@
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import CommonProps from '../../common/interfaces/common-props.interface';
 
-type Props = CommonProps;
+interface Props extends CommonProps {
+  backgroundColor?: string;
+}
 
 export function Thead(props: Props) {
+  const { backgroundColor } = props;
+
   const accentColor = useAccentColor();
 
   return (
-    <thead style={{ backgroundColor: accentColor }}>
+    <thead style={{ backgroundColor: backgroundColor || accentColor }}>
       <tr>{props.children}</tr>
     </thead>
   );

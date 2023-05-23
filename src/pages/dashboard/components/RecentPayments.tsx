@@ -8,9 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date } from '$app/common/helpers';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
-import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { t } from 'i18next';
 import { route } from '$app/common/helpers/route';
@@ -19,9 +17,10 @@ import { Payment } from '$app/common/interfaces/payment';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { Card } from '$app/components/cards';
 import { generatePath } from 'react-router-dom';
+import dayjs from 'dayjs';
+import { Badge } from '$app/components/Badge';
 
 export function RecentPayments() {
-  const { dateFormat } = useCurrentCompanyDateFormats();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
 
@@ -47,16 +46,6 @@ export function RecentPayments() {
       ),
     },
     {
-      id: 'amount',
-      label: t('amount'),
-      format: (value, payment) =>
-        formatMoney(
-          value,
-          payment.client?.country_id || company.settings.country_id,
-          payment.client?.settings.currency_id || company.settings.currency_id
-        ),
-    },
-    {
       id: 'invoice_number',
       label: t('invoice'),
       format: (value, payment) =>
@@ -74,26 +63,56 @@ export function RecentPayments() {
     {
       id: 'date',
       label: t('date'),
-      format: (value) => date(value, dateFormat),
+      format: (value) => value && dayjs(value).format('MMM DD'),
+    },
+    {
+      id: 'amount',
+      label: t('amount'),
+      format: (value, payment) => (
+        <Badge variant="green">
+          {formatMoney(
+            value,
+            payment.client?.country_id || company.settings.country_id,
+            payment.client?.settings.currency_id || company.settings.currency_id
+          )}
+        </Badge>
+      ),
     },
   ];
 
   return (
     <Card
       title={t('recent_payments')}
-      className="h-96"
-      padding="small"
+      className="h-96 relative"
       withoutBodyPadding
-      withScrollableBody
+      withoutHeaderBorder
     >
-      <DataTable
-        resource="payment"
-        columns={columns}
-        endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&page=1"
-        withoutActions
-        withoutPagination
-        withoutPadding
-      />
+      <div className="pl-6 pr-4">
+        <DataTable
+          resource="payment"
+          columns={columns}
+          className="pr-4"
+          endpoint="/api/v1/payments?include=client,invoices&sort=date|desc&per_page=50&page=1"
+          withoutActions
+          withoutPagination
+          withoutPadding
+          styleOptions={{
+            addRowSeparator: true,
+            withoutBottomBorder: true,
+            withoutTopBorder: true,
+            withoutLeftBorder: true,
+            withoutRightBorder: true,
+            headerBackgroundColor: 'transparent',
+            thChildrenClassName: 'text-gray-500 dark:text-white',
+            tdClassName: 'first:pl-0 py-4',
+            thClassName: 'first:pl-0',
+            tBodyStyle: { border: 0 },
+          }}
+          style={{
+            height: '19.9rem',
+          }}
+        />
+      </div>
     </Card>
   );
 }

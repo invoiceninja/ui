@@ -41,7 +41,7 @@ export default function Expenses() {
     <Default
       title={t('expenses')}
       breadcrumbs={pages}
-      docsLink="docs/expenses"
+      docsLink="en/expenses"
       withoutBackButton
     >
       <DataTable

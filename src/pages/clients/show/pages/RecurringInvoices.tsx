@@ -22,9 +22,12 @@ export default function RecurringInvoices() {
   return (
     <DataTable
       resource="recurring_invoice"
-      endpoint={route('/api/v1/recurring_invoices?client_id=:id&sort=id|desc', {
-        id,
-      })}
+      endpoint={route(
+        '/api/v1/recurring_invoices?include=client&client_id=:id&sort=id|desc',
+        {
+          id,
+        }
+      )}
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/recurring_invoices/bulk"
