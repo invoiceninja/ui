@@ -29,7 +29,7 @@ export function Schedules() {
   return (
     <Settings
       title={documentTitle}
-      docsLink="docs/advanced-settings/#schedules"
+      docsLink="en/advanced-settings/#schedules"
       breadcrumbs={pages}
       withoutBackButton
     >

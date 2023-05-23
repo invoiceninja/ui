@@ -38,7 +38,7 @@ export function GroupSettings() {
     <Settings
       title={t('group_settings')}
       breadcrumbs={pages}
-      docsLink="docs/advanced-settings/#group_settings"
+      docsLink="en/advanced-settings/#group_settings"
     >
       <div className="flex justify-end mt-4 lg:mt-0">
         <Button to="/group_settings/create">Create group</Button>
