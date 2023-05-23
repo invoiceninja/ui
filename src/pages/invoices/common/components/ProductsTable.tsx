@@ -24,9 +24,13 @@ import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { Fragment, useEffect } from 'react';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { useParams } from 'react-router-dom';
+import { atom, useSetAtom } from 'jotai';
 
 export type ProductTableResource = Invoice | RecurringInvoice | PurchaseOrder;
 export type RelationType = 'client_id' | 'vendor_id';
+
+export const isDeleteActionTriggeredAtom = atom<boolean | undefined>(undefined);
 
 interface Props {
   type: 'product' | 'task';
@@ -43,12 +47,24 @@ interface Props {
   ) => unknown;
   onDeleteRowClick: (index: number) => unknown;
   onCreateItemClick: () => unknown;
+  shouldCreateInitialLineItem?: boolean;
 }
 
 export function ProductsTable(props: Props) {
   const [t] = useTranslation();
+  const { id } = useParams();
 
-  const { resource, items, columns, relationType } = props;
+  const {
+    resource,
+    items,
+    columns,
+    relationType,
+    shouldCreateInitialLineItem,
+  } = props;
+
+  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
+
+  const isEditPage = location.pathname.includes(id!);
 
   const resolveTranslation = useResolveTranslation();
 
@@ -67,6 +83,10 @@ export function ProductsTable(props: Props) {
     onSort: props.onSort,
   });
 
+  const isAnyLineItemEmpty = () => {
+    return items.some((lineItem) => isLineItemEmpty(lineItem));
+  };
+
   const getLineItemIndex = (lineItem: InvoiceItem) => {
     return resource.line_items.indexOf(lineItem);
   };
@@ -74,7 +94,10 @@ export function ProductsTable(props: Props) {
   useEffect(() => {
     if (
       (resource.client_id || resource.vendor_id) &&
-      !props.resource.line_items.length
+      !resource.line_items.length &&
+      (shouldCreateInitialLineItem ||
+        typeof shouldCreateInitialLineItem === 'undefined') &&
+      !isEditPage
     ) {
       props.onCreateItemClick();
     }
@@ -123,14 +146,16 @@ export function ProductsTable(props: Props) {
                                   getLineItemIndex(lineItem)
                                 )}
 
-                                {resource && !isLineItemEmpty(lineItem) && (
+                                {resource && (
                                   <button
                                     className="ml-2 text-gray-600 hover:text-red-600"
-                                    onClick={() =>
+                                    onClick={() => {
+                                      setIsDeleteActionTriggered(true);
+
                                       props.onDeleteRowClick(
                                         getLineItemIndex(lineItem)
-                                      )
-                                    }
+                                      );
+                                    }}
                                   >
                                     <Trash2 size={18} />
                                   </button>
@@ -151,7 +176,9 @@ export function ProductsTable(props: Props) {
                 <Tr className="bg-slate-100 hover:bg-slate-200">
                   <Td colSpan={100}>
                     <button
-                      onClick={() => props.onCreateItemClick()}
+                      onClick={() =>
+                        !isAnyLineItemEmpty() && props.onCreateItemClick()
+                      }
                       className="w-full py-2 inline-flex justify-center items-center space-x-2"
                     >
                       <Plus size={18} />

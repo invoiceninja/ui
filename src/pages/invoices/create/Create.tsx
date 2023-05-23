@@ -201,6 +201,9 @@ export default function Create() {
                 <ProductsTable
                   type="product"
                   resource={invoice}
+                  shouldCreateInitialLineItem={
+                    searchParams.get('table') !== 'tasks'
+                  }
                   items={invoice.line_items.filter(
                     (item) => item.type_id === InvoiceItemType.Product
                   )}
@@ -224,6 +227,9 @@ export default function Create() {
                 <ProductsTable
                   type="task"
                   resource={invoice}
+                  shouldCreateInitialLineItem={
+                    searchParams.get('table') === 'tasks'
+                  }
                   items={invoice.line_items.filter(
                     (item) => item.type_id === InvoiceItemType.Task
                   )}

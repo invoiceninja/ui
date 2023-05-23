@@ -29,9 +29,11 @@ import { CustomField } from '$app/components/CustomField';
 import {
   ProductTableResource,
   RelationType,
+  isDeleteActionTriggeredAtom,
 } from '../components/ProductsTable';
 import { useHandleTaxRateChange } from './useHandleTaxRateChange';
 import { Product } from '$app/common/interfaces/product';
+import { useAtom } from 'jotai';
 
 const numberInputs = [
   'discount',
@@ -60,21 +62,25 @@ interface Props {
 }
 
 export const isLineItemEmpty = (lineItem: InvoiceItem) => {
-  if (
-    !lineItem.cost &&
-    !lineItem.quantity &&
-    !lineItem.notes &&
-    !lineItem.product_key
-  ) {
-    return true;
-  }
+  const properties = Object.keys(lineItem);
 
-  return false;
+  return !properties.some((property) => {
+    return (
+      property !== '_id' &&
+      property !== 'type_id' &&
+      property !== 'is_amount_discount' &&
+      lineItem[property as keyof InvoiceItem]
+    );
+  });
 };
 
 export function useResolveInputField(props: Props) {
   const [inputCurrencySeparators, setInputCurrencySeparators] =
     useState<DecimalInputSeparators>();
+
+  const [isDeleteActionTriggered, setIsDeleteActionTriggered] = useAtom(
+    isDeleteActionTriggeredAtom
+  );
 
   const isAnyExceptLastLineItemEmpty = (items: InvoiceItem[]) => {
     const filteredItems = items.filter(
@@ -142,6 +148,8 @@ export function useResolveInputField(props: Props) {
     value: string | number | boolean,
     index: number
   ) => {
+    setIsDeleteActionTriggered(false);
+
     await props.onLineItemPropertyChange(key, value, index);
   };
 
@@ -150,6 +158,8 @@ export function useResolveInputField(props: Props) {
     value: string,
     product: Product | null
   ) => {
+    setIsDeleteActionTriggered(false);
+
     await handleProductChange(index, value, product);
   };
 
@@ -169,8 +179,10 @@ export function useResolveInputField(props: Props) {
   }, [resource?.[props.relationType]]);
 
   useEffect(() => {
-    cleanLineItemsList(resource?.line_items);
-  }, [resource?.line_items]);
+    if (isDeleteActionTriggered === false) {
+      cleanLineItemsList(resource?.line_items);
+    }
+  }, [resource?.line_items, isDeleteActionTriggered]);
 
   return (key: string, index: number) => {
     const property = resolveProperty(key);
@@ -178,7 +190,7 @@ export function useResolveInputField(props: Props) {
     if (property === 'product_key') {
       return (
         <ProductSelector
-          key={resource?.line_items[index][property]}
+          key={`${property}${resource?.line_items[index][property]}`}
           onChange={(value) =>
             onProductChange(index, value.label, value.resource)
           }
@@ -197,6 +209,7 @@ export function useResolveInputField(props: Props) {
       return (
         <InputField
           id={property}
+          key={`${property}${index}`}
           element="textarea"
           value={resource?.line_items[index][property]}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
@@ -228,6 +241,7 @@ export function useResolveInputField(props: Props) {
     if (taxInputs.includes(property)) {
       return (
         <TaxRateSelector
+          key={`${property}${resource?.line_items[index][property]}`}
           onChange={(value) =>
             value.resource &&
             handleTaxRateChange(property, index, value.resource)
@@ -237,15 +251,7 @@ export function useResolveInputField(props: Props) {
           }
           className="w-auto"
           defaultValue={resource?.line_items[index][property]}
-          onClearButtonClick={() => {
-            onChange(property, '', index);
-
-            onChange(
-              property.replace('rate', 'name') as keyof InvoiceItem,
-              '',
-              index
-            );
-          }}
+          onClearButtonClick={() => handleTaxRateChange(property, index)}
           clearButton={Boolean(resource?.line_items[index][property])}
         />
       );

@@ -34,7 +34,7 @@ import { blankLineItem } from '$app/common/constants/blank-line-item';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
@@ -70,6 +70,7 @@ import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useBulkAction } from '$app/pages/recurring-invoices/common/queries';
 import { EntityState } from '$app/common/enums/entity-state';
+import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -200,6 +201,8 @@ export function useSave(props: RecurringInvoiceSaveProps) {
   const { setErrors } = props;
   const queryClient = useQueryClient();
 
+  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
+
   return (
     recurringInvoice: RecurringInvoice,
     queryAction?: 'send_now' | 'start'
@@ -231,7 +234,8 @@ export function useSave(props: RecurringInvoiceSaveProps) {
         error.response?.status === 422
           ? toast.dismiss() && setErrors(error.response.data)
           : toast.error();
-      });
+      })
+      .finally(() => setIsDeleteActionTriggered(undefined));
   };
 }
 
@@ -450,6 +454,8 @@ export function useActions() {
 export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
   const navigate = useNavigate();
 
+  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
+
   return (
     recurringInvoice: RecurringInvoice,
     queryAction?: 'start' | 'send_now'
@@ -477,7 +483,8 @@ export function useCreate({ setErrors }: RecurringInvoiceSaveProps) {
         error.response?.status === 422
           ? toast.dismiss() && setErrors(error.response.data)
           : toast.error();
-      });
+      })
+      .finally(() => setIsDeleteActionTriggered(undefined));
   };
 }
 
