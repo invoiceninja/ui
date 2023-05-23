@@ -124,7 +124,7 @@ export function OnlinePayments() {
 
         {paymentTerms && (
           <>
-            <Element leftSide={t('payment_type')}>
+            <Element leftSide={t('payment_terms')}>
               <SelectField
                 value={company?.settings?.payment_terms}
                 id="settings.payment_terms"
