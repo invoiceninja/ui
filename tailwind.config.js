@@ -10,8 +10,9 @@ module.exports = {
       },
       colors: {
         ninja: {
-          gray: '#454544',
+          gray: '#242930',
           'gray-darker': '#2F2E2E',
+          'gray-lighter': '#363D47',
         },
       },
     },

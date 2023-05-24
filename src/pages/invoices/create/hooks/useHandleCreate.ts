@@ -17,11 +17,15 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { Invoice } from '$app/common/interfaces/invoice';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useNavigate } from 'react-router-dom';
+import { useSetAtom } from 'jotai';
+import { isDeleteActionTriggeredAtom } from '../../common/components/ProductsTable';
 
 export function useHandleCreate(
   setErrors: (errors: ValidationBag | undefined) => unknown
 ) {
   const navigate = useNavigate();
+
+  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return (invoice: Invoice) => {
     toast.processing();
@@ -39,6 +43,7 @@ export function useHandleCreate(
         error.response?.status === 422
           ? toast.dismiss() && setErrors(error.response.data)
           : toast.error();
-      });
+      })
+      .finally(() => setIsDeleteActionTriggered(undefined));
   };
 }

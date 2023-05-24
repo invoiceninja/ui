@@ -23,7 +23,10 @@ export default function Invoices() {
   return (
     <DataTable
       resource="invoice"
-      endpoint={route('/api/v1/invoices?client_id=:id&sort=id|desc', { id })}
+      endpoint={route(
+        '/api/v1/invoices?include=client&client_id=:id&sort=id|desc',
+        { id }
+      )}
       columns={columns}
       withResourcefulActions
       bulkRoute="/api/v1/invoices/bulk"

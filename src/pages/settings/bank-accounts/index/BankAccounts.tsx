@@ -15,7 +15,7 @@ import { useTranslation } from 'react-i18next';
 import { useBankAccountColumns } from '../common/hooks/useBankAccountColumns';
 import { Button } from '$app/components/forms';
 import { MdLink, MdRefresh, MdRuleFolder } from 'react-icons/md';
-import { endpoint, isHosted } from '$app/common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
@@ -105,7 +105,8 @@ export function BankAccounts() {
               </Button>
             )}
 
-            {isHosted() && (proPlan() || enterprisePlan()) && (
+            {((isHosted() && (proPlan() || enterprisePlan())) ||
+              isSelfHosted()) && (
               <Button
                 type="secondary"
                 onClick={() =>

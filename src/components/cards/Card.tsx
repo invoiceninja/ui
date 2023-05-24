@@ -52,6 +52,7 @@ interface Props {
   padding?: 'small' | 'regular';
   collapsed?: boolean;
   childrenClassName?: string;
+  withoutHeaderBorder?: boolean;
 }
 
 export function Card(props: Props) {
@@ -64,7 +65,7 @@ export function Card(props: Props) {
   return (
     <div
       className={classNames(
-        `bg-white shadow rounded ${props.className} overflow-visible`,
+        `bg-white shadow rounded overflow-visible ${props.className}`,
         { 'overflow-y-auto': props.withScrollableBody }
       )}
       style={props.style}
@@ -72,10 +73,11 @@ export function Card(props: Props) {
       <form onSubmit={props.onFormSubmit}>
         {props.title && (
           <div
-            className={classNames('border-b border-gray-200', {
+            className={classNames({
               'bg-white sticky top-0': props.withScrollableBody,
               'px-4 sm:px-6 py-3': padding == 'small',
               'px-4 sm:px-6 py-5': padding == 'regular',
+              'border-b border-gray-200': !props.withoutHeaderBorder,
             })}
             onClick={() =>
               typeof props.collapsed !== 'undefined' &&
@@ -120,8 +122,8 @@ export function Card(props: Props) {
           className={classNames(props.childrenClassName, {
             hidden: isCollapsed,
             'py-0': props.withoutBodyPadding,
-            'py-4': padding == 'regular',
-            'py-2': padding == 'small',
+            'py-4': padding === 'regular' && !props.withoutBodyPadding,
+            'py-2': padding === 'small' && !props.withoutBodyPadding,
           })}
         >
           {props.isLoading && <Element leftSide={<Spinner />} />}

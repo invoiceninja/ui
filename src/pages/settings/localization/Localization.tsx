@@ -39,7 +39,7 @@ export function Localization() {
       onCancelClick={onCancel}
       title={t('localization')}
       breadcrumbs={pages}
-      docsLink="docs/basic-settings/#localization"
+      docsLink="en/basic-settings/#localization"
       withoutBackButton
     >
       <Tabs tabs={tabs} className="mt-6" />

@@ -47,7 +47,7 @@ export function EmailSettings() {
   return (
     <Settings
       title={t('email_settings')}
-      docsLink="docs/advanced-settings/#email_settings"
+      docsLink="en/advanced-settings/#email_settings"
       breadcrumbs={pages}
       onSaveClick={onSave}
       onCancelClick={onCancel}

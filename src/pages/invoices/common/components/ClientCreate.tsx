@@ -88,6 +88,7 @@ export function ClientCreate(props: Props) {
         props.onClientCreated && props.onClientCreated(response.data.data);
 
         queryClient.invalidateQueries('/api/v1/clients');
+        queryClient.invalidateQueries(endpoint('/api/v1/clients'));
 
         window.dispatchEvent(
           new CustomEvent('invalidate.combobox.queries', {
