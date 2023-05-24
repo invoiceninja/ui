@@ -18,7 +18,7 @@ import {
   useCompanyGatewaysQuery,
 } from '$app/common/queries/company-gateways';
 import { Settings } from '$app/components/layouts/Settings';
-import { ChangeEvent, CSSProperties, useEffect, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useGateways } from '../common/hooks/useGateways';
 import { Credentials } from './components/Credentials';
@@ -29,10 +29,19 @@ import { useHandleCreate } from './hooks/useHandleCreate';
 import { blankFeesAndLimitsRecord } from './hooks/useHandleMethodToggle';
 import { TabGroup } from '$app/components/TabGroup';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { GatewayTypeIcon } from '$app/pages/clients/show/components/GatewayTypeIcon';
+import {
+  availableGatewayLogos,
+  GatewayTypeIcon,
+} from '$app/pages/clients/show/components/GatewayTypeIcon';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const imageStyle: CSSProperties = { width: 30, height: 30 };
+const gatewaysStyles = [
+  { key: 'paypal_express', width: 110 },
+  { key: 'mollie', width: 110 },
+  { key: 'eway', width: 170 },
+  { key: 'forte', width: 190 },
+  { key: 'square', width: 130 },
+  { key: 'checkoutcom', width: 170 },
+];
 
 export function Create() {
   const [t] = useTranslation();
@@ -51,12 +60,14 @@ export function Create() {
 
   const [filteredGateways, setFilteredGateways] = useState<Gateway[]>([]);
 
+  const [tabIndex, setTabIndex] = useState<number>(0);
+
   const gateways = useGateways();
 
   const onSave = useHandleCreate(companyGateway, setErrors);
 
-  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setGateway(gateways.find((gateway) => gateway.id === event.target.value));
+  const handleChange = (value: string) => {
+    setGateway(gateways.find((gateway) => gateway.id === value));
   };
 
   const defaultTab = [t('provider')];
@@ -75,6 +86,16 @@ export function Create() {
   ];
 
   const [tabs, setTabs] = useState<string[]>(defaultTab);
+
+  const getGatewayWidth = (provider: string) => {
+    const providerName = provider.toLowerCase();
+
+    const gateway = gatewaysStyles.find(
+      (gateway) => gateway.key === providerName
+    );
+
+    return gateway ? gateway.width : undefined;
+  };
 
   useEffect(() => {
     let existingCompanyGatewaysKeys: string[] = [];
@@ -148,8 +169,6 @@ export function Create() {
     }
   }, [gateway]);
 
-  console.log(filteredGateways);
-
   return (
     <Settings
       title={documentTitle}
@@ -157,11 +176,11 @@ export function Create() {
       onSaveClick={onSave}
       disableSaveButton={!gateway}
     >
-      <TabGroup tabs={tabs}>
+      <TabGroup tabs={tabs} onTabChange={(index) => setTabIndex(index)}>
         <Card title={t('add_gateway')}>
           <Element leftSide={t('provider')}>
             <SelectField
-              onChange={handleChange}
+              onValueChange={(value) => handleChange(value)}
               value={gateway?.id}
               errorMessage={errors?.errors.gateway_key}
               withBlank
@@ -219,34 +238,44 @@ export function Create() {
         </div>
       </TabGroup>
 
-      <div className="flex flex-col scroll-auto">
-        <Card className="px-5">
-          <div className="flex items-center justify-between h-full">
-            <GatewayTypeIcon name="PayPal_Express" style={{ height: 100 }} />
+      {!tabIndex && (
+        <div className="flex flex-wrap gap-4">
+          {filteredGateways.map(
+            (gateway, index) =>
+              availableGatewayLogos.includes(
+                gateway.provider.toLowerCase()
+              ) && (
+                <Card key={index} className="w-52">
+                  <div className="flex flex-col items-center justify-between space-y-5 h-52">
+                    <div className="flex justify-center items-center border-b border-b-gray-200 w-full h-28">
+                      <GatewayTypeIcon
+                        name={gateway.provider.toLowerCase()}
+                        style={{
+                          width: getGatewayWidth(gateway.provider) || 150,
+                        }}
+                      />
+                    </div>
 
-            <div className="flex flex-col flex-1 items-start px-5">
-              <span className="text-sm">
-                PayPal is an online payment platform that facilitates payments
-                between individuals and businesses. In addition to online
-                payments, PayPal offers a debit card for payments, credit card
-                readers for use in businesses, and lines of credit. PayPal is
-                considered a very secure method of sending payments online.
-              </span>
+                    {gateway.site_url && (
+                      <Link external to={gateway.site_url}>
+                        {t('official_website')}
+                      </Link>
+                    )}
 
-              <Link
-                external
-                to="https://www.paypal.com/us/cgi-bin/webscr?cmd=_login-api-run"
-              >
-                https://www.paypal.com/us/cgi-bin/webscr?cmd=_login-api-run
-              </Link>
-            </div>
-
-            <div className="flex items-center">
-              <Button>Set Up</Button>
-            </div>
-          </div>
-        </Card>
-      </div>
+                    <Button
+                      onClick={(event: ChangeEvent<HTMLButtonElement>) => {
+                        event.preventDefault();
+                        handleChange(gateway.id);
+                      }}
+                    >
+                      {t('set_up')}
+                    </Button>
+                  </div>
+                </Card>
+              )
+          )}
+        </div>
+      )}
     </Settings>
   );
 }
