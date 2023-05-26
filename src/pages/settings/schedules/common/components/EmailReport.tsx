@@ -12,7 +12,8 @@ import { Schedule } from '$app/common/interfaces/schedule';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Element } from '$app/components/cards';
 import { SelectField } from '$app/components/forms';
-import { reports, Section } from '$app/pages/reports/index/Reports';
+import { useGetAvailableReports } from '$app/pages/reports/common/hooks/useGetAvailableReports';
+import { Section } from '$app/pages/reports/index/Reports';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -26,6 +27,8 @@ interface Props {
 
 export function EmailReport(props: Props) {
   const [t] = useTranslation();
+
+  const reports = useGetAvailableReports();
 
   const { schedule, handleChange, errors } = props;
 
