@@ -30,6 +30,10 @@ import { MultiValue, StylesConfig } from 'react-select';
 import { SelectOption } from '$app/components/datatables/Actions';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { useScheduleReport } from '../common/hooks/useScheduleReport';
+import { useGetAvailableReports } from '../common/hooks/useGetAvailableReports';
+import { ColumnSelection } from '../common/components/ColumnSelection';
+import { ColumnFiltering } from '../common/components/ColumnFiltering';
+import { Client } from '$app/common/interfaces/client';
 
 export type Identifier =
   | 'activity'
@@ -57,12 +61,23 @@ export type Identifier =
 
 export type Section = 'sales' | 'company' | 'receivables' | 'tax' | 'data';
 
+type BlankEntity = Client;
+
 export interface Report {
   identifier: Identifier;
   label: string;
   endpoint: string;
   payload: Payload;
   section?: Section;
+  availableKeys?: string[] | undefined;
+  blankEntity?: BlankEntity;
+  entityName?: string;
+}
+
+export interface Filter {
+  key: string;
+  operator: string;
+  value: string;
 }
 
 interface Payload {
@@ -77,340 +92,8 @@ interface Payload {
   is_expense_billed?: boolean;
   include_tax?: boolean;
   status?: string;
+  filters?: Filter[];
 }
-
-export const reports: Report[] = [
-  {
-    identifier: 'activity',
-    label: 'activity',
-    endpoint: '/api/v1/reports/activities',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-  },
-  {
-    identifier: 'clients',
-    label: 'clients',
-    endpoint: '/api/v1/reports/clients',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'client_contacts',
-    label: 'client_contacts',
-    endpoint: '/api/v1/reports/contacts',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'credits',
-    label: 'credits',
-    endpoint: '/api/v1/reports/credits',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'documents',
-    label: 'documents',
-    endpoint: '/api/v1/reports/documents',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'expenses',
-    label: 'expenses',
-    endpoint: '/api/v1/reports/expenses',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'invoices',
-    label: 'invoices',
-    endpoint: '/api/v1/reports/invoices',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      status: '',
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'invoice_items',
-    label: 'invoice_items',
-    endpoint: '/api/v1/reports/invoice_items',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'quotes',
-    label: 'quotes',
-    endpoint: '/api/v1/reports/quotes',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'quote_items',
-    label: 'quote_items',
-    endpoint: '/api/v1/reports/quote_items',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'recurring_invoices',
-    label: 'recurring_invoices',
-    endpoint: '/api/v1/reports/recurring_invoices',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'payments',
-    label: 'payments',
-    endpoint: '/api/v1/reports/payments',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'products',
-    label: 'products',
-    endpoint: '/api/v1/reports/products',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'product_sales',
-    label: 'product_sales',
-    endpoint: '/api/v1/reports/product_sales',
-    payload: {
-      start_date: '',
-      end_date: '',
-      client_id: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'sales',
-  },
-  {
-    identifier: 'tasks',
-    label: 'tasks',
-    endpoint: '/api/v1/reports/tasks',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-    },
-    section: 'data',
-  },
-  {
-    identifier: 'profitloss',
-    label: 'profitloss',
-    endpoint: '/api/v1/reports/profitloss',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-    section: 'company',
-  },
-  {
-    identifier: 'ar_detailed',
-    label: 'ar_detailed',
-    endpoint: '/api/v1/reports/ar_detail_report',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-    section: 'receivables',
-  },
-  {
-    identifier: 'ar_summary',
-    label: 'ar_summary',
-    endpoint: '/api/v1/reports/ar_summary_report',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-    section: 'receivables',
-  },
-  {
-    identifier: 'client_balance',
-    label: 'client_balance',
-    endpoint: '/api/v1/reports/client_balance_report',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-    section: 'receivables',
-  },
-  {
-    identifier: 'client_sales',
-    label: 'client_sales',
-    endpoint: '/api/v1/reports/client_sales_report',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-    section: 'sales',
-  },
-  {
-    identifier: 'tax_summary',
-    label: 'tax_summary',
-    endpoint: '/api/v1/reports/tax_summary_report',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-    section: 'tax',
-  },
-  {
-    identifier: 'user_sales',
-    label: 'user_sales',
-    endpoint: '/api/v1/reports/user_sales_report',
-    payload: {
-      start_date: '',
-      end_date: '',
-      date_key: '',
-      date_range: 'all',
-      report_keys: [],
-      send_email: false,
-      is_expense_billed: false,
-      is_income_billed: false,
-      include_tax: false,
-    },
-    section: 'sales',
-  },
-];
 
 interface Range {
   identifier: string;
@@ -434,6 +117,8 @@ export default function Reports() {
   const { t } = useTranslation();
 
   const scheduleReport = useScheduleReport();
+
+  const reports = useGetAvailableReports();
 
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
@@ -631,7 +316,7 @@ export default function Reports() {
       }
     >
       <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-6 h-max">
+        <Card className="col-span-7 h-max">
           <Element leftSide={t('report')}>
             <SelectField
               value={report.identifier}
@@ -686,81 +371,9 @@ export default function Reports() {
             </SelectField>
           </Element>
 
-          <Element leftSide={t('report_template')}>
-            <SelectField
-              //value={report.identifier}
-              //onValueChange={(value) => handleReportChange(value as Identifier)}
-              withBlank
-            >
-              <optgroup label="Financial Reports">
-                <option value="1">Client Balance Report</option>
-                <option value="2">Vendor Expenses Report</option>
-                <option value="3">Bank Account Summary Report</option>
-                <option value="4">
-                  Transaction by Account and Category Report
-                </option>
-                <option value="5">Transaction by Date Range Report</option>
-              </optgroup>
+          <ColumnSelection report={report} setReport={setReport} />
 
-              <optgroup label="Sales Reports">
-                <option value="6">Product Sales Summary Report</option>
-                <option value="7">Invoice Summary Report</option>
-                <option value="8">Quote Summary Report</option>
-                <option value="9">Credit Summary Report</option>
-                <option value="10">Revenue by Product Category Report</option>
-              </optgroup>
-
-              <optgroup label="Expense Reports">
-                <option value="11">Expense Summary by Category Report</option>
-                <option value="12">Expense Summary by Client Report</option>
-                <option value="13">Expense Summary by Vendor Report</option>
-                <option value="14">Recurring Expense Summary Report</option>
-                <option value="15">Expense Details by Date Range Report</option>
-              </optgroup>
-
-              <optgroup label="Payment Reports">
-                <option value="16">Payment Summary by Client Report</option>
-                <option value="17">Payment Summary by Vendor Report</option>
-                <option value="18">Payment Summary by Invoice Report</option>
-                <option value="19">Payment Details by Date Range Report</option>
-              </optgroup>
-
-              <optgroup label="Project Reports">
-                <option value="20">Project Summary by Client Report</option>
-                <option value="21">Project Summary by Status Report</option>
-                <option value="22">Project Task Summary Report</option>
-              </optgroup>
-
-              <optgroup label="Task Reports">
-                <option value="23">Task Summary by Project Report</option>
-                <option value="24">Task Summary by Client Report</option>
-                <option value="25">Task Summary by User Report</option>
-                <option value="26">Task Details by Date Range Report</option>
-              </optgroup>
-
-              <optgroup label="Purchase Order Reports">
-                <option value="27">
-                  Purchase Order Summary by Vendor Report
-                </option>
-                <option value="28">
-                  Purchase Order Summary by Client Report
-                </option>
-                <option value="29">
-                  Purchase Order Summary by Status Report
-                </option>
-                <option value="30">
-                  Purchase Order Details by Date Range Report
-                </option>
-              </optgroup>
-            </SelectField>
-          </Element>
-
-          <Element leftSide={t('send_email')}>
-            <Toggle
-              checked={report.payload.send_email}
-              onValueChange={handleSendEmailChange}
-            />
-          </Element>
+          <ColumnFiltering report={report} setReport={setReport} />
 
           {report.identifier === 'profitloss' && (
             <>
@@ -794,7 +407,7 @@ export default function Reports() {
           )}
         </Card>
 
-        <Card className="col-span-6 h-max">
+        <Card className="col-span-5 h-max">
           <Element leftSide={t('range')}>
             <SelectField
               onValueChange={(value) => handleRangeChange(value)}
@@ -847,6 +460,13 @@ export default function Reports() {
               />
             </Element>
           )}
+
+          <Element leftSide={t('send_email')}>
+            <Toggle
+              checked={report.payload.send_email}
+              onValueChange={handleSendEmailChange}
+            />
+          </Element>
         </Card>
       </div>
     </Default>
