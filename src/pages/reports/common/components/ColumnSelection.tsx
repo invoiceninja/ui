@@ -8,10 +8,14 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
 import { Icon } from '$app/components/icons/Icon';
-import { MdArrowCircleRight, MdClose, MdDragHandle } from 'react-icons/md';
+import {
+  MdAdd,
+  MdArrowCircleRight,
+  MdClose,
+  MdDragHandle,
+  MdSearch,
+} from 'react-icons/md';
 import {
   DragDropContext,
   Draggable,
@@ -20,8 +24,9 @@ import {
 } from '@hello-pangea/dnd';
 import { Report } from '../../index/Reports';
 import { useTranslation } from 'react-i18next';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { arrayMoveImmutable } from 'array-move';
+import { InputField } from '$app/components/forms';
 
 interface Props {
   report: Report;
@@ -35,22 +40,14 @@ export const getColumnWithoutEntityName = (
   return reportKey.replace(`${report.entityName}.`, '');
 };
 
-export function ColumnSelection(props: Props) {
+export function ColumnSelection({ report, setReport }: Props) {
   const [t] = useTranslation();
 
-  const { report, setReport } = props;
-
-  const [availableColumn, setAvailableColumn] = useState<string>('all');
-
   const isColumnSelected = (column: string) => {
-    return report.payload.report_keys.some(
-      (key) => key === `${report.entityName}.${column}`
-    );
+    return report.payload.report_keys.some((key) => key === column);
   };
 
   const handleResetSelectedColumns = () => {
-    setAvailableColumn('all');
-
     setReport((current) => ({
       ...current,
       payload: {
@@ -131,109 +128,104 @@ export function ColumnSelection(props: Props) {
     }
   };
 
-  useEffect(() => {
-    if (availableColumn === 'all') {
-      handleReportKeysChange(availableColumn, 'setAll');
-    } else if (availableColumn) {
-      const updatedColumn = `${report.entityName}.${availableColumn}`;
-
-      handleReportKeysChange(updatedColumn, 'add');
-    }
-
-    availableColumn && availableColumn !== 'all' && setAvailableColumn('');
-  }, [availableColumn]);
-
   return (
-    <>
-      <Element leftSide={t('Available columns')}>
-        <div className="flex items-center gap-x-5">
-          <SelectField
-            value={availableColumn}
-            onValueChange={(value) =>
-              !isColumnSelected(value) && setAvailableColumn(value)
-            }
-            withBlank
-            style={{ width: '11rem' }}
-          >
-            <option value="all">{t('all')}</option>
+    <div className="flex items-center gap-x-5 py-5 px-3">
+      <div className="flex flex-1 flex-col">
+        <span className="text-gray-600 mb-1">Available Columns</span>
 
-            {report.availableKeys?.map((key) => (
-              <option key={key} value={key}>
-                {t(key)}
-              </option>
-            ))}
-          </SelectField>
-
-          <Icon element={MdArrowCircleRight} size={25} />
-
-          <div className="flex flex-col flex-1 mb-6">
-            <div className="flex justify-between items-end">
-              <span className="text-gray-600 mb-1">Selected columns</span>
-
-              {report.payload.report_keys.length ? (
-                <div
-                  className="text-gray-800 text-xs mb-1 cursor-pointer"
-                  onClick={handleResetSelectedColumns}
-                >
-                  {t('reset')}
-                </div>
-              ) : null}
-            </div>
-
-            <DragDropContext onDragEnd={onDragEnd}>
-              <Droppable droppableId="columns">
-                {(provided) => (
-                  <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="flex flex-col px-3 py-2 w-full border border-gray-300 rounded"
-                  >
-                    {report.payload.report_keys.map((column, index) => (
-                      <Draggable
-                        key={index}
-                        draggableId={`item-${index}`}
-                        index={index}
-                      >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            className="w-full inline-flex items-center justify-between pr-4 py-2"
-                          >
-                            <div className="space-x-2 inline-flex items-center">
-                              <Icon
-                                className="cursor-pointer"
-                                element={MdClose}
-                                onClick={() =>
-                                  handleReportKeysChange(column, 'remove')
-                                }
-                              />
-
-                              <p>
-                                {t(getColumnWithoutEntityName(column, report))}
-                              </p>
-                            </div>
-
-                            <div className="cursor-grab">
-                              <Icon element={MdDragHandle} size={22} />
-                            </div>
-                          </div>
-                        )}
-                      </Draggable>
-                    ))}
-
-                    {!report.payload.report_keys.length && (
-                      <span>{t('all')}</span>
-                    )}
-                    {provided.placeholder}
-                  </div>
-                )}
-              </Droppable>
-            </DragDropContext>
+        <div className="flex border border-gray-300 rounded mb-1">
+          <div className="flex items-center bg-gray-100 rounded px-2">
+            <Icon element={MdSearch} size={20} />
           </div>
+
+          <InputField className="ring-0 border-0 focus:ring-0" />
         </div>
-      </Element>
-    </>
+
+        <div className="flex flex-col overflow-y-auto h-96 w-full border border-gray-300 rounded py-1 px-2">
+          {report.availableKeys?.map((key) => (
+            <div
+              key={key}
+              className="flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer"
+            >
+              <span>{t(key)}</span>
+
+              <div
+                className="hover:bg-gray-200 rounded-xl p-[0.18rem]"
+                onClick={() =>
+                  !isColumnSelected(key) && handleReportKeysChange(key, 'add')
+                }
+              >
+                <Icon element={MdAdd} size={20} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <Icon element={MdArrowCircleRight} size={30} />
+
+      <div className="flex flex-col flex-1 self-start">
+        <div className="flex justify-between items-end">
+          <span className="text-gray-600 mb-1">Selected columns</span>
+
+          {Boolean(report.payload.report_keys.length) && (
+            <div
+              className="text-gray-800 text-xs mb-1 cursor-pointer"
+              onClick={handleResetSelectedColumns}
+            >
+              {t('reset')}
+            </div>
+          )}
+        </div>
+
+        <DragDropContext onDragEnd={onDragEnd}>
+          <Droppable droppableId="columns">
+            {(provided) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="flex flex-col px-3 py-2 w-full border border-gray-300 rounded overflow-auto"
+              >
+                {report.payload.report_keys.map((column, index) => (
+                  <Draggable
+                    key={index}
+                    draggableId={`item-${index}`}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        {...provided.dragHandleProps}
+                        className="w-full inline-flex items-center justify-between pr-4 py-2"
+                      >
+                        <div className="space-x-2 inline-flex items-center">
+                          <Icon
+                            className="cursor-pointer"
+                            element={MdClose}
+                            onClick={() =>
+                              handleReportKeysChange(column, 'remove')
+                            }
+                          />
+
+                          <p>{t(getColumnWithoutEntityName(column, report))}</p>
+                        </div>
+
+                        <div className="cursor-grab">
+                          <Icon element={MdDragHandle} size={22} />
+                        </div>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+
+                {!report.payload.report_keys.length && <span>{t('all')}</span>}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </div>
+    </div>
   );
 }

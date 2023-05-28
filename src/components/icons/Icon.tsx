@@ -11,10 +11,11 @@
 import { useAccentColor } from '$app/common/hooks/useAccentColor';
 import CommonProps from '$app/common/interfaces/common-props.interface';
 import { isValidElement, cloneElement, createElement } from 'react';
+import { Icon as ReactFeatherIcon } from 'react-feather';
 import { IconType } from 'react-icons';
 
 interface Props extends CommonProps {
-  element: IconType;
+  element: IconType | ReactFeatherIcon;
   size?: number;
   color?: string;
 }

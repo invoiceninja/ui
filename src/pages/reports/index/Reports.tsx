@@ -24,7 +24,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
-import { MdDownload, MdPrint, MdSchedule } from 'react-icons/md';
+import { MdDownload, MdFilterAlt, MdPrint, MdSchedule } from 'react-icons/md';
 import { useInvoiceFilters } from '$app/pages/invoices/common/hooks/useInvoiceFilters';
 import { MultiValue, StylesConfig } from 'react-select';
 import { SelectOption } from '$app/components/datatables/Actions';
@@ -34,6 +34,8 @@ import { useGetAvailableReports } from '../common/hooks/useGetAvailableReports';
 import { ColumnSelection } from '../common/components/ColumnSelection';
 import { ColumnFiltering } from '../common/components/ColumnFiltering';
 import { Client } from '$app/common/interfaces/client';
+import { Settings } from 'react-feather';
+import { Modal } from '$app/components/Modal';
 
 export type Identifier =
   | 'activity'
@@ -123,6 +125,9 @@ export default function Reports() {
   const [report, setReport] = useState<Report>(reports[0]);
   const [isPendingExport, setIsPendingExport] = useState(false);
   const [errors, setErrors] = useState<ValidationBag>();
+
+  const [isConfigureColumnsModalOpen, setIsConfigureColumnsModalOpen] =
+    useState<boolean>(false);
 
   const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
 
@@ -289,14 +294,30 @@ export default function Reports() {
             onClick={() => !isPendingExport && handleExport('xlsx')}
             icon={<Icon element={MdDownload} />}
           >
-            {t('export_as_xlsx')}
+            Export as XLSX
           </DropdownElement>
 
           <DropdownElement
             onClick={() => !isPendingExport && handleExport('csv')}
             icon={<Icon element={MdDownload} />}
           >
-            {t('export_as_csv')}
+            Export as CSV
+          </DropdownElement>
+
+          <DropdownElement
+            onClick={() =>
+              !isPendingExport && setIsConfigureColumnsModalOpen(true)
+            }
+            icon={<Icon element={Settings} className="h-4 w-4" />}
+          >
+            Configure Columns
+          </DropdownElement>
+
+          <DropdownElement
+            onClick={() => !isPendingExport && handleExport('xlsx')}
+            icon={<Icon element={MdFilterAlt} />}
+          >
+            Add Filters
           </DropdownElement>
 
           <DropdownElement
@@ -370,8 +391,6 @@ export default function Reports() {
               </optgroup>
             </SelectField>
           </Element>
-
-          <ColumnSelection report={report} setReport={setReport} />
 
           <ColumnFiltering report={report} setReport={setReport} />
 
@@ -469,6 +488,16 @@ export default function Reports() {
           </Element>
         </Card>
       </div>
+
+      <Modal
+        size="regular"
+        title="Configure Columns"
+        visible={isConfigureColumnsModalOpen}
+        onClose={() => setIsConfigureColumnsModalOpen(false)}
+        overflowVisible
+      >
+        <ColumnSelection report={report} setReport={setReport} />
+      </Modal>
     </Default>
   );
 }

@@ -28,19 +28,38 @@ interface Props {
 
 export function Modal(props: Props) {
   const [open, setOpen] = useState(false);
+  const [isInitial, setIsInitial] = useState<boolean>(true);
+  const [includeTranslation, setIncludeTranslation] = useState<boolean>(true);
 
   useEffect(() => {
     setOpen(props.visible);
   }, [props.visible]);
+
+  useEffect(() => {
+    if (open) {
+      setIncludeTranslation(false);
+    }
+  }, [open]);
+
+  useEffect(() => {
+    if (open && !isInitial) {
+      setIsInitial(true);
+      setOpen(false);
+      props.onClose(false);
+    }
+
+    if (!includeTranslation) {
+      setIsInitial(false);
+    }
+  }, [includeTranslation]);
 
   return (
     <Transition.Root show={open} as={Fragment}>
       <Dialog
         as="div"
         className="fixed z-10 inset-0 overflow-y-auto"
-        onClose={(value) => {
-          !props.disableClosing && setOpen(value);
-          !props.disableClosing && props.onClose(value);
+        onClose={() => {
+          !props.disableClosing && setIncludeTranslation(true);
         }}
       >
         <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -66,15 +85,23 @@ export function Modal(props: Props) {
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
-            enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-            enterTo="opacity-100 translate-y-0 sm:scale-100"
+            enterFrom={classNames('opacity-0 sm:scale-95', {
+              'translate-y-4 sm:translate-y-0': includeTranslation,
+            })}
+            enterTo={classNames('opacity-100', {
+              'translate-y-0 sm:scale-100': includeTranslation,
+            })}
             leave="ease-in duration-200"
-            leaveFrom="opacity-100 translate-y-0 sm:scale-100"
-            leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+            leaveFrom={classNames('opacity-100', {
+              'translate-y-0 sm:scale-100': includeTranslation,
+            })}
+            leaveTo={classNames('opacity-0', {
+              'translate-y-4 sm:translate-y-0 sm:scale-95': includeTranslation,
+            })}
           >
             <div
               className={classNames(
-                'inline-block align-bottom rounded px-4 pt-5 pb-4 text-left shadow-xl transform transition-all sm:my-8 sm:align-middle w-full sm:p-6',
+                'inline-block align-bottom rounded px-4 pt-5 pb-4 text-left shadow-xl sm:my-8 sm:align-middle w-full sm:p-6 relative',
                 {
                   'max-w-sm':
                     props.size === 'extraSmall' ||
@@ -87,6 +114,7 @@ export function Modal(props: Props) {
                     typeof props.backgroundColor === 'undefined',
                   'bg-gray-50': props.backgroundColor === 'gray',
                   'overflow-hidden': !props.overflowVisible,
+                  'transform translate-all': includeTranslation,
                 }
               )}
             >
@@ -102,7 +130,7 @@ export function Modal(props: Props) {
                   {!props.disableClosing && (
                     <X
                       className="cursor-pointer"
-                      onClick={() => props.onClose(false)}
+                      onClick={() => setIncludeTranslation(true)}
                       fontSize={22}
                     />
                   )}
@@ -118,7 +146,7 @@ export function Modal(props: Props) {
               {props.children && (
                 <div
                   className={classNames(
-                    'text-sm text-gray-500 flex flex-col space-y-4',
+                    'text-sm text-gray-500 flex flex-col space-y-4 relative',
                     {
                       'justify-center items-center': props.centerContent,
                       'mt-5 sm:mt-6': !props.disableClosing,
