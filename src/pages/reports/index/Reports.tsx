@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { InputField, SelectField } from '$app/components/forms';
+import { Button, InputField, SelectField } from '$app/components/forms';
 import { AxiosError } from 'axios';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
@@ -20,7 +20,7 @@ import { Page } from '$app/components/Breadcrumbs';
 import { ClientSelector } from '$app/components/clients/ClientSelector';
 import Toggle from '$app/components/forms/Toggle';
 import { Default } from '$app/components/layouts/Default';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
@@ -308,22 +308,6 @@ export default function Reports() {
 
           <DropdownElement
             onClick={() =>
-              !isPendingExport && setIsConfigureColumnsModalOpen(true)
-            }
-            icon={<Icon element={Settings} className="h-4 w-4" />}
-          >
-            Configure Columns
-          </DropdownElement>
-
-          <DropdownElement
-            onClick={() => !isPendingExport && setIsAddFilterModalOpen(true)}
-            icon={<Icon element={MdFilterAlt} />}
-          >
-            Add Filters
-          </DropdownElement>
-
-          <DropdownElement
-            onClick={() =>
               !isPendingExport &&
               scheduleReport(report.identifier, report.payload.date_range)
             }
@@ -339,6 +323,34 @@ export default function Reports() {
       }
     >
       <Card>
+        <div className="flex items-center pl-6 space-x-5 mb-2">
+          <Button
+            type="secondary"
+            onClick={(event: ChangeEvent<HTMLButtonElement>) => {
+              event.preventDefault();
+              !isPendingExport && setIsConfigureColumnsModalOpen(true);
+            }}
+          >
+            <div className="flex space-x-4 items-center">
+              <Icon element={Settings} className="h-4 w-4" />
+              <span>Configure Columns</span>
+            </div>
+          </Button>
+
+          <Button
+            type="secondary"
+            onClick={(event: ChangeEvent<HTMLButtonElement>) => {
+              event.preventDefault();
+              !isPendingExport && setIsAddFilterModalOpen(true);
+            }}
+          >
+            <div className="flex space-x-4 items-center">
+              <Icon element={MdFilterAlt} />
+              <span>Add Filters</span>
+            </div>
+          </Button>
+        </div>
+
         <Element leftSide={t('report')}>
           <SelectField
             value={report.identifier}
