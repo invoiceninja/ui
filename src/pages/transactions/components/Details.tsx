@@ -117,10 +117,8 @@ export function Details(props: Props) {
       );
 
       setMatchedExpenses(filteredMatchedExpenses);
-
       setMatchedExpenseCategory(expenseCategoryResponse?.data.data);
-
-      setMatchedPayment(paymentResponse?.data.data);
+      setMatchedPayment(paymentResponse);
     }
   }, [
     transaction,
