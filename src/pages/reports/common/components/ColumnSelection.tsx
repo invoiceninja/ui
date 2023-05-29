@@ -14,7 +14,6 @@ import {
   MdArrowCircleRight,
   MdClose,
   MdDragHandle,
-  MdSearch,
 } from 'react-icons/md';
 import {
   DragDropContext,
@@ -26,7 +25,6 @@ import { Report } from '../../index/Reports';
 import { useTranslation } from 'react-i18next';
 import { Dispatch, SetStateAction } from 'react';
 import { arrayMoveImmutable } from 'array-move';
-import { InputField } from '$app/components/forms';
 
 interface Props {
   report: Report;
@@ -44,7 +42,9 @@ export function ColumnSelection({ report, setReport }: Props) {
   const [t] = useTranslation();
 
   const isColumnSelected = (column: string) => {
-    return report.payload.report_keys.some((key) => key === column);
+    return report.payload.report_keys.some(
+      (key) => key === `${report.entityName}.${column}`
+    );
   };
 
   const handleResetSelectedColumns = () => {
@@ -78,19 +78,22 @@ export function ColumnSelection({ report, setReport }: Props) {
     action: 'setAll' | 'add' | 'remove'
   ) => {
     if (action === 'add') {
-      const doesKeyExist = isColumnSelected(keyIdentifier);
+      const updatedKeyIdentifier = `${report.entityName}.${keyIdentifier}`;
+
+      const doesKeyExist = isColumnSelected(updatedKeyIdentifier);
       const isCurrentAll = !report.payload.report_keys.length;
 
       if (!doesKeyExist) {
         const updatedFilterKeys =
-          report.payload.filters?.filter(({ key }) => key === keyIdentifier) ||
-          [];
+          report.payload.filters?.filter(
+            ({ key }) => key === updatedKeyIdentifier
+          ) || [];
 
         setReport((current) => ({
           ...current,
           payload: {
             ...current.payload,
-            report_keys: [...current.payload.report_keys, keyIdentifier],
+            report_keys: [...current.payload.report_keys, updatedKeyIdentifier],
             filters: isCurrentAll ? updatedFilterKeys : report.payload.filters,
           },
         }));
@@ -129,28 +132,20 @@ export function ColumnSelection({ report, setReport }: Props) {
   };
 
   return (
-    <div className="flex items-center gap-x-5 py-5 px-3">
+    <div className="flex items-center gap-x-5 pb-3">
       <div className="flex flex-1 flex-col">
         <span className="text-gray-600 mb-1">Available Columns</span>
 
-        <div className="flex border border-gray-300 rounded mb-1">
-          <div className="flex items-center bg-gray-100 rounded px-2">
-            <Icon element={MdSearch} size={20} />
-          </div>
-
-          <InputField className="ring-0 border-0 focus:ring-0" />
-        </div>
-
-        <div className="flex flex-col overflow-y-auto h-96 w-full border border-gray-300 rounded py-1 px-2">
+        <div className="flex flex-col overflow-y-auto h-96 w-full border border-gray-300 rounded p-2">
           {report.availableKeys?.map((key) => (
             <div
               key={key}
-              className="flex items-center justify-between px-3 py-2 hover:bg-gray-100 cursor-pointer"
+              className="flex items-center justify-between px-3 py-2 hover:bg-gray-100"
             >
               <span>{t(key)}</span>
 
               <div
-                className="hover:bg-gray-200 rounded-xl p-[0.18rem]"
+                className="hover:bg-gray-200 rounded-xl p-[0.18rem] cursor-pointer"
                 onClick={() =>
                   !isColumnSelected(key) && handleReportKeysChange(key, 'add')
                 }
@@ -166,7 +161,7 @@ export function ColumnSelection({ report, setReport }: Props) {
 
       <div className="flex flex-col flex-1 self-start">
         <div className="flex justify-between items-end">
-          <span className="text-gray-600 mb-1">Selected columns</span>
+          <span className="text-gray-600 mb-1">Selected Columns</span>
 
           {Boolean(report.payload.report_keys.length) && (
             <div
@@ -184,7 +179,8 @@ export function ColumnSelection({ report, setReport }: Props) {
               <div
                 {...provided.droppableProps}
                 ref={provided.innerRef}
-                className="flex flex-col px-3 py-2 w-full border border-gray-300 rounded overflow-auto"
+                className="flex flex-col p-2 w-full border border-gray-300 rounded overflow-auto"
+                style={{ minHeight: '15rem', maxHeight: '24rem' }}
               >
                 {report.payload.report_keys.map((column, index) => (
                   <Draggable
@@ -197,16 +193,17 @@ export function ColumnSelection({ report, setReport }: Props) {
                         ref={provided.innerRef}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
-                        className="w-full inline-flex items-center justify-between pr-4 py-2"
+                        className="w-full inline-flex items-center justify-between pr-4 py-2 pl-2 hover:bg-gray-100"
                       >
                         <div className="space-x-2 inline-flex items-center">
-                          <Icon
-                            className="cursor-pointer"
-                            element={MdClose}
+                          <div
+                            className="hover:bg-gray-200 rounded-xl p-[0.18rem] cursor-pointer"
                             onClick={() =>
                               handleReportKeysChange(column, 'remove')
                             }
-                          />
+                          >
+                            <Icon element={MdClose} />
+                          </div>
 
                           <p>{t(getColumnWithoutEntityName(column, report))}</p>
                         </div>
@@ -219,7 +216,9 @@ export function ColumnSelection({ report, setReport }: Props) {
                   </Draggable>
                 ))}
 
-                {!report.payload.report_keys.length && <span>{t('all')}</span>}
+                {!report.payload.report_keys.length && (
+                  <span className="self-center">No selected columns.</span>
+                )}
                 {provided.placeholder}
               </div>
             )}

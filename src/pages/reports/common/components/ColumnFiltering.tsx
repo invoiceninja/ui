@@ -126,8 +126,6 @@ export function ColumnFiltering(props: Props) {
 
     const updatedColumn = getColumnWithoutEntityName(column, report);
 
-    console.log(column);
-
     if (updatedColumn === 'id') {
       defaultOperator = '=';
     }
@@ -188,10 +186,11 @@ export function ColumnFiltering(props: Props) {
   };
 
   return (
-    <div className="flex flex-col px-6">
-      <span className="text-gray-500 mb-4 text-sm">Advanced filters</span>
-
-      <div className="flex flex-col space-y-5">
+    <div className="flex flex-col justify-center">
+      <div
+        className="flex flex-col space-y-5 pr-4 pb-1 pl-1 overflow-y-auto"
+        style={{ maxHeight: '20rem' }}
+      >
         {Boolean(report.payload.filters?.length) && (
           <>
             {report.payload.filters?.map((filter, index) => (
@@ -310,12 +309,13 @@ export function ColumnFiltering(props: Props) {
         )}
 
         {Boolean(!report.payload.filters?.length) && !internalFilter && (
-          <span className="text-sm text-gray-500 self-center">
-            No filters applied.
-          </span>
+          <span className="text-sm text-gray-500">No filters applied.</span>
         )}
+      </div>
 
+      <div className="flex pr-4 w-full">
         <Button
+          className="mt-7 w-full"
           onClick={(event: ChangeEvent<HTMLButtonElement>) => {
             event.preventDefault();
             !internalFilter && setInternalFilter(DEFAULT_FILTER);

@@ -128,6 +128,8 @@ export default function Reports() {
 
   const [isConfigureColumnsModalOpen, setIsConfigureColumnsModalOpen] =
     useState<boolean>(false);
+  const [isAddFilterModalOpen, setIsAddFilterModalOpen] =
+    useState<boolean>(false);
 
   const pages: Page[] = [{ name: t('reports'), href: '/reports' }];
 
@@ -314,7 +316,7 @@ export default function Reports() {
           </DropdownElement>
 
           <DropdownElement
-            onClick={() => !isPendingExport && handleExport('xlsx')}
+            onClick={() => !isPendingExport && setIsAddFilterModalOpen(true)}
             icon={<Icon element={MdFilterAlt} />}
           >
             Add Filters
@@ -336,158 +338,150 @@ export default function Reports() {
         </Dropdown>
       }
     >
-      <div className="grid grid-cols-12 gap-4">
-        <Card className="col-span-7 h-max">
-          <Element leftSide={t('report')}>
-            <SelectField
-              value={report.identifier}
-              onValueChange={(value) => handleReportChange(value as Identifier)}
-              withBlank
-            >
-              {getReportsBySection().map((report, i) => (
+      <Card>
+        <Element leftSide={t('report')}>
+          <SelectField
+            value={report.identifier}
+            onValueChange={(value) => handleReportChange(value as Identifier)}
+            withBlank
+          >
+            {getReportsBySection().map((report, i) => (
+              <option value={report.identifier} key={i}>
+                {t(report.label)}
+              </option>
+            ))}
+
+            <optgroup label={t('data') || ''}>
+              {getReportsBySection('data').map((report, i) => (
                 <option value={report.identifier} key={i}>
                   {t(report.label)}
                 </option>
               ))}
+            </optgroup>
 
-              <optgroup label={t('data') || ''}>
-                {getReportsBySection('data').map((report, i) => (
-                  <option value={report.identifier} key={i}>
-                    {t(report.label)}
-                  </option>
-                ))}
-              </optgroup>
-
-              <optgroup label={t('sales') || ''}>
-                {getReportsBySection('sales').map((report, i) => (
-                  <option value={report.identifier} key={i}>
-                    {t(report.label)}
-                  </option>
-                ))}
-              </optgroup>
-
-              <optgroup label={t('receivables') || ''}>
-                {getReportsBySection('receivables').map((report, i) => (
-                  <option value={report.identifier} key={i}>
-                    {t(report.label)}
-                  </option>
-                ))}
-              </optgroup>
-
-              <optgroup label={t('company') || ''}>
-                {getReportsBySection('company').map((report, i) => (
-                  <option value={report.identifier} key={i}>
-                    {t(report.label)}
-                  </option>
-                ))}
-              </optgroup>
-
-              <optgroup label={t('tax') || ''}>
-                {getReportsBySection('tax').map((report, i) => (
-                  <option value={report.identifier} key={i}>
-                    {t(report.label)}
-                  </option>
-                ))}
-              </optgroup>
-            </SelectField>
-          </Element>
-
-          <ColumnFiltering report={report} setReport={setReport} />
-
-          {report.identifier === 'profitloss' && (
-            <>
-              <Element leftSide={t('expense_paid_report')}>
-                <Toggle
-                  checked={report.payload.is_expense_billed}
-                  onValueChange={(value) =>
-                    handlePayloadChange('is_expense_billed', value)
-                  }
-                />
-              </Element>
-
-              <Element leftSide={t('cash_vs_accrual')}>
-                <Toggle
-                  checked={report.payload.is_income_billed}
-                  onValueChange={(value) =>
-                    handlePayloadChange('is_income_billed', value)
-                  }
-                />
-              </Element>
-
-              <Element leftSide={t('include_tax')}>
-                <Toggle
-                  checked={report.payload.include_tax}
-                  onValueChange={(value) =>
-                    handlePayloadChange('include_tax', value)
-                  }
-                />
-              </Element>
-            </>
-          )}
-        </Card>
-
-        <Card className="col-span-5 h-max">
-          <Element leftSide={t('range')}>
-            <SelectField
-              onValueChange={(value) => handleRangeChange(value)}
-              value={report.payload.date_range}
-            >
-              {ranges.map((range, i) => (
-                <option value={range.identifier} key={i}>
-                  {t(range.label)}
+            <optgroup label={t('sales') || ''}>
+              {getReportsBySection('sales').map((report, i) => (
+                <option value={report.identifier} key={i}>
+                  {t(report.label)}
                 </option>
               ))}
-            </SelectField>
-          </Element>
+            </optgroup>
 
-          {report.payload.date_range === 'custom' && (
-            <Element leftSide={t('start_date')}>
-              <InputField
-                type="date"
-                value={report.payload.start_date}
-                onValueChange={(value) =>
-                  handleCustomDateChange('start_date', value)
-                }
-                errorMessage={errors?.errors?.start_date}
-              />
-            </Element>
-          )}
+            <optgroup label={t('receivables') || ''}>
+              {getReportsBySection('receivables').map((report, i) => (
+                <option value={report.identifier} key={i}>
+                  {t(report.label)}
+                </option>
+              ))}
+            </optgroup>
 
-          {report.payload.date_range === 'custom' && (
-            <Element leftSide={t('end_date')}>
-              <InputField
-                type="date"
-                value={report.payload.end_date}
-                onValueChange={(value) =>
-                  handleCustomDateChange('end_date', value)
-                }
-                errorMessage={errors?.errors?.end_date}
-              />
-            </Element>
-          )}
+            <optgroup label={t('company') || ''}>
+              {getReportsBySection('company').map((report, i) => (
+                <option value={report.identifier} key={i}>
+                  {t(report.label)}
+                </option>
+              ))}
+            </optgroup>
 
-          {report.identifier === 'product_sales' && (
-            <Element leftSide={t('client')}>
-              <ClientSelector
-                value={report.payload.client_id}
-                onChange={(client) =>
-                  handlePayloadChange('client_id', client.id)
-                }
-                clearButton
-                onClearButtonClick={() => handlePayloadChange('client_id', '')}
-                withoutAction={true}
-              />
-            </Element>
-          )}
+            <optgroup label={t('tax') || ''}>
+              {getReportsBySection('tax').map((report, i) => (
+                <option value={report.identifier} key={i}>
+                  {t(report.label)}
+                </option>
+              ))}
+            </optgroup>
+          </SelectField>
+        </Element>
 
-          <Element leftSide={t('send_email')}>
-            <Toggle
-              checked={report.payload.send_email}
-              onValueChange={handleSendEmailChange}
+        <Element leftSide={t('range')}>
+          <SelectField
+            onValueChange={(value) => handleRangeChange(value)}
+            value={report.payload.date_range}
+          >
+            {ranges.map((range, i) => (
+              <option value={range.identifier} key={i}>
+                {t(range.label)}
+              </option>
+            ))}
+          </SelectField>
+        </Element>
+
+        {report.payload.date_range === 'custom' && (
+          <Element leftSide={t('start_date')}>
+            <InputField
+              type="date"
+              value={report.payload.start_date}
+              onValueChange={(value) =>
+                handleCustomDateChange('start_date', value)
+              }
+              errorMessage={errors?.errors?.start_date}
             />
           </Element>
-        </Card>
-      </div>
+        )}
+
+        {report.payload.date_range === 'custom' && (
+          <Element leftSide={t('end_date')}>
+            <InputField
+              type="date"
+              value={report.payload.end_date}
+              onValueChange={(value) =>
+                handleCustomDateChange('end_date', value)
+              }
+              errorMessage={errors?.errors?.end_date}
+            />
+          </Element>
+        )}
+
+        {report.identifier === 'product_sales' && (
+          <Element leftSide={t('client')}>
+            <ClientSelector
+              value={report.payload.client_id}
+              onChange={(client) => handlePayloadChange('client_id', client.id)}
+              clearButton
+              onClearButtonClick={() => handlePayloadChange('client_id', '')}
+              withoutAction={true}
+            />
+          </Element>
+        )}
+
+        {report.identifier === 'profitloss' && (
+          <>
+            <Element leftSide={t('expense_paid_report')}>
+              <Toggle
+                checked={report.payload.is_expense_billed}
+                onValueChange={(value) =>
+                  handlePayloadChange('is_expense_billed', value)
+                }
+              />
+            </Element>
+
+            <Element leftSide={t('cash_vs_accrual')}>
+              <Toggle
+                checked={report.payload.is_income_billed}
+                onValueChange={(value) =>
+                  handlePayloadChange('is_income_billed', value)
+                }
+              />
+            </Element>
+
+            <Element leftSide={t('include_tax')}>
+              <Toggle
+                checked={report.payload.include_tax}
+                onValueChange={(value) =>
+                  handlePayloadChange('include_tax', value)
+                }
+              />
+            </Element>
+          </>
+        )}
+
+        <Element leftSide={t('send_email')}>
+          <Toggle
+            checked={report.payload.send_email}
+            onValueChange={handleSendEmailChange}
+          />
+        </Element>
+      </Card>
 
       <Modal
         size="regular"
@@ -497,6 +491,16 @@ export default function Reports() {
         overflowVisible
       >
         <ColumnSelection report={report} setReport={setReport} />
+      </Modal>
+
+      <Modal
+        size="regular"
+        title="Advanced Filters"
+        visible={isAddFilterModalOpen}
+        onClose={() => setIsAddFilterModalOpen(false)}
+        overflowVisible
+      >
+        <ColumnFiltering report={report} setReport={setReport} />
       </Modal>
     </Default>
   );
