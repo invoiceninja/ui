@@ -1,7 +1,5 @@
 # Invoice Ninja
 
-Client application for Invoice Ninja. **Early preview.**
-
 ### `npm run dev`
 
 Runs the app in the development mode.\
