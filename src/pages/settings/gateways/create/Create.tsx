@@ -60,6 +60,8 @@ export function Create() {
 
   const [filteredGateways, setFilteredGateways] = useState<Gateway[]>([]);
 
+  const [createBySetup, setCreateBySetup] = useState<boolean>(false);
+
   const [tabIndex, setTabIndex] = useState<number>(0);
 
   const gateways = useGateways();
@@ -103,7 +105,7 @@ export function Create() {
     setFilteredGateways(gateways);
 
     companyGateways?.data.data.map((gateway: CompanyGateway) => {
-      if (!gateway.is_deleted || gateway.archived_at == 0) {
+      if (!gateway.is_deleted && gateway.archived_at === 0) {
         existingCompanyGatewaysKeys = [
           ...existingCompanyGatewaysKeys,
           gateway.gateway_key,
@@ -168,6 +170,13 @@ export function Create() {
       setTabs([...defaultTab]);
     }
   }, [gateway]);
+
+  useEffect(() => {
+    if (createBySetup) {
+      onSave();
+      setCreateBySetup(false);
+    }
+  }, [companyGateway]);
 
   return (
     <Settings
@@ -265,10 +274,11 @@ export function Create() {
                     <Button
                       onClick={(event: ChangeEvent<HTMLButtonElement>) => {
                         event.preventDefault();
+                        setCreateBySetup(true);
                         handleChange(gateway.id);
                       }}
                     >
-                      {t('set_up')}
+                      {t('setup')}
                     </Button>
                   </div>
                 </Card>

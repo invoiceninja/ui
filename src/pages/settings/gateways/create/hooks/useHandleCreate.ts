@@ -16,21 +16,34 @@ import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Dispatch, SetStateAction } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueryClient } from 'react-query';
+import { useAtomValue } from 'jotai';
+import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 
 export function useHandleCreate(
   companyGateway: CompanyGateway | undefined,
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>
 ) {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   return () => {
     toast.processing();
 
     setErrors(undefined);
 
-    request('POST', endpoint('/api/v1/company_gateways'), companyGateway)
+    request(
+      'POST',
+      endpoint('/api/v1/company_gateways?sort=id|desc'),
+      companyGateway
+    )
       .then(() => {
+        invalidateQueryValue &&
+          queryClient.invalidateQueries([invalidateQueryValue]);
+
         toast.success('created_company_gateway');
+
         navigate('/settings/online_payments');
       })
       .catch((error: AxiosError<ValidationBag>) => {
