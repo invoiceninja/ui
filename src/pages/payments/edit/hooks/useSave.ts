@@ -13,21 +13,19 @@ import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { Payment } from '$app/common/interfaces/payment';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { route } from '$app/common/helpers/route';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function useSave(
   setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
 ) {
-  const [t] = useTranslation();
   const queryClient = useQueryClient();
 
   return (payment: Payment) => {
     setErrors(undefined);
 
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request(
       'PUT',
@@ -35,15 +33,15 @@ export function useSave(
       payment
     )
       .then(() => {
-        toast.success(t('updated_payment'), { id: toastId });
+        toast.success('updated_payment');
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-
-        toast.error(t('error_title'), { id: toastId });
-
         if (error.response?.status === 422) {
+          toast.dismiss();
           setErrors(error.response.data);
+        } else {
+          console.error(error);
+          toast.error();
         }
       })
       .finally(() =>

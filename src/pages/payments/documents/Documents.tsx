@@ -33,9 +33,9 @@ export default function Documents() {
         onSuccess={invalidateQuery}
       />
 
-      {payment?.data.data && (
+      {payment && (
         <DocumentsTable
-          documents={payment.data.data?.documents ?? []}
+          documents={payment.documents ?? []}
           onDocumentDelete={invalidateQuery}
         />
       )}

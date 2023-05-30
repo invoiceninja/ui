@@ -17,7 +17,7 @@ export function useConvertCurrencyToggle(params: {
   const { data: payment } = usePaymentQuery({ id: params.id });
   const [changeCurrency, setchangeCurrency] = useState(false);
   useEffect(() => {
-    setchangeCurrency(Boolean(payment?.data.data.exchange_currency_id));
+    setchangeCurrency(Boolean(payment?.exchange_currency_id));
   }, [payment]);
 
   return [changeCurrency, setchangeCurrency];
