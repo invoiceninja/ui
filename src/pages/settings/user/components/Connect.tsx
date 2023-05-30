@@ -90,29 +90,6 @@ export function Connect() {
       });
   };
 
-  const handleConnectOauth = (
-    event: FormEvent<HTMLButtonElement>,
-    provider: 'google' | 'microsoft'
-  ) => {
-    event.preventDefault();
-
-    toast.processing();
-
-    request(
-      'POST',
-      endpoint(`/api/v1/connected_account?include=company_user&provider=:provider&id_token=:token&access_token=:access_token`, {
-        token: localStorage.getItem('X-NINJA-TOKEN'),
-        provider,
-      })
-    )
-      .then(() => {
-        window.location.reload();
-      })
-      .catch((error) => {
-        console.error(error);
-        toast.error();
-      });
-  };
 
   const authHandler = (err: any, data: any, msal: any) => {
     dispatch(setMsal(msal));
