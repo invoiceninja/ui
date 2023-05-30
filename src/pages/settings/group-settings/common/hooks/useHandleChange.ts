@@ -15,10 +15,22 @@ import { Dispatch, SetStateAction } from 'react';
 interface Params {
   setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
   setGroupSettings: Dispatch<SetStateAction<GroupSettings | undefined>>;
+  isCreatePage?: boolean;
 }
 
+export const blankGateway: GroupSettings = {
+  id: '',
+  name: '',
+  settings: {},
+  created_at: 0,
+  updated_at: 0,
+  archived_at: 0,
+  is_deleted: false,
+  documents: [],
+};
+
 export function useHandleChange(params: Params) {
-  const { setGroupSettings, setErrors } = params;
+  const { setGroupSettings, setErrors, isCreatePage } = params;
 
   return (
     property: keyof GroupSettings,
@@ -26,9 +38,16 @@ export function useHandleChange(params: Params) {
   ) => {
     setErrors(undefined);
 
-    setGroupSettings(
-      (currentGroupSettings) =>
-        currentGroupSettings && { ...currentGroupSettings, [property]: value }
-    );
+    if (isCreatePage) {
+      setGroupSettings({
+        ...blankGateway,
+        [property]: value,
+      });
+    } else {
+      setGroupSettings(
+        (currentGroupSettings) =>
+          currentGroupSettings && { ...currentGroupSettings, [property]: value }
+      );
+    }
   };
 }

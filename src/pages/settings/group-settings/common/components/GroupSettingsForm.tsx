@@ -27,10 +27,10 @@ interface Props {
 export function GroupSettingsForm(props: Props) {
   const [t] = useTranslation();
 
-  const { groupSettings, handleChange, errors } = props;
+  const { groupSettings, handleChange, errors, page } = props;
 
   return (
-    <Card>
+    <Card title={page === 'create' ? t('create_group') : t('edit_group')}>
       <Element leftSide={t('name')}>
         <InputField
           value={groupSettings.name}
