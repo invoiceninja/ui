@@ -102,7 +102,7 @@ export function useSettingsRoutes() {
       name: t('invoice_design'),
       href: '/settings/invoice_design',
       current: location.pathname.endsWith('/settings/invoice_design'),
-      enabled: isAdmin || isOwner || false
+      enabled: isAdmin || isOwner || false,
     },
     {
       name: t('generated_numbers'),
@@ -134,6 +134,12 @@ export function useSettingsRoutes() {
       name: t('bank_accounts'),
       href: '/settings/bank_accounts',
       current: location.pathname.startsWith('/settings/bank_accounts'),
+      enabled: isAdmin || isOwner || false,
+    },
+    {
+      name: t('group_settings'),
+      href: '/settings/group_settings',
+      current: location.pathname.startsWith('/settings/group_settings'),
       enabled: isAdmin || isOwner || false,
     },
     {

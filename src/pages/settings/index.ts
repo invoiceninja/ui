@@ -31,7 +31,7 @@ export * from './schedules';
 export * from './backup-restore';
 export * from './system-logs/SystemLog';
 
-export * from './group-settings/GroupSettings';
+export * from './group-settings/';
 export * from './users';
 export * from './payment-terms';
 export * from './tax-rates';
