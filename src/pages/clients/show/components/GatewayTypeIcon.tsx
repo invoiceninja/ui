@@ -36,8 +36,6 @@ export const availableGatewayLogos = [
   'forte',
 ];
 
-const imageStyle: CSSProperties = { width: 30, height: 30 };
-
 export function GatewayTypeIcon(props: Props) {
   switch (props.name) {
     case 'visa':
@@ -45,7 +43,7 @@ export function GatewayTypeIcon(props: Props) {
         <img
           src="/gateway-card-images/visa.png"
           alt="Visa"
-          style={imageStyle}
+          style={props.style || { width: 30, height: 30 }}
         />
       );
 
@@ -54,7 +52,7 @@ export function GatewayTypeIcon(props: Props) {
         <img
           src="/gateway-card-images/american-express.png"
           alt="American Express"
-          style={imageStyle}
+          style={props.style || { width: 30, height: 30 }}
         />
       );
 
@@ -63,7 +61,7 @@ export function GatewayTypeIcon(props: Props) {
         <img
           src="/gateway-card-images/mastercard.png"
           alt="Mastercard"
-          style={imageStyle}
+          style={props.style || { width: 30, height: 30 }}
         />
       );
 
@@ -72,7 +70,7 @@ export function GatewayTypeIcon(props: Props) {
         <img
           src="/gateway-card-images/paypal.png"
           alt="Paypal"
-          style={{ width: 40, height: 40 }}
+          style={props.style || { width: 40, height: 40 }}
         />
       );
 
@@ -198,7 +196,7 @@ export function GatewayTypeIcon(props: Props) {
         <img
           src="/gateway-card-images/wepay.svg"
           alt="Wepay"
-          style={imageStyle}
+          style={props.style || { width: 30, height: 30 }}
         />
       );
 
