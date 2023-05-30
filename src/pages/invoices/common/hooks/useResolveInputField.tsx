@@ -90,6 +90,7 @@ export function useResolveInputField(props: Props) {
     return filteredItems.some((lineItem) => isLineItemEmpty(lineItem));
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const cleanLineItemsList = useCallback(
     (lineItems: InvoiceItem[]) => {
       let typeId = InvoiceItemType.Product;
@@ -179,9 +180,9 @@ export function useResolveInputField(props: Props) {
   }, [resource?.[props.relationType]]);
 
   useEffect(() => {
-    if (isDeleteActionTriggered === false) {
-      cleanLineItemsList(resource?.line_items);
-    }
+    // if (isDeleteActionTriggered === false) {
+    //   cleanLineItemsList(resource?.line_items);
+    // } // Disabled, causing infinite loop of line items
   }, [resource?.line_items, isDeleteActionTriggered]);
 
   return (key: string, index: number) => {
