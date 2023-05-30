@@ -38,20 +38,7 @@ export function Connect() {
     toast.processing();
 
     window.location.href = endpoint('/auth/:mailer', { mailer });
-    
-    // request(
-    //   'GET',
-    //   endpoint('/auth/:mailer', { mailer }),
-    //   {},
-    //   { headers: { 'X-REACT': true } }
-    // )
-    //   .then((response) => {
-    //     toast.success(response.data.message);
-    //   })
-    //   .catch((error) => {
-    //     toast.error();
-    //     console.error(error);
-    //   });
+
   };
 
   const handleDisconnectMailer = (event: FormEvent<HTMLButtonElement>) => {
@@ -92,7 +79,6 @@ export function Connect() {
       });
   };
 
-zZ
   const authHandler = (err: any, data: any, msal: any) => {
     dispatch(setMsal(msal));
 
