@@ -19,6 +19,8 @@ import { useNavigate } from 'react-router-dom';
 import { useQueryClient } from 'react-query';
 import { useAtomValue } from 'jotai';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { route } from '$app/common/helpers/route';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 export function useHandleCreate(
   companyGateway: CompanyGateway | undefined,
@@ -38,13 +40,17 @@ export function useHandleCreate(
       endpoint('/api/v1/company_gateways?sort=id|desc'),
       companyGateway
     )
-      .then(() => {
+      .then((response: GenericSingleResourceResponse<CompanyGateway>) => {
         invalidateQueryValue &&
           queryClient.invalidateQueries([invalidateQueryValue]);
 
         toast.success('created_company_gateway');
 
-        navigate('/settings/online_payments');
+        navigate(
+          route('/settings/gateways/:id/edit', {
+            id: response.data.data.id,
+          })
+        );
       })
       .catch((error: AxiosError<ValidationBag>) => {
         if (error?.response?.status === 422) {
