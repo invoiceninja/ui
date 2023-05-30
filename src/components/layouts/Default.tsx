@@ -333,10 +333,12 @@ export function Default(props: Props) {
       icon: AiOutlineBank,
       current: location.pathname.startsWith('/transactions'),
       visible:
+        enabled(ModuleBitmask.Transactions) &&
+        (
         hasPermission('view_bank_transaction') ||
         hasPermission('create_bank_transaction') ||
-        hasPermission('edit_bank_transaction'),
-      rightButton: {
+        hasPermission('edit_bank_transaction')),
+        rightButton: {
         icon: PlusCircle,
         to: '/transactions/create',
         label: t('new_transaction'),
