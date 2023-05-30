@@ -267,7 +267,7 @@ export function Create() {
 
                     {gateway.site_url && (
                       <Link external to={gateway.site_url}>
-                        {t('official_website')}
+                        {t('website')}
                       </Link>
                     )}
 
