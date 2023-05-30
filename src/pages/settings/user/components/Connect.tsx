@@ -37,7 +37,7 @@ export function Connect() {
 
     toast.processing();
 
-    window.location.href = endpoint('/auth/:mailer', { mailer });
+    window.location.href = endpoint('/auth/:mailer?react=true', { mailer });
 
   };
 
@@ -54,6 +54,7 @@ export function Connect() {
     )
       .then((response) => {
         toast.success(response.data.message);
+        window.location.reload();
       })
       .catch((error) => {
         toast.error();
@@ -72,6 +73,7 @@ export function Connect() {
     )
       .then((response) => {
         toast.success(response.data.message);
+        window.location.reload();
       })
       .catch((error) => {
         toast.error();
