@@ -8,14 +8,12 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from "react-i18next";
+import { useCompanyChanges } from "$app/common/hooks/useCompanyChanges";
 import { Element } from '$app/components/cards';
-import { Button, Checkbox, Link, SelectField } from "$app/components/forms";
+import { Button, SelectField } from "$app/components/forms";
 import { useHandleCurrentCompanyChangeProperty } from "$app/pages/settings/common/hooks/useHandleCurrentCompanyChange";
 import { ChangeEvent, useState } from "react";
-import { useCompanyChanges } from "$app/common/hooks/useCompanyChanges";
-import { TaxSetting } from "$app/common/interfaces/company.interface";
-import { TaxSettings } from "../../../TaxSettings";
+import { useTranslation } from "react-i18next";
 
 export function USRegions() {
     const [t] = useTranslation();
