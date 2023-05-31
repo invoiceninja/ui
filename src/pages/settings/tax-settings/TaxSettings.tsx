@@ -18,11 +18,13 @@ import { useDispatch } from 'react-redux';
 import { TaxRates } from '..';
 import { Card, Element } from '../../../components/cards';
 import { SelectField } from '../../../components/forms';
-import Toggle from '../../../components/forms/Toggle';
+import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { Selector } from './components';
+import { Divider } from '$app/components/cards/Divider';
+import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -126,10 +128,25 @@ export function TaxSettings() {
             )}
           </div>
         </Element>
+
+        {usePaidOrSelfHost() ? (
+          <>
+        <Divider />
+
+        <Element leftSide={t('calculate_taxes')}>
+          <Toggle
+            checked={companyChanges.calculate_taxes}
+                onChange={(value: boolean) =>
+                  handleToggleChange('calculate_taxes', value)
+                }
+          />
+        </Element>
+          </>
+        ) : ''
+        }
+
       </Card>
-
       <Selector />
-
       <TaxRates />
     </Settings>
   );
