@@ -10,24 +10,23 @@
 
 import { SelectField } from './forms';
 import { GenericSelectorProps } from './CountrySelector';
-import { usStates } from '$app/common/constants/us-states';
+import { euCountries } from '$app/common/constants/eu-countries';
 
-export function USStateSelector(props: GenericSelectorProps) {
-  
-  const states = usStates;
-
+export function EUCountrySelector(props: GenericSelectorProps) {
+    const countries = euCountries;
+    
     return (
-          <SelectField
+        <SelectField
             value={props.value}
             onValueChange={props.onChange}
             label={props.label}
             withBlank
-          >
-            {Object.entries(states).map((state, index) => (
+        >
+            {Object.entries(countries).map((state, index) => (
                 <option key={index} value={state[0]}>
                     {state[1]}
                 </option>
             ))}
-          </SelectField>
+        </SelectField>
     );
 }

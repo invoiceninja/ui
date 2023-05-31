@@ -9,12 +9,14 @@
  */
 
 import { SellerSubregion } from "./components/SellerSubregion";
+import { USRegions } from "./components/USRegions";
 
 export function CalculateTaxes() {
 
     return (
         <>
             <SellerSubregion />
+            <USRegions />
         </>
     );
 }
