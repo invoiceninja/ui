@@ -53,8 +53,6 @@ interface ComboboxStaticProps<T = any> {
 
 export type Nullable<T> = T | null;
 
-const comboboxActionId = '__combobox_internal_option__';
-
 export function ComboboxStatic({
   inputOptions,
   entries,
@@ -144,11 +142,7 @@ export function ComboboxStatic({
       <HeadlessCombobox
         as="div"
         value={selectedValue}
-        onChange={(entry) => {
-          entry?.value === comboboxActionId
-            ? action?.onClick()
-            : setSelectedValue(entry);
-        }}
+        onChange={setSelectedValue}
         disabled={readonly}
         ref={comboboxRef}
       >
@@ -199,31 +193,13 @@ export function ComboboxStatic({
             className="absolute z-10 mt-1 max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
           >
             {action && action.visible && (
-              <HeadlessCombobox.Option
-                value={{
-                  id: comboboxActionId,
-                  label: comboboxActionId,
-                  value: comboboxActionId,
-                  resource: null,
-                }}
-                className={({ active }) =>
-                  classNames(
-                    'text-center border-b relative cursor-pointer select-none py-2 pl-3 pr-9',
-                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-900'
-                  )
-                }
+              <button
+                onClick={action.onClick}
+                className="min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-gray-100"
+                tabIndex={-1}
               >
-                {({ selected }) => (
-                  <span
-                    className={classNames(
-                      'block truncate',
-                      selected && 'font-semibold'
-                    )}
-                  >
-                    {action.label}
-                  </span>
-                )}
-              </HeadlessCombobox.Option>
+                {action.label}
+              </button>
             )}
 
             {filteredValues.length > 0 &&
