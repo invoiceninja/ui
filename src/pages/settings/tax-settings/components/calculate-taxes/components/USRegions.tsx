@@ -42,8 +42,8 @@ export function USRegions() {
                     value={company?.tax_data.regions.US.tax_all_subregions}
                     onChange={handleChange}
                 >
-                    <option value={true}>{t('tax_all')}</option>
-                    <option value={false}>{t('tax_selected')}</option>
+                    <option value="true">{t('tax_all')}</option>
+                    <option value="false">{t('tax_selected')}</option>
                 </SelectField>
                 
                 <Button
