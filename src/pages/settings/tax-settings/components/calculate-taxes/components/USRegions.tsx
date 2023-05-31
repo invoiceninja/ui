@@ -11,7 +11,6 @@
 import { useTranslation } from "react-i18next";
 import { Element } from '$app/components/cards';
 import { Button, SelectField } from "$app/components/forms";
-import { useCurrentCompany } from "$app/common/hooks/useCurrentCompany";
 import { useHandleCurrentCompanyChangeProperty } from "$app/pages/settings/common/hooks/useHandleCurrentCompanyChange";
 
 export function USRegions() {
