@@ -18,7 +18,7 @@ export function useResolveEu() {
 
     return (id: number | string) => {
         
-        let country = countries.find((country) => country.id == id);
+        const country = countries.find((country) => country.id == id);
         
         return country && eu_countries[country.iso_3166_2] ? true : false;
     };

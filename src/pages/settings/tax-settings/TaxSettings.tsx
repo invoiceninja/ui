@@ -65,7 +65,6 @@ export function TaxSettings() {
 
   const onSave = useHandleCompanySave();
   const onCancel = useDiscardChanges();
-  const resolveCountry = useResolveCountry();
 
   return (
     <Settings
