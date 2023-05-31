@@ -9,10 +9,7 @@
  */
 
 import { useTranslation } from "react-i18next";
-import { Props } from "react-select";
 import { SellerSubregion } from "./components/SellerSubregion";
-
-
 
 export function CalculateTaxes() {
     const [t] = useTranslation();

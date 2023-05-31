@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { t } from 'i18next';
 import { SelectField } from './forms';
 import { GenericSelectorProps } from './CountrySelector';
 
