@@ -8,12 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useTranslation } from "react-i18next";
 import { SellerSubregion } from "./components/SellerSubregion";
 
 export function CalculateTaxes() {
-    const [t] = useTranslation();
-
 
     return (
         <>
