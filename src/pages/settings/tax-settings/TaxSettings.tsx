@@ -27,7 +27,6 @@ import { Divider } from '$app/components/cards/Divider';
 import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
 import { CalculateTaxes } from './components/calculate-taxes/CalculateTaxes';
 import { useCalculateTaxesRegion } from '$app/common/hooks/useCalculateTaxesRegion';
-import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 
 export function TaxSettings() {
   const [t] = useTranslation();
