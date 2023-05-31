@@ -25,6 +25,7 @@ import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { Selector } from './components';
 import { Divider } from '$app/components/cards/Divider';
 import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
+import { CalculateTaxes } from './components/calculate-taxes/CalculateTaxes';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -131,18 +132,28 @@ export function TaxSettings() {
 
         {usePaidOrSelfHost() ? (
           <>
-        <Divider />
+            <Divider />
 
-        <Element leftSide={t('calculate_taxes')}>
-          <Toggle
-            checked={companyChanges.calculate_taxes}
+            <Element leftSide={t('calculate_taxes')}>
+              <Toggle
+                checked={companyChanges?.calculate_taxes}
                 onChange={(value: boolean) =>
                   handleToggleChange('calculate_taxes', value)
                 }
-          />
-        </Element>
+              />
+            </Element>
+
+            {companyChanges.calculate_taxes ? (
+
+              <CalculateTaxes />
+
+            ) : ''
+
+            }
+
           </>
         ) : ''
+
         }
 
       </Card>
