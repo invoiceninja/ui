@@ -140,6 +140,7 @@ export const settingsRoutes = (
       <Route path="group_settings">
         <Route path="" element={<Settings.GroupSettings />} />
         <Route path="create" element={<Settings.CreateGroupSettings />} />
+        <Route path=":id/edit" element={<Settings.EditGroupSettings />} />
       </Route>
       <Route path="subscriptions">
         <Route path="" element={<Settings.Subscriptions />} />

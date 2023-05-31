@@ -10,3 +10,4 @@
 
 export * from '../group-settings/index/GroupSettings';
 export { Create as CreateGroupSettings } from '../group-settings/create/Create';
+export { Edit as EditGroupSettings } from '../group-settings/edit/Edit';
