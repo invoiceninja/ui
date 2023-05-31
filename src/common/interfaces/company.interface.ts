@@ -43,10 +43,10 @@ export interface Company {
   enabled_modules: number;
   calculate_taxes: boolean;
   tax_data: TaxData;
-  // e_invoice_certificate: string;
-  // e_invoice_passphrase: string;
-  // has_e_invoice_certificate: boolean;
-  // has_e_invoice_passphrase: boolean;
+  e_invoice_certificate: string;
+  e_invoice_passphrase: string;
+  has_e_invoice_certificate: boolean;
+  has_e_invoice_certificate_passphrase: boolean;
 }
 
 export interface CompanyInput {
