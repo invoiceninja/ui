@@ -26,42 +26,40 @@ export function SellerSubregion() {
     const handleChange = useHandleCurrentCompanyChangeProperty();
     const resolveCountry = useResolveCountry();
     const resolveEu = useResolveEu();
-    
+
     useEffect(() => {
         if (resolveCountry(companyChanges?.settings.country_id)?.iso_3166_2 === 'AU')
             handleChange('tax_data.seller_subregion', 'AU');
-    });
+    }, [companyChanges?.settings.country_id]);
 
     return (
-        <>
-            <Element leftSide={t('seller_subregion')}>
-                {resolveCountry(companyChanges?.settings.country_id)?.iso_3166_2 === 'US' ? (
-                    <USStateSelector
-                        value={companyChanges.tax_data?.seller_subregion}
-                        onChange={(value) => handleChange('tax_data.seller_subregion', value)}
-                    />
+        <Element leftSide={t('seller_subregion')}>
+            {resolveCountry(companyChanges?.settings.country_id)?.iso_3166_2 === 'US' && (
+                <USStateSelector
+                    value={companyChanges.tax_data?.seller_subregion}
+                    onChange={(value) => handleChange('tax_data.seller_subregion', value)}
+                />
 
-                ) : ''
-                }
-                {resolveEu(companyChanges?.settings.country_id) ? (
-                    <EUCountrySelector
-                        value={companyChanges.tax_data?.seller_subregion ? companyChanges.tax_data?.seller_subregion : resolveCountry(companyChanges?.settings.country_id)?.iso_3166_2}
-                        onChange={(value) => handleChange('tax_data.seller_subregion', value)}
-                    />
+            ) 
+            }
+            {resolveEu(companyChanges?.settings.country_id) && (
+                <EUCountrySelector
+                    value={companyChanges.tax_data?.seller_subregion ? companyChanges.tax_data?.seller_subregion : resolveCountry(companyChanges?.settings.country_id)?.iso_3166_2}
+                    onChange={(value) => handleChange('tax_data.seller_subregion', value)}
+                />
 
-                ) : ''
-                }
-                {resolveCountry(companyChanges?.settings.country_id)?.iso_3166_2 === 'AU' ? (
-                    
-                    <InputField
-                        type="text"
-                        disabled={true}
-                        name="tax_data.seller_subregion"
-                        value={'AU'}
-                    />
-                ) : ''
-                }
-            </Element>
-        </>
+            ) 
+            }
+            {resolveCountry(companyChanges?.settings.country_id)?.iso_3166_2 === 'AU' && (
+
+                <InputField
+                    type="text"
+                    disabled={true}
+                    name="tax_data.seller_subregion"
+                    value={'AU'}
+                />
+            ) 
+            }
+        </Element>
     );
 }

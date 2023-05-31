@@ -11,36 +11,23 @@
 import { useTranslation } from "react-i18next";
 import { Element } from '$app/components/cards';
 import { Button, SelectField } from "$app/components/forms";
-import { ChangeEvent } from "react";
-import { useDispatch } from 'react-redux';
-import { updateChanges } from '$app/common/stores/slices/company-users';
 import { useCurrentCompany } from "$app/common/hooks/useCurrentCompany";
+import { useHandleCurrentCompanyChangeProperty } from "$app/pages/settings/common/hooks/useHandleCurrentCompanyChange";
 
 export function USRegions() {
     const [t] = useTranslation();
     const company = useCurrentCompany();
 
-    // const handleChange = useHandleCurrentCompanyChangeProperty();
-    const dispatch = useDispatch();
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        dispatch(
-            updateChanges({
-                object: 'company',
-                property: event.target.id,
-                value: event.target.value,
-            })
-        );
-    };
+    const handleChange = useHandleCurrentCompanyChangeProperty();
 
     return (
         <>
             <Element leftSide={t('united_states')}>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-s2 gap-4">
                 <SelectField
                     id="tax_data.regions.US.tax_all_subregions"
                     className="col-auto"
-                    value={company?.tax_data.regions.US.tax_all_subregions}
-                    onChange={handleChange}
+                    onValueChange={(value) => handleChange('tax_data.regions.US.tax_all_subregions', Boolean(value))}
                 >
                     <option value="true">{t('tax_all')}</option>
                     <option value="false">{t('tax_selected')}</option>
