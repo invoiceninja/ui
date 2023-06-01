@@ -24,8 +24,13 @@ export function USRegions() {
 
     const [isOpen, setIsOpen] = useState(false);
     const [isEditSubregionModalOpen, setIsEditSubregionModalOpen] = useState<boolean>(false);
-
+    
     const usRegions: Array<[string, TaxSetting]> = Object.entries(companyChanges.tax_data.regions.US.subregions);
+    const [taxSetting, setTaxSetting] = useState<TaxSetting>([]);
+
+    const isChecked = (apply_tax: string | boolean) => {
+        return Boolean(apply_tax);
+    };
 
     return (
         <>
@@ -55,40 +60,50 @@ export function USRegions() {
             </Element>
             {isOpen && (
                 
-                usRegions?.map((value, index) => (
+                usRegions?.map((value: [string, TaxSetting], index) => (
                     
-                    <div className="flex grid grid-cols-3 gap-4" key={index}>
+                    <div className="py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row undefined px-5 sm:px-6 lg:items-center" key={index}>
 
-                        <div className="col-auto border">
+                        <div className="flex col-span-1 items-center justify-start pl-5">
                             <Checkbox
-                                id={`tax_data.regions.US.subregions.${value[0]}.taxable`}
+                                id={`tax_data.regions.US.subregions.${value[0]}`}
+                                value={`tax_data.regions.US.subregions.${value[0]}.apply_tax`}
+                                className="flex justify-end h-6 w-6 rounded-half shadow"
+                                onValueChange={(value, checked) =>
+                                    
+                                    handleChange(
+                                        value,
+                                        checked,
+                                    )
+                                    
+                                }                           
                             ></Checkbox>
+
+                            <div className="">
+                                {value[0]}
+                            </div>
                         </div>
 
-                        <div>
-                            {value[0]}
-                        </div>
-                    
-                        <div  className="border">
+                        <div className="">
                                 {value[1].tax_name} {value[1].tax_rate}%
                         </div>  
                     
-                        <div>
+                        <div className="">
                             <Button 
                                 type="primary" 
-                                className="col-auto"
+                                className=""
                                 onClick={(e: ChangeEvent<HTMLInputElement>) => {
                                     e.preventDefault();
+                                    setTaxSetting(value[1]);
                                     setIsEditSubregionModalOpen(true)
                                 }}
                             >
-                                edit
+                                {t('edit')}
                             </Button>
                         </div>
                     </div>
                 ))
 
-                
             )}
 
 
@@ -97,7 +112,7 @@ export function USRegions() {
                 setVisible={setIsEditSubregionModalOpen}
                 region="US"
                 subregion="AL"
-                tax_setting={companyChanges.tax_data.regions.US.subregions.AL}
+                taxSetting={taxSetting}
             />
 
         </>

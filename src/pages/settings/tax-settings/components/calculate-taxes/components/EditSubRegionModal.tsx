@@ -17,9 +17,9 @@ import { TaxSetting } from '$app/common/interfaces/company.interface';
 interface Props {
     region: string;
     subregion: string;
-    tax_setting: TaxSetting;
     visible: boolean;
     setVisible: Dispatch<SetStateAction<boolean>>;
+    taxSetting: TaxSetting;
 }
 
 export function EditSubRegionModal(props: Props) {
@@ -30,37 +30,47 @@ export function EditSubRegionModal(props: Props) {
         setVisible,
         region,
         subregion,
-        tax_setting,
+        taxSetting,
     } = props;
 
     const handleChangeRuleField = (value: string) => {
 
     };
 
-    const handleAddRule = (value: string) => {
+    const handleUpdate = (value: string) => {
 
     };
 
-    
-
     return (
         <Modal
-            title="`${props.region} {props.subregion}`"
+            title={`${region} - ${props.subregion}`}
             visible={visible}
             onClose={() => setVisible(false)}
         >
             <InputField
-                required
-                label={t('field')}
-                value={tax_setting.tax_name}
+                label={t('tax_name')}
+                value={taxSetting.tax_name}
                 onValueChange={(value) => handleChangeRuleField(value)}
             >
+            </InputField>
 
+            <InputField
+                label={t('tax_rate')}
+                value={taxSetting.tax_rate}
+                onValueChange={(value) => handleChangeRuleField(value)}
+            >
+            </InputField>
+
+            <InputField
+                label={t('reduced_rate')}
+                value={taxSetting.reduced_tax_rate}
+                onValueChange={(value) => handleChangeRuleField(value)}
+            >
             </InputField>
 
             <Button
                 className="self-end"
-                onClick={handleAddRule}
+                onClick={handleUpdate}
                 disableWithoutIcon
             >
                 {t('save')}
