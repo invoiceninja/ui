@@ -45,7 +45,7 @@ export function EditSubRegionModal(props: Props) {
 
     return (
         <Modal
-            title="edit"
+            title="`${props.region} {props.subregion}`"
             visible={visible}
             onClose={() => setVisible(false)}
         >
