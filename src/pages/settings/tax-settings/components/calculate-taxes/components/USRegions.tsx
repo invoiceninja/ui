@@ -27,6 +27,7 @@ export function USRegions() {
     
     const usRegions: Array<[string, TaxSetting]> = Object.entries(companyChanges.tax_data.regions.US.subregions);
     const [taxSetting, setTaxSetting] = useState<TaxSetting>(usRegions[0][1]);
+    const [subRegion, setSubRegion] = useState<string>(usRegions[0][0]);
 
     const isChecked = (apply_tax: string | boolean) => {
         return Boolean(apply_tax);
@@ -66,18 +67,21 @@ export function USRegions() {
                     </SelectField>
                     </div>
 
-                    <div className="flex col-span-1 col-start-5 col-end-6 justify-end">
-                    <Button
-                        type="primary"
-                        className=""
-                        onClick={(e: ChangeEvent<HTMLInputElement>) => {
-                            e.preventDefault();
-                            setIsOpen((isOpen) => !isOpen)
-                        }}
-                    >
-                        {isOpen ? t('hide') : t('show')}
-                    </Button>
-                    </div>
+
+                    {!companyChanges.tax_data.regions.US.tax_all_subregions && (
+                        <div className="flex col-span-1 col-start-5 col-end-6 justify-end">
+                        <Button
+                            type="primary"
+                            className=""
+                            onClick={(e: ChangeEvent<HTMLInputElement>) => {
+                                e.preventDefault();
+                                setIsOpen((isOpen) => !isOpen)
+                            }}
+                        >
+                            {isOpen ? t('hide') : t('show')}
+                        </Button>
+                        </div>
+                    )}
                 </div>
             </Element>
             {isOpen && (
@@ -106,7 +110,7 @@ export function USRegions() {
                         <div onClick={() => divClickIntercept(`tax_data.regions.US.subregions.${value[0]}.apply_tax`)}>
                             {value[1].tax_name} {value[1].tax_rate}% {value[1].reduced_tax_rate ?  ` :: ${t('reduced_rate')} ${value[1].reduced_tax_rate}%` : ''}
                         </div>  
-                    
+                        
                         <div className="flex justify-end">
                             <Button 
                                 type="primary" 
@@ -114,8 +118,9 @@ export function USRegions() {
                                 disableWithoutIcon={true}
                                 disabled={companyChanges.tax_data.regions.US.tax_all_subregions}
                                 onClick={(e: ChangeEvent<HTMLInputElement>) => {
-                                    e.preventDefault();
-                                    setTaxSetting(value[1]);
+                                    e.preventDefault()
+                                    setTaxSetting(value[1])
+                                    setSubRegion(value[0])
                                     setIsEditSubregionModalOpen(true)
                                 }}
                             >
@@ -127,12 +132,11 @@ export function USRegions() {
 
             )}
 
-
             <EditSubRegionModal
                 visible={isEditSubregionModalOpen}
                 setVisible={setIsEditSubregionModalOpen}
                 region="US"
-                subregion="AL"
+                subregion={subRegion}
                 taxSetting={taxSetting}
             />
 
