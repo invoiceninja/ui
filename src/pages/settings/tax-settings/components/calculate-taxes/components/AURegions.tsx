@@ -51,7 +51,7 @@ export function AURegions() {
 
     return (
         <>
-            <Element leftSide="Europe" key="EU">
+            <Element leftSide="Australia" key="AU">
                 <div className="grid grid-cols-5 gap-4">
                     <div className="col-span-4">
                         <SelectField
