@@ -10,10 +10,10 @@
 
 import { Button, InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
-import { Dispatch, SetStateAction } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TaxSetting } from '$app/common/interfaces/company.interface';
-import { useHandleCurrentCompanyChange } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
+import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 
 interface Props {
     region: string;
@@ -34,7 +34,7 @@ export function EditSubRegionModal(props: Props) {
         taxSetting,
     } = props;
 
-    const handleChange = useHandleCurrentCompanyChange();
+    const handleChange = useHandleCurrentCompanyChangeProperty();
 
     const closeModal = () => {
         setVisible(false);
@@ -50,7 +50,7 @@ export function EditSubRegionModal(props: Props) {
                 id={`tax_data.regions.${region}.subregions.${subregion}.tax_name`}
                 label={t('tax_name')}
                 value={taxSetting.tax_name}
-                onChange={handleChange}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => handleChange(event.target.id, event.target.value)}
             >
             </InputField>
 
@@ -58,7 +58,7 @@ export function EditSubRegionModal(props: Props) {
                 id={`tax_data.regions.${region}.subregions.${subregion}.tax_rate`}
                 label={t('tax_rate')}
                 value={taxSetting.tax_rate}
-                onChange={handleChange}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => handleChange(event.target.id, parseFloat(event.target.value))}
             >
             </InputField>
 
@@ -66,7 +66,7 @@ export function EditSubRegionModal(props: Props) {
                 id={`tax_data.regions.${region}.subregions.${subregion}.reduced_tax_rate`}
                 label={t('reduced_rate')}
                 value={taxSetting.reduced_tax_rate}
-                onChange={handleChange}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => handleChange(event.target.id, parseFloat(event.target.value))}
             >
             </InputField>
 

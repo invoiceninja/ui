@@ -43,6 +43,11 @@ export function USRegions() {
 
     };
 
+    const divClickIntercept = (id: string, value: boolean) => {
+        const checkbox = document.getElementById(id.replace('.apply_tax',''));
+        checkbox?.click();
+    }
+
     return (
         <>
             <Element leftSide={t('united_states')}>
@@ -51,6 +56,7 @@ export function USRegions() {
                     <SelectField
                         id="tax_data.regions.US.tax_all_subregions"
                         className=""
+                        value={companyChanges.tax_data.regions.US.tax_all_subregions}
                         onValueChange={(value) => 
                             handleChangeAndUpdateView('tax_data.regions.US.tax_all_subregions', value === "true")
                         }
@@ -78,21 +84,17 @@ export function USRegions() {
                 
                 usRegions?.map((value: [string, TaxSetting], index) => (
                     
-                    <div className="border py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row undefined px-5 sm:px-6 lg:items-center" key={index}>
+                    <div key={index} className="border py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row undefined px-5 sm:px-6 lg:items-center">
 
-                        <div className="flex col-span-1 items-center justify-start pl-5">
+                        <div className="flex col-span-1 items-center justify-start pl-5" onClick={() => divClickIntercept(`tax_data.regions.US.subregions.${value[0]}.apply_tax`, value[1].apply_tax ? true : false)}>
                             <Checkbox
                                 id={`tax_data.regions.US.subregions.${value[0]}`}
                                 value={`tax_data.regions.US.subregions.${value[0]}.apply_tax`}
                                 checked={value[1].apply_tax ? true : false}
                                 className="flex justify-end h-6 w-6 rounded-half shadow"
+                                disabled={companyChanges.tax_data.regions.US.tax_all_subregions}
                                 onValueChange={(value, checked) =>
-                                    
-                                    handleChange(
-                                        value,
-                                        checked,
-                                    )
-                                    
+                                    handleChange(value,checked)
                                 }                           
                             ></Checkbox>
 
@@ -101,7 +103,7 @@ export function USRegions() {
                             </div>
                         </div>
 
-                        <div className="">
+                        <div onClick={() => divClickIntercept(`tax_data.regions.US.subregions.${value[0]}.apply_tax`, value[1].apply_tax ? true : false)}>
                             {value[1].tax_name} {value[1].tax_rate}% {value[1].reduced_tax_rate ?  ` :: ${t('reduced_rate')} ${value[1].reduced_tax_rate}%` : ''}
                         </div>  
                     
@@ -109,6 +111,8 @@ export function USRegions() {
                             <Button 
                                 type="primary" 
                                 className=""
+                                disableWithoutIcon={true}
+                                disabled={companyChanges.tax_data.regions.US.tax_all_subregions}
                                 onClick={(e: ChangeEvent<HTMLInputElement>) => {
                                     e.preventDefault();
                                     setTaxSetting(value[1]);
