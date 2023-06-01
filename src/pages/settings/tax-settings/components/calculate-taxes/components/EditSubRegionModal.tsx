@@ -13,6 +13,7 @@ import { Modal } from '$app/components/Modal';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TaxSetting } from '$app/common/interfaces/company.interface';
+import { useHandleCurrentCompanyChange } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 
 interface Props {
     region: string;
@@ -33,12 +34,10 @@ export function EditSubRegionModal(props: Props) {
         taxSetting,
     } = props;
 
-    const handleChangeRuleField = (value: string) => {
-        return value;
-    };
+    const handleChange = useHandleCurrentCompanyChange();
 
-    const handleUpdate = (value: string) => {
-        return value;
+    const closeModal = () => {
+        setVisible(false);
     };
 
     return (
@@ -48,29 +47,32 @@ export function EditSubRegionModal(props: Props) {
             onClose={() => setVisible(false)}
         >
             <InputField
+                id={`tax_data.regions.${region}.subregions.${subregion}.tax_name`}
                 label={t('tax_name')}
                 value={taxSetting.tax_name}
-                onValueChange={(value) => handleChangeRuleField(value)}
+                onChange={handleChange}
             >
             </InputField>
 
             <InputField
+                id={`tax_data.regions.${region}.subregions.${subregion}.tax_rate`}
                 label={t('tax_rate')}
                 value={taxSetting.tax_rate}
-                onValueChange={(value) => handleChangeRuleField(value)}
+                onChange={handleChange}
             >
             </InputField>
 
             <InputField
+                id={`tax_data.regions.${region}.subregions.${subregion}.reduced_tax_rate`}
                 label={t('reduced_rate')}
                 value={taxSetting.reduced_tax_rate}
-                onValueChange={(value) => handleChangeRuleField(value)}
+                onChange={handleChange}
             >
             </InputField>
 
             <Button
                 className="self-end"
-                onClick={handleUpdate}
+                onClick={closeModal}
                 disableWithoutIcon
             >
                 {t('save')}

@@ -36,6 +36,13 @@ export function USRegions() {
         return usRegions.filter(([, taxSetting]) => isChecked(taxSetting.apply_tax)).length;
     }, [usRegions]);
 
+    const handleChangeAndUpdateView = (value: string, checked: boolean) => {
+
+        handleChange(value, checked);
+        setIsOpen(!checked);
+
+    };
+
     return (
         <>
             <Element leftSide={t('united_states')}>
@@ -45,7 +52,7 @@ export function USRegions() {
                         id="tax_data.regions.US.tax_all_subregions"
                         className=""
                         onValueChange={(value) => 
-                            handleChange('tax_data.regions.US.tax_all_subregions', value === "true")
+                            handleChangeAndUpdateView('tax_data.regions.US.tax_all_subregions', value === "true")
                         }
                     >
                         <option value="true">{t('tax_all')}</option>
@@ -77,6 +84,7 @@ export function USRegions() {
                             <Checkbox
                                 id={`tax_data.regions.US.subregions.${value[0]}`}
                                 value={`tax_data.regions.US.subregions.${value[0]}.apply_tax`}
+                                checked={value[1].apply_tax ? true : false}
                                 className="flex justify-end h-6 w-6 rounded-half shadow"
                                 onValueChange={(value, checked) =>
                                     
@@ -94,10 +102,10 @@ export function USRegions() {
                         </div>
 
                         <div className="">
-                                {value[1].tax_name} {value[1].tax_rate}%
+                            {value[1].tax_name} {value[1].tax_rate}% {value[1].reduced_tax_rate ?  ` :: ${t('reduced_rate')} ${value[1].reduced_tax_rate}%` : ''}
                         </div>  
                     
-                        <div className="">
+                        <div className="flex justify-end">
                             <Button 
                                 type="primary" 
                                 className=""
