@@ -54,7 +54,7 @@ export function USRegions() {
             {isOpen && (
 
                 usRegions?.map((value, index) => (
-                    <Element leftSide={value[0]}>
+                    <Element leftSide={value[0]} key={index}>
 
                     <div key={index}>
                             {value[1].tax_name} {value[1].tax_rate}%
