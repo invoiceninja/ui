@@ -11,7 +11,7 @@
 import { useCompanyChanges } from "$app/common/hooks/useCompanyChanges";
 import { TaxSetting } from "$app/common/interfaces/company.interface";
 import { Element } from '$app/components/cards';
-import { Button, SelectField } from "$app/components/forms";
+import { Button, Checkbox, SelectField } from "$app/components/forms";
 import { useHandleCurrentCompanyChangeProperty } from "$app/pages/settings/common/hooks/useHandleCurrentCompanyChange";
 import { ChangeEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -52,15 +52,26 @@ export function USRegions() {
                 </div>
             </Element>
             {isOpen && (
-
+                
                 usRegions?.map((value, index) => (
-                    <Element leftSide={value[0]} key={index}>
+                    
+                    <div className="flex grid grid-cols-3 gap-4" key={index}>
 
-                    <div key={index}>
-                            {value[1].tax_name} {value[1].tax_rate}%
-                    </div>  
-                    </Element>
+                        <div className="col-auto border">
+                            <Checkbox
+                                id={`tax_data.regions.US.subregions.${value[0]}.taxable`}
+                            ></Checkbox>
+                        </div>
 
+                        <div>
+                            {value[0]}
+                        </div>
+                    
+                        <div  className="border">
+                                {value[1].tax_name} {value[1].tax_rate}%
+                        </div>  
+                    
+                    </div>
                 ))
 
                 
