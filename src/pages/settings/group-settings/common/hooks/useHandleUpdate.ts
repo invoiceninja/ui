@@ -15,12 +15,17 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { setActiveSettings } from '$app/common/stores/slices/settings';
 import { AxiosError } from 'axios';
 import { useAtomValue } from 'jotai';
 import { Dispatch, FormEvent, SetStateAction } from 'react';
 import { useQueryClient } from 'react-query';
+import { useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 
 interface Params {
@@ -33,9 +38,11 @@ interface Params {
 export function useHandleUpdate(params: Params) {
   const { id } = useParams();
   const queryClient = useQueryClient();
+  const dispatch = useDispatch();
   const companyChanges = useCompanyChanges();
   const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
+  const { isGroupLevelActive } = useCurrentSettingsLevel();
 
   const { groupSettings, setErrors, setIsFormBusy, isFormBusy } = params;
 
@@ -57,7 +64,7 @@ export function useHandleUpdate(params: Params) {
           settings: companyChanges?.settings,
         }
       )
-        .then(() => {
+        .then((response: GenericSingleResourceResponse<GroupSettings>) => {
           toast.success('updated_group');
 
           queryClient.invalidateQueries(
@@ -65,6 +72,25 @@ export function useHandleUpdate(params: Params) {
               id: id || activeGroupSettings?.id,
             })
           );
+
+          if (isGroupLevelActive) {
+            dispatch(
+              updateChanges({
+                object: 'company',
+                property: 'settings',
+                value: response.data.data.settings,
+              })
+            );
+
+            dispatch(
+              setActiveSettings({
+                status: {
+                  name: response.data.data.name,
+                  level: 'group',
+                },
+              })
+            );
+          }
 
           invalidateQueryValue &&
             queryClient.invalidateQueries([invalidateQueryValue]);

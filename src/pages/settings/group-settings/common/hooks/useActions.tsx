@@ -57,8 +57,6 @@ export function useActions() {
           .then((response: GenericSingleResourceResponse<GroupSettings>) => {
             setActiveSettingsAtom(response.data.data);
 
-            console.log(response.data.data.settings);
-
             dispatch(
               updateChanges({
                 object: 'company',
