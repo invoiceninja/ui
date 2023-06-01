@@ -9,6 +9,7 @@
  */
 
 import { useCompanyChanges } from "$app/common/hooks/useCompanyChanges";
+import { TaxSetting } from "$app/common/interfaces/company.interface";
 import { Element } from '$app/components/cards';
 import { Button, SelectField } from "$app/components/forms";
 import { useHandleCurrentCompanyChangeProperty } from "$app/pages/settings/common/hooks/useHandleCurrentCompanyChange";
@@ -18,10 +19,12 @@ import { useTranslation } from "react-i18next";
 export function USRegions() {
     const [t] = useTranslation();
     const handleChange = useHandleCurrentCompanyChangeProperty();
+    const companyChanges = useCompanyChanges();
 
     const [isOpen, setIsOpen] = useState(false);
-    const companyChanges = useCompanyChanges();
-    
+
+    const usRegions: Array<[string, TaxSetting]> = Object.entries(companyChanges.tax_data.regions.US.subregions);
+
     return (
         <>
             <Element leftSide={t('united_states')}>
@@ -50,16 +53,17 @@ export function USRegions() {
             </Element>
             {isOpen && (
 
- 
-            
-                Object.keys(companyChanges.tax_data.regions.US.subregions) as (keyof typeof companyChanges.tax_data.regions.US.subregions)[]).forEach((key, index) => {
+                usRegions?.map((value, index) => (
+                    <Element leftSide={value[0]}>
 
+                    <div key={index}>
+                            {value[1].tax_name} {value[1].tax_rate}%
+                    </div>  
+                    </Element>
 
-                    console.log(key, companyChanges.tax_data.regions.US.subregions[key], index)
+                ))
+
                 
-                    }
-                
-
             )}
         </>
     );
