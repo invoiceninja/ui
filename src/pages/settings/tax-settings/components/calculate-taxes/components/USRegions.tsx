@@ -13,7 +13,7 @@ import { TaxSetting } from "$app/common/interfaces/company.interface";
 import { Element } from '$app/components/cards';
 import { Button, Checkbox, SelectField } from "$app/components/forms";
 import { useHandleCurrentCompanyChangeProperty } from "$app/pages/settings/common/hooks/useHandleCurrentCompanyChange";
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { EditSubRegionModal } from "./EditSubRegionModal";
 
@@ -32,30 +32,39 @@ export function USRegions() {
         return Boolean(apply_tax);
     };
 
+    const countSelected = useMemo(() => {
+        return usRegions.filter(([, taxSetting]) => isChecked(taxSetting.apply_tax)).length;
+    }, [usRegions]);
+
     return (
         <>
             <Element leftSide={t('united_states')}>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-5 gap-4">
+                    <div className="col-span-4">
                     <SelectField
                         id="tax_data.regions.US.tax_all_subregions"
-                        className="col-auto"
-                        onValueChange={(value) => handleChange('tax_data.regions.US.tax_all_subregions', Boolean(value))}
+                        className=""
+                        onValueChange={(value) => 
+                            handleChange('tax_data.regions.US.tax_all_subregions', value === "true")
+                        }
                     >
                         <option value="true">{t('tax_all')}</option>
-                        <option value="false">{t('tax_selected')}</option>
+                        <option value="false">{t('tax_selected')} - [ {countSelected} {t('selected')} ]</option>
                     </SelectField>
-                
+                    </div>
+
+                    <div className="flex col-span-1 col-start-5 col-end-6 justify-end">
                     <Button
                         type="primary"
-                        className="col-auto"
+                        className=""
                         onClick={(e: ChangeEvent<HTMLInputElement>) => {
                             e.preventDefault();
                             setIsOpen((isOpen) => !isOpen)
                         }}
                     >
-                        Show
+                        {isOpen ? t('hide') : t('show')}
                     </Button>
-                    
+                    </div>
                 </div>
             </Element>
             {isOpen && (
