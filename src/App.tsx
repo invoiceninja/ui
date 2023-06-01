@@ -23,8 +23,7 @@ import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation } from 'react-router-dom';
-import { useActiveSettingsDetails } from './common/hooks/useActiveSettingsDetails';
-import { SettingsLevel } from './common/enums/settings';
+import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
 
 export function App() {
   const { i18n } = useTranslation();
@@ -39,7 +38,7 @@ export function App() {
 
   const account = useCurrentAccount();
 
-  const activeSettings = useActiveSettingsDetails();
+  const { isCompanyLevelActive } = useCurrentSettingsLevel();
 
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
 
@@ -110,10 +109,7 @@ export function App() {
   }, [company]);
 
   useEffect(() => {
-    if (
-      !location.pathname.startsWith('/settings') &&
-      activeSettings.level !== SettingsLevel.Company
-    ) {
+    if (!location.pathname.startsWith('/settings') && !isCompanyLevelActive) {
       switchToCompanySettings();
     }
   }, [location]);

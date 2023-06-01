@@ -14,17 +14,16 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useCompanyChanges } from './useCompanyChanges';
 import { useCurrentCompany } from './useCurrentCompany';
-import { useActiveSettingsDetails } from './useActiveSettingsDetails';
-import { SettingsLevel } from '../enums/settings';
+import { useCurrentSettingsLevel } from './useCurrentSettingsLevel';
 
 export function useInjectCompanyChanges(): Company | undefined {
   const company = useCurrentCompany();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
-  const activeSettings = useActiveSettingsDetails();
+  const { isCompanyLevelActive } = useCurrentSettingsLevel();
 
   useEffect(() => {
-    if (activeSettings.level === SettingsLevel.Company) {
+    if (isCompanyLevelActive) {
       dispatch(injectInChanges({ object: 'company', data: company }));
     }
   }, [company]);

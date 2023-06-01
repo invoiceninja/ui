@@ -20,15 +20,15 @@ import { useAtom, useSetAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../atoms';
 import { updatingRecords as updatingRecordsAtom } from '$app/pages/settings/invoice-design/common/atoms';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
-import { SettingsLevel } from '$app/common/enums/settings';
 import { useHandleUpdate } from '../../group-settings/common/hooks/useHandleUpdate';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const companyChanges = useInjectCompanyChanges();
-  const activeSettingsDetails = useActiveSettingsDetails();
+  const { isGroupLevelActive, isCompanyLevelActive } =
+    useCurrentSettingsLevel();
 
   const handleUpdateGroupSettings = useHandleUpdate({});
 
@@ -41,11 +41,11 @@ export function useHandleCompanySave() {
 
     setErrors(undefined);
 
-    if (activeSettingsDetails.level === SettingsLevel.Group) {
+    if (isGroupLevelActive) {
       handleUpdateGroupSettings();
     }
 
-    if (activeSettingsDetails.level === SettingsLevel.Company) {
+    if (isCompanyLevelActive) {
       request(
         'PUT',
         endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),

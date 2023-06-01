@@ -23,8 +23,8 @@ import { Icon } from '../icons/Icon';
 import { MdClose } from 'react-icons/md';
 import { FaObjectGroup } from 'react-icons/fa';
 import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
-import { SettingsLevel } from '$app/common/enums/settings';
 import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompanySettings';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
 interface Props {
   title: string;
@@ -43,6 +43,7 @@ export function Settings(props: Props) {
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
   const activeSettings = useActiveSettingsDetails();
   const switchToCompanySettings = useSwitchToCompanySettings();
+  const { isGroupLevelActive } = useCurrentSettingsLevel();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -66,7 +67,7 @@ export function Settings(props: Props) {
     >
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 lg:col-span-3">
-          {activeSettings.level === SettingsLevel.Group && (
+          {isGroupLevelActive && (
             <div
               className={`flex items-center justify-between px-2 bg-white border border-gray-200 py-3 rounded space-x-3`}
             >
