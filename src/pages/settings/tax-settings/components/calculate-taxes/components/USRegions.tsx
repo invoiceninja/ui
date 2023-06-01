@@ -12,9 +12,11 @@ import { useCompanyChanges } from "$app/common/hooks/useCompanyChanges";
 import { TaxSetting } from "$app/common/interfaces/company.interface";
 import { Element } from '$app/components/cards';
 import { Button, Checkbox, SelectField } from "$app/components/forms";
+import Edit from "$app/pages/invoices/edit/Edit";
 import { useHandleCurrentCompanyChangeProperty } from "$app/pages/settings/common/hooks/useHandleCurrentCompanyChange";
 import { ChangeEvent, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { EditSubRegionModal } from "./EditSubRegionModal";
 
 export function USRegions() {
     const [t] = useTranslation();
@@ -22,6 +24,7 @@ export function USRegions() {
     const companyChanges = useCompanyChanges();
 
     const [isOpen, setIsOpen] = useState(false);
+    const [isEditSubregionModalOpen, setIsEditSubregionModalOpen] = useState<boolean>(false);
 
     const usRegions: Array<[string, TaxSetting]> = Object.entries(companyChanges.tax_data.regions.US.subregions);
 
@@ -71,11 +74,33 @@ export function USRegions() {
                                 {value[1].tax_name} {value[1].tax_rate}%
                         </div>  
                     
+                        <div>
+                            <Button 
+                                type="primary" 
+                                className="col-auto"
+                                onClick={(e: ChangeEvent<HTMLInputElement>) => {
+                                    e.preventDefault();
+                                    setIsEditSubregionModalOpen(true)
+                                }}
+                            >
+                                edit
+                            </Button>
+                        </div>
                     </div>
                 ))
 
                 
             )}
+
+
+            <EditSubRegionModal
+                visible={isEditSubregionModalOpen}
+                setVisible={setIsEditSubregionModalOpen}
+                region="US"
+                subregion="AL"
+                tax_setting={companyChanges.tax_data.regions.US.subregions.AL}
+            />
+
         </>
     );
 }
