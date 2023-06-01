@@ -43,7 +43,7 @@ export function USRegions() {
 
     };
 
-    const divClickIntercept = (id: string, value: boolean) => {
+    const divClickIntercept = (id: string) => {
         const checkbox = document.getElementById(id.replace('.apply_tax',''));
         checkbox?.click();
     }
@@ -86,7 +86,7 @@ export function USRegions() {
                     
                     <div key={index} className="border py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row undefined px-5 sm:px-6 lg:items-center">
 
-                        <div className="flex col-span-1 items-center justify-start pl-5" onClick={() => divClickIntercept(`tax_data.regions.US.subregions.${value[0]}.apply_tax`, value[1].apply_tax ? true : false)}>
+                        <div className="flex col-span-1 items-center justify-start pl-5" onClick={() => divClickIntercept(`tax_data.regions.US.subregions.${value[0]}.apply_tax`)}>
                             <Checkbox
                                 id={`tax_data.regions.US.subregions.${value[0]}`}
                                 value={`tax_data.regions.US.subregions.${value[0]}.apply_tax`}
@@ -103,7 +103,7 @@ export function USRegions() {
                             </div>
                         </div>
 
-                        <div onClick={() => divClickIntercept(`tax_data.regions.US.subregions.${value[0]}.apply_tax`, value[1].apply_tax ? true : false)}>
+                        <div onClick={() => divClickIntercept(`tax_data.regions.US.subregions.${value[0]}.apply_tax`)}>
                             {value[1].tax_name} {value[1].tax_rate}% {value[1].reduced_tax_rate ?  ` :: ${t('reduced_rate')} ${value[1].reduced_tax_rate}%` : ''}
                         </div>  
                     
