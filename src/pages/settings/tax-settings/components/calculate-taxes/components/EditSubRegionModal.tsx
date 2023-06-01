@@ -34,11 +34,11 @@ export function EditSubRegionModal(props: Props) {
     } = props;
 
     const handleChangeRuleField = (value: string) => {
-
+        return value;
     };
 
     const handleUpdate = (value: string) => {
-
+        return value;
     };
 
     return (
