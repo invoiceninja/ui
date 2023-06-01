@@ -9,12 +9,10 @@
  */
 
 import { Button, InputField } from '$app/components/forms';
-import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { Modal } from '$app/components/Modal';
-import { Dispatch, SetStateAction, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TaxSetting } from '$app/common/interfaces/company.interface';
-import { Input } from 'postcss';
 
 interface Props {
     region: string;
@@ -38,7 +36,7 @@ export function EditSubRegionModal(props: Props) {
     const handleChangeRuleField = (value: string) => {
 
     };
-    
+
     const handleAddRule = (value: string) => {
 
     };
