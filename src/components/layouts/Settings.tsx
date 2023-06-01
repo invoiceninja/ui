@@ -9,7 +9,7 @@
  */
 
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
-import { useAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -19,6 +19,16 @@ import { Default } from './Default';
 import { companySettingsErrorsAtom } from '../../pages/settings/common/atoms';
 import { ValidationAlert } from '$app/components/ValidationAlert';
 import { useSettingsRoutes } from './common/hooks';
+import { Icon } from '../icons/Icon';
+import { MdClose } from 'react-icons/md';
+import { FaObjectGroup } from 'react-icons/fa';
+import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
+import { SettingsLevel } from '$app/common/enums/settings';
+import { settingsAtom } from '$app/common/atoms/settings';
+import { setActiveSettings } from '$app/common/stores/slices/settings';
+import { useDispatch } from 'react-redux';
+import { updateChanges } from '$app/common/stores/slices/company-users';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 
 interface Props {
   title: string;
@@ -34,7 +44,11 @@ interface Props {
 
 export function Settings(props: Props) {
   const [t] = useTranslation();
+  const dispatch = useDispatch();
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
+  const companyUserSettings = useAtomValue(settingsAtom);
+  const activeSettings = useActiveSettingsDetails();
+  const changes = useCompanyChanges();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -42,9 +56,30 @@ export function Settings(props: Props) {
 
   const { basic, advanced } = useSettingsRoutes();
 
+  const handleSwitchToCompanySettings = () => {
+    dispatch(
+      updateChanges({
+        object: 'company',
+        property: 'settings',
+        value: companyUserSettings,
+      })
+    );
+
+    dispatch(
+      setActiveSettings({
+        status: {
+          name: '',
+          level: 'company',
+        },
+      })
+    );
+  };
+
   useEffect(() => {
     setErrors(undefined);
   }, [settingPathNameKey]);
+
+  console.log(changes?.settings);
 
   return (
     <Default
@@ -58,6 +93,43 @@ export function Settings(props: Props) {
     >
       <div className="grid grid-cols-12 lg:gap-10">
         <div className="col-span-12 lg:col-span-3">
+          {activeSettings.level === SettingsLevel.Group && (
+            <div
+              className={`flex items-center justify-between px-2 bg-white border border-gray-200 py-3 rounded space-x-3`}
+            >
+              <div className="flex items-center space-x-1 lg:space-x-3 3xl:space-x-1 flex-1 w-[90%] lg:w-[75%] 3xl:w-[90%]">
+                <div>
+                  <Icon element={FaObjectGroup} size={20} />
+                </div>
+
+                <div className="flex-col hidden lg:inline 3xl:hidden w-[70%]">
+                  <p className="text-sm truncate w-full">
+                    {t('group_settings')}
+                  </p>
+
+                  <p className="text-sm truncate w-full">
+                    {activeSettings.name}
+                  </p>
+                </div>
+
+                <span className="text-sm lg:hidden 3xl:inline">
+                  {t('group_settings')}:
+                </span>
+
+                <span className="text-sm truncate lg:hidden 3xl:inline flex-1">
+                  {activeSettings.name}
+                </span>
+              </div>
+
+              <div
+                className="cursor-pointer"
+                onClick={handleSwitchToCompanySettings}
+              >
+                <Icon element={MdClose} size={20} />
+              </div>
+            </div>
+          )}
+
           <a className="flex items-center py-4 px-3 text-xs uppercase font-medium text-gray-600">
             <span className="truncate">{t('basic_settings')}</span>
           </a>

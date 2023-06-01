@@ -14,14 +14,19 @@ import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useCompanyChanges } from './useCompanyChanges';
 import { useCurrentCompany } from './useCurrentCompany';
+import { useActiveSettingsDetails } from './useActiveSettingsDetails';
+import { SettingsLevel } from '../enums/settings';
 
 export function useInjectCompanyChanges(): Company | undefined {
   const company = useCurrentCompany();
   const companyChanges = useCompanyChanges();
   const dispatch = useDispatch();
+  const activeSettings = useActiveSettingsDetails();
 
   useEffect(() => {
-    dispatch(injectInChanges({ object: 'company', data: company }));
+    if (activeSettings.level === SettingsLevel.Company) {
+      dispatch(injectInChanges({ object: 'company', data: company }));
+    }
   }, [company]);
 
   return companyChanges;

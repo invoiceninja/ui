@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { getEntityState } from '$app/common/helpers';
+import { endpoint, getEntityState } from '$app/common/helpers';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
@@ -21,21 +21,74 @@ import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { Divider } from '$app/components/cards/Divider';
 import { Settings } from 'react-feather';
 import { BiPlusCircle } from 'react-icons/bi';
+import { useQueryClient } from 'react-query';
+import { request } from '$app/common/helpers/request';
+import { toast } from '$app/common/helpers/toast/toast';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { useSetAtom } from 'jotai';
+import { settingsAtom } from '$app/common/atoms/settings';
+import { useDispatch } from 'react-redux';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { setActiveSettings } from '$app/common/stores/slices/settings';
+import { updateChanges } from '$app/common/stores/slices/company-users';
 
 export function useActions() {
   const [t] = useTranslation();
   const location = useLocation();
+  const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+  const currentCompany = useCurrentCompany();
+
+  const setSettingsAtom = useSetAtom(settingsAtom);
+
   const { id } = useParams();
 
   const bulk = useBulkAction();
 
   const isEditPage = location.pathname.includes(id!);
 
+  const fetchGroupSettingsDetails = (groupSettingsId: string) => {
+    queryClient.fetchQuery(
+      endpoint('/api/v1/group_settings/:id', { id: groupSettingsId }),
+      () =>
+        request(
+          'GET',
+          endpoint('/api/v1/group_settings/:id', { id: groupSettingsId })
+        )
+          .then((response: GenericSingleResourceResponse<GroupSettings>) => {
+            setSettingsAtom(currentCompany.settings);
+
+            console.log(currentCompany.settings);
+
+            dispatch(
+              updateChanges({
+                object: 'company',
+                property: 'settings',
+                value: response.data.data.settings,
+              })
+            );
+
+            dispatch(
+              setActiveSettings({
+                status: {
+                  name: response.data.data.name,
+                  level: 'group',
+                },
+              })
+            );
+          })
+          .catch((error) => {
+            toast.error();
+            console.error(error);
+          })
+    );
+  };
+
   const actions: Action<GroupSettings>[] = [
     (group) =>
       getEntityState(group) === EntityState.Active && (
         <DropdownElement
-          //onClick={() => bulk(group.id, 'archive')}
+          onClick={() => fetchGroupSettingsDetails(group.id)}
           icon={<Icon className="h-4 w-4" element={Settings} />}
         >
           {t('configure_settings')}
