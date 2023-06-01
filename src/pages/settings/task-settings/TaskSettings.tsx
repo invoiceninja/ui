@@ -219,7 +219,9 @@ export function TaskSettings() {
 
         <Element leftSide={t('show_tasks_in_client_portal')}>
           <Toggle
-            checked={companyChanges?.settings?.enable_client_portal_tasks}
+            checked={
+              companyChanges?.settings?.enable_client_portal_tasks || false
+            }
             onChange={(value: boolean) =>
               handleToggleChange('settings.enable_client_portal_tasks', value)
             }
@@ -235,7 +237,7 @@ export function TaskSettings() {
                 ? false
                 : true
             }
-            value={companyChanges?.settings?.show_all_tasks_client_portal.toString()}
+            value={companyChanges?.settings?.show_all_tasks_client_portal?.toString()}
           >
             <option value="invoiced">{t('invoiced')}</option>
             <option value="uninvoiced">{t('uninvoiced')}</option>

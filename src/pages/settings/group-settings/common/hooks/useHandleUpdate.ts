@@ -9,10 +9,12 @@
  */
 
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
+import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { AxiosError } from 'axios';
@@ -22,37 +24,46 @@ import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
 
 interface Params {
-  groupSettings: GroupSettings | undefined;
-  setErrors: Dispatch<SetStateAction<ValidationBag | undefined>>;
-  setIsFormBusy: Dispatch<SetStateAction<boolean>>;
-  isFormBusy: boolean;
+  groupSettings?: GroupSettings;
+  setErrors?: Dispatch<SetStateAction<ValidationBag | undefined>>;
+  setIsFormBusy?: Dispatch<SetStateAction<boolean>>;
+  isFormBusy?: boolean;
 }
 
 export function useHandleUpdate(params: Params) {
   const { id } = useParams();
   const queryClient = useQueryClient();
+  const companyChanges = useCompanyChanges();
+  const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
   const { groupSettings, setErrors, setIsFormBusy, isFormBusy } = params;
 
-  return (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  return (event?: FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
 
     if (!isFormBusy) {
       toast.processing();
-      setErrors(undefined);
-      setIsFormBusy(true);
+      setErrors?.(undefined);
+      setIsFormBusy?.(true);
 
       request(
         'PUT',
-        endpoint('/api/v1/group_settings/:id', { id }),
-        groupSettings
+        endpoint('/api/v1/group_settings/:id', {
+          id: id || activeGroupSettings?.id,
+        }),
+        groupSettings || {
+          ...activeGroupSettings,
+          settings: companyChanges?.settings,
+        }
       )
         .then(() => {
           toast.success('updated_group');
 
           queryClient.invalidateQueries(
-            route('/api/v1/group_settings/:id', { id })
+            route('/api/v1/group_settings/:id', {
+              id: id || activeGroupSettings?.id,
+            })
           );
 
           invalidateQueryValue &&
@@ -61,13 +72,13 @@ export function useHandleUpdate(params: Params) {
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {
             toast.dismiss();
-            setErrors(error.response.data);
+            setErrors?.(error.response.data);
           } else {
             console.error(error);
             toast.error();
           }
         })
-        .finally(() => setIsFormBusy(false));
+        .finally(() => setIsFormBusy?.(false));
     }
   };
 }

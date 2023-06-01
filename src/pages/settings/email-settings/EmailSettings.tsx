@@ -20,11 +20,11 @@ import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '$app/components/layouts/Settings';
 import dayjs from 'dayjs';
-import { useHandleCancel } from '$app/pages/invoices/edit/hooks/useHandleCancel';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -40,7 +40,7 @@ export function EmailSettings() {
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const onSave = useHandleCompanySave();
-  const onCancel = useHandleCancel();
+  const onCancel = useDiscardChanges();
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
 
@@ -59,7 +59,7 @@ export function EmailSettings() {
       <Card title={t('settings')}>
         <Element leftSide={t('show_email_footer')}>
           <Toggle
-            checked={company?.settings.show_email_footer}
+            checked={company?.settings.show_email_footer || false}
             onValueChange={(value) =>
               handleChange('settings.show_email_footer', value)
             }
@@ -68,7 +68,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('attach_pdf')}>
           <Toggle
-            checked={company?.settings.pdf_email_attachment}
+            checked={company?.settings.pdf_email_attachment || false}
             onValueChange={(value) =>
               handleChange('settings.pdf_email_attachment', value)
             }
@@ -77,7 +77,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('attach_documents')}>
           <Toggle
-            checked={company?.settings.document_email_attachment}
+            checked={company?.settings.document_email_attachment || false}
             onValueChange={(value) =>
               handleChange('settings.document_email_attachment', value)
             }
@@ -86,7 +86,7 @@ export function EmailSettings() {
 
         <Element leftSide={t('attach_ubl')}>
           <Toggle
-            checked={company?.settings.ubl_email_attachment}
+            checked={company?.settings.ubl_email_attachment || false}
             onValueChange={(value) =>
               handleChange('settings.ubl_email_attachment', value)
             }

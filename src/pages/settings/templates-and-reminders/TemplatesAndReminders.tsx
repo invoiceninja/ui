@@ -25,7 +25,6 @@ import { useStaticsQuery } from '$app/common/queries/statics';
 import { AdvancedSettingsPlanAlert } from '$app/components/AdvancedSettingsPlanAlert';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 import { Settings } from '$app/components/layouts/Settings';
-import { useHandleCancel } from '$app/pages/invoices/edit/hooks/useHandleCancel';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
@@ -35,6 +34,7 @@ import { commonVariables } from './common/constants/variables/common-variables';
 import { paymentVariables } from './common/constants/variables/payment-variables';
 import Toggle from '$app/components/forms/Toggle';
 import frequencies from '$app/common/constants/frequency';
+import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 
 const REMINDERS = ['reminder1', 'reminder2', 'reminder3'];
 
@@ -54,7 +54,7 @@ export function TemplatesAndReminders() {
   const company = useInjectCompanyChanges();
   const handleChange = useHandleCurrentCompanyChangeProperty();
   const handleSave = useHandleCompanySave();
-  const handleCancel = useHandleCancel();
+  const onCancel = useDiscardChanges();
   const user = useCurrentUser();
 
   const { data: statics } = useStaticsQuery();
@@ -124,7 +124,7 @@ export function TemplatesAndReminders() {
       docsLink="en/advanced-settings/#templates_and_reminders"
       breadcrumbs={pages}
       onSaveClick={handleSave}
-      onCancelClick={handleCancel}
+      onCancelClick={onCancel}
       disableSaveButton={showPlanAlert}
       withoutBackButton
     >

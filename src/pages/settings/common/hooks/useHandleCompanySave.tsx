@@ -16,17 +16,23 @@ import { request } from '$app/common/helpers/request';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useQueryClient } from 'react-query';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../atoms';
 import { updatingRecords as updatingRecordsAtom } from '$app/pages/settings/invoice-design/common/atoms';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
+import { SettingsLevel } from '$app/common/enums/settings';
+import { useHandleUpdate } from '../../group-settings/common/hooks/useHandleUpdate';
 
 export function useHandleCompanySave() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const companyChanges = useInjectCompanyChanges();
+  const activeSettingsDetails = useActiveSettingsDetails();
 
-  const [, setErrors] = useAtom(companySettingsErrorsAtom);
+  const handleUpdateGroupSettings = useHandleUpdate({});
+
+  const setErrors = useSetAtom(companySettingsErrorsAtom);
 
   const [updatingRecords, setUpdatingRecords] = useAtom(updatingRecordsAtom);
 
@@ -35,43 +41,51 @@ export function useHandleCompanySave() {
 
     setErrors(undefined);
 
-    request(
-      'PUT',
-      endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
-      companyChanges
-    )
-      .then((response) => {
-        dispatch(updateRecord({ object: 'company', data: response.data.data }));
+    if (activeSettingsDetails.level === SettingsLevel.Group) {
+      handleUpdateGroupSettings();
+    }
 
-        queryClient.invalidateQueries('/api/v1/statics');
+    if (activeSettingsDetails.level === SettingsLevel.Company) {
+      request(
+        'PUT',
+        endpoint('/api/v1/companies/:id', { id: companyChanges?.id }),
+        companyChanges
+      )
+        .then((response) => {
+          dispatch(
+            updateRecord({ object: 'company', data: response.data.data })
+          );
 
-        toast.dismiss();
+          queryClient.invalidateQueries('/api/v1/statics');
 
-        updatingRecords?.forEach((record) => {
-          toast.processing();
-
-          if (record.checked) {
-            request('POST', endpoint('/api/v1/designs/set/default'), {
-              design_id: record.design_id,
-              entity: record.entity,
-            }).catch((error) => {
-              console.log(error);
-              toast.error();
-            });
-          }
-        });
-
-        toast.success('updated_settings');
-      })
-      .catch((error: AxiosError<ValidationBag>) => {
-        if (error.response?.status === 422) {
-          setErrors(error.response.data);
           toast.dismiss();
-        } else {
-          console.error(error);
-          toast.error();
-        }
-      })
-      .finally(() => setUpdatingRecords(undefined));
+
+          updatingRecords?.forEach((record) => {
+            toast.processing();
+
+            if (record.checked) {
+              request('POST', endpoint('/api/v1/designs/set/default'), {
+                design_id: record.design_id,
+                entity: record.entity,
+              }).catch((error) => {
+                console.log(error);
+                toast.error();
+              });
+            }
+          });
+
+          toast.success('updated_settings');
+        })
+        .catch((error: AxiosError<ValidationBag>) => {
+          if (error.response?.status === 422) {
+            setErrors(error.response.data);
+            toast.dismiss();
+          } else {
+            console.error(error);
+            toast.error();
+          }
+        })
+        .finally(() => setUpdatingRecords(undefined));
+    }
   };
 }

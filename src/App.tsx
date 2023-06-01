@@ -21,15 +21,25 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
+import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
+import { useLocation } from 'react-router-dom';
+import { useActiveSettingsDetails } from './common/hooks/useActiveSettingsDetails';
+import { SettingsLevel } from './common/enums/settings';
 
 export function App() {
   const { i18n } = useTranslation();
 
   const company = useCurrentCompany();
 
+  const location = useLocation();
+
+  const switchToCompanySettings = useSwitchToCompanySettings();
+
   const user = useCurrentUser();
 
   const account = useCurrentAccount();
+
+  const activeSettings = useActiveSettingsDetails();
 
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
 
@@ -98,6 +108,15 @@ export function App() {
       sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'true');
     }
   }, [company]);
+
+  useEffect(() => {
+    if (
+      !location.pathname.startsWith('/settings') &&
+      activeSettings.level !== SettingsLevel.Company
+    ) {
+      switchToCompanySettings();
+    }
+  }, [location]);
 
   return (
     <div className="App">

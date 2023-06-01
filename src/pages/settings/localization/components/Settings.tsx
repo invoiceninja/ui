@@ -88,7 +88,7 @@ export function Settings() {
             }
             name="show_currency_code"
             options={currencyFormats}
-            defaultSelected={company?.settings?.show_currency_code.toString()}
+            defaultSelected={company?.settings?.show_currency_code?.toString()}
           />
         </Element>
 
@@ -138,7 +138,7 @@ export function Settings() {
 
         <Element leftSide={t('military_time')}>
           <Toggle
-            checked={company?.settings?.military_time}
+            checked={company?.settings?.military_time || false}
             onChange={(value: boolean) =>
               dispatch(
                 updateChanges({

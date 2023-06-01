@@ -12,7 +12,7 @@ import { endpoint, getEntityState } from '$app/common/helpers';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Action } from '$app/components/ResourceActions';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Icon } from '$app/components/icons/Icon';
 import { MdArchive, MdDelete, MdRestore } from 'react-icons/md';
 import { EntityState } from '$app/common/enums/entity-state';
@@ -24,9 +24,8 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useQueryClient } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useSetAtom } from 'jotai';
-import { settingsAtom } from '$app/common/atoms/settings';
+import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
 import { useDispatch } from 'react-redux';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { setActiveSettings } from '$app/common/stores/slices/settings';
@@ -37,9 +36,9 @@ export function useActions() {
   const location = useLocation();
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
-  const currentCompany = useCurrentCompany();
+  const navigate = useNavigate();
 
-  const setSettingsAtom = useSetAtom(settingsAtom);
+  const setActiveSettingsAtom = useSetAtom(activeGroupSettingsAtom);
 
   const { id } = useParams();
 
@@ -56,9 +55,9 @@ export function useActions() {
           endpoint('/api/v1/group_settings/:id', { id: groupSettingsId })
         )
           .then((response: GenericSingleResourceResponse<GroupSettings>) => {
-            setSettingsAtom(currentCompany.settings);
+            setActiveSettingsAtom(response.data.data);
 
-            console.log(currentCompany.settings);
+            console.log(response.data.data.settings);
 
             dispatch(
               updateChanges({
@@ -76,6 +75,8 @@ export function useActions() {
                 },
               })
             );
+
+            navigate('/settings/company_details');
           })
           .catch((error) => {
             toast.error();

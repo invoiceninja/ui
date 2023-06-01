@@ -77,7 +77,7 @@ export function ProductColumns() {
 
       <Element leftSide={t('share_invoice_quote_columns')}>
         <Toggle
-          checked={company?.settings.sync_invoice_quote_columns}
+          checked={company?.settings.sync_invoice_quote_columns || false}
           onValueChange={(value) =>
             handleValueChange('sync_invoice_quote_columns', value)
           }

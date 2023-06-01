@@ -9,6 +9,8 @@
  */
 
 import { atom } from 'jotai';
-import { Settings } from '../interfaces/company.interface';
+import { GroupSettings } from '../interfaces/group-settings';
 
-export const settingsAtom = atom<Settings | undefined>(undefined);
+export const activeGroupSettingsAtom = atom<GroupSettings | undefined>(
+  undefined
+);

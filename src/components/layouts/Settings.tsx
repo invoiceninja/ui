@@ -9,7 +9,7 @@
  */
 
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtom } from 'jotai';
 import { ReactNode, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
@@ -24,11 +24,7 @@ import { MdClose } from 'react-icons/md';
 import { FaObjectGroup } from 'react-icons/fa';
 import { useActiveSettingsDetails } from '$app/common/hooks/useActiveSettingsDetails';
 import { SettingsLevel } from '$app/common/enums/settings';
-import { settingsAtom } from '$app/common/atoms/settings';
-import { setActiveSettings } from '$app/common/stores/slices/settings';
-import { useDispatch } from 'react-redux';
-import { updateChanges } from '$app/common/stores/slices/company-users';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
+import { useSwitchToCompanySettings } from '$app/common/hooks/useSwitchToCompanySettings';
 
 interface Props {
   title: string;
@@ -44,11 +40,9 @@ interface Props {
 
 export function Settings(props: Props) {
   const [t] = useTranslation();
-  const dispatch = useDispatch();
   const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
-  const companyUserSettings = useAtomValue(settingsAtom);
   const activeSettings = useActiveSettingsDetails();
-  const changes = useCompanyChanges();
+  const switchToCompanySettings = useSwitchToCompanySettings();
 
   const location = useLocation();
   const navigate = useNavigate();
@@ -56,30 +50,9 @@ export function Settings(props: Props) {
 
   const { basic, advanced } = useSettingsRoutes();
 
-  const handleSwitchToCompanySettings = () => {
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: 'settings',
-        value: companyUserSettings,
-      })
-    );
-
-    dispatch(
-      setActiveSettings({
-        status: {
-          name: '',
-          level: 'company',
-        },
-      })
-    );
-  };
-
   useEffect(() => {
     setErrors(undefined);
   }, [settingPathNameKey]);
-
-  console.log(changes?.settings);
 
   return (
     <Default
@@ -121,10 +94,7 @@ export function Settings(props: Props) {
                 </span>
               </div>
 
-              <div
-                className="cursor-pointer"
-                onClick={handleSwitchToCompanySettings}
-              >
+              <div className="cursor-pointer" onClick={switchToCompanySettings}>
                 <Icon element={MdClose} size={20} />
               </div>
             </div>

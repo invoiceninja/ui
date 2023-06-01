@@ -857,8 +857,8 @@ export function GeneralSettings() {
   useEffect(() => {
     if (company?.settings) {
       const value = company?.settings.company_logo_size
-        .replaceAll('%', '')
-        .replaceAll('px', '');
+        ?.replaceAll('%', '')
+        ?.replaceAll('px', '');
 
       handleValueChange('company_logo_size', `${value}${logoSizeType}`);
     }
@@ -1031,8 +1031,8 @@ export function GeneralSettings() {
           <div className="w-full">
             <InputField
               value={company?.settings.company_logo_size
-                .replaceAll('px', '')
-                .replaceAll('%', '')}
+                ?.replaceAll('px', '')
+                ?.replaceAll('%', '')}
               onValueChange={(value) =>
                 handleValueChange(
                   'company_logo_size',
@@ -1119,7 +1119,7 @@ export function GeneralSettings() {
       <Element leftSide={t('show_paid_stamp')}>
         <Toggle
           onValueChange={(value) => handleValueChange('show_paid_stamp', value)}
-          checked={company?.settings.show_paid_stamp}
+          checked={company?.settings.show_paid_stamp || false}
         />
       </Element>
 
@@ -1128,7 +1128,7 @@ export function GeneralSettings() {
           onValueChange={(value) =>
             handleValueChange('show_shipping_address', value)
           }
-          checked={company?.settings.show_shipping_address}
+          checked={company?.settings.show_shipping_address || false}
         />
       </Element>
 
@@ -1153,7 +1153,7 @@ export function GeneralSettings() {
 
       <Element leftSide={t('page_numbering')}>
         <Toggle
-          checked={company?.settings?.page_numbering}
+          checked={company?.settings?.page_numbering || false}
           id="settings.page_numbering"
           onChange={(value: boolean) =>
             handleToggleChange('settings.page_numbering', value)
