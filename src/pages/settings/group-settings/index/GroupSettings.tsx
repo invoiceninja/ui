@@ -40,7 +40,7 @@ export function GroupSettings() {
       id: 'name',
       label: t('name'),
       format: (field, group) => (
-        <Link to={route('/settings/gateways/:id/edit', { id: group.id })}>
+        <Link to={route('/settings/group_settings/:id/edit', { id: group.id })}>
           {field}
         </Link>
       ),
