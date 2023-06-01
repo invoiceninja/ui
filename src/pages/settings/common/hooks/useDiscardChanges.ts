@@ -8,11 +8,34 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { resetChanges } from '$app/common/stores/slices/company-users';
+import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
+import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
+import {
+  resetChanges,
+  updateChanges,
+} from '$app/common/stores/slices/company-users';
+import { useAtomValue } from 'jotai';
 import { useDispatch } from 'react-redux';
 
 export function useDiscardChanges() {
   const dispatch = useDispatch();
+  const { isCompanyLevelActive, isGroupLevelActive } =
+    useCurrentSettingsLevel();
+  const activeGroupSettings = useAtomValue(activeGroupSettingsAtom);
 
-  return () => dispatch(resetChanges('company'));
+  return () => {
+    if (isCompanyLevelActive) {
+      dispatch(resetChanges('company'));
+    }
+
+    if (isGroupLevelActive) {
+      dispatch(
+        updateChanges({
+          object: 'company',
+          property: 'settings',
+          value: activeGroupSettings?.settings,
+        })
+      );
+    }
+  };
 }
