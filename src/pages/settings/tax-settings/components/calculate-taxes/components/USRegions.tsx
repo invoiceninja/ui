@@ -26,7 +26,7 @@ export function USRegions() {
     const [isEditSubregionModalOpen, setIsEditSubregionModalOpen] = useState<boolean>(false);
     
     const usRegions: Array<[string, TaxSetting]> = Object.entries(companyChanges.tax_data.regions.US.subregions);
-    const [taxSetting, setTaxSetting] = useState<TaxSetting>([]);
+    const [taxSetting, setTaxSetting] = useState<TaxSetting>(usRegions[0][1]);
 
     const isChecked = (apply_tax: string | boolean) => {
         return Boolean(apply_tax);
@@ -71,7 +71,7 @@ export function USRegions() {
                 
                 usRegions?.map((value: [string, TaxSetting], index) => (
                     
-                    <div className="py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row undefined px-5 sm:px-6 lg:items-center" key={index}>
+                    <div className="border py-4 sm:py-3 sm:grid sm:grid-cols-3 sm:gap-10 flex flex-col lg:flex-row undefined px-5 sm:px-6 lg:items-center" key={index}>
 
                         <div className="flex col-span-1 items-center justify-start pl-5">
                             <Checkbox
