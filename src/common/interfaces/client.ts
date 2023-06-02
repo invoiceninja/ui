@@ -75,4 +75,7 @@ export interface Client extends Timestamps {
   contacts: ClientContact[];
   documents: any[];
   gateway_tokens: GatewayToken[];
+  has_valid_vat_number: boolean;
+  is_tax_exempt: boolean;
+  routing_id: string;
 }

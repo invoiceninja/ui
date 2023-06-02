@@ -14,6 +14,8 @@ import { or } from '$app/common/guards/guards/or';
 import { permission } from '$app/common/guards/guards/permission';
 import { Route } from 'react-router-dom';
 import { lazy } from 'react';
+import { enabled } from '$app/common/guards/guards/enabled';
+import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 
 const Transactions = lazy(
   () => import('$app/pages/transactions/index/Transactions')
@@ -31,6 +33,7 @@ export const transactionRoutes = (
       element={
         <Guard
           guards={[
+            enabled(ModuleBitmask.Transactions),
             or(
               permission('view_bank_transaction'),
               permission('create_bank_transaction'),
@@ -45,7 +48,12 @@ export const transactionRoutes = (
       path="create"
       element={
         <Guard
-          guards={[permission('create_bank_transaction')]}
+          guards={[
+            enabled(ModuleBitmask.Transactions),
+              or(
+                permission('create_bank_transaction'),
+              ),
+            ]}
           component={<CreateTransaction />}
         />
       }
@@ -55,6 +63,7 @@ export const transactionRoutes = (
       element={
         <Guard
           guards={[
+            enabled(ModuleBitmask.Transactions),
             or(
               permission('create_bank_transaction'),
               permission('edit_bank_transaction')
@@ -69,6 +78,7 @@ export const transactionRoutes = (
       element={
         <Guard
           guards={[
+            enabled(ModuleBitmask.Transactions),
             or(
               permission('view_bank_transaction'),
               permission('edit_bank_transaction'),

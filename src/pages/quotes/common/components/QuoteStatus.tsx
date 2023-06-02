@@ -64,7 +64,7 @@ export function QuoteStatus(props: Props) {
 
   if (invoice_id) return <Badge variant="green">{t('converted')}</Badge>;
 
-  if (isPastDue()) return <Badge variant="red">{t('expired')}</Badge>;
+  if (isPastDue() || QuoteStatusEnum.Expired) return <Badge variant="red">{t('expired')}</Badge>;
 
   if (isViewed && isUnpaid && !isApproved) {
     return <Badge variant="yellow">{t('viewed')}</Badge>;

@@ -25,7 +25,10 @@ export interface Entry<T = any> {
   label: string;
   value: string | number | boolean;
   resource: T | null;
+  eventType: EventType;
 }
+
+type EventType = 'internal' | 'external';
 
 interface InputOptions {
   value: string | number | boolean | null;
@@ -52,8 +55,6 @@ interface ComboboxStaticProps<T = any> {
 }
 
 export type Nullable<T> = T | null;
-
-const comboboxActionId = '__combobox_internal_option__';
 
 export function ComboboxStatic({
   inputOptions,
@@ -106,7 +107,7 @@ export function ComboboxStatic({
   );
 
   useEffect(() => {
-    if (selectedValue) {
+    if (selectedValue && selectedValue.eventType === 'internal') {
       onChange(selectedValue);
     }
   }, [selectedValue]);
@@ -125,6 +126,7 @@ export function ComboboxStatic({
           label: inputOptions.value ? inputOptions.value.toString() : '',
           value: inputOptions.value ? inputOptions.value.toString() : '',
           resource: null,
+          eventType: 'external',
         })
       : setSelectedValue(null);
   }, [entries, inputOptions.value]);
@@ -144,11 +146,9 @@ export function ComboboxStatic({
       <HeadlessCombobox
         as="div"
         value={selectedValue}
-        onChange={(entry) => {
-          entry?.value === comboboxActionId
-            ? action?.onClick()
-            : setSelectedValue(entry);
-        }}
+        onChange={(value) =>
+          setSelectedValue(() => value && { ...value, eventType: 'internal' })
+        }
         disabled={readonly}
         ref={comboboxRef}
       >
@@ -199,31 +199,13 @@ export function ComboboxStatic({
             className="absolute z-10 mt-1 max-h-60 overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm"
           >
             {action && action.visible && (
-              <HeadlessCombobox.Option
-                value={{
-                  id: comboboxActionId,
-                  label: comboboxActionId,
-                  value: comboboxActionId,
-                  resource: null,
-                }}
-                className={({ active }) =>
-                  classNames(
-                    'text-center border-b relative cursor-pointer select-none py-2 pl-3 pr-9',
-                    active ? 'bg-gray-100 text-gray-900' : 'text-gray-900'
-                  )
-                }
+              <button
+                onClick={action.onClick}
+                className="min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-gray-100"
+                tabIndex={-1}
               >
-                {({ selected }) => (
-                  <span
-                    className={classNames(
-                      'block truncate',
-                      selected && 'font-semibold'
-                    )}
-                  >
-                    {action.label}
-                  </span>
-                )}
-              </HeadlessCombobox.Option>
+                {action.label}
+              </button>
             )}
 
             {filteredValues.length > 0 &&
@@ -348,6 +330,7 @@ export function ComboboxAsync<T = any>({
               label: entry[entryOptions.label],
               value: entry[entryOptions.value],
               resource: entry,
+              eventType: 'external',
             })
           );
 
