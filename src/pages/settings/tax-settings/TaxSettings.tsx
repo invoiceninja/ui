@@ -148,7 +148,7 @@ export function TaxSettings() {
 
               <CalculateTaxes />
 
-            ) : ''
+            ) : null
 
             }
 

@@ -29,9 +29,10 @@ export function SellerSubregion() {
 
     useEffect(() => {
 
-        if (resolveCountry(companyChanges?.settings.country_id)?.iso_3166_2 === 'AU'){
+        if (companyChanges?.settings.country_id === '36'){
             handleChange('tax_data.seller_subregion', 'AU');
         }
+        
 
     }, [companyChanges?.settings.country_id, companyChanges.tax_data.seller_subregion]);
 
