@@ -330,6 +330,7 @@ export function ComboboxAsync<T = any>({
               label: entry[entryOptions.label],
               value: entry[entryOptions.value],
               resource: entry,
+              eventType: 'external',
             })
           );
 
