@@ -25,7 +25,10 @@ export interface Entry<T = any> {
   label: string;
   value: string | number | boolean;
   resource: T | null;
+  eventType: EventType;
 }
+
+type EventType = 'internal' | 'external';
 
 interface InputOptions {
   value: string | number | boolean | null;
@@ -104,7 +107,7 @@ export function ComboboxStatic({
   );
 
   useEffect(() => {
-    if (selectedValue) {
+    if (selectedValue && selectedValue.eventType === 'internal') {
       onChange(selectedValue);
     }
   }, [selectedValue]);
@@ -123,6 +126,7 @@ export function ComboboxStatic({
           label: inputOptions.value ? inputOptions.value.toString() : '',
           value: inputOptions.value ? inputOptions.value.toString() : '',
           resource: null,
+          eventType: 'external',
         })
       : setSelectedValue(null);
   }, [entries, inputOptions.value]);
@@ -142,7 +146,9 @@ export function ComboboxStatic({
       <HeadlessCombobox
         as="div"
         value={selectedValue}
-        onChange={setSelectedValue}
+        onChange={(value) =>
+          setSelectedValue(() => value && { ...value, eventType: 'internal' })
+        }
         disabled={readonly}
         ref={comboboxRef}
       >
