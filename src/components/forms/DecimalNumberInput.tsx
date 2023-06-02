@@ -45,7 +45,7 @@ export function DecimalNumberInput(props: Props) {
     <section>
       {props.currency && (
         <DebounceInput
-          debounceTimeout={300}
+          debounceTimeout={600}
           id={props.id}
           type={'text'}
           className={classNames(
