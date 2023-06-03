@@ -15,7 +15,7 @@ export function useCalculateTaxesRegion(country_id: string | number): boolean {
     /**
      * Supported tax regions
      */
-    const supported_countries: Array<string> = [
+    const supportedCountries: string[] = [
         'AU',
         'US',
         'DE',
@@ -23,6 +23,6 @@ export function useCalculateTaxesRegion(country_id: string | number): boolean {
 
     const resolveCountry = useResolveCountry();
 
-    return supported_countries.includes(resolveCountry(country_id)?.iso_3166_2 || '');
+    return supportedCountries.includes(resolveCountry(country_id)?.iso_3166_2 || '');
 
 }
