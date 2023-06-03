@@ -171,7 +171,7 @@ export function EmailSettings() {
             }
           />
         </Element>
-        {company?.settings.enable_e_invoice === true ? (
+        {company?.settings.enable_e_invoice ? (
           <>
             <Element
               leftSide={t('upload_certificate')}

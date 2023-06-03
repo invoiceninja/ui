@@ -131,7 +131,7 @@ export function TaxSettings() {
           </div>
         </Element>
 
-        {usePaidOrSelfHost() && useCalculateTaxesRegion(companyChanges?.settings?.country_id) ? (
+        {usePaidOrSelfHost() && useCalculateTaxesRegion(companyChanges?.settings?.country_id) && (
           <>
             <Divider />
 
@@ -144,18 +144,14 @@ export function TaxSettings() {
               />
             </Element>
 
-            {companyChanges.calculate_taxes ? (
+            {companyChanges.calculate_taxes && (
 
               <CalculateTaxes />
 
-            ) : null
-
-            }
+            )}
 
           </>
-        ) : ''
-
-        }
+        )}
 
       </Card>
       <Selector />

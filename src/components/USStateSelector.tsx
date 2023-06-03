@@ -13,8 +13,6 @@ import { GenericSelectorProps } from './CountrySelector';
 import { usStates } from '$app/common/constants/us-states';
 
 export function USStateSelector(props: GenericSelectorProps) {
-  
-  const states = usStates;
 
     return (
           <SelectField
@@ -23,7 +21,7 @@ export function USStateSelector(props: GenericSelectorProps) {
             label={props.label}
             withBlank
           >
-            {Object.entries(states).map((state, index) => (
+        {Object.entries(usStates).map((state, index) => (
                 <option key={index} value={state[0]}>
                     {state[1]}
                 </option>

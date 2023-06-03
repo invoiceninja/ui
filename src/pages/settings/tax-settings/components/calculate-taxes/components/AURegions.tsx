@@ -29,12 +29,8 @@ export function AURegions() {
     const [taxSetting, setTaxSetting] = useState<TaxSetting>(regions[0][1]);
     const [subRegion, setSubRegion] = useState<string>(regions[0][0]);
 
-    const isChecked = (apply_tax: string | boolean) => {
-        return Boolean(apply_tax);
-    };
-
     const countSelected = useMemo(() => {
-        return regions.filter(([, taxSetting]) => isChecked(taxSetting.apply_tax)).length;
+        return regions.filter(([, taxSetting]) => taxSetting.apply_tax).length;
     }, [regions]);
 
     const handleChangeAndUpdateView = (value: string, checked: boolean) => {
