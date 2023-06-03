@@ -12,14 +12,13 @@ import { euCountries } from '../constants/eu-countries';
 import { useCountries } from './useCountries';
 
 export function useResolveEu() {
-    const countries = useCountries();
 
-    const eu_countries = euCountries;
+    const countries = useCountries();
 
     return (id: number | string) => {
         
-        const country = countries.find((country) => country.id == id);
+        const country = countries.find((country) => country.id === id);
         
-        return country && eu_countries[country.iso_3166_2] ? true : false;
+        return country && euCountries[country.iso_3166_2] ? true : false;
     };
 }
