@@ -10,7 +10,7 @@
 
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import { Card, Element } from '$app/components/cards';
+import { Element } from '$app/components/cards';
 import { InputField } from '$app/components/forms';
 import { useTranslation } from 'react-i18next';
 
@@ -21,23 +21,20 @@ interface Props {
     value: GroupSettings[keyof GroupSettings]
   ) => void;
   errors: ValidationBag | undefined;
-  page?: 'create' | 'edit';
 }
 
 export function GroupSettingsForm(props: Props) {
   const [t] = useTranslation();
 
-  const { groupSettings, handleChange, errors, page } = props;
+  const { groupSettings, handleChange, errors } = props;
 
   return (
-    <Card title={page === 'create' ? t('create_group') : t('edit_group')}>
-      <Element leftSide={t('name')}>
-        <InputField
-          value={groupSettings.name}
-          onValueChange={(value) => handleChange('name', value)}
-          errorMessage={errors?.errors.name}
-        />
-      </Element>
-    </Card>
+    <Element leftSide={t('name')}>
+      <InputField
+        value={groupSettings.name}
+        onValueChange={(value) => handleChange('name', value)}
+        errorMessage={errors?.errors.name}
+      />
+    </Element>
   );
 }

@@ -27,6 +27,9 @@ import { endpoint } from '$app/common/helpers';
 import { DocumentsTable } from '$app/components/DocumentsTable';
 import { useQueryClient } from 'react-query';
 import { TabGroup } from '$app/components/TabGroup';
+import { Divider } from '$app/components/cards/Divider';
+import { Card } from '$app/components/cards';
+import { GroupSettingsProperties } from '../common/components/GroupSettingsProperties';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -90,16 +93,29 @@ export function Edit() {
         )
       }
     >
-      <TabGroup tabs={[t('overview'), t('documents')]}>
+      <TabGroup tabs={[t('overview'), t('clients'), t('documents')]}>
         <div>
           {groupSettings && (
-            <GroupSettingsForm
-              groupSettings={groupSettings}
-              handleChange={handleChange}
-              errors={errors}
-            />
+            <Card title={t('edit_group')}>
+              <div className="pb-4">
+                <GroupSettingsForm
+                  groupSettings={groupSettings}
+                  handleChange={handleChange}
+                  errors={errors}
+                />
+              </div>
+
+              <Divider withoutPadding />
+
+              <GroupSettingsProperties
+                groupSettings={groupSettings}
+                handleChange={handleChange}
+              />
+            </Card>
           )}
         </div>
+
+        <div>Clients</div>
 
         <div>
           <Upload

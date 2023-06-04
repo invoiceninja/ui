@@ -30,6 +30,7 @@ export function Icon(props: Props) {
       fontSize: props.size || 18,
       color: props.color || accentColor,
       className: props.className,
+      onClick: props.onClick,
     });
   }
 

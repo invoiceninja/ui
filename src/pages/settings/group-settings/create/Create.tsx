@@ -17,6 +17,7 @@ import { Settings } from '$app/components/layouts/Settings';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { useTranslation } from 'react-i18next';
 import { useHandleCreate } from '../common/hooks/useHandleCreate';
+import { Card } from '$app/components/cards';
 
 export function Create() {
   const [t] = useTranslation();
@@ -58,12 +59,13 @@ export function Create() {
       disableSaveButton={isFormBusy || !groupSettings}
     >
       {groupSettings && (
-        <GroupSettingsForm
-          page="create"
-          groupSettings={groupSettings}
-          handleChange={handleChange}
-          errors={errors}
-        />
+        <Card title={t('create_group')}>
+          <GroupSettingsForm
+            groupSettings={groupSettings}
+            handleChange={handleChange}
+            errors={errors}
+          />
+        </Card>
       )}
     </Settings>
   );
