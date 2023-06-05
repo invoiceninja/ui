@@ -46,7 +46,7 @@ export interface Payment {
   paymentables: Paymentable[];
   documents?: any[];
   invoices?: Invoice[];
-  credits?: Credit[],
+  credits?: Credit[];
   client?: Client;
 }
 

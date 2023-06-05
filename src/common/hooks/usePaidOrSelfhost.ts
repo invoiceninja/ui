@@ -14,10 +14,11 @@ import { proPlan } from '../guards/guards/pro-plan';
 import { useCurrentAccount } from './useCurrentAccount';
 
 export function usePaidOrSelfHost() {
+  const account = useCurrentAccount();
 
-    const account = useCurrentAccount();
+  const isPaidPlan =
+    new Date(account?.plan_expires) > new Date() &&
+    (enterprisePlan() || proPlan());
 
-    const isPaidPlan = new Date(account?.plan_expires) > new Date() && (enterprisePlan() || proPlan());
-
-    return (isHosted() && isPaidPlan) || isSelfHosted();
+  return (isHosted() && isPaidPlan) || isSelfHosted();
 }

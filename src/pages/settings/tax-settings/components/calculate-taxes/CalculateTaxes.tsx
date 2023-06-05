@@ -8,19 +8,18 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { AURegions } from "./components/AURegions";
-import { EURegions } from "./components/EURegions";
-import { SellerSubregion } from "./components/SellerSubregion";
-import { USRegions } from "./components/USRegions";
+import { AURegions } from './components/AURegions';
+import { EURegions } from './components/EURegions';
+import { SellerSubregion } from './components/SellerSubregion';
+import { USRegions } from './components/USRegions';
 
 export function CalculateTaxes() {
-
-    return (
-        <>
-            <SellerSubregion />
-            <USRegions />
-            <EURegions />
-            <AURegions />
-        </>
-    );
+  return (
+    <>
+      <SellerSubregion />
+      <USRegions />
+      <EURegions />
+      <AURegions />
+    </>
+  );
 }

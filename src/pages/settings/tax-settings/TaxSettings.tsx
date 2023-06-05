@@ -131,28 +131,23 @@ export function TaxSettings() {
           </div>
         </Element>
 
-        {usePaidOrSelfHost() && useCalculateTaxesRegion(companyChanges?.settings?.country_id) && (
-          <>
-            <Divider />
+        {usePaidOrSelfHost() &&
+          useCalculateTaxesRegion(companyChanges?.settings?.country_id) && (
+            <>
+              <Divider />
 
-            <Element leftSide={t('calculate_taxes')}>
-              <Toggle
-                checked={companyChanges?.calculate_taxes}
-                onChange={(value: boolean) =>
-                  handleToggleChange('calculate_taxes', value)
-                }
-              />
-            </Element>
+              <Element leftSide={t('calculate_taxes')}>
+                <Toggle
+                  checked={companyChanges?.calculate_taxes}
+                  onChange={(value: boolean) =>
+                    handleToggleChange('calculate_taxes', value)
+                  }
+                />
+              </Element>
 
-            {companyChanges.calculate_taxes && (
-
-              <CalculateTaxes />
-
-            )}
-
-          </>
-        )}
-
+              {companyChanges.calculate_taxes && <CalculateTaxes />}
+            </>
+          )}
       </Card>
       <Selector />
       <TaxRates />

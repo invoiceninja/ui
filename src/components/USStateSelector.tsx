@@ -13,19 +13,18 @@ import { GenericSelectorProps } from './CountrySelector';
 import { usStates } from '$app/common/constants/us-states';
 
 export function USStateSelector(props: GenericSelectorProps) {
-
-    return (
-          <SelectField
-            value={props.value}
-            onValueChange={props.onChange}
-            label={props.label}
-            withBlank
-          >
-        {Object.entries(usStates).map((state, index) => (
-                <option key={index} value={state[0]}>
-                    {state[1]}
-                </option>
-            ))}
-          </SelectField>
-    );
+  return (
+    <SelectField
+      value={props.value}
+      onValueChange={props.onChange}
+      label={props.label}
+      withBlank
+    >
+      {Object.entries(usStates).map((state, index) => (
+        <option key={index} value={state[0]}>
+          {state[1]}
+        </option>
+      ))}
+    </SelectField>
+  );
 }

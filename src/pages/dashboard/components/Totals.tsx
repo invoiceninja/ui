@@ -191,7 +191,10 @@ export function Totals() {
 
       <div className="grid grid-cols-12 mt-4 gap-4">
         {company && (
-          <Card title={t('account_login_text')} className="col-span-12 xl:col-span-4">
+          <Card
+            title={t('account_login_text')}
+            className="col-span-12 xl:col-span-4"
+          >
             <div className="px-6 pb-8">
               <div className="flex flex-col space-y-2">
                 <span className="text-2xl">{`${user?.first_name} ${user?.last_name}`}</span>
@@ -259,7 +262,10 @@ export function Totals() {
         )}
 
         {chartData && (
-          <Card title={t('overview')} className="col-span-12 xl:col-span-8 pr-4">
+          <Card
+            title={t('overview')}
+            className="col-span-12 xl:col-span-8 pr-4"
+          >
             <Chart
               chartSensitivity={chartScale}
               dates={{ start_date: body.start_date, end_date: body.end_date }}

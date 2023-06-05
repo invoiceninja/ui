@@ -8,21 +8,17 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { useResolveCountry } from "./useResolveCountry";
+import { useResolveCountry } from './useResolveCountry';
 
 export function useCalculateTaxesRegion(countryId: string | number): boolean {
+  /**
+   * Supported tax regions
+   */
+  const supportedCountries: string[] = ['AU', 'US', 'DE'];
 
-    /**
-     * Supported tax regions
-     */
-    const supportedCountries: string[] = [
-        'AU',
-        'US',
-        'DE',
-    ];
+  const resolveCountry = useResolveCountry();
 
-    const resolveCountry = useResolveCountry();
-
-    return supportedCountries.includes(resolveCountry(countryId)?.iso_3166_2 || '');
-
+  return supportedCountries.includes(
+    resolveCountry(countryId)?.iso_3166_2 || ''
+  );
 }
