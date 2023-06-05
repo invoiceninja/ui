@@ -30,6 +30,8 @@ import { TabGroup } from '$app/components/TabGroup';
 import { Divider } from '$app/components/cards/Divider';
 import { Card } from '$app/components/cards';
 import { GroupSettingsProperties } from '../common/components/GroupSettingsProperties';
+import classNames from 'classnames';
+import { Clients } from './components/Clients';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -73,6 +75,14 @@ export function Edit() {
     }
   }, [groupSettingsResponse]);
 
+  const shouldShowGroupSettingsProperties = () => {
+    const filteredProperties = Object.keys(
+      groupSettings?.settings || []
+    ).filter((key) => key !== 'entity');
+
+    return Boolean(filteredProperties.length);
+  };
+
   const onSuccess = () => {
     queryClient.invalidateQueries(route('/api/v1/group_settings/:id', { id }));
   };
@@ -97,7 +107,11 @@ export function Edit() {
         <div>
           {groupSettings && (
             <Card title={t('edit_group')}>
-              <div className="pb-4">
+              <div
+                className={classNames({
+                  'pb-4': shouldShowGroupSettingsProperties(),
+                })}
+              >
                 <GroupSettingsForm
                   groupSettings={groupSettings}
                   handleChange={handleChange}
@@ -105,17 +119,23 @@ export function Edit() {
                 />
               </div>
 
-              <Divider withoutPadding />
+              {shouldShowGroupSettingsProperties() && (
+                <>
+                  <Divider withoutPadding />
 
-              <GroupSettingsProperties
-                groupSettings={groupSettings}
-                handleChange={handleChange}
-              />
+                  <GroupSettingsProperties
+                    groupSettings={groupSettings}
+                    handleChange={handleChange}
+                  />
+                </>
+              )}
             </Card>
           )}
         </div>
 
-        <div>Clients</div>
+        <div>
+          <Clients />
+        </div>
 
         <div>
           <Upload

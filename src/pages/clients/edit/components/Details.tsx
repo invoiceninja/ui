@@ -70,7 +70,7 @@ export function Details(props: Props) {
         <Element leftSide={t('group')}>
           <SelectField
             id="group_settings_id"
-            defaultValue={props.client?.group_settings_id}
+            value={props.client?.group_settings_id}
             onChange={handleChange}
           >
             <option value=""></option>

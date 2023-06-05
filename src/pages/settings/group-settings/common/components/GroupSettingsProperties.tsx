@@ -8,9 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { GroupSectionProperties } from '$app/common/constants/group-settings';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { Icon } from '$app/components/icons/Icon';
-import { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { MdClose } from 'react-icons/md';
 
@@ -22,32 +22,23 @@ interface Props {
   ) => void;
 }
 
+const GroupSettingsSections = [
+  'company_details',
+  'localization',
+  'payment_settings',
+  'tax_settings',
+  'task_settings',
+  'workflow_settings',
+  'invoice_design',
+  'generated_numbers',
+  'client_portal',
+  'email_settings',
+];
+
 export function GroupSettingsProperties(props: Props) {
   const [t] = useTranslation();
 
   const { groupSettings, handleChange } = props;
-
-  const gridElement = useRef<HTMLDivElement>(null);
-
-  const [numberOfGridColumns, setNumberOfGridColumns] = useState(-1);
-
-  useLayoutEffect(() => {
-    const updateNumberOfGridColumns = () => {
-      if (gridElement.current) {
-        const width = gridElement.current.offsetWidth - 48;
-
-        setNumberOfGridColumns(Math.floor(width / 400));
-      }
-    };
-
-    updateNumberOfGridColumns();
-
-    window.addEventListener('resize', updateNumberOfGridColumns);
-
-    return () => {
-      //window.removeEventListener('resize', updateGridWidth);
-    };
-  }, []);
 
   const customizeValueOutput = (value: string | boolean) => {
     if (typeof value === 'boolean') {
@@ -57,22 +48,7 @@ export function GroupSettingsProperties(props: Props) {
     return t(value);
   };
 
-  const getOrderForProperty = (propertyIndex: number) => {
-    const numberOfProperties = Object.keys(groupSettings.settings).length;
-    const elementsPerRow = Math.ceil(numberOfProperties / numberOfGridColumns);
-    const numberOfGridRows = Math.ceil(numberOfProperties / elementsPerRow);
-
-    // Određivanje reda i kolone za dati indeks elementa
-    const row = Math.floor(propertyIndex / elementsPerRow);
-    const column = propertyIndex % elementsPerRow;
-
-    // Određivanje order vrijednosti na osnovu reda i kolone
-    const order = row + column * numberOfGridRows + 1;
-
-    return order;
-  };
-
-  const handleRemovePropertyFromSettings = (property: string) => {
+  const handleRemoveProperty = (property: string) => {
     const updatedSettings = { ...groupSettings.settings };
 
     delete updatedSettings[property];
@@ -80,36 +56,54 @@ export function GroupSettingsProperties(props: Props) {
     handleChange('settings', updatedSettings);
   };
 
-  console.log(Object.entries(groupSettings.settings));
+  const shouldSectionBeAvailable = (sectionKey: string) => {
+    return Object.keys(groupSettings.settings).some((key) =>
+      GroupSectionProperties[
+        sectionKey as keyof typeof GroupSectionProperties
+      ].includes(key)
+    );
+  };
 
   return (
-    <div
-      ref={gridElement}
-      className="grid gap-y-3 p-6 w-full"
-      style={{
-        gridTemplateColumns: 'repeat(auto-fill, minmax(25rem, 1fr))',
-      }}
-    >
-      {Object.entries(groupSettings.settings).map(
-        ([property, value], index: number) => (
-          <div
-            key={index}
-            className="flex border border-gray-200 rounded w-max pl-3 pr-2 py-2 items-center space-x-4"
-            style={{ order: getOrderForProperty(index) }}
-          >
-            <div className="flex space-x-1 text-sm">
-              <span>{t(property)}:</span>
-              <span>{customizeValueOutput(value)}</span>
-            </div>
+    <div className="flex flex-col px-6 pt-6 w-full">
+      {GroupSettingsSections.map(
+        (section, index) =>
+          shouldSectionBeAvailable(section) && (
+            <div key={index} className="mb-4 last:mb-0">
+              <span className="text-gray-600">{t(section)}:</span>
 
-            <Icon
-              className="cursor-pointer"
-              element={MdClose}
-              onClick={() => handleRemovePropertyFromSettings(property)}
-              size={19}
-            />
-          </div>
-        )
+              <div className="flex flex-col mb-2">
+                {Object.entries(groupSettings.settings).map(
+                  ([property, value], index: number) =>
+                    GroupSectionProperties[
+                      section as keyof typeof GroupSectionProperties
+                    ].includes(property) && (
+                      <div
+                        key={index}
+                        className="flex justify-between border-gray-200 rounded pl-3 pr-2 py-2 items-center w-2/4 first:mt-2"
+                      >
+                        <div className="flex flex-1 text-sm truncate">
+                          {t(property)}:
+                        </div>
+
+                        <span className="flex flex-1 justify-start text-sm whitespace-normal">
+                          {customizeValueOutput(value)}
+                        </span>
+
+                        <div className="flex justify-end">
+                          <Icon
+                            className="cursor-pointer"
+                            element={MdClose}
+                            onClick={() => handleRemoveProperty(property)}
+                            size={19}
+                          />
+                        </div>
+                      </div>
+                    )
+                )}
+              </div>
+            </div>
+          )
       )}
     </div>
   );

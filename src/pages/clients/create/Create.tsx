@@ -23,7 +23,7 @@ import { set } from 'lodash';
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { AdditionalInfo } from '../edit/components/AdditionalInfo';
 import { Address } from '../edit/components/Address';
 import { Contacts } from '../edit/components/Contacts';
@@ -32,6 +32,7 @@ import { Details } from '../edit/components/Details';
 export default function Create() {
   const [t] = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const pages: Page[] = [
     { name: t('clients'), href: '/clients' },
@@ -60,7 +61,10 @@ export default function Create() {
 
   useEffect(() => {
     if (blankClient) {
-      setClient(blankClient.data?.data);
+      setClient({
+        ...blankClient.data?.data,
+        group_settings_id: searchParams.get('group') || '',
+      });
     }
   }, [blankClient]);
 
