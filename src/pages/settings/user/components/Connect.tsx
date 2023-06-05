@@ -48,8 +48,7 @@ export function Connect() {
     request(
       'POST',
       endpoint('/api/v1/users/:id/disconnect_mailer', { id: user!.id }),
-      {},
-      { headers: { 'X-REACT': true } }
+      {}
     )
       .then((response) => {
         toast.success(response.data.message);
