@@ -66,6 +66,8 @@ export const userSlice = createSlice({
     deletePassword: (state) => {
       delete state.changes['password'];
       delete state.user['password'];
+      delete state.changes['password_confirmation'];
+      delete state.user['password_confirmation'];
     },
   },
 });

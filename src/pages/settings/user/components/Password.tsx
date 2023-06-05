@@ -12,10 +12,11 @@ import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { deletePassword, updateChanges } from '$app/common/stores/slices/user';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useOutletContext } from 'react-router-dom';
 import { Card, Element } from '../../../../components/cards';
 import { InputField } from '../../../../components/forms';
+import { RootState } from '$app/common/stores/store';
 
 export function Password() {
   const [t] = useTranslation();
@@ -24,43 +25,43 @@ export function Password() {
 
   const errors: ValidationBag = useOutletContext();
 
-  const [password, setPassword] = useState('');
-  const [passwordConfirmation, setPasswordConfirmation] = useState('');
+  const userChanges = useSelector((state: RootState) => state.user.changes);
 
-  const handleChange = () => {
-    password === passwordConfirmation && password.length > 1
-      ? dispatch(updateChanges({ property: 'password', value: password }))
-      : dispatch(deletePassword());
-  };
+  const [arePasswordsChanged, setArePasswordsChanged] = useState(false);
 
-  const onUserUpdated = () => {
-    setPassword('');
-    setPasswordConfirmation('');
+  const handleChange = (property: string, value: string) => {
+    dispatch(updateChanges({ property, value }));
   };
 
   useEffect(() => {
-    window.addEventListener('user.updated', onUserUpdated);
-
-    handleChange();
-  }, [password, passwordConfirmation]);
+    arePasswordsChanged &&
+      window.addEventListener('user.updated', () => dispatch(deletePassword()));
+  }, [arePasswordsChanged]);
 
   return (
     <Card title={t('password')}>
       <Element leftSide={t('new_password')}>
         <InputField
-          value={password}
-          id="password"
           type="password"
-          onValueChange={(value) => setPassword(value)}
+          value={userChanges.password || ''}
+          onValueChange={(value) => {
+            handleChange('password', value);
+
+            !arePasswordsChanged && setArePasswordsChanged(true);
+          }}
           errorMessage={(errors?.errors?.password ?? [])[0]}
         />
       </Element>
+
       <Element leftSide={t('confirm_password')}>
         <InputField
-          value={passwordConfirmation}
-          id="password_confirmation"
           type="password"
-          onValueChange={(value) => setPasswordConfirmation(value)}
+          value={userChanges.password_confirmation || ''}
+          onValueChange={(value) => {
+            handleChange('password_confirmation', value);
+
+            !arePasswordsChanged && setArePasswordsChanged(true);
+          }}
           errorMessage={(errors?.errors?.password_confirmation ?? [])[0]}
         />
       </Element>

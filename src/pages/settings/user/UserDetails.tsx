@@ -13,7 +13,6 @@ import { request } from '$app/common/helpers/request';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTitle } from '$app/common/hooks/useTitle';
 import {
-  deletePassword,
   injectInChanges,
   resetChanges,
   updateUser,
@@ -110,8 +109,7 @@ export function UserDetails() {
           console.error(error);
           toast.error();
         }
-      })
-      .finally(() => dispatch(deletePassword()));
+      });
   };
 
   useEffect(() => {
@@ -126,6 +124,9 @@ export function UserDetails() {
       breadcrumbs={pages}
       docsLink="en/basic-settings/#user_details"
       withoutBackButton
+      disableSaveButton={
+        userState.changes.password !== userState.changes.password_confirmation
+      }
     >
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}
