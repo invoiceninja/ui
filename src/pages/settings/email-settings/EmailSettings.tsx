@@ -87,14 +87,10 @@ export function EmailSettings() {
     },
   });
 
-
   const onDrop = useCallback((acceptedFiles: File[]) => {
-
     if (acceptedFiles.length === 0) {
-
       toast.error(t('invalid_file'));
       return;
-
     }
 
     formData.append('e_invoice_certificate', acceptedFiles[0]);
@@ -110,7 +106,18 @@ export function EmailSettings() {
     multiple: false,
     maxFiles: 1,
     accept: {
-      'application/*': ['.p12', '.pfx', '.pem', '.cer', '.crt', '.der', '.txt', '.p7b', '.spc', '.bin'],
+      'application/*': [
+        '.p12',
+        '.pfx',
+        '.pem',
+        '.cer',
+        '.crt',
+        '.der',
+        '.txt',
+        '.p7b',
+        '.spc',
+        '.bin',
+      ],
     },
   });
 
@@ -175,7 +182,11 @@ export function EmailSettings() {
           <>
             <Element
               leftSide={t('upload_certificate')}
-              leftSideHelp={company?.has_e_invoice_certificate ? t('certificate_set') : t('certificate_not_set')}
+              leftSideHelp={
+                company?.has_e_invoice_certificate
+                  ? t('certificate_set')
+                  : t('certificate_not_set')
+              }
             >
               <div
                 {...getRootProps()}
@@ -195,10 +206,14 @@ export function EmailSettings() {
 
             <Element
               leftSide={t('certificate_passphrase')}
-              leftSideHelp={company?.has_e_invoice_certificate_passphrase ? t('passphrase_set') : t('passphrase_not_set')}
+              leftSideHelp={
+                company?.has_e_invoice_certificate_passphrase
+                  ? t('passphrase_set')
+                  : t('passphrase_not_set')
+              }
             >
               <InputField
-                value={''}
+                value=""
                 id="password"
                 type="password"
                 onValueChange={(value) =>
@@ -207,9 +222,7 @@ export function EmailSettings() {
               />
             </Element>
           </>
-        ) : (
-          ''
-        )}
+        ) : null}
 
         <Divider />
 
@@ -361,8 +374,8 @@ export function EmailSettings() {
                 value.includes('$body')
                   ? handleChange('settings.email_style_custom', value)
                   : toast.error(
-                    trans('body_variable_missing', { body: '$body' })
-                  )
+                      trans('body_variable_missing', { body: '$body' })
+                    )
               }
             />
           </Element>
