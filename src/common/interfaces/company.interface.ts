@@ -41,6 +41,12 @@ export interface Company {
   track_inventory: boolean;
   stop_on_unpaid_recurring: boolean;
   enabled_modules: number;
+  calculate_taxes: boolean;
+  tax_data: TaxData;
+  e_invoice_certificate: string;
+  e_invoice_passphrase: string;
+  has_e_invoice_certificate: boolean;
+  has_e_invoice_certificate_passphrase: boolean;
 }
 
 export interface CompanyInput {
@@ -273,4 +279,133 @@ export interface Settings {
   sync_invoice_quote_columns: boolean;
   client_initiated_payments: boolean;
   client_initiated_payments_minimum: number;
+  e_invoice_type: string;
+  default_expense_payment_type_id: string;
+  enable_e_invoice: boolean;
+}
+
+export interface TaxData {
+  version: string;
+  seller_subregion: string;
+  regions: Regions;
+}
+
+export interface Regions {
+  US: USRegion;
+  EU: EURegion;
+  AU: AURegion;
+}
+
+export interface USRegion {
+  has_sales_above_threshold: boolean;
+  tax_all_subregions: boolean;
+  tax_threshold: number;
+  subregions: USSubregion;
+}
+
+export interface USSubregion {
+  AL: TaxSetting;
+  AK: TaxSetting;
+  AZ: TaxSetting;
+  AR: TaxSetting;
+  CA: TaxSetting;
+  CO: TaxSetting;
+  CT: TaxSetting;
+  DE: TaxSetting;
+  FL: TaxSetting;
+  GA: TaxSetting;
+  HI: TaxSetting;
+  ID: TaxSetting;
+  IL: TaxSetting;
+  IN: TaxSetting;
+  IA: TaxSetting;
+  KS: TaxSetting;
+  KY: TaxSetting;
+  LA: TaxSetting;
+  ME: TaxSetting;
+  MD: TaxSetting;
+  MA: TaxSetting;
+  MI: TaxSetting;
+  MN: TaxSetting;
+  MS: TaxSetting;
+  MO: TaxSetting;
+  MT: TaxSetting;
+  NE: TaxSetting;
+  NV: TaxSetting;
+  NH: TaxSetting;
+  NJ: TaxSetting;
+  NM: TaxSetting;
+  NY: TaxSetting;
+  NC: TaxSetting;
+  ND: TaxSetting;
+  OH: TaxSetting;
+  OK: TaxSetting;
+  OR: TaxSetting;
+  PA: TaxSetting;
+  RI: TaxSetting;
+  SC: TaxSetting;
+  SD: TaxSetting;
+  TN: TaxSetting;
+  TX: TaxSetting;
+  UT: TaxSetting;
+  VT: TaxSetting;
+  VA: TaxSetting;
+  WA: TaxSetting;
+  WV: TaxSetting;
+  WI: TaxSetting;
+  WY: TaxSetting;
+}
+
+export interface TaxSetting {
+  apply_tax: boolean;
+  tax_rate: number;
+  tax_name: string;
+  reduced_tax_rate: number;
+}
+
+export interface EURegion {
+  has_sales_above_threshold: boolean;
+  tax_all_subregions: boolean;
+  tax_threshold: number;
+  subregions: EUSubregions;
+}
+
+export interface EUSubregions {
+  AT: TaxSetting;
+  BE: TaxSetting;
+  BG: TaxSetting;
+  CY: TaxSetting;
+  CZ: TaxSetting;
+  DE: TaxSetting;
+  DK: TaxSetting;
+  EE: TaxSetting;
+  ES: TaxSetting;
+  FI: TaxSetting;
+  FR: TaxSetting;
+  GR: TaxSetting;
+  HR: TaxSetting;
+  HU: TaxSetting;
+  IE: TaxSetting;
+  IT: TaxSetting;
+  LT: TaxSetting;
+  LU: TaxSetting;
+  LV: TaxSetting;
+  MT: TaxSetting;
+  NL: TaxSetting;
+  PT: TaxSetting;
+  RO: TaxSetting;
+  SE: TaxSetting;
+  SI: TaxSetting;
+  SK: TaxSetting;
+}
+
+export interface AURegion {
+  has_sales_above_threshold: boolean;
+  tax_all_subregions: boolean;
+  tax_threshold: number;
+  subregions: AUSubregions;
+}
+
+export interface AUSubregions {
+  AU: TaxSetting;
 }
