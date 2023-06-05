@@ -10,7 +10,7 @@
 
 import { useResolveCountry } from "./useResolveCountry";
 
-export function useCalculateTaxesRegion(country_id: string | number): boolean {
+export function useCalculateTaxesRegion(countryId: string | number): boolean {
 
     /**
      * Supported tax regions
@@ -23,6 +23,6 @@ export function useCalculateTaxesRegion(country_id: string | number): boolean {
 
     const resolveCountry = useResolveCountry();
 
-    return supportedCountries.includes(resolveCountry(country_id)?.iso_3166_2 || '');
+    return supportedCountries.includes(resolveCountry(countryId)?.iso_3166_2 || '');
 
 }
