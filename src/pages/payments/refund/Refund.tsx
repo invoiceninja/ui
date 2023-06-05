@@ -223,8 +223,7 @@ export default function Refund() {
                       value={
                         invoiceItem?.paid_to_date >
                         payment?.amount - payment?.refunded
-                          ? payment?.amount -
-                            payment?.refunded
+                          ? payment?.amount - payment?.refunded
                           : invoiceItem?.paid_to_date
                       }
                       onChange={formik.handleChange}

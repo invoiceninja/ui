@@ -10,7 +10,7 @@
 
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import { isHosted, trans } from '$app/common/helpers';
+import { endpoint, isHosted, trans } from '$app/common/helpers';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { useShouldDisableAdvanceSettings } from '$app/common/hooks/useShouldDisableAdvanceSettings';
 import { useTitle } from '$app/common/hooks/useTitle';
@@ -25,6 +25,15 @@ import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { useHandleCurrentCompanyChangeProperty } from '../common/hooks/useHandleCurrentCompanyChange';
+import { useDropzone } from 'react-dropzone';
+import { updateRecord } from '$app/common/stores/slices/company-users';
+import { AxiosResponse, AxiosError } from 'axios';
+import { useFormik } from 'formik';
+import { useCallback, useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { request } from '$app/common/helpers/request';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { Image } from 'react-feather';
 
 export function EmailSettings() {
   useTitle('email_settings');
@@ -37,12 +46,80 @@ export function EmailSettings() {
   ];
 
   const company = useInjectCompanyChanges();
+  const currentCompany = useCurrentCompany();
+
   const handleChange = useHandleCurrentCompanyChangeProperty();
 
   const onSave = useHandleCompanySave();
   const onCancel = useHandleCancel();
 
   const showPlanAlert = useShouldDisableAdvanceSettings();
+  const dispatch = useDispatch();
+  const [formData, setFormData] = useState(new FormData());
+
+  const formik = useFormik({
+    enableReinitialize: true,
+    initialValues: formData,
+    onSubmit: () => {
+      toast.loading(t('processing'));
+
+      request(
+        'POST',
+        endpoint('/api/v1/companies/:id', { id: currentCompany.id }),
+        formData,
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      )
+        .then((response: AxiosResponse) => {
+          dispatch(
+            updateRecord({ object: 'company', data: response.data.data })
+          );
+
+          toast.dismiss();
+          toast.success(t('uploaded_document'));
+        })
+        .catch((error: AxiosError) => {
+          console.error(error);
+
+          toast.dismiss();
+          toast.error(t('error_title'));
+        })
+        .finally(() => setFormData(new FormData()));
+    },
+  });
+
+  const onDrop = useCallback((acceptedFiles: File[]) => {
+    if (acceptedFiles.length === 0) {
+      toast.error(t('invalid_file'));
+      return;
+    }
+
+    formData.append('e_invoice_certificate', acceptedFiles[0]);
+    formData.append('_method', 'PUT');
+
+    setFormData(formData);
+
+    formik.submitForm();
+  }, []);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    multiple: false,
+    maxFiles: 1,
+    accept: {
+      'application/*': [
+        '.p12',
+        '.pfx',
+        '.pem',
+        '.cer',
+        '.crt',
+        '.der',
+        '.txt',
+        '.p7b',
+        '.spc',
+        '.bin',
+      ],
+    },
+  });
 
   return (
     <Settings
@@ -92,6 +169,60 @@ export function EmailSettings() {
             }
           />
         </Element>
+
+        <Element leftSide={t('enable_e_invoice')}>
+          <Toggle
+            checked={company?.settings.enable_e_invoice}
+            onValueChange={(value) =>
+              handleChange('settings.enable_e_invoice', value)
+            }
+          />
+        </Element>
+        {company?.settings.enable_e_invoice ? (
+          <>
+            <Element
+              leftSide={t('upload_certificate')}
+              leftSideHelp={
+                company?.has_e_invoice_certificate
+                  ? t('certificate_set')
+                  : t('certificate_not_set')
+              }
+            >
+              <div
+                {...getRootProps()}
+                className="flex flex-col md:flex-row md:items-center"
+              >
+                <div className="relative block w-full border-2 border-gray-300 border-dashed rounded-lg p-12 text-center hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                  <input {...getInputProps()} />
+                  <Image className="mx-auto h-12 w-12 text-gray-400" />
+                  <span className="mt-2 block text-sm font-medium text-gray-900">
+                    {isDragActive
+                      ? 'drop_your_logo_here'
+                      : t('dropzone_default_message')}
+                  </span>
+                </div>
+              </div>
+            </Element>
+
+            <Element
+              leftSide={t('certificate_passphrase')}
+              leftSideHelp={
+                company?.has_e_invoice_certificate_passphrase
+                  ? t('passphrase_set')
+                  : t('passphrase_not_set')
+              }
+            >
+              <InputField
+                value=""
+                id="password"
+                type="password"
+                onValueChange={(value) =>
+                  handleChange('has_e_invoice_certificate_passphrase', value)
+                }
+              />
+            </Element>
+          </>
+        ) : null}
 
         <Divider />
 

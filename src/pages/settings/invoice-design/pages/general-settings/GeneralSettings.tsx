@@ -57,9 +57,12 @@ export default function GeneralSettings() {
     }
   }, [company?.settings]);
 
-  useSaveBtn({
-    onClick: onSave,
-  }, [company]);
+  useSaveBtn(
+    {
+      onClick: onSave,
+    },
+    [company]
+  );
 
   return (
     <div className="flex flex-col lg:flex-row gap-4">

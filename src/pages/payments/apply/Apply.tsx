@@ -137,7 +137,7 @@ export default function Apply() {
           </Element>
         </>
       )}
-      
+
       <Element leftSide={t('invoices')}>
         <DebouncedCombobox
           endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${payment?.client_id}`}
