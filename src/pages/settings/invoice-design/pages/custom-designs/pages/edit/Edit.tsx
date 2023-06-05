@@ -68,7 +68,7 @@ export default function Edit() {
           .then(() => {
             queryClient.invalidateQueries('/api/v1/designs');
             queryClient.invalidateQueries(route('/api/v1/designs/:id', { id }));
-            
+
             toast.success('updated_design');
           })
           .catch((e) => {

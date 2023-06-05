@@ -314,7 +314,7 @@ export function ComboboxAsync<T = any>({
       const $url = new URL(apiEndpoint(endpoint));
 
       $url.searchParams.set('sort', sortBy);
-      $url.searchParams.set('is_deleted', 'false');
+      $url.searchParams.set('status', 'active');
 
       if (inputOptions.value) {
         $url.searchParams.set('with', inputOptions.value.toString());

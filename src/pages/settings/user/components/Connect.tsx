@@ -38,7 +38,6 @@ export function Connect() {
     toast.processing();
 
     window.location.href = endpoint('/auth/:mailer?react=true', { mailer });
-
   };
 
   const handleDisconnectMailer = (event: FormEvent<HTMLButtonElement>) => {
@@ -49,8 +48,7 @@ export function Connect() {
     request(
       'POST',
       endpoint('/api/v1/users/:id/disconnect_mailer', { id: user!.id }),
-      {},
-      { headers: { 'X-REACT': true } }
+      {}
     )
       .then((response) => {
         toast.success(response.data.message);
@@ -86,11 +84,14 @@ export function Connect() {
 
     request(
       'POST',
-      endpoint('/api/v1/connected_account?include=company_user&provider=microsoft'),
+      endpoint(
+        '/api/v1/connected_account?include=company_user&provider=microsoft'
+      ),
       data
-    ).then(() => {
-      window.location.reload();
-    })
+    )
+      .then(() => {
+        window.location.reload();
+      })
       .catch((error) => {
         console.error(error);
         toast.error();
@@ -106,9 +107,10 @@ export function Connect() {
           token,
         }
       )
-    ).then(() => {
-      window.location.reload();
-    })
+    )
+      .then(() => {
+        window.location.reload();
+      })
       .catch((error) => {
         console.error(error);
         toast.error();
@@ -122,45 +124,45 @@ export function Connect() {
       {!user?.oauth_provider_id && (
         <>
           <div className="grid grid-cols-3 text-sm mt-4">
-          <Element leftSide="Google">
+            <Element leftSide="Google">
               <GoogleLogin
                 onSuccess={(response) =>
                   response.credential && handleGoogle(response.credential)
                 }
                 onError={() => toast.error()}
               />
-          </Element>
+            </Element>
           </div>
           <div className="grid grid-cols-3 text-sm mt-4">
-          <Element leftSide="Microsoft">
-            {/* 
+            <Element leftSide="Microsoft">
+              {/* 
           eslint-disable-next-line 
           @typescript-eslint/ban-ts-comment 
           */}
-            {/* @ts-ignore */}
-            <MicrosoftLogin
-              clientId={microsoftClientId}
-              authCallback={authHandler}
-              redirectUri={'https://app.invoicing.co/'}
-            >
-              <SignInProviderButton>
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="20"
-                  height="20"
-                  viewBox="0 0 23 23"
-                >
-                  <path fill="#f3f3f3" d="M0 0h23v23H0z"></path>
-                  <path fill="#f35325" d="M1 1h10v10H1z"></path>
-                  <path fill="#81bc06" d="M12 1h10v10H12z"></path>
-                  <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
-                  <path fill="#ffba08" d="M12 12h10v10H12z"></path>
-                </svg>
+              {/* @ts-ignore */}
+              <MicrosoftLogin
+                clientId={microsoftClientId}
+                authCallback={authHandler}
+                redirectUri={'https://app.invoicing.co/'}
+              >
+                <SignInProviderButton>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 23 23"
+                  >
+                    <path fill="#f3f3f3" d="M0 0h23v23H0z"></path>
+                    <path fill="#f35325" d="M1 1h10v10H1z"></path>
+                    <path fill="#81bc06" d="M12 1h10v10H12z"></path>
+                    <path fill="#05a6f0" d="M1 12h10v10H1z"></path>
+                    <path fill="#ffba08" d="M12 12h10v10H12z"></path>
+                  </svg>
 
-                <p>Log in with Microsoft</p>
-              </SignInProviderButton>
-            </MicrosoftLogin>
-          </Element>
+                  <p>Log in with Microsoft</p>
+                </SignInProviderButton>
+              </MicrosoftLogin>
+            </Element>
           </div>
         </>
       )}

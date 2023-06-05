@@ -102,7 +102,7 @@ export function useSettingsRoutes() {
       name: t('invoice_design'),
       href: '/settings/invoice_design',
       current: location.pathname.endsWith('/settings/invoice_design'),
-      enabled: isAdmin || isOwner || false
+      enabled: isAdmin || isOwner || false,
     },
     {
       name: t('generated_numbers'),
