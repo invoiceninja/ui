@@ -23,6 +23,7 @@ import { useHandleChange } from '$app/pages/products/common/hooks';
 import { toast } from '$app/common/helpers/toast/toast';
 import { ProductForm } from '$app/pages/products/common/components/ProductForm';
 import { useQueryClient } from 'react-query';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 
 interface Props {
   isModalOpen: boolean;
@@ -54,7 +55,7 @@ export function ProductCreate(props: Props) {
       setIsFormBusy(true);
 
       request('POST', endpoint('/api/v1/products'), product)
-        .then(() => {
+        .then((response: GenericSingleResourceResponse<Product>) => {
           toast.success('created_product');
 
           queryClient.invalidateQueries('/api/v1/products');
@@ -68,6 +69,7 @@ export function ProductCreate(props: Props) {
           );
 
           props.setIsModalOpen(false);
+          props.onProductCreated?.(response.data.data);
         })
         .catch((error: AxiosError<ValidationBag>) => {
           if (error.response?.status === 422) {

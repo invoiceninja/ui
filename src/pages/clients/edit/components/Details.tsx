@@ -21,6 +21,7 @@ import { ChangeEvent } from 'react';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { CustomField } from '$app/components/CustomField';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import Toggle from '$app/components/forms/Toggle';
 interface Props {
   client: Client | undefined;
   setClient: React.Dispatch<React.SetStateAction<Client | undefined>>;
@@ -131,6 +132,30 @@ export function Details(props: Props) {
           id="phone"
           value={props.client?.phone}
           onChange={handleChange}
+        />
+      </Element>
+
+      <Element leftSide={t('routing_id')}>
+        <InputField
+          id="routing_id"
+          value={props.client?.routing_id}
+          onChange={handleChange}
+        />
+      </Element>
+
+      <Element leftSide={t('valid_vat_number')}>
+        <Toggle
+          id="has_valid_vat_number"
+          checked={props.client?.has_valid_vat_number}
+          onValueChange={(value) => handleCustomFieldChange('has_valid_vat_number', value)}
+        />
+      </Element>
+
+      <Element leftSide={t('tax_exempt')}>
+        <Toggle
+          id="is_tax_exempt"
+          checked={props.client?.is_tax_exempt}
+          onValueChange={(value) => handleCustomFieldChange('is_tax_exempt', value)}
         />
       </Element>
 

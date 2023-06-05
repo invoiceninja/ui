@@ -12,5 +12,6 @@ export function defaultHeaders() {
   return {
     'X-Api-Token': localStorage.getItem('X-NINJA-TOKEN') as string,
     'X-Requested-With': 'XMLHttpRequest',
+    'X-React': 'true'
   };
 }

@@ -43,7 +43,8 @@ import { useHandleCredit } from './hooks/useHandleCredit';
 import { useHandleInvoice } from './hooks/useHandleInvoice';
 import { useSave } from './hooks/useSave';
 
-export interface PaymentOnCreation extends Omit<Payment, 'invoices'> {
+export interface PaymentOnCreation
+  extends Omit<Payment, 'invoices' | 'credits'> {
   invoices: Paymentable[];
   credits: Paymentable[];
 }

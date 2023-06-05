@@ -35,6 +35,8 @@ export function usePaymentQuery(params: PaymentParams) {
         endpoint('/api/v1/payments/:id?include=client,invoices,paymentables', {
           id: params.id,
         })
+      ).then(
+        (response: GenericSingleResourceResponse<Payment>) => response.data.data
       ),
     { enabled: params.enabled ?? true, staleTime: Infinity }
   );

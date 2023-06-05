@@ -18,11 +18,15 @@ import { useDispatch } from 'react-redux';
 import { TaxRates } from '..';
 import { Card, Element } from '../../../components/cards';
 import { SelectField } from '../../../components/forms';
-import Toggle from '../../../components/forms/Toggle';
+import Toggle from '$app/components/forms/Toggle';
 import { Settings } from '../../../components/layouts/Settings';
 import { useDiscardChanges } from '../common/hooks/useDiscardChanges';
 import { useHandleCompanySave } from '../common/hooks/useHandleCompanySave';
 import { Selector } from './components';
+import { Divider } from '$app/components/cards/Divider';
+import { usePaidOrSelfHost } from '$app/common/hooks/usePaidOrSelfhost';
+import { CalculateTaxes } from './components/calculate-taxes/CalculateTaxes';
+import { useCalculateTaxesRegion } from '$app/common/hooks/useCalculateTaxesRegion';
 
 export function TaxSettings() {
   const [t] = useTranslation();
@@ -126,10 +130,26 @@ export function TaxSettings() {
             )}
           </div>
         </Element>
+
+        {usePaidOrSelfHost() &&
+          useCalculateTaxesRegion(companyChanges?.settings?.country_id) && (
+            <>
+              <Divider />
+
+              <Element leftSide={t('calculate_taxes')}>
+                <Toggle
+                  checked={companyChanges?.calculate_taxes}
+                  onChange={(value: boolean) =>
+                    handleToggleChange('calculate_taxes', value)
+                  }
+                />
+              </Element>
+
+              {companyChanges.calculate_taxes && <CalculateTaxes />}
+            </>
+          )}
       </Card>
-
       <Selector />
-
       <TaxRates />
     </Settings>
   );
