@@ -9,6 +9,23 @@
  */
 
 import { CSSProperties } from 'react';
+import visaLogo from '/gateway-card-images/visa.png';
+import authorizeLogo from '/gateway-card-images/authorize-net.png';
+import americanExpressLogo from '/gateway-card-images/american-express.png';
+import masterCardLogo from '/gateway-card-images/mastercard.png';
+import paypalLogo from '/gateway-card-images/paypal.png';
+import braintreeLogo from '/gateway-card-images/braintree.svg.png';
+import checkoutcomLogo from '/gateway-card-images/checkout.jpg';
+import goCardlessLogo from '/gateway-card-images/gocardless.png';
+import mollieLogo from '/gateway-card-images/mollie.png';
+import payfastLogo from '/gateway-card-images/payfast.png';
+import paytraceLogo from '/gateway-card-images/paytrace.svg';
+import razorpayLogo from '/gateway-card-images/razorpay.png';
+import squareLogo from '/gateway-card-images/square.svg.png';
+import stripeLogo from '/gateway-card-images/stripe.svg';
+import ewayLogo from '/gateway-card-images/eway.png';
+import forteLogo from '/gateway-card-images/forte.png';
+import wepayLogo from '/gateway-card-images/wepay.svg';
 
 interface Props {
   name: string;
@@ -41,7 +58,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'visa':
       return (
         <img
-          src="/gateway-card-images/visa.png"
+          src={visaLogo}
           alt="Visa"
           style={props.style || { width: 30, height: 30 }}
         />
@@ -50,7 +67,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'american_express':
       return (
         <img
-          src="/gateway-card-images/american-express.png"
+          src={americanExpressLogo}
           alt="American Express"
           style={props.style || { width: 30, height: 30 }}
         />
@@ -59,7 +76,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'mastercard':
       return (
         <img
-          src="/gateway-card-images/mastercard.png"
+          src={masterCardLogo}
           alt="Mastercard"
           style={props.style || { width: 30, height: 30 }}
         />
@@ -68,7 +85,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'paypal':
       return (
         <img
-          src="/gateway-card-images/paypal.png"
+          src={paypalLogo}
           alt="Paypal"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -77,7 +94,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'paypal_express':
       return (
         <img
-          src="/gateway-card-images/paypal.png"
+          src={paypalLogo}
           alt="Paypal"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -86,7 +103,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'authorize':
       return (
         <img
-          src="/gateway-card-images/authorize-net.png"
+          src={authorizeLogo}
           alt="AuthorizeNet"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -95,7 +112,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'braintree':
       return (
         <img
-          src="/gateway-card-images/braintree.svg.png"
+          src={braintreeLogo}
           alt="Braintree"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -104,7 +121,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'checkoutcom':
       return (
         <img
-          src="/gateway-card-images/checkout.jpg"
+          src={checkoutcomLogo}
           alt="Checkoutcom"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -113,7 +130,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'gocardless':
       return (
         <img
-          src="/gateway-card-images/gocardless.png"
+          src={goCardlessLogo}
           alt="GoCardless"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -122,7 +139,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'mollie':
       return (
         <img
-          src="/gateway-card-images/mollie.png"
+          src={mollieLogo}
           alt="Mollie"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -131,7 +148,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'payfast':
       return (
         <img
-          src="/gateway-card-images/payfast.png"
+          src={payfastLogo}
           alt="Payfast"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -140,7 +157,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'paytrace':
       return (
         <img
-          src="/gateway-card-images/paytrace.svg"
+          src={paytraceLogo}
           alt="Paytrace"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -149,7 +166,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'razorpay':
       return (
         <img
-          src="/gateway-card-images/razorpay.png"
+          src={razorpayLogo}
           alt="Razorpay"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -158,7 +175,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'square':
       return (
         <img
-          src="/gateway-card-images/square.svg.png"
+          src={squareLogo}
           alt="Square"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -167,7 +184,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'stripe':
       return (
         <img
-          src="/gateway-card-images/stripe.svg"
+          src={stripeLogo}
           alt="Stripe"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -176,7 +193,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'eway':
       return (
         <img
-          src="/gateway-card-images/eway.png"
+          src={ewayLogo}
           alt="Eway"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -185,7 +202,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'forte':
       return (
         <img
-          src="/gateway-card-images/forte.png"
+          src={forteLogo}
           alt="Forte"
           style={props.style || { width: 40, height: 40 }}
         />
@@ -194,7 +211,7 @@ export function GatewayTypeIcon(props: Props) {
     case 'wepay':
       return (
         <img
-          src="/gateway-card-images/wepay.svg"
+          src={wepayLogo}
           alt="Wepay"
           style={props.style || { width: 30, height: 30 }}
         />
