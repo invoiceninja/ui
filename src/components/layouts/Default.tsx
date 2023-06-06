@@ -367,22 +367,32 @@ export function Default(props: Props) {
   const saveBtn = useSaveBtn();
 
   useEffect(() => {
-    setShowSmsVerificationBanner(!account?.account_sms_verified && isHosted());
+    if (account) {
+      setShowSmsVerificationBanner(!account.account_sms_verified && isHosted());
+    }
   }, [account?.account_sms_verified]);
 
   return (
     <>
-      {showSmsVerificationBanner && (
+      {!showSmsVerificationBanner && (
         <Banner className="space-x-3">
           <span>{t('verify_phone_number_help')}.</span>
 
-          <Link
-            className="font-medium text-xs md:text-sm"
-            to="/settings/user_details/enable_two_factor"
-            withCTAArrow
-          >
-            {t('verify_phone_number')}
-          </Link>
+          <div className="flex space-x-1">
+            <Link
+              className="font-medium text-xs md:text-sm"
+              to="/settings/user_details/enable_two_factor"
+            >
+              {t('verify_phone_number')}
+            </Link>
+
+            <span
+              className="font-medium"
+              style={{ color: 'rgb(48, 129, 199)' }}
+            >
+              &rarr;
+            </span>
+          </div>
         </Banner>
       )}
 
@@ -396,7 +406,7 @@ export function Default(props: Props) {
         <DesktopSidebar
           navigation={navigation}
           docsLink={props.docsLink}
-          isBannerDisplayed={showSmsVerificationBanner}
+          isBannerDisplayed={!showSmsVerificationBanner}
         />
 
         <div

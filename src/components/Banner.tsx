@@ -23,7 +23,7 @@ export function Banner(props: Props) {
   return (
     <div
       className={classNames(
-        `flex justify-center items-center bg-orange-300 px-3.5 py-3.5 text-xs md:px-6 md:text-sm w-full leading-6 text-gray-900 ${props.className}`,
+        `flex justify-center items-center px-3.5 py-3.5 text-xs md:px-6 md:text-sm leading-6 text-gray-900 ${props.className}`,
         {
           'bg-orange-300': !variant || variant === 'orange',
         }

@@ -17,7 +17,6 @@ interface Props extends CommonProps {
   to: string;
   children: ReactNode;
   external?: boolean;
-  withCTAArrow?: boolean;
 }
 
 export function Link(props: Props) {
@@ -43,13 +42,11 @@ export function Link(props: Props) {
 
   return (
     <RouterLink
-      className={`flex space-x-1 text-sm ${props.className}`}
+      className={`text-sm hover:underline ${props.className}`}
       style={css}
       to={props.to}
     >
-      <div className="hover:underline">{props.children}</div>
-
-      {props.withCTAArrow && <span aria-label="hidden">&rarr;</span>}
+      {props.children}
     </RouterLink>
   );
 }
