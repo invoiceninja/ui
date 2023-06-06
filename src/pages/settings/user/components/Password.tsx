@@ -29,10 +29,6 @@ export function Password() {
 
   const [isPasswordsChanged, setIsPasswordsChanged] = useState(false);
 
-  const handleChange = (property: string, value: string) => {
-    dispatch(updateChanges({ property, value }));
-  };
-
   useEffect(() => {
     isPasswordsChanged &&
       window.addEventListener('user.updated', () => dispatch(deletePassword()));
@@ -45,7 +41,7 @@ export function Password() {
           type="password"
           value={userChanges.password || ''}
           onValueChange={(value) => {
-            handleChange('password', value);
+            dispatch(updateChanges({ property: 'password', value }));
 
             !isPasswordsChanged && setIsPasswordsChanged(true);
           }}
