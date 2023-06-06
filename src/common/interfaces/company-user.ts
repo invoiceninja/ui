@@ -14,6 +14,7 @@ import { User } from './user';
 
 export interface ReactSettings {
   show_pdf_preview: boolean;
+  react_notification_link: boolean;
 }
 
 export interface CompanyUser {
