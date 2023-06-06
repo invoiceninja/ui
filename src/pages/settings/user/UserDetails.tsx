@@ -124,9 +124,6 @@ export function UserDetails() {
       breadcrumbs={pages}
       docsLink="en/basic-settings/#user_details"
       withoutBackButton
-      disableSaveButton={
-        userState.changes.password !== userState.changes.password_confirmation
-      }
     >
       <PasswordConfirmation
         show={isPasswordConfirmModalOpen}

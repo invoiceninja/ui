@@ -27,16 +27,16 @@ export function Password() {
 
   const userChanges = useSelector((state: RootState) => state.user.changes);
 
-  const [arePasswordsChanged, setArePasswordsChanged] = useState(false);
+  const [isPasswordsChanged, setIsPasswordsChanged] = useState(false);
 
   const handleChange = (property: string, value: string) => {
     dispatch(updateChanges({ property, value }));
   };
 
   useEffect(() => {
-    arePasswordsChanged &&
+    isPasswordsChanged &&
       window.addEventListener('user.updated', () => dispatch(deletePassword()));
-  }, [arePasswordsChanged]);
+  }, [isPasswordsChanged]);
 
   return (
     <Card title={t('password')}>
@@ -47,22 +47,9 @@ export function Password() {
           onValueChange={(value) => {
             handleChange('password', value);
 
-            !arePasswordsChanged && setArePasswordsChanged(true);
+            !isPasswordsChanged && setIsPasswordsChanged(true);
           }}
-          errorMessage={(errors?.errors?.password ?? [])[0]}
-        />
-      </Element>
-
-      <Element leftSide={t('confirm_password')}>
-        <InputField
-          type="password"
-          value={userChanges.password_confirmation || ''}
-          onValueChange={(value) => {
-            handleChange('password_confirmation', value);
-
-            !arePasswordsChanged && setArePasswordsChanged(true);
-          }}
-          errorMessage={(errors?.errors?.password_confirmation ?? [])[0]}
+          errorMessage={errors?.errors?.password}
         />
       </Element>
     </Card>
