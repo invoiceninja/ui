@@ -20,6 +20,7 @@ export function useReactSettings() {
 
   const settings: ReactSettings = {
     show_pdf_preview: true,
+    react_notification_link: true,
     ...reactSettings,
   };
 
