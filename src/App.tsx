@@ -9,7 +9,6 @@
  */
 
 import { isHosted } from '$app/common/helpers';
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
@@ -29,14 +28,9 @@ export function App() {
 
   const user = useCurrentUser();
 
-  const account = useCurrentAccount();
-
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
 
   const [showCompanyActivityModal, setShowCompanyActivityModal] =
-    useState<boolean>(false);
-
-  const [showSmsVerificationModal, setShowSmsVerificationModal] =
     useState<boolean>(false);
 
   const resolveLanguage = useResolveLanguage();
@@ -80,16 +74,6 @@ export function App() {
   }, [user]);
 
   useEffect(() => {
-    const modalShown = sessionStorage.getItem('PHONE-VERIFICATION-SHOWN');
-
-    if (account && (modalShown === 'false' || !modalShown)) {
-      setShowSmsVerificationModal(!account?.account_sms_verified);
-
-      sessionStorage.setItem('PHONE-VERIFICATION-SHOWN', 'true');
-    }
-  }, [account]);
-
-  useEffect(() => {
     const modalShown = sessionStorage.getItem('COMPANY-ACTIVITY-SHOWN');
 
     if (company && (modalShown === 'false' || !modalShown)) {
@@ -107,12 +91,6 @@ export function App() {
         type="activity"
         visible={Boolean(company) && showCompanyActivityModal}
         setVisible={setShowCompanyActivityModal}
-      />
-
-      <AccountWarningsModal
-        type="phone"
-        visible={Boolean(account) && showSmsVerificationModal && isHosted()}
-        setVisible={setShowSmsVerificationModal}
       />
 
       <Toaster position="top-center" />
