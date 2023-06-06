@@ -72,6 +72,8 @@ export function SecuritySettings() {
       })
     );
 
+  console.log(companyChanges?.default_password_timeout);
+
   return (
     <Card title={t('security_settings')}>
       <Element leftSide={t('password_timeout')}>

@@ -12,6 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, InputField } from './forms';
 import { Modal } from './Modal';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 interface Props {
   show?: boolean;
@@ -23,6 +24,7 @@ export function PasswordConfirmation(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const company = useCurrentCompany();
 
   const [isModalOpen, setIsModalOpen] = useState(props.show ?? false);
   const [currentPassword, setCurrentPassword] = useState('');
@@ -33,13 +35,19 @@ export function PasswordConfirmation(props: Props) {
     setIsModalOpen(props.show as boolean);
   }, [props.show]);
 
-  const handleConfirm = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+  const handleConfirm = (event?: FormEvent<HTMLFormElement>) => {
+    event?.preventDefault();
     props.onClose(false);
     props.onSave(currentPassword, isPasswordRequired);
 
     setCurrentPassword('');
   };
+
+  useEffect(() => {
+    if (company && isModalOpen && !company.default_password_timeout) {
+      handleConfirm();
+    }
+  }, [isModalOpen, company?.default_password_timeout]);
 
   return (
     <Modal
@@ -48,7 +56,7 @@ export function PasswordConfirmation(props: Props) {
           ? navigate('/settings/users')
           : props.onClose(false)
       }
-      visible={isModalOpen}
+      visible={isModalOpen && Boolean(!company?.default_password_timeout)}
       title={t('confirmation')}
       text={t('please_enter_your_password')}
     >
