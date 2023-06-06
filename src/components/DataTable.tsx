@@ -49,8 +49,6 @@ import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import CommonProps from '$app/common/interfaces/common-props.interface';
 import classNames from 'classnames';
 import { Guard } from '$app/common/guards/Guard';
-import { permission } from '$app/common/guards/guards/permission';
-import { Permissions } from '$app/common/hooks/permissions/useHasPermission';
 
 export type DataTableColumns<T = any> = {
   id: string;
