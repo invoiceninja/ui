@@ -15,6 +15,7 @@ import { HelpSidebarIcons } from '$app/components/HelpSidebarIcons';
 import { Icon } from 'react-feather';
 import { useSelector } from 'react-redux';
 import { SidebarItem } from './SidebarItem';
+import classNames from 'classnames';
 
 export interface NavigationItem {
   name: string;
@@ -33,6 +34,7 @@ export interface NavigationItem {
 interface Props {
   navigation: NavigationItem[];
   docsLink?: string;
+  isBannerDisplayed?: boolean;
 }
 
 export function DesktopSidebar(props: Props) {
@@ -44,9 +46,14 @@ export function DesktopSidebar(props: Props) {
 
   return (
     <div
-      className={`hidden md:flex z-10 ${
-        isMiniSidebar ? 'md:w-16' : 'md:w-64'
-      } md:flex-col md:fixed md:inset-y-0`}
+      className={classNames(
+        'hidden md:flex z-10 md:flex-col md:fixed md:inset-y-0',
+        {
+          'md:w-16': isMiniSidebar,
+          'md:w-64': !isMiniSidebar,
+          'mt-12': props.isBannerDisplayed,
+        }
+      )}
     >
       <div className="flex flex-col flex-grow border-gray-100 bg-ninja-gray overflow-y-auto border-r">
         <div className="flex items-center flex-shrink-0 pl-3 pr-6 bg-ninja-gray h-16 border-b border-gray-600">

@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { FormEvent, ReactElement, ReactNode, useState } from 'react';
+import { FormEvent, ReactElement, ReactNode, useEffect, useState } from 'react';
 import {
   Home,
   Menu as MenuIcon,
@@ -27,7 +27,7 @@ import {
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { useSelector } from 'react-redux';
 import { RootState } from '$app/common/stores/store';
@@ -41,7 +41,7 @@ import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
-import { isDemo, isSelfHosted } from '$app/common/helpers';
+import { isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
@@ -50,6 +50,8 @@ import { useEnabled } from '$app/common/guards/guards/enabled';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { Banner } from '../Banner';
+import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 
 export interface SaveOption {
   label: string;
@@ -75,11 +77,16 @@ interface Props extends CommonProps {
 export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const account = useCurrentAccount();
+
   const whiteLabelLink = import.meta.env
     .VITE_WHITELABEL_INVOICE_URL as unknown as string;
 
   const shouldShowUnlockButton =
     !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
+
+  const [showSmsVerificationBanner, setShowSmsVerificationBanner] =
+    useState<boolean>(false);
 
   const isMiniSidebar = useSelector(
     (state: RootState) => state.settings.isMiniSidebar
@@ -334,11 +341,10 @@ export function Default(props: Props) {
       current: location.pathname.startsWith('/transactions'),
       visible:
         enabled(ModuleBitmask.Transactions) &&
-        (
-        hasPermission('view_bank_transaction') ||
-        hasPermission('create_bank_transaction') ||
-        hasPermission('edit_bank_transaction')),
-        rightButton: {
+        (hasPermission('view_bank_transaction') ||
+          hasPermission('create_bank_transaction') ||
+          hasPermission('edit_bank_transaction')),
+      rightButton: {
         icon: PlusCircle,
         to: '/transactions/create',
         label: t('new_transaction'),
@@ -360,8 +366,26 @@ export function Default(props: Props) {
   const { isOwner } = useAdmin();
   const saveBtn = useSaveBtn();
 
+  useEffect(() => {
+    setShowSmsVerificationBanner(!account?.account_sms_verified && isHosted());
+  }, [account?.account_sms_verified]);
+
   return (
     <>
+      {showSmsVerificationBanner && (
+        <Banner className="space-x-3">
+          <span>{t('verify_phone_number_help')}.</span>
+
+          <Link
+            className="font-medium text-xs md:text-sm"
+            to="/settings/user_details/enable_two_factor"
+            withCTAArrow
+          >
+            {t('verify_phone_number')}
+          </Link>
+        </Banner>
+      )}
+
       <div>
         <MobileSidebar
           navigation={navigation}
@@ -369,7 +393,11 @@ export function Default(props: Props) {
           setSidebarOpen={setSidebarOpen}
         />
 
-        <DesktopSidebar navigation={navigation} docsLink={props.docsLink} />
+        <DesktopSidebar
+          navigation={navigation}
+          docsLink={props.docsLink}
+          isBannerDisplayed={showSmsVerificationBanner}
+        />
 
         <div
           className={`${
