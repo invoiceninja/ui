@@ -46,7 +46,7 @@ export function Settings() {
         setSubdomainValidation('');
       })
       .catch(() => {
-        setSubdomainValidation(`${t('subdomain_is_not_available')}`);
+        setSubdomainValidation(t('subdomain_is_not_available') ?? '');
         handleChange('subdomain', value);
       });
 
