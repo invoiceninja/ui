@@ -47,7 +47,7 @@ export interface Company {
   e_invoice_passphrase: string;
   has_e_invoice_certificate: boolean;
   has_e_invoice_certificate_passphrase: boolean;
-  default_password_timeout: boolean;
+  default_password_timeout: number;
 }
 
 export interface CompanyInput {
