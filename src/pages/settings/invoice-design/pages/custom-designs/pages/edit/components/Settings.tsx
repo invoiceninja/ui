@@ -62,7 +62,7 @@ export function Settings() {
 
         <Divider />
 
-        <ClickableElement href="https://invoiceninja.github.io/docs/custom-fields/">
+        <ClickableElement href="https://invoiceninja.github.io/en/custom-fields/">
           {t('view_docs')}
         </ClickableElement>
 
