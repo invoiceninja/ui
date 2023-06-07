@@ -23,14 +23,9 @@ import { request } from '$app/common/helpers/request';
 import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
-import { proPlan } from '$app/common/guards/guards/pro-plan';
-import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { freePlan } from '$app/common/guards/guards/free-plan';
 
-interface Props {
-  onSave: any;
-}
-export function Settings(props: Props) {
+export function Settings() {
   const [t] = useTranslation();
   
   useInjectCompanyChanges();
