@@ -37,7 +37,7 @@ export function Settings() {
   const [subdomainValidation, setSubdomainValidation] = useState('');
 
   const checkSubdomain = (value: string) => {
-    
+    setErrors(undefined)
     request('POST', endpoint('/api/v1/check_subdomain'), {
       subdomain: value,
     })
