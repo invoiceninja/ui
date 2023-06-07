@@ -25,6 +25,7 @@ import {
   usePurchaseOrderColumns,
   usePurchaseOrderFilters,
 } from '../common/hooks';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function PurchaseOrders() {
   const { documentTitle } = useTitle('purchase_orders');
@@ -78,6 +79,7 @@ export default function PurchaseOrders() {
             table="purchaseOrder"
           />
         }
+        linkToCreateGuards={[permission('create_purchase_order')]}
       />
     </Default>
   );

@@ -27,6 +27,9 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { MdPrint } from 'react-icons/md';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function Quotes() {
   const { documentTitle } = useTitle('quotes');
@@ -71,7 +74,13 @@ export default function Quotes() {
         customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         withResourcefulActions
-        rightSide={<ImportButton route="/quotes/import" />}
+        rightSide={
+          <Guard
+            type="component"
+            guards={[or(permission('create_quote'), permission('edit_quote'))]}
+            component={<ImportButton route="/quotes/import" />}
+          />
+        }
         leftSideChevrons={
           <DataTableColumnsPicker
             columns={quoteColumns as unknown as string[]}
@@ -79,6 +88,7 @@ export default function Quotes() {
             table="quote"
           />
         }
+        linkToCreateGuards={[permission('create_quote')]}
       />
     </Default>
   );
