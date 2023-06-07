@@ -54,8 +54,6 @@ export function SecuritySettings() {
     },
   ];
 
-  console.log('test');
-
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
     dispatch(
       updateChanges({
