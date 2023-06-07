@@ -48,6 +48,8 @@ export interface Company {
   has_e_invoice_certificate: boolean;
   has_e_invoice_certificate_passphrase: boolean;
   default_password_timeout: number;
+  subdomain: string;
+  client_can_register: boolean;
 }
 
 export interface CompanyInput {
@@ -58,6 +60,7 @@ export interface CompanyInput {
 }
 
 export interface Settings {
+  accept_client_input_quote_approval: boolean;
   auto_archive_invoice: boolean;
   auto_bill_standard_invoices: boolean;
   lock_invoices: string;

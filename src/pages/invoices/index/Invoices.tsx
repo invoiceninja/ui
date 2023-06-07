@@ -25,6 +25,9 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { Icon } from '$app/components/icons/Icon';
 import { MdPrint } from 'react-icons/md';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
+import { Guard } from '$app/common/guards/Guard';
+import { permission } from '$app/common/guards/guards/permission';
+import { or } from '$app/common/guards/guards/or';
 
 export default function Invoices() {
   const { documentTitle } = useTitle('invoices');
@@ -74,7 +77,15 @@ export default function Invoices() {
         customFilters={filters}
         customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
-        rightSide={<ImportButton route="/invoices/import" />}
+        rightSide={
+          <Guard
+            type="component"
+            component={<ImportButton route="/invoices/import" />}
+            guards={[
+              or(permission('create_invoice'), permission('edit_invoice')),
+            ]}
+          />
+        }
         leftSideChevrons={
           <DataTableColumnsPicker
             table="invoice"
@@ -82,6 +93,7 @@ export default function Invoices() {
             defaultColumns={defaultColumns}
           />
         }
+        linkToCreateGuards={[permission('create_invoice')]}
       />
     </Default>
   );

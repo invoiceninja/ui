@@ -31,8 +31,6 @@ export function Clients() {
 
   useInjectCompanyChanges();
 
-  useInjectCompanyChanges();
-
   const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
     dispatch(
       updateChanges({

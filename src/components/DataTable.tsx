@@ -48,6 +48,7 @@ import { MdArchive, MdDelete, MdEdit, MdRestore } from 'react-icons/md';
 import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import CommonProps from '$app/common/interfaces/common-props.interface';
 import classNames from 'classnames';
+import { Guard } from '$app/common/guards/Guard';
 
 export type DataTableColumns<T = any> = {
   id: string;
@@ -93,6 +94,7 @@ interface Props<T> extends CommonProps {
   showRestore?: (resource: T) => boolean;
   beforeFilter?: ReactNode;
   styleOptions?: StyleOptions;
+  linkToCreateGuards?: Guard[];
 }
 
 type ResourceAction<T> = (resource: T) => ReactElement;
@@ -230,9 +232,15 @@ export function DataTable<T extends object>(props: Props<T>) {
               {props.rightSide}
 
               {props.linkToCreate && (
-                <Button to={props.linkToCreate}>
-                  <span>{t(`new_${props.resource}`)}</span>
-                </Button>
+                <Guard
+                  type="component"
+                  guards={props.linkToCreateGuards || []}
+                  component={
+                    <Button to={props.linkToCreate}>
+                      <span>{t(`new_${props.resource}`)}</span>
+                    </Button>
+                  }
+                />
               )}
             </Inline>
           }
