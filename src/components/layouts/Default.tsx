@@ -401,7 +401,7 @@ export function Default(props: Props) {
                     onClick={() =>
                       window.open(
                         isSelfHosted()
-                          ? whiteLabelLink
+                          ? 'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3'
                           : user?.company_user?.ninja_portal_url,
                         '_blank'
                       )
