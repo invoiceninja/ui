@@ -18,8 +18,8 @@ export function useCompanyGatewaysQuery() {
   const { isAdmin } = useAdmin();
 
   return useQuery(
-    route('/api/v1/company_gateways'),
-    () => request('GET', endpoint('/api/v1/company_gateways')),
+    '/api/v1/company_gateways?sort=id|desc',
+    () => request('GET', endpoint('/api/v1/company_gateways?sort=id|desc')),
     { staleTime: Infinity, enabled: isAdmin }
   );
 }
