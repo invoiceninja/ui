@@ -47,6 +47,7 @@ export interface Company {
   e_invoice_passphrase: string;
   has_e_invoice_certificate: boolean;
   has_e_invoice_certificate_passphrase: boolean;
+  client_can_register: boolean;
 }
 
 export interface CompanyInput {
