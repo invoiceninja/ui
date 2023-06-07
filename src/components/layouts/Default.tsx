@@ -75,8 +75,8 @@ interface Props extends CommonProps {
 export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const whiteLabelLink = import.meta.env
-    .VITE_WHITELABEL_INVOICE_URL as unknown as string;
+  // const whiteLabelLink = import.meta.env
+  //   .VITE_WHITELABEL_INVOICE_URL as unknown as string;
 
   const shouldShowUnlockButton =
     !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
