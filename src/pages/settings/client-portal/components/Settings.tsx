@@ -8,29 +8,109 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isHosted } from '$app/common/helpers';
+import { endpoint, isHosted, isSelfHosted } from '$app/common/helpers';
 import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
 import { Divider } from '$app/components/cards/Divider';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
 import { useHandleCurrentCompanyChangeProperty } from '$app/pages/settings/common/hooks/useHandleCurrentCompanyChange';
 import { useTranslation } from 'react-i18next';
 import { Card, Element } from '../../../../components/cards';
-import { InputField, Link } from '../../../../components/forms';
+import { InputField, Link, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
+import { useAtom } from 'jotai';
+import { companySettingsErrorsAtom } from '../../common/atoms';
+import { request } from '$app/common/helpers/request';
+import { AxiosError } from 'axios';
+import { useState } from 'react';
+import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { proPlan } from '$app/common/guards/guards/pro-plan';
+import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
+import { freePlan } from '$app/common/guards/guards/free-plan';
 
-export function Settings() {
+interface Props {
+  onSave: any;
+}
+export function Settings(props: Props) {
   const [t] = useTranslation();
+  
+  useInjectCompanyChanges();
+
   const company = useCompanyChanges();
+
   const handleChange = useHandleCurrentCompanyChangeProperty();
+
+  const [errors, setErrors] = useAtom(companySettingsErrorsAtom);
+  const [subdomainValidation, setSubdomainValidation] = useState('');
+
+  const checkSubdomain = (value: string) => {
+    
+    request('POST', endpoint('/api/v1/check_subdomain'), {
+      subdomain: value,
+    })
+      .then(() => {
+        handleChange('subdomain', value);
+        setSubdomainValidation('');
+      })
+      .catch((error: AxiosError) => {
+        setSubdomainValidation(`${t('subdomain_is_not_available')}`);
+        handleChange('subdomain', value);
+      });
+
+  }
 
   return (
     <Card title={t('settings')}>
+
+      {isHosted() && (
+      <>
+        <Element leftSide={t('portal_mode')} leftSideHelp={t('subdomain_guide')}>
+          <SelectField
+            disabled={freePlan()}
+            id="portal_mode"
+            value={company?.portal_mode}
+            onValueChange={(value) =>
+              handleChange('portal_mode', value)
+            }>
+            <option value="subdomain" key="subdomain">
+              {t('subdomain')}
+            </option>
+            <option value="domain" key="domain">
+              {t('domain')}
+            </option>
+          </SelectField>
+        </Element>
+        
+        {company?.portal_mode === 'subdomain' && (
+        <Element leftSide={t('subdomain')}>
+          <InputField
+            value={company?.subdomain}
+            disabled={freePlan()}
+            onValueChange={(value) => checkSubdomain(value)}
+            errorMessage={errors?.errors.subdomain ?? subdomainValidation}
+          />
+        </Element>
+        )}
+
+        {company?.portal_mode === 'domain' && (
+          <Element leftSide={t('domain_url')} leftSideHelp="custom domain info">
+            <InputField
+              value={company?.portal_domain}
+              onValueChange={(value) => handleChange('portal_domain', value)}
+            />
+          </Element>
+        )}
+
+        </>
+      )}
+
+      {isSelfHosted() && (
       <Element leftSide={t('domain_url')}>
         <InputField
           value={company?.portal_domain}
           onValueChange={(value) => handleChange('portal_domain', value)}
         />
       </Element>
+      )}
 
       <Element
         leftSide={
@@ -47,7 +127,7 @@ export function Settings() {
               <span>{t('app_help_link')}</span>
               <Link
                 external
-                to="https://invoiceninja.github.io/docs/hosted-custom-domain/#custom-domain-configuration"
+                to="https://invoiceninja.github.io/en/hosted-custom-domain/#custom-domain-configuration"
               >
                 {t('here')}
               </Link>
@@ -92,6 +172,19 @@ export function Settings() {
         />
       </Element>
 
+      <Element
+        leftSide={t('accept_purchase_order_number')}
+        leftSideHelp={t('accept_purchase_order_number_help')}
+      >
+        <Toggle
+          checked={company?.settings.accept_client_input_quote_approval}
+          onValueChange={(value) =>
+            handleChange('settings.accept_client_input_quote_approval', value)
+          }
+        />
+      </Element>
+
+      
       {/* <Element leftSide={t('storefront')} leftSideHelp={t('storefront_help')}>
         <Toggle />
       </Element> */}

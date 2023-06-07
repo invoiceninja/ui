@@ -65,7 +65,7 @@ export function ClientPortal() {
 
       <TabGroup tabs={tabs}>
         <div>
-          <SettingsComponent />
+          <SettingsComponent onSave={onSave}/>
         </div>
 
         <div>
