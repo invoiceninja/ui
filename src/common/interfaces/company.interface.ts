@@ -48,6 +48,7 @@ export interface Company {
   has_e_invoice_certificate: boolean;
   has_e_invoice_certificate_passphrase: boolean;
   subdomain: string;
+  client_can_register: boolean;
 }
 
 export interface CompanyInput {
