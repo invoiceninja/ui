@@ -20,7 +20,6 @@ import Toggle from '../../../../components/forms/Toggle';
 import { useAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../../common/atoms';
 import { request } from '$app/common/helpers/request';
-import { AxiosError } from 'axios';
 import { useState } from 'react';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { freePlan } from '$app/common/guards/guards/free-plan';
@@ -46,7 +45,7 @@ export function Settings() {
         handleChange('subdomain', value);
         setSubdomainValidation('');
       })
-      .catch((error: AxiosError) => {
+      .catch(() => {
         setSubdomainValidation(`${t('subdomain_is_not_available')}`);
         handleChange('subdomain', value);
       });
