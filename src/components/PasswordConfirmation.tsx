@@ -59,7 +59,7 @@ export function PasswordConfirmation(props: Props) {
   };
 
   useEffect(() => {
-    if (company && isModalOpen && !isPasswordTimeoutExpired) {
+    if (isModalOpen && !isPasswordTimeoutExpired) {
       handleConfirm();
     }
   }, [isModalOpen]);
