@@ -79,10 +79,6 @@ export function Default(props: Props) {
 
   const account = useCurrentAccount();
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const whiteLabelLink = import.meta.env
-    .VITE_WHITELABEL_INVOICE_URL as unknown as string;
-
   const shouldShowUnlockButton =
     !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 
