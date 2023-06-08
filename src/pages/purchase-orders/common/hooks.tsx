@@ -28,7 +28,7 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { EntityStatus } from '$app/components/EntityStatus';
 import { Icon } from '$app/components/icons/Icon';
 import { Action } from '$app/components/ResourceActions';
-import { useAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai';
 import { useDownloadPdf } from '$app/pages/invoices/common/hooks/useDownloadPdf';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { useTranslation } from 'react-i18next';
@@ -57,6 +57,7 @@ import { PurchaseOrderStatus as PurchaseOrderStatusBadge } from '$app/pages/purc
 import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useScheduleEmailRecord';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
+import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -66,6 +67,8 @@ export function useCreate(props: CreateProps) {
   const { setErrors } = props;
 
   const navigate = useNavigate();
+
+  const setIsDeleteActionTriggered = useSetAtom(isDeleteActionTriggeredAtom);
 
   return (purchaseOrder: PurchaseOrder) => {
     toast.processing();
@@ -87,7 +90,8 @@ export function useCreate(props: CreateProps) {
         error.response?.status === 422
           ? toast.dismiss() && setErrors(error.response.data)
           : toast.error();
-      });
+      })
+      .finally(() => setIsDeleteActionTriggered(undefined));
   };
 }
 

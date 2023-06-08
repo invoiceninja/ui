@@ -100,43 +100,47 @@ export default function Apply() {
       withSaveButton
     >
       <Element leftSide={t('number')}>
-        <InputField disabled value={payment?.data.data.number} />
+        <InputField disabled value={payment?.number} />
       </Element>
-      <Element leftSide={t('amount')}>
-        <InputField
-          disabled
-          value={formatMoney(
-            payment?.data.data.amount - payment?.data.data.refunded,
-            payment?.data.data.client.country_id,
-            payment?.data.data.client.settings.currency_id
-          )}
-        />
-      </Element>
-      <Element leftSide={t('applied')}>
-        <InputField
-          disabled
-          value={formatMoney(
-            payment?.data.data.applied,
-            payment?.data.data.client.country_id,
-            payment?.data.data.client.settings.currency_id
-          )}
-        />
-      </Element>
-      <Element leftSide={t('unapplied')}>
-        <InputField
-          disabled
-          value={formatMoney(
-            payment?.data.data.amount -
-              payment?.data.data.refunded -
-              payment?.data.data.applied,
-            payment?.data.data.client.country_id,
-            payment?.data.data.client.settings.currency_id
-          )}
-        />
-      </Element>
+
+      {payment && payment.client && (
+        <>
+          <Element leftSide={t('amount')}>
+            <InputField
+              disabled
+              value={formatMoney(
+                payment?.amount - payment?.refunded,
+                payment?.client.country_id,
+                payment?.client.settings.currency_id
+              )}
+            />
+          </Element>
+          <Element leftSide={t('applied')}>
+            <InputField
+              disabled
+              value={formatMoney(
+                payment?.applied,
+                payment?.client.country_id,
+                payment?.client.settings.currency_id
+              )}
+            />
+          </Element>
+          <Element leftSide={t('unapplied')}>
+            <InputField
+              disabled
+              value={formatMoney(
+                payment?.amount - payment?.refunded - payment?.applied,
+                payment?.client.country_id,
+                payment?.client.settings.currency_id
+              )}
+            />
+          </Element>
+        </>
+      )}
+
       <Element leftSide={t('invoices')}>
         <DebouncedCombobox
-          endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${payment?.data.data.client_id}`}
+          endpoint={`/api/v1/invoices?status_id=1,2,3&is_deleted=false&client_id=${payment?.client_id}`}
           label="number"
           onChange={(value: Record<Invoice>) =>
             handleInvoiceChange(

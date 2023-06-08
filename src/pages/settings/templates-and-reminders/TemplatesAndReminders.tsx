@@ -121,7 +121,7 @@ export function TemplatesAndReminders() {
   return (
     <Settings
       title={t('templates_and_reminders')}
-      docsLink="docs/advanced-settings/#templates_and_reminders"
+      docsLink="en/advanced-settings/#templates_and_reminders"
       breadcrumbs={pages}
       onSaveClick={handleSave}
       onCancelClick={handleCancel}

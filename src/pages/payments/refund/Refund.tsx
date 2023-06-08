@@ -35,9 +35,9 @@ export default function Refund() {
   const { data: payment } = usePaymentQuery({ id });
 
   const { data: companyGateway } = useCompanyGatewayQuery({
-    id: payment?.data.data.company_gateway_id,
+    id: payment?.company_gateway_id,
     queryParams: 'include=gateway',
-    enabled: Boolean(payment?.data.data.company_gateway_id),
+    enabled: Boolean(payment?.company_gateway_id),
   });
 
   const [t] = useTranslation();
@@ -54,8 +54,8 @@ export default function Refund() {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      id: payment?.data.data.id,
-      date: payment?.data.data.date,
+      id: payment?.id,
+      date: payment?.date,
 
       invoices: [],
     },
@@ -92,28 +92,33 @@ export default function Refund() {
     },
   });
 
-  const getInvoiceAmount = (invoiceItem: Invoice) =>
-    invoiceItem?.paid_to_date >
-    payment?.data.data.amount - payment?.data.data.refunded
-      ? payment?.data.data.amount - payment?.data.data.refunded
-      : invoiceItem?.paid_to_date;
+  const getInvoiceAmount = (invoiceItem: Invoice) => {
+    if (payment) {
+      return invoiceItem?.paid_to_date > payment.amount - payment.refunded
+        ? payment.amount - payment.refunded
+        : invoiceItem?.paid_to_date;
+    }
+  };
 
   useEffect(() => {
-    invoices.map((invoiceId: string) => {
-      const invoiceItem = payment?.data.data.invoices.find(
-        (invoice: Invoice) => invoice.id == invoiceId
-      );
-      if (invoiceItem)
-        formik.setFieldValue('invoices', [
-          ...formik.values.invoices,
-          {
-            amount: getInvoiceAmount(invoiceItem),
-            invoice_id: invoiceItem?.id,
-            credit_id: '',
-            id: '',
-          },
-        ]);
-    });
+    if (payment && Array.isArray(payment.invoices)) {
+      invoices.map((invoiceId: string) => {
+        const invoiceItem = payment.invoices!.find(
+          (invoice: Invoice) => invoice.id == invoiceId
+        );
+
+        if (invoiceItem)
+          formik.setFieldValue('invoices', [
+            ...formik.values.invoices,
+            {
+              amount: getInvoiceAmount(invoiceItem),
+              invoice_id: invoiceItem?.id,
+              credit_id: '',
+              id: '',
+            },
+          ]);
+      });
+    }
   }, [invoices]);
 
   useEffect(() => {
@@ -127,11 +132,12 @@ export default function Refund() {
   }, [formik.values.invoices]);
 
   useEffect(() => {
-    if (companyGateway && payment) {
+    if (companyGateway) {
       const gateway: Gateway = companyGateway.data.data.gateway;
-      const gatewayTypeId = payment.data.data.gateway_type_id;
 
-      const showGatewayRefund = Boolean(gateway.options[gatewayTypeId]?.refund);
+      const showGatewayRefund = Object.values(gateway.options).some(
+        (option) => option.refund
+      );
 
       setShouldShowGatewayRefund(showGatewayRefund);
     }
@@ -146,18 +152,17 @@ export default function Refund() {
       saveButtonLabel={t('refund')}
     >
       <Element leftSide={t('number')}>
-        <InputField disabled value={payment?.data.data.number} />
+        <InputField disabled value={payment?.number} />
       </Element>
 
-      <Element leftSide={t('amount')}>
-        <InputField
-          disabled
-          value={payment?.data.data.amount - payment?.data.data.refunded}
-        />
-      </Element>
+      {payment && (
+        <Element leftSide={t('amount')}>
+          <InputField disabled value={payment?.amount - payment?.refunded} />
+        </Element>
+      )}
 
       <Element leftSide={t('applied')}>
-        <InputField disabled value={payment?.data.data.applied} />
+        <InputField disabled value={payment?.applied} />
       </Element>
 
       <Element leftSide={t('date')}>
@@ -181,14 +186,12 @@ export default function Refund() {
           }}
         >
           <option value=""></option>
-          {payment?.data.data.invoices &&
-            payment?.data.data.invoices.map(
-              (invoice: Invoice, index: number) => (
-                <option key={index} value={invoice.id}>
-                  {invoice.number}
-                </option>
-              )
-            )}
+          {payment?.invoices &&
+            payment?.invoices.map((invoice: Invoice, index: number) => (
+              <option key={index} value={invoice.id}>
+                {invoice.number}
+              </option>
+            ))}
         </SelectField>
 
         {errors?.errors.invoices && (
@@ -200,10 +203,11 @@ export default function Refund() {
 
       <Divider />
 
-      {payment?.data.data &&
+      {payment &&
+        Array.isArray(payment.invoices) &&
         formik.values.invoices.map(
           (requestInvoiceItem: { invoice_id: string }, index: number) => {
-            const invoiceItem = payment?.data.data.invoices.find(
+            const invoiceItem = payment.invoices!.find(
               (invoice: Invoice) => invoice.id == requestInvoiceItem.invoice_id
             );
 
@@ -218,9 +222,8 @@ export default function Refund() {
                       id={`invoices[${index}].amount`}
                       value={
                         invoiceItem?.paid_to_date >
-                        payment?.data.data.amount - payment?.data.data.refunded
-                          ? payment?.data.data.amount -
-                            payment?.data.data.refunded
+                        payment?.amount - payment?.refunded
+                          ? payment?.amount - payment?.refunded
                           : invoiceItem?.paid_to_date
                       }
                       onChange={formik.handleChange}

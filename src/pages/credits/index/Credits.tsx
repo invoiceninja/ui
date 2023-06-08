@@ -23,6 +23,7 @@ import {
   useAllCreditColumns,
   useCreditColumns,
 } from '../common/hooks';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function Credits() {
   useTitle('credits');
@@ -53,7 +54,7 @@ export default function Credits() {
     <Default
       title={t('credits')}
       breadcrumbs={pages}
-      docsLink="docs/credits/"
+      docsLink="en/credits/"
       withoutBackButton
     >
       <DataTable
@@ -73,6 +74,7 @@ export default function Credits() {
             table="credit"
           />
         }
+        linkToCreateGuards={[permission('create_credit')]}
       />
     </Default>
   );

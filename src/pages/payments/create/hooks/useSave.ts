@@ -14,22 +14,20 @@ import { request } from '$app/common/helpers/request';
 import { route } from '$app/common/helpers/route';
 import { Payment } from '$app/common/interfaces/payment';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
-import toast from 'react-hot-toast';
-import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function useSave(
   setErrors: React.Dispatch<React.SetStateAction<ValidationBag | undefined>>
 ) {
-  const [t] = useTranslation();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   return (payment: Payment, sendEmail: boolean) => {
     setErrors(undefined);
 
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request(
       'POST',
@@ -39,15 +37,16 @@ export function useSave(
       payment
     )
       .then((data) => {
-        toast.success(t('created_payment'), { id: toastId });
+        toast.success('created_payment');
         navigate(route('/payments/:id/edit', { id: data.data.data.id }));
       })
       .catch((error: AxiosError<ValidationBag>) => {
-        console.error(error);
-        toast.error(t('error_title'), { id: toastId });
-
         if (error.response?.status === 422) {
+          toast.dismiss();
           setErrors(error.response.data);
+        } else {
+          toast.error();
+          console.error(error);
         }
       })
       .finally(() => {

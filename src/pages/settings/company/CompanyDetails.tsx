@@ -42,7 +42,7 @@ export function CompanyDetails() {
       onCancelClick={onCancel}
       title={t('company_details')}
       breadcrumbs={pages}
-      docsLink="docs/basic-settings/#company_details"
+      docsLink="en/basic-settings/#company_details"
       withoutBackButton
     >
       <Tabs tabs={tabs} className="mt-6" />

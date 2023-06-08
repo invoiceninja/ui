@@ -46,7 +46,7 @@ export function BankAccount() {
     <Settings
       title={t('bank_account')}
       breadcrumbs={pages}
-      docsLink="docs/basic-settings/#bank_account_details"
+      docsLink="en/basic-settings/#bank_account_details"
     >
       <Details accountDetails={accountDetails} />
     </Settings>

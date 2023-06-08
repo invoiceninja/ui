@@ -265,6 +265,8 @@ export function useActions() {
         toast.success(t(`${action}d_product`) || '');
 
         queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
+        queryClient.invalidateQueries('/api/v1/products');
+
       })
       .catch((error) => {
         console.error(error);

@@ -19,6 +19,7 @@ import {
   useProjectColumns,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function Projects() {
   useTitle('projects');
@@ -37,7 +38,7 @@ export default function Projects() {
     <Default
       title={t('projects')}
       breadcrumbs={pages}
-      docsLink="docs/projects/"
+      docsLink="en/projects/"
       withoutBackButton
     >
       <DataTable
@@ -56,6 +57,7 @@ export default function Projects() {
             table="project"
           />
         }
+        linkToCreateGuards={[permission('create_project')]}
       />
     </Default>
   );

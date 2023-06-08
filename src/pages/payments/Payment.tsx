@@ -64,7 +64,7 @@ export default function Payment() {
   useEffect(() => {
     if (data) {
       const paymentResponse: PaymentEntity = {
-        ...data.data.data,
+        ...data,
         invoices: [],
         credits: [],
       };

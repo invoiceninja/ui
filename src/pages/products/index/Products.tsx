@@ -21,6 +21,9 @@ import {
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function Products() {
   useTitle('products');
@@ -39,7 +42,7 @@ export default function Products() {
     <Default
       title={t('products')}
       breadcrumbs={pages}
-      docsLink="docs/products"
+      docsLink="en/products"
       withoutBackButton
     >
       <DataTable
@@ -51,7 +54,15 @@ export default function Products() {
         linkToEdit="/products/:id/edit"
         withResourcefulActions
         customActions={actions}
-        rightSide={<ImportButton route="/products/import" />}
+        rightSide={
+          <Guard
+            type="component"
+            guards={[
+              or(permission('create_product'), permission('edit_product')),
+            ]}
+            component={<ImportButton route="/products/import" />}
+          />
+        }
         leftSideChevrons={
           <DataTableColumnsPicker
             table="product"
@@ -59,6 +70,7 @@ export default function Products() {
             defaultColumns={defaultColumns}
           />
         }
+        linkToCreateGuards={[permission('create_product')]}
       />
     </Default>
   );

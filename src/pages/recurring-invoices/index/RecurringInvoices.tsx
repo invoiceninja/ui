@@ -23,6 +23,9 @@ import {
   useRecurringInvoiceFilters,
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function RecurringInvoices() {
   useTitle('recurring_invoices');
@@ -45,7 +48,7 @@ export default function RecurringInvoices() {
     <Default
       title={t('recurring_invoices')}
       breadcrumbs={pages}
-      docsLink="docs/recurring-invoices/"
+      docsLink="en/recurring-invoices/"
       withoutBackButton
     >
       <DataTable
@@ -60,7 +63,18 @@ export default function RecurringInvoices() {
         customFilterQueryKey="client_status"
         customFilterPlaceholder="status"
         withResourcefulActions
-        rightSide={<ImportButton route="/recurring_invoices/import" />}
+        rightSide={
+          <Guard
+            type="component"
+            guards={[
+              or(
+                permission('create_recurring_invoice'),
+                permission('edit_recurring_invoice')
+              ),
+            ]}
+            component={<ImportButton route="/recurring_invoices/import" />}
+          />
+        }
         leftSideChevrons={
           <DataTableColumnsPicker
             columns={recurringInvoiceColumns as unknown as string[]}
@@ -68,6 +82,7 @@ export default function RecurringInvoices() {
             table="recurringInvoice"
           />
         }
+        linkToCreateGuards={[permission('create_recurring_invoice')]}
       />
     </Default>
   );

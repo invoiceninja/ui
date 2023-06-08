@@ -59,7 +59,7 @@ export function OnlinePayments() {
     <Settings
       title={t('online_payments')}
       breadcrumbs={pages}
-      docsLink="docs/basic-settings/#online_payments"
+      docsLink="en/basic-settings/#online_payments"
       onSaveClick={onSave}
       onCancelClick={onCancel}
       withoutBackButton
@@ -124,7 +124,7 @@ export function OnlinePayments() {
 
         {paymentTerms && (
           <>
-            <Element leftSide={t('payment_type')}>
+            <Element leftSide={t('payment_terms')}>
               <SelectField
                 value={company?.settings?.payment_terms}
                 id="settings.payment_terms"

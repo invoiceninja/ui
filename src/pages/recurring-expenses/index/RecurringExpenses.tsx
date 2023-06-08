@@ -18,6 +18,7 @@ import {
   useAllRecurringExpenseColumns,
   useRecurringExpenseColumns,
 } from '../common/hooks';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function RecurringExpenses() {
   useTitle('recurring_expenses');
@@ -38,7 +39,7 @@ export default function RecurringExpenses() {
     <Default
       title={t('recurring_expenses')}
       breadcrumbs={pages}
-      docsLink="docs/recurring-expenses"
+      docsLink="en/recurring-expenses"
       withoutBackButton
     >
       <DataTable
@@ -57,6 +58,7 @@ export default function RecurringExpenses() {
             table="recurringExpense"
           />
         }
+        linkToCreateGuards={[permission('create_recurring_expense')]}
       />
     </Default>
   );

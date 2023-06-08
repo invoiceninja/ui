@@ -31,6 +31,7 @@ export enum ModuleBitmask {
   Expenses = 16,
   RecurringExpenses = 512,
   PurchaseOrders = 16384,
+  Transactions = 32768,
 }
 
 export function EnabledModules() {
@@ -50,10 +51,9 @@ export function EnabledModules() {
     { label: t('tasks'), bitmask: ModuleBitmask.Tasks },
     { label: t('vendors'), bitmask: ModuleBitmask.Vendors },
     { label: t('expenses'), bitmask: ModuleBitmask.Expenses },
-    {
-      label: t('recurring_expenses'),
-      bitmask: ModuleBitmask.RecurringExpenses,
-    },
+    { label: t('purchase_orders'), bitmask: ModuleBitmask.PurchaseOrders},
+    { label: t('recurring_expenses'), bitmask: ModuleBitmask.RecurringExpenses },
+    { label: t('transactions'), bitmask: ModuleBitmask.Transactions },
 
     // { label: t('tickets'), bitmask: 128 },
     // { label: t('proposals'), bitmask: 256 },

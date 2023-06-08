@@ -9,6 +9,7 @@
  */
 
 import { Client } from './client';
+import { Credit } from './credit';
 import { Invoice } from './invoice';
 
 export interface Payment {
@@ -45,6 +46,7 @@ export interface Payment {
   paymentables: Paymentable[];
   documents?: any[];
   invoices?: Invoice[];
+  credits?: Credit[];
   client?: Client;
 }
 
