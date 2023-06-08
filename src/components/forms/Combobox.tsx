@@ -306,7 +306,7 @@ export function ComboboxAsync<T = any>({
   onDismiss,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
-  const [url, setUrl] = useState('');
+  const [url, setUrl] = useState<string|null>(null);
 
   const { data } = useQuery(
     [url],
@@ -340,6 +340,7 @@ export function ComboboxAsync<T = any>({
     },
     {
       staleTime: staleTime ?? Infinity,
+      enabled: url !== null
     }
   );
 
