@@ -81,6 +81,7 @@ export function ClientSelector(props: ClientSelectorProps) {
           visible: props.withoutAction ? false : true,
           onClick: () => setIsModalOpen(true),
         }}
+        key="client_selector"
         // clearInputAfterFirstSelection
       />
 
