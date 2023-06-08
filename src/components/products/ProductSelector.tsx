@@ -51,6 +51,7 @@ export function ProductSelector(props: Props) {
         onDismiss={props.onClearButtonClick}
         sortBy="product_key|asc"
         nullable
+        key="product_selector"
       />
 
       {props.errorMessage && (
