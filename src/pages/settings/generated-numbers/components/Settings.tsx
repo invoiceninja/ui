@@ -9,46 +9,26 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Card, Element } from '../../../../components/cards';
-import { InputField, SelectField } from '../../../../components/forms';
-import Toggle from '../../../../components/forms/Toggle';
-import { useDispatch } from 'react-redux';
-import { ChangeEvent } from 'react';
-import { useCompanyChanges } from '$app/common/hooks/useCompanyChanges';
-import { updateChanges } from '$app/common/stores/slices/company-users';
+import { Card, Element } from '$app/components/cards';
+import { InputField, SelectField } from '$app/components/forms';
+import Toggle from '$app/components/forms/Toggle';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { useHandleCurrentCompanyChangeProperty } from '../../common/hooks/useHandleCurrentCompanyChange';
 
 export function Settings() {
   const [t] = useTranslation();
-  const companyChanges = useCompanyChanges();
-  const dispatch = useDispatch();
 
-  useInjectCompanyChanges();
-
-  const handleToggleChange = (id: string, value: boolean | string) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: id,
-        value,
-      })
-    );
-
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) =>
-    dispatch(
-      updateChanges({
-        object: 'company',
-        property: event.target.id,
-        value: event.target.value,
-      })
-    );
+  const companyChanges = useInjectCompanyChanges();
+  const handleChange = useHandleCurrentCompanyChangeProperty();
 
   return (
     <Card title={t('settings')}>
       <Element leftSide={t('number_padding')}>
         <SelectField
           id="settings.counter_padding"
-          onChange={handleChange}
+          onValueChange={(value) =>
+            handleChange('settings.counter_padding', parseInt(value))
+          }
           value={companyChanges?.settings?.counter_padding}
         >
           <option value="1">1</option>
@@ -67,6 +47,9 @@ export function Settings() {
         <SelectField
           id="settings.counter_number_applied"
           onChange={handleChange}
+          onValueChange={(value) =>
+            handleChange('settings.counter_number_applied', value)
+          }
           value={companyChanges?.settings?.counter_number_applied}
         >
           <option value="when_saved">{t('when_saved')}</option>
@@ -85,7 +68,7 @@ export function Settings() {
       <Element leftSide={t('shared_invoice_quote_counter')}>
         <Toggle
           onChange={(value: boolean) =>
-            handleToggleChange('settings.shared_invoice_quote_counter', value)
+            handleChange('settings.shared_invoice_quote_counter', value)
           }
           checked={
             companyChanges?.settings?.shared_invoice_quote_counter || false
@@ -96,7 +79,7 @@ export function Settings() {
       <Element leftSide={t('shared_invoice_credit_counter')}>
         <Toggle
           onChange={(value: boolean) =>
-            handleToggleChange('settings.shared_invoice_credit_counter', value)
+            handleChange('settings.shared_invoice_credit_counter', value)
           }
           checked={
             companyChanges?.settings?.shared_invoice_credit_counter || false
@@ -109,6 +92,9 @@ export function Settings() {
           id="settings.reset_counter_frequency_id"
           onChange={handleChange}
           value={companyChanges?.settings?.reset_counter_frequency_id}
+          onValueChange={(value) =>
+            handleChange('settings.reset_counter_frequency_id', parseInt(value))
+          }
         >
           <option value="0">{t('never')}</option>
           <option value="1">{t('freq_daily')}</option>
@@ -125,8 +111,9 @@ export function Settings() {
           <option value="12">{t('freq_three_years')}</option>
         </SelectField>
       </Element>
-      {companyChanges?.settings?.reset_counter_frequency_id > 0 && (
-        <>
+
+      {companyChanges?.settings &&
+        companyChanges?.settings?.reset_counter_frequency_id > 0 && (
           <Element leftSide={t('next_reset')}>
             <InputField
               type="date"
@@ -135,8 +122,7 @@ export function Settings() {
               value={companyChanges?.settings?.reset_counter_date || ''}
             />
           </Element>
-        </>
-      )}
+        )}
     </Card>
   );
 }
