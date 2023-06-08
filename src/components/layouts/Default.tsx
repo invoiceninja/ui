@@ -75,9 +75,6 @@ interface Props extends CommonProps {
 export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // const whiteLabelLink = import.meta.env
-  //   .VITE_WHITELABEL_INVOICE_URL as unknown as string;
-
   const shouldShowUnlockButton =
     !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 
@@ -401,7 +398,7 @@ export function Default(props: Props) {
                     onClick={() =>
                       window.open(
                         isSelfHosted()
-                          ? 'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3'
+                          ? import.meta.env.VITE_WHITELABEL_INVOICE_URL || 'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3'
                           : user?.company_user?.ninja_portal_url,
                         '_blank'
                       )
