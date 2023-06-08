@@ -8,7 +8,6 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { endpoint as apiEndpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { GenericManyResponse } from '$app/common/interfaces/generic-many-response';
 import { Combobox as HeadlessCombobox } from '@headlessui/react';
