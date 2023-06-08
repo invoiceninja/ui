@@ -32,6 +32,7 @@ export interface Context {
 interface Props {
   guards: Guard[];
   component: JSX.Element;
+  type?: 'page' | 'component';
 }
 
 export function useGuardContext() {
@@ -49,12 +50,12 @@ enum State {
   Unauthorized = 'unauthorized',
 }
 
-export function Guard(props: Props) {
+export function Guard({ guards, component, type = 'page' }: Props) {
   const [state, setState] = useState<State>(State.Loading);
   const { companyUser, queryClient, params, user } = useGuardContext();
 
   useEffect(() => {
-    const promises = props.guards.map((guard) =>
+    const promises = guards.map((guard) =>
       guard({ companyUser, queryClient, params, user })
     );
 
@@ -68,16 +69,18 @@ export function Guard(props: Props) {
   });
 
   if (state === State.Loading) {
-    return (
+    return type === 'page' ? (
       <Default>
         <Spinner />
       </Default>
+    ) : (
+      <Spinner />
     );
   }
 
   if (state === State.Unauthorized) {
-    return <Unauthorized />;
+    return type === 'page' ? <Unauthorized /> : null;
   }
 
-  return <Fallback>{props.component}</Fallback>;
+  return <Fallback>{component}</Fallback>;
 }

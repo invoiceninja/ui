@@ -14,11 +14,17 @@ import { DataTable, DataTableColumns } from '$app/components/DataTable';
 import { Check } from 'react-feather';
 import { useTranslation } from 'react-i18next';
 import { route } from '$app/common/helpers/route';
+import { EntityStatus } from '$app/components/EntityStatus';
 
 export function Gateways() {
   const [t] = useTranslation();
 
   const columns: DataTableColumns<CompanyGateway> = [
+    {
+      id: 'status_id',
+      label: t('status'),
+      format: (_, gateway) => <EntityStatus entity={gateway} />,
+    },
     {
       id: 'label',
       label: t('label'),

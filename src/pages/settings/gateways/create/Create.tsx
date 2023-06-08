@@ -9,7 +9,7 @@
  */
 
 import { Card, Element } from '$app/components/cards';
-import { SelectField } from '$app/components/forms';
+import { Button, Link, SelectField } from '$app/components/forms';
 import { useTitle } from '$app/common/hooks/useTitle';
 import { CompanyGateway } from '$app/common/interfaces/company-gateway';
 import { Gateway } from '$app/common/interfaces/statics';
@@ -29,6 +29,19 @@ import { useHandleCreate } from './hooks/useHandleCreate';
 import { blankFeesAndLimitsRecord } from './hooks/useHandleMethodToggle';
 import { TabGroup } from '$app/components/TabGroup';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
+import {
+  availableGatewayLogos,
+  GatewayTypeIcon,
+} from '$app/pages/clients/show/components/GatewayTypeIcon';
+
+const gatewaysStyles = [
+  { key: 'paypal_express', width: 110 },
+  { key: 'mollie', width: 110 },
+  { key: 'eway', width: 170 },
+  { key: 'forte', width: 190 },
+  { key: 'square', width: 130 },
+  { key: 'checkoutcom', width: 170 },
+];
 
 export function Create() {
   const [t] = useTranslation();
@@ -47,12 +60,16 @@ export function Create() {
 
   const [filteredGateways, setFilteredGateways] = useState<Gateway[]>([]);
 
+  const [createBySetup, setCreateBySetup] = useState<boolean>(false);
+
+  const [tabIndex, setTabIndex] = useState<number>(0);
+
   const gateways = useGateways();
 
   const onSave = useHandleCreate(companyGateway, setErrors);
 
-  const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setGateway(gateways.find((gateway) => gateway.id === event.target.value));
+  const handleChange = (value: string) => {
+    setGateway(gateways.find((gateway) => gateway.id === value));
   };
 
   const defaultTab = [t('provider')];
@@ -72,13 +89,23 @@ export function Create() {
 
   const [tabs, setTabs] = useState<string[]>(defaultTab);
 
+  const getGatewayWidth = (provider: string) => {
+    const providerName = provider.toLowerCase();
+
+    const gateway = gatewaysStyles.find(
+      (gateway) => gateway.key === providerName
+    );
+
+    return gateway ? gateway.width : undefined;
+  };
+
   useEffect(() => {
     let existingCompanyGatewaysKeys: string[] = [];
 
     setFilteredGateways(gateways);
 
     companyGateways?.data.data.map((gateway: CompanyGateway) => {
-      if (!gateway.is_deleted || gateway.archived_at == 0) {
+      if (!gateway.is_deleted && gateway.archived_at === 0) {
         existingCompanyGatewaysKeys = [
           ...existingCompanyGatewaysKeys,
           gateway.gateway_key,
@@ -144,6 +171,13 @@ export function Create() {
     }
   }, [gateway]);
 
+  useEffect(() => {
+    if (createBySetup) {
+      onSave();
+      setCreateBySetup(false);
+    }
+  }, [companyGateway]);
+
   return (
     <Settings
       title={documentTitle}
@@ -151,11 +185,11 @@ export function Create() {
       onSaveClick={onSave}
       disableSaveButton={!gateway}
     >
-      <TabGroup tabs={tabs}>
+      <TabGroup tabs={tabs} onTabChange={(index) => setTabIndex(index)}>
         <Card title={t('add_gateway')}>
           <Element leftSide={t('provider')}>
             <SelectField
-              onChange={handleChange}
+              onValueChange={(value) => handleChange(value)}
               value={gateway?.id}
               errorMessage={errors?.errors.gateway_key}
               withBlank
@@ -212,6 +246,46 @@ export function Create() {
           )}
         </div>
       </TabGroup>
+
+      {!tabIndex && (
+        <div className="flex flex-wrap gap-4">
+          {filteredGateways.map(
+            (gateway, index) =>
+              availableGatewayLogos.includes(
+                gateway.provider.toLowerCase()
+              ) && (
+                <Card key={index} className="w-52">
+                  <div className="flex flex-col items-center justify-between space-y-5 h-52">
+                    <div className="flex justify-center items-center border-b border-b-gray-200 w-full h-28">
+                      <GatewayTypeIcon
+                        name={gateway.provider.toLowerCase()}
+                        style={{
+                          width: getGatewayWidth(gateway.provider) || 150,
+                        }}
+                      />
+                    </div>
+
+                    {gateway.site_url && (
+                      <Link external to={gateway.site_url}>
+                        {t('website')}
+                      </Link>
+                    )}
+
+                    <Button
+                      onClick={(event: ChangeEvent<HTMLButtonElement>) => {
+                        event.preventDefault();
+                        setCreateBySetup(true);
+                        handleChange(gateway.id);
+                      }}
+                    >
+                      {t('setup')}
+                    </Button>
+                  </div>
+                </Card>
+              )
+          )}
+        </div>
+      )}
     </Settings>
   );
 }

@@ -21,12 +21,19 @@ interface Props {
   width?: 'full';
   childrenClassName?: string;
   withScrollableContent?: boolean;
+  onTabChange?: (index: number) => void;
 }
 
 export function TabGroup(props: Props) {
   const accentColor = useAccentColor();
 
   const [currentIndex, setCurrentIndex] = useState(props.defaultTabIndex || 0);
+
+  const handleTabChange = (index: number) => {
+    setCurrentIndex(index);
+
+    props.onTabChange?.(index);
+  };
 
   return (
     <div className={props.className}>
@@ -38,7 +45,7 @@ export function TabGroup(props: Props) {
           >
             <button
               type="button"
-              onClick={() => setCurrentIndex(index)}
+              onClick={() => handleTabChange(index)}
               style={{
                 borderColor:
                   currentIndex === index ? accentColor : 'transparent',

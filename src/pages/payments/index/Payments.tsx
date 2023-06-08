@@ -22,6 +22,7 @@ import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { useActions } from '../common/hooks/useActions';
 import { usePaymentFilters } from '../common/hooks/usePaymentFilters';
 import { Payment } from '$app/common/interfaces/payment';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function Payments() {
   useTitle('payments');
@@ -65,6 +66,7 @@ export default function Payments() {
             table="payment"
           />
         }
+        linkToCreateGuards={[permission('create_payment')]}
       />
     </Default>
   );
