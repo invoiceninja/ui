@@ -17,11 +17,15 @@ import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import Toggle from '../../../../components/forms/Toggle';
+import { SelectField } from '$app/components/forms';
+import { Divider } from '$app/components/cards/Divider';
 
 export function Notifications() {
   const [t] = useTranslation();
   const userChanges = useSelector((state: RootState) => state.user.changes);
   const dispatch = useDispatch();
+
+  const [allEvent, setAllEvents] = useState<string>('');
 
   const [isGlobalChecked, setIsGlobalChecked] = useState({
     initial: true,
@@ -105,16 +109,19 @@ export function Notifications() {
 
   return (
     <Card title={t('notifications')}>
-      <Element leftSide={t('all_events')}>
-        <Toggle
-          checked={isGlobalChecked.value}
-          onChange={(value: boolean) =>
-            setIsGlobalChecked({ initial: false, value })
-          }
-        />
+      <Element className="mb-4" leftSide={t('all_events')}>
+        <SelectField
+          value={allEvent}
+          onValueChange={(value) => setAllEvents(value)}
+          withBlank
+        >
+          <option value="all_records">{t('all_records')}</option>
+          <option value="owned_by_user">{t('owned_by_user')}</option>
+          <option value="custom">{t('custom')}</option>
+        </SelectField>
       </Element>
 
-      <div className="pt-6 border-b"></div>
+      <Divider withoutPadding />
 
       {options.map((notification, index) => (
         <Element key={index} className="mt-0" leftSide={notification.label}>
