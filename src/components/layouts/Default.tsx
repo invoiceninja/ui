@@ -375,7 +375,7 @@ export function Default(props: Props) {
 
   return (
     <>
-      {!showSmsVerificationBanner && (
+      {showSmsVerificationBanner && (
         <Banner className="space-x-3">
           <span>{t('verify_phone_number_help')}.</span>
 
@@ -407,7 +407,7 @@ export function Default(props: Props) {
         <DesktopSidebar
           navigation={navigation}
           docsLink={props.docsLink}
-          isBannerDisplayed={!showSmsVerificationBanner}
+          isBannerDisplayed={showSmsVerificationBanner}
         />
 
         <div
