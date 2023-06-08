@@ -53,6 +53,7 @@ interface Props {
   collapsed?: boolean;
   childrenClassName?: string;
   withoutHeaderBorder?: boolean;
+  topRight?: ReactNode;
 }
 
 export function Card(props: Props) {
@@ -106,6 +107,8 @@ export function Card(props: Props) {
                   </p>
                 )}
               </div>
+
+              {props.topRight}
 
               {typeof props.collapsed !== 'undefined' && isCollapsed && (
                 <ChevronDown />

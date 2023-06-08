@@ -22,23 +22,21 @@ import { useSelector } from 'react-redux';
 import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
 
 export function App() {
   const { i18n } = useTranslation();
-
-  const company = useCurrentCompany();
-
+  const user = useCurrentUser();
   const location = useLocation();
-
+  const navigate = useNavigate();
+  const company = useCurrentCompany();
+  const account = useCurrentAccount();
+  const resolveLanguage = useResolveLanguage();
   const switchToCompanySettings = useSwitchToCompanySettings();
 
-  const user = useCurrentUser();
-
-  const account = useCurrentAccount();
-
-  const { isCompanyLevelActive } = useCurrentSettingsLevel();
+  const { isCompanyLevelActive, isGroupLevelActive } =
+    useCurrentSettingsLevel();
 
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
 
@@ -47,8 +45,6 @@ export function App() {
 
   const [showSmsVerificationModal, setShowSmsVerificationModal] =
     useState<boolean>(false);
-
-  const resolveLanguage = useResolveLanguage();
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
@@ -111,6 +107,13 @@ export function App() {
   useEffect(() => {
     if (!location.pathname.startsWith('/settings') && !isCompanyLevelActive) {
       switchToCompanySettings();
+    }
+
+    if (
+      location.pathname.startsWith('/settings/group_settings') &&
+      isGroupLevelActive
+    ) {
+      navigate('/settings/company_details');
     }
   }, [location]);
 

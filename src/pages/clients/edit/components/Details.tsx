@@ -35,7 +35,8 @@ export function Details(props: Props) {
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     props.setClient(
-      (client) => client && set(client, event.target.id, event.target.value)
+      (client) =>
+        client && set({ ...client }, event.target.id, event.target.value)
     );
   };
 
@@ -146,16 +147,20 @@ export function Details(props: Props) {
       <Element leftSide={t('valid_vat_number')}>
         <Toggle
           id="has_valid_vat_number"
-          checked={props.client?.has_valid_vat_number}
-          onValueChange={(value) => handleCustomFieldChange('has_valid_vat_number', value)}
+          checked={props.client?.has_valid_vat_number || false}
+          onValueChange={(value) =>
+            handleCustomFieldChange('has_valid_vat_number', value)
+          }
         />
       </Element>
 
       <Element leftSide={t('tax_exempt')}>
         <Toggle
           id="is_tax_exempt"
-          checked={props.client?.is_tax_exempt}
-          onValueChange={(value) => handleCustomFieldChange('is_tax_exempt', value)}
+          checked={props.client?.is_tax_exempt || false}
+          onValueChange={(value) =>
+            handleCustomFieldChange('is_tax_exempt', value)
+          }
         />
       </Element>
 

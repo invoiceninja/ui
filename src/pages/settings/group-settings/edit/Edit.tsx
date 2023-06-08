@@ -9,7 +9,7 @@
  */
 
 import { useHandleChange } from '../common/hooks/useHandleChange';
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { GroupSettings } from '$app/common/interfaces/group-settings';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { GroupSettingsForm } from '../common/components/GroupSettingsForm';
@@ -32,6 +32,10 @@ import { Card } from '$app/components/cards';
 import { GroupSettingsProperties } from '../common/components/GroupSettingsProperties';
 import classNames from 'classnames';
 import { Clients } from './components/Clients';
+import { Button } from '$app/components/forms';
+import { Icon } from '$app/components/icons/Icon';
+import { Settings as SettingsIcon } from 'react-feather';
+import { useConfigureGroupSettings } from '../common/hooks/useConfigureGroupSettings';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -43,6 +47,8 @@ export function Edit() {
   const { data: groupSettingsResponse } = useGroupQuery({ id });
 
   const actions = useActions();
+
+  const configureGroupSettings = useConfigureGroupSettings();
 
   const pages = [
     { name: t('settings'), href: '/settings' },
@@ -75,7 +81,7 @@ export function Edit() {
     }
   }, [groupSettingsResponse]);
 
-  const shouldShowGroupSettingsProperties = () => {
+  const getShouldShowProperties = () => {
     const filteredProperties = Object.keys(
       groupSettings?.settings || []
     ).filter((key) => key !== 'entity');
@@ -105,11 +111,29 @@ export function Edit() {
     >
       <TabGroup tabs={[t('overview'), t('clients'), t('documents')]}>
         <div>
-          {groupSettings && (
-            <Card title={t('edit_group')}>
+          {groupSettings && groupSettingsResponse && (
+            <Card
+              title={t('edit_group')}
+              topRight={
+                <Button
+                  onClick={(event: FormEvent<HTMLButtonElement>) => {
+                    event.preventDefault();
+                    configureGroupSettings(groupSettingsResponse);
+                  }}
+                >
+                  <Icon
+                    className="h-4 w-4"
+                    element={SettingsIcon}
+                    color="white"
+                  />
+
+                  <span>{t('configure_settings')}</span>
+                </Button>
+              }
+            >
               <div
                 className={classNames({
-                  'pb-4': shouldShowGroupSettingsProperties(),
+                  'pb-4': getShouldShowProperties(),
                 })}
               >
                 <GroupSettingsForm
@@ -119,7 +143,7 @@ export function Edit() {
                 />
               </div>
 
-              {shouldShowGroupSettingsProperties() && (
+              {getShouldShowProperties() && (
                 <>
                   <Divider withoutPadding />
 

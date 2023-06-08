@@ -163,7 +163,7 @@ export function AdditionalInfo(props: Props) {
 
           <Element leftSide={t('send_reminders')}>
             <Toggle
-              checked={props.client?.settings.send_reminders}
+              checked={props.client?.settings?.send_reminders || false}
               onChange={(value) =>
                 props.setClient(
                   (client) =>

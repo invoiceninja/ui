@@ -24,21 +24,17 @@ import { BiPlusCircle } from 'react-icons/bi';
 import { useQueryClient } from 'react-query';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useSetAtom } from 'jotai';
-import { activeGroupSettingsAtom } from '$app/common/atoms/settings';
-import { useDispatch } from 'react-redux';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
-import { setActiveSettings } from '$app/common/stores/slices/settings';
-import { updateChanges } from '$app/common/stores/slices/company-users';
+import { route } from '$app/common/helpers/route';
+import { useConfigureGroupSettings } from './useConfigureGroupSettings';
 
 export function useActions() {
   const [t] = useTranslation();
   const location = useLocation();
-  const dispatch = useDispatch();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
-  const setActiveSettingsAtom = useSetAtom(activeGroupSettingsAtom);
+  const configureGroupSettings = useConfigureGroupSettings();
 
   const { id } = useParams();
 
@@ -55,26 +51,7 @@ export function useActions() {
           endpoint('/api/v1/group_settings/:id', { id: groupSettingsId })
         )
           .then((response: GenericSingleResourceResponse<GroupSettings>) => {
-            setActiveSettingsAtom(response.data.data);
-
-            dispatch(
-              updateChanges({
-                object: 'company',
-                property: 'settings',
-                value: response.data.data.settings,
-              })
-            );
-
-            dispatch(
-              setActiveSettings({
-                status: {
-                  name: response.data.data.name,
-                  level: 'group',
-                },
-              })
-            );
-
-            navigate('/settings/company_details');
+            configureGroupSettings(response.data.data);
           })
           .catch((error) => {
             toast.error();
@@ -85,7 +62,7 @@ export function useActions() {
 
   const actions: Action<GroupSettings>[] = [
     (group) =>
-      getEntityState(group) === EntityState.Active && (
+      !isEditPage && (
         <DropdownElement
           onClick={() => fetchGroupSettingsDetails(group.id)}
           icon={<Icon className="h-4 w-4" element={Settings} />}
@@ -96,7 +73,13 @@ export function useActions() {
     (group) =>
       getEntityState(group) === EntityState.Active && (
         <DropdownElement
-          //onClick={() => bulk(group.id, 'archive')}
+          onClick={() =>
+            navigate(
+              route('/clients/create?group=:groupId', {
+                groupId: group.id,
+              })
+            )
+          }
           icon={<Icon element={BiPlusCircle} />}
         >
           {t('new_client')}
