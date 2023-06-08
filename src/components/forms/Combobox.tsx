@@ -272,7 +272,7 @@ export function ComboboxStatic({
 }
 
 interface ComboboxAsyncProps<T> {
-  endpoint: string;
+  endpoint: URL;
   inputOptions: InputOptions;
   entryOptions: {
     id: string;
@@ -306,21 +306,21 @@ export function ComboboxAsync<T = any>({
   onDismiss,
 }: ComboboxAsyncProps<T>) {
   const [entries, setEntries] = useState<Entry<T>[]>([]);
-  const [url, setUrl] = useState<string|null>(null);
+  const [url, setUrl] = useState(endpoint);
+
+  console.log(url.searchParams.toString());
 
   const { data } = useQuery(
-    [url],
+    [url.pathname, url.searchParams.toString()],
     () => {
-      const $url = new URL(apiEndpoint(endpoint));
-
-      $url.searchParams.set('sort', sortBy);
-      $url.searchParams.set('status', 'active');
+      url.searchParams.set('sort', sortBy);
+      url.searchParams.set('status', 'active');
 
       if (inputOptions.value) {
-        $url.searchParams.set('with', inputOptions.value.toString());
+        url.searchParams.set('with', inputOptions.value.toString());
       }
 
-      return request('GET', $url.href).then(
+      return request('GET', url.href).then(
         (response: AxiosResponse<GenericManyResponse<any>>) => {
           const data: Entry<T>[] = [];
 
@@ -340,7 +340,6 @@ export function ComboboxAsync<T = any>({
     },
     {
       staleTime: staleTime ?? Infinity,
-      enabled: url !== null
     }
   );
 
@@ -355,14 +354,12 @@ export function ComboboxAsync<T = any>({
   }, []);
 
   const onEmptyValues = (query: string) => {
-    setUrl(() => {
-      const url = new URL(apiEndpoint(endpoint));
-
-      if (query.length > 0) {
-        url.searchParams.set('filter', query);
+    setUrl((current) => {
+      if (query.length > 0 && current) {
+        current.searchParams.set('filter', query);
       }
-
-      return url.href;
+      
+      return new URL(current.href);
     });
   };
 

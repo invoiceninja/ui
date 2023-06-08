@@ -14,6 +14,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync, Entry } from '../forms/Combobox';
 import { Alert } from '../Alert';
+import { endpoint } from '$app/common/helpers';
 
 interface Props {
   defaultValue?: string | number | boolean;
@@ -39,7 +40,7 @@ export function ProductSelector(props: Props) {
       />
 
       <ComboboxAsync<Product>
-        endpoint="/api/v1/products?per_page=500"
+        endpoint={new URL(endpoint('/api/v1/products?per_page=500'))}
         inputOptions={{ value: props.defaultValue ?? null }}
         entryOptions={{ id: 'id', label: 'product_key', value: 'id' }}
         onChange={(product) => props.onChange && props.onChange(product)}
