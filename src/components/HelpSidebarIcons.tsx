@@ -137,7 +137,7 @@ export function HelpSidebarIcons(props: Props) {
         <Button
           onClick={() => {
             window.open(
-              'https://invoiceninja.github.io/docs/self-host-troubleshooting/#cron-not-running-queue-not-running',
+              'https://invoiceninja.github.io/en/self-host-troubleshooting/#cron-not-running-queue-not-running',
               '_blank'
             );
           }}

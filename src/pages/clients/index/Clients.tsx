@@ -25,6 +25,9 @@ import { MergeClientModal } from '../common/components/MergeClientModal';
 import { useState } from 'react';
 import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { usePurgeClient } from '../common/hooks/usePurgeClient';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function Clients() {
   useTitle('clients');
@@ -69,7 +72,15 @@ export default function Clients() {
         linkToEdit="/clients/:id/edit"
         withResourcefulActions
         customActions={actions}
-        rightSide={<ImportButton route="/clients/import" />}
+        rightSide={
+          <Guard
+            type="component"
+            guards={[
+              or(permission('create_client'), permission('edit_client')),
+            ]}
+            component={<ImportButton route="/clients/import" />}
+          />
+        }
         leftSideChevrons={
           <DataTableColumnsPicker
             table="client"
@@ -77,6 +88,7 @@ export default function Clients() {
             defaultColumns={defaultColumns}
           />
         }
+        linkToCreateGuards={[permission('create_client')]}
       />
 
       <MergeClientModal

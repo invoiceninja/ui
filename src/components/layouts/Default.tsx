@@ -79,6 +79,7 @@ export function Default(props: Props) {
 
   const account = useCurrentAccount();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const whiteLabelLink = import.meta.env
     .VITE_WHITELABEL_INVOICE_URL as unknown as string;
 
@@ -439,7 +440,8 @@ export function Default(props: Props) {
                     onClick={() =>
                       window.open(
                         isSelfHosted()
-                          ? whiteLabelLink
+                          ? import.meta.env.VITE_WHITELABEL_INVOICE_URL ||
+                              'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3'
                           : user?.company_user?.ninja_portal_url,
                         '_blank'
                       )
