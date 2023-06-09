@@ -13,7 +13,6 @@ import { request } from '$app/common/helpers/request';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTitle } from '$app/common/hooks/useTitle';
 import {
-  deletePassword,
   injectInChanges,
   resetChanges,
   updateUser,
@@ -33,6 +32,8 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { useAdmin } from '$app/common/hooks/permissions/useHasPermission';
+import { useSetAtom } from 'jotai';
+import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 
 export function UserDetails() {
   useTitle('user_details');
@@ -53,6 +54,8 @@ export function UserDetails() {
   const dispatch = useDispatch();
 
   const company = useInjectCompanyChanges();
+
+  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   const [isPasswordConfirmModalOpen, setPasswordConfirmModalOpen] =
     useState(false);
@@ -103,6 +106,7 @@ export function UserDetails() {
       .catch((error: AxiosError<ValidationBag>) => {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
+          setLastPasswordEntryTime(0);
         } else if (error.response?.status == 422) {
           toast.dismiss();
           setErrors(error.response.data);
@@ -110,8 +114,7 @@ export function UserDetails() {
           console.error(error);
           toast.error();
         }
-      })
-      .finally(() => dispatch(deletePassword()));
+      });
   };
 
   useEffect(() => {

@@ -21,6 +21,11 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
+import dayjs from 'dayjs';
+import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
+import { atom, useSetAtom } from 'jotai';
+
+export const dayJSLocaleAtom = atom<ILocale | null>(null);
 
 export function App() {
   const { i18n } = useTranslation();
@@ -31,6 +36,8 @@ export function App() {
 
   const account = useCurrentAccount();
 
+  const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
+
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
 
   const [showCompanyActivityModal, setShowCompanyActivityModal] =
@@ -40,6 +47,8 @@ export function App() {
     useState<boolean>(false);
 
   const resolveLanguage = useResolveLanguage();
+
+  const resolveDayJSLocale = useResolveDayJSLocale();
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
@@ -55,6 +64,11 @@ export function App() {
       : document.querySelector('html')?.classList.remove('dark');
 
     if (resolvedLanguage?.locale) {
+      resolveDayJSLocale(resolvedLanguage.locale).then((resolvedLocale) => {
+        updateDayJSLocale(resolvedLocale);
+        dayjs.locale(resolvedLocale);
+      });
+
       if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
         fetch(
           new URL(

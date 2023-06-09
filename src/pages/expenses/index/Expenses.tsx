@@ -21,6 +21,7 @@ import {
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { ImportButton } from '$app/components/import/ImportButton';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function Expenses() {
   useTitle('expenses');
@@ -64,6 +65,7 @@ export default function Expenses() {
             table="expense"
           />
         }
+        linkToCreateGuards={[permission('create_expense')]}
       />
     </Default>
   );

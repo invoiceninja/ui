@@ -47,6 +47,9 @@ export interface Company {
   e_invoice_passphrase: string;
   has_e_invoice_certificate: boolean;
   has_e_invoice_certificate_passphrase: boolean;
+  default_password_timeout: number;
+  subdomain: string;
+  client_can_register: boolean;
 }
 
 export interface CompanyInput {
@@ -57,6 +60,7 @@ export interface CompanyInput {
 }
 
 export interface Settings {
+  accept_client_input_quote_approval: boolean;
   auto_archive_invoice: boolean;
   auto_bill_standard_invoices: boolean;
   lock_invoices: string;
@@ -133,7 +137,7 @@ export interface Settings {
   shared_invoice_quote_counter: boolean;
   shared_invoice_credit_counter: boolean;
   recurring_number_prefix: string;
-  reset_counter_frequency_id: string;
+  reset_counter_frequency_id: number;
   reset_counter_date: string;
   counter_padding: number;
   auto_bill: string;

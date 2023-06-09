@@ -77,7 +77,7 @@ export function SecuritySettings() {
       <Element leftSide={t('password_timeout')}>
         <SelectField
           id="default_password_timeout"
-          value={companyChanges?.default_password_timeout || false}
+          value={companyChanges?.default_password_timeout}
           onChange={handleChange}
         >
           {options.map((option) => (
@@ -91,7 +91,7 @@ export function SecuritySettings() {
       <Element leftSide={t('web_session_timeout')}>
         <SelectField
           id="session_timeout"
-          value={companyChanges?.session_timeout || false}
+          value={companyChanges?.session_timeout}
           onChange={handleChange}
         >
           {options.map((option) => (

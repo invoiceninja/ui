@@ -44,6 +44,7 @@ export interface Client extends Timestamps {
   group_settings_id: string;
   paid_to_date: number;
   credit_balance: number;
+  payment_balance: number;
   last_login: number;
   size_id: string;
   public_notes: string;

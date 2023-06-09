@@ -28,6 +28,8 @@ import { Actions } from './components/Actions';
 import { Details } from './components/Details';
 import { Notifications } from './components/Notifications';
 import { Permissions } from './components/Permissions';
+import { useSetAtom } from 'jotai';
+import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 
 export function Edit() {
   const [passwordValidated, setPasswordValidated] = useState(false);
@@ -56,6 +58,8 @@ export function Edit() {
   const currentUser = useCurrentUser();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   useEffect(() => {
     if (
@@ -105,9 +109,13 @@ export function Edit() {
         toast.dismiss();
       })
       .catch((error: AxiosError) => {
-        error.response?.status === 412
-          ? toast.error('password_error_incorrect')
-          : toast.error();
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+          setLastPasswordEntryTime(0);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       });
   };
 

@@ -23,6 +23,7 @@ import {
 } from '../common/hooks';
 import { DataTableColumnsPicker } from '$app/components/DataTableColumnsPicker';
 import { Inline } from '$app/components/Inline';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function Tasks() {
   const { documentTitle } = useTitle('tasks');
@@ -45,7 +46,7 @@ export default function Tasks() {
         resource="task"
         columns={columns}
         customActions={actions}
-        endpoint="/api/v1/tasks?include=status,client&sort=id|desc"
+        endpoint="/api/v1/tasks?include=status,client,project&sort=id|desc"
         bulkRoute="/api/v1/tasks/bulk"
         linkToCreate="/tasks/create"
         customFilters={filters}
@@ -67,6 +68,7 @@ export default function Tasks() {
             </Inline>
           </Link>
         }
+        linkToCreateGuards={[permission('create_task')]}
       />
     </Default>
   );

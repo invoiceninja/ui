@@ -12,6 +12,10 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, InputField } from './forms';
 import { Modal } from './Modal';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import dayjs from 'dayjs';
+import { useAtom } from 'jotai';
+import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 
 interface Props {
   show?: boolean;
@@ -23,23 +27,42 @@ export function PasswordConfirmation(props: Props) {
   const [t] = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
+  const company = useCurrentCompany();
 
   const [isModalOpen, setIsModalOpen] = useState(props.show ?? false);
   const [currentPassword, setCurrentPassword] = useState('');
 
-  const isPasswordRequired = true;
+  const [lastPasswordEntryTime, setLastPasswordEntryTime] = useAtom(
+    lastPasswordEntryTimeAtom
+  );
+
+  const lastPwdTimeDiff = dayjs().unix() - lastPasswordEntryTime;
+
+  const isPasswordTimeoutExpired =
+    lastPwdTimeDiff > company.default_password_timeout / 1000 &&
+    company.default_password_timeout > 0;
 
   useEffect(() => {
     setIsModalOpen(props.show as boolean);
   }, [props.show]);
 
-  const handleConfirm = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    props.onClose(false);
-    props.onSave(currentPassword, isPasswordRequired);
-
+  const handleConfirm = (
+    event?: FormEvent<HTMLFormElement>,
+    isFormConfirmation?: boolean
+  ) => {
+    event?.preventDefault();
+    props.onSave(currentPassword, true);
+    isFormConfirmation && setLastPasswordEntryTime(dayjs().unix());
     setCurrentPassword('');
+
+    props.onClose(false);
   };
+
+  useEffect(() => {
+    if (isModalOpen && !isPasswordTimeoutExpired) {
+      handleConfirm();
+    }
+  }, [isModalOpen]);
 
   return (
     <Modal
@@ -48,11 +71,11 @@ export function PasswordConfirmation(props: Props) {
           ? navigate('/settings/users')
           : props.onClose(false)
       }
-      visible={isModalOpen}
+      visible={isModalOpen && isPasswordTimeoutExpired}
       title={t('confirmation')}
       text={t('please_enter_your_password')}
     >
-      <form onSubmit={handleConfirm}>
+      <form onSubmit={(event) => handleConfirm(event, true)}>
         <InputField
           id="current_password"
           type="password"
@@ -66,7 +89,9 @@ export function PasswordConfirmation(props: Props) {
       </form>
       <Button
         disabled={currentPassword.length === 0}
-        onClick={handleConfirm}
+        onClick={(event: FormEvent<HTMLFormElement>) =>
+          handleConfirm(event, true)
+        }
         disableWithoutIcon
       >
         {t('continue')}
