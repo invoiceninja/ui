@@ -27,7 +27,7 @@ import {
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Button, Link } from '$app/components/forms';
+import { Button } from '$app/components/forms';
 import { Breadcrumbs, Page } from '$app/components/Breadcrumbs';
 import { useSelector } from 'react-redux';
 import { RootState } from '$app/common/stores/store';
@@ -50,8 +50,8 @@ import { useEnabled } from '$app/common/guards/guards/enabled';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
-import { Banner } from '../Banner';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
+import { PhoneVerificationBanner } from '../PhoneVerificationBanner';
 
 export interface SaveOption {
   label: string;
@@ -371,27 +371,7 @@ export function Default(props: Props) {
 
   return (
     <>
-      {showSmsVerificationBanner && (
-        <Banner className="space-x-3">
-          <span>{t('verify_phone_number_help')}.</span>
-
-          <div className="flex space-x-1">
-            <Link
-              className="font-medium text-xs md:text-sm"
-              to="/settings/user_details/enable_two_factor"
-            >
-              {t('verify_phone_number')}
-            </Link>
-
-            <span
-              className="font-medium"
-              style={{ color: 'rgb(48, 129, 199)' }}
-            >
-              &rarr;
-            </span>
-          </div>
-        </Banner>
-      )}
+      {showSmsVerificationBanner && <PhoneVerificationBanner />}
 
       <div>
         <MobileSidebar

@@ -10,13 +10,14 @@
 
 import { Button, InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
+import classNames from 'classnames';
 import { Dispatch, SetStateAction, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
   visible: boolean;
   setVisible: Dispatch<SetStateAction<boolean>>;
-  resendSmsCode: () => void;
+  resendSmsCode?: () => void;
   verifyPhoneNumber: (code: string) => void;
 }
 
@@ -81,7 +82,10 @@ export function SmsVerificationModal(props: Props) {
     <Modal
       title={t('sms_code')}
       visible={props.visible}
-      onClose={() => props.setVisible(false)}
+      onClose={() => {
+        props.setVisible(false);
+        setCode(initialCodeValue);
+      }}
     >
       <div>
         <div className="flex justify-end mb-1">
@@ -102,10 +106,17 @@ export function SmsVerificationModal(props: Props) {
           ))}
         </div>
 
-        <div className="flex justify-between mt-8">
-          <Button type="minimal" onClick={() => props.resendSmsCode()}>
-            {t('resend_code')}
-          </Button>
+        <div
+          className={classNames('flex mt-8', {
+            'justify-between': props.resendSmsCode,
+            'justify-end': !props.resendSmsCode,
+          })}
+        >
+          {props.resendSmsCode && (
+            <Button type="minimal" onClick={() => props.resendSmsCode?.()}>
+              {t('resend_code')}
+            </Button>
+          )}
 
           <Button
             onClick={() => props.verifyPhoneNumber(code.join(''))}
