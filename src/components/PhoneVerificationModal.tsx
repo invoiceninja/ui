@@ -11,7 +11,7 @@
 import { useTranslation } from 'react-i18next';
 import { Button, InputField, SelectField } from './forms';
 import { Modal } from './Modal';
-import { Dispatch, FormEvent, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { useCountries } from '$app/common/hooks/useCountries';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
@@ -51,15 +51,13 @@ export function PhoneVerificationModal(props: Props) {
     setErrors(undefined);
   };
 
-  const handleSendSMSCode = (event: FormEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-
+  const handleSendSMSCode = () => {
     setErrors(undefined);
 
     toast.processing();
 
     request('POST', endpoint('/api/v1/verify'), {
-      phone: `+38761602460`,
+      phone: `+${countryCode}${phoneNumber}`,
     })
       .then(() => {
         toast.success('check_phone_code');
@@ -151,7 +149,14 @@ export function PhoneVerificationModal(props: Props) {
           <Alert type="danger">{errors.errors.phone}</Alert>
         )}
 
-        <Button className="self-end" type="primary" onClick={handleSendSMSCode}>
+        <Button
+          className="self-end"
+          behavior="button"
+          type="primary"
+          onClick={handleSendSMSCode}
+          disableWithoutIcon
+          disabled={!countryCode || !phoneNumber}
+        >
           {t('send_code')}
         </Button>
       </Modal>

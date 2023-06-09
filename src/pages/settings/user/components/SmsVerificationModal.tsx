@@ -11,7 +11,7 @@
 import { Button, InputField } from '$app/components/forms';
 import { Modal } from '$app/components/Modal';
 import classNames from 'classnames';
-import { Dispatch, SetStateAction, useRef, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 interface Props {
@@ -77,6 +77,13 @@ export function SmsVerificationModal(props: Props) {
 
     setCode(initialCodeValue);
   };
+
+  useEffect(() => {
+    if (!props.visible) {
+      setIsCodeEntered(false);
+      setCode(initialCodeValue);
+    }
+  }, [props.visible]);
 
   return (
     <Modal
