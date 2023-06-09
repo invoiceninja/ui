@@ -65,12 +65,12 @@ export function Standing(props: Props) {
                   </span>
                 </div>
                     
-                {client.unapplied_payments > 0 && (
+                {client.payment_balance > 0 && (
                 <div className="flex items-center justify-between">
                   <p className="font-semibold">{t('payments')}</p>
                   <span>
                     {formatMoney(
-                      client.unapplied_payments,
+                      client.payment_balance,
                       client.country_id,
                       client.settings.currency_id
                     )}
