@@ -30,14 +30,18 @@ import { PasswordConfirmation } from '$app/components/PasswordConfirmation';
 import { Spinner } from '$app/components/Spinner';
 import prettyBytes from 'pretty-bytes';
 import { useState } from 'react';
-import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { MdDelete, MdDownload, MdPageview } from 'react-icons/md';
 import { useQueryClient } from 'react-query';
+import { useSetAtom } from 'jotai';
+import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { toast } from '$app/common/helpers/toast/toast';
 
 export function Table() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [perPage, setPerPage] = useState<string>('10');
@@ -55,7 +59,7 @@ export function Table() {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const destroy = (password: string, isRequired = true) => {
-    const toastId = toast.loading(t('processing'));
+    toast.processing();
 
     request(
       'delete',
@@ -63,11 +67,15 @@ export function Table() {
       {},
       { headers: { 'X-Api-Password': password } }
     )
-      .then(() => toast.success(t('deleted_document'), { id: toastId }))
+      .then(() => toast.success('deleted_document'))
       .catch((error) => {
-        console.error(error);
-
-        toast.error(t('error_title'), { id: toastId });
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+          setLastPasswordEntryTime(0);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       })
       .finally(() => queryClient.invalidateQueries('/api/v1/documents'));
   };
