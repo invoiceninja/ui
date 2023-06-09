@@ -53,6 +53,18 @@ export function Standing(props: Props) {
                     )}
                   </span>
                 </div>
+
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold">{t('credit_balance')}</p>
+                  <span>
+                    {formatMoney(
+                      client.credit_balance,
+                      client.country_id,
+                      client.settings.currency_id
+                    )}
+                  </span>
+                </div>
+
               </div>
             }
             className="h-full"
