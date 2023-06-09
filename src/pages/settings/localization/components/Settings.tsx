@@ -36,7 +36,7 @@ export function Settings() {
 
   const handleChange = useHandleCurrentCompanyChange();
 
-  const [hasLanguageIdChanged, setHasLanguageIdChanged] = useAtom(
+  const [, setHasLanguageIdChanged] = useAtom(
     hasLanguageChanged
   );
 
