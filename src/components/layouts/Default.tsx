@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { FormEvent, ReactElement, ReactNode, useState } from 'react';
+import { FormEvent, ReactElement, ReactNode, useEffect, useState } from 'react';
 import {
   Home,
   Menu as MenuIcon,
@@ -41,7 +41,7 @@ import { BiBuildings, BiWallet, BiFile } from 'react-icons/bi';
 import { AiOutlineBank } from 'react-icons/ai';
 import { ModuleBitmask } from '$app/pages/settings/account-management/component';
 import { QuickCreatePopover } from '$app/components/QuickCreatePopover';
-import { isDemo, isSelfHosted } from '$app/common/helpers';
+import { isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useUnlockButtonForHosted } from '$app/common/hooks/useUnlockButtonForHosted';
 import { useUnlockButtonForSelfHosted } from '$app/common/hooks/useUnlockButtonForSelfHosted';
@@ -50,6 +50,8 @@ import { useEnabled } from '$app/common/guards/guards/enabled';
 import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
+import { CompanyActivationBanner } from '../CompanyActivationBanner';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export interface SaveOption {
   label: string;
@@ -75,6 +77,8 @@ interface Props extends CommonProps {
 export function Default(props: Props) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const company = useCurrentCompany();
+
   const shouldShowUnlockButton =
     !isDemo() && (useUnlockButtonForHosted() || useUnlockButtonForSelfHosted());
 
@@ -84,6 +88,9 @@ export function Default(props: Props) {
 
   const [t] = useTranslation();
   const user = useCurrentUser();
+
+  const [showCompanyActivationBanner, setCompanyActivationBanner] =
+    useState<boolean>(false);
 
   const hasPermission = useHasPermission();
   const location = useLocation();
@@ -331,11 +338,10 @@ export function Default(props: Props) {
       current: location.pathname.startsWith('/transactions'),
       visible:
         enabled(ModuleBitmask.Transactions) &&
-        (
-        hasPermission('view_bank_transaction') ||
-        hasPermission('create_bank_transaction') ||
-        hasPermission('edit_bank_transaction')),
-        rightButton: {
+        (hasPermission('view_bank_transaction') ||
+          hasPermission('create_bank_transaction') ||
+          hasPermission('edit_bank_transaction')),
+      rightButton: {
         icon: PlusCircle,
         to: '/transactions/create',
         label: t('new_transaction'),
@@ -357,8 +363,16 @@ export function Default(props: Props) {
   const { isOwner } = useAdmin();
   const saveBtn = useSaveBtn();
 
+  useEffect(() => {
+    if (company) {
+      setCompanyActivationBanner(company.is_disabled && isHosted());
+    }
+  }, [company]);
+
   return (
     <>
+      {showCompanyActivationBanner && <CompanyActivationBanner />}
+
       <div>
         <MobileSidebar
           navigation={navigation}
@@ -366,7 +380,11 @@ export function Default(props: Props) {
           setSidebarOpen={setSidebarOpen}
         />
 
-        <DesktopSidebar navigation={navigation} docsLink={props.docsLink} />
+        <DesktopSidebar
+          navigation={navigation}
+          docsLink={props.docsLink}
+          isBannerDisplayed={showCompanyActivationBanner}
+        />
 
         <div
           className={`${
@@ -398,7 +416,8 @@ export function Default(props: Props) {
                     onClick={() =>
                       window.open(
                         isSelfHosted()
-                          ? import.meta.env.VITE_WHITELABEL_INVOICE_URL || 'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3'
+                          ? import.meta.env.VITE_WHITELABEL_INVOICE_URL ||
+                              'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3'
                           : user?.company_user?.ninja_portal_url,
                         '_blank'
                       )

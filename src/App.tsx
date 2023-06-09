@@ -40,9 +40,6 @@ export function App() {
 
   const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
 
-  const [showCompanyActivityModal, setShowCompanyActivityModal] =
-    useState<boolean>(false);
-
   const [showSmsVerificationModal, setShowSmsVerificationModal] =
     useState<boolean>(false);
 
@@ -103,25 +100,9 @@ export function App() {
     }
   }, [account]);
 
-  useEffect(() => {
-    const modalShown = sessionStorage.getItem('COMPANY-ACTIVITY-SHOWN');
-
-    if (company && (modalShown === 'false' || !modalShown)) {
-      setShowCompanyActivityModal(company.is_disabled);
-
-      sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'true');
-    }
-  }, [company]);
-
   return (
     <div className="App">
       <VerifyModal visible={!isEmailVerified && isHosted()} type="email" />
-
-      <AccountWarningsModal
-        type="activity"
-        visible={Boolean(company) && showCompanyActivityModal}
-        setVisible={setShowCompanyActivityModal}
-      />
 
       <AccountWarningsModal
         type="phone"
