@@ -30,6 +30,8 @@ import { useQueryClient } from 'react-query';
 import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
 import { TaskClock } from './TaskClock';
+import { date as formatDate } from '$app/common/helpers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 export function ViewSlider() {
   const [t] = useTranslation();
@@ -39,6 +41,8 @@ export function ViewSlider() {
   const accentColor = useAccentColor();
   const formatMoney = useFormatMoney();
   const formatTimeLog = useFormatTimeLog();
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   const [currentTask] = useAtom(currentTaskAtom);
 
@@ -85,7 +89,7 @@ export function ViewSlider() {
               <ClickableElement key={i}>
                 <div className="flex items-center justify-between">
                   <div className="flex flex-col">
-                    <p>{date}</p>
+                    <p>{formatDate(date, dateFormat)}</p>
 
                     <small>
                       {start} - {end}

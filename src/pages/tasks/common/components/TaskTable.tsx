@@ -21,10 +21,10 @@ import {
   handleTaskDateChange,
   handleTaskDurationChange,
   handleTaskTimeChange,
-  parseTime,
   parseTimeToDate,
 } from '../helpers';
 import { parseTimeLog, TimeLogsType } from '../helpers/calculate-time';
+import { TimePicker } from '$app/components/forms/TimePicker';
 
 interface Props {
   task: Task;
@@ -153,8 +153,10 @@ export function TaskTable(props: Props) {
     if (typeof lastChangedIndex === 'number') {
       const parsedTimeLog = parseTimeLog(task.time_log);
 
-      const startTime = parsedTimeLog[lastChangedIndex][0];
-      const endTime = parsedTimeLog[lastChangedIndex][1];
+      const startTime =
+        parsedTimeLog[lastChangedIndex] && parsedTimeLog[lastChangedIndex][0];
+      const endTime =
+        parsedTimeLog[lastChangedIndex] && parsedTimeLog[lastChangedIndex][1];
 
       if (startTime && endTime && startTime > endTime) {
         parsedTimeLog[lastChangedIndex][1] = startTime;
@@ -196,13 +198,11 @@ export function TaskTable(props: Props) {
                   </Td>
 
                   <Td>
-                    <InputField
-                      type="time"
-                      value={parseTime(start)}
+                    <TimePicker
+                      value={start}
                       onValueChange={(value) =>
                         handleTimeChange(start, value, LogPosition.Start, index)
                       }
-                      step="1"
                     />
                   </Td>
 
@@ -219,13 +219,11 @@ export function TaskTable(props: Props) {
                   )}
 
                   <Td>
-                    <InputField
-                      type="time"
-                      value={parseTime(stop || 0)}
+                    <TimePicker
+                      value={stop || 0}
                       onValueChange={(value) =>
                         handleTimeChange(stop, value, LogPosition.End, index)
                       }
-                      step="1"
                     />
                   </Td>
 
