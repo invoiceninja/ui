@@ -8,6 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Project } from './project';
 import { Client } from './client';
 import { TaskStatus } from './task-status';
 
@@ -38,5 +39,6 @@ export interface Task {
   updated_at: number;
   client?: Client;
   status?: TaskStatus;
+  project?: Project;
   documents: any[];
 }
