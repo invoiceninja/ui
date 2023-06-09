@@ -57,6 +57,12 @@ export function usePaymentFilters() {
       color: 'white',
       backgroundColor: '#6B7280',
     },
+    {
+      label: t('partially_unapplied'),
+      value: 'partially_unapplied',
+      color: 'white',
+      backgroundColor: '#bf83cc',
+    }
   ];
 
   return filters;
