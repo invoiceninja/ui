@@ -67,6 +67,7 @@ export function useAllTaskColumns() {
     'status',
     'number',
     'client',
+    'project',
     //   'project',  @Todo: Need to fetch relationship
     'description',
     'duration',
@@ -122,6 +123,14 @@ export function useTaskColumns() {
     });
 
   const columns: DataTableColumnsExtended<Task, TaskColumns> = [
+    {
+      column: 'project',
+      id: 'project_id',
+      label: t('project'),
+      format: (value, task) =>(
+        <Link to={route('/projects/:id/edit', { id: task?.project?.id })}>{task?.project?.name}</Link>
+      ),
+    },
     {
       column: 'status',
       id: 'status_id',

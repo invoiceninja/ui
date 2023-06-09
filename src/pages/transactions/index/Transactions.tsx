@@ -19,6 +19,9 @@ import { Details } from '../components/Details';
 import { Slider } from '$app/components/cards/Slider';
 import { Transaction } from '$app/common/interfaces/transactions';
 import { useTransactionFilters } from '../common/hooks/useTransactionFilters';
+import { Guard } from '$app/common/guards/Guard';
+import { or } from '$app/common/guards/guards/or';
+import { permission } from '$app/common/guards/guards/permission';
 
 export default function Transactions() {
   useTitle('transactions');
@@ -80,8 +83,20 @@ export default function Transactions() {
           customFilters={filters}
           customFilterQueryKey="client_status"
           customFilterPlaceholder="status"
-          rightSide={<ImportButton route="/transactions/import" />}
+          rightSide={
+            <Guard
+              type="component"
+              guards={[
+                or(
+                  permission('create_bank_transaction'),
+                  permission('edit_bank_transaction')
+                ),
+              ]}
+              component={<ImportButton route="/transactions/import" />}
+            />
+          }
           withResourcefulActions
+          linkToCreateGuards={[permission('create_bank_transaction')]}
         />
       </Default>
     </>
