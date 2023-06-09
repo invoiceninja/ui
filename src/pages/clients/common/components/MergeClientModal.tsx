@@ -26,6 +26,8 @@ import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { useSetAtom } from 'jotai';
+import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 
 interface Props {
   visible: boolean;
@@ -39,6 +41,8 @@ export function MergeClientModal(props: Props) {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   const [mergeIntoClientId, setMergeIntoClientId] = useState<string>('');
 
@@ -93,6 +97,7 @@ export function MergeClientModal(props: Props) {
         .catch((error: AxiosError) => {
           if (error.response?.status === 412) {
             toast.error('password_error_incorrect');
+            setLastPasswordEntryTime(0);
           } else {
             console.error(error);
             toast.error();

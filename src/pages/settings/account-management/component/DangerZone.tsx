@@ -19,11 +19,15 @@ import { route } from '$app/common/helpers/route';
 import { useSelector } from 'react-redux';
 import { RootState } from '$app/common/stores/store';
 import { toast } from '$app/common/helpers/toast/toast';
+import { useSetAtom } from 'jotai';
+import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 
 export function DangerZone() {
   const [t] = useTranslation();
 
   const company = useCurrentCompany();
+
+  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   const companyUsers = useSelector((state: RootState) => state.companyUsers);
 
@@ -48,9 +52,13 @@ export function DangerZone() {
     )
       .then(() => toast.success('purge_successful'))
       .catch((error) => {
-        console.error(error);
-
-        toast.error();
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+          setLastPasswordEntryTime(0);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       })
       .finally(() => setIsPurgeModalOpen(false));
   };
@@ -68,9 +76,13 @@ export function DangerZone() {
     )
       .then(() => window.location.reload())
       .catch((error) => {
-        console.error(error);
-
-        toast.error();
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+          setLastPasswordEntryTime(0);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       });
   };
 

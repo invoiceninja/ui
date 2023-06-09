@@ -31,6 +31,8 @@ import { useHandleChange } from './common/hooks/hooks';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from './common/hooks/useActions';
 import { CopyToClipboard } from '$app/components/CopyToClipboard';
+import { useSetAtom } from 'jotai';
+import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 
 export function Edit() {
   const [t] = useTranslation();
@@ -56,6 +58,8 @@ export function Edit() {
   const actions = useActions();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+
+  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState<boolean>(false);
@@ -93,6 +97,7 @@ export function Edit() {
 
           if (error.response?.status === 412) {
             toast.error('password_error_incorrect');
+            setLastPasswordEntryTime(0);
           } else {
             console.error(error);
             toast.error();
