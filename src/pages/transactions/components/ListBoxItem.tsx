@@ -16,6 +16,8 @@ import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import paymentStatus from '$app/common/constants/payment-status';
 import { ExpenseStatus } from '$app/pages/expenses/common/components/ExpenseStatus';
+import { date as formatDate } from '$app/common/helpers';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 
 interface Props {
   resourceItem: ResourceItem;
@@ -28,6 +30,8 @@ export function ListBoxItem(props: Props) {
   const company = useCurrentCompany();
 
   const formatMoney = useFormatMoney();
+
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
   return (
     <li
@@ -51,7 +55,7 @@ export function ListBoxItem(props: Props) {
         <div className="flex flex-col flex-grow pl-8 pr-3">
           <span className="text-sm">{props.resourceItem.clientName}</span>
           <span className="text-sm text-gray-600">
-            {props.resourceItem.date}
+            {formatDate(props.resourceItem.date || '', dateFormat)}
           </span>
         </div>
         {props.resourceItem.amount && (

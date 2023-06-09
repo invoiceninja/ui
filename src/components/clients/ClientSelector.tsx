@@ -16,6 +16,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ComboboxAsync } from '../forms/Combobox';
 import { Alert } from '../Alert';
+import { endpoint } from '$app/common/helpers';
 
 export interface ClientSelectorProps extends GenericSelectorProps<Client> {
   initiallyVisible?: boolean;
@@ -66,7 +67,7 @@ export function ClientSelector(props: ClientSelectorProps) {
           label: props.inputLabel?.toString(),
           value: props.value || null,
         }}
-        endpoint="/api/v1/clients"
+        endpoint={new URL(endpoint('/api/v1/clients'))}
         readonly={props.readonly}
         onDismiss={props.onClearButtonClick}
         querySpecificEntry="/api/v1/clients/:id"
@@ -81,6 +82,7 @@ export function ClientSelector(props: ClientSelectorProps) {
           visible: props.withoutAction ? false : true,
           onClick: () => setIsModalOpen(true),
         }}
+        key="client_selector"
         // clearInputAfterFirstSelection
       />
 

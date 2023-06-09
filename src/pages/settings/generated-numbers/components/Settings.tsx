@@ -26,10 +26,10 @@ export function Settings() {
       <Element leftSide={t('number_padding')}>
         <SelectField
           id="settings.counter_padding"
-          onValueChange={(value) =>
-            handleChange('settings.counter_padding', parseInt(value))
-          }
           value={companyChanges?.settings?.counter_padding}
+          onValueChange={(value) =>
+            handleChange('settings.counter_padding', value)
+          }
         >
           <option value="1">1</option>
           <option value="2">01</option>
@@ -46,11 +46,10 @@ export function Settings() {
       <Element leftSide={t('generate_number')}>
         <SelectField
           id="settings.counter_number_applied"
-          onChange={handleChange}
+          value={companyChanges?.settings?.counter_number_applied}
           onValueChange={(value) =>
             handleChange('settings.counter_number_applied', value)
           }
-          value={companyChanges?.settings?.counter_number_applied}
         >
           <option value="when_saved">{t('when_saved')}</option>
           <option value="when_sent">{t('when_sent')}</option>
@@ -59,9 +58,10 @@ export function Settings() {
 
       <Element leftSide={t('recurring_prefix')}>
         <InputField
-          id="settings.recurring_number_prefix"
           value={companyChanges?.settings?.recurring_number_prefix}
-          onChange={handleChange}
+          onValueChange={(value) =>
+            handleChange('settings.recurring_number_prefix', value)
+          }
         />
       </Element>
 
@@ -89,8 +89,6 @@ export function Settings() {
 
       <Element leftSide={t('reset_counter')}>
         <SelectField
-          id="settings.reset_counter_frequency_id"
-          onChange={handleChange}
           value={companyChanges?.settings?.reset_counter_frequency_id}
           onValueChange={(value) =>
             handleChange('settings.reset_counter_frequency_id', parseInt(value))
@@ -117,9 +115,10 @@ export function Settings() {
           <Element leftSide={t('next_reset')}>
             <InputField
               type="date"
-              id="settings.reset_counter_date"
-              onChange={handleChange}
               value={companyChanges?.settings?.reset_counter_date || ''}
+              onValueChange={(value) =>
+                handleChange('settings.reset_counter_date', value)
+              }
             />
           </Element>
         )}

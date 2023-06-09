@@ -26,12 +26,14 @@ import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { parseTimeLog } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useSetAtom } from 'jotai';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 export function useInvoiceProject() {
   const navigate = useNavigate();
   const company = useCurrentCompany();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const { timeFormat } = useCompanyTimeFormat();
   const { data } = useBlankInvoiceQuery();
 
   const setInvoice = useSetAtom(invoiceAtom);
@@ -88,9 +90,11 @@ export function useInvoiceProject() {
 
         logs.forEach(([start, stop]) => {
           parsed.push(
-            `${dayjs.unix(start).format(`${dateFormat} hh:mm:ss A`)} - ${dayjs
+            `${dayjs
+              .unix(start)
+              .format(`${dateFormat} ${timeFormat}`)} - ${dayjs
               .unix(stop)
-              .format('hh:mm:ss A')} <br />`
+              .format(timeFormat)} <br />`
           );
         });
 
