@@ -260,7 +260,7 @@ export function usePaymentColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.payment ||
+    currentUser?.company_user?.react_settings?.react_table_columns?.payment ||
     defaultColumns;
 
   return columns

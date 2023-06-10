@@ -823,7 +823,7 @@ export function useQuoteColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.quote ||
+    currentUser?.company_user?.react_settings?.react_table_columns?.quote ||
     defaultColumns;
 
   return columns

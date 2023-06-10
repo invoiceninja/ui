@@ -227,7 +227,7 @@ export function useProductColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.product ||
+    currentUser?.company_user?.react_settings?.react_table_columns?.product ||
     defaultColumns;
 
   return columns
@@ -266,7 +266,6 @@ export function useActions() {
 
         queryClient.invalidateQueries(route('/api/v1/products/:id', { id }));
         queryClient.invalidateQueries('/api/v1/products');
-
       })
       .catch((error) => {
         console.error(error);

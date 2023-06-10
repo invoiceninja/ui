@@ -378,7 +378,7 @@ export function useRecurringExpenseColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns
+    currentUser?.company_user?.react_settings?.react_table_columns
       ?.recurringExpense || defaultColumns;
 
   return columns

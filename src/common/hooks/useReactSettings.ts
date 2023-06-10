@@ -8,20 +8,13 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { ReactSettings } from '$app/common/interfaces/company-user';
 import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
 
 export function useReactSettings() {
-  const reactSettings =
-    useSelector(
-      (state: RootState) => state.user.changes?.company_user?.react_settings
-    ) || {};
+  const reactSettings = useSelector(
+    (state: RootState) => state.user.changes?.company_user?.react_settings
+  );
 
-  const settings: ReactSettings = {
-    show_pdf_preview: true,
-    ...reactSettings,
-  };
-
-  return settings;
+  return reactSettings ? JSON.parse(reactSettings) : {};
 }

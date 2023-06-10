@@ -416,7 +416,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.invoice ||
+    currentUser?.company_user?.react_settings?.react_table_columns?.invoice ||
     defaultColumns;
 
   return columns

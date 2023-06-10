@@ -127,8 +127,10 @@ export function useTaskColumns() {
       column: 'project',
       id: 'project_id',
       label: t('project'),
-      format: (value, task) =>(
-        <Link to={route('/projects/:id/edit', { id: task?.project?.id })}>{task?.project?.name}</Link>
+      format: (value, task) => (
+        <Link to={route('/projects/:id/edit', { id: task?.project?.id })}>
+          {task?.project?.name}
+        </Link>
       ),
     },
     {
@@ -271,7 +273,7 @@ export function useTaskColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.task ||
+    currentUser?.company_user?.react_settings?.react_table_columns?.task ||
     defaultColumns;
 
   return columns
