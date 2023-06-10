@@ -80,13 +80,13 @@ export function GroupSettingsProperties(props: Props) {
                     ].includes(property) && (
                       <div
                         key={index}
-                        className="flex justify-between border-gray-200 rounded pl-3 pr-2 py-2 items-center w-2/4 first:mt-2"
+                        className="flex justify-between border-gray-200 rounded pl-3 pr-2 py-2 items-center w-1/2 first:mt-2"
                       >
                         <div className="flex flex-1 text-sm truncate">
                           {t(property)}:
                         </div>
 
-                        <span className="flex flex-1 justify-start text-sm whitespace-normal">
+                        <span className="flex flex-1 justify-start text-sm whitespace-normal pl-4">
                           {customizeValueOutput(value)}
                         </span>
 
