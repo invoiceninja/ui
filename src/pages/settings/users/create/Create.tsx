@@ -28,6 +28,8 @@ import { useNavigate } from 'react-router-dom';
 import { Details } from '../edit/components/Details';
 import { Notifications } from '../edit/components/Notifications';
 import { Permissions } from '../edit/components/Permissions';
+import { useSetAtom } from 'jotai';
+import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 
 export function Create() {
   useTitle('new_user');
@@ -41,6 +43,8 @@ export function Create() {
   ];
 
   const tabs: string[] = [t('details'), t('notifications'), t('permissions')];
+
+  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   const { data: response } = useBlankUserQuery();
   const [user, setUser] = useState<User>();
@@ -97,6 +101,7 @@ export function Create() {
       .catch((error) => {
         if (error.response?.status === 412) {
           toast.error('password_error_incorrect');
+          setLastPasswordEntryTime(0);
         } else if (error.response?.status === 422) {
           const errorMessages = error.response.data;
 

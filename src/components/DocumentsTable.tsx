@@ -23,6 +23,8 @@ import { FileIcon } from './FileIcon';
 import { Icon } from './icons/Icon';
 import { PasswordConfirmation } from './PasswordConfirmation';
 import { Table, Tbody, Td, Th, Thead, Tr } from './tables';
+import { useSetAtom } from 'jotai';
+import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 
 interface Props {
   documents: Document[];
@@ -34,6 +36,8 @@ export function DocumentsTable(props: Props) {
 
   const [isPasswordConfirmModalOpen, setIsPasswordConfirmModalOpen] =
     useState(false);
+
+  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   const [documentId, setDocumentId] = useState<string>();
 
@@ -53,8 +57,13 @@ export function DocumentsTable(props: Props) {
         props.onDocumentDelete?.();
       })
       .catch((error) => {
-        console.error(error);
-        toast.error();
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+          setLastPasswordEntryTime(0);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       });
   };
 

@@ -20,6 +20,7 @@ import { useAtom, useSetAtom } from 'jotai';
 import { companySettingsErrorsAtom } from '../atoms';
 import { updatingRecords as updatingRecordsAtom } from '$app/pages/settings/invoice-design/common/atoms';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
+import { hasLanguageChanged as hasLanguageChangedAtom } from '$app/pages/settings/localization/common/atoms';
 import { useHandleUpdate } from '../../group-settings/common/hooks/useHandleUpdate';
 import { useCurrentSettingsLevel } from '$app/common/hooks/useCurrentSettingsLevel';
 
@@ -35,6 +36,9 @@ export function useHandleCompanySave() {
   const setErrors = useSetAtom(companySettingsErrorsAtom);
 
   const [updatingRecords, setUpdatingRecords] = useAtom(updatingRecordsAtom);
+  const [hasLanguageChanged, setHasLanguageIdChanged] = useAtom(
+    hasLanguageChangedAtom
+  );
 
   return () => {
     toast.processing();
@@ -73,6 +77,11 @@ export function useHandleCompanySave() {
               });
             }
           });
+
+          if (hasLanguageChanged) {
+            queryClient.invalidateQueries('/api/v1/statics');
+            setHasLanguageIdChanged(false);
+          }
 
           toast.success('updated_settings');
         })

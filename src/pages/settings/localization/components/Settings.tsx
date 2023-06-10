@@ -23,6 +23,9 @@ import { useDispatch } from 'react-redux';
 import { Card, Element } from '../../../../components/cards';
 import { Radio, SelectField } from '../../../../components/forms';
 import Toggle from '../../../../components/forms/Toggle';
+import { useAtom } from 'jotai';
+import { hasLanguageChanged } from '../common/atoms';
+import { ChangeEvent } from 'react';
 
 export function Settings() {
   const [t] = useTranslation();
@@ -32,6 +35,15 @@ export function Settings() {
   const company = useInjectCompanyChanges();
 
   const handleChange = useHandleCurrentCompanyChange();
+
+  const [, setHasLanguageIdChanged] = useAtom(
+    hasLanguageChanged
+  );
+
+  const handleLanguageChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setHasLanguageIdChanged(true);
+    handleChange(event);    
+  };
 
   const currencyFormats = [
     {
@@ -95,7 +107,7 @@ export function Settings() {
         {!isDemo() && (
           <Element leftSide={t('language')}>
             <SelectField
-              onChange={handleChange}
+              onChange={handleLanguageChange}
               id="settings.language_id"
               value={company?.settings?.language_id || '1'}
             >

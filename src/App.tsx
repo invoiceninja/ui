@@ -21,9 +21,14 @@ import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { routes } from './common/routes';
 import { RootState } from './common/stores/store';
+import dayjs from 'dayjs';
+import { useResolveDayJSLocale } from './common/hooks/useResolveDayJSLocale';
+import { atom, useSetAtom } from 'jotai';
 import { useSwitchToCompanySettings } from './common/hooks/useSwitchToCompanySettings';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useCurrentSettingsLevel } from './common/hooks/useCurrentSettingsLevel';
+
+export const dayJSLocaleAtom = atom<ILocale | null>(null);
 
 export function App() {
   const { i18n } = useTranslation();
@@ -32,8 +37,8 @@ export function App() {
   const navigate = useNavigate();
   const company = useCurrentCompany();
   const account = useCurrentAccount();
-  const resolveLanguage = useResolveLanguage();
-  const switchToCompanySettings = useSwitchToCompanySettings();
+
+  const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
 
   const { isCompanyLevelActive, isGroupLevelActive } =
     useCurrentSettingsLevel();
@@ -45,6 +50,10 @@ export function App() {
 
   const [showSmsVerificationModal, setShowSmsVerificationModal] =
     useState<boolean>(false);
+
+  const resolveLanguage = useResolveLanguage();
+
+  const resolveDayJSLocale = useResolveDayJSLocale();
 
   const darkMode = useSelector((state: RootState) => state.settings.darkMode);
 
@@ -60,6 +69,11 @@ export function App() {
       : document.querySelector('html')?.classList.remove('dark');
 
     if (resolvedLanguage?.locale) {
+      resolveDayJSLocale(resolvedLanguage.locale).then((resolvedLocale) => {
+        updateDayJSLocale(resolvedLocale);
+        dayjs.locale(resolvedLocale);
+      });
+
       if (!i18n.hasResourceBundle(resolvedLanguage.locale, 'translation')) {
         fetch(
           new URL(
@@ -106,7 +120,7 @@ export function App() {
 
   useEffect(() => {
     if (!location.pathname.startsWith('/settings') && !isCompanyLevelActive) {
-      switchToCompanySettings();
+      useSwitchToCompanySettings();
     }
 
     if (

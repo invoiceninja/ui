@@ -28,6 +28,7 @@ import { route } from '$app/common/helpers/route';
 import { useTranslation } from 'react-i18next';
 import { toast } from '$app/common/helpers/toast/toast';
 import { useFetchProjectQuery } from '$app/common/queries/projects';
+import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 export function useInvoiceTask() {
   const [t] = useTranslation();
@@ -35,6 +36,7 @@ export function useInvoiceTask() {
   const company = useCurrentCompany();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
+  const { timeFormat } = useCompanyTimeFormat();
   const { data } = useBlankInvoiceQuery();
 
   const fetchProjectDetails = useFetchProjectQuery();
@@ -116,9 +118,11 @@ export function useInvoiceTask() {
             }
 
             parsed.push(
-              `${dayjs.unix(start).format(`${dateFormat} hh:mm:ss A`)} - ${dayjs
+              `${dayjs
+                .unix(start)
+                .format(`${dateFormat} ${timeFormat}`)} - ${dayjs
                 .unix(stop)
-                .format('hh:mm:ss A')} ${hoursDescription} <br />`
+                .format(timeFormat)} ${hoursDescription} <br />`
             );
           }
         });

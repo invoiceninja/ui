@@ -12,13 +12,16 @@ import { invalidationQueryAtom } from '$app/common/atoms/data-table';
 import { endpoint } from '$app/common/helpers';
 import { request } from '$app/common/helpers/request';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
 
 export function usePurgeClient(clientId: string | undefined) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+
+  const setLastPasswordEntryTime = useSetAtom(lastPasswordEntryTimeAtom);
 
   const invalidateQueryValue = useAtomValue(invalidationQueryAtom);
 
@@ -40,11 +43,13 @@ export function usePurgeClient(clientId: string | undefined) {
         navigate('/clients');
       })
       .catch((error: AxiosError) => {
-        console.error(error);
-
-        error.response?.status === 412
-          ? toast.error('password_error_incorrect')
-          : toast.error();
+        if (error.response?.status === 412) {
+          toast.error('password_error_incorrect');
+          setLastPasswordEntryTime(0);
+        } else {
+          console.error(error);
+          toast.error();
+        }
       });
   };
 }
