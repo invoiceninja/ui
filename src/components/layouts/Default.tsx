@@ -331,11 +331,10 @@ export function Default(props: Props) {
       current: location.pathname.startsWith('/transactions'),
       visible:
         enabled(ModuleBitmask.Transactions) &&
-        (
-        hasPermission('view_bank_transaction') ||
-        hasPermission('create_bank_transaction') ||
-        hasPermission('edit_bank_transaction')),
-        rightButton: {
+        (hasPermission('view_bank_transaction') ||
+          hasPermission('create_bank_transaction') ||
+          hasPermission('edit_bank_transaction')),
+      rightButton: {
         icon: PlusCircle,
         to: '/transactions/create',
         label: t('new_transaction'),
@@ -398,7 +397,8 @@ export function Default(props: Props) {
                     onClick={() =>
                       window.open(
                         isSelfHosted()
-                          ? import.meta.env.VITE_WHITELABEL_INVOICE_URL || 'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3'
+                          ? import.meta.env.VITE_WHITELABEL_INVOICE_URL ||
+                              'https://app.invoiceninja.com/buy_now/?account_key=AsFmBAeLXF0IKf7tmi0eiyZfmWW9hxMT&product_id=3'
                           : user?.company_user?.ninja_portal_url,
                         '_blank'
                       )
