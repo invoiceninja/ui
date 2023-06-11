@@ -365,7 +365,8 @@ export function Default(props: Props) {
 
   useEffect(() => {
     if (account) {
-      setShowSmsVerificationBanner(!account.account_sms_verified && isHosted());
+      setShowSmsVerificationBanner(!account.account_sms_verified);
+      // setShowSmsVerificationBanner(!account.account_sms_verified && isHosted());
     }
   }, [account?.account_sms_verified]);
 

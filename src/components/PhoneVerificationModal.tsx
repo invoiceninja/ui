@@ -12,7 +12,6 @@ import { useTranslation } from 'react-i18next';
 import { Button, InputField, SelectField } from './forms';
 import { Modal } from './Modal';
 import { Dispatch, SetStateAction, useState } from 'react';
-import { useCountries } from '$app/common/hooks/useCountries';
 import { request } from '$app/common/helpers/request';
 import { endpoint } from '$app/common/helpers';
 import { toast } from '$app/common/helpers/toast/toast';
@@ -25,6 +24,8 @@ import { updateCompanyUsers } from '$app/common/stores/slices/company-users';
 import { useDispatch } from 'react-redux';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { CompanyUser } from '$app/common/interfaces/company-user';
+import PhoneInput, { isPossiblePhoneNumber } from 'react-phone-number-input'
+import 'react-phone-number-input/style.css'
 
 interface Props {
   visible: boolean;
@@ -34,33 +35,34 @@ interface Props {
 export function PhoneVerificationModal(props: Props) {
   const [t] = useTranslation();
   const dispatch = useDispatch();
-  const countries = useCountries();
   const queryClient = useQueryClient();
 
   const [isSmsModalOpen, setIsSmsModalOpen] = useState<boolean>(false);
-
-  const [countryCode, setCountryCode] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState<string | undefined>('')
 
   const [errors, setErrors] = useState<ValidationBag>();
 
   const handleClose = () => {
     props.setVisible(false);
     setPhoneNumber('');
-    setCountryCode('');
     setErrors(undefined);
   };
 
   const handleSendSMSCode = () => {
     setErrors(undefined);
 
+    if(!isPossiblePhoneNumber(phoneNumber ?? '')){
+      setErrors({ message: "error", errors: {"phone": [t("invalid_phone_number")]}}); 
+      return;
+    }
+
     toast.processing();
 
     request('POST', endpoint('/api/v1/verify'), {
-      phone: `+${countryCode}${phoneNumber}`,
+      phone: phoneNumber,
     })
       .then(() => {
-        toast.success('check_phone_code');
+        toast.success('code_was_sent');
 
         setIsSmsModalOpen(true);
       })
@@ -72,7 +74,6 @@ export function PhoneVerificationModal(props: Props) {
           toast.dismiss();
         } else {
           toast.dismiss();
-          console.error(error);
         }
       });
   };
@@ -107,7 +108,6 @@ export function PhoneVerificationModal(props: Props) {
           toast.error(error.response.data.message);
         } else {
           toast.dismiss();
-          console.error(error);
         }
       });
   };
@@ -120,31 +120,17 @@ export function PhoneVerificationModal(props: Props) {
         onClose={handleClose}
       >
         <div className="flex flex-col text-gray-900 mb-1">
-          <span className="text-gray-500 mb-2">{t('phone_number')}</span>
 
-          <div className="flex space-x-3">
-            <SelectField
-              value={countryCode}
-              onValueChange={(value) => setCountryCode(value)}
-              withBlank
-              style={{ width: '5.5rem' }}
-            >
-              {countries.map((country, index) => (
-                <option key={index} value={country.country_code}>
-                  + {country.country_code}
-                </option>
-              ))}
-            </SelectField>
-
-            <div className="flex-1">
-              <InputField
-                value={phoneNumber}
-                onValueChange={(value) => setPhoneNumber(value)}
-              />
-            </div>
-          </div>
+          <PhoneInput
+            international
+            placeholder={t('phone')}
+            countrySelectProps={{ unicodeFlags: true }}
+            defaultCountry="US"
+            value={phoneNumber}
+            onChange={setPhoneNumber}/>
+         
         </div>
-
+          
         {errors?.errors.phone && (
           <Alert type="danger">{errors.errors.phone}</Alert>
         )}
@@ -155,7 +141,6 @@ export function PhoneVerificationModal(props: Props) {
           type="primary"
           onClick={handleSendSMSCode}
           disableWithoutIcon
-          disabled={!countryCode || !phoneNumber}
         >
           {t('send_code')}
         </Button>
