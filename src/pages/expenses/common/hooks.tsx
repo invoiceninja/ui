@@ -15,7 +15,6 @@ import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Expense } from '$app/common/interfaces/expense';
 import { RecurringExpense } from '$app/common/interfaces/recurring-expense';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -44,6 +43,7 @@ import { useSetAtom } from 'jotai';
 import { useBulk } from '$app/common/queries/expenses';
 import { Divider } from '$app/components/cards/Divider';
 import { EntityState } from '$app/common/enums/entity-state';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export function useActions() {
   const [t] = useTranslation();
@@ -190,9 +190,10 @@ export function useExpenseColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const currentUser = useCurrentUser();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
+
+  const reactSettings = useReactSettings();
 
   const expenseColumns = useAllExpenseColumns();
   type ExpenseColumns = (typeof expenseColumns)[number];
@@ -415,8 +416,7 @@ export function useExpenseColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.react_settings?.react_table_columns?.expense ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.expense || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

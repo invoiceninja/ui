@@ -31,7 +31,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useQueryClient } from 'react-query';
 import { expenseAtom } from '$app/pages/expenses/common/atoms';
 import paymentType from '$app/common/constants/payment-type';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Dispatch, SetStateAction } from 'react';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -46,6 +45,7 @@ import { RecurringExpenseStatus as RecurringExpenseStatusBadge } from './compone
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useAtomValue, useSetAtom } from 'jotai';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const defaultColumns: string[] = [
   'status',
@@ -121,7 +121,7 @@ export function useRecurringExpenseColumns() {
 
   const formatMoney = useFormatMoney();
 
-  const currentUser = useCurrentUser();
+  const reactSettings = useReactSettings();
 
   const recurringExpenseColumns = useAllRecurringExpenseColumns();
   type RecurringExpenseColumns = (typeof recurringExpenseColumns)[number];
@@ -378,8 +378,7 @@ export function useRecurringExpenseColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.react_settings?.react_table_columns
-      ?.recurringExpense || defaultColumns;
+    reactSettings?.react_table_columns?.recurringExpense || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

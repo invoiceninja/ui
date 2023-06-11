@@ -16,7 +16,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Task } from '$app/common/interfaces/task';
 import { Divider } from '$app/components/cards/Divider';
 import { SelectOption } from '$app/components/datatables/Actions';
@@ -47,6 +46,7 @@ import { useStart } from './hooks/useStart';
 import { useStop } from './hooks/useStop';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useSetAtom } from 'jotai';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const defaultColumns: string[] = [
   'status',
@@ -98,9 +98,9 @@ export function useTaskColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const currentUser = useCurrentUser();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
+  const reactSettings = useReactSettings();
 
   const calculateDate = (task: Task) => {
     const timeLog = parseTimeLog(task.time_log);
@@ -273,8 +273,7 @@ export function useTaskColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.react_settings?.react_table_columns?.task ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.task || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

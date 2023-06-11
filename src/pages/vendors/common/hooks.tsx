@@ -12,7 +12,6 @@ import { Link } from '$app/components/forms';
 import { date } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useResolveCountry } from '$app/common/hooks/useResolveCountry';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Vendor } from '$app/common/interfaces/vendor';
@@ -23,6 +22,7 @@ import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useIn
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const defaultColumns: string[] = [
   'number',
@@ -75,9 +75,9 @@ export function useVendorColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const currentUser = useCurrentUser();
   const resolveCountry = useResolveCountry();
   const resolveCurrency = useResolveCurrency();
+  const reactSettings = useReactSettings();
 
   const vendorColumns = useAllVendorColumns();
   type VendorColumns = (typeof vendorColumns)[number];
@@ -246,8 +246,7 @@ export function useVendorColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.react_settings?.react_table_columns?.vendor ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.vendor || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

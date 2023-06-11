@@ -46,7 +46,6 @@ import { creditAtom } from '$app/pages/credits/common/atoms';
 import { Credit } from '$app/common/interfaces/credit';
 import { purchaseOrderAtom } from '$app/pages/purchase-orders/common/atoms';
 import { route } from '$app/common/helpers/route';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { Link } from '$app/components/forms';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
@@ -71,6 +70,7 @@ import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useBulkAction } from '$app/pages/recurring-invoices/common/queries';
 import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -546,8 +546,8 @@ export function useRecurringInvoiceColumns() {
   type RecurringInvoiceColumns = (typeof recurringInvoiceColumns)[number];
 
   const company = useCurrentCompany();
-  const currentUser = useCurrentUser();
   const formatMoney = useFormatMoney();
+  const reactSettings = useReactSettings();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -744,8 +744,7 @@ export function useRecurringInvoiceColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.react_settings?.react_table_columns
-      ?.recurringInvoice || defaultColumns;
+    reactSettings?.react_table_columns?.recurringInvoice || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

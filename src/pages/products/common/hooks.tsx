@@ -16,7 +16,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Product } from '$app/common/interfaces/product';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -39,6 +38,7 @@ import { Divider } from '$app/components/cards/Divider';
 import { Tooltip } from '$app/components/Tooltip';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useSetAtom } from 'jotai';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const defaultColumns: string[] = [
   'product_key',
@@ -92,8 +92,9 @@ export function useProductColumns() {
   const { dateFormat } = useCurrentCompanyDateFormats();
 
   const company = useCurrentCompany();
-  const currentUser = useCurrentUser();
   const formatMoney = useFormatMoney();
+
+  const reactSettings = useReactSettings();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -227,8 +228,7 @@ export function useProductColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.react_settings?.react_table_columns?.product ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.product || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

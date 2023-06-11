@@ -23,8 +23,8 @@ import { EntityStatus } from '$app/components/EntityStatus';
 import { Tooltip } from '$app/components/Tooltip';
 import { useTranslation } from 'react-i18next';
 import { InvoiceStatus } from '../components/InvoiceStatus';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export type DataTableColumnsExtended<TResource = any, TColumn = string> = {
   column: TColumn;
@@ -114,10 +114,11 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const currentUser = useCurrentUser();
   const formatMoney = useFormatMoney();
   const company = useCurrentCompany();
   const resolveCountry = useResolveCountry();
+
+  const reactSettings = useReactSettings();
 
   const [firstCustom, secondCustom, thirdCustom, fourthCustom] =
     useEntityCustomFields({
@@ -416,8 +417,7 @@ export function useInvoiceColumns(): DataTableColumns<Invoice> {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.react_settings?.react_table_columns?.invoice ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.invoice || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

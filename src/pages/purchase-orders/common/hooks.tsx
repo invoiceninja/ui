@@ -18,7 +18,6 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { ValidationBag } from '$app/common/interfaces/validation-bag';
@@ -58,6 +57,7 @@ import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useSche
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -143,8 +143,8 @@ export function usePurchaseOrderColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const currentUser = useCurrentUser();
   const company = useCurrentCompany();
+  const reactSettings = useReactSettings();
 
   const formatMoney = useFormatMoney();
 
@@ -320,8 +320,7 @@ export function usePurchaseOrderColumns() {
     ];
 
   const list: string[] =
-    currentUser?.company_user?.react_settings?.react_table_columns
-      ?.purchaseOrder || defaultColumns;
+    reactSettings?.react_table_columns?.purchaseOrder || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

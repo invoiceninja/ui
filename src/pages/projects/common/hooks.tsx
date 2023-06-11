@@ -15,7 +15,6 @@ import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { Project } from '$app/common/interfaces/project';
 import { Divider } from '$app/components/cards/Divider';
 import { DropdownElement } from '$app/components/dropdown/DropdownElement';
@@ -43,6 +42,7 @@ import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-ap
 import { Task } from '$app/common/interfaces/task';
 import { AxiosError } from 'axios';
 import { useSetAtom } from 'jotai';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const defaultColumns: string[] = [
   'name',
@@ -92,9 +92,10 @@ export function useProjectColumns() {
   const { t } = useTranslation();
   const { dateFormat } = useCurrentCompanyDateFormats();
 
-  const currentUser = useCurrentUser();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
+
+  const reactSettings = useReactSettings();
 
   const projectColumns = useAllProjectColumns();
   type ProjectColumns = (typeof projectColumns)[number];
@@ -227,8 +228,7 @@ export function useProjectColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.react_settings?.react_table_columns?.project ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.project || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

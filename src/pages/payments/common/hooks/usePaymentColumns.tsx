@@ -15,7 +15,6 @@ import { route } from '$app/common/helpers/route';
 import { useFormatMoney } from '$app/common/hooks/money/useFormatMoney';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useResolveCurrency } from '$app/common/hooks/useResolveCurrency';
 import { Payment } from '$app/common/interfaces/payment';
 import { EntityStatus } from '$app/components/EntityStatus';
@@ -25,6 +24,7 @@ import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useIn
 import { useTranslation } from 'react-i18next';
 import { PaymentStatus } from '../components/PaymentStatus';
 import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export const defaultColumns: string[] = [
   'status',
@@ -81,10 +81,11 @@ export function usePaymentColumns() {
   const paymentColumns = useAllPaymentColumns();
   type PaymentColumns = (typeof paymentColumns)[number];
 
-  const currentUser = useCurrentUser();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCurrency = useResolveCurrency();
+
+  const reactSettings = useReactSettings();
 
   const calculateConvertedAmount = (payment: Payment) => {
     if (payment.exchange_rate) {
@@ -260,8 +261,7 @@ export function usePaymentColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.react_settings?.react_table_columns?.payment ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.payment || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))
