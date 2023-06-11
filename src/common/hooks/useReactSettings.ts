@@ -10,11 +10,18 @@
 
 import { RootState } from '$app/common/stores/store';
 import { useSelector } from 'react-redux';
+import { ReactSettings } from '../interfaces/company-user';
 
 export function useReactSettings() {
-  const reactSettings = useSelector(
-    (state: RootState) => state.user.changes?.company_user?.react_settings
-  );
+  const reactSettings =
+    useSelector(
+      (state: RootState) => state.user.changes?.company_user?.react_settings
+    ) || {};
 
-  return reactSettings ? JSON.parse(reactSettings) : {};
+  const settings: ReactSettings = {
+    show_pdf_preview: true,
+    ...reactSettings,
+  };
+
+  return settings;
 }
