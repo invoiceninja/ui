@@ -15,6 +15,9 @@ import { toast } from '$app/common/helpers/toast/toast';
 import { request } from '$app/common/helpers/request';
 import { endpoint, isHosted } from '$app/common/helpers';
 
+export const buttonStyles =
+  'font-medium text-xs md:text-sm underline cursor-pointer';
+
 export function VerifyEmail() {
   const [t] = useTranslation();
   const user = useCurrentUser();
@@ -45,14 +48,9 @@ export function VerifyEmail() {
       <div className="flex space-x-1">
         <span>{t('confirm_your_email_address')}.</span>
 
-        <span
-          className="font-medium text-xs md:text-sm underline cursor-pointer"
-          onClick={resend}
-        >
+        <button className={buttonStyles} onClick={resend}>
           {t('resend_email')}
-        </span>
-
-        <span className="font-medium">&rarr;</span>
+        </button>
       </div>
     </Banner>
   );
