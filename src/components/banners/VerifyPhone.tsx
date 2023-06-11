@@ -117,8 +117,6 @@ function Verification({ visible, onClose }: VerificationProps) {
   const [number, setNumber] = useState<string>();
   const [isConfirmationVisible, setIsConfirmationVisible] = useState(false);
 
-  const account = useCurrentAccount();
-
   const handleSms = () => {
     setErrors(undefined);
 
@@ -154,14 +152,6 @@ function Verification({ visible, onClose }: VerificationProps) {
         return toast.dismiss();
       });
   };
-
-  if (!isHosted()) {
-    return null;
-  }
-
-  if (account.account_sms_verified) {
-    return null;
-  }
 
   return (
     <>
@@ -212,6 +202,16 @@ function Verification({ visible, onClose }: VerificationProps) {
 export function VerifyPhone() {
   const [t] = useTranslation();
   const [isVerificationVisible, setIsVerificationVisible] = useState(false);
+
+  const account = useCurrentAccount();
+
+  if (!isHosted()) {
+    return null;
+  }
+
+  if (account.account_sms_verified) {
+    return null;
+  }
 
   return (
     <>
