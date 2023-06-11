@@ -38,8 +38,6 @@ export function App() {
 
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
 
-  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
-
   const [showCompanyActivityModal, setShowCompanyActivityModal] =
     useState<boolean>(false);
 
@@ -88,12 +86,6 @@ export function App() {
   }, [darkMode, resolvedLanguage]);
 
   useEffect(() => {
-    if (user && Object.keys(user).length) {
-      setIsEmailVerified(Boolean(user.email_verified_at));
-    }
-  }, [user]);
-
-  useEffect(() => {
     const modalShown = sessionStorage.getItem('PHONE-VERIFICATION-SHOWN');
 
     if (account && (modalShown === 'false' || !modalShown)) {
@@ -115,8 +107,6 @@ export function App() {
 
   return (
     <div className="App">
-      <VerifyModal visible={!isEmailVerified && isHosted()} type="email" />
-
       <AccountWarningsModal
         type="activity"
         visible={Boolean(company) && showCompanyActivityModal}
