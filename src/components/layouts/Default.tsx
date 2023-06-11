@@ -52,6 +52,7 @@ import { DropdownElement } from '$app/components/dropdown/DropdownElement';
 import { useSaveBtn } from '$app/components/layouts/common/hooks';
 import { VerifyEmail } from '../banners/VerifyEmail';
 import { ActivateCompany } from '../banners/ActivateCompany';
+import { VerifyPhone } from '../banners/VerifyPhone';
 
 export interface SaveOption {
   label: string;
@@ -360,8 +361,9 @@ export function Default(props: Props) {
 
   return (
     <div>
-      <VerifyEmail />
       <ActivateCompany />
+      <VerifyEmail />
+      <VerifyPhone />
 
       <MobileSidebar
         navigation={navigation}
