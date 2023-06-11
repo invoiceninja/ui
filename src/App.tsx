@@ -34,9 +34,6 @@ export function App() {
 
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
 
-  const [showCompanyActivityModal, setShowCompanyActivityModal] =
-    useState<boolean>(false);
-
   const [showSmsVerificationModal, setShowSmsVerificationModal] =
     useState<boolean>(false);
 
@@ -91,24 +88,8 @@ export function App() {
     }
   }, [account]);
 
-  useEffect(() => {
-    const modalShown = sessionStorage.getItem('COMPANY-ACTIVITY-SHOWN');
-
-    if (company && (modalShown === 'false' || !modalShown)) {
-      setShowCompanyActivityModal(company.is_disabled);
-
-      sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'true');
-    }
-  }, [company]);
-
   return (
     <div className="App">
-      <AccountWarningsModal
-        type="activity"
-        visible={Boolean(company) && showCompanyActivityModal}
-        setVisible={setShowCompanyActivityModal}
-      />
-
       <AccountWarningsModal
         type="phone"
         visible={Boolean(account) && showSmsVerificationModal && isHosted()}
