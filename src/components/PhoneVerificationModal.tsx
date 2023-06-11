@@ -9,7 +9,7 @@
  */
 
 import { useTranslation } from 'react-i18next';
-import { Button, InputField, SelectField } from './forms';
+import { Button } from './forms';
 import { Modal } from './Modal';
 import { Dispatch, SetStateAction, useState } from 'react';
 import { request } from '$app/common/helpers/request';
