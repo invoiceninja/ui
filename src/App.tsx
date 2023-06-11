@@ -14,7 +14,6 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
 import { AccountWarningsModal } from '$app/components/AccountWarningsModal';
-import { VerifyModal } from '$app/components/VerifyModal';
 import { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
