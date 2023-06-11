@@ -28,7 +28,7 @@ export function PhoneVerificationBanner() {
             className="font-medium text-xs md:text-sm text-blue-500 hover:underline cursor-pointer"
             onClick={() => setIsModalOpened(true)}
           >
-            {t('verify_phone_number')}
+            {t('verify_phone_number_help')}
           </span>
 
           <span className="font-medium text-blue-500">&rarr;</span>
