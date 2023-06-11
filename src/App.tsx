@@ -11,7 +11,6 @@
 import { isHosted } from '$app/common/helpers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
 import { AccountWarningsModal } from '$app/components/AccountWarningsModal';
 import { useEffect, useState } from 'react';
@@ -30,8 +29,6 @@ export function App() {
   const { i18n } = useTranslation();
 
   const company = useCurrentCompany();
-
-  const user = useCurrentUser();
 
   const account = useCurrentAccount();
 
