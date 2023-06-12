@@ -39,6 +39,15 @@ export function Preferences() {
           }
         />
       </Element>
+
+      <Element leftSide={t('react_notification_link')} leftSideHelp={t('react_notification_link_help')}>
+        <Toggle
+          checked={reactSettings.react_notification_link}
+          onValueChange={(value) =>
+            handleChange('company_user.react_settings.react_notification_link', value)
+          }
+        />
+      </Element>
     </Card>
   );
 }
