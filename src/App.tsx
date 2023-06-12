@@ -8,14 +8,9 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { isHosted } from '$app/common/helpers';
-import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useResolveLanguage } from '$app/common/hooks/useResolveLanguage';
-import { AccountWarningsModal } from '$app/components/AccountWarningsModal';
-import { VerifyModal } from '$app/components/VerifyModal';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
@@ -32,19 +27,7 @@ export function App() {
 
   const company = useCurrentCompany();
 
-  const user = useCurrentUser();
-
-  const account = useCurrentAccount();
-
   const updateDayJSLocale = useSetAtom(dayJSLocaleAtom);
-
-  const [isEmailVerified, setIsEmailVerified] = useState<boolean>(true);
-
-  const [showCompanyActivityModal, setShowCompanyActivityModal] =
-    useState<boolean>(false);
-
-  const [showSmsVerificationModal, setShowSmsVerificationModal] =
-    useState<boolean>(false);
 
   const resolveLanguage = useResolveLanguage();
 
@@ -87,48 +70,8 @@ export function App() {
     }
   }, [darkMode, resolvedLanguage]);
 
-  useEffect(() => {
-    if (user && Object.keys(user).length) {
-      setIsEmailVerified(Boolean(user.email_verified_at));
-    }
-  }, [user]);
-
-  useEffect(() => {
-    const modalShown = sessionStorage.getItem('PHONE-VERIFICATION-SHOWN');
-
-    if (account && (modalShown === 'false' || !modalShown)) {
-      setShowSmsVerificationModal(!account?.account_sms_verified);
-
-      sessionStorage.setItem('PHONE-VERIFICATION-SHOWN', 'true');
-    }
-  }, [account]);
-
-  useEffect(() => {
-    const modalShown = sessionStorage.getItem('COMPANY-ACTIVITY-SHOWN');
-
-    if (company && (modalShown === 'false' || !modalShown)) {
-      setShowCompanyActivityModal(company.is_disabled);
-
-      sessionStorage.setItem('COMPANY-ACTIVITY-SHOWN', 'true');
-    }
-  }, [company]);
-
   return (
     <div className="App">
-      <VerifyModal visible={!isEmailVerified && isHosted()} type="email" />
-
-      <AccountWarningsModal
-        type="activity"
-        visible={Boolean(company) && showCompanyActivityModal}
-        setVisible={setShowCompanyActivityModal}
-      />
-
-      <AccountWarningsModal
-        type="phone"
-        visible={Boolean(account) && showSmsVerificationModal && isHosted()}
-        setVisible={setShowSmsVerificationModal}
-      />
-
       <Toaster position="top-center" />
 
       {routes}
