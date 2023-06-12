@@ -76,7 +76,7 @@ export function DataTableColumnsPicker(props: Props) {
 
     set(
       user,
-      `company_user.settings.react_table_columns.${table}`,
+      `company_user.react_settings.react_table_columns.${table}`,
       currentColumns
     );
 
