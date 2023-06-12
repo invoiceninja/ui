@@ -54,9 +54,13 @@ export function DataTableColumnsPicker(props: Props) {
   const [filteredColumns, setFilteredColumns] = useState(props.columns);
 
   const [currentColumns, setCurrentColumns] = useState<string[]>(
-    currentUser?.company_user?.settings?.react_table_columns?.[
+    currentUser?.company_user?.settings?.react_table_columns?.[ // This is legacy fallback for old settings location. If you see this in 2 years, feel free to remove it.
       table as ReactTableColumns
-    ] || defaultColumns
+    ] ||
+      currentUser?.company_user?.react_settings?.react_table_columns?.[
+        table as ReactTableColumns
+      ] ||
+      defaultColumns
   );
 
   const [isModalVisible, setIsModalVisible] = useState(false);
