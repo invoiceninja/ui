@@ -416,6 +416,7 @@ export function useExpenseColumns() {
 
   const list: string[] =
     currentUser?.company_user?.settings?.react_table_columns?.expense ||
+    currentUser?.company_user?.react_settings?.react_table_columns?.expense ||
     defaultColumns;
 
   return columns

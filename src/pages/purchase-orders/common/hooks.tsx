@@ -321,6 +321,7 @@ export function usePurchaseOrderColumns() {
 
   const list: string[] =
     currentUser?.company_user?.settings?.react_table_columns?.purchaseOrder ||
+    currentUser?.company_user?.react_settings?.react_table_columns?.purchaseOrder ||
     defaultColumns;
 
   return columns

@@ -247,6 +247,7 @@ export function useVendorColumns() {
 
   const list: string[] =
     currentUser?.company_user?.settings?.react_table_columns?.vendor ||
+    currentUser?.company_user?.react_settings?.react_table_columns?.vendor ||
     defaultColumns;
 
   return columns

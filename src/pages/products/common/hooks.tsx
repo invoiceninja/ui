@@ -228,6 +228,7 @@ export function useProductColumns() {
 
   const list: string[] =
     currentUser?.company_user?.settings?.react_table_columns?.product ||
+    currentUser?.company_user?.react_settings?.react_table_columns?.product ||
     defaultColumns;
 
   return columns

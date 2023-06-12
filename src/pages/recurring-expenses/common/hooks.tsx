@@ -379,7 +379,10 @@ export function useRecurringExpenseColumns() {
 
   const list: string[] =
     currentUser?.company_user?.settings?.react_table_columns
-      ?.recurringExpense || defaultColumns;
+      ?.recurringExpense ||
+    currentUser?.company_user?.react_settings?.react_table_columns
+      ?.recurringExpense ||
+    defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

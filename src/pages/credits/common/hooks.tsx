@@ -804,6 +804,7 @@ export function useCreditColumns() {
 
   const list: string[] =
     currentUser?.company_user?.settings?.react_table_columns?.credit ||
+    currentUser?.company_user?.react_settings?.react_table_columns?.credit ||
     defaultColumns;
 
   return columns

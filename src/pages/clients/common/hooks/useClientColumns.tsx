@@ -361,6 +361,7 @@ export function useClientColumns() {
 
   const list: string[] =
     currentUser?.company_user?.settings?.react_table_columns?.client ||
+    currentUser?.company_user?.react_settings?.react_table_columns?.client ||
     defaultColumns;
 
   return columns

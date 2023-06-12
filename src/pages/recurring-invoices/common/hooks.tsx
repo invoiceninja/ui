@@ -745,7 +745,10 @@ export function useRecurringInvoiceColumns() {
 
   const list: string[] =
     currentUser?.company_user?.settings?.react_table_columns
-      ?.recurringInvoice || defaultColumns;
+      ?.recurringInvoice ||
+    currentUser?.company_user?.react_settings?.react_table_columns
+      ?.recurringInvoice ||
+    defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))
