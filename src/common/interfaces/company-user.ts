@@ -15,6 +15,7 @@ import { User } from './user';
 export interface ReactSettings {
   show_pdf_preview: boolean;
   react_notification_link: boolean;
+  react_table_columns?: Record<ReactTableColumns, string[]>;
 }
 
 export interface CompanyUser {
