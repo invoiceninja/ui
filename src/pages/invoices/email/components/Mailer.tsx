@@ -10,7 +10,6 @@
 
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import MDEditor from '@uiw/react-md-editor';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
