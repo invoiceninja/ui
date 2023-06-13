@@ -9,9 +9,10 @@
  */
 
 import { InputLabel } from '$app/components/forms/InputLabel';
-import MDEditor from '@uiw/react-md-editor';
 import { debounce } from 'lodash';
 import { useEffect, useRef, useState } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 interface Props {
   value?: string | undefined;
@@ -39,16 +40,33 @@ export function MarkdownEditor(props: Props) {
     delayedQuery(input || '');
   };
 
+  const modules = {
+    toolbar: [
+      [{ font: [] }],
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      ["bold", "italic", "underline", "strike"],
+      [{ color: [] }, { background: [] }],
+      [{ script: "sub" }, { script: "super" }],
+      ["blockquote", "code-block"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ indent: "-1" }, { indent: "+1" }, { align: [] }],
+      ["link", "image", "video"],
+      ["clean"],
+    ],
+  };
+
   return (
     <div className="space-y-4">
+      
       {props.label && <InputLabel>{props.label}</InputLabel>}
 
-      <MDEditor
-        value={value}
+      <ReactQuill
+        theme="snow"
+        value={value} 
         onChange={handleChange}
-        preview="edit"
-        data-color-mode="light"
+        modules={modules}
       />
     </div>
+
   );
 }

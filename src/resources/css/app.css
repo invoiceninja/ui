@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.ql-clipboard {
+    position: fixed !important;
+}
+
+.ql-editor {
+    height: auto !important;
+    min-height: 200px !important;
+}
+
+.ql-container {
+    min-height: 200px !important;
+}

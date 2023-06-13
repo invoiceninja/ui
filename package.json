@@ -43,6 +43,7 @@
     "react-phone-number-input": "^3.2.23",
     "react-qr-code": "^2.0.8",
     "react-query": "^3.39.2",
+    "react-quill": "^2.0.0",
     "react-redux": "^8.0.5",
     "react-router-dom": "^6.4.4",
     "react-select": "^5.7.0",
