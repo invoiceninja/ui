@@ -45,9 +45,9 @@ export function Edit() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('subscriptions'), href: '/settings/subscriptions' },
+    { name: t('payment_links'), href: '/settings/subscriptions' },
     {
-      name: t('edit_subscription'),
+      name: t('edit_payment_link'),
       href: route('/settings/subscriptions/:id/edit', { id }),
     },
   ];
