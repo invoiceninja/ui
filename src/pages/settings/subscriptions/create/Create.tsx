@@ -48,8 +48,8 @@ export function Create() {
 
   const pages = [
     { name: t('settings'), href: '/settings' },
-    { name: t('subscriptions'), href: '/settings/subscriptions' },
-    { name: t('new_subscription'), href: '/settings/subscriptions/create' },
+    { name: t('payment_links'), href: '/settings/subscriptions' },
+    { name: t('new_payment_link'), href: '/settings/subscriptions/create' },
   ];
 
   const tabs = [t('overview'), t('settings'), t('webhook')];
@@ -120,7 +120,7 @@ export function Create() {
 
   return (
     <Settings
-      title={t('new_subscription')}
+      title={t('new_payment_link')}
       breadcrumbs={pages}
       onSaveClick={handleSave}
       disableSaveButton={!subscription || showPlanAlert}
