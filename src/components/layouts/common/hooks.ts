@@ -137,7 +137,7 @@ export function useSettingsRoutes() {
       enabled: isAdmin || isOwner || false,
     },
     {
-      name: t('subscriptions'),
+      name: t('payment_links'),
       href: '/settings/subscriptions',
       current: location.pathname.startsWith('/settings/subscriptions'),
       enabled: isAdmin || isOwner || false,

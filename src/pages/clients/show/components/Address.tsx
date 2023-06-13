@@ -33,12 +33,13 @@ export function Address(props: Props) {
             value={
               <>
                 <p>
-                  {client.address1.length > 0 && `${client.address1}, `}
+                  {client.address1.length > 0 && client.address1}
                   {client.address2}
                 </p>
 
                 <p>
-                  {client.city.length > 0 && `${client.city}, `}
+                  {client.city.length > 0 && client.city}
+                  {client.postal_code.length > 0 && client.postal_code}
                   {client.state}
                 </p>
 

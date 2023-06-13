@@ -39,6 +39,7 @@ export function Preferences() {
           }
         />
       </Element>
+
       <Element leftSide={t('react_notification_link')} leftSideHelp={t('react_notification_link_help')}>
         <Toggle
           checked={reactSettings.react_notification_link}
