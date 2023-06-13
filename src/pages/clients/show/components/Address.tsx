@@ -39,6 +39,7 @@ export function Address(props: Props) {
 
                 <p>
                   {client.city.length > 0 && `${client.city}, `}
+                  {client.postal_code.length > 0 && `${client.postal_code}, `}
                   {client.state}
                 </p>
 
