@@ -12,6 +12,7 @@
     "@reduxjs/toolkit": "^1.9.1",
     "@sentry/react": "^7.24.1",
     "@sentry/tracing": "^7.24.1",
+    "@tinymce/tinymce-react": "^4.3.0",
     "@tippyjs/react": "^4.2.6",
     "@uiw/react-md-editor": "^3.19.8",
     "array-move": "^4.0.0",
