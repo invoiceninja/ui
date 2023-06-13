@@ -10,7 +10,6 @@
 
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import MDEditor from '@uiw/react-md-editor';
 import { endpoint } from '$app/common/helpers';
 import { route } from '$app/common/helpers/route';
 import { useCurrencies } from '$app/common/hooks/useCurrencies';
@@ -32,6 +31,7 @@ import { ChangeEvent, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from 'react-query';
 import { useParams } from 'react-router-dom';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 
 interface Props {
   client: Client | undefined;
@@ -176,7 +176,7 @@ export function AdditionalInfo(props: Props) {
 
         <div>
           <Element leftSide={t('public_notes')}>
-            <MDEditor
+            <MarkdownEditor
               value={props.client?.public_notes}
               onChange={(value) => {
                 const client = { ...props.client };
@@ -188,7 +188,7 @@ export function AdditionalInfo(props: Props) {
           </Element>
 
           <Element leftSide={t('private_notes')}>
-            <MDEditor
+            <MarkdownEditor
               value={props.client?.private_notes}
               onChange={(value) => {
                 const client = { ...props.client };

@@ -10,7 +10,6 @@
 
 import { Card, Element } from '$app/components/cards';
 import { InputField, SelectField } from '$app/components/forms';
-import MDEditor from '@uiw/react-md-editor';
 import { enterprisePlan } from '$app/common/guards/guards/enterprise-plan';
 import { freePlan } from '$app/common/guards/guards/free-plan';
 import { proPlan } from '$app/common/guards/guards/pro-plan';
@@ -29,6 +28,7 @@ import { MailerComponent } from '$app/pages/purchase-orders/email/Email';
 import { forwardRef, RefObject, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isHosted, isSelfHosted } from '$app/common/helpers';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 
 export type MailerResourceType =
   | 'invoice'
@@ -166,10 +166,9 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
           />
 
           {(proPlan() || enterprisePlan()) && (
-            <MDEditor
+            <MarkdownEditor
               value={body || template?.raw_body}
               onChange={(value) => setBody(String(value))}
-              preview="edit"
             />
           )}
         </Card>
