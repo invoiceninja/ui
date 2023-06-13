@@ -27,8 +27,10 @@ export function Settings(props: SubscriptionProps) {
       <Element leftSide={t('frequency')}>
         <SelectField
           value={subscription.frequency_id}
+          errorMessage={errors?.errors.frequency_id}
           onValueChange={(value) => handleChange('frequency_id', value)}
         >
+          <option value="">{t('once')}</option>
           {Object.keys(frequencies).map((frequency, index) => (
             <option key={index} value={frequency}>
               {t(frequencies[frequency as keyof typeof frequencies])}
