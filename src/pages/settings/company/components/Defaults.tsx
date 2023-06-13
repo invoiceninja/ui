@@ -15,13 +15,13 @@ import Toggle from '../../../../components/forms/Toggle';
 import { useDispatch, useSelector } from 'react-redux';
 import { useStaticsQuery } from '$app/common/queries/statics';
 import { ChangeEvent } from 'react';
-import MDEditor from '@uiw/react-md-editor';
 import { endpoint } from '$app/common/helpers';
 import { useQuery } from 'react-query';
 import { RootState } from '$app/common/stores/store';
 import { updateChanges } from '$app/common/stores/slices/company-users';
 import { PaymentTerm } from '../../../../common/interfaces/payment-term';
 import { request } from '$app/common/helpers/request';
+import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
 
 export function Defaults() {
   const [t] = useTranslation();
@@ -179,7 +179,7 @@ export function Defaults() {
           <div className="pt-6 border-b"></div>
 
           <Element className="mt-4" leftSide={t('invoice_terms')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.invoice_terms}
               onChange={(value) =>
                 dispatch(
@@ -194,7 +194,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('invoice_footer')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.invoice_footer}
               onChange={(value) =>
                 dispatch(
@@ -209,7 +209,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('quote_terms')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.quote_terms}
               onChange={(value) =>
                 dispatch(
@@ -224,7 +224,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('quote_footer')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.quote_footer}
               onChange={(value) =>
                 dispatch(
@@ -239,7 +239,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('credit_terms')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.credit_terms}
               onChange={(value) =>
                 dispatch(
@@ -254,7 +254,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('credit_footer')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.credit_footer}
               onChange={(value) =>
                 dispatch(
@@ -269,7 +269,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('purchase_order_terms')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.purchase_order_terms}
               onChange={(value) =>
                 dispatch(
@@ -284,7 +284,7 @@ export function Defaults() {
           </Element>
 
           <Element className="mt-4" leftSide={t('purchase_order_footer')}>
-            <MDEditor
+            <MarkdownEditor
               value={companyChanges?.settings?.purchase_order_footer}
               onChange={(value) =>
                 dispatch(
