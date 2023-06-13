@@ -58,7 +58,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "format": "prettier --write src/",
-    "lint": "eslint \"**/*.{ts,tsx}\" --max-warnings=0",
+    "lint": "eslint src --max-warnings=0",
     "test": "jest",
     "prepare": "husky install",
     "preview": "vite preview"
