@@ -16,6 +16,7 @@ import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
 import { TaxItem } from './invoice-sum';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
+import { Currency } from '$app/common/interfaces/currency';
 
 export class InvoiceSumInclusive {
   protected taxMap = collect<TaxItem>();
@@ -28,7 +29,7 @@ export class InvoiceSumInclusive {
   public totalCustomValues = 0;
   public subTotal = 0;
 
-  constructor(public invoice: Invoice | Credit | PurchaseOrder | Quote | RecurringInvoice) {
+  constructor(public invoice: Invoice | Credit | PurchaseOrder | Quote | RecurringInvoice, currency: Currency) {
     this.invoiceItems = new InvoiceItemSumInclusive(this.invoice);
   }
 

@@ -178,7 +178,7 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
 
     if (currency && credit) {
       
-      const invoiceSum = credit.uses_inclusive_taxes ? new InvoiceSumInclusive(credit).build() : new InvoiceSum(credit, currency).build();
+      const invoiceSum = credit.uses_inclusive_taxes ? new InvoiceSumInclusive(credit, currency).build() : new InvoiceSum(credit, currency).build();
 
       setInvoiceSum(invoiceSum);
     }
