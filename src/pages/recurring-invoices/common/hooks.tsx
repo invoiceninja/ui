@@ -178,7 +178,7 @@ export function useRecurringInvoiceUtilities(
 
     if (currency && recurringInvoice) {
 
-      const invoiceSum = recurringInvoice.uses_inclusive_taxes ? new InvoiceSumInclusive(recurringInvoice).build() : new InvoiceSum(recurringInvoice, currency).build();
+      const invoiceSum = recurringInvoice.uses_inclusive_taxes ? new InvoiceSumInclusive(recurringInvoice, currency).build() : new InvoiceSum(recurringInvoice, currency).build();
 
       setInvoiceSum(invoiceSum);
     }

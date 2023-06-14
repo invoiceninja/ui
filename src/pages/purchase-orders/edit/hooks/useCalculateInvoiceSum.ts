@@ -21,7 +21,7 @@ export function useCalculateInvoiceSum(
   return async (purchaseOrder: PurchaseOrder) => {
     const currency = await resolveCurrency(purchaseOrder.vendor_id);
 
-    const invoiceSum = purchaseOrder.uses_inclusive_taxes ? new InvoiceSumInclusive(purchaseOrder).build() : new InvoiceSum(purchaseOrder, currency!).build();
+    const invoiceSum = purchaseOrder.uses_inclusive_taxes ? new InvoiceSumInclusive(purchaseOrder, currency!).build() : new InvoiceSum(purchaseOrder, currency!).build();
 
     setInvoiceSum(invoiceSum);
 

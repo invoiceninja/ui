@@ -180,7 +180,7 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
 
     if (currency && quote) {
       
-      const invoiceSum = quote.uses_inclusive_taxes ? new InvoiceSumInclusive(quote).build() : new InvoiceSum(quote, currency).build();
+      const invoiceSum = quote.uses_inclusive_taxes ? new InvoiceSumInclusive(quote, currency).build() : new InvoiceSum(quote, currency).build();
 
       setInvoiceSum(invoiceSum);
     }
