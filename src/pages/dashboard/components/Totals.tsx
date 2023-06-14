@@ -79,8 +79,8 @@ export function Totals() {
   const [body, setBody] = useState<{ start_date: string; end_date: string }>({
     start_date: new Date(
       new Date().getFullYear(),
-      new Date().getMonth(),
-      new Date().getDate() - 7
+      new Date().getMonth() - 1,
+      new Date().getDate()
     )
       .toISOString()
       .split('T')[0],
@@ -111,6 +111,7 @@ export function Totals() {
           currencies.push({ value: id, label: name as unknown as string });
         });
 
+        setCurrency(parseInt(currencies[0].value));
         setCurrencies(currencies);
         setIsLoadingTotals(false);
       }
