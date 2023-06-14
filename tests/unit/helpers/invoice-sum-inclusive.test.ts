@@ -12,13 +12,13 @@ const USD = currencies[0];
 
 describe('InvoiceSumInclusive test', () => {
   test('correct instance', () => {
-    expect(new InvoiceSumInclusive(invoice)).toBeInstanceOf(
+    expect(new InvoiceSumInclusive(invoice, USD)).toBeInstanceOf(
       InvoiceSumInclusive
     );
   });
 
   it('playground', async () => {
-    await new InvoiceSumInclusive(invoice).build();
+    await new InvoiceSumInclusive(invoice, USD).build();
   });
 });
 
@@ -32,7 +32,7 @@ describe('InvoiceSum test invoice calculation', () => {
   });
 
   it('Line Item Calc', async () => {
-    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+    const invoiceSum = await new InvoiceSumInclusive(invoice, USD).build();
 
     expect(invoiceSum.invoice.amount).toEqual(2628);
     expect(invoiceSum.invoice.balance).toEqual(2628);
@@ -49,7 +49,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.tax_rate3 = 0;
 
     invoice.line_items = invoice_item;
-    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+    const invoiceSum = await new InvoiceSumInclusive(invoice, USD).build();
 
     expect(invoiceSum.invoice.amount).toEqual(20);
     expect(invoiceSum.invoice.balance).toEqual(20);
@@ -59,7 +59,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.is_amount_discount = true;
     invoice.discount = 1;
 
-    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+    const invoiceSum = await new InvoiceSumInclusive(invoice, USD).build();
 
     expect(invoiceSum.invoice.amount).toEqual(19);
     expect(invoiceSum.invoice.balance).toEqual(19);
@@ -69,7 +69,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.is_amount_discount = false;
     invoice.discount = 50;
 
-    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+    const invoiceSum = await new InvoiceSumInclusive(invoice, USD).build();
 
     expect(invoiceSum.invoice.amount).toEqual(10);
     expect(invoiceSum.invoice.balance).toEqual(10);
@@ -80,7 +80,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.discount = 5;
     invoice.custom_surcharge1 = 5;
 
-    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+    const invoiceSum = await new InvoiceSumInclusive(invoice, USD).build();
 
     expect(invoiceSum.invoice.amount).toEqual(20);
     expect(invoiceSum.invoice.balance).toEqual(20);
@@ -94,7 +94,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.tax_name1 = 'GST';
     invoice.uses_inclusive_taxes = true;
 
-    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+    const invoiceSum = await new InvoiceSumInclusive(invoice, USD).build();
 
     expect(invoiceSum.subTotal).toEqual(20);
     expect(invoiceSum.invoice.amount).toEqual(20);
@@ -111,7 +111,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.tax_name2 = 'GST';
     invoice.uses_inclusive_taxes = true;
 
-    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+    const invoiceSum = await new InvoiceSumInclusive(invoice, USD).build();
 
     expect(invoiceSum.subTotal).toEqual(20);
     expect(invoiceSum.invoice.amount).toEqual(20);
@@ -134,7 +134,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.tax_name2 = 'GST';
     invoice.uses_inclusive_taxes = true;
 
-    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+    const invoiceSum = await new InvoiceSumInclusive(invoice, USD).build();
 
     expect(invoiceSum.subTotal).toEqual(20);
     expect(invoiceSum.invoice.amount).toEqual(20);
@@ -157,7 +157,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.tax_name2 = '';
     invoice.uses_inclusive_taxes = true;
 
-    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+    const invoiceSum = await new InvoiceSumInclusive(invoice, USD).build();
 
     expect(invoiceSum.subTotal).toEqual(20);
     expect(invoiceSum.totalTaxes).toEqual(1.82);
@@ -201,7 +201,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.tax_name2 = '';
     invoice.uses_inclusive_taxes = true;
 
-    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+    const invoiceSum = await new InvoiceSumInclusive(invoice, USD).build();
 
     expect(invoiceSum.subTotal).toEqual(14);
     expect(invoiceSum.totalTaxes).toEqual(1.27);
@@ -245,7 +245,7 @@ describe('InvoiceSum test invoice calculation', () => {
     invoice.tax_name2 = '';
     invoice.uses_inclusive_taxes = true;
 
-    const invoiceSum = await new InvoiceSumInclusive(invoice).build();
+    const invoiceSum = await new InvoiceSumInclusive(invoice, USD).build();
 
     //todo - this value is failing - need to fix when @ben implements client accessor in Invoice Model
     // expect(invoiceSum.subTotal).toEqual(7.48);
