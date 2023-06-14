@@ -18,7 +18,8 @@ import { TaxItem } from './invoice-sum';
 
 export class InvoiceSumInclusive {
   protected taxMap = collect<TaxItem>();
-  protected invoiceItems = new InvoiceItemSumInclusive(this.invoice);
+  // protected invoiceItems = new InvoiceItemSumInclusive(this.invoice);
+  public declare invoiceItems: InvoiceItemSumInclusive;
   protected totalTaxMap: Record<string, unknown>[] = [];
 
   public totalDiscount = 0;
@@ -27,7 +28,9 @@ export class InvoiceSumInclusive {
   public totalCustomValues = 0;
   public subTotal = 0;
 
-  constructor(public invoice: Invoice | Credit | PurchaseOrder | Quote) {}
+  constructor(public invoice: Invoice | Credit | PurchaseOrder | Quote) {
+    this.invoiceItems = new InvoiceItemSumInclusive(this.invoice);
+  }
 
   public build() {
      this.calculateLineItems()
@@ -155,35 +158,67 @@ export class InvoiceSumInclusive {
   }
 
   protected  setTaxMap() {
+
     if (this.invoice.is_amount_discount) {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
     }
 
     this.taxMap = collect();
 
-    const keys = this.invoiceItems.taxCollection.pluck('key').unique();
-    const values = this.invoiceItems.taxCollection;
+    let taxCollection = collect<TaxItem>();
+    taxCollection = this.invoiceItems.taxCollection.pluck('items');
+
+    const keys = taxCollection.pluck('key').unique();
 
     keys.map((key) => {
-      const taxName = values
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        .filter((value) => value[key as string] == key)
-        .pluck('tax_name')
+      const taxName = taxCollection
+        .filter((item) => item.key === key)
+        .pluck('name')
         .first();
 
-      const totalLineTax = values
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        .filter((value) => value[key as string] === key)
+      const totalLineTax = taxCollection
+        .filter((item) => item.key === key)
         .sum('total');
 
-      this.taxMap.push({ name: taxName, total: totalLineTax });
-
-      this.totalTaxes += this.invoiceItems.totalTaxes;
+      this.taxMap.push({
+        name: taxName as string,
+        total: totalLineTax as number,
+      });
     });
 
+    this.totalTaxes += this.invoiceItems.totalTaxes;
+
     return this;
+
+    // if (this.invoice.is_amount_discount) {
+    //   this.invoiceItems.calculateTaxesWithAmountDiscount();
+    // }
+
+    // this.taxMap = collect();
+
+    // const keys = this.invoiceItems.taxCollection.pluck('key').unique();
+    // const values = this.invoiceItems.taxCollection;
+
+    // keys.map((key) => {
+    //   const taxName = values
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+    //     .filter((value) => value[key as string] == key)
+    //     .pluck('tax_name')
+    //     .first();
+
+    //   const totalLineTax = values
+    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    //     // @ts-ignore
+    //     .filter((value) => value[key as string] === key)
+    //     .sum('total');
+
+    //   this.taxMap.push({ name: taxName, total: totalLineTax });
+
+    //   this.totalTaxes += this.invoiceItems.totalTaxes;
+    // });
+
+    // return this;
   }
 
   protected  calculateTotals() {
