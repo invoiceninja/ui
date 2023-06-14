@@ -13,7 +13,6 @@ import { InvoiceItem } from '$app/common/interfaces/invoice-item';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Credit } from '$app/common/interfaces/credit';
 import { Quote } from '$app/common/interfaces/quote';
-import { Currency } from '$app/common/interfaces/currency';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 
 export class InvoiceItemSumInclusive {

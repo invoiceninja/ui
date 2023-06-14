@@ -14,7 +14,6 @@ import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { Credit } from '$app/common/interfaces/credit';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
-import { Currency } from '$app/common/interfaces/currency';
 
 export class InvoiceSumInclusive {
   protected taxMap = collect();
