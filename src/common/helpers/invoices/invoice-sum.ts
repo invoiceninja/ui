@@ -15,6 +15,8 @@ import { Currency } from '$app/common/interfaces/currency';
 import { NumberFormatter } from '../number-formatter';
 import { RecurringInvoice } from '$app/common/interfaces/recurring-invoice';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Credit } from '$app/common/interfaces/credit';
+import { Quote } from '$app/common/interfaces/quote';
 
 export interface TaxItem {
   key?: string;
@@ -35,7 +37,7 @@ export class InvoiceSum {
   public subTotal = 0;
 
   constructor(
-    public invoice: Invoice | RecurringInvoice | PurchaseOrder,
+    public invoice: Invoice | RecurringInvoice | PurchaseOrder | Credit | Quote,
     protected currency: Currency
   ) {
     this.invoiceItems = new InvoiceItemSum(this.invoice, this.currency);
