@@ -14,9 +14,10 @@ import { InvoiceStatus } from '$app/common/enums/invoice-status';
 import { Credit } from '$app/common/interfaces/credit';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { Quote } from '$app/common/interfaces/quote';
+import { TaxItem } from './invoice-sum';
 
 export class InvoiceSumInclusive {
-  protected taxMap = collect();
+  protected taxMap = collect<TaxItem>();
   protected invoiceItems = new InvoiceItemSumInclusive(this.invoice);
   protected totalTaxMap: Record<string, unknown>[] = [];
 
