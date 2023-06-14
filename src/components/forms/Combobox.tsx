@@ -199,6 +199,7 @@ export function ComboboxStatic({
           >
             {action && action.visible && (
               <button
+                type="button"
                 onClick={action.onClick}
                 className="min-w-[19rem] relative cursor-pointer select-none py-2 pl-3 pr-9 text-gray-900 hover:bg-gray-100"
                 tabIndex={-1}
@@ -357,7 +358,7 @@ export function ComboboxAsync<T = any>({
       if (query.length > 0 && current) {
         current.searchParams.set('filter', query);
       }
-      
+
       return new URL(current.href);
     });
   };
