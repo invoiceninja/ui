@@ -87,7 +87,6 @@ import { EntityState } from '$app/common/enums/entity-state';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
-import invoice from '$tests/helpers/data/invoice';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
