@@ -86,6 +86,8 @@ import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useSche
 import { EntityState } from '$app/common/enums/entity-state';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import invoice from '$tests/helpers/data/invoice';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -178,7 +180,8 @@ export function useQuoteUtilities(props: QuoteUtilitiesProps) {
     );
 
     if (currency && quote) {
-      const invoiceSum = new InvoiceSum(quote, currency).build();
+      
+      const invoiceSum = quote.uses_inclusive_taxes ? new InvoiceSumInclusive(quote).build() : new InvoiceSum(quote, currency).build();
 
       setInvoiceSum(invoiceSum);
     }

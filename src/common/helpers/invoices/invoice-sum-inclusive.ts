@@ -33,6 +33,7 @@ export class InvoiceSumInclusive {
   }
 
   public build() {
+    console.log("inclusively");
      this.calculateLineItems()
      .calculateDiscount()
      .calculateCustomValues()
@@ -190,35 +191,6 @@ export class InvoiceSumInclusive {
 
     return this;
 
-    // if (this.invoice.is_amount_discount) {
-    //   this.invoiceItems.calculateTaxesWithAmountDiscount();
-    // }
-
-    // this.taxMap = collect();
-
-    // const keys = this.invoiceItems.taxCollection.pluck('key').unique();
-    // const values = this.invoiceItems.taxCollection;
-
-    // keys.map((key) => {
-    //   const taxName = values
-    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //     // @ts-ignore
-    //     .filter((value) => value[key as string] == key)
-    //     .pluck('tax_name')
-    //     .first();
-
-    //   const totalLineTax = values
-    //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    //     // @ts-ignore
-    //     .filter((value) => value[key as string] === key)
-    //     .sum('total');
-
-    //   this.taxMap.push({ name: taxName, total: totalLineTax });
-
-    //   this.totalTaxes += this.invoiceItems.totalTaxes;
-    // });
-
-    // return this;
   }
 
   protected  calculateTotals() {

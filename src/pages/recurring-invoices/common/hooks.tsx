@@ -71,6 +71,7 @@ import { useEntityCustomFields } from '$app/common/hooks/useEntityCustomFields';
 import { useBulkAction } from '$app/pages/recurring-invoices/common/queries';
 import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -176,7 +177,8 @@ export function useRecurringInvoiceUtilities(
     );
 
     if (currency && recurringInvoice) {
-      const invoiceSum = new InvoiceSum(recurringInvoice, currency).build();
+
+      const invoiceSum = recurringInvoice.uses_inclusive_taxes ? new InvoiceSumInclusive(recurringInvoice).build() : new InvoiceSum(recurringInvoice, currency).build();
 
       setInvoiceSum(invoiceSum);
     }

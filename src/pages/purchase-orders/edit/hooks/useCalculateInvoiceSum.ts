@@ -9,17 +9,19 @@
  */
 
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
 import { useResolveCurrency } from './useResolveCurrency';
 
 export function useCalculateInvoiceSum(
-  setInvoiceSum: (invoiceSum: InvoiceSum) => unknown
+  setInvoiceSum: (invoiceSum: InvoiceSum | InvoiceSumInclusive) => unknown
 ) {
   const resolveCurrency = useResolveCurrency();
 
   return async (purchaseOrder: PurchaseOrder) => {
     const currency = await resolveCurrency(purchaseOrder.vendor_id);
-    const invoiceSum = new InvoiceSum(purchaseOrder, currency!).build();
+
+    const invoiceSum = purchaseOrder.uses_inclusive_taxes ? new InvoiceSumInclusive(purchaseOrder).build() : new InvoiceSum(purchaseOrder, currency!).build();
 
     setInvoiceSum(invoiceSum);
 
