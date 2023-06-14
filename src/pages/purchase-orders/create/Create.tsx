@@ -43,6 +43,7 @@ import { useHandleProductChange } from '../edit/hooks/useHandleProductChange';
 import { blankInvitation } from '$app/common/constants/blank-invitation';
 import { useVendorResolver } from '$app/common/hooks/vendors/useVendorResolver';
 import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_purchase_order');
@@ -109,7 +110,7 @@ export default function Create() {
     });
   }, [data]);
 
-  const [invoiceSum, setInvoiceSum] = useState<InvoiceSum>();
+  const [invoiceSum, setInvoiceSum] = useState<InvoiceSum | InvoiceSumInclusive>();
   const [errors, setErrors] = useState<ValidationBag>();
 
   const productColumns = useProductColumns();
