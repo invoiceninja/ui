@@ -29,7 +29,7 @@ export class InvoiceSumInclusive {
   public totalCustomValues = 0;
   public subTotal = 0;
 
-  constructor(public invoice: Invoice | Credit | PurchaseOrder | Quote | RecurringInvoice, currency: Currency) {
+  constructor(public invoice: Invoice | Credit | PurchaseOrder | Quote | RecurringInvoice, protected currency: Currency) {
     this.invoiceItems = new InvoiceItemSumInclusive(this.invoice);
   }
 
@@ -82,7 +82,7 @@ export class InvoiceSumInclusive {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name1} ${parseFloat(
-          this.invoice.tax_rate1.toFixed(2)
+          this.invoice.tax_rate1.toFixed(this.currency.precision)
         )} %`,
       });
     }
@@ -94,7 +94,7 @@ export class InvoiceSumInclusive {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name2} ${parseFloat(
-          this.invoice.tax_rate2.toFixed(2)
+          this.invoice.tax_rate2.toFixed(this.currency.precision)
         )} %`,
       });
     }
@@ -106,7 +106,7 @@ export class InvoiceSumInclusive {
 
       this.totalTaxMap.push({
         name: `${this.invoice.tax_name3} ${parseFloat(
-          this.invoice.tax_rate3.toFixed(2)
+          this.invoice.tax_rate3.toFixed(this.currency.precision)
         )} %`,
       });
     }
@@ -134,25 +134,25 @@ export class InvoiceSumInclusive {
 
     if (this.invoice.custom_surcharge_tax1) {
       taxComponent += parseFloat(
-        (this.invoice.custom_surcharge1 * (rate / 100)).toFixed(2)
+        (this.invoice.custom_surcharge1 * (rate / 100)).toFixed(this.currency.precision)
       );
     }
 
     if (this.invoice.custom_surcharge_tax2) {
       taxComponent += parseFloat(
-        (this.invoice.custom_surcharge2 * (rate / 100)).toFixed(2)
+        (this.invoice.custom_surcharge2 * (rate / 100)).toFixed(this.currency.precision)
       );
     }
 
     if (this.invoice.custom_surcharge_tax3) {
       taxComponent += parseFloat(
-        (this.invoice.custom_surcharge3 * (rate / 100)).toFixed(2)
+        (this.invoice.custom_surcharge3 * (rate / 100)).toFixed(this.currency.precision)
       );
     }
 
     if (this.invoice.custom_surcharge_tax4) {
       taxComponent += parseFloat(
-        (this.invoice.custom_surcharge4 * (rate / 100)).toFixed(2)
+        (this.invoice.custom_surcharge4 * (rate / 100)).toFixed(this.currency.precision)
       );
     }
 
@@ -195,7 +195,7 @@ export class InvoiceSumInclusive {
   }
 
   protected  calculateTotals() {
-    this.totalTaxes = Number(this.totalTaxes.toFixed(2));
+    this.totalTaxes = Number(this.totalTaxes.toFixed(this.currency.precision));
 
     return this;
   }
@@ -243,13 +243,13 @@ export class InvoiceSumInclusive {
       return this.invoice.discount;
     }
 
-    return parseFloat((amount * (this.invoice.discount / 100)).toFixed(2));
+    return parseFloat((amount * (this.invoice.discount / 100)).toFixed(this.currency.precision));
   }
 
   protected taxer(amount: number, tax_rate: number) {
     // This needs extraction in the taxer service/class.
 
-    return parseFloat((amount * ((tax_rate ?? 0) / 100)).toFixed(2));
+    return parseFloat((amount * ((tax_rate ?? 0) / 100)).toFixed(this.currency.precision));
   }
 
   protected valuer(customValue: number | undefined): number {
