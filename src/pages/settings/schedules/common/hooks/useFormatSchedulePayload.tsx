@@ -29,6 +29,7 @@ const TemplateParametersProperties = {
     'show_aging_table',
     'show_credits_table',
     'show_payments_table',
+    'only_clients_with_invoices',
     'clients',
   ],
   EMAIL_RECORD: ['entity', 'entity_id'],

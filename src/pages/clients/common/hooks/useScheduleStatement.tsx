@@ -24,6 +24,7 @@ export function useScheduleStatement() {
       show_aging_table: statement.show_aging_table,
       show_credits_table: statement.show_credits_table,
       show_payments_table: statement.show_payments_table,
+      only_clients_with_invoices: statement.only_clients_with_invoices,
       status: statement.status,
       date_range:
         statement.dateRangeId === 'custom'
