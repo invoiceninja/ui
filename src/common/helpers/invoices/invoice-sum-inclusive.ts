@@ -108,6 +108,10 @@ export class InvoiceSumInclusive {
     return this;
   }
 
+  public getTaxMap() {
+    return this.taxMap;
+  }
+
   protected  calculateCustomValues() {
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge1);
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge2);
