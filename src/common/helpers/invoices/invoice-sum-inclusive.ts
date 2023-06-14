@@ -11,6 +11,10 @@ import { InvoiceItemSumInclusive } from './invoice-item-sum-inclusive';
 import { Invoice } from '$app/common/interfaces/invoice';
 import collect from 'collect.js';
 import { InvoiceStatus } from '$app/common/enums/invoice-status';
+import { Credit } from '$app/common/interfaces/credit';
+import { PurchaseOrder } from '$app/common/interfaces/purchase-order';
+import { Quote } from '$app/common/interfaces/quote';
+import { Currency } from '$app/common/interfaces/currency';
 
 export class InvoiceSumInclusive {
   protected taxMap = collect();
@@ -23,23 +27,23 @@ export class InvoiceSumInclusive {
   public totalCustomValues = 0;
   public subTotal = 0;
 
-  constructor(public invoice: Invoice) {}
+  constructor(public invoice: Invoice | Credit | PurchaseOrder | Quote) {}
 
-  public async build() {
-    await this.calculateLineItems();
-    await this.calculateDiscount();
-    await this.calculateCustomValues();
-    await this.calculateInvoiceTaxes();
-    await this.setTaxMap();
-    await this.calculateTotals();
-    await this.calculateBalance();
-    await this.calculatePartial();
+  public build() {
+     this.calculateLineItems()
+     .calculateDiscount()
+     .calculateCustomValues()
+     .calculateInvoiceTaxes()
+     .setTaxMap()
+     .calculateTotals()
+     .calculateBalance()
+     .calculatePartial();
 
     return this;
   }
 
-  protected async calculateLineItems() {
-    await this.invoiceItems.process();
+  protected  calculateLineItems() {
+    this.invoiceItems.process();
 
     this.invoice.line_items = this.invoiceItems.lineItems;
     this.total = this.invoiceItems.subTotal;
@@ -48,14 +52,14 @@ export class InvoiceSumInclusive {
     return this;
   }
 
-  protected async calculateDiscount() {
+  protected  calculateDiscount() {
     this.totalDiscount = this.discount(this.invoiceItems.subTotal);
     this.total -= this.totalDiscount;
 
     return this;
   }
 
-  protected async calculateInvoiceTaxes() {
+  protected  calculateInvoiceTaxes() {
     let amount = this.total;
 
     if (this.invoice.discount > 0 && this.invoice.is_amount_discount) {
@@ -105,7 +109,7 @@ export class InvoiceSumInclusive {
     return this;
   }
 
-  protected async calculateCustomValues() {
+  protected  calculateCustomValues() {
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge1);
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge2);
     this.totalCustomValues += this.valuer(this.invoice.custom_surcharge3);
@@ -146,7 +150,7 @@ export class InvoiceSumInclusive {
     return taxComponent;
   }
 
-  protected async setTaxMap() {
+  protected  setTaxMap() {
     if (this.invoice.is_amount_discount) {
       this.invoiceItems.calculateTaxesWithAmountDiscount();
     }
@@ -178,13 +182,13 @@ export class InvoiceSumInclusive {
     return this;
   }
 
-  protected async calculateTotals() {
+  protected  calculateTotals() {
     this.totalTaxes = Number(this.totalTaxes.toFixed(2));
 
     return this;
   }
 
-  protected async calculateBalance() {
+  protected  calculateBalance() {
     this.setCalculatedAttributes();
 
     return this;
