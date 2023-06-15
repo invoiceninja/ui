@@ -43,7 +43,6 @@ import { currentTaskAtom } from '../common/atoms';
 import { useFormatTimeLog } from '../common/hooks';
 import { date as formatDate } from '$app/common/helpers';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
-import { TimePicker } from '$app/components/forms/TimePicker';
 
 export function EditSlider() {
   const [t] = useTranslation();
