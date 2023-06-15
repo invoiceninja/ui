@@ -50,6 +50,7 @@ export interface Company {
   default_password_timeout: number;
   subdomain: string;
   client_can_register: boolean;
+  oauth_password_required: boolean;
 }
 
 export interface CompanyInput {
