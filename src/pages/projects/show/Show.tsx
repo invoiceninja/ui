@@ -139,8 +139,8 @@ export default function Show() {
           endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
           columns={columns}
           withResourcefulActions
-          bulkRoute="/api/v1/invoices/bulk"
-          linkToCreate={route('/invoices/create?client=:id', { id: id })}
+          bulkRoute="/api/v1/tasks/bulk"
+          linkToCreate={`/tasks/create?project=${project.id}`}
         />
       </div>
     </Default>
