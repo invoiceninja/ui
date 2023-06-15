@@ -54,6 +54,7 @@ import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useSche
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { getEntityState } from '$app/common/helpers';
 import { EntityState } from '$app/common/enums/entity-state';
+import dayjs from 'dayjs';
 
 export function useActions() {
   const { t } = useTranslation();
@@ -78,19 +79,19 @@ export function useActions() {
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const cloneToInvoice = (invoice: Invoice) => {
-    setInvoice({ ...invoice, number: '', documents: [], due_date: '' });
+    setInvoice({ ...invoice, number: '', documents: [], due_date: '', date: dayjs().format('YYYY-MM-DD') });
 
     navigate('/invoices/create?action=clone');
   };
 
   const cloneToQuote = (invoice: Invoice) => {
-    setQuote({ ...(invoice as unknown as Quote), number: '', documents: [] });
+    setQuote({ ...(invoice as unknown as Quote), number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
 
     navigate('/quotes/create?action=clone');
   };
 
   const cloneToCredit = (invoice: Invoice) => {
-    setCredit({ ...(invoice as unknown as Credit), number: '', documents: [] });
+    setCredit({ ...(invoice as unknown as Credit), number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
 
     navigate('/credits/create?action=clone');
   };
@@ -110,6 +111,7 @@ export function useActions() {
       ...(invoice as unknown as PurchaseOrder),
       number: '',
       documents: [],
+      date: dayjs().format('YYYY-MM-DD')
     });
 
     navigate('/purchase_orders/create?action=clone');

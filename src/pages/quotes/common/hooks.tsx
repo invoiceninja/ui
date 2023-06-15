@@ -86,6 +86,7 @@ import { EntityState } from '$app/common/enums/entity-state';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import dayjs from 'dayjs';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -290,13 +291,13 @@ export function useActions() {
   const scheduleEmailRecord = useScheduleEmailRecord({ entity: 'quote' });
 
   const cloneToQuote = (quote: Quote) => {
-    setQuote({ ...quote, number: '', documents: [] });
+    setQuote({ ...quote, number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
 
     navigate('/quotes/create?action=clone');
   };
 
   const cloneToCredit = (quote: Quote) => {
-    setCredit({ ...quote, number: '', documents: [] });
+    setCredit({ ...quote, number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
 
     navigate('/credits/create?action=clone');
   };
@@ -316,13 +317,14 @@ export function useActions() {
       ...(quote as unknown as PurchaseOrder),
       number: '',
       documents: [],
+      date: dayjs().format('YYYY-MM-DD')
     });
 
     navigate('/purchase_orders/create?action=clone');
   };
 
   const cloneToInvoice = (quote: Quote) => {
-    setInvoice({ ...quote, number: '', documents: [], due_date: '' });
+    setInvoice({ ...quote, number: '', documents: [], due_date: '', date: dayjs().format('YYYY-MM-DD') });
     navigate('/invoices/create?action=clone');
   };
 
