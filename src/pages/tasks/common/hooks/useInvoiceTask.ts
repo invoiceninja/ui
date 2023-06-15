@@ -117,12 +117,34 @@ export function useInvoiceTask() {
               hoursDescription = `• ${hours} ${t('hours')}`;
             }
 
+            const start_date_log = `${dayjs.unix(start).format(`${dateFormat}`)}`;
+            const start_time_log = `${dayjs.unix(start).format(`${timeFormat}`)}`;
+            const end_time_log = `${dayjs.unix(stop).format(`${timeFormat}`)}`;
+
+            const description = [];
+
+            if(company.invoice_task_datelog || company.invoice_task_timelog)
+              description.push('<div class="task-time-details">');
+
+            if (company.invoice_task_datelog)
+              description.push(start_date_log);
+
+            if (company.invoice_task_timelog)
+              description.push(start_time_log + ' - ');
+
+            if (company.invoice_task_timelog)
+              description.push(end_time_log);
+
+            if (company.invoice_task_hours)
+              description.push(hoursDescription);
+
+            if (company.invoice_task_datelog || company.invoice_task_timelog)
+              description.push('</div>\n');
+              
+            console.log(description);
+
             parsed.push(
-              `${dayjs
-                .unix(start)
-                .format(`${dateFormat} ${timeFormat}`)} - ${dayjs
-                .unix(stop)
-                .format(timeFormat)} ${hoursDescription} <br />`
+              description.join(' '),
             );
           }
         });
@@ -136,27 +158,14 @@ export function useInvoiceTask() {
           quantity: taskQuantity,
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
         };
-
-        let projectDescription = '';
-
-        if (company.invoice_task_project && task.project_id) {
-          const project = await fetchProjectDetails(task.project_id);
-
-          if (project) {
-            projectDescription = `## ${project.name}`;
-          }
-        }
+        
+        const project_name = (company.invoice_task_project && task?.project?.name) ? '## ' + task.project?.name + '\n' : '';
+        const task_description = company.invoice_task_item_description ? '### ' + task?.description + '\n' : '';
 
         if (parsed.length) {
-          item.notes = [
-            projectDescription,
-            task.description,
-            '<div class="task-time-details">',
-            ...parsed,
-            '</div>',
-          ]
-            .join('\n')
-            .trim();
+
+          item.notes = 
+            project_name + task_description + ' ' + parsed.join(' ');
         }
 
         invoice.line_items = parsed.length ? [item] : [];

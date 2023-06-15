@@ -50,6 +50,13 @@ export interface Company {
   default_password_timeout: number;
   subdomain: string;
   client_can_register: boolean;
+
+  invoice_task_item_description: boolean;
+  show_tasks_table: boolean;
+  invoice_task_datelog: boolean;
+  invoice_task_timelog: boolean;
+  invoice_task_locked: boolean;
+  invoice_task_documents: boolean;
 }
 
 export interface CompanyInput {
