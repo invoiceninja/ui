@@ -67,7 +67,6 @@ export function UserDetails() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const onSave = (password: string, passwordIsRequired: boolean) => {
     toast.processing();
-
     setErrors(undefined);
 
     const requests = [
