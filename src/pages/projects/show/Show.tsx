@@ -26,10 +26,11 @@ import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 import duration from 'dayjs/plugin/duration';
 import dayjs from 'dayjs';
-import { Dropdown } from '$app/components/dropdown/Dropdown';
 import { Inline } from '$app/components/Inline';
 import { ResourceActions } from '$app/components/ResourceActions';
 import { useActions } from '../common/hooks';
+import { DataTable } from '$app/components/DataTable';
+import { useTaskColumns } from '$app/pages/tasks/common/hooks';
 
 dayjs.extend(duration);
 
@@ -57,6 +58,7 @@ export default function Show() {
   });
 
   const actions = useActions();
+  const columns = useTaskColumns();
 
   if (!project) {
     return (
@@ -129,6 +131,17 @@ export default function Show() {
             {t('duration')}: {duration()}
           </p>
         </InfoCard>
+      </div>
+
+      <div className="my-4">
+        <DataTable
+          resource="task"
+          endpoint={`/api/v1/tasks?include=status,client,project&sort=id|desc&project_tasks=${project.id}`}
+          columns={columns}
+          withResourcefulActions
+          bulkRoute="/api/v1/invoices/bulk"
+          linkToCreate={route('/invoices/create?client=:id', { id: id })}
+        />
       </div>
     </Default>
   );
