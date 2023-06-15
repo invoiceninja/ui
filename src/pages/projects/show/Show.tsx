@@ -8,11 +8,108 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { date, endpoint } from '$app/common/helpers';
+import { request } from '$app/common/helpers/request';
+import { route } from '$app/common/helpers/route';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useTitle } from '$app/common/hooks/useTitle';
+import { GenericSingleResourceResponse } from '$app/common/interfaces/generic-api-response';
+import { Project } from '$app/common/interfaces/project';
+import { Page } from '$app/components/Breadcrumbs';
+import { InfoCard } from '$app/components/InfoCard';
+import { Spinner } from '$app/components/Spinner';
+import { Link } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
+import { calculateTime } from '$app/pages/tasks/common/helpers/calculate-time';
+import { useTranslation } from 'react-i18next';
+import { useQuery } from 'react-query';
+import { useParams } from 'react-router-dom';
+import duration from 'dayjs/plugin/duration';
+import dayjs from 'dayjs';
+
+dayjs.extend(duration);
 
 export default function Show() {
   const { documentTitle } = useTitle('project');
+  const { t } = useTranslation();
+  const { id } = useParams();
+  const { dateFormat } = useCurrentCompanyDateFormats();
 
-  return <Default title={documentTitle}></Default>;
+  const pages: Page[] = [
+    { name: t('projects'), href: '/projects' },
+    { name: t('project'), href: route('/projects/:id', { id }) },
+  ];
+
+  const { data: project } = useQuery({
+    queryKey: ['/api/v1/projects', `/api/v1/projects/${id}`],
+    queryFn: () =>
+      request(
+        'GET',
+        endpoint(`/api/v1/projects/${id}?include=client,tasks`)
+      ).then(
+        (response: GenericSingleResourceResponse<Project>) => response.data.data
+      ),
+    staleTime: Infinity,
+  });
+
+  if (!project) {
+    return (
+      <Default title={documentTitle} breadcrumbs={pages}>
+        <Spinner />
+      </Default>
+    );
+  }
+
+  const duration = () => {
+    let duration = 0;
+
+    project.tasks?.map((task) => {
+      duration += parseInt(calculateTime(task.time_log, { inSeconds: true }));
+    });
+
+    return dayjs.duration(duration, 'seconds').format('HH:mm:ss');
+  };
+
+  return (
+    <Default title={documentTitle} breadcrumbs={pages}>
+      <div className="grid grid-cols-3 gap-4">
+        <InfoCard title={t('details')}>
+          <Link
+            className="block"
+            to={route('/clients/:id', { id: project.client_id })}
+          >
+            {project.client?.display_name}
+          </Link>
+
+          {project.due_date.length > 0 && (
+            <p>
+              {t('due_date')}: {date(project.due_date, dateFormat)}
+            </p>
+          )}
+
+          <p>
+            {t('budgeted_hours')}: {project.budgeted_hours}
+          </p>
+
+          <p>
+            {t('task_rate')}: {project.task_rate}
+          </p>
+        </InfoCard>
+
+        <InfoCard title={t('notes')}>
+          <p>{project.public_notes}</p>
+        </InfoCard>
+
+        <InfoCard title={t('summary')}>
+          <p>
+            {t('tasks')}: {project.tasks?.length}
+          </p>
+
+          <p>
+            {t('duration')}: {duration()}
+          </p>
+        </InfoCard>
+      </div>
+    </Default>
+  );
 }
