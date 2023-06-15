@@ -9,6 +9,7 @@
  */
 
 import { Client } from './client';
+import { Task } from './task';
 
 export interface Project {
   id: string;
@@ -32,5 +33,6 @@ export interface Project {
   custom_value4: string;
   color: string;
   documents: any[];
-  client: Client;
+  client?: Client;
+  tasks?: Task[];
 }
