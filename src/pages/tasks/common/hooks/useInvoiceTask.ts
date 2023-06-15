@@ -27,7 +27,6 @@ import { invoiceAtom } from '$app/pages/invoices/common/atoms';
 import { route } from '$app/common/helpers/route';
 import { useTranslation } from 'react-i18next';
 import { toast } from '$app/common/helpers/toast/toast';
-import { useFetchProjectQuery } from '$app/common/queries/projects';
 import { useCompanyTimeFormat } from '$app/common/hooks/useCompanyTimeFormat';
 
 export function useInvoiceTask() {
@@ -39,7 +38,6 @@ export function useInvoiceTask() {
   const { timeFormat } = useCompanyTimeFormat();
   const { data } = useBlankInvoiceQuery();
 
-  const fetchProjectDetails = useFetchProjectQuery();
 
   const [, setInvoice] = useAtom(invoiceAtom);
 
