@@ -8,11 +8,16 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { Button, InputField, SelectField } from '$app/components/forms';
-import { Modal } from '$app/components/Modal';
+import dayjs from 'dayjs';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { Calendar } from 'react-feather';
 import { useTranslation } from 'react-i18next';
+import { DatePicker } from 'antd';
+import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
+import customParseFormat from 'dayjs/plugin/customParseFormat'
+import { SelectField } from './forms';
+import { dayJSLocaleAtom } from '$app/App';
+import { useAtomValue } from 'jotai';
 
 type Props = {
   startDate: string;
@@ -23,6 +28,7 @@ type Props = {
 export function DropdownDateRangePicker(props: Props) {
   const [t] = useTranslation();
   const [isOpenModal, setisOpenModal] = useState(false);
+  const { RangePicker } = DatePicker;
 
   const now = new Date();
   const quarter = Math.floor(now.getMonth() / 3);
@@ -30,13 +36,25 @@ export function DropdownDateRangePicker(props: Props) {
   const [customStartDate, setCustomStartDate] = useState<string>();
   const [customEndDate, setCustomEndDate] = useState<string>();
 
+  const { dateFormat } = useCurrentCompanyDateFormats();
+  const locale = useAtomValue(dayJSLocaleAtom);
+
   useEffect(() => {
     setCustomStartDate(props.startDate);
     setCustomEndDate(props.endDate);
   }, [props.startDate, props.endDate]);
 
+  const handleCustomDateChange = (value: [string, string]) => {
+    dayjs.extend(customParseFormat)    
+    if(value[0] === '' || value[1] === '') {
+      return;
+    }
+
+    props.handleDateChange(dayjs(value[0]).format('YYYY-MM-DD') + ',' + dayjs(value[1]).format('YYYY-MM-DD'));
+  }
+
   return (
-    <div className="  flex justify-end items-center">
+    <div className="flex justify-end items-center">
       <Calendar className="mx-2" />{' '}
       <SelectField
         defaultValue={props.startDate + '/' + props.startDate}
@@ -48,6 +66,7 @@ export function DropdownDateRangePicker(props: Props) {
           if (event.target.value === 'Custom') {
             setisOpenModal(true);
           } else {
+            setisOpenModal(false);
             props.handleDateChange(event.target.value);
           }
         }}
@@ -151,47 +170,16 @@ export function DropdownDateRangePicker(props: Props) {
         </option>
         <option value={'Custom'}>{`${t('custom_range')}`}</option>
       </SelectField>
-      <Modal
-        title={t('custom_range')}
-        visible={isOpenModal}
-        onClose={() => {
-          setisOpenModal(false);
-        }}
-        overflowVisible
-      >
-        <div className="flex justify-center flex-col my-3">
-          <InputField
-            type="date"
-            label={`${t('start')} ${t('date')}`}
-            value={customStartDate}
-            onValueChange={(value) => setCustomStartDate(value)}
-          />
-
-          <br></br>
-
-          <InputField
-            type="date"
-            label={`${t('end')} ${t('date')}`}
-            value={customEndDate}
-            onValueChange={(value) => setCustomEndDate(value)}
-          />
-
-          <br></br>
-
-          <Button
-            className="my-2"
-            type="primary"
-            disableWithoutIcon
-            disabled={!customStartDate || !customEndDate}
-            onClick={() => {
-              props.handleDateChange(customStartDate + ',' + customEndDate);
-              setisOpenModal(false);
-            }}
-          >
-            {t('ok')}
-          </Button>
-        </div>
-      </Modal>
+          {isOpenModal &&(
+            <div className="flex flex-row space-x-2">
+              <RangePicker
+                size="large"
+                defaultValue={[dayjs(customStartDate), dayjs(customEndDate)]}
+                format={dateFormat}
+                onChange={(dates, dateString) => handleCustomDateChange(dateString) }
+              />
+            </div>
+          )}
     </div>
   );
 }
