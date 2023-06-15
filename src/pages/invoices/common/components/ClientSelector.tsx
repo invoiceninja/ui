@@ -58,7 +58,7 @@ export function ClientSelector(props: Props) {
   return (
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex  flex-col justify-between space-y-2">
-        {hasPermission('view_client') && (
+        {hasPermission('view_client') ? (
           <Selector
             inputLabel={t('client')}
             onChange={(client) => props.onChange(client.id)}
@@ -70,9 +70,7 @@ export function ClientSelector(props: Props) {
             errorMessage={props.errorMessage}
             disableWithSpinner={props.disableWithSpinner}
           />
-        )}
-
-        {!hasPermission('view_client') && (
+        ) : (
           <p className="text-gray-900 text-sm">
             {resource?.client?.display_name}
           </p>
