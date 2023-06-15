@@ -33,7 +33,11 @@ export function Preferences() {
     <Card title={t('preferences')}>
       <Element leftSide={t('show_pdf_preview')}>
         <Toggle
-          checked={reactSettings.show_pdf_preview}
+          checked={
+            typeof reactSettings.show_pdf_preview === 'boolean'
+              ? reactSettings.show_pdf_preview
+              : true
+          }
           onValueChange={(value) =>
             handleChange('company_user.react_settings.show_pdf_preview', value)
           }

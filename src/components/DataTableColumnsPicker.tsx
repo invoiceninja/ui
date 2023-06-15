@@ -34,6 +34,8 @@ import {
   DropResult,
 } from '@hello-pangea/dnd';
 import { arrayMoveImmutable } from 'array-move';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import { useInjectUserChanges } from '$app/common/hooks/useInjectUserChanges';
 
 interface Props {
   columns: string[];
@@ -51,12 +53,15 @@ export function DataTableColumnsPicker(props: Props) {
   const { t } = useTranslation();
   const { table, defaultColumns } = props;
 
+  useInjectUserChanges();
+
+  const reactSettings = useReactSettings();
+
   const [filteredColumns, setFilteredColumns] = useState(props.columns);
 
   const [currentColumns, setCurrentColumns] = useState<string[]>(
-    currentUser?.company_user?.settings?.react_table_columns?.[
-      table as ReactTableColumns
-    ] || defaultColumns
+    reactSettings?.react_table_columns?.[table as ReactTableColumns] ||
+      defaultColumns
   );
 
   const [isModalVisible, setIsModalVisible] = useState(false);
@@ -76,7 +81,7 @@ export function DataTableColumnsPicker(props: Props) {
 
     set(
       user,
-      `company_user.settings.react_table_columns.${table}`,
+      `company_user.react_settings.react_table_columns.${table}`,
       currentColumns
     );
 
