@@ -111,7 +111,7 @@ export function useProjectColumns() {
       id: 'name',
       label: t('name'),
       format: (value, project) => (
-        <Link to={route('/projects/:id/edit', { id: project.id })}>
+        <Link to={route('/projects/:id', { id: project.id })}>
           {value}
         </Link>
       ),
