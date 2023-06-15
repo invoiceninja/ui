@@ -16,6 +16,7 @@ import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 import dayjs from 'dayjs';
 import { useAtom } from 'jotai';
 import { lastPasswordEntryTimeAtom } from '$app/common/atoms/password-confirmation';
+import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 
 interface Props {
   show?: boolean;
@@ -28,7 +29,8 @@ export function PasswordConfirmation(props: Props) {
   const navigate = useNavigate();
   const location = useLocation();
   const company = useCurrentCompany();
-
+  const user = useCurrentUser();
+  
   const [isModalOpen, setIsModalOpen] = useState(props.show ?? false);
   const [currentPassword, setCurrentPassword] = useState('');
 
@@ -59,7 +61,7 @@ export function PasswordConfirmation(props: Props) {
   };
 
   useEffect(() => {
-    if (isModalOpen && !isPasswordTimeoutExpired) {
+    if (isModalOpen && !isPasswordTimeoutExpired || (!user?.has_password && user?.oauth_provider_id && user.oauth_provider_id.length > 1)) {
       handleConfirm();
     }
   }, [isModalOpen]);
