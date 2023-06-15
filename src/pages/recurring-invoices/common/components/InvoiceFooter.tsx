@@ -25,6 +25,8 @@ import { ProjectSelector } from '$app/components/projects/ProjectSelector';
 import { UserSelector } from '$app/components/users/UserSelector';
 import { VendorSelector } from '$app/components/vendors/VendorSelector';
 import { route } from '$app/common/helpers/route';
+import Toggle from '$app/components/forms/Toggle';
+import { DesignSelector } from '$app/common/generic/DesignSelector';
 
 interface Props {
   handleChange: ChangeHandler;
@@ -123,6 +125,18 @@ export function InvoiceFooter(props: Props) {
                   handleChange('exchange_rate', parseFloat(value))
                 }
               />
+
+              <div className="space-y-2">
+                <DesignSelector
+                  inputLabel={t('design')}
+                  value={recurringInvoice?.design_id}
+                  onChange={(design) => handleChange('design_id', design.id)}
+                  clearButton={Boolean(recurringInvoice?.design_id)}
+                  onClearButtonClick={() => handleChange('design_id', '')}
+                  disableWithQueryParameter
+                />
+              </div>
+
             </div>
 
             <div className="col-span-12 lg:col-span-6 space-y-6">
@@ -141,7 +155,16 @@ export function InvoiceFooter(props: Props) {
                   onChange={(vendor) => handleChange('vendor_id', vendor.id)}
                 />
               </div>
+
+              <div className="pt-9">
+                <Toggle
+                  label={t('inclusive_taxes')}
+                  checked={recurringInvoice?.uses_inclusive_taxes || false}
+                  onChange={(value) => handleChange('uses_inclusive_taxes', value)}
+                />
+              </div>
             </div>
+
           </div>
         </div>
       </TabGroup>
