@@ -101,6 +101,7 @@ export function useActions() {
       ...(invoice as unknown as RecurringInvoice),
       number: '',
       documents: [],
+      frequency_id: '5'
     });
 
     navigate('/recurring_invoices/create?action=clone');
