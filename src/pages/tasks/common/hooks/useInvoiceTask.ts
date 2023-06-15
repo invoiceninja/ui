@@ -96,7 +96,7 @@ export function useInvoiceTask() {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 
-        logs.forEach(([start, stop, , billable]) => {
+        logs.forEach(([start, stop, interval_description, billable]) => {
           if (
             billable ||
             !company?.settings.allow_billable_task_items ||
@@ -115,26 +115,25 @@ export function useInvoiceTask() {
               hoursDescription = `• ${hours} ${t('hours')}`;
             }
 
-            const start_date_log = `${dayjs.unix(start).format(`${dateFormat}`)}`;
-            const start_time_log = `${dayjs.unix(start).format(`${timeFormat}`)}`;
-            const end_time_log = `${dayjs.unix(stop).format(`${timeFormat}`)}`;
-
             const description = [];
 
             if(company.invoice_task_datelog || company.invoice_task_timelog)
               description.push('<div class="task-time-details">');
 
             if (company.invoice_task_datelog)
-              description.push(start_date_log);
+              description.push(dayjs.unix(start).format(dateFormat));
 
             if (company.invoice_task_timelog)
-              description.push(start_time_log + ' - ');
+              description.push(dayjs.unix(start).format(timeFormat) + ' - ');
 
             if (company.invoice_task_timelog)
-              description.push(end_time_log);
+              description.push(dayjs.unix(stop).format(timeFormat));
 
             if (company.invoice_task_hours)
               description.push(hoursDescription);
+
+            if (company.invoice_task_item_description)
+              description.push(interval_description);
 
             if (company.invoice_task_datelog || company.invoice_task_timelog)
               description.push('</div>\n');
@@ -158,12 +157,11 @@ export function useInvoiceTask() {
         };
         
         const project_name = (company.invoice_task_project && task?.project?.name) ? '## ' + task.project?.name + '\n' : '';
-        const task_description = company.invoice_task_item_description ? '### ' + task?.description + '\n' : '';
 
         if (parsed.length) {
 
           item.notes = 
-            project_name + task_description + ' ' + parsed.join(' ');
+            project_name + '### ' + task?.description + ' ' + parsed.join(' ');
         }
 
         invoice.line_items = parsed.length ? [item] : [];
