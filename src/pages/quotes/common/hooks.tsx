@@ -51,7 +51,6 @@ import { route } from '$app/common/helpers/route';
 import { useDispatch } from 'react-redux';
 import { useInjectCompanyChanges } from '$app/common/hooks/useInjectCompanyChanges';
 import { updateRecord } from '$app/common/stores/slices/company-users';
-import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { DataTableColumnsExtended } from '$app/pages/invoices/common/hooks/useInvoiceColumns';
 import { QuoteStatus as QuoteStatusBadge } from '../common/components/QuoteStatus';
 import { Link } from '$app/components/forms';
@@ -87,6 +86,7 @@ import { EntityState } from '$app/common/enums/entity-state';
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export type ChangeHandler = <T extends keyof Quote>(
   property: T,
@@ -552,10 +552,10 @@ export function useQuoteColumns() {
   const accentColor = useAccentColor();
   const navigate = useNavigate();
 
-  const currentUser = useCurrentUser();
   const company = useCurrentCompany();
   const formatMoney = useFormatMoney();
   const resolveCountry = useResolveCountry();
+  const reactSettings = useReactSettings();
 
   const quoteViewedAt = useCallback((quote: Quote) => {
     let viewed = '';
@@ -825,8 +825,7 @@ export function useQuoteColumns() {
   ];
 
   const list: string[] =
-    currentUser?.company_user?.settings?.react_table_columns?.quote ||
-    defaultColumns;
+    reactSettings?.react_table_columns?.quote || defaultColumns;
 
   return columns
     .filter((column) => list.includes(column.column))

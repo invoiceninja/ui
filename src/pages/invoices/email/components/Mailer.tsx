@@ -29,6 +29,7 @@ import { forwardRef, RefObject, useImperativeHandle, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isHosted, isSelfHosted } from '$app/common/helpers';
 import { MarkdownEditor } from '$app/components/forms/MarkdownEditor';
+import { useReactSettings } from '$app/common/hooks/useReactSettings';
 
 export type MailerResourceType =
   | 'invoice'
@@ -56,6 +57,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
   const [subject, setSubject] = useState('');
   const [body, setBody] = useState('');
   const [ccEmail, setCcEmail] = useState('');
+  const reactSettings = useReactSettings();
 
   const isCcEmailAvailable =
     isSelfHosted() || (isHosted() && (proPlan() || enterprisePlan()));
@@ -174,7 +176,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
         </Card>
 
         {template && (
-          <Card style={{ height: 800 }} title={template.subject}>
+          <Card className="scale-y-100" title={template.subject}>
             <iframe
               srcDoc={generateEmailPreview(template.body, template.wrapper)}
               frameBorder="0"
@@ -186,7 +188,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
       </div>
 
       <div className="col-span-12 lg:col-span-7 bg-blue-300 h-max">
-        {props.resource && (
+        {props.resource && reactSettings?.show_pdf_preview && (
           <InvoiceViewer method="GET" link={pdfUrl(props.resource) as string} />
         )}
       </div>
