@@ -16,8 +16,6 @@ import { DatePicker } from 'antd';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import { SelectField } from './forms';
-import { dayJSLocaleAtom } from '$app/App';
-import { useAtomValue } from 'jotai';
 
 type Props = {
   startDate: string;
@@ -37,7 +35,6 @@ export function DropdownDateRangePicker(props: Props) {
   const [customEndDate, setCustomEndDate] = useState<string>();
 
   const { dateFormat } = useCurrentCompanyDateFormats();
-  const locale = useAtomValue(dayJSLocaleAtom);
 
   useEffect(() => {
     setCustomStartDate(props.startDate);
@@ -45,8 +42,8 @@ export function DropdownDateRangePicker(props: Props) {
   }, [props.startDate, props.endDate]);
 
   const handleCustomDateChange = (value: [string, string]) => {
-    dayjs.extend(customParseFormat)    
-    if(value[0] === '' || value[1] === '') {
+    dayjs.extend(customParseFormat)
+    if (value[0] === '' || value[1] === '') {
       return;
     }
 
@@ -170,16 +167,16 @@ export function DropdownDateRangePicker(props: Props) {
         </option>
         <option value={'Custom'}>{`${t('custom_range')}`}</option>
       </SelectField>
-          {isOpenModal &&(
-            <div className="flex flex-row space-x-2">
-              <RangePicker
-                size="large"
-                defaultValue={[dayjs(customStartDate), dayjs(customEndDate)]}
-                format={dateFormat}
-                onChange={(dates, dateString) => handleCustomDateChange(dateString) }
-              />
-            </div>
-          )}
+      {isOpenModal && (
+        <div className="flex flex-row space-x-2">
+          <RangePicker
+            size="large"
+            defaultValue={[dayjs(customStartDate), dayjs(customEndDate)]}
+            format={dateFormat}
+            onChange={(dates, dateString) => handleCustomDateChange(dateString)}
+          />
+        </div>
+      )}
     </div>
   );
 }
