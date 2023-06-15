@@ -8,12 +8,11 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date, isHosted, isSelfHosted } from '$app/common/helpers';
+import { date, isHosted } from '$app/common/helpers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
 import { useTranslation } from 'react-i18next';
-import { License } from '.';
 import { Card, Element } from '../../../../components/cards';
 import { Link } from '../../../../components/forms';
 
@@ -53,8 +52,6 @@ export function Plan() {
           </Link>
         </Element>
       )}
-
-      {isSelfHosted() && <License />}
     </Card>
   );
 }
