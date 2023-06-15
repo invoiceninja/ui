@@ -180,7 +180,7 @@ export function Totals() {
             </Button>
           </div>
 
-          <div className="flex justify-center sm:col-start-3 ">
+          <div className="flex flex-auto justify-center sm:col-start-3 ">
             <DropdownDateRangePicker
               handleDateChange={handleDateChange}
               startDate={body.start_date}

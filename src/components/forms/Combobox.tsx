@@ -276,7 +276,7 @@ interface ComboboxAsyncProps<T> {
   inputOptions: InputOptions;
   entryOptions: {
     id: string;
-    label: string;
+    label: string | ((entry: T) => string | JSX.Element);
     value: string;
   };
   readonly?: boolean;
@@ -327,7 +327,7 @@ export function ComboboxAsync<T = any>({
           response.data.data.map((entry) =>
             data.push({
               id: entry[entryOptions.id],
-              label: entry[entryOptions.label],
+              label: typeof entryOptions.label === 'string' ? entry[entryOptions.label] : entryOptions.label(entry),
               value: entry[entryOptions.value],
               resource: entry,
               eventType: 'external',
