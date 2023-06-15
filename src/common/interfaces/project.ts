@@ -8,6 +8,8 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
+import { Client } from './client';
+
 export interface Project {
   id: string;
   user_id: string;
@@ -30,4 +32,5 @@ export interface Project {
   custom_value4: string;
   color: string;
   documents: any[];
+  client: Client;
 }
