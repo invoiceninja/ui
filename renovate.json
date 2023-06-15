@@ -11,7 +11,7 @@
       "updateTypes": ["minor", "patch", "pin", "digest"]
     }
   ],
-  "prHourlyLimit": 5,
-  "prConcurrentLimit": 5,
+  "prHourlyLimit": 1,
+  "prConcurrentLimit": 1,
   "rangeStrategy": "auto"
 }
