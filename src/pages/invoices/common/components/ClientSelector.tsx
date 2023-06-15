@@ -107,7 +107,7 @@ export function ClientSelector(props: Props) {
               <p className="text-sm text-gray-700">{contact.email}</p>
 
               {resource.invitations.length >= 1 && (
-                <Link to={resource.invitations[0].link} external>
+                <Link to={`${resource.invitations[0].link}?silent=true&client_hash=${client.client_hash}`} external>
                   {t('view_in_portal')}
                 </Link>
               )}
