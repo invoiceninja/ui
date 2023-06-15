@@ -174,7 +174,7 @@ export const Mailer = forwardRef<MailerComponent, Props>((props, ref) => {
         </Card>
 
         {template && (
-          <Card style={{ height: 800 }} title={template.subject}>
+          <Card className="scale-y-100" title={template.subject}>
             <iframe
               srcDoc={generateEmailPreview(template.body, template.wrapper)}
               frameBorder="0"
