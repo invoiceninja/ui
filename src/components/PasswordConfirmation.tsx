@@ -61,7 +61,7 @@ export function PasswordConfirmation(props: Props) {
   };
 
   useEffect(() => {
-    if (isModalOpen && !isPasswordTimeoutExpired || (!user?.has_password && user?.oauth_provider_id && user.oauth_provider_id.length > 1)) {
+    if (isModalOpen && (!isPasswordTimeoutExpired || (!company?.oauth_password_required && user?.oauth_provider_id && user.oauth_provider_id.length > 1))) {
       handleConfirm();
     }
   }, [isModalOpen]);
