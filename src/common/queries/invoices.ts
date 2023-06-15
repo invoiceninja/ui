@@ -19,6 +19,8 @@ import { useHasPermission } from '$app/common/hooks/permissions/useHasPermission
 
 export interface GenericQueryOptions {
   enabled: boolean;
+  id?: string;
+  with?: string[];
 }
 
 export function useInvoiceQuery(params: { id: string | undefined }) {
