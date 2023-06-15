@@ -42,7 +42,20 @@ export function ProductSelector(props: Props) {
       <ComboboxAsync<Product>
         endpoint={new URL(endpoint('/api/v1/products?per_page=500'))}
         inputOptions={{ value: props.defaultValue ?? null }}
-        entryOptions={{ id: 'id', label: 'product_key', value: 'id' }}
+        entryOptions={{
+          id: 'id',
+          label: (product) => (
+            <div>
+              <p className="font-semibold">{product.product_key}</p>
+              <p className="text-sm text-gray-800 truncate">
+                {product.notes.length > 35
+                  ? product.notes.substring(0, 35).concat('...')
+                  : product.notes}
+              </p>
+            </div>
+          ),
+          value: 'id',
+        }}
         onChange={(product) => props.onChange && props.onChange(product)}
         action={{
           label: t('new_product'),
