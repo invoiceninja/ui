@@ -29,6 +29,7 @@ import {
   handleTaskDateChange,
   handleTaskDurationChange,
   handleTaskTimeChange,
+  parseTime,
   parseTimeToDate,
 } from '$app/pages/tasks/common/helpers';
 import {
@@ -131,9 +132,11 @@ export function EditSlider() {
               }
             />
 
-            <TimePicker
+            <InputField
               label={t('start_time')}
-              value={timeLog[timeLogIndex!][LogPosition.Start]}
+              type="time"
+              step="1"
+              value={parseTime(timeLog[timeLogIndex!][LogPosition.Start])}
               onValueChange={(value) =>
                 handleTimeChange(
                   timeLog[timeLogIndex!][LogPosition.Start],
@@ -160,9 +163,11 @@ export function EditSlider() {
               />
             )}
 
-            <TimePicker
+            <InputField
+              type="time"
+              step="1"
               label={t('end_time')}
-              value={timeLog[timeLogIndex!][LogPosition.End]}
+              value={parseTime(timeLog[timeLogIndex!][LogPosition.End])}
               onValueChange={(value) =>
                 handleTimeChange(
                   timeLog[timeLogIndex!][LogPosition.End],
