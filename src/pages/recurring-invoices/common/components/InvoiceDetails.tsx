@@ -59,9 +59,9 @@ export function InvoiceDetails(props: Props) {
             value={
               recurringInvoice?.next_send_date
                 ? dayjs(recurringInvoice?.next_send_date).format('YYYY-MM-DD')
-                : new Date().toISOString().split('T')[0]
+                : dayjs().format('YYYY-MM-DD')
             }
-            min={new Date().toISOString().split('T')[0]}
+            min={dayjs().format('YYYY-MM-DD')}
             errorMessage={props.errors?.errors.next_send_date}
           />
         </Element>
