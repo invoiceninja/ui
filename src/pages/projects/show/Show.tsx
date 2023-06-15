@@ -18,7 +18,7 @@ import { Project } from '$app/common/interfaces/project';
 import { Page } from '$app/components/Breadcrumbs';
 import { InfoCard } from '$app/components/InfoCard';
 import { Spinner } from '$app/components/Spinner';
-import { Link } from '$app/components/forms';
+import { Button, Link } from '$app/components/forms';
 import { Default } from '$app/components/layouts/Default';
 import { calculateTime } from '$app/pages/tasks/common/helpers/calculate-time';
 import { useTranslation } from 'react-i18next';
@@ -26,6 +26,10 @@ import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 import duration from 'dayjs/plugin/duration';
 import dayjs from 'dayjs';
+import { Dropdown } from '$app/components/dropdown/Dropdown';
+import { Inline } from '$app/components/Inline';
+import { ResourceActions } from '$app/components/ResourceActions';
+import { useActions } from '../common/hooks';
 
 dayjs.extend(duration);
 
@@ -52,6 +56,8 @@ export default function Show() {
     staleTime: Infinity,
   });
 
+  const actions = useActions();
+
   if (!project) {
     return (
       <Default title={documentTitle} breadcrumbs={pages}>
@@ -71,7 +77,21 @@ export default function Show() {
   };
 
   return (
-    <Default title={documentTitle} breadcrumbs={pages}>
+    <Default
+      title={documentTitle}
+      breadcrumbs={pages}
+      navigationTopRight={
+        <Inline>
+          <Button to={`/projects/${id}/edit`}>{t('edit_project')}</Button>
+
+          <ResourceActions
+            resource={project}
+            label={t('more_actions')}
+            actions={actions}
+          />
+        </Inline>
+      }
+    >
       <div className="grid grid-cols-3 gap-4">
         <InfoCard title={t('details')}>
           <Link
