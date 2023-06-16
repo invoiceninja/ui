@@ -71,6 +71,7 @@ import { useBulkAction } from '$app/pages/recurring-invoices/common/queries';
 import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import dayjs from 'dayjs';
 
 interface RecurringInvoiceUtilitiesProps {
   client?: Client;
@@ -307,6 +308,7 @@ export function useActions() {
       documents: [],
       number: '',
       due_date: '',
+      date: dayjs().format('YYYY-MM-DD')
     });
 
     navigate('/invoices/create?action=clone');
@@ -317,6 +319,7 @@ export function useActions() {
       ...(recurringInvoice as unknown as Quote),
       number: '',
       documents: [],
+      date: dayjs().format('YYYY-MM-DD')
     });
 
     navigate('/quotes/create?action=clone');
@@ -327,6 +330,7 @@ export function useActions() {
       ...(recurringInvoice as unknown as Credit),
       number: '',
       documents: [],
+      date: dayjs().format('YYYY-MM-DD')
     });
 
     navigate('/credits/create?action=clone');
@@ -337,6 +341,7 @@ export function useActions() {
       ...(recurringInvoice as unknown as PurchaseOrder),
       number: '',
       documents: [],
+      date: dayjs().format('YYYY-MM-DD')
     });
 
     navigate('/purchase_orders/create?action=clone');

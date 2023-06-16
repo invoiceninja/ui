@@ -58,6 +58,7 @@ import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
+import dayjs from 'dayjs';
 
 interface CreateProps {
   setErrors: (validationBag?: ValidationBag) => unknown;
@@ -389,7 +390,7 @@ export function useActions() {
   const [, setPurchaseOrder] = useAtom(purchaseOrderAtom);
 
   const cloneToPurchaseOrder = (purchaseOrder: PurchaseOrder) => {
-    setPurchaseOrder({ ...purchaseOrder, number: '', documents: [] });
+    setPurchaseOrder({ ...purchaseOrder, number: '', documents: [], date: dayjs().format('YYYY-MM-DD') });
 
     navigate('/purchase_orders/create?action=clone');
   };
