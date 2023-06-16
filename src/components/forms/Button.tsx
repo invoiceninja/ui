@@ -24,6 +24,7 @@ interface Props extends CommonProps {
   to?: string;
   behavior?: 'button' | 'submit';
   disableWithoutIcon?: boolean;
+  noBackgroundColor?: boolean;
 }
 
 const defaultProps: Props = {
@@ -37,7 +38,12 @@ export function Button(props: Props) {
   const accentColor = useAccentColor();
 
   const css: React.CSSProperties = {
-    backgroundColor: props.type === 'primary' ? accentColor : 'transparent',
+    backgroundColor:
+      props.type === 'primary'
+        ? accentColor
+        : props.noBackgroundColor
+        ? 'transparent'
+        : 'white',
     color:
       props.type !== 'primary' && props.type !== 'secondary' ? accentColor : '',
   };
