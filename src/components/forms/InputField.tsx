@@ -15,7 +15,6 @@ import { DebounceInput } from 'react-debounce-input';
 import { AiFillEye, AiFillEyeInvisible } from 'react-icons/ai';
 import CommonProps from '../../common/interfaces/common-props.interface';
 import { InputLabel } from './InputLabel';
-import { DatePicker } from '$app/components/forms/Datepicker';
 
 interface Props extends CommonProps {
   label?: string | null;
