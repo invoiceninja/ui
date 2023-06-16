@@ -18,6 +18,6 @@ export function openClientPortal(
   resource: Invoice | RecurringInvoice | Quote | Credit | PurchaseOrder
 ) {
   if (resource.invitations.length > 0) {
-    window.open(resource.invitations[0].link, '_blank')?.focus();
+    window.open(`${resource.invitations[0].link}?silent=true`, '_blank')?.focus();
   }
 }
