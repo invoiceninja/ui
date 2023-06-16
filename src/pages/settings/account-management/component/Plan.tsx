@@ -8,7 +8,7 @@
  * @license https://www.elastic.co/licensing/elastic-license
  */
 
-import { date, isHosted, isSelfHosted } from '$app/common/helpers';
+import { date, isDemo, isHosted, isSelfHosted } from '$app/common/helpers';
 import { useCurrentAccount } from '$app/common/hooks/useCurrentAccount';
 import { useCurrentCompanyDateFormats } from '$app/common/hooks/useCurrentCompanyDateFormats';
 import { useCurrentUser } from '$app/common/hooks/useCurrentUser';
@@ -54,7 +54,7 @@ export function Plan() {
         </Element>
       )}
 
-      {isSelfHosted() && <License />}
+      {isSelfHosted() && !isDemo() && <License />}
     </Card>
   );
 }
