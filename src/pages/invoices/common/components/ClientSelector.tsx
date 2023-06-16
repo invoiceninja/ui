@@ -28,6 +28,7 @@ interface Props {
   onContactCheckboxChange: (contactId: string, value: boolean) => unknown;
   errorMessage?: string | string[];
   disableWithSpinner?: boolean;
+  textOnly?: boolean;
 }
 
 export function ClientSelector(props: Props) {
@@ -59,17 +60,23 @@ export function ClientSelector(props: Props) {
     <Card className="col-span-12 xl:col-span-4 h-max" withContainer>
       <div className="flex  flex-col justify-between space-y-2">
         {hasPermission('view_client') ? (
-          <Selector
-            inputLabel={t('client')}
-            onChange={(client) => props.onChange(client.id)}
-            value={resource?.client_id}
-            readonly={props.readonly || !resource}
-            clearButton={Boolean(resource?.client_id)}
-            onClearButtonClick={props.onClearButtonClick}
-            initiallyVisible={!resource?.client_id}
-            errorMessage={props.errorMessage}
-            disableWithSpinner={props.disableWithSpinner}
-          />
+          props.textOnly ? (
+            <p className="text-gray-900 text-sm">
+              {resource?.client?.display_name}
+            </p>
+          ) : (
+            <Selector
+              inputLabel={t('client')}
+              onChange={(client) => props.onChange(client.id)}
+              value={resource?.client_id}
+              readonly={props.readonly || !resource}
+              clearButton={Boolean(resource?.client_id)}
+              onClearButtonClick={props.onClearButtonClick}
+              initiallyVisible={!resource?.client_id}
+              errorMessage={props.errorMessage}
+              disableWithSpinner={props.disableWithSpinner}
+            />
+          )
         ) : (
           <p className="text-gray-900 text-sm">
             {resource?.client?.display_name}
