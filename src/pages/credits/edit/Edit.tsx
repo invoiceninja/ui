@@ -118,6 +118,7 @@ export default function Edit() {
           onContactCheckboxChange={handleInvitationChange}
           errorMessage={errors?.errors.client_id}
           readonly
+          textOnly
         />
 
         <CreditDetails handleChange={handleChange} errors={errors} />

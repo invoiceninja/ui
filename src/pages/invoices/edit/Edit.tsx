@@ -129,6 +129,7 @@ export default function Edit() {
           onClearButtonClick={() => handleChange('client_id', '')}
           onContactCheckboxChange={handleInvitationChange}
           errorMessage={errors?.errors.client_id}
+          textOnly
           readonly
         />
 
