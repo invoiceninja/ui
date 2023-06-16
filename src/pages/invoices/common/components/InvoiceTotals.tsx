@@ -20,10 +20,11 @@ import { CustomSurchargeField } from '$app/components/CustomSurchargeField';
 import { TaxRateSelector } from '$app/components/tax-rates/TaxRateSelector';
 import { InvoiceSum } from '$app/common/helpers/invoices/invoice-sum';
 import { ProductTableResource, RelationType } from './ProductsTable';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 
 interface Props {
   resource: ProductTableResource;
-  invoiceSum?: InvoiceSum;
+  invoiceSum?: InvoiceSum | InvoiceSumInclusive;
   relationType: RelationType;
   onChange: (property: keyof ProductTableResource, value: unknown) => unknown;
 }

@@ -33,12 +33,14 @@ import { CreditDetails } from '../common/components/CreditDetails';
 import { CreditFooter } from '../common/components/CreditFooter';
 import { useCreate, useCreditUtilities } from '../common/hooks';
 import { useBlankCreditQuery } from '../common/queries';
+import { useCurrentCompany } from '$app/common/hooks/useCurrentCompany';
 
 export default function Create() {
   const { documentTitle } = useTitle('new_credit');
   const { t } = useTranslation();
 
   const reactSettings = useReactSettings();
+  const company = useCurrentCompany();
 
   const pages: Page[] = [
     { name: t('credits'), href: '/credits' },
@@ -99,6 +101,8 @@ export default function Create() {
         if (searchParams.get('client')) {
           _credit.client_id = searchParams.get('client')!;
         }
+
+        _credit.uses_inclusive_taxes = company?.settings?.inclusive_taxes ?? false;
 
         value = _credit;
       }

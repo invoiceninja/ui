@@ -83,6 +83,7 @@ import { useScheduleEmailRecord } from '$app/pages/invoices/common/hooks/useSche
 import { usePrintPdf } from '$app/pages/invoices/common/hooks/usePrintPdf';
 import { EntityState } from '$app/common/enums/entity-state';
 import { isDeleteActionTriggeredAtom } from '$app/pages/invoices/common/components/ProductsTable';
+import { InvoiceSumInclusive } from '$app/common/helpers/invoices/invoice-sum-inclusive';
 import { useReactSettings } from '$app/common/hooks/useReactSettings';
 import dayjs from 'dayjs';
 
@@ -177,7 +178,8 @@ export function useCreditUtilities(props: CreditUtilitiesProps) {
     );
 
     if (currency && credit) {
-      const invoiceSum = new InvoiceSum(credit, currency).build();
+      
+      const invoiceSum = credit.uses_inclusive_taxes ? new InvoiceSumInclusive(credit, currency).build() : new InvoiceSum(credit, currency).build();
 
       setInvoiceSum(invoiceSum);
     }
