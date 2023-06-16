@@ -327,7 +327,10 @@ export function ComboboxAsync<T = any>({
           response.data.data.map((entry) =>
             data.push({
               id: entry[entryOptions.id],
-              label: typeof entryOptions.label === 'string' ? entry[entryOptions.label] : entryOptions.label(entry),
+              label:
+                typeof entryOptions.label === 'string'
+                  ? entry[entryOptions.label]
+                  : entryOptions.label(entry),
               value: entry[entryOptions.value],
               resource: entry,
               eventType: 'external',

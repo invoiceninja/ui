@@ -38,7 +38,6 @@ export function useInvoiceTask() {
   const { timeFormat } = useCompanyTimeFormat();
   const { data } = useBlankInvoiceQuery();
 
-
   const [, setInvoice] = useAtom(invoiceAtom);
 
   const calculateTaskHours = (timeLog: string) => {
@@ -96,7 +95,7 @@ export function useInvoiceTask() {
         const logs = parseTimeLog(task.time_log);
         const parsed: string[] = [];
 
-        logs.forEach(([start, stop, interval_description, billable]) => {
+        logs.forEach(([start, stop, intervalDescription, billable]) => {
           if (
             billable ||
             !company?.settings.allow_billable_task_items ||
@@ -117,32 +116,35 @@ export function useInvoiceTask() {
 
             const description = [];
 
-            if(company.invoice_task_datelog || company.invoice_task_timelog)
+            if (company.invoice_task_datelog || company.invoice_task_timelog) {
               description.push('<div class="task-time-details">');
+            }
 
-            if (company.invoice_task_datelog)
+            if (company.invoice_task_datelog) {
               description.push(dayjs.unix(start).format(dateFormat));
+            }
 
-            if (company.invoice_task_timelog)
+            if (company.invoice_task_timelog) {
               description.push(dayjs.unix(start).format(timeFormat) + ' - ');
+            }
 
-            if (company.invoice_task_timelog)
+            if (company.invoice_task_timelog) {
               description.push(dayjs.unix(stop).format(timeFormat));
+            }
 
-            if (company.invoice_task_hours)
+            if (company.invoice_task_hours) {
               description.push(hoursDescription);
+            }
 
-            if (company.invoice_task_item_description)
-              description.push(interval_description);
+            if (company.invoice_task_item_description) {
+              description.push(intervalDescription);
+            }
 
-            if (company.invoice_task_datelog || company.invoice_task_timelog)
+            if (company.invoice_task_datelog || company.invoice_task_timelog) {
               description.push('</div>\n');
-              
-            console.log(description);
+            }
 
-            parsed.push(
-              description.join(' '),
-            );
+            parsed.push(description.join(' '));
           }
         });
 
@@ -155,13 +157,15 @@ export function useInvoiceTask() {
           quantity: taskQuantity,
           line_total: Number((task.rate * taskQuantity).toFixed(2)),
         };
-        
-        const project_name = (company.invoice_task_project && task?.project?.name) ? '## ' + task.project?.name + '\n' : '';
+
+        const projectName =
+          company.invoice_task_project && task?.project?.name
+            ? '## ' + task.project?.name + '\n'
+            : '';
 
         if (parsed.length) {
-
-          item.notes = 
-            project_name + '### ' + task?.description + ' ' + parsed.join(' ');
+          item.notes =
+            projectName + '### ' + task?.description + ' ' + parsed.join(' ');
         }
 
         invoice.line_items = parsed.length ? [item] : [];

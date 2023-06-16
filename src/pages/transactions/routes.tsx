@@ -50,10 +50,8 @@ export const transactionRoutes = (
         <Guard
           guards={[
             enabled(ModuleBitmask.Transactions),
-              or(
-                permission('create_bank_transaction'),
-              ),
-            ]}
+            or(permission('create_bank_transaction')),
+          ]}
           component={<CreateTransaction />}
         />
       }

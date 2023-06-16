@@ -136,7 +136,6 @@ export function InvoiceFooter(props: Props) {
                   disableWithQueryParameter
                 />
               </div>
-
             </div>
 
             <div className="col-span-12 lg:col-span-6 space-y-6">
@@ -160,11 +159,12 @@ export function InvoiceFooter(props: Props) {
                 <Toggle
                   label={t('inclusive_taxes')}
                   checked={recurringInvoice?.uses_inclusive_taxes || false}
-                  onChange={(value) => handleChange('uses_inclusive_taxes', value)}
+                  onChange={(value) =>
+                    handleChange('uses_inclusive_taxes', value)
+                  }
                 />
               </div>
             </div>
-
           </div>
         </div>
       </TabGroup>

@@ -36,13 +36,11 @@ export function Settings() {
 
   const handleChange = useHandleCurrentCompanyChange();
 
-  const [, setHasLanguageIdChanged] = useAtom(
-    hasLanguageChanged
-  );
+  const [, setHasLanguageIdChanged] = useAtom(hasLanguageChanged);
 
   const handleLanguageChange = (event: ChangeEvent<HTMLInputElement>) => {
     setHasLanguageIdChanged(true);
-    handleChange(event);    
+    handleChange(event);
   };
 
   const currencyFormats = [

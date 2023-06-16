@@ -30,7 +30,9 @@ export function useHandleCompanySave() {
   const [, setErrors] = useAtom(companySettingsErrorsAtom);
 
   const [updatingRecords, setUpdatingRecords] = useAtom(updatingRecordsAtom);
-  const [hasLanguageChanged, setHasLanguageIdChanged] = useAtom(hasLanguageChangedAtom);
+  const [hasLanguageChanged, setHasLanguageIdChanged] = useAtom(
+    hasLanguageChangedAtom
+  );
 
   return () => {
     toast.processing();
@@ -44,7 +46,6 @@ export function useHandleCompanySave() {
     )
       .then((response) => {
         dispatch(updateRecord({ object: 'company', data: response.data.data }));
-
 
         toast.dismiss();
 

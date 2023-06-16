@@ -30,7 +30,7 @@ export function PasswordConfirmation(props: Props) {
   const location = useLocation();
   const company = useCurrentCompany();
   const user = useCurrentUser();
-  
+
   const [isModalOpen, setIsModalOpen] = useState(props.show ?? false);
   const [currentPassword, setCurrentPassword] = useState('');
 
@@ -61,7 +61,13 @@ export function PasswordConfirmation(props: Props) {
   };
 
   useEffect(() => {
-    if (isModalOpen && (!isPasswordTimeoutExpired || (!company?.oauth_password_required && user?.oauth_provider_id && user.oauth_provider_id.length > 1))) {
+    if (
+      isModalOpen &&
+      (!isPasswordTimeoutExpired ||
+        (!company?.oauth_password_required &&
+          user?.oauth_provider_id &&
+          user.oauth_provider_id.length > 1))
+    ) {
       handleConfirm();
     }
   }, [isModalOpen]);

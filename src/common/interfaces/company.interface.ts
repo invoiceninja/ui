@@ -57,7 +57,6 @@ export interface Company {
   invoice_task_locked: boolean;
   invoice_task_documents: boolean;
   oauth_password_required: boolean;
-
 }
 
 export interface CompanyInput {
