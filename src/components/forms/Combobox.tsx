@@ -43,6 +43,7 @@ interface Action {
 interface ComboboxStaticProps<T = any> {
   inputOptions: InputOptions;
   entries: Entry<T>[];
+  entryOptions: EntryOptions;
   readonly?: boolean;
   nullable?: boolean;
   initiallyVisible?: boolean;
@@ -66,6 +67,7 @@ export function ComboboxStatic({
   onEmptyValues,
   onChange,
   onDismiss,
+  entryOptions,
 }: ComboboxStaticProps) {
   const [t] = useTranslation();
   const [selectedValue, setSelectedValue] = useState<Entry | null>(null);
@@ -228,7 +230,10 @@ export function ComboboxStatic({
                           selected && 'font-semibold'
                         )}
                       >
-                        {entry.label}
+                        {entry.resource &&
+                        typeof entryOptions.labelFn !== 'undefined'
+                          ? entryOptions.labelFn(entry.resource)
+                          : entry.label}
                       </span>
 
                       {selected && (
@@ -271,14 +276,17 @@ export function ComboboxStatic({
   );
 }
 
+interface EntryOptions {
+  id: string;
+  label: string;
+  value: string;
+  labelFn?: (resource: T) => string | JSX.Element;
+}
+
 interface ComboboxAsyncProps<T> {
   endpoint: URL;
   inputOptions: InputOptions;
-  entryOptions: {
-    id: string;
-    label: string | ((entry: T) => string | JSX.Element);
-    value: string;
-  };
+  entryOptions: EntryOptions;
   readonly?: boolean;
   staleTime?: number;
   initiallyVisible?: boolean;
@@ -308,8 +316,6 @@ export function ComboboxAsync<T = any>({
   const [entries, setEntries] = useState<Entry<T>[]>([]);
   const [url, setUrl] = useState(endpoint);
 
-  console.log(url.searchParams.toString());
-
   const { data } = useQuery(
     [url.pathname, url.searchParams.toString()],
     () => {
@@ -327,10 +333,7 @@ export function ComboboxAsync<T = any>({
           response.data.data.map((entry) =>
             data.push({
               id: entry[entryOptions.id],
-              label:
-                typeof entryOptions.label === 'string'
-                  ? entry[entryOptions.label]
-                  : entryOptions.label(entry),
+              label: entry[entryOptions.label],
               value: entry[entryOptions.value],
               resource: entry,
               eventType: 'external',
@@ -378,6 +381,7 @@ export function ComboboxAsync<T = any>({
       exclude={exclude}
       action={action}
       nullable={nullable}
+      entryOptions={entryOptions}
     />
   );
 }

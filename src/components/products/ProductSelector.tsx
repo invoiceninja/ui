@@ -44,7 +44,9 @@ export function ProductSelector(props: Props) {
         inputOptions={{ value: props.defaultValue ?? null }}
         entryOptions={{
           id: 'id',
-          label: (product) => (
+          label: 'product_key',
+          value: 'id',
+          labelFn: (product) => (
             <div>
               <p className="font-semibold">{product.product_key}</p>
               <p className="text-sm text-gray-800 truncate">
@@ -54,7 +56,6 @@ export function ProductSelector(props: Props) {
               </p>
             </div>
           ),
-          value: 'id',
         }}
         onChange={(product) => props.onChange && props.onChange(product)}
         action={{
