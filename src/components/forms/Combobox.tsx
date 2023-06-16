@@ -355,9 +355,7 @@ export function ComboboxAsync<T = any>({
 
   const onEmptyValues = (query: string) => {
     setUrl((current) => {
-      if (query.length > 0 && current) {
-        current.searchParams.set('filter', query);
-      }
+      current.searchParams.set('filter', query);
 
       return new URL(current.href);
     });
