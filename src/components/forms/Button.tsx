@@ -37,7 +37,7 @@ export function Button(props: Props) {
   const accentColor = useAccentColor();
 
   const css: React.CSSProperties = {
-    backgroundColor: props.type === 'primary' ? accentColor : 'white',
+    backgroundColor: props.type === 'primary' ? accentColor : 'transparent',
     color:
       props.type !== 'primary' && props.type !== 'secondary' ? accentColor : '',
   };
