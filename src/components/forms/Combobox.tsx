@@ -43,7 +43,7 @@ interface Action {
 interface ComboboxStaticProps<T = any> {
   inputOptions: InputOptions;
   entries: Entry<T>[];
-  entryOptions: EntryOptions;
+  entryOptions: EntryOptions<T>;
   readonly?: boolean;
   nullable?: boolean;
   initiallyVisible?: boolean;
@@ -276,7 +276,7 @@ export function ComboboxStatic({
   );
 }
 
-interface EntryOptions {
+interface EntryOptions<T = any> {
   id: string;
   label: string;
   value: string;
@@ -286,7 +286,7 @@ interface EntryOptions {
 interface ComboboxAsyncProps<T> {
   endpoint: URL;
   inputOptions: InputOptions;
-  entryOptions: EntryOptions;
+  entryOptions: EntryOptions<T>;
   readonly?: boolean;
   staleTime?: number;
   initiallyVisible?: boolean;
